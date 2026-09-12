@@ -131,6 +131,7 @@ import { ffaFormat } from "./ffa/arc.js";
 import { pogFormat } from "./ads/pog.js";
 import { irrlichtArkFormat } from "./irrlicht/ark.js";
 import { fl2Format } from "./aaru/fl2.js";
+import { fl3Format } from "./aaru/fl2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -377,5 +378,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pogFormat,
 		irrlichtArkFormat,
 		fl2Format,
+		fl3Format,
 	]);
 }
