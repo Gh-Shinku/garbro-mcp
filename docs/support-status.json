@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"baselineCommit": "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
+	"defaultStatus": "not-started",
+	"implementations": [
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "XP3",
+				"class": "Xp3Opener",
+				"source": "ArcFormats/KiriKiri/ArcXP3.cs"
+			},
+			"localId": "xp3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"standalone archives",
+				"raw and zlib indexes",
+				"continued indexes",
+				"raw and zlib file segments",
+				"multi-segment entries"
+			],
+			"unsupported": [
+				"game-specific encryption",
+				"obfuscated indexes",
+				"PEXP3 and executable embedding",
+				"archive creation"
+			]
+		}
+	]
+}

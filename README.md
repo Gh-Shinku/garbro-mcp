@@ -92,4 +92,5 @@ extracted by GARbro, matching path, size, and SHA-256. `fixtures/private/` is ex
 control.
 
 See [docs/formats/xp3.md](docs/formats/xp3.md) for XP3 format notes, implementation sources, and
-known limitations.
+known limitations. See [docs/support.md](docs/support.md) for the generated GARbro compatibility
+baseline, status definitions, and current migration progress.

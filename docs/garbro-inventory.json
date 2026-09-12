@@ -1,0 +1,8845 @@
+{
+	"schemaVersion": 1,
+	"generatedFrom": {
+		"project": "GARbro",
+		"repository": "https://github.com/morkt/GARbro.git",
+		"commit": "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0"
+	},
+	"counts": {
+		"archive": 606,
+		"image": 424,
+		"audio": 91,
+		"script": 11,
+		"total": 1132
+	},
+	"formats": [
+		{
+			"type": "archive",
+			"tag": "000/DESIRE",
+			"class": "D000Opener",
+			"source": "Legacy/Desire/ArcDSV.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "060/POG",
+			"class": "PogOpener",
+			"source": "ArcFormats/Ads/ArcPOG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "256/DMOTION",
+			"class": "PakOpener",
+			"source": "Legacy/DMotion/ArcDM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "A/Leaf",
+			"class": "AOpener",
+			"source": "ArcFormats/Leaf/ArcA.cs",
+			"extensions": [
+				"a"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "A5R",
+			"class": "A5rOpener",
+			"source": "Legacy/Pinky/ArcA5R.cs",
+			"extensions": [
+				"a5r",
+				"a5e"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "A98",
+			"class": "PakOpener",
+			"source": "ArcFormats/ActiveSoft/ArcADPACK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AAP",
+			"class": "AapOpener",
+			"source": "Legacy/Aquarium/ArcAAP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AAR",
+			"class": "AarOpener",
+			"source": "ArcFormats/AliceSoft/ArcAAR.cs",
+			"extensions": [
+				"red"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ABB/RAW",
+			"class": "RawOpener",
+			"source": "ArcFormats/Patisserie/ArcRAW.cs",
+			"extensions": [
+				"raw"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ABM",
+			"class": "AbmOpener",
+			"source": "ArcFormats/Lilim/ArcABM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ABMP/QLIE",
+			"class": "AbmpOpener",
+			"source": "ArcFormats/Qlie/ArcABMP.cs",
+			"extensions": [
+				"b"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ABMP7",
+			"class": "Abmp7Opener",
+			"source": "ArcFormats/Qlie/ArcABMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ACV",
+			"class": "AcvOpener",
+			"source": "ArcFormats/NonColor/ArcACV.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ADPACK32",
+			"class": "Pak32Opener",
+			"source": "ArcFormats/ActiveSoft/ArcADPACK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ADS",
+			"class": "AdsOpener",
+			"source": "ArcFormats/BlackRainbow/ArcADS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AFA",
+			"class": "AfaOpener",
+			"source": "ArcFormats/AliceSoft/ArcAFA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AFS",
+			"class": "AfsOpener",
+			"source": "ArcFormats/Cri/ArcAFS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AIR",
+			"class": "AirOpener",
+			"source": "ArcFormats/AIRNovel/ArcAIR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ALD",
+			"class": "AldOpener",
+			"source": "ArcFormats/AliceSoft/ArcALD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ALF",
+			"class": "AlfOpener",
+			"source": "ArcFormats/Eushully/ArcALF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ALK",
+			"class": "AlkOpener",
+			"source": "ArcFormats/AliceSoft/ArcALK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ALL/GIGA",
+			"class": "AllOpener",
+			"source": "Legacy/Giga/ArcALL.cs",
+			"extensions": [
+				"273"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AM/Leaf",
+			"class": "AmOpener",
+			"source": "ArcFormats/Leaf/ArcAM.cs",
+			"extensions": [
+				"am"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AM2",
+			"class": "Am2Opener",
+			"source": "ArcFormats/Valkyria/ArcAM2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AMI",
+			"class": "AmiOpener",
+			"source": "ArcFormats/Amaterasu/ArcAMI.cs",
+			"extensions": [
+				"ami",
+				"amr"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AMPV",
+			"class": "AmvOpener",
+			"source": "ArcFormats/BlueGale/VideoAMV.cs",
+			"extensions": [
+				"amv"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AN10/KAGUYA",
+			"class": "An10Opener",
+			"source": "ArcFormats/Kaguya/ArcANM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AN20/KAGUYA",
+			"class": "An20Opener",
+			"source": "ArcFormats/Kaguya/ArcANM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AN21/KAGUYA",
+			"class": "An21Opener",
+			"source": "ArcFormats/Kaguya/ArcAN21.cs",
+			"extensions": [
+				"anm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ANI",
+			"class": "AniOpener",
+			"source": "ArcFormats/AnimeGameSystem/ArcANI.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ANI/PAZ",
+			"class": "AniOpener",
+			"source": "ArcFormats/Musica/ArcANI.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ANIM/MARBLE",
+			"class": "AnimOpener",
+			"source": "ArcFormats/Marble/VideoANIM.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ANM/KAGUYA",
+			"class": "AnmOpener",
+			"source": "ArcFormats/Kaguya/ArcANM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AOIMY",
+			"class": "AoiMyOpener",
+			"source": "ArcFormats/Aoi/ArcBOX.cs",
+			"extensions": [
+				"box"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AOIMY/UNICODE",
+			"class": "AoiMyUnicodeOpener",
+			"source": "ArcFormats/Aoi/ArcBOX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AOS",
+			"class": "AosOpener",
+			"source": "ArcFormats/Lilim/ArcAOS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AOSv2",
+			"class": "Aos2Opener",
+			"source": "ArcFormats/Lilim/ArcAOS.cs",
+			"extensions": [
+				"aos"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "APP/Csystem",
+			"class": "AppOpener",
+			"source": "ArcFormats/Cyberworks/ArcAPP.cs",
+			"extensions": [
+				"appendix"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AQA",
+			"class": "AqaOpener",
+			"source": "Legacy/Unknown/ArcAQA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AR2",
+			"class": "Ar2Opener",
+			"source": "ArcFormats/Leaf/ArcAR2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AR2/IDX",
+			"class": "Ar2Opener",
+			"source": "Legacy/Kasane/ArcAR2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AR2/NEON",
+			"class": "Ar2Opener",
+			"source": "Legacy/Neon/ArcAR2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC",
+			"class": "PakOpener",
+			"source": "ArcFormats/DraftArc.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/~ARCHIVE",
+			"class": "ScenarioArcOpener",
+			"source": "ArcFormats/Carriere/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ADVENGINE",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Abel/ArcARC.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ADVSYS3",
+			"class": "ArcOpener",
+			"source": "ArcFormats/AdvSys/ArcAdvSys3.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AI5WIN",
+			"class": "ArcAI5Opener",
+			"source": "ArcFormats/elf/ArcAi5Win.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AI6WIN",
+			"class": "Ai6Opener",
+			"source": "ArcFormats/Silky/ArcAi6Win.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ApplePie",
+			"class": "ArcOpener",
+			"source": "Legacy/ApplePie/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AR",
+			"class": "ArcOpener",
+			"source": "ArcFormats/PalmTree/ArcAR.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ARC1",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Succubus/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/arcx",
+			"class": "ArcOpener",
+			"source": "Legacy/Pinpai/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ARI",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Kaguya/ArcKaguya.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AZ",
+			"class": "ArcOpener",
+			"source": "ArcFormats/AZSys/ArcAZSys.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AZ/encrypted",
+			"class": "ArcEncryptedOpener",
+			"source": "ArcFormats/AZSys/ArcEncrypted.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AZ/ISAAC",
+			"class": "ArcIsaacEncryptedOpener",
+			"source": "ArcFormats/AZSys/ArcEncrypted.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/AZURITE",
+			"class": "SilkyArcOpener",
+			"source": "ArcFormats/Silky/ArcAzurite.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/CARRIERE",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Carriere/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Csystem",
+			"class": "OldDatOpener",
+			"source": "ArcFormats/Cyberworks/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Csystem/2",
+			"class": "OldDatOpener2",
+			"source": "ArcFormats/Cyberworks/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Cyberworks",
+			"class": "DatOpener",
+			"source": "ArcFormats/Cyberworks/ArcDAT.cs",
+			"extensions": [
+				"dat",
+				"04",
+				"05",
+				"06",
+				"app"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/DAF",
+			"class": "DafOpener",
+			"source": "ArcFormats/Cadath/ArcDAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/FOMA",
+			"class": "ArcOpener",
+			"source": "Legacy/StudioFoma/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/KISS",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Kiss/ArcARC.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/KOGADO",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Kogado/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/LIBIDO",
+			"class": "ArcOpener",
+			"source": "Legacy/Libido/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/LIN2",
+			"class": "Lin2Opener",
+			"source": "ArcFormats/Kaguya/ArcLIN2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/LINK",
+			"class": "LinkOpener",
+			"source": "ArcFormats/Kaguya/ArcLINK.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/LSD",
+			"class": "LsdOpener",
+			"source": "ArcFormats/Gss/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/MICROVISION",
+			"class": "ArcOpener",
+			"source": "ArcFormats/MicroVision/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/noncolor",
+			"class": "DatOpener",
+			"source": "ArcFormats/NonColor/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ONE-UP",
+			"class": "ArcOpener",
+			"source": "ArcFormats/OneUp/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/REC",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Speed/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/RPM",
+			"class": "ArcOpener",
+			"source": "ArcFormats/RPM/ArcARC.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/SILKY'S",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Silky/ArcARC.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Tactics",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Tactics/ArcTactics.cs",
+			"extensions": [
+				"arc",
+				"adf"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Tactics/0",
+			"class": "YuOpener",
+			"source": "ArcFormats/Tactics/ArcYU.cs",
+			"extensions": [
+				".dll"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Tactics/2",
+			"class": "Arc2Opener",
+			"source": "ArcFormats/Tactics/ArcTactics.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/TYPES",
+			"class": "ArcOpener",
+			"source": "Legacy/Types/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/UF01",
+			"class": "UfOpener",
+			"source": "ArcFormats/Kaguya/ArcUF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Will",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Will/ArcWILL.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/WillV2",
+			"class": "Arc2Opener",
+			"source": "ArcFormats/Will/ArcPulltop.cs",
+			"extensions": [
+				"arc",
+				"ar2"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/WITCH",
+			"class": "ArcOpener",
+			"source": "Legacy/Witch/ArcARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/Xuse",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Xuse/ArcXuse.cs",
+			"extensions": [
+				"arc",
+				"xarc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC/ZENOS",
+			"class": "ZenosOpener",
+			"source": "ArcFormats/RPM/ArcZENOS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARC0",
+			"class": "Arc0Opener",
+			"source": "ArcFormats/Mixwill/ArcARC0.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC0/WILL",
+			"class": "Arc0Opener",
+			"source": "ArcFormats/Tanaka/ArcARC0.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC3",
+			"class": "Arc3Opener",
+			"source": "ArcFormats/CaramelBox/ArcARC3.cs",
+			"extensions": [
+				"bin",
+				"ar3",
+				"ac3"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARC4",
+			"class": "Arc4Opener",
+			"source": "ArcFormats/CaramelBox/ArcARC4.cs",
+			"extensions": [
+				"bin",
+				"dat",
+				"データ"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARCC",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Hexenhaus/ArcARCC.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARCG",
+			"class": "ArcGOpener",
+			"source": "ArcFormats/Tanaka/ArcARCG.cs",
+			"extensions": [
+				"arc",
+				"bmx",
+				"scb",
+				"vpk"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARCX",
+			"class": "ArcOpener",
+			"source": "ArcFormats/ArcARCX.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ARF",
+			"class": "ArfOpener",
+			"source": "Legacy/Logg/ArcARF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARK",
+			"class": "ArkOpener",
+			"source": "ArcFormats/Irrlicht/ArcARK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ARY",
+			"class": "AryOpener",
+			"source": "Legacy/Pearl/ArcARY.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ASD/KTOOL",
+			"class": "AsdKToolOpener",
+			"source": "Legacy/KApp/ArcASD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ASD/SPIEL",
+			"class": "AsdAudioOpener",
+			"source": "Legacy/KApp/ArcASD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ASSETS/UNITY",
+			"class": "UnityAssetOpener",
+			"source": "ArcFormats/Unity/ArcASSET.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AST",
+			"class": "ArcOpener",
+			"source": "ArcFormats/ArcAST.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AVC",
+			"class": "DatOpener",
+			"source": "ArcFormats/ArcAVC.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "AWF",
+			"class": "AwfOpener",
+			"source": "ArcFormats/Silky/ArcAWF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "AXR",
+			"class": "AxrOpener",
+			"source": "ArcFormats/VnEngine/ArcAXR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BCD",
+			"class": "BcdOpener",
+			"source": "Legacy/Ransel/ArcBCD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BDF",
+			"class": "BdfOpener",
+			"source": "ArcFormats/Zyx/ArcBDF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BDT",
+			"class": "BdtOpener",
+			"source": "ArcFormats/FC01/ArcBDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BG/Xuse",
+			"class": "BgOpener",
+			"source": "ArcFormats/Xuse/ArcNT.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BGI",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Ethornell/ArcBGI.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/?",
+			"class": "BinOpener",
+			"source": "ArcFormats/Misc/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/ABEL",
+			"class": "FilepakOpener",
+			"source": "ArcFormats/Abel/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/ACPXPK",
+			"class": "BinOpener",
+			"source": "ArcFormats/Favorite/ArcFVP.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/ARC1",
+			"class": "BinOpener",
+			"source": "Legacy/Alterna/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/Dogenzaka",
+			"class": "BinOpener",
+			"source": "ArcFormats/Dogenzaka/ArcBIN.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/Dogenzaka/2",
+			"class": "GamedatOpener",
+			"source": "ArcFormats/Dogenzaka/ArcBIN.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/DXLIB",
+			"class": "Dx8Opener",
+			"source": "ArcFormats/DxLib/ArcDX8.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/EBG_SYSTEM",
+			"class": "BinOpener",
+			"source": "Legacy/EbgSystem/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/ESC-ARC",
+			"class": "BinOpener",
+			"source": "ArcFormats/Escude/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/FVP",
+			"class": "Bin2Opener",
+			"source": "ArcFormats/Favorite/ArcBIN.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/HED",
+			"class": "PakOpener",
+			"source": "ArcFormats/elf/ArcHED.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/IDX",
+			"class": "BinOpener",
+			"source": "ArcFormats/Unity/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/MUGI",
+			"class": "BinOpener",
+			"source": "ArcFormats/Mugi/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/ODIO",
+			"class": "BinOpener",
+			"source": "ArcFormats/Hexenhaus/ArcODIO.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/OZ",
+			"class": "BinOpener",
+			"source": "ArcFormats/Patisserie/ArcBIN.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/PAC",
+			"class": "BinOpener",
+			"source": "ArcFormats/DigitalWorks/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/RAIN",
+			"class": "BinOpener",
+			"source": "Legacy/Rain/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/RFIL",
+			"class": "BinOpener",
+			"source": "ArcFormats/TechGian/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/UME",
+			"class": "BinOpener",
+			"source": "Legacy/UMeSoft/ArcBIN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BIN/Xuse",
+			"class": "BinOpener",
+			"source": "ArcFormats/Xuse/ArcBIN.cs",
+			"extensions": [
+				"bin",
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BMX",
+			"class": "BmxOpener",
+			"source": "ArcFormats/Tanaka/ArcBMX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BMX/TRIANGLE",
+			"class": "BmxOpener",
+			"source": "ArcFormats/Triangle/ArcBMX.cs",
+			"extensions": [
+				"bmx",
+				"wax",
+				"fx",
+				"gx"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BND",
+			"class": "BndOpener",
+			"source": "Legacy/ShapeShifter/ArcBND.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BND/IDX",
+			"class": "BndOpener",
+			"source": "Legacy/Tetratech/ArcBND.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BND/NMI",
+			"class": "BndOpener",
+			"source": "Legacy/Ponytail/ArcBND.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BOX",
+			"class": "BoxOpener",
+			"source": "ArcFormats/Aoi/ArcBOX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BSA",
+			"class": "BsaOpener",
+			"source": "ArcFormats/Bishop/ArcBSA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BSC",
+			"class": "BscOpener",
+			"source": "ArcFormats/Bishop/ArcBSC.cs",
+			"extensions": [
+				"bsc",
+				"bsg"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "BURIKO ARC",
+			"class": "Arc2Opener",
+			"source": "ArcFormats/Ethornell/ArcBGI.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "BYTES/UNITY",
+			"class": "BytesOpener",
+			"source": "ArcFormats/Unity/ArcSpVM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "C24",
+			"class": "C24Opener",
+			"source": "ArcFormats/Foster/ArcC24.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "C25",
+			"class": "C25Opener",
+			"source": "ArcFormats/Foster/ArcC24.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CAB",
+			"class": "CabOpener",
+			"source": "Experimental/Cabinet/ArcCAB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CAB/PackDat3",
+			"class": "CabOpener",
+			"source": "ArcFormats/EntExec/ArcCAB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CAF",
+			"class": "CafOpener",
+			"source": "ArcFormats/Tail/ArcCAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CCF",
+			"class": "CcfOpener",
+			"source": "ArcFormats/BlackRainbow/ArcCCF.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CDT",
+			"class": "CdtOpener",
+			"source": "ArcFormats/Nejii/ArcCDT.cs",
+			"extensions": [
+				"cdt",
+				"pdt",
+				"vdt",
+				"ovd"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CDT/UMA",
+			"class": "CdtOpener",
+			"source": "Legacy/Uma/ArcCDT.cs",
+			"extensions": [
+				"cdt",
+				"spt"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CFP/CAPYBARA",
+			"class": "CfpOpener",
+			"source": "ArcFormats/Winters/ArcCFP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CG/ACTGS",
+			"class": "CgOpener",
+			"source": "ArcFormats/Actgs/ArcCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CG/ACTGS/2",
+			"class": "ArcCgOpener",
+			"source": "ArcFormats/Actgs/ArcCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CG/DESERT",
+			"class": "DesertCgOpener",
+			"source": "ArcFormats/Software House Parsley/ArcCG3.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CG/PARSLEY/1",
+			"class": "CgV1Opener",
+			"source": "ArcFormats/Software House Parsley/ArcCG.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CG/PARSLEY/2",
+			"class": "CgV2Opener",
+			"source": "ArcFormats/Software House Parsley/ArcCG2.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CGD/SPIEL",
+			"class": "CgdOpener",
+			"source": "Legacy/KApp/ArcCGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CGF",
+			"class": "CgfOpener",
+			"source": "ArcFormats/Triangle/ArcCGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CHR/AIRYU",
+			"class": "ChrOpener",
+			"source": "Legacy/Airyu/ArcCHR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CHR/GAMESYSTEM",
+			"class": "ChrOpener",
+			"source": "ArcFormats/GameSystem/ArcCHR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CHR/Palette",
+			"class": "ChrOpener",
+			"source": "ArcFormats/Palette/ArcCHR.cs",
+			"extensions": [
+				"chr"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CHR/TIGERMAN",
+			"class": "ChrOpener",
+			"source": "Legacy/Tigerman/ArcCHR.cs",
+			"extensions": [
+				"chr",
+				"cls",
+				"ev"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CMB",
+			"class": "CmbOpener",
+			"source": "Legacy/PineSoft/ArcCMB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CMB/VOICE",
+			"class": "CmbAudioOpener",
+			"source": "Legacy/PineSoft/ArcVoice.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CMP",
+			"class": "CmpOpener",
+			"source": "ArcFormats/GameSystem/ArcCMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CP3",
+			"class": "Cp3Opener",
+			"source": "ArcFormats/Seraphim/ArcCP3.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CPA",
+			"class": "PakOpener",
+			"source": "Legacy/Aquarium/ArcCPA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CPC",
+			"class": "CpcOpener",
+			"source": "Legacy/BRoom/ArcCPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CPK",
+			"class": "CpkOpener",
+			"source": "ArcFormats/Cri/ArcCPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CPZ",
+			"class": "CpzOpener",
+			"source": "ArcFormats/Cmvs/ArcCPZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CPZ1",
+			"class": "Cpz1Opener",
+			"source": "ArcFormats/Cmvs/ArcCPZ1.cs",
+			"extensions": [
+				"cpz"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CPZ2",
+			"class": "Cpz2Opener",
+			"source": "ArcFormats/Cmvs/ArcCPZ2.cs",
+			"extensions": [
+				"cpz"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "CRM",
+			"class": "CrmOpener",
+			"source": "ArcFormats/Circus/ArcCRM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "CSAF",
+			"class": "CsafOpener",
+			"source": "ArcFormats/FamilyAdvSystem/ArcCSAF.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAF1",
+			"class": "Daf1Opener",
+			"source": "ArcFormats/DenSDK/ArcDAF.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAF2",
+			"class": "Daf2Opener",
+			"source": "ArcFormats/DenSDK/ArcDAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/0verflow",
+			"class": "DatOpener",
+			"source": "ArcFormats/GameSystem/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/ACHV",
+			"class": "PakOpener",
+			"source": "ArcFormats/Antique/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/ACTGS",
+			"class": "DatOpener",
+			"source": "ArcFormats/Actgs/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/AGS",
+			"class": "DatOpener",
+			"source": "ArcFormats/AnimeGameSystem/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/AI5WIN",
+			"class": "DatAI5Opener",
+			"source": "ArcFormats/elf/ArcAi5DAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/Ail",
+			"class": "DatOpener",
+			"source": "ArcFormats/Ail/ArcAil.cs",
+			"extensions": [
+				"dat",
+				"snl"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/AIR",
+			"class": "DatOpener",
+			"source": "ArcFormats/Adobe/ArcAIR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/ANKH",
+			"class": "DatOpener",
+			"source": "ArcFormats/Ankh/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/ARC2",
+			"class": "Arc2Opener",
+			"source": "ArcFormats/CsWare/ArcARC2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/ARCH",
+			"class": "DatOpener",
+			"source": "ArcFormats/Seraphim/ArcArchAngel.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/BK",
+			"class": "BkOpener",
+			"source": "ArcFormats/Maika/ArcBK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/BLD",
+			"class": "BldOpener",
+			"source": "ArcFormats/BellDa/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/BR",
+			"class": "DatOpener",
+			"source": "ArcFormats/BlackRainbow/ArcDAT.cs",
+			"extensions": [
+				"dat",
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CAPYBARA",
+			"class": "DatOpener",
+			"source": "ArcFormats/Winters/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CATF",
+			"class": "DatOpener",
+			"source": "Legacy/SystemAqua/ArcDAT.cs",
+			"extensions": [
+				"dat",
+				"cat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CHERRY",
+			"class": "DatOpener",
+			"source": "ArcFormats/Cherry/ArcMyk.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CIRCUS",
+			"class": "DatOpener",
+			"source": "ArcFormats/Circus/ArcCircus.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CLS",
+			"class": "ClsOpener",
+			"source": "ArcFormats/Lambda/ArcCLS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CPN",
+			"class": "DatOpener",
+			"source": "Legacy/Marron/ArcCPN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CRG",
+			"class": "PakOpener",
+			"source": "Legacy/Rhss/ArcCRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CSPACK",
+			"class": "DatOpener",
+			"source": "ArcFormats/CatSystem/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/CSWARE",
+			"class": "PakOpener",
+			"source": "ArcFormats/CsWare/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/DISCOVERY",
+			"class": "DatOpener",
+			"source": "Legacy/Discovery/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/DJSYSTEM",
+			"class": "DatOpener",
+			"source": "ArcFormats/DjSystem/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/EGO/0",
+			"class": "OldDatOpener",
+			"source": "ArcFormats/StudioEgo/ArcEGO.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/EGO/1",
+			"class": "DatOpener",
+			"source": "ArcFormats/StudioEgo/ArcEGO.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/electr",
+			"class": "DatOpener",
+			"source": "Legacy/Electriciteit/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/FLK",
+			"class": "DatOpener",
+			"source": "Legacy/SplushWave/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/FPACK",
+			"class": "DatOpener",
+			"source": "Legacy/Iris/ArcFPACK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/FPK",
+			"class": "FpkOpener",
+			"source": "ArcFormats/Abel/ArcFPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/FWA",
+			"class": "FwaOpener",
+			"source": "Legacy/Nug/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/GM",
+			"class": "GmDatOpener",
+			"source": "Legacy/Eve/ArcGM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/GScripter",
+			"class": "DataOpener",
+			"source": "ArcFormats/GScripter/ArcDATA.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/GX4LIB",
+			"class": "DatOpener",
+			"source": "ArcFormats/Unity/Gx4Lib/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/HED",
+			"class": "HedDatOpener",
+			"source": "ArcFormats/Origin/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/hibiki",
+			"class": "HDatOpener",
+			"source": "ArcFormats/YaneSDK/ArcHibiki.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/HOT",
+			"class": "HotOpener",
+			"source": "Legacy/Hdl/ArcHOT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/IGS",
+			"class": "IgsDatOpener",
+			"source": "Experimental/CellWorks/ArcDB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/JAM",
+			"class": "DatOpener",
+			"source": "ArcFormats/JamCreation/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/LAZYCREW",
+			"class": "DatOpener",
+			"source": "Legacy/Lazycrew/ArcDAT.cs",
+			"extensions": [
+				"dat",
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/LNK",
+			"class": "LnkOpener",
+			"source": "ArcFormats/Kid/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/LNK2",
+			"class": "Lnk2Opener",
+			"source": "ArcFormats/Ail/ArcLNK2.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MIK01",
+			"class": "MikOpener",
+			"source": "ArcFormats/Maika/ArcMIK01.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MINATO",
+			"class": "MinatoDatOpener",
+			"source": "ArcFormats/NonColor/ArcMinato.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MIRIS",
+			"class": "DatOpener",
+			"source": "ArcFormats/Eternity/ArcMiris.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MK",
+			"class": "DatOpener",
+			"source": "Legacy/Witch/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MK2",
+			"class": "Mk2Opener",
+			"source": "ArcFormats/Maika/ArcMK2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MPF2",
+			"class": "Mpf2Opener",
+			"source": "ArcFormats/Apricot/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/MUSE",
+			"class": "DatOpener",
+			"source": "Legacy/Muse/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/NekoSDK",
+			"class": "DatOpener",
+			"source": "ArcFormats/NekoSDK/ArcDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/NNNN",
+			"class": "NNNNOpener",
+			"source": "ArcFormats/MokoPro/CompressedFile.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/OMI",
+			"class": "DatOpener",
+			"source": "Legacy/Omi/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PAC",
+			"class": "PacOpener",
+			"source": "Legacy/KeroQ/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PACK",
+			"class": "DatOpener",
+			"source": "Legacy/Aos/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PAPRIKA",
+			"class": "PkDatOpener",
+			"source": "Legacy/Paprika/ArcPKDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PCG",
+			"class": "DatOpener",
+			"source": "ArcFormats/Groover/ArcPCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PIAS",
+			"class": "DatOpener",
+			"source": "Legacy/Pias/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PIAS/ENC",
+			"class": "EncryptedDatOpener",
+			"source": "Legacy/Pias/EncryptedGraphDat.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PITA",
+			"class": "DatOpener",
+			"source": "Legacy/BlackButterfly/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PMASTER",
+			"class": "DatOpener",
+			"source": "ArcFormats/Unity/PMaster/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/PUREMAIL",
+			"class": "PmDatOpener",
+			"source": "ArcFormats/GameSystem/ArcPureMail.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/RepiPack",
+			"class": "DatOpener",
+			"source": "ArcFormats/Littlewitch/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/SAKURA",
+			"class": "DatOpener",
+			"source": "ArcFormats/StudioSakura/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/SCN",
+			"class": "ScnDatOpener",
+			"source": "ArcFormats/Software House Parsley/ArcScn.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/SGS",
+			"class": "SgsDatOpener",
+			"source": "Legacy/Sogna/ArcSGS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/TASKFORCE",
+			"class": "DatOpener",
+			"source": "ArcFormats/Taskforce/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/TRIANGLE",
+			"class": "DatOpener",
+			"source": "ArcFormats/Triangle/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/UNA",
+			"class": "DatOpener",
+			"source": "Legacy/Harvest/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/UNKNOWN",
+			"class": "DatOpener",
+			"source": "Legacy/Unknown/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/VALKYRIA",
+			"class": "DatOpener",
+			"source": "ArcFormats/Valkyria/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/vf",
+			"class": "VffOpener",
+			"source": "ArcFormats/LiveMaker/ArcVF.cs",
+			"extensions": [
+				"dat",
+				"exe"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/W/VOICE",
+			"class": "VoiceOpener",
+			"source": "Legacy/Weapon/ArcVoice.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/WEAPON",
+			"class": "DatOpener",
+			"source": "Legacy/Weapon/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/yanepack",
+			"class": "CgOpener",
+			"source": "ArcFormats/Software House Parsley/ArcCG.cs",
+			"extensions": [
+				"",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/yanepkDx",
+			"class": "PackOpener",
+			"source": "Legacy/Yaneurao/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/yanepkEx",
+			"class": "PackExOpener",
+			"source": "Legacy/Yaneurao/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/YaneSDK",
+			"class": "PakOpener",
+			"source": "ArcFormats/YaneSDK/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/YOUKAI/1",
+			"class": "GrpDatOpener",
+			"source": "ArcFormats/Youkai/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/YOUKAI/2",
+			"class": "SoundDatOpener",
+			"source": "ArcFormats/Youkai/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/YOUKAI/3",
+			"class": "VoiceDatOpener",
+			"source": "ArcFormats/Youkai/ArcDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DAT/YOX",
+			"class": "DatOpener",
+			"source": "ArcFormats/Yox/ArcYOX.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DATA/UCOM",
+			"class": "DataOpener",
+			"source": "ArcFormats/Ucom/ArcDATA.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DDP2",
+			"class": "Ddp2Opener",
+			"source": "ArcFormats/DDSystem/ArcDDP.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DDP3",
+			"class": "Ddp3Opener",
+			"source": "ArcFormats/DDSystem/ArcDDP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DET",
+			"class": "DetOpener",
+			"source": "ArcFormats/uGOS/ArcDET.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DL1",
+			"class": "Dl1Opener",
+			"source": "Legacy/Aaru/ArcDL1.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DLB",
+			"class": "DlbOpener",
+			"source": "Legacy/AyPio/ArcDLB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DLB/V0",
+			"class": "Dlb0Opener",
+			"source": "Legacy/AyPio/ArcDLB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DM",
+			"class": "DmOpener",
+			"source": "Legacy/DigitalMonkey/ArcDM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DNS",
+			"class": "DnsOpener",
+			"source": "ArcFormats/Marble/ArcDNS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DPF",
+			"class": "DpfOpener",
+			"source": "Legacy/Mutation/ArcDPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DPK",
+			"class": "DpkOpener",
+			"source": "ArcFormats/Dac/ArcDPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DPK/SYSD",
+			"class": "DpkOpener",
+			"source": "ArcFormats/SysD/ArcDPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DPM",
+			"class": "DpmOpener",
+			"source": "ArcFormats/HSP/ArcDPM.cs",
+			"extensions": [
+				"dpm",
+				"bin",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DRS",
+			"class": "DrsOpener",
+			"source": "ArcFormats/Ikura/ArcDRS.cs",
+			"extensions": [
+				"",
+				"dat",
+				"snr"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DSK/PFT",
+			"class": "DskOpener",
+			"source": "ArcFormats/Abogado/ArcDSK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DSM/UNITY",
+			"class": "DsmOpener",
+			"source": "ArcFormats/Unity/ArcDSM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "DXA",
+			"class": "DxOpener",
+			"source": "ArcFormats/DxLib/ArcDX.cs",
+			"extensions": [
+				"dxa",
+				"hud",
+				"usi",
+				"med",
+				"dat",
+				"bin",
+				"bcx",
+				"wolf"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "DXR",
+			"class": "DxrOpener",
+			"source": "ArcFormats/Macromedia/ArcDXR.cs",
+			"extensions": [
+				"dxr",
+				"cxt",
+				"cct",
+				"dcr",
+				"dir",
+				"exe"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "EME",
+			"class": "EmeOpener",
+			"source": "ArcFormats/EmonEngine/ArcEME.cs",
+			"extensions": [
+				"eme",
+				"rre"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "EP1",
+			"class": "Ep1Opener",
+			"source": "Legacy/StudioEbisu/ArcEP1.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "EPK",
+			"class": "PakOpener",
+			"source": "ArcFormats/TamaSoft/ArcEPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "EPK/Ellefin",
+			"class": "EpkOpener",
+			"source": "ArcFormats/Ellefin/ArcEPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ERI/MULTI",
+			"class": "EriOpener",
+			"source": "ArcFormats/Entis/ArcERI.cs",
+			"extensions": [
+				"eri"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "EXE",
+			"class": "ExeOpener",
+			"source": "Experimental/Microsoft/ArcEXE.cs",
+			"extensions": [
+				"exe",
+				"dll"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "EXE/NE",
+			"class": "NeExeOpener",
+			"source": "Experimental/Microsoft/ArcNE.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FA2",
+			"class": "Fa2Opener",
+			"source": "ArcFormats/Foster/ArcFA2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FFA/ARC",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Ffa/ArcFFA.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "FFA/DAT",
+			"class": "DatOpener",
+			"source": "ArcFormats/Ffa/ArcBlackPackage.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "FFA/JDAT",
+			"class": "JDatOpener",
+			"source": "ArcFormats/Ffa/ArcBlackPackage.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "FG",
+			"class": "FgOpener",
+			"source": "ArcFormats/FrontWing/ArcFG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FGA",
+			"class": "FgaOpener",
+			"source": "ArcFormats/Lilim/ArcFGA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FJSYS",
+			"class": "FjsysOpener",
+			"source": "ArcFormats/NSystem/ArcFJSYS.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "FL2/AARU",
+			"class": "Fl2Opener",
+			"source": "Legacy/Aaru/ArcFL2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FL3/AARU",
+			"class": "Fl3Opener",
+			"source": "Legacy/Aaru/ArcFL3.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FL4/AARU",
+			"class": "Fl4Opener",
+			"source": "Legacy/Aaru/ArcFL4.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FLK",
+			"class": "FlkOpener",
+			"source": "Legacy/Liddell/ArcFLK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FLT",
+			"class": "FltOpener",
+			"source": "ArcFormats/FrontWing/ArcFLT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FPK",
+			"class": "FpkOpener",
+			"source": "ArcFormats/Interheart/ArcFPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FPK/2.00",
+			"class": "Fpk2Opener",
+			"source": "ArcFormats/Interheart/ArcFPK2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "FPK/MFWY",
+			"class": "FpkOpener",
+			"source": "ArcFormats/AdvSys/ArcAdvSysT.cs",
+			"extensions": [
+				"fpk"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "FPK/MOONHIR",
+			"class": "FpkOpener",
+			"source": "ArcFormats/Moonhir/ArcFPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "G/GML",
+			"class": "GOpener",
+			"source": "ArcFormats/GLib/ArcG.cs",
+			"extensions": [
+				"g",
+				"xp"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "G00/v2",
+			"class": "G00Opener",
+			"source": "ArcFormats/RealLive/ArcG00.cs",
+			"extensions": [
+				"g00"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "G2",
+			"class": "G2Opener",
+			"source": "ArcFormats/Glib2/ArcG2.cs",
+			"extensions": [
+				"g2",
+				"stx"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GAF/ORIGIN",
+			"class": "GafOpener",
+			"source": "ArcFormats/Origin/ArcGAF.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GAL/X",
+			"class": "GalXOpener",
+			"source": "ArcFormats/LiveMaker/ArcGALX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GAMEDAT",
+			"class": "DatOpener",
+			"source": "ArcFormats/Pajamas/ArcGameDat.cs",
+			"extensions": [
+				"dat",
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GAN",
+			"class": "GanOpener",
+			"source": "ArcFormats/Ikura/ArcGAN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GD/Xuse",
+			"class": "GdOpener",
+			"source": "ArcFormats/Xuse/ArcGD.cs",
+			"extensions": [
+				"gd"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GLNK/MIRIS",
+			"class": "GlnkOpener",
+			"source": "ArcFormats/Eternity/ArcGLNK.cs",
+			"extensions": [
+				"dat",
+				"glk",
+				"mlk",
+				"slk",
+				"gl",
+				"ml",
+				"sl",
+				"ets",
+				"etg",
+				"etm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GPC",
+			"class": "GpcOpener",
+			"source": "ArcFormats/Eushully/ArcGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GPC7",
+			"class": "GpcOpener",
+			"source": "ArcFormats/SuperNekoX/ArcGPC.cs",
+			"extensions": [
+				"gpc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GPK",
+			"class": "GpkOpener",
+			"source": "ArcFormats/BlackCyc/ArcGPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GPK/STACK",
+			"class": "GpkOpener",
+			"source": "ArcFormats/Stack/ArcGPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GPK2",
+			"class": "GpkOpener",
+			"source": "ArcFormats/Gpk2/ArcGPK2.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GR2/PACK",
+			"class": "Gr2Opener",
+			"source": "ArcFormats/AdvSys/ArcGR2.cs",
+			"extensions": [
+				"gr2",
+				"vic",
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GRP/EXHIBIT",
+			"class": "GrpOpener",
+			"source": "ArcFormats/ExHibit/ArcGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GRP/ICE",
+			"class": "GrpOpener",
+			"source": "ArcFormats/Ankh/ArcGRP.cs",
+			"extensions": [
+				"grp",
+				"bin",
+				"dat",
+				"vc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GRP/MINK",
+			"class": "GrpOpener",
+			"source": "Legacy/Mink/ArcMINK.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GSD",
+			"class": "GsdOpener",
+			"source": "ArcFormats/MicroVision/ArcGSD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GsData",
+			"class": "DatOpener",
+			"source": "ArcFormats/GsPack/ArcGsPack.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GSP",
+			"class": "GspOpener",
+			"source": "ArcFormats/BlackRainbow/ArcGSP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "GsPack",
+			"class": "PakOpener",
+			"source": "ArcFormats/GsPack/ArcGsPack.cs",
+			"extensions": [
+				"pak",
+				"dat",
+				"pa_"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GX",
+			"class": "GxOpener",
+			"source": "ArcFormats/Scoop/ArcGX.cs",
+			"extensions": [
+				"gx",
+				"fx",
+				"vx"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "GXP",
+			"class": "PakOpener",
+			"source": "ArcFormats/Astronauts/ArcGXP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "H/Xuse",
+			"class": "HOpener",
+			"source": "ArcFormats/Xuse/ArcNT.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "HG2",
+			"class": "Hg2Opener",
+			"source": "ArcFormats/CatSystem/ArcHG2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "HG3",
+			"class": "Hg3Opener",
+			"source": "ArcFormats/CatSystem/ArcHG3.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "HIM4",
+			"class": "Him4Opener",
+			"source": "ArcFormats/SHSystem/ArcHXP.cs",
+			"extensions": [
+				"hxp"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "HIM5",
+			"class": "Him5Opener",
+			"source": "ArcFormats/SHSystem/ArcHXP.cs",
+			"extensions": [
+				"hxp"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "HZC/MULTI",
+			"class": "HzcOpener",
+			"source": "ArcFormats/Favorite/ArcHZC.cs",
+			"extensions": [
+				"hzc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "IAF/MULTI",
+			"class": "IafOpener",
+			"source": "ArcFormats/Triangle/ArcIAF.cs",
+			"extensions": [
+				"iaf"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "IAR",
+			"class": "IarOpener",
+			"source": "ArcFormats/Sas5/ArcIAR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IDA",
+			"class": "IdaOpener",
+			"source": "Legacy/Inspire/ArcIDA.cs",
+			"extensions": [
+				"ida",
+				"mha"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "IFL",
+			"class": "IflOpener",
+			"source": "ArcFormats/Silky/ArcIFL.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IFP",
+			"class": "IfpOpener",
+			"source": "ArcFormats/Winters/ArcIFP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IFX",
+			"class": "IfxOpener",
+			"source": "ArcFormats/Winters/ArcIFX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IGA",
+			"class": "IgaOpener",
+			"source": "ArcFormats/Noesis/ArcIGA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IKS",
+			"class": "IksOpener",
+			"source": "ArcFormats/ArcIKS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IKURA/GDL",
+			"class": "MpxOpener",
+			"source": "ArcFormats/Ikura/ArcDRS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IMP",
+			"class": "ImpOpener",
+			"source": "ArcFormats/BlackRainbow/ArcIMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "INT",
+			"class": "IntOpener",
+			"source": "ArcFormats/CatSystem/ArcINT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "IPQ",
+			"class": "IpqOpener",
+			"source": "ArcFormats/TechnoBrain/ArcIPQ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ISA",
+			"class": "IsaOpener",
+			"source": "ArcFormats/Ism/ArcISA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "K3",
+			"class": "K3Opener",
+			"source": "Legacy/Gsx/ArcK3.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "K5",
+			"class": "K5Opener",
+			"source": "Legacy/Gsx/ArcK5.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "KAR",
+			"class": "KarOpener",
+			"source": "ArcFormats/Cadath/ArcKAR.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "KCAP",
+			"class": "PackOpener",
+			"source": "ArcFormats/Selene/ArcKCAP.cs",
+			"extensions": [
+				"pack"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "KOE",
+			"class": "KoeOpener",
+			"source": "ArcFormats/RealLive/ArcKOE.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "KOTORI/Xuse",
+			"class": "KotoriOpener",
+			"source": "ArcFormats/Xuse/ArcXuse.cs",
+			"extensions": [
+				"bin"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "KPC",
+			"class": "KpcOpener",
+			"source": "ArcFormats/KScript/ArcKPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LAC",
+			"class": "LacOpener",
+			"source": "ArcFormats/Leaf/ArcLAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LAX",
+			"class": "LaxOpener",
+			"source": "ArcFormats/Lambda/ArcLAX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LAY/MAGES",
+			"class": "LayOpener",
+			"source": "ArcFormats/NitroPlus/ArcLAY.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LB5",
+			"class": "Lb5Opener",
+			"source": "Legacy/Jupiter/ArcLB5.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LIB",
+			"class": "LibOpener",
+			"source": "ArcFormats/Malie/ArcLIB.cs",
+			"extensions": [
+				"lib",
+				"sdp"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "LIB/SYSTEM98",
+			"class": "LibOpener",
+			"source": "Legacy/System98/ArcLIB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LIBP",
+			"class": "DatOpener",
+			"source": "ArcFormats/Malie/ArcLIB.cs",
+			"extensions": [
+				"lib",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "LIBU",
+			"class": "LibUOpener",
+			"source": "ArcFormats/Malie/ArcLIBU.cs",
+			"extensions": [
+				"lib"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "LPC",
+			"class": "LpcOpener",
+			"source": "ArcFormats/Hypatia/ArcLPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LPK",
+			"class": "LpkOpener",
+			"source": "ArcFormats/Lucifen/ArcLPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LPK/KOGADO",
+			"class": "LpkOpener",
+			"source": "ArcFormats/Hypatia/ArcLPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "LST",
+			"class": "LstOpener",
+			"source": "ArcFormats/Tactics/ArcLST.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "LWG",
+			"class": "LwgOpener",
+			"source": "ArcFormats/Liar/ArcLWG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MAI",
+			"class": "ArcOpener",
+			"source": "ArcFormats/MAI/ArcMAI.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MAJIRO",
+			"class": "ArcOpener",
+			"source": "ArcFormats/Majiro/ArcMajiro.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MBF",
+			"class": "MbfOpener",
+			"source": "ArcFormats/Tanaka/ArcMBF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MBL",
+			"class": "MblOpener",
+			"source": "ArcFormats/Marble/ArcMBL.cs",
+			"extensions": [
+				"mbl",
+				"dns"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MBL/GRA",
+			"class": "GraMblOpener",
+			"source": "ArcFormats/Marble/ArcMBL.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MBM",
+			"class": "MbmOpener",
+			"source": "Legacy/Logg/ArcMBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MC/SERAPH",
+			"class": "McOpener",
+			"source": "ArcFormats/Seraphim/ArcMC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MCA",
+			"class": "McaOpener",
+			"source": "ArcFormats/FC01/ArcMCA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MCD/TSD",
+			"class": "McdOpener",
+			"source": "Legacy/Tsd/ArcMCD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MED",
+			"class": "MedOpener",
+			"source": "ArcFormats/DxLib/ArcMED.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MFG",
+			"class": "MfgOpener",
+			"source": "ArcFormats/Silky/ArcMFG.cs",
+			"extensions": [
+				"mfg",
+				"mfm",
+				"mfs"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MFS",
+			"class": "MfOpener",
+			"source": "ArcFormats/ClickTeam/ArcMF.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MGD",
+			"class": "MgdOpener",
+			"source": "ArcFormats/Masys/ArcMGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MGPK",
+			"class": "MgpkOpener",
+			"source": "ArcFormats/MangaGamer/ArcMGPK.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MGPK0",
+			"class": "Mgpk0Opener",
+			"source": "ArcFormats/MangaGamer/ArcMGPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MGR",
+			"class": "MgrOpener",
+			"source": "ArcFormats/Propeller/ArcMGR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MGS",
+			"class": "MgsOpener",
+			"source": "ArcFormats/Masys/ArcMGS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MGX",
+			"class": "MgxOpener",
+			"source": "ArcFormats/UMeSoft/ArcMGX.cs",
+			"extensions": [
+				"grx"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MIF",
+			"class": "PakOpener",
+			"source": "ArcFormats/Basil/ArcMIF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MJA",
+			"class": "MjaOpener",
+			"source": "ArcFormats/Artemis/ArcMJA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ML2",
+			"class": "Ml2Opener",
+			"source": "Legacy/Mina/ArcML2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MMA",
+			"class": "MmaOpener",
+			"source": "ArcFormats/Mnp/ArcMMA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MNG",
+			"class": "MngOpener",
+			"source": "ArcFormats/ImageMNG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MNV",
+			"class": "DatOpener",
+			"source": "ArcFormats/MnoViolet/ArcMnoViolet.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MPK",
+			"class": "MpkOpener",
+			"source": "ArcFormats/Propeller/ArcMPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MPK/HG",
+			"class": "MpkOpener",
+			"source": "Legacy/Tako/ArcMPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MPK/KURUMI",
+			"class": "MpkOpener",
+			"source": "Legacy/Kurumi/ArcMPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MPK/MAGES",
+			"class": "MpkOpener",
+			"source": "ArcFormats/NitroPlus/ArcMPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MRG",
+			"class": "MrgOpener",
+			"source": "ArcFormats/FC01/ArcMRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "MRG/2",
+			"class": "Mrg2Opener",
+			"source": "ArcFormats/FC01/ArcMRG.cs",
+			"extensions": [
+				"mrg"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "MRG/mrg0",
+			"class": "Mrg0Opener",
+			"source": "ArcFormats/FC01/ArcMRG0.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NAF",
+			"class": "NafOpener",
+			"source": "Legacy/Brownie/ArcNAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NCL",
+			"class": "NclOpener",
+			"source": "Legacy/Uran/ArcNCL.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NEKOPACK/1",
+			"class": "Pak1Opener",
+			"source": "ArcFormats/Nekopack/ArcNEKO.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NEKOPACK/2",
+			"class": "Pak2Opener",
+			"source": "ArcFormats/Nekopack/ArcNEKO2.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NEKOPACK/3",
+			"class": "Pak3Opener",
+			"source": "ArcFormats/Nekopack/ArcNEKO3.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NEKOPACK/4",
+			"class": "PakOpener",
+			"source": "ArcFormats/NekoSDK/ArcPAK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NFS",
+			"class": "NfsOpener",
+			"source": "ArcFormats/Nags/ArcNFS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NOA",
+			"class": "NoaOpener",
+			"source": "ArcFormats/Entis/ArcNOA.cs",
+			"extensions": [
+				"noa",
+				"dat",
+				"rsa",
+				"arc",
+				"emc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NOR",
+			"class": "NorOpener",
+			"source": "Legacy/Sophia/ArcNOR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NPA",
+			"class": "NpaOpener",
+			"source": "ArcFormats/NitroPlus/ArcNPA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NPA-SG",
+			"class": "NpaSteinsGateOpener",
+			"source": "ArcFormats/NitroPlus/ArcSteinsGate.cs",
+			"extensions": [
+				"npa"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NPF",
+			"class": "NpfOpener",
+			"source": "ArcFormats/Nonono/ArcNPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NPK",
+			"class": "NpkOpener",
+			"source": "ArcFormats/NitroPlus/ArcNPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NPP",
+			"class": "NppOpener",
+			"source": "ArcFormats/NitroPlus/ArcNPP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NS2",
+			"class": "Ns2Opener",
+			"source": "ArcFormats/NScripter/ArcNS2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "NSA",
+			"class": "NsaOpener",
+			"source": "ArcFormats/NScripter/ArcNSA.cs",
+			"extensions": [
+				"nsa",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "NSC",
+			"class": "NscOpener",
+			"source": "Legacy/Nekotaro/ArcNSC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ODN",
+			"class": "OdnOpener",
+			"source": "ArcFormats/Valkyria/ArcODN.cs",
+			"extensions": [
+				"odn",
+				"dat",
+				"pni"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "OPK",
+			"class": "OpkOpener",
+			"source": "ArcFormats/Cromwell/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "OVK",
+			"class": "OvkOpener",
+			"source": "ArcFormats/RealLive/ArcOVK.cs",
+			"extensions": [
+				"ovk",
+				"nwk"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAC",
+			"class": "PacOpener",
+			"source": "ArcFormats/Nexas/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/ADS",
+			"class": "PacOpener",
+			"source": "ArcFormats/Ads/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/AMUSE",
+			"class": "Pac2Opener",
+			"source": "ArcFormats/Softpal/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/CLIO",
+			"class": "PacOpener",
+			"source": "Legacy/Clio/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/DAI",
+			"class": "PacOpener",
+			"source": "ArcFormats/DaiSystem/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/EMIC",
+			"class": "PacOpener",
+			"source": "ArcFormats/Emic/ArcPACK.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/HED",
+			"class": "PacOpener",
+			"source": "ArcFormats/DigitalWorks/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/IDX",
+			"class": "PacOpener",
+			"source": "Legacy/Pochette/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/LUNA",
+			"class": "PacOpener",
+			"source": "ArcFormats/LunaSoft/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/MyAdv",
+			"class": "PacOpener",
+			"source": "ArcFormats/MyAdv/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/PARSLEY",
+			"class": "PacOpener",
+			"source": "ArcFormats/Software House Parsley/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/PENGUIN",
+			"class": "PacOpener",
+			"source": "Legacy/PenguinWorks/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/PLANTECH",
+			"class": "PacOpener",
+			"source": "Legacy/PlanTech/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/SHA",
+			"class": "PacOpener",
+			"source": "ArcFormats/MangaGamer/ArcSHA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/SOFTPAL",
+			"class": "PacOpener",
+			"source": "ArcFormats/Softpal/ArcPAC.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/TERIOS",
+			"class": "PacOpener",
+			"source": "ArcFormats/Entis/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/TIGERMAN",
+			"class": "PacOpener",
+			"source": "Legacy/Tigerman/ArcPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/TMR-HIRO",
+			"class": "PacOpener",
+			"source": "ArcFormats/Tmr-Hiro/ArcPAC.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/UMPK",
+			"class": "PakOpener",
+			"source": "ArcFormats/StudioJikkenshitsu/ArcUMPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAC/VC",
+			"class": "VcPacOpener",
+			"source": "ArcFormats/Circus/ArcValkyrieComplex.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAC1",
+			"class": "PacOpener",
+			"source": "ArcFormats/RiddleSoft/ArcPAC.cs",
+			"extensions": [
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/AIMS",
+			"class": "PackOpener",
+			"source": "ArcFormats/Aims/ArcPACK.cs",
+			"extensions": [
+				"p",
+				"mus",
+				"pac"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/BONK",
+			"class": "PackOpener",
+			"source": "ArcFormats/Bonk/ArcPACK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/CDPA",
+			"class": "PackOpener",
+			"source": "ArcFormats/CDPA/ArcPACK.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/DX",
+			"class": "PackOpener",
+			"source": "ArcFormats/BlackRainbow/ArcDX.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/FACTOR",
+			"class": "PackOpener",
+			"source": "Legacy/Factor/ArcRES.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/Irrlicht",
+			"class": "PackOpener",
+			"source": "ArcFormats/Irrlicht/ArcPACK.cs",
+			"extensions": [
+				"pack"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/LUNE",
+			"class": "PackOpener",
+			"source": "Legacy/Lune/ArcPACK.cs",
+			"extensions": [
+				"dat",
+				"wda"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACK/QLIE",
+			"class": "PackOpener",
+			"source": "ArcFormats/Qlie/ArcQLIE.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PACK2/Palette",
+			"class": "Pak2Opener",
+			"source": "ArcFormats/Palette/ArcPAK2.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PACKDAT",
+			"class": "PakOpener",
+			"source": "ArcFormats/ArcPACKDAT.cs",
+			"extensions": [
+				"pak",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/ABOGADO",
+			"class": "PakOpener",
+			"source": "ArcFormats/Abogado/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/ACE",
+			"class": "PakOpener",
+			"source": "Legacy/HyperWorks/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/AGSI",
+			"class": "PakOpener",
+			"source": "ArcFormats/FC01/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/ALPHA",
+			"class": "PakOpener",
+			"source": "Legacy/AlphaSystem/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/ASURA",
+			"class": "PakOpener",
+			"source": "Legacy/Asura/ArcPAK.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/CHERRY",
+			"class": "PakOpener",
+			"source": "ArcFormats/Cherry/ArcCherry.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/CHERRY2",
+			"class": "Pak2Opener",
+			"source": "ArcFormats/Cherry/ArcCherry.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/cromwell",
+			"class": "GraphicPakOpener",
+			"source": "ArcFormats/Cromwell/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/Debonosu",
+			"class": "PakOpener",
+			"source": "ArcFormats/Debonosu/ArcPAK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/EAGLS",
+			"class": "PakOpener",
+			"source": "ArcFormats/Eagls/ArcEAGLS.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/FilePack",
+			"class": "FilePackOpener",
+			"source": "ArcFormats/Palette/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/G2",
+			"class": "PakOpener",
+			"source": "ArcFormats/G2/ArcGCEX.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/HCSYSTEM",
+			"class": "PakOpener",
+			"source": "ArcFormats/HCSystem/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/HERB",
+			"class": "PakOpener",
+			"source": "Legacy/Herb/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/HyPack",
+			"class": "PakOpener",
+			"source": "ArcFormats/Hypatia/ArcKogado.cs",
+			"extensions": [
+				"pak",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/IPAC",
+			"class": "PakOpener",
+			"source": "ArcFormats/Ipac/ArcIPAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/KCAP",
+			"class": "KcapOpener",
+			"source": "ArcFormats/Leaf/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/KEY",
+			"class": "PakOpener",
+			"source": "ArcFormats/Key/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/LAC",
+			"class": "PakOpener",
+			"source": "ArcFormats/Leaf/ArcLAC.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/LEAF",
+			"class": "LeafPackOpener",
+			"source": "ArcFormats/Leaf/ArcLEAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MAGI",
+			"class": "PakOpener",
+			"source": "ArcFormats/NitroPlus/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MD002",
+			"class": "PakOpener",
+			"source": "ArcFormats/AdvScripter/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MELTY",
+			"class": "PakOpener",
+			"source": "ArcFormats/BlackRainbow/ArcPAK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MINA/BMP",
+			"class": "BmpPakOpener",
+			"source": "Legacy/Mina/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MINA/SPT",
+			"class": "ScriptPakOpener",
+			"source": "Legacy/Mina/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MINA/WAV",
+			"class": "WavPakOpener",
+			"source": "Legacy/Mina/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/MORNING",
+			"class": "PakOpener",
+			"source": "ArcFormats/Morning/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/NEKOPUNCH",
+			"class": "PakOpener",
+			"source": "ArcFormats/Nekopunch/ArcPAK.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/NITRO+",
+			"class": "PakOpener",
+			"source": "ArcFormats/NitroPlus/ArcNitro.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/P8",
+			"class": "P8Opener",
+			"source": "ArcFormats/Cyberworks/ArcP8.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/REDZONE",
+			"class": "PakOpener",
+			"source": "Legacy/RedZone/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/SCEPLAY",
+			"class": "PakOpener",
+			"source": "Legacy/Sceplay/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/ScrPlayer",
+			"class": "PakOpener",
+			"source": "ArcFormats/ScrPlayer/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/SP",
+			"class": "SpPakOpener",
+			"source": "ArcFormats/BlackRainbow/ArcSPPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/SYSTEM21",
+			"class": "PakOpener",
+			"source": "Legacy/System21/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/vav",
+			"class": "PakOpener",
+			"source": "ArcFormats/FrontWing/ArcVAV.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAK/VC",
+			"class": "VcPakOpener",
+			"source": "ArcFormats/Circus/ArcValkyrieComplex.cs",
+			"extensions": [
+				"pak"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAK0/EGO",
+			"class": "Pak0Opener",
+			"source": "ArcFormats/StudioEgo/ArcPAK0.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PAN",
+			"class": "PanOpener",
+			"source": "Legacy/Pan/ArcPAN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAQ/FORCE",
+			"class": "PaqOpener",
+			"source": "Legacy/Force/ArcPAQ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PAZ",
+			"class": "PazOpener",
+			"source": "ArcFormats/Musica/ArcPAZ.cs",
+			"extensions": [
+				"paz",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PB",
+			"class": "PbOpener",
+			"source": "ArcFormats/Kaas/ArcPB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PBX",
+			"class": "PbxOpener",
+			"source": "ArcFormats/Pandora/ArcPBX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PBZ",
+			"class": "PbzOpener",
+			"source": "ArcFormats/Cmvs/ArcPBZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCD/IMAGE",
+			"class": "ImageDataOpener",
+			"source": "Legacy/Witch/ArcPCD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCD/NEJII",
+			"class": "PcdOpener",
+			"source": "ArcFormats/Nejii/ArcPCD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCF",
+			"class": "PcfOpener",
+			"source": "ArcFormats/Primel/ArcPCF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCK",
+			"class": "PckOpener",
+			"source": "ArcFormats/Crowd/ArcPCK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCK/AVG",
+			"class": "PckOpener",
+			"source": "ArcFormats/Strikes/ArcPCK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCK/CIRCUS",
+			"class": "PckOpener",
+			"source": "ArcFormats/Circus/ArcPCK.cs",
+			"extensions": [
+				"pck",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PCK/TAMAMO",
+			"class": "PckOpener",
+			"source": "ArcFormats/Tamamo/ArcPCK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PCS",
+			"class": "PcsOpener",
+			"source": "ArcFormats/CsWare/ArcPCS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PD",
+			"class": "PdOpener",
+			"source": "ArcFormats/FlyingShine/ArcPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PD/2",
+			"class": "FlyingShinePdOpener",
+			"source": "ArcFormats/FlyingShine/ArcPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PD/3",
+			"class": "Pd3Opener",
+			"source": "ArcFormats/FlyingShine/ArcPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PD/KAAS",
+			"class": "PdOpener",
+			"source": "ArcFormats/Kaas/ArcKAAS.cs",
+			"extensions": [
+				"pd"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PEL",
+			"class": "PelOpener",
+			"source": "Legacy/Dall/ArcPEL.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PFD",
+			"class": "PfdOpener",
+			"source": "Legacy/Artel/ArcPFD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PFS",
+			"class": "PfsOpener",
+			"source": "ArcFormats/Artemis/ArcPFS.cs",
+			"extensions": [
+				"pfs",
+				"000",
+				"001",
+				"002",
+				"003",
+				"004",
+				"005",
+				"010"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PHS",
+			"class": "PhsOpener",
+			"source": "Legacy/Uran/ArcPHS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PK",
+			"class": "PkOpener",
+			"source": "ArcFormats/UMeSoft/ArcPK.cs",
+			"extensions": [
+				"pk",
+				"gpk",
+				"tpk",
+				"wpk",
+				"mpk",
+				"pk0",
+				"pka",
+				"pkb",
+				"pkc",
+				"pkd",
+				"pke",
+				"pkf"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PK/B-ROOM",
+			"class": "PkOpener",
+			"source": "Legacy/BRoom/ArcPK.cs",
+			"extensions": [
+				"pk",
+				"cpc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PK/B-ROOM/E",
+			"class": "EncryptedPkOpener",
+			"source": "Legacy/BRoom/ArcPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PK/BANANA",
+			"class": "PkOpener",
+			"source": "ArcFormats/Banana/ArcPK.cs",
+			"extensions": [
+				"pk",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PK/BISHOP",
+			"class": "PkOpener",
+			"source": "ArcFormats/Bishop/ArcPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PK/IVORY",
+			"class": "PakOpener",
+			"source": "ArcFormats/Ivory/ArcPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKD",
+			"class": "PkdOpener",
+			"source": "ArcFormats/AdvDx/ArcPKD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKD/ZONE",
+			"class": "PkdOpener",
+			"source": "Legacy/Zone/ArcPKD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKG",
+			"class": "PkgOpener",
+			"source": "ArcFormats/Yatagarasu/ArcPKG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKG/2",
+			"class": "Pkg2Opener",
+			"source": "ArcFormats/Yatagarasu/ArcPKG2.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKG/ARCHIVE",
+			"class": "PkgOpener",
+			"source": "ArcFormats/Tail/ArcPKG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PKK",
+			"class": "PkkOpener",
+			"source": "Legacy/Electriciteit/ArcPKK.cs",
+			"extensions": [
+				"pkk",
+				"skn"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PKWV",
+			"class": "PkwOpener",
+			"source": "ArcFormats/Crowd/ArcPCK.cs",
+			"extensions": [
+				"PCK"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PKZ",
+			"class": "PkzOpener",
+			"source": "ArcFormats/Sviu/ArcPKZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PL10",
+			"class": "Pl10Opener",
+			"source": "ArcFormats/Kaguya/ArcPLT.cs",
+			"extensions": [
+				"plt"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PLA",
+			"class": "PlaOpener",
+			"source": "Legacy/SquadraD/ArcPLA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PLT/KAGUYA",
+			"class": "Pl00Opener",
+			"source": "ArcFormats/Kaguya/ArcPLT.cs",
+			"extensions": [
+				"plt"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PMA",
+			"class": "PmaOpener",
+			"source": "ArcFormats/ScenePlayer/ArcPMA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PMX",
+			"class": "PmxOpener",
+			"source": "ArcFormats/ScenePlayer/ArcPMX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PNA",
+			"class": "PnaOpener",
+			"source": "ArcFormats/Will/ArcPNA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PP/ILLUSION",
+			"class": "PpOpener",
+			"source": "ArcFormats/Illusion/ArcPP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PSB/EMOTE",
+			"class": "PsbOpener",
+			"source": "ArcFormats/Emote/ArcPSB.cs",
+			"extensions": [
+				"psb",
+				"pimg",
+				"dpak",
+				"psbz",
+				"psp"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "PX/IVORY",
+			"class": "PxOpener",
+			"source": "ArcFormats/Ivory/ArcPX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "PX/LEAF",
+			"class": "PxOpener",
+			"source": "ArcFormats/Leaf/ArcPX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "QPK",
+			"class": "PakOpener",
+			"source": "ArcFormats/Psp/ArcQPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "RAD",
+			"class": "RadOpener",
+			"source": "Legacy/RSystem/ArcRAD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "RGSSAD",
+			"class": "RgssOpener",
+			"source": "Experimental/RPGMaker/ArcRGSS.cs",
+			"extensions": [
+				"rgss3a",
+				"rgss2a",
+				"rgssad"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "RIO",
+			"class": "RioOpener",
+			"source": "ArcFormats/rUGP/ArcRIO.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "RLZ",
+			"class": "RlzOpener",
+			"source": "Legacy/Dice/ArcRLZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "RPA",
+			"class": "RpaOpener",
+			"source": "ArcFormats/RenPy/ArcRPA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "S25",
+			"class": "S25Opener",
+			"source": "ArcFormats/ShiinaRio/ArcS25.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SAF",
+			"class": "SafOpener",
+			"source": "ArcFormats/Rits/ArcSAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SAR",
+			"class": "SarOpener",
+			"source": "ArcFormats/NScripter/ArcSAR.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SCN/ARCH",
+			"class": "Scn95Opener",
+			"source": "ArcFormats/Seraphim/ArcSCN.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SDA/MMFASS",
+			"class": "SdaOpener",
+			"source": "Legacy/Mmfass/ArcSDA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SDA/SD",
+			"class": "SdaOpener",
+			"source": "Legacy/SquadraD/ArcSDA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SDA/yane",
+			"class": "SdaOpener",
+			"source": "Legacy/Yaneurao/ArcSDA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SDT/UMA",
+			"class": "SdtOpener",
+			"source": "Legacy/Uma/ArcSDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SEC5",
+			"class": "Sec5Opener",
+			"source": "ArcFormats/Sas5/ArcSec5.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SEEN",
+			"class": "SeenOpener",
+			"source": "ArcFormats/RealLive/ArcSEEN.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SERAPH/ARCH",
+			"class": "ArchPacOpener",
+			"source": "ArcFormats/Seraphim/ArcSeraph.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SERAPH/SCN",
+			"class": "ScnOpener",
+			"source": "ArcFormats/Seraphim/ArcSCN.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SERAPH/VOICE",
+			"class": "VoiceDatOpener",
+			"source": "ArcFormats/Seraphim/ArcVoice.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SG/cOBJ",
+			"class": "SgOpener",
+			"source": "ArcFormats/Ivory/ArcSG.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SKA/SOHFU",
+			"class": "SkaOpener",
+			"source": "ArcFormats/Sohfu/ArcSKA.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SMV",
+			"class": "SmvOpener",
+			"source": "ArcFormats/Tanaka/ArcSMV.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SND",
+			"class": "SndOpener",
+			"source": "ArcFormats/Eushully/ArcGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SNN",
+			"class": "SnnOpener",
+			"source": "ArcFormats/BlueGale/ArcSNN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SNR",
+			"class": "SnrOpener",
+			"source": "ArcFormats/Eushully/ArcGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SPACK",
+			"class": "DatOpener",
+			"source": "ArcFormats/ArcSPack.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SPC/CRI",
+			"class": "SpcOpener",
+			"source": "ArcFormats/Cri/ArcSPC.cs",
+			"extensions": [
+				"spc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "SPD/SLG",
+			"class": "SpdOpener",
+			"source": "ArcFormats/Slg/ArcSPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SQZ",
+			"class": "SqzOpener",
+			"source": "ArcFormats/Musica/ArcSQZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SUD",
+			"class": "SudOpener",
+			"source": "ArcFormats/Triangle/ArcSUD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SWF",
+			"class": "SwfOpener",
+			"source": "ArcFormats/Macromedia/ArcSWF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SXSTORAGE",
+			"class": "SxOpener",
+			"source": "Experimental/SakanaGL/ArcSX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "SZS",
+			"class": "SzsOpener",
+			"source": "ArcFormats/Slg/ArcSZS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TAC",
+			"class": "TacOpener",
+			"source": "ArcFormats/TanukiSoft/ArcTAC.cs",
+			"extensions": [
+				"tac",
+				"stx"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "TAN/DO",
+			"class": "TanOpener",
+			"source": "ArcFormats/Ikura/ArcTAN.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TCD",
+			"class": "TcdOpener",
+			"source": "ArcFormats/TopCat/ArcTCD3.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TCD1",
+			"class": "Tcd1Opener",
+			"source": "ArcFormats/TopCat/ArcTCD1.cs",
+			"extensions": [
+				"tcd"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "TEX/LEAF",
+			"class": "TexOpener",
+			"source": "ArcFormats/Leaf/ArcTEX.cs",
+			"extensions": [
+				"tex"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "TLZ",
+			"class": "TlzOpener",
+			"source": "ArcFormats/Otemoto/ArcTLZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TPF",
+			"class": "TpfOpener",
+			"source": "ArcFormats/Nexas/ArcTPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TTD",
+			"class": "TtdOpener",
+			"source": "ArcFormats/Morning/ArcTTD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "TTD",
+			"class": "TtdOpener",
+			"source": "Legacy/Melonpan/ArcTTD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "UCA",
+			"class": "UcaOpener",
+			"source": "Legacy/WestGate/ArcUCA.cs",
+			"extensions": [
+				"uca",
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "UCG",
+			"class": "UcgOpener",
+			"source": "ArcFormats/Software House Parsley/ArcUCG.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "UK",
+			"class": "UkOpener",
+			"source": "ArcFormats/Ucom/ArcUK.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "UNITY/FS",
+			"class": "UnityFSOpener",
+			"source": "ArcFormats/Unity/ArcUnityFS.cs",
+			"extensions": [
+				"",
+				"unity3d",
+				"asset"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "USF",
+			"class": "UsfOpener",
+			"source": "Legacy/WestGate/ArcUSF.cs",
+			"extensions": [
+				"alh",
+				"usf",
+				"udc",
+				"uwb",
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "UWF",
+			"class": "UwfOpener",
+			"source": "Legacy/WestGate/ArcUWF.cs",
+			"extensions": [
+				"uwf",
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "VAFS",
+			"class": "VafsOpener",
+			"source": "ArcFormats/Softpal/ArcVAFS.cs",
+			"extensions": [
+				"052",
+				"054",
+				"055",
+				"056",
+				"058"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "VBD/SOUND",
+			"class": "SoundDataOpener",
+			"source": "Legacy/Witch/ArcVBD.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "VCT",
+			"class": "VctOpener",
+			"source": "Legacy/Unison/ArcVCT.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "VFS/AOI",
+			"class": "VfsOpener",
+			"source": "ArcFormats/Aoi/ArcVFS.cs",
+			"extensions": [
+				"vfs"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "VFS/VNSYSTEM",
+			"class": "VfsOpener",
+			"source": "ArcFormats/VnSystem/ArcVFS.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "VOL/ELF",
+			"class": "VolOpener",
+			"source": "ArcFormats/elf/ArcVOL.cs",
+			"extensions": [
+				"vol"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "VPK",
+			"class": "VpkOpener",
+			"source": "ArcFormats/BlackCyc/ArcVPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "VPK1",
+			"class": "VpkOpener",
+			"source": "ArcFormats/Tanaka/ArcVPK.cs",
+			"extensions": [
+				"vpk"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "VSD/AI5WIN",
+			"class": "VsdOpener",
+			"source": "ArcFormats/elf/ArcVSD.cs",
+			"extensions": [
+				"vsd"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WAG",
+			"class": "WagOpener",
+			"source": "ArcFormats/Xuse/ArcWAG.cs",
+			"extensions": [
+				"wag",
+				"4ag",
+				"004"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WAG/IAF",
+			"class": "WagOpener",
+			"source": "ArcFormats/Hexenhaus/ArcWAG.cs",
+			"extensions": [
+				"wag"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WAR",
+			"class": "WarOpener",
+			"source": "ArcFormats/ShiinaRio/ArcWARC.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "WAR/1.0",
+			"class": "War0Opener",
+			"source": "ArcFormats/ShiinaRio/ArcWARC1.0.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "WAR/SAS5",
+			"class": "WarOpener",
+			"source": "ArcFormats/Sas5/ArcWAR.cs",
+			"extensions": [
+				"war"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WAR2/SAS5",
+			"class": "War2Opener",
+			"source": "ArcFormats/Sas5/ArcWAR.cs",
+			"extensions": [
+				"war"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WBP",
+			"class": "WbpOpener",
+			"source": "ArcFormats/WildBug/ArcWBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "WIP/MULTI",
+			"class": "WipOpener",
+			"source": "ArcFormats/Will/ArcWIP.cs",
+			"extensions": [
+				"wip"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WSM0",
+			"class": "Wsm0Opener",
+			"source": "ArcFormats/Tanaka/ArcWSM.cs",
+			"extensions": [
+				"wsm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WSM1",
+			"class": "Wsm1Opener",
+			"source": "ArcFormats/Tanaka/ArcWSM.cs",
+			"extensions": [
+				"wsm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WSM2",
+			"class": "Wsm2Opener",
+			"source": "ArcFormats/Tanaka/ArcWSM.cs",
+			"extensions": [
+				"wsm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WSM4",
+			"class": "Wsm4Opener",
+			"source": "ArcFormats/Tanaka/ArcWSM.cs",
+			"extensions": [
+				"wsm"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "WVB",
+			"class": "WvbOpener",
+			"source": "ArcFormats/Xuse/ArcWVB.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "WVX",
+			"class": "WrcOpener",
+			"source": "ArcFormats/Tanaka/ArcWRC.cs",
+			"extensions": [
+				"wvx",
+				"wrc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "X/AKATOMBO",
+			"class": "XOpener",
+			"source": "Legacy/Akatombo/ArcX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "X/RARE",
+			"class": "XOpener",
+			"source": "Legacy/Rare/ArcX.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "XARC/XUSE",
+			"class": "XarcOpener",
+			"source": "ArcFormats/Xuse/ArcXARC.cs",
+			"extensions": [
+				"arc"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "XFL",
+			"class": "XflOpener",
+			"source": "ArcFormats/Liar/ArcXFL.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "XP3",
+			"class": "Xp3Opener",
+			"source": "ArcFormats/KiriKiri/ArcXP3.cs",
+			"extensions": [
+				"xp3",
+				"exe"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "XPK",
+			"class": "XpkOpener",
+			"source": "ArcFormats/KiriKiri/ArcXPK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "YK",
+			"class": "YkOpener",
+			"source": "Legacy/Koei/ArcYK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "YK",
+			"class": "YkOpener",
+			"source": "Legacy/Rune/ArcYK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "YKC",
+			"class": "YkcOpener",
+			"source": "ArcFormats/Yuka/ArcYKC.cs",
+			"extensions": [
+				"ykc",
+				"dat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "YPF",
+			"class": "YpfOpener",
+			"source": "ArcFormats/YuRis/ArcYPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "YSK",
+			"class": "YskOpener",
+			"source": "Legacy/GPlay/ArcYSK.cs",
+			"extensions": []
+		},
+		{
+			"type": "archive",
+			"tag": "ZIP",
+			"class": "ZipOpener",
+			"source": "ArcFormats/PkWare/ArcZIP.cs",
+			"extensions": [
+				"zip",
+				"vndat"
+			]
+		},
+		{
+			"type": "archive",
+			"tag": "ZLK",
+			"class": "ZlkOpener",
+			"source": "Legacy/Nyoken/ArcZLK.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "ADP",
+			"class": "AdpAudio",
+			"source": "ArcFormats/Abogado/AudioADP.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "ADP/CROSSNET",
+			"class": "AdpAudio",
+			"source": "Legacy/CrossNet/AudioADP.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "ADP/HYPATIA",
+			"class": "AdpAudio",
+			"source": "ArcFormats/Hypatia/AudioADP.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "ADP4",
+			"class": "Adp4Audio",
+			"source": "ArcFormats/GameSystem/AudioADP4.cs",
+			"extensions": [
+				"adp4",
+				"adps"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "ADX",
+			"class": "AdxAudio",
+			"source": "ArcFormats/Cri/AudioADX.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "AF2",
+			"class": "Af2Audio",
+			"source": "ArcFormats/CsWare/AudioAF2.cs",
+			"extensions": [
+				"af2",
+				"pmd"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "AIFF",
+			"class": "AiffAudio",
+			"source": "ArcFormats/AudioAIFF.cs",
+			"extensions": [
+				"aif",
+				"aiff"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "AOG",
+			"class": "AogAudio",
+			"source": "ArcFormats/Aoi/AudioAOG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "AOG/SYS3",
+			"class": "AogAudio",
+			"source": "ArcFormats/Eushully/AudioAOG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "BGM/HARVEST",
+			"class": "BgmAudio",
+			"source": "Legacy/Harvest/AudioBGM.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "BGM/SOFTPAL",
+			"class": "BgmAudio",
+			"source": "ArcFormats/Softpal/AudioBGM.cs",
+			"extensions": [
+				"ogg"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "BW",
+			"class": "BgiAudio",
+			"source": "ArcFormats/Ethornell/AudioBGI.cs",
+			"extensions": [
+				"bw",
+				"",
+				"_bw"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "CMB/PCM",
+			"class": "CmbAudio",
+			"source": "Legacy/PineSoft/AudioCMB.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "CWV",
+			"class": "CwvAudio",
+			"source": "Legacy/Uncanny/AudioCWV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "DWV",
+			"class": "DwvAudio",
+			"source": "ArcFormats/SysD/AudioDWV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "EDIM",
+			"class": "EdimAudio",
+			"source": "ArcFormats/Macromedia/AudioEDIM.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "EMS",
+			"class": "EmsAudio",
+			"source": "ArcFormats/Entis/AudioEMS.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "EOG",
+			"class": "EogAudio",
+			"source": "ArcFormats/Crowd/AudioEOG.cs",
+			"extensions": [
+				"eog",
+				"amb"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "ESD",
+			"class": "EsdAudio",
+			"source": "ArcFormats/TamaSoft/AudioESD.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "EZS",
+			"class": "EzsAudio",
+			"source": "Legacy/BRoom/AudioEZS.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "FSB5",
+			"class": "Fsb5Audio",
+			"source": "ArcFormats/Unity/AudioFSB5.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "G/Leaf",
+			"class": "GAudio",
+			"source": "ArcFormats/Leaf/AudioG.cs",
+			"extensions": [
+				"g"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "HCA",
+			"class": "HcaAudio",
+			"source": "ArcFormats/Cri/AudioHCA.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "IKM",
+			"class": "IkmAudio",
+			"source": "ArcFormats/MicroVision/AudioIKM.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "KOE/MEBIUS",
+			"class": "KoeAudio",
+			"source": "ArcFormats/Mebius/AudioKOE.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "KOG",
+			"class": "KogAudio",
+			"source": "ArcFormats/Sviu/AudioKOG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "KWF",
+			"class": "KwfAudio",
+			"source": "Legacy/Dice/AudioKWF.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MIO",
+			"class": "MioAudio",
+			"source": "ArcFormats/Entis/AudioMIO.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MP3",
+			"class": "Mp3Audio",
+			"source": "ArcFormats/AudioMP3.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MRG",
+			"class": "MrgAudio",
+			"source": "Legacy/Regrips/AudioWRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MSF",
+			"class": "MsfAudio",
+			"source": "Legacy/Unknown/AudioMSF.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MUW",
+			"class": "MuwAudio",
+			"source": "Legacy/Artel/AudioMUW.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MV",
+			"class": "MvAudio",
+			"source": "ArcFormats/Cmvs/AudioMV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "MV2",
+			"class": "Mv2Audio",
+			"source": "ArcFormats/Cmvs/AudioMV2.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "NSF",
+			"class": "NsfAudio",
+			"source": "Legacy/Pan/AudioNSF.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "NWA",
+			"class": "NwaAudio",
+			"source": "ArcFormats/RealLive/AudioNWA.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OGG",
+			"class": "OggAudio",
+			"source": "ArcFormats/AudioOGG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OGG/NNNN",
+			"class": "NNNNOggAudio",
+			"source": "ArcFormats/MokoPro/CompressedFile.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OGG/TINK",
+			"class": "TinkAudio",
+			"source": "ArcFormats/Cyberworks/AudioTINK.cs",
+			"extensions": [
+				"j0",
+				"k0",
+				"u0"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "OGGPAK",
+			"class": "OggPakAudio",
+			"source": "ArcFormats/Key/AudioOGGPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OGV",
+			"class": "OgvAudio",
+			"source": "ArcFormats/ShiinaRio/AudioOGV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OPUS",
+			"class": "OpusAudio",
+			"source": "Experimental/Opus/AudioOPUS.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "OWP",
+			"class": "OwpAudio",
+			"source": "ArcFormats/RealLive/AudioOWP.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "P16",
+			"class": "P16Audio",
+			"source": "ArcFormats/Leaf/AudioP16.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "PAD",
+			"class": "PadAudio",
+			"source": "ArcFormats/ShiinaRio/AudioPAD.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "PCM",
+			"class": "PcmAudio",
+			"source": "ArcFormats/Circus/AudioPCM.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "PCM/AGS",
+			"class": "PcmAudio",
+			"source": "ArcFormats/AnimeGameSystem/AudioPCM.cs",
+			"extensions": [
+				"pcm"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "PCM/ICE",
+			"class": "IceAudio",
+			"source": "ArcFormats/Ankh/AudioPCM.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "PCM/KAAS",
+			"class": "KaasAudio",
+			"source": "ArcFormats/Kaas/AudioKAAS.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "PMW",
+			"class": "PmwAudio",
+			"source": "ArcFormats/ScenePlayer/AudioPMW.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "PWV",
+			"class": "PwvAudio",
+			"source": "Legacy/Mermaid/AudioPWV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "PX/cTRK",
+			"class": "PxAudio",
+			"source": "ArcFormats/Ivory/AudioCTRK.cs",
+			"extensions": [
+				"px",
+				"trk"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "RHA",
+			"class": "RhaAudio",
+			"source": "ArcFormats/rUGP/AudioRHA.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "RPGMVO",
+			"class": "RpgmvoAudio",
+			"source": "Experimental/RPGMaker/AudioRPGMV.cs",
+			"extensions": [
+				"rpgmvo",
+				"ogg_"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "SED/HARVEST",
+			"class": "SedAudio",
+			"source": "Legacy/Harvest/AudioSED.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "SND",
+			"class": "SndAudio",
+			"source": "ArcFormats/Macromedia/AudioSND.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "STR",
+			"class": "WstrAudio",
+			"source": "Legacy/UMeSoft/AudioSTR.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "UM3",
+			"class": "Um3Audio",
+			"source": "ArcFormats/Bruns/AudioUM3.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VAW",
+			"class": "VawAudio",
+			"source": "ArcFormats/BlackCyc/AudioVAW.cs",
+			"extensions": [
+				"vaw",
+				"wgq"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "VMD",
+			"class": "VmdAudio",
+			"source": "ArcFormats/C4/AudioVMD.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VOC",
+			"class": "VocAudio",
+			"source": "ArcFormats/AudioVOC.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VOC/UK2",
+			"class": "VocAudio",
+			"source": "Legacy/AyPio/AudioVOC.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VOI",
+			"class": "VoiAudio",
+			"source": "ArcFormats/Slg/AudioVOI.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VWF",
+			"class": "VwfAudio",
+			"source": "ArcFormats/Cadath/AudioVWF.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "VZY",
+			"class": "VzyAudio",
+			"source": "ArcFormats/BeF/AudioVZY.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "W/Leaf",
+			"class": "WAudio",
+			"source": "ArcFormats/Leaf/AudioW.cs",
+			"extensions": [
+				"w"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WA1",
+			"class": "Wa1Audio",
+			"source": "ArcFormats/Ffa/AudioWA1.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WA2",
+			"class": "Wa2Audio",
+			"source": "ArcFormats/Ffa/AudioWA2.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAF",
+			"class": "WafAudio",
+			"source": "ArcFormats/Kid/AudioWAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAPE",
+			"class": "WapeAudio",
+			"source": "ArcFormats/TechnoBrain/AudioWAPE.cs",
+			"extensions": [
+				"wav"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WAV",
+			"class": "WaveAudio",
+			"source": "GameRes/AudioWAV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/0",
+			"class": "Audio1",
+			"source": "Legacy/Pisckiss/Audio0.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/AGS32I",
+			"class": "AgsAudio",
+			"source": "Legacy/Ags32i/AudioAGS.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/BROWNIE",
+			"class": "WavAudio",
+			"source": "Legacy/Brownie/AudioWAV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/CSWARE",
+			"class": "WavAudio",
+			"source": "ArcFormats/CsWare/AudioWAV.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/IKE",
+			"class": "IkeAudio",
+			"source": "Legacy/UMeSoft/AudioIKE.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/PW",
+			"class": "PwAudio",
+			"source": "ArcFormats/BellDa/AudioPW.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAV/TMR-HIRO",
+			"class": "TmrHiroAudio",
+			"source": "ArcFormats/Tmr-Hiro/AudioTmr.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WAY",
+			"class": "WadyAudio",
+			"source": "ArcFormats/Marble/AudioWADY.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WAZ",
+			"class": "WazAudio",
+			"source": "Legacy/AnotherRoom/AudioWAZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WBC",
+			"class": "WbcAudio",
+			"source": "ArcFormats/Primel/AudioWBC.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WHC",
+			"class": "WhcAudio",
+			"source": "ArcFormats/Basil/AudioWHC.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WMA",
+			"class": "WmaAudio",
+			"source": "ArcFormats/AudioWMA.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WPN",
+			"class": "WpnAudio",
+			"source": "ArcFormats/WildBug/AudioWPN.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WRG",
+			"class": "WrgAudio",
+			"source": "Legacy/Regrips/AudioWRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WST",
+			"class": "WstAudio",
+			"source": "ArcFormats/Ipac/AudioWST.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "WV1",
+			"class": "Wv1Audio",
+			"source": "Legacy/Aaru/AudioWV1.cs",
+			"extensions": [
+				"wv1",
+				"wav"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WV3",
+			"class": "Wv3Audio",
+			"source": "Legacy/Eve/AudioWV.cs",
+			"extensions": [
+				"wv3",
+				"wav"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WV5",
+			"class": "Wv5Audio",
+			"source": "ArcFormats/Maika/AudioWV5.cs",
+			"extensions": [
+				"wv5",
+				"wav"
+			]
+		},
+		{
+			"type": "audio",
+			"tag": "WWA",
+			"class": "WwaAudio",
+			"source": "ArcFormats/WildBug/AudioWWA.cs",
+			"extensions": []
+		},
+		{
+			"type": "audio",
+			"tag": "xxx",
+			"class": "xxxAudio",
+			"source": "ArcFormats/DraftAudio.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ABC",
+			"class": "AbcFormat",
+			"source": "Legacy/Sarang/ImageABC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ABM",
+			"class": "AbmFormat",
+			"source": "ArcFormats/Lilim/ImageABM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ACD",
+			"class": "AcdFormat",
+			"source": "ArcFormats/FC01/ImageACD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ACG",
+			"class": "AgFormat",
+			"source": "ArcFormats/Masys/ImageAG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "AGF",
+			"class": "AgfFormat",
+			"source": "ArcFormats/Eushully/ImageAGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "AGF/AOI",
+			"class": "AgfFormat",
+			"source": "ArcFormats/Aoi/ImageAGF.cs",
+			"extensions": [
+				"agf"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AJP",
+			"class": "AjpFormat",
+			"source": "ArcFormats/AliceSoft/ImageAJP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "AKB",
+			"class": "AkbFormat",
+			"source": "ArcFormats/Silky/ImageAKB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ALB",
+			"class": "AlbFormat",
+			"source": "ArcFormats/Slg/ImageALB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ALO",
+			"class": "AloFormat",
+			"source": "ArcFormats/BeF/ImageALO.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ALP/BeF",
+			"class": "AlpFormat",
+			"source": "Legacy/hmp/ImageALP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ALP/GAMESYSTEM",
+			"class": "AlpFormat",
+			"source": "ArcFormats/GameSystem/ImageALP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ALP/MEGU",
+			"class": "AlpFormat",
+			"source": "ArcFormats/Masys/ImageALP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "AM/MAI",
+			"class": "AmFormat",
+			"source": "ArcFormats/MAI/ImageMAI.cs",
+			"extensions": [
+				"amp",
+				"ami"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AMAP",
+			"class": "AmapFormat",
+			"source": "ArcFormats/TanukiSoft/ImageAF.cs",
+			"extensions": [
+				"af"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AN1",
+			"class": "An1Format",
+			"source": "Legacy/Discovery/ImageAN1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ANT",
+			"class": "AntFormat",
+			"source": "ArcFormats/StudioEgo/ImageANT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "AO/KAGUYA",
+			"class": "AoFormat",
+			"source": "ArcFormats/Kaguya/ImageAO.cs",
+			"extensions": [
+				"sp_"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AP",
+			"class": "ApFormat",
+			"source": "ArcFormats/Kaguya/ImageAP.cs",
+			"extensions": [
+				"bg_",
+				"cg_",
+				"cgw",
+				"sp_",
+				"aps",
+				"alp",
+				"prs"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AP-0",
+			"class": "Ap0Format",
+			"source": "ArcFormats/Kaguya/ImageAP.cs",
+			"extensions": [
+				"alp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AP-2",
+			"class": "Ap2Format",
+			"source": "ArcFormats/Kaguya/ImageAP.cs",
+			"extensions": [
+				"alp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "AP-3",
+			"class": "Ap3Format",
+			"source": "ArcFormats/Kaguya/ImageAP.cs",
+			"extensions": [
+				"alp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "APS",
+			"class": "ApsFormat",
+			"source": "ArcFormats/Kaguya/ImageAPS.cs",
+			"extensions": [
+				"aps",
+				"parts"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "APS3",
+			"class": "Aps3Format",
+			"source": "ArcFormats/Kaguya/ImageAPS.cs",
+			"extensions": [
+				"aps",
+				"parts",
+				"ap3"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "ARD",
+			"class": "ArdFormat",
+			"source": "Legacy/Acme/ImageARD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ARGB",
+			"class": "ArgbFormat",
+			"source": "ArcFormats/Qlie/ImageARGB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "B/ABMP6",
+			"class": "AbmpFormat",
+			"source": "ArcFormats/Qlie/ImageABMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "B5",
+			"class": "B5Format",
+			"source": "ArcFormats/CsWare/ImageB5.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BBM",
+			"class": "BbmFormat",
+			"source": "ArcFormats/BlueGale/ImageBBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BC",
+			"class": "BcFormat",
+			"source": "ArcFormats/Tanaka/ImageBC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BCF",
+			"class": "BcfFormat",
+			"source": "ArcFormats/Basil/ImageBCF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BET",
+			"class": "BetFormat",
+			"source": "Legacy/System21/ImageBET.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BET/SZDD",
+			"class": "LzBetFormat",
+			"source": "Legacy/System21/ImageBET.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BGD",
+			"class": "BgdFormat",
+			"source": "ArcFormats/GameSystem/ImageBGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BGI",
+			"class": "BgiFormat",
+			"source": "ArcFormats/Ethornell/ImageBGI.cs",
+			"extensions": [
+				"",
+				"bgi",
+				"_bg",
+				"bg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BGRA",
+			"class": "BgraFormat",
+			"source": "ArcFormats/G2/ImageBGRA.cs",
+			"extensions": [
+				"argb",
+				"arg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BIP",
+			"class": "BipFormat",
+			"source": "ArcFormats/Cri/ImageBIP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BIZ",
+			"class": "BizFormat",
+			"source": "Legacy/Adviz/ImageBIZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BIZ/2",
+			"class": "Biz2Format",
+			"source": "Legacy/Adviz/ImageBIZ2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BJR",
+			"class": "BjrFormat",
+			"source": "ArcFormats/Leaf/ImageBJR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BM_",
+			"class": "Bm_Format",
+			"source": "ArcFormats/ImageLZ.cs",
+			"extensions": [
+				"bm_",
+				"gpp",
+				"meh",
+				"gr_"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BM_/ZONE",
+			"class": "Bm_Format",
+			"source": "Legacy/Zone/ImageBM_.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BM2",
+			"class": "Bm2Format",
+			"source": "Legacy/Aaru/ImageBM2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMD",
+			"class": "BmdFormat",
+			"source": "ArcFormats/BlackRainbow/ImageBMD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP",
+			"class": "BmpFormat",
+			"source": "GameRes/ImageBMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/ADVG",
+			"class": "AdvgFormat",
+			"source": "Legacy/ADVGSys/ImageBMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/CP",
+			"class": "CpFormat",
+			"source": "ArcFormats/BellDa/ImageCP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/FC",
+			"class": "FcFormat",
+			"source": "Legacy/Mink/ImageFC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/FD",
+			"class": "FdFormat",
+			"source": "Legacy/Mink/ImageFD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/IKE",
+			"class": "IkeFormat",
+			"source": "Legacy/UMeSoft/ImageIKE.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/MB",
+			"class": "MbImageFormat",
+			"source": "ArcFormats/ImageMB.cs",
+			"extensions": [
+				"bmp",
+				"gra",
+				"xxx"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BMP/NNNN",
+			"class": "NNNNBmpFormat",
+			"source": "ArcFormats/MokoPro/CompressedFile.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/PISCKISS",
+			"class": "Bm1Format",
+			"source": "Legacy/Pisckiss/Image1.cs",
+			"extensions": [
+				"1"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BMP/RLE",
+			"class": "BmpRleFormat",
+			"source": "ArcFormats/Interheart/ImageBMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMP/uGOS",
+			"class": "DetBmpFormat",
+			"source": "ArcFormats/uGOS/ImageBMP.cs",
+			"extensions": [
+				"bmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "BMX",
+			"class": "BmxFormat",
+			"source": "Legacy/Saiki/ImageJPX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BMZ",
+			"class": "BmzFormat",
+			"source": "ArcFormats/BlackRainbow/ImageBMZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BPA",
+			"class": "BpaFormat",
+			"source": "Legacy/Liddell/ImageBPA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BPC",
+			"class": "BpcFormat",
+			"source": "ArcFormats/CsWare/ImageBPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BPD",
+			"class": "BpdFormat",
+			"source": "Legacy/PineSoft/ImageBPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BPE",
+			"class": "BpeFormat",
+			"source": "Legacy/QSoft/ImageBPE.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BPIC",
+			"class": "BpicFormat",
+			"source": "ArcFormats/Softpal/ImageBPIC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BRG",
+			"class": "BrgFormat",
+			"source": "Legacy/Regrips/ImagePRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BSG",
+			"class": "BsgFormat",
+			"source": "ArcFormats/Bishop/ImageBSG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "BTN/SUR",
+			"class": "BtnFormat",
+			"source": "ArcFormats/TamaSoft/ImageBTN.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "C24",
+			"class": "C24Format",
+			"source": "ArcFormats/Foster/ImageC24.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "C25",
+			"class": "C25Format",
+			"source": "ArcFormats/Foster/ImageC25.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CB",
+			"class": "SeraphCbImage",
+			"source": "ArcFormats/Seraphim/ImageSeraph.cs",
+			"extensions": [
+				"CB",
+				"CLB"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CBF",
+			"class": "CbfFormat",
+			"source": "ArcFormats/Abel/ImageCBF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CBF/MA",
+			"class": "CbfFormat",
+			"source": "Legacy/hmp/ImageCBF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CBM",
+			"class": "CbmFormat",
+			"source": "Legacy/KeroQ/ImageCBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CF",
+			"class": "SeraphCfImage",
+			"source": "ArcFormats/Seraphim/ImageSeraph.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CFP",
+			"class": "CfpFormat",
+			"source": "ArcFormats/Tail/ImageCFP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CFP/REB2",
+			"class": "Cfp2Format",
+			"source": "ArcFormats/Tail/ImageCFP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CG",
+			"class": "CgFormat",
+			"source": "ArcFormats/AnimeGameSystem/ImageAinos.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CGD",
+			"class": "CgdFormat",
+			"source": "ArcFormats/GameSystem/ImageCGD.cs",
+			"extensions": [
+				"cgd",
+				"crgb"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CGD/CARRIERE",
+			"class": "CgdFormat",
+			"source": "ArcFormats/Carriere/ImageCGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CGD/KTOOL",
+			"class": "CgdKToolFormat",
+			"source": "Legacy/KApp/ImageCGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CGD/SPIEL",
+			"class": "CgdSpielFormat",
+			"source": "Legacy/KApp/ImageCGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CGF/CADATH",
+			"class": "CgfFormat",
+			"source": "ArcFormats/Cadath/ImageCGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CHD",
+			"class": "ChdFormat",
+			"source": "ArcFormats/ShiinaRio/ImageCHD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CHR",
+			"class": "ChrFormat",
+			"source": "ArcFormats/GameSystem/ImageCHR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CHR/TIGERMAN",
+			"class": "ChrFormat",
+			"source": "Legacy/Tigerman/ImageCHR.cs",
+			"extensions": [
+				"chr",
+				"cls",
+				"ev"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CII",
+			"class": "CiiFormat",
+			"source": "Legacy/Uncanny/ImageCII.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CLM",
+			"class": "ClmFormat",
+			"source": "ArcFormats/FC01/ImageCLM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CLS",
+			"class": "ClsFormat",
+			"source": "ArcFormats/Lambda/ImageCLS.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CM/MAI",
+			"class": "CmFormat",
+			"source": "ArcFormats/MAI/ImageMAI.cs",
+			"extensions": [
+				"cmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CMP/ARK",
+			"class": "CmpFormat",
+			"source": "Legacy/Ark/ImageCMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CompressedBG",
+			"class": "CompressedBGFormat",
+			"source": "ArcFormats/Ethornell/ImageCBG.cs",
+			"extensions": [
+				"",
+				"bgi"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CP2",
+			"class": "Cp2Format",
+			"source": "Legacy/Aquarium/ImageCP2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CP3",
+			"class": "Cp3Format",
+			"source": "ArcFormats/Seraphim/ImageCP3.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CPB",
+			"class": "CpbFormat",
+			"source": "ArcFormats/AZSys/ImageCPB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CPB/TYP1",
+			"class": "Typ1Format",
+			"source": "ArcFormats/AZSys/ImageTYP1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CRX",
+			"class": "CrxFormat",
+			"source": "ArcFormats/Circus/ImageCRX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CRXD",
+			"class": "CrxdFormat",
+			"source": "ArcFormats/Circus/ImageCRXD.cs",
+			"extensions": [
+				"crx"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CRZ",
+			"class": "CrzFormat",
+			"source": "ArcFormats/Crowd/ImageCRZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CSF",
+			"class": "CsfFormat",
+			"source": "Legacy/Eye/ImageCSF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CT",
+			"class": "SeraphCtImage",
+			"source": "ArcFormats/Seraphim/ImageSeraph.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CTF",
+			"class": "CtfFormat",
+			"source": "Legacy/Unknown/ImageCTF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CWD",
+			"class": "CwdFormat",
+			"source": "ArcFormats/Crowd/ImageCWL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CWL",
+			"class": "CwlFormat",
+			"source": "ArcFormats/Crowd/ImageCWL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CWP",
+			"class": "CwpFormat",
+			"source": "ArcFormats/Crowd/ImageCWP.cs",
+			"extensions": [
+				"cwp",
+				"amp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "CX",
+			"class": "SeraphCxImage",
+			"source": "ArcFormats/Seraphim/ImageSeraph.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "CZ",
+			"class": "CzFormat",
+			"source": "ArcFormats/Key/ImageCZ.cs",
+			"extensions": [
+				"cz",
+				"cz0",
+				"cz1",
+				"cz3"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DAR",
+			"class": "DarFormat",
+			"source": "Legacy/Uran/ImageDAR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DAT/SPEED",
+			"class": "SpDatFormat",
+			"source": "ArcFormats/StudioJikkenshitsu/ImageDAT.cs",
+			"extensions": [
+				"dat"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DBM",
+			"class": "DbmFormat",
+			"source": "ArcFormats/SysD/ImageDBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DCF",
+			"class": "DcfFormat",
+			"source": "ArcFormats/AliceSoft/ImageDCF.cs",
+			"extensions": [
+				"dcf",
+				"pcf"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DDS",
+			"class": "DdsFormat",
+			"source": "ArcFormats/DirectDraw/ImageDDS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DES98",
+			"class": "DesFormat",
+			"source": "Legacy/Desire/ImageDES.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DGC",
+			"class": "DgcFormat",
+			"source": "ArcFormats/Dac/ImageDGC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DIF/MnV",
+			"class": "DifFormat",
+			"source": "ArcFormats/MnoViolet/ImageDIF.cs",
+			"extensions": [
+				"dif"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DPC",
+			"class": "DpcFormat",
+			"source": "Legacy/Desire/ImageDPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DPNG",
+			"class": "DpngFormat",
+			"source": "ArcFormats/Qlie/ImageDPNG.cs",
+			"extensions": [
+				"png"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DPO",
+			"class": "DpoFormat",
+			"source": "ArcFormats/JamCreation/ImageDPO.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DREF",
+			"class": "DrefFormat",
+			"source": "ArcFormats/Emote/ImageDREF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DRG",
+			"class": "DrgFormat",
+			"source": "ArcFormats/Ikura/ImageDRG.cs",
+			"extensions": [
+				"drg",
+				"ggd",
+				"dgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DTL/SOHFU",
+			"class": "DtlFormat",
+			"source": "ArcFormats/Sohfu/ImageDTL.cs",
+			"extensions": [
+				"ls8b",
+				"ls8"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DTLC/SOHFU",
+			"class": "DtlcFormat",
+			"source": "ArcFormats/Sohfu/ImageDTL.cs",
+			"extensions": [
+				"ls8b",
+				"ls8"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "DWQ",
+			"class": "DwqFormat",
+			"source": "ArcFormats/BlackCyc/ImageDWQ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DZI",
+			"class": "DziFormat",
+			"source": "ArcFormats/Malie/ImageDZI.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "DZP",
+			"class": "DzpFormat",
+			"source": "Legacy/Force/ImageDZP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ED8",
+			"class": "Ed8Format",
+			"source": "ArcFormats/ActiveSoft/ImageEDT.cs",
+			"extensions": [
+				"ed8",
+				"sal"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "EDT",
+			"class": "EdtFormat",
+			"source": "ArcFormats/ActiveSoft/ImageEDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "EENC",
+			"class": "EencFormat",
+			"source": "ArcFormats/Bruns/ImageEENC.cs",
+			"extensions": [
+				"brs",
+				"png",
+				"bmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "EGN",
+			"class": "EgnFormat",
+			"source": "ArcFormats/ImageEGN.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ELG",
+			"class": "ElgFormat",
+			"source": "ArcFormats/Lucifen/ImageELG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "EPA",
+			"class": "EpaFormat",
+			"source": "ArcFormats/Pajamas/ImageEPA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "EPF",
+			"class": "CandyFormat",
+			"source": "ArcFormats/Interheart/ImageCandy.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ERI",
+			"class": "EriFormat",
+			"source": "ArcFormats/Entis/ImageERI.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ERP",
+			"class": "ErpFormat",
+			"source": "Legacy/BRoom/ImageERP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "EXP/CLIO",
+			"class": "ExpFormat",
+			"source": "Legacy/Clio/ImageEXP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FB",
+			"class": "FbFormat",
+			"source": "Legacy/Akatombo/ImageFB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FCB",
+			"class": "FcbFormat",
+			"source": "ArcFormats/CaramelBox/ImageFCB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FG/FWEI",
+			"class": "FweiFormat",
+			"source": "ArcFormats/FrontWing/ImageFG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FG/FWGI",
+			"class": "FwgiFormat",
+			"source": "ArcFormats/FrontWing/ImageFG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FGP",
+			"class": "FgpFormat",
+			"source": "Legacy/FazeX/ImageFGP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "FRM",
+			"class": "FrmFormat",
+			"source": "Legacy/Logg/ImageFRM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "G",
+			"class": "GFormat",
+			"source": "Legacy/HyperWorks/ImageG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "G/SYSTEM98",
+			"class": "GFormat",
+			"source": "Legacy/System98/ImageG.cs",
+			"extensions": [
+				"g",
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "G00",
+			"class": "G00Format",
+			"source": "ArcFormats/RealLive/ImageG00.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "G00/JPEG",
+			"class": "G00JpegFormat",
+			"source": "ArcFormats/RealLive/ImageG00Jpeg.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "G24",
+			"class": "G24Format",
+			"source": "ArcFormats/elf/ImageG24.cs",
+			"extensions": [
+				"g24",
+				"g16",
+				"g32"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "G2408A",
+			"class": "G2408Format",
+			"source": "Legacy/Sceplay/ImageG24.cs",
+			"extensions": [
+				"g2408a",
+				"g2408b"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "G24A",
+			"class": "G24AFormat",
+			"source": "Legacy/Sceplay/ImageG24.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GAL",
+			"class": "GalFormat",
+			"source": "ArcFormats/LiveMaker/ImageGAL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GAL/X200",
+			"class": "GalXFormat",
+			"source": "ArcFormats/LiveMaker/ImageGALX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GAM",
+			"class": "GamFormat",
+			"source": "Legacy/ProjectMyu/ImageGAM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GAX",
+			"class": "GaxFormat",
+			"source": "ArcFormats/Crowd/ImageGAX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GBC",
+			"class": "GbcFormat",
+			"source": "ArcFormats/Primel/ImageGBC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GBP",
+			"class": "GbpFormat",
+			"source": "ArcFormats/Sviu/ImageGBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GCC",
+			"class": "GccFormat",
+			"source": "ArcFormats/elf/ImageGCC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GCMP",
+			"class": "GCmpFormat",
+			"source": "Legacy/Nekotaro/ImageGCmp.cs",
+			"extensions": [
+				"GCMP",
+				"AIG"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GCP",
+			"class": "GcpFormat",
+			"source": "ArcFormats/RiddleSoft/ImageGCP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GD/C4",
+			"class": "GdFormat",
+			"source": "ArcFormats/C4/ImageGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GD/XEX",
+			"class": "XexGdFormat",
+			"source": "ArcFormats/C4/ImageGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GDF",
+			"class": "GdfFormat",
+			"source": "Legacy/Mink/ImageGDF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GDF/BMP",
+			"class": "DatFormat",
+			"source": "Legacy/Mink/ImageDAT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GDT",
+			"class": "GdtFormat",
+			"source": "ArcFormats/CsWare/ImageGDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GDT",
+			"class": "GdtFormat",
+			"source": "Legacy/Pochette/ImageGDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GEC",
+			"class": "GecFormat",
+			"source": "ArcFormats/Banana/ImageGEC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GEF",
+			"class": "GefFormat",
+			"source": "Legacy/YellowCap/ImageGEF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GEM",
+			"class": "GemFormat",
+			"source": "Legacy/Wing/ImageGEM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GFB",
+			"class": "GfbFormat",
+			"source": "ArcFormats/Gpk2/ImageGFB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GG2",
+			"class": "Gga0Format",
+			"source": "ArcFormats/Ikura/ImageDRG.cs",
+			"extensions": [
+				"gg1",
+				"gg2",
+				"gg3",
+				"gg0"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GGA",
+			"class": "GgaFormat",
+			"source": "ArcFormats/Ikura/ImageGGA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GGD",
+			"class": "DrgIndexedFormat",
+			"source": "ArcFormats/Ikura/ImageDRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GGF",
+			"class": "GgfFormat",
+			"source": "Legacy/YellowCap/ImageGGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GGP",
+			"class": "GgpFormat",
+			"source": "ArcFormats/Ikura/ImageGGP.cs",
+			"extensions": [
+				"ggp",
+				"gg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GGS",
+			"class": "GgsFormat",
+			"source": "ArcFormats/Ikura/ImageGGS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GH",
+			"class": "GhFormat",
+			"source": "ArcFormats/Succubus/ImageGH.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GIZ",
+			"class": "Giz3Format",
+			"source": "Legacy/Adviz/ImageGIZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GIZ/2",
+			"class": "GizFormat",
+			"source": "Legacy/Adviz/ImageGIZ2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GP/EUSHULLY",
+			"class": "GpFormat",
+			"source": "ArcFormats/Eushully/ImageGP.cs",
+			"extensions": [
+				"gpcf"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GP1",
+			"class": "Gp1Format",
+			"source": "Legacy/Mermaid/ImageGP1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GP8",
+			"class": "Gp8Format",
+			"source": "ArcFormats/elf/ImageGP8.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPC",
+			"class": "GpcFormat",
+			"source": "ArcFormats/Ucom/ImageGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPC/PC98",
+			"class": "GpcFormat",
+			"source": "Legacy/Adv98/ImageGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPD",
+			"class": "GpdFormat",
+			"source": "ArcFormats/Antique/ImageGPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPD/ANKH",
+			"class": "GpdFormat",
+			"source": "ArcFormats/Ankh/ImageGPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPH",
+			"class": "GphFormat",
+			"source": "ArcFormats/elf/ImageGPH.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GPS",
+			"class": "GpsFormat",
+			"source": "ArcFormats/Abel/ImageGPS.cs",
+			"extensions": [
+				"gps",
+				"gp2",
+				"cmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GR",
+			"class": "GrFormat",
+			"source": "ArcFormats/Eagls/ImageGR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GR1/LUVL",
+			"class": "Gr1Format",
+			"source": "Legacy/AnotherRoom/ImageGR1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GR2",
+			"class": "Gr2Format",
+			"source": "ArcFormats/AdvSys/ImageGR2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GR2/Pola",
+			"class": "PolaFormat",
+			"source": "ArcFormats/AdvSys/ImageGR2.cs",
+			"extensions": [
+				"gr2"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GR3",
+			"class": "GrpFormat",
+			"source": "ArcFormats/Nexas/ImageGRP.cs",
+			"extensions": [
+				"grp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GRA",
+			"class": "GraFormat",
+			"source": "ArcFormats/MnoViolet/ImageGRA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRA/KURUMI",
+			"class": "GraFormat",
+			"source": "Legacy/Kurumi/ImageGRA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRA/TIARE",
+			"class": "GraFormat",
+			"source": "Legacy/Tiare/ImageGRA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRA/VS",
+			"class": "GraFormat",
+			"source": "ArcFormats/Kurumi/ImageGRA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRB",
+			"class": "GrbFormat",
+			"source": "Legacy/CrossNet/ImageGRB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRC",
+			"class": "GrcFormat",
+			"source": "ArcFormats/StudioJikkenshitsu/ImageGRC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRD",
+			"class": "GrdFormat",
+			"source": "ArcFormats/Silky/ImageGRD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRD/SJ",
+			"class": "GrdFormat",
+			"source": "ArcFormats/StudioJikkenshitsu/ImageGRD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRD/TMR-HIRO",
+			"class": "GrdFormat",
+			"source": "ArcFormats/Tmr-Hiro/ImageGRD.cs",
+			"extensions": [
+				"grd",
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GRP",
+			"class": "GrpFormat",
+			"source": "ArcFormats/Amaterasu/ImageGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRP/CHERRY",
+			"class": "GrpFormat",
+			"source": "ArcFormats/Cherry/ImageGRP.cs",
+			"extensions": [
+				"grp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GRP/CHERRY3",
+			"class": "Grp3Format",
+			"source": "ArcFormats/Cherry/ImageGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRP/ENC",
+			"class": "GrpEncFormat",
+			"source": "ArcFormats/Cherry/ImageGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRP/HERB",
+			"class": "GrpFormat",
+			"source": "Legacy/Herb/ImageGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRP/RG",
+			"class": "GrpFormat",
+			"source": "Legacy/Bom/ImageGRP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GRX",
+			"class": "GrxFormat",
+			"source": "ArcFormats/UMeSoft/ImageGRX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GSA",
+			"class": "GsaFormat",
+			"source": "ArcFormats/Bishop/ImageGSA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GsPIC",
+			"class": "PicFormat",
+			"source": "ArcFormats/GsPack/ImageGS.cs",
+			"extensions": [
+				"pic"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "GSS",
+			"class": "GssFormat",
+			"source": "Legacy/Ags32i/ImageGSS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GT/ApplePie",
+			"class": "GtFormat",
+			"source": "Legacy/ApplePie/ImageGT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GTO",
+			"class": "GtoFormat",
+			"source": "Legacy/Yaneurao/ImageGTO.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GTX",
+			"class": "GpcFormat",
+			"source": "ArcFormats/MicroVision/ImageGPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GWD",
+			"class": "GwdFormat",
+			"source": "ArcFormats/AdvSys/ImageGWD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GXT",
+			"class": "GxtFormat",
+			"source": "ArcFormats/Cri/ImageGXT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "GYU",
+			"class": "GyuFormat",
+			"source": "ArcFormats/ExHibit/ImageGYU.cs",
+			"extensions": [
+				"gyu",
+				"lvg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "HBM",
+			"class": "HbmFormat",
+			"source": "ArcFormats/Rits/ImageHBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HG2",
+			"class": "Hg2Format",
+			"source": "ArcFormats/CatSystem/ImageHG2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HG3",
+			"class": "Hg3Format",
+			"source": "ArcFormats/CatSystem/ImageHG3.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HHP",
+			"class": "HhpFormat",
+			"source": "Legacy/MayBeSoft/ImageHHP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HIP",
+			"class": "HipFormat",
+			"source": "ArcFormats/elf/ImageHIZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HIZ",
+			"class": "HizFormat",
+			"source": "ArcFormats/elf/ImageHIZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HMP",
+			"class": "HmpFormat",
+			"source": "ArcFormats/Interheart/ImageHMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HOT",
+			"class": "HotFormat",
+			"source": "Legacy/Hdl/ImageHOT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HTF",
+			"class": "HtfFormat",
+			"source": "Legacy/Jam/ImageHTF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "HZC",
+			"class": "HzcFormat",
+			"source": "ArcFormats/Favorite/ImageHZC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "I24",
+			"class": "I24Format",
+			"source": "Legacy/HyperWorks/ImageI24.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IAF",
+			"class": "IafFormat",
+			"source": "ArcFormats/Triangle/ImageIAF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IAR/IMAGE",
+			"class": "IarFormat",
+			"source": "ArcFormats/Sas5/ImageIAR.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "IBM/ICE",
+			"class": "IbmFormat",
+			"source": "ArcFormats/Ice/ImageIBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IES",
+			"class": "IesFormat",
+			"source": "ArcFormats/Ipac/ImageIES.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IES/RAW",
+			"class": "IesRawFormat",
+			"source": "ArcFormats/Ipac/ImageIES.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IGF",
+			"class": "IgfFormat",
+			"source": "ArcFormats/Silky/ImageIGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMA",
+			"class": "ImaFormat",
+			"source": "Legacy/HillField/ImageIMA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMG",
+			"class": "ImgFormat",
+			"source": "ArcFormats/ScrPlayer/ImageIMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMG/BMP",
+			"class": "ImgBmpFormat",
+			"source": "ArcFormats/Lilim/ImageIMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMG/HF",
+			"class": "ImgFormat",
+			"source": "Legacy/HillField/ImageIMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMG/PNG",
+			"class": "ImgPngFormat",
+			"source": "ArcFormats/Lilim/ImageIMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IMG2",
+			"class": "Img2Format",
+			"source": "ArcFormats/ScrPlayer/ImageI.cs",
+			"extensions": [
+				"i"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "IMGD/WAG",
+			"class": "ImgdFormat",
+			"source": "ArcFormats/Hexenhaus/ArcWAG.cs",
+			"extensions": [
+				"png"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "IPF",
+			"class": "IpfFormat",
+			"source": "ArcFormats/TechnoBrain/ImageIPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IPH",
+			"class": "IphFormat",
+			"source": "ArcFormats/TechnoBrain/ImageIPH.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "IPT",
+			"class": "IptFormat",
+			"source": "Experimental/Artemis/ImageIPT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ISG",
+			"class": "IsgFormat",
+			"source": "ArcFormats/Ism/ImageISG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "JBP",
+			"class": "JbpFormat",
+			"source": "ArcFormats/Sviu/ImageJBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "JMG",
+			"class": "JmgFormat",
+			"source": "Legacy/James/ImageJMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "JPEG",
+			"class": "JpegFormat",
+			"source": "GameRes/ImageJPEG.cs",
+			"extensions": [
+				"jpg",
+				"jpeg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "JPG/HIDDEN",
+			"class": "HiddenJpegFormat",
+			"source": "Legacy/Gaia/ImageJPG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "JPX",
+			"class": "JpxFormat",
+			"source": "Legacy/Saiki/ImageJPX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "K2",
+			"class": "K2Format",
+			"source": "Legacy/Gsx/ImageK2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "K4",
+			"class": "K4Format",
+			"source": "Legacy/Gsx/ImageK4.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KG",
+			"class": "KgFormat",
+			"source": "ArcFormats/Interheart/ImageKG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KG/ABOGADO",
+			"class": "KgFormat",
+			"source": "ArcFormats/Abogado/ImageKG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KGD",
+			"class": "KgdFormat",
+			"source": "Legacy/KeroQ/ImageKGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KGD1",
+			"class": "Kgd1Format",
+			"source": "Legacy/KeroQ/ImageKGD1.cs",
+			"extensions": [
+				"kgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "KGF",
+			"class": "KgfFormat",
+			"source": "ArcFormats/Cadath/ImageKGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KGP",
+			"class": "KgpFormat",
+			"source": "ArcFormats/KScript/ImageKGP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KGR",
+			"class": "KgrFormat",
+			"source": "Legacy/ProjectMyu/ImageKGR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "KSL",
+			"class": "KslFormat",
+			"source": "ArcFormats/KScript/ImageKSL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LAG",
+			"class": "LagFormat",
+			"source": "ArcFormats/Strikes/ImageLAG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LFG",
+			"class": "LfgFormat",
+			"source": "ArcFormats/Leaf/ImageLFG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LGF",
+			"class": "LgfFormat",
+			"source": "ArcFormats/Leaf/ImageLGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LIM",
+			"class": "LimFormat",
+			"source": "ArcFormats/Liar/ImageLIM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LMG",
+			"class": "LmgFormat",
+			"source": "Legacy/CottonClub/ImageLMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LPG",
+			"class": "LpgFormat",
+			"source": "ArcFormats/Hypatia/ImageLPG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LSG",
+			"class": "LsgFormat",
+			"source": "ArcFormats/Hypatia/ImageLSG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "LZS",
+			"class": "LzsFormat",
+			"source": "ArcFormats/ImageLZS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MAG",
+			"class": "MagFormat",
+			"source": "ArcFormats/Banana/ImageMAG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MAG/MAKI02",
+			"class": "MagFormat",
+			"source": "ArcFormats/Otemoto/ImageMAG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MAI/IZUMI",
+			"class": "Mai2Format",
+			"source": "Legacy/Izumi/ImageMAI2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MAL",
+			"class": "MalFormat",
+			"source": "ArcFormats/Valkyria/ImageMAL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MBP",
+			"class": "MbpFormat",
+			"source": "Legacy/hmp/ImageMBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MCG",
+			"class": "McgFormat",
+			"source": "ArcFormats/FC01/ImageMCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MCG/MEBIUS",
+			"class": "McgFormat",
+			"source": "ArcFormats/Mebius/ImageMCG.cs",
+			"extensions": [
+				"mcg",
+				"msk"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MCP",
+			"class": "xxxFormat",
+			"source": "Legacy/Mink/ImageMCP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MD",
+			"class": "MdFormat",
+			"source": "Legacy/Mina/ImageMD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MFC",
+			"class": "MfcFormat",
+			"source": "ArcFormats/Vitamin/ImageMFC.cs",
+			"extensions": [
+				"mfc"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MFG",
+			"class": "MfgFormat",
+			"source": "ArcFormats/Silky/ImageMFG.cs",
+			"extensions": [
+				"mfp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MG1",
+			"class": "MgFormat",
+			"source": "Legacy/Mermaid/ImageMG1.cs",
+			"extensions": [
+				"mg1",
+				"mg2"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MG2",
+			"class": "Mg2Format",
+			"source": "ArcFormats/Valkyria/ImageMG2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MGD/NSystem",
+			"class": "MgdFormat",
+			"source": "ArcFormats/NSystem/ImageMGD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MGF",
+			"class": "MgfFormat",
+			"source": "ArcFormats/Malie/ImageMGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MGO",
+			"class": "MgoFormat",
+			"source": "Legacy/Melody/ImageMGO.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MGR",
+			"class": "MgrFormat",
+			"source": "ArcFormats/Propeller/ImageMGR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MGX",
+			"class": "MgxFormat",
+			"source": "ArcFormats/UMeSoft/ArcMGX.cs",
+			"extensions": [
+				"grx"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MI2",
+			"class": "Mi2Format",
+			"source": "Legacy/Mapl/ImageMI2.cs",
+			"extensions": [
+				"mi2",
+				"fcg"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MI3",
+			"class": "Mai3Format",
+			"source": "Legacy/Izumi/ImageMAI3.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MI4",
+			"class": "Mi4Format",
+			"source": "ArcFormats/ShiinaRio/ImageMI4.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MIA",
+			"class": "MiaFormat",
+			"source": "Legacy/Miami/ImageMIA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MNG",
+			"class": "MngFormat",
+			"source": "ArcFormats/ImageMNG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MOE",
+			"class": "MoeFormat",
+			"source": "ArcFormats/Ivory/ImageMOE.cs",
+			"extensions": [
+				"moe",
+				"shw"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MOE/MMD",
+			"class": "MmdFormat",
+			"source": "ArcFormats/Ivory/ImageMMD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MRL",
+			"class": "MrlFormat",
+			"source": "Legacy/Artel/ImageMRL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MSK/AI5",
+			"class": "MskFormat",
+			"source": "ArcFormats/elf/ImageGP8.cs",
+			"extensions": [
+				"msk"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MSK/ANKH",
+			"class": "MskFormat",
+			"source": "ArcFormats/Ankh/ImageMSK.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MSK/G16",
+			"class": "Msk16Format",
+			"source": "ArcFormats/elf/ImageG24.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MSK/MAI",
+			"class": "MaskFormat",
+			"source": "ArcFormats/MAI/ImageMAI.cs",
+			"extensions": [
+				"msk"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MSK0",
+			"class": "MskFormat",
+			"source": "ArcFormats/Cmvs/ImageMSK.cs",
+			"extensions": [
+				"msk"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "MTG",
+			"class": "MtgFormat",
+			"source": "Legacy/Asura/ImageMTG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MTL",
+			"class": "MtlFormat",
+			"source": "ArcFormats/Zyx/ImageMTL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "MWP",
+			"class": "MwpFormat",
+			"source": "ArcFormats/Emic/ImageMWP.cs",
+			"extensions": [
+				"mwp",
+				"bmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "NBMP",
+			"class": "NbmpFormat",
+			"source": "Legacy/WestGate/ImageNBMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NCG",
+			"class": "NcgFormat",
+			"source": "Legacy/Nekotaro/ImageNCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NCL",
+			"class": "NclFormat",
+			"source": "Legacy/Powerd/ImageNCL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NCL/URAN",
+			"class": "NclFormat",
+			"source": "Legacy/Uran/ImageNCL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NG3",
+			"class": "Ng3Format",
+			"source": "ArcFormats/Basil/ImageNG3.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NGC",
+			"class": "NgcFormat",
+			"source": "Legacy/Brownie/ImageNGC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NGP",
+			"class": "NgpFormat",
+			"source": "ArcFormats/Nags/ImageNGP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "NGW",
+			"class": "NgwFormat",
+			"source": "Legacy/Brownie/ImageNGW.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "OPF",
+			"class": "OpfFormat",
+			"source": "ArcFormats/HCSystem/ImageOPF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "P/4AG",
+			"class": "P4AGFormat",
+			"source": "ArcFormats/Xuse/ImageP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PAC/PLANTECH",
+			"class": "PacFormat",
+			"source": "Legacy/PlanTech/ImagePAC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PB00",
+			"class": "Pb00Format",
+			"source": "ArcFormats/Mixwill/ImagePB00.cs",
+			"extensions": [
+				"pb"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PB2",
+			"class": "Pb2Format",
+			"source": "ArcFormats/Cmvs/ImagePB2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PB3",
+			"class": "Pb3Format",
+			"source": "ArcFormats/Cmvs/ImagePB3.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PBM",
+			"class": "PbmFormat",
+			"source": "ArcFormats/Nekopunch/ImagePBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PCG",
+			"class": "PcgFormat",
+			"source": "ArcFormats/Software House Parsley/ImagePCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PDT",
+			"class": "PdtFormat",
+			"source": "ArcFormats/RealLive/ImagePDT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PDT/5",
+			"class": "Pdt5Format",
+			"source": "Legacy/AyPio/ImagePDT5.cs",
+			"extensions": [
+				"pdt",
+				"anm"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PDT/BMP",
+			"class": "PdtBmpFormat",
+			"source": "Legacy/AyPio/PdtBitmap.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PDT/UK2",
+			"class": "PdtFormat",
+			"source": "Legacy/AyPio/ImagePDT.cs",
+			"extensions": [
+				"pdt",
+				"anm"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGA",
+			"class": "PgaFormat",
+			"source": "ArcFormats/Palette/ImagePGA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PGD/00_C",
+			"class": "Pgd00Format",
+			"source": "ArcFormats/Softpal/ImagePGD.cs",
+			"extensions": [
+				"pgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGD/11_C",
+			"class": "Pgd11Format",
+			"source": "ArcFormats/Softpal/ImagePGD.cs",
+			"extensions": [
+				"pgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGD/GE",
+			"class": "PgdGeFormat",
+			"source": "ArcFormats/Softpal/ImagePGD.cs",
+			"extensions": [
+				"pgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGD/TGA",
+			"class": "PgdTgaFormat",
+			"source": "ArcFormats/Softpal/ImagePGD.cs",
+			"extensions": [
+				"pgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGD3",
+			"class": "Pgd3Format",
+			"source": "ArcFormats/Softpal/ImagePGD.cs",
+			"extensions": [
+				"pgd"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PGX",
+			"class": "PgxFormat",
+			"source": "ArcFormats/Glib2/ImagePGX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PIC/GROCER",
+			"class": "PicFormat",
+			"source": "Legacy/Grocer/ImagePIC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PIC/KAAS",
+			"class": "PicFormat",
+			"source": "ArcFormats/Kaas/ImageKAAS.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PIC/NP",
+			"class": "NpFormat",
+			"source": "Legacy/Paprika/ImageNP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PIC/SOFTPAL",
+			"class": "PicFormat",
+			"source": "ArcFormats/Softpal/ImagePIC.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PIC/SPRITE",
+			"class": "PicFormat",
+			"source": "ArcFormats/ImagePIC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PICT/MAC",
+			"class": "PictFormat",
+			"source": "ArcFormats/Macintosh/ImagePICT.cs",
+			"extensions": [
+				"pct",
+				"pict",
+				"pic"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PKT/DM",
+			"class": "PktFormat",
+			"source": "Legacy/DigitalMonkey/ImagePKT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PL4",
+			"class": "Pl4Format",
+			"source": "Legacy/Pearl/ImagePL4.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PMG",
+			"class": "PmgFormat",
+			"source": "Legacy/Acme/ImagePMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PMP",
+			"class": "PmpFormat",
+			"source": "ArcFormats/ScenePlayer/ImagePMP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PMS",
+			"class": "PmsFormat",
+			"source": "ArcFormats/AliceSoft/ImagePMS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PNG",
+			"class": "PngFormat",
+			"source": "GameRes/ImagePNG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PNG/ISM",
+			"class": "PngIsmFormat",
+			"source": "ArcFormats/Ism/ImagePNG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PNG/RC4",
+			"class": "Rc4PngFormat",
+			"source": "ArcFormats/Dogenzaka/ImageRSA.cs",
+			"extensions": [
+				"a"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PNX",
+			"class": "PnxFormat",
+			"source": "ArcFormats/ImagePNX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PNX/ZENOS",
+			"class": "PnxFormat",
+			"source": "Legacy/Zenos/ImagePNX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PR1",
+			"class": "Pr1Format",
+			"source": "Legacy/Discovery/ImagePR1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PRG",
+			"class": "PrgFormat",
+			"source": "Legacy/Regrips/ImagePRG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PRS",
+			"class": "PrsFormat",
+			"source": "ArcFormats/Marble/ImagePRS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PRS/YP",
+			"class": "YpFormat",
+			"source": "ArcFormats/Marble/ImageYP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PRT",
+			"class": "PrtFormat",
+			"source": "ArcFormats/Kid/ImagePRT.cs",
+			"extensions": [
+				"prt",
+				"cps"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "PSB",
+			"class": "PsbFormat",
+			"source": "ArcFormats/Cmvs/ImagePSB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PSD",
+			"class": "PsdFormat",
+			"source": "ArcFormats/Adobe/ImagePSD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PSM",
+			"class": "PsmFormat",
+			"source": "ArcFormats/ImagePSM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PT1",
+			"class": "Pt1Format",
+			"source": "ArcFormats/Ffa/ImagePT1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PTI",
+			"class": "PtiFormat",
+			"source": "ArcFormats/ImagePTI.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "PX",
+			"class": "PxFormat",
+			"source": "ArcFormats/Leaf/ImagePX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "QNT",
+			"class": "QntFormat",
+			"source": "ArcFormats/AliceSoft/ImageQNT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RAD",
+			"class": "RadFormat",
+			"source": "Legacy/Rina/ImageRAD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RBM",
+			"class": "RbmFormat",
+			"source": "Legacy/Mutation/ImageRBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RBP",
+			"class": "RbpFormat",
+			"source": "Legacy/Dice/ImageRBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RC8",
+			"class": "Rc8Format",
+			"source": "ArcFormats/Majiro/ImageRC8.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RCT",
+			"class": "RctFormat",
+			"source": "ArcFormats/Majiro/ImageRCT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RED",
+			"class": "RedFormat",
+			"source": "Legacy/Ocarina/ImageRED.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RIP",
+			"class": "RipFormat",
+			"source": "ArcFormats/rUGP/ImageRIP.cs",
+			"extensions": [
+				"rip",
+				"sia"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "RMSK/SILKY'S",
+			"class": "RmskFormat",
+			"source": "ArcFormats/Silky/ImageMSK.cs",
+			"extensions": [
+				"msk"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "RMT",
+			"class": "RmtFormat",
+			"source": "ArcFormats/elf/ImageRMT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "RPGMVP",
+			"class": "RpgmvpFormat",
+			"source": "Experimental/RPGMaker/ImageRPGMV.cs",
+			"extensions": [
+				"rpgmvp",
+				"png_"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "RSG",
+			"class": "RsgFormat",
+			"source": "Legacy/RSystem/ImageRSG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "S25",
+			"class": "S25Format",
+			"source": "ArcFormats/ShiinaRio/ImageS25.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "S5I",
+			"class": "S5iFormat",
+			"source": "ArcFormats/rUGP/ImageS5I.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SBI",
+			"class": "SbiFormat",
+			"source": "ArcFormats/Vitamin/ImageSBI.cs",
+			"extensions": [
+				"cmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "SCP",
+			"class": "ScpFormat",
+			"source": "ArcFormats/Scoop/ImageSCP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SFG",
+			"class": "SfgFormat",
+			"source": "Legacy/AlphaSystem/ImageSFG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SG",
+			"class": "SgFormat",
+			"source": "ArcFormats/Ivory/ImageSG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SGF",
+			"class": "SgfFormat",
+			"source": "ArcFormats/Eternity/ImageSGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SGX",
+			"class": "SgxFormat",
+			"source": "ArcFormats/UMeSoft/ImageGRX.cs",
+			"extensions": [
+				"grx"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "SPC",
+			"class": "SpcFormat",
+			"source": "ArcFormats/Cri/ImageSPC.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SPD",
+			"class": "SpdFormat",
+			"source": "ArcFormats/TopCat/ImageSPD.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SPL",
+			"class": "SplFormat",
+			"source": "ArcFormats/Zyx/ImageSPL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SUR",
+			"class": "SurFormat",
+			"source": "ArcFormats/TamaSoft/ImageSUR.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SWG",
+			"class": "SwgFormat",
+			"source": "Legacy/SplushWave/ImageSWG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "SYG",
+			"class": "SygFormat",
+			"source": "ArcFormats/Risa/ImageSYG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TAN",
+			"class": "TanFormat",
+			"source": "ArcFormats/Ikura/ImageTAN.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TB1",
+			"class": "Tb1Format",
+			"source": "ArcFormats/Cyberworks/ImageTB1.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TBL/PAN",
+			"class": "TblFormat",
+			"source": "Legacy/Pan/ImageTBL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TCZ",
+			"class": "TczFormat",
+			"source": "Legacy/Ponytail/ImageTCZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TEX/SZDD",
+			"class": "TexFormat",
+			"source": "Legacy/System21/ImageTEX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TEXB",
+			"class": "TexbFormat",
+			"source": "ArcFormats/GameSystem/ImageTEXB.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TGA",
+			"class": "TgaFormat",
+			"source": "GameRes/ImageTGA.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TGF",
+			"class": "TgfFormat",
+			"source": "ArcFormats/Tactics/ImageTGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "THP",
+			"class": "ThpFormat",
+			"source": "Legacy/PrimeSoft/ImageTHP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TIC",
+			"class": "TicFormat",
+			"source": "ArcFormats/Slg/ImageTIG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TIFF",
+			"class": "TifFormat",
+			"source": "GameRes/ImageTIFF.cs",
+			"extensions": [
+				"tif",
+				"tiff"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "TIG",
+			"class": "TigFormat",
+			"source": "ArcFormats/Slg/ImageTIG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TIL",
+			"class": "TilFormat",
+			"source": "ArcFormats/FC01/ImageTIL.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TIM/SLG",
+			"class": "TimFormat",
+			"source": "ArcFormats/Slg/ImageTIM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TIM2",
+			"class": "Tim2Format",
+			"source": "ArcFormats/DigitalWorks/ImageTM2.cs",
+			"extensions": [
+				"tm2",
+				"ext"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "TLG",
+			"class": "TlgFormat",
+			"source": "ArcFormats/KiriKiri/ImageTLG.cs",
+			"extensions": [
+				"tlg",
+				"tlg5",
+				"tlg6"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "TPGF",
+			"class": "TpgFormat",
+			"source": "Legacy/Types/ImageTPGF.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TRI",
+			"class": "TriFormat",
+			"source": "ArcFormats/Triangle/ImageTRI.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TSZ",
+			"class": "TszFormat",
+			"source": "Legacy/Ponytail/ImageTSZ.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "TX",
+			"class": "TxFormat",
+			"source": "ArcFormats/DigitalWorks/ImageTX.cs",
+			"extensions": [
+				"tmx",
+				"tx"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "TXT/uGOS",
+			"class": "TxtFormat",
+			"source": "ArcFormats/uGOS/ImageTXT.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "UG",
+			"class": "UgFormat",
+			"source": "Legacy/Ucom/ImageUG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "UNH",
+			"class": "UnhFormat",
+			"source": "Legacy/Harvest/ImageUNH.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "UTAGE",
+			"class": "UtageFormat",
+			"source": "ArcFormats/Unity/Utage/ImageUTAGE.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "VRS/DO",
+			"class": "DoFormat",
+			"source": "ArcFormats/Ikura/ImageVRS.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WBI",
+			"class": "WbiFormat",
+			"source": "Legacy/Tobe/ImageWBI.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WBM",
+			"class": "WbmFormat",
+			"source": "ArcFormats/WildBug/ImageWBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WBM/HYPATIA",
+			"class": "WbmFormat",
+			"source": "ArcFormats/Hypatia/ImageWBM.cs",
+			"extensions": [
+				"wbm",
+				"dat"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "WCG",
+			"class": "WcgFormat",
+			"source": "ArcFormats/Liar/ImageWCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WEBP",
+			"class": "WebPFormat",
+			"source": "ArcFormats/WebP/ImageWEBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WEBP",
+			"class": "WebPFormat",
+			"source": "Experimental/WebP/ImageWEBP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WIP",
+			"class": "WipFormat",
+			"source": "ArcFormats/Will/ImageWIP.cs",
+			"extensions": [
+				"wip",
+				"wi0",
+				"msk",
+				"mos"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "WM2",
+			"class": "Wm2Format",
+			"source": "ArcFormats/FC01/ImageWM2.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "WMK",
+			"class": "WmkFormat",
+			"source": "ArcFormats/FC01/ImageWMK.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "XL24",
+			"class": "Xl24Format",
+			"source": "ArcFormats/Pandora/ImageXL24.cs",
+			"extensions": [
+				"bmp"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "XMG",
+			"class": "XmgFormat",
+			"source": "ArcFormats/Zyx/ImageXMG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "XTX",
+			"class": "XtxFormat",
+			"source": "ArcFormats/Cri/ImageXTX.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "xxx",
+			"class": "xxxFormat",
+			"source": "ArcFormats/DraftImage.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "YCG",
+			"class": "YcgFormat",
+			"source": "ArcFormats/YuRis/ImageYCG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "YGA",
+			"class": "YgaFormat",
+			"source": "Legacy/Yaneurao/ImageYGA.cs",
+			"extensions": [
+				"yga",
+				"epf"
+			]
+		},
+		{
+			"type": "image",
+			"tag": "YGP",
+			"class": "YgpFormat",
+			"source": "ArcFormats/Ikura/ImageYGP.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "YKG",
+			"class": "YkgFormat",
+			"source": "ArcFormats/Yuka/ImageYKG.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "YPF/NABE",
+			"class": "YpfFormat",
+			"source": "Legacy/Nabe/ImageYPF.cs",
+			"extensions": [
+				""
+			]
+		},
+		{
+			"type": "image",
+			"tag": "ZAW",
+			"class": "ZawFormat",
+			"source": "ArcFormats/VnEngine/ImageZAW.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ZBM",
+			"class": "ZbmFormat",
+			"source": "ArcFormats/Crowd/ImageZBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ZBM/BLUEGALE",
+			"class": "ZbmFormat",
+			"source": "ArcFormats/BlueGale/ImageZBM.cs",
+			"extensions": []
+		},
+		{
+			"type": "image",
+			"tag": "ZIT",
+			"class": "ZitFormat",
+			"source": "ArcFormats/Silky/ImageZIT.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "AMP/LEAF",
+			"class": "AmpFormat",
+			"source": "ArcFormats/Leaf/ArcPAK.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "DAT/GENERIC",
+			"class": "DataFileFormat",
+			"source": "ArcFormats/ArcCommon.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "DSM/UTAGE",
+			"class": "DsmConverter",
+			"source": "ArcFormats/Unity/ScriptDSM.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "GSC",
+			"class": "GscFormat",
+			"source": "ArcFormats/Liar/ArcXFL.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "ISD",
+			"class": "IsdScript",
+			"source": "ArcFormats/Ice/ScriptISD.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "NScripter",
+			"class": "NSOpener",
+			"source": "ArcFormats/NScripter/Script.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "QDO",
+			"class": "QdoOpener",
+			"source": "Legacy/RedZone/ScriptQDO.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "SCR",
+			"class": "BinScriptFormat",
+			"source": "GameRes/ScriptText.cs",
+			"extensions": [
+				"scr",
+				"bin"
+			]
+		},
+		{
+			"type": "script",
+			"tag": "SCR/AMI",
+			"class": "ScrFormat",
+			"source": "ArcFormats/Amaterasu/ArcAMI.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "SCW",
+			"class": "GsScriptFormat",
+			"source": "ArcFormats/GsPack/ArcGsPack.cs",
+			"extensions": []
+		},
+		{
+			"type": "script",
+			"tag": "TXT",
+			"class": "TextScriptFormat",
+			"source": "GameRes/ScriptText.cs",
+			"extensions": []
+		}
+	]
+}

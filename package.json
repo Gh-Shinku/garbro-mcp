@@ -21,6 +21,7 @@
 		"format:check": "biome format .",
 		"lint": "biome lint --write .",
 		"lint:check": "biome lint .",
+		"inventory:garbro": "node scripts/generate-garbro-inventory.mjs",
 		"typecheck": "tsc -b && tsc -p tsconfig.tests.json",
 		"test": "pnpm build && vitest run",
 		"test:differential": "pnpm build && node scripts/differential-archive.mjs",
