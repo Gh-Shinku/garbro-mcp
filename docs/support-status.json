@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "K3",
+				"class": "K3Opener",
+				"source": "Legacy/Gsx/ArcK3.cs"
+			},
+			"localId": "gsx-k3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"base-relative offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "RAD",
 				"class": "RadOpener",
 				"source": "Legacy/RSystem/ArcRAD.cs"

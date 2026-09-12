@@ -89,6 +89,7 @@ import { herbPakFormat } from "./herb/pak.js";
 import { applePieArcFormat } from "./applepie/arc.js";
 import { pfdFormat } from "./artel/pfd.js";
 import { radFormat } from "./rsystem/rad.js";
+import { k3Format } from "./gsx/k3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -259,5 +260,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		applePieArcFormat,
 		pfdFormat,
 		radFormat,
+		k3Format,
 	]);
 }
