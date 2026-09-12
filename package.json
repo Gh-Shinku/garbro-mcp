@@ -22,6 +22,7 @@
 		"lint": "biome lint --write .",
 		"lint:check": "biome lint .",
 		"inventory:garbro": "node scripts/generate-garbro-inventory.mjs",
+		"targets:garbro": "node scripts/generate-test-data-targets.mjs",
 		"typecheck": "tsc -b && tsc -p tsconfig.tests.json",
 		"test": "pnpm build && vitest run",
 		"test:differential": "pnpm build && node scripts/differential-archive.mjs",

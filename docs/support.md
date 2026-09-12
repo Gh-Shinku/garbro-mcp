@@ -25,6 +25,9 @@ Project-specific progress and known limitations are stored separately in
 [`support-status.json`](support-status.json). Entries absent from the status file are considered
 `not-started`.
 
+Use [`test-data-targets.md`](test-data-targets.md) when acquiring private validation samples. It
+selects one representative game for every row in GARbro's official supported-formats table.
+
 ## Status definitions
 
 - `not-started`: no project implementation is tracked.
