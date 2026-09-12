@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PFD",
+				"class": "PfdOpener",
+				"source": "Legacy/Artel/ArcPFD.cs"
+			},
+			"localId": "artel-pfd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"separate extension field",
+				"index-following offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/ApplePie",
 				"class": "ArcOpener",
 				"source": "Legacy/ApplePie/ArcARC.cs"
