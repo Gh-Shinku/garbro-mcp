@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/ESC-ARC",
+				"class": "BinOpener",
+				"source": "ArcFormats/Escude/ArcBIN.cs"
+			},
+			"localId": "escude-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ESC-ARC1 and ESC-ARC2 signatures",
+				"encrypted index decoding",
+				"fixed and indirect CP932 paths",
+				"raw entry extraction",
+				"ACP variable-width LZW decompression"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/ACPXPK",
 				"class": "BinOpener",
 				"source": "ArcFormats/Favorite/ArcFVP.cs"

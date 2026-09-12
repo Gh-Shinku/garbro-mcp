@@ -4,6 +4,7 @@ import { AmiFormat } from "./amaterasu/ami.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
+import { EscudeBinFormat } from "./escude/bin.js";
 import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { DrsFormat } from "./ikura/drs.js";
@@ -14,6 +15,7 @@ export * from "./active-soft/index.js";
 export * from "./amaterasu/index.js";
 export * from "./cri/index.js";
 export * from "./ethornell/index.js";
+export * from "./escude/index.js";
 export * from "./favorite/index.js";
 export * from "./ikura/index.js";
 export * from "./xp3/index.js";
@@ -29,6 +31,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new BurikoArcFormat(),
 		new DrsFormat(),
 		new MpxFormat(),
+		new EscudeBinFormat(),
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
 	]);
