@@ -21,6 +21,7 @@ import { clioPacFormat } from "./clio/pac.js";
 import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
+import { spcFormat } from "./cri/spc.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
 import { EscudeBinFormat } from "./escude/bin.js";
 import { AcpxFormat } from "./favorite/acpx.js";
@@ -145,6 +146,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		bananaPkFormat,
+		spcFormat,
 		ailDatFormat,
 		advSysFpkFormat,
 		bishopBscFormat,

@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SPC/CRI",
+				"class": "SpcOpener",
+				"source": "ArcFormats/Cri/ArcSPC.cs"
+			},
+			"localId": "cri-spc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"LZSS index decompression",
+				"nested xtx index walk",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PK/BANANA",
 				"class": "PkOpener",
 				"source": "ArcFormats/Banana/ArcPK.cs"
