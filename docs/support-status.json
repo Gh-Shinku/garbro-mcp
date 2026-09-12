@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ZIP",
+				"class": "ZipOpener",
+				"source": "ArcFormats/PkWare/ArcZIP.cs"
+			},
+			"localId": "zip",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"end-of-central-directory detection",
+				"stored and deflate entries",
+				"ZIP64 records",
+				"CP932 and UTF-8 names",
+				"directory record skipping",
+				"streaming extraction",
+				"encrypted entry metadata"
+			],
+			"unsupported": [
+				"encrypted entry extraction",
+				"bzip2 and LZMA methods",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BCD",
 				"class": "BcdOpener",
 				"source": "Legacy/Ransel/ArcBCD.cs"
