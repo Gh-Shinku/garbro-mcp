@@ -4,6 +4,7 @@ import { ailDatFormat, lnk2Format } from "./ail/dat.js";
 import { AmiFormat } from "./amaterasu/ami.js";
 import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
+import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { dpfFormat } from "./mutation/dpf.js";
 import { circusPckFormat } from "./circus/pck.js";
@@ -133,6 +134,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		ailDatFormat,
+		bishopBscFormat,
 		circusPckFormat,
 		irrlichtPackFormat,
 		kissArcFormat,
