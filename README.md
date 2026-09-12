@@ -18,6 +18,7 @@ The project currently includes archive support for:
 - CatSystem2 KIF/INT archives with 32-byte and 64-byte filename indexes;
 - SYSTEM-epsilon PACKDAT archives with script and rotating-XOR transforms;
 - Selene KCAP archives with default or programmatically supplied passphrases;
+- Kogado HyPack v1-v3 archives with Mariel and XOR-FF entries;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/HyPack",
+				"class": "PakOpener",
+				"source": "ArcFormats/Hypatia/ArcKogado.cs"
+			},
+			"localId": "hypack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"versions 0x100, 0x200, 0x300, and 0x301",
+				"CP932 names and extensions",
+				"raw entry extraction",
+				"Mariel LZ decompression",
+				"XOR-FF entry decoding"
+			],
+			"unsupported": ["Cocotte decompression", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "KCAP",
 				"class": "PackOpener",
 				"source": "ArcFormats/Selene/ArcKCAP.cs"
