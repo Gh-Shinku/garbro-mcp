@@ -11,5 +11,8 @@
 	},
 	"files": [
 		"dist"
-	]
+	],
+	"dependencies": {
+		"iconv-lite": "^0.7.3"
+	}
 }

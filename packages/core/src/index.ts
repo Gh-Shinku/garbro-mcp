@@ -1,4 +1,5 @@
 export * from "./binary.js";
+export * from "./encoding.js";
 export * from "./errors.js";
 export * from "./extract.js";
 export * from "./registry.js";

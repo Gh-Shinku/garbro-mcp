@@ -1,4 +1,9 @@
 import { GarbroError } from "./errors.js";
+import {
+	decodeBinaryString,
+	type BinaryStringEncoding,
+	type CStringEncoding,
+} from "./encoding.js";
 
 export class BufferCursor {
 	readonly #buffer: Buffer;
@@ -65,6 +70,13 @@ export class BufferCursor {
 		return value;
 	}
 
+	readU16BE(): number {
+		this.#ensure(2);
+		const value = this.#buffer.readUInt16BE(this.#position);
+		this.#position += 2;
+		return value;
+	}
+
 	readI16LE(): number {
 		this.#ensure(2);
 		const value = this.#buffer.readInt16LE(this.#position);
@@ -72,9 +84,37 @@ export class BufferCursor {
 		return value;
 	}
 
+	readI16BE(): number {
+		this.#ensure(2);
+		const value = this.#buffer.readInt16BE(this.#position);
+		this.#position += 2;
+		return value;
+	}
+
+	readU24LE(): number {
+		this.#ensure(3);
+		const value = this.#buffer.readUIntLE(this.#position, 3);
+		this.#position += 3;
+		return value;
+	}
+
+	readU24BE(): number {
+		this.#ensure(3);
+		const value = this.#buffer.readUIntBE(this.#position, 3);
+		this.#position += 3;
+		return value;
+	}
+
 	readU32LE(): number {
 		this.#ensure(4);
 		const value = this.#buffer.readUInt32LE(this.#position);
+		this.#position += 4;
+		return value;
+	}
+
+	readU32BE(): number {
+		this.#ensure(4);
+		const value = this.#buffer.readUInt32BE(this.#position);
 		this.#position += 4;
 		return value;
 	}
@@ -86,9 +126,37 @@ export class BufferCursor {
 		return value;
 	}
 
+	readI32BE(): number {
+		this.#ensure(4);
+		const value = this.#buffer.readInt32BE(this.#position);
+		this.#position += 4;
+		return value;
+	}
+
+	readU48LE(): number {
+		this.#ensure(6);
+		const value = this.#buffer.readUIntLE(this.#position, 6);
+		this.#position += 6;
+		return value;
+	}
+
+	readU48BE(): number {
+		this.#ensure(6);
+		const value = this.#buffer.readUIntBE(this.#position, 6);
+		this.#position += 6;
+		return value;
+	}
+
 	readU64LE(): bigint {
 		this.#ensure(8);
 		const value = this.#buffer.readBigUInt64LE(this.#position);
+		this.#position += 8;
+		return value;
+	}
+
+	readU64BE(): bigint {
+		this.#ensure(8);
+		const value = this.#buffer.readBigUInt64BE(this.#position);
 		this.#position += 8;
 		return value;
 	}
@@ -98,6 +166,26 @@ export class BufferCursor {
 		const value = this.#buffer.readBigInt64LE(this.#position);
 		this.#position += 8;
 		return value;
+	}
+
+	readI64BE(): bigint {
+		this.#ensure(8);
+		const value = this.#buffer.readBigInt64BE(this.#position);
+		this.#position += 8;
+		return value;
+	}
+
+	readFixedString(length: number, encoding: BinaryStringEncoding): string {
+		return decodeBinaryString(this.readBytes(length), encoding);
+	}
+
+	readCString(length: number, encoding: CStringEncoding = "cp932"): string {
+		const bytes = this.readBytes(length);
+		const terminator = bytes.indexOf(0);
+		return decodeBinaryString(
+			terminator === -1 ? bytes : bytes.subarray(0, terminator),
+			encoding,
+		);
 	}
 
 	readUtf16Le(codeUnits: number): string {
