@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VBD/SOUND",
+				"class": "SoundDataOpener",
+				"source": "Legacy/Witch/ArcVBD.cs"
+			},
+			"localId": "witch-vbd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"interleaved offset/name records",
+				"adjacent-size derivation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ML2",
 				"class": "Ml2Opener",
 				"source": "Legacy/Mina/ArcML2.cs"
