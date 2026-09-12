@@ -82,6 +82,18 @@ export function normalizeEntryPath(rawPath: string): {
 	return path === rawPath ? { path } : { path, rawPath };
 }
 
+export interface FixedEntryOpener {
+	(
+		source: ByteSource,
+		entry: FixedEntry,
+		sourcePath: string,
+	): Promise<Readable>;
+}
+
+/** Opens an entry as a raw read stream. Mirrors the default GARbro entry behavior. */
+export const rawEntryOpener: FixedEntryOpener = async (source, entry) =>
+	source.createReadStream(entry.offset, entry.size);
+
 export class FixedIndexArchiveHandle implements ArchiveHandle {
 	readonly sourcePath: string;
 	readonly format: FormatDescriptor;
@@ -89,6 +101,7 @@ export class FixedIndexArchiveHandle implements ArchiveHandle {
 	readonly metadata: Record<string, unknown>;
 	readonly entries: readonly FixedEntry[];
 	readonly #source: ByteSource;
+	readonly #opener: FixedEntryOpener;
 
 	constructor(
 		source: ByteSource,
@@ -96,6 +109,7 @@ export class FixedIndexArchiveHandle implements ArchiveHandle {
 		format: FormatDescriptor,
 		entries: readonly FixedEntry[],
 		metadata: Record<string, unknown>,
+		opener: FixedEntryOpener = rawEntryOpener,
 	) {
 		this.#source = source;
 		this.sourcePath = sourcePath;
@@ -103,6 +117,7 @@ export class FixedIndexArchiveHandle implements ArchiveHandle {
 		this.size = source.size;
 		this.entries = entries;
 		this.metadata = metadata;
+		this.#opener = opener;
 	}
 
 	async openEntry(entryId: string): Promise<Readable> {
@@ -113,7 +128,7 @@ export class FixedIndexArchiveHandle implements ArchiveHandle {
 				`Archive entry not found: ${entryId}`,
 			);
 		}
-		return this.#source.createReadStream(entry.offset, entry.size);
+		return this.#opener(this.#source, entry, this.sourcePath);
 	}
 
 	async close(): Promise<void> {
@@ -132,6 +147,8 @@ export interface FixedArchiveDefinition {
 		entries: FixedEntry[];
 		metadata?: Record<string, unknown>;
 	}>;
+	/** Optional custom entry decoder, for example when entries are LZSS-compressed. */
+	openEntry?: FixedEntryOpener;
 }
 
 export function defineFixedArchive(
@@ -148,6 +165,7 @@ export function defineFixedArchive(
 				definition.descriptor,
 				entries,
 				metadata ?? {},
+				definition.openEntry,
 			);
 		},
 	};
