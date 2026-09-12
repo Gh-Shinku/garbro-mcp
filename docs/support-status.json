@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "060/POG",
+				"class": "PogOpener",
+				"source": "ArcFormats/Ads/ArcPOG.cs"
+			},
+			"localId": "ads-pog",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"trailing name table",
+				"derived entry sizes",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FFA/ARC",
 				"class": "ArcOpener",
 				"source": "ArcFormats/Ffa/ArcFFA.cs"
