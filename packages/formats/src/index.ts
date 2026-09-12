@@ -84,6 +84,7 @@ import { nafFormat } from "./brownie/naf.js";
 import { cpaFormat } from "./aquarium/cpa.js";
 import { sceplayPakFormat } from "./sceplay/pak.js";
 import { tigermanPacFormat } from "./tigerman/pac.js";
+import { irisFpackFormat } from "./iris/fpack.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -154,6 +155,7 @@ export * from "./brownie/index.js";
 export * from "./aquarium/index.js";
 export * from "./sceplay/index.js";
 export * from "./tigerman/index.js";
+export * from "./iris/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -244,5 +246,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cpaFormat,
 		sceplayPakFormat,
 		tigermanPacFormat,
+		irisFpackFormat,
 	]);
 }
