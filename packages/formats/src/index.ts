@@ -51,6 +51,7 @@ import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
 import { phsFormat } from "./uran/phs.js";
 import { redzonePakFormat } from "./redzone/pak.js";
+import { pinesoftVoiceFormat } from "./pinesoft/voice.js";
 import { parsleyPacFormat } from "./parsley/pac.js";
 import { kissArcFormat } from "./kiss/arc.js";
 import { KcapFormat } from "./selene/kcap.js";
@@ -115,6 +116,7 @@ export * from "./nexton/index.js";
 export * from "./oneup/index.js";
 export * from "./nitroplus/index.js";
 export * from "./plantech/index.js";
+export * from "./pinesoft/index.js";
 export * from "./parsley/index.js";
 export * from "./seraphim/index.js";
 export * from "./succubus/index.js";
@@ -146,6 +148,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		fpk2Format,
 		irrlichtPackFormat,
 		kissArcFormat,
+		pinesoftVoiceFormat,
 		sudFormat,
 		lnk2Format,
 		nppFormat,
