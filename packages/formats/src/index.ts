@@ -20,6 +20,7 @@ import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { mrg0Format } from "./fc01/mrg0.js";
 import { HyPackFormat } from "./hypatia/hypack.js";
+import { dallPelFormat } from "./dall/pel.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
@@ -69,6 +70,7 @@ export * from "./cat-system/index.js";
 export * from "./cri/index.js";
 export * from "./abel/index.js";
 export * from "./antique/index.js";
+export * from "./dall/index.js";
 export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
@@ -145,6 +147,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaArc0Format,
 		tanakaWvxFormat,
 		mrg0Format,
+		dallPelFormat,
 		dpfFormat,
 		unaDatFormat,
 		museDatFormat,
