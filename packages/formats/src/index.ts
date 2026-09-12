@@ -118,6 +118,7 @@ import { vpkFormat } from "./black-cyc/vpk.js";
 import { bndFormat } from "./tetratech/bnd.js";
 import { aosDatFormat } from "./aos/dat.js";
 import { keroqDatFormat } from "./keroq/dat.js";
+import { bcdFormat } from "./ransel/bcd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -217,6 +218,7 @@ export * from "./black-cyc/index.js";
 export * from "./tetratech/index.js";
 export * from "./aos/index.js";
 export * from "./keroq/index.js";
+export * from "./ransel/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -341,5 +343,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bndFormat,
 		aosDatFormat,
 		keroqDatFormat,
+		bcdFormat,
 	]);
 }
