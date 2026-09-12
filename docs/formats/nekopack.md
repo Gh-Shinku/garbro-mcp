@@ -32,9 +32,15 @@ global resource catalog.
 | Known directory recovery | Supported |
 | Injected filename candidate recovery | Supported |
 | Hexadecimal fallback names | Supported |
-| Versions 2 and 3 | Planned separately |
+| Version 2 dynamic MMX-style decryption | Supported |
+| Version 2 duplicated-size validation | Supported |
+| Version 3 | Planned separately |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover GARBro filename-hash vectors, a fixed encrypted-block vector, resolved and
-unresolved names, listing, and extraction. No real game data is used, following the current
-migration policy.
+Version 2 retains the hashed directory layout but duplicates directory counts and encrypted size
+fields for validation. Its initial key generates four packed-lane transforms plus six key-register
+updates. The implementation models the 8-, 16-, 32-, and 64-bit unsigned wraparound explicitly.
+
+Synthetic fixtures cover filename-hash vectors, fixed encrypted-block vectors, resolved and
+unresolved names, both encryption schemes, listing, and extraction. No real game data is used,
+following the current migration policy.

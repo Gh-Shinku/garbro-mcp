@@ -18,7 +18,7 @@ const NEKOPACK_SIGNATURE = Buffer.from("NEKOPACK", "ascii");
 const HEADER_SIZE = 0x18;
 const MAX_ENTRY_COUNT = 0xfffff;
 
-const knownDirectoryNames = [
+export const nekoPackKnownDirectoryNames = [
 	"image/actor",
 	"image/back",
 	"image/mask",
@@ -182,7 +182,7 @@ async function readDirectory(
 	if (index.size < 16) {
 		throw new GarbroError("INVALID_ARCHIVE", "NekoPack v1 index is too small");
 	}
-	const directoryNames = createNameMap(seed, knownDirectoryNames);
+	const directoryNames = createNameMap(seed, nekoPackKnownDirectoryNames);
 	const fileNames = createNameMap(seed, knownFileNames);
 	const cursor = new BufferCursor(index.data.subarray(0, index.size));
 	const entries: NekoPack1Entry[] = [];
