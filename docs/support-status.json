@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DNS",
+				"class": "DnsOpener",
+				"source": "ArcFormats/Marble/ArcDNS.cs"
+			},
+			"localId": "marble-dns",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"file-name detection",
+				"fixed 0x8000 index area",
+				".S name conversion",
+				"byte negation on extraction",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BMX",
 				"class": "BmxOpener",
 				"source": "ArcFormats/Tanaka/ArcBMX.cs"

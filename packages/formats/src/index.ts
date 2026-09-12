@@ -107,6 +107,7 @@ import { mykFormat } from "./cherry/myk.js";
 import { arcxFormat } from "./arcx/arc.js";
 import { sdaFormat } from "./mmfass/sda.js";
 import { bmxFormat } from "./tanaka/bmx.js";
+import { dnsFormat } from "./marble/dns.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -196,6 +197,7 @@ export * from "./slg/index.js";
 export * from "./cherry/index.js";
 export * from "./arcx/index.js";
 export * from "./mmfass/index.js";
+export * from "./marble/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -309,5 +311,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		arcxFormat,
 		sdaFormat,
 		bmxFormat,
+		dnsFormat,
 	]);
 }
