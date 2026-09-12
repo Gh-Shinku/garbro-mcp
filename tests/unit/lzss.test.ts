@@ -1,4 +1,4 @@
-import { inflateLzss } from "@garbro-mcp/codecs";
+import { inflateLzss, inflateLzssAll } from "@garbro-mcp/codecs";
 import { describe, expect, it } from "vitest";
 
 describe("LZSS codec", () => {
@@ -33,6 +33,18 @@ describe("LZSS codec", () => {
 		const input = Buffer.from([0x01, 0x41, 0x01]);
 		expect(inflateLzss(input, { outputLength: 4 }).toString("latin1")).toBe(
 			"A",
+		);
+	});
+
+	it("decodes to the end of the input without a declared output size", () => {
+		const input = Buffer.from([0x01, 0x41, 0xee, 0xf1]);
+		expect(inflateLzssAll(input).toString("latin1")).toBe("AAAAA");
+	});
+
+	it("honors the optional output limit", () => {
+		const input = Buffer.from([0x01, 0x41, 0xee, 0xf1]);
+		expect(() => inflateLzssAll(input, { maxOutputLength: 2 })).toThrow(
+			/exceeds/,
 		);
 	});
 
