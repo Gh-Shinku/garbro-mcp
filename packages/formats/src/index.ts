@@ -104,6 +104,7 @@ import { alphaSystemPakFormat } from "./alpha-system/pak.js";
 import { szsFormat } from "./slg/szs.js";
 import { capybaraDatFormat } from "./winters/capybara.js";
 import { mykFormat } from "./cherry/myk.js";
+import { arcxFormat } from "./arcx/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -191,6 +192,7 @@ export * from "./taskforce/index.js";
 export * from "./alpha-system/index.js";
 export * from "./slg/index.js";
 export * from "./cherry/index.js";
+export * from "./arcx/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -301,5 +303,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		szsFormat,
 		capybaraDatFormat,
 		mykFormat,
+		arcxFormat,
 	]);
 }
