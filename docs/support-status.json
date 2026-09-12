@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "INT",
+				"class": "IntOpener",
+				"source": "ArcFormats/CatSystem/ArcINT.cs"
+			},
+			"localId": "cat-system-int",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"32-byte and 64-byte CP932 filename indexes",
+				"plain entry listing",
+				"plain entry extraction",
+				"encrypted-variant identification"
+			],
+			"unsupported": [
+				"game-specific encrypted indexes and entries",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GSP",
 				"class": "GspOpener",
 				"source": "ArcFormats/BlackRainbow/ArcGSP.cs"

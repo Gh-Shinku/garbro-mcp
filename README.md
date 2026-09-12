@@ -15,6 +15,7 @@ The project currently includes archive support for:
 - Favorite View Point ACPXPK archives with ACP LZW compression;
 - Escu:de ESC-ARC v1/v2 archives with encrypted indexes and ACP LZW entries;
 - Black Rainbow GSP archives;
+- CatSystem2 KIF/INT archives with 32-byte and 64-byte filename indexes;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

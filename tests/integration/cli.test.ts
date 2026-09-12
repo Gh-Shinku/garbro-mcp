@@ -38,6 +38,7 @@ describe("CLI", () => {
 				{ id: "ikura-gdl" },
 				{ id: "escude-bin" },
 				{ id: "gsp" },
+				{ id: "cat-system-int" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],
