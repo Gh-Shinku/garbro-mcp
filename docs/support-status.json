@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/FilePack",
+				"class": "FilePackOpener",
+				"source": "ArcFormats/Palette/ArcPAK.cs"
+			},
+			"localId": "palette-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"XOR-0xFF name field",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/W/VOICE",
 				"class": "VoiceOpener",
 				"source": "Legacy/Weapon/ArcVoice.cs"

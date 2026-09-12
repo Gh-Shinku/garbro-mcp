@@ -92,6 +92,7 @@ import { radFormat } from "./rsystem/rad.js";
 import { k3Format } from "./gsx/k3.js";
 import { aqaFormat } from "./unknown/aqa.js";
 import { weaponVoiceFormat } from "./weapon/voice.js";
+import { palettePakFormat } from "./palette/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -169,6 +170,7 @@ export * from "./artel/index.js";
 export * from "./rsystem/index.js";
 export * from "./unknown/index.js";
 export * from "./weapon/index.js";
+export * from "./palette/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -267,5 +269,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		k3Format,
 		aqaFormat,
 		weaponVoiceFormat,
+		palettePakFormat,
 	]);
 }
