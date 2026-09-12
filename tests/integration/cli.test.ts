@@ -32,6 +32,8 @@ describe("CLI", () => {
 				{ id: "afs" },
 				{ id: "cpk" },
 				{ id: "ami" },
+				{ id: "bgi-arc" },
+				{ id: "buriko-arc" },
 				{ id: "favorite-bin" },
 			],
 		});

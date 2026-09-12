@@ -6,6 +6,45 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BGI",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Ethornell/ArcBGI.cs"
+			},
+			"localId": "bgi-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"raw entry extraction",
+				"DSC Huffman and LZ decompression"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BURIKO ARC",
+				"class": "Arc2Opener",
+				"source": "ArcFormats/Ethornell/ArcBGI.cs"
+			},
+			"localId": "buriko-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"raw entry extraction",
+				"DSC Huffman and LZ decompression",
+				"BSE 1.00 and 1.01 header decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AMI",
 				"class": "AmiOpener",
 				"source": "ArcFormats/Amaterasu/ArcAMI.cs"
