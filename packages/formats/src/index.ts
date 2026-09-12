@@ -30,6 +30,7 @@ import { KcapFormat } from "./selene/kcap.js";
 import { vsdFormat } from "./silky/vsd.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
+import { p8Format } from "./tinkerbell/p8.js";
 import { ukFormat } from "./ucom/uk.js";
 import { valkyriaAm2Format } from "./valkyria/am2.js";
 import { valkyriaDatFormat } from "./valkyria/dat.js";
@@ -61,6 +62,7 @@ export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
 export * from "./system-epsilon/index.js";
+export * from "./tinkerbell/index.js";
 export * from "./ucom/index.js";
 export * from "./valkyria/index.js";
 export * from "./xp3/index.js";
@@ -103,5 +105,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyPacFormat,
 		valkyriaDatFormat,
 		valkyriaAm2Format,
+		p8Format,
 	]);
 }
