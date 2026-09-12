@@ -1,0 +1,40 @@
+{
+	"name": "garbro-mcp",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Modern TypeScript toolkit for detecting and extracting ADV/Galgame resource archives",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.6.0",
+			"onFail": "download"
+		}
+	},
+	"type": "module",
+	"engines": {
+		"node": ">=24.0.0"
+	},
+	"scripts": {
+		"build": "tsc -b",
+		"clean": "tsc -b --clean",
+		"format": "biome format --write .",
+		"format:check": "biome format .",
+		"lint": "biome lint --write .",
+		"lint:check": "biome lint .",
+		"typecheck": "tsc -b && tsc -p tsconfig.tests.json",
+		"test": "pnpm build && vitest run",
+		"test:differential": "pnpm build && node scripts/differential-xp3.mjs",
+		"check": "pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.13",
+		"@garbro-mcp/codecs": "workspace:*",
+		"@garbro-mcp/core": "workspace:*",
+		"@garbro-mcp/formats": "workspace:*",
+		"@garbro-mcp/mcp": "workspace:*",
+		"@modelcontextprotocol/client": "^2.0.0",
+		"@types/node": "^24.13.4",
+		"typescript": "^7.0.2",
+		"vitest": "^5.0.0"
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"name": "@garbro-mcp/cli",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"bin": {
+		"garbro-mcp": "./dist/index.js"
+	},
+	"dependencies": {
+		"@garbro-mcp/core": "workspace:*",
+		"@garbro-mcp/formats": "workspace:*",
+		"commander": "^15.0.0"
+	}
+}

@@ -1,0 +1,202 @@
+import { createHash } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { deflateSync } from "node:zlib";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const outputDirectory = resolve(root, "fixtures/xp3");
+const signature = Buffer.from([
+	0x58, 0x50, 0x33, 0x0d, 0x0a, 0x20, 0x0a, 0x1a, 0x8b, 0x67, 0x01,
+]);
+
+function u16(value) {
+	const buffer = Buffer.alloc(2);
+	buffer.writeUInt16LE(value);
+	return buffer;
+}
+
+function u32(value) {
+	const buffer = Buffer.alloc(4);
+	buffer.writeUInt32LE(value >>> 0);
+	return buffer;
+}
+
+function u64(value) {
+	const buffer = Buffer.alloc(8);
+	buffer.writeBigUInt64LE(BigInt(value));
+	return buffer;
+}
+
+function chunk(tag, data) {
+	return Buffer.concat([Buffer.from(tag, "ascii"), u64(data.length), data]);
+}
+
+function adler32(input) {
+	let a = 1;
+	let b = 0;
+	for (const byte of input) {
+		a = (a + byte) % 65521;
+		b = (b + a) % 65521;
+	}
+	return ((b << 16) | a) >>> 0;
+}
+
+function prepareEntries(definitions) {
+	let offset = 19n;
+	return definitions.map((definition) => {
+		const content = Buffer.from(definition.content);
+		const split = definition.split ?? [content.length];
+		let contentOffset = 0;
+		const segments = split.map((size, index) => {
+			const original = content.subarray(contentOffset, contentOffset + size);
+			contentOffset += size;
+			const compressed =
+				definition.compressedSegments?.includes(index) ?? false;
+			const stored = compressed ? deflateSync(original) : original;
+			const segment = { compressed, offset, original, stored };
+			offset += BigInt(stored.length);
+			return segment;
+		});
+		return { ...definition, content, segments };
+	});
+}
+
+function fileChunk(entry) {
+	const name = Buffer.from(entry.path, "utf16le");
+	const packedSize = entry.segments.reduce(
+		(sum, segment) => sum + segment.stored.length,
+		0,
+	);
+	const info = Buffer.concat([
+		u32(entry.protected ? 0x80000000 : 0),
+		u64(entry.content.length),
+		u64(packedSize),
+		u16(name.length / 2),
+		name,
+	]);
+	const segmentTable = Buffer.concat(
+		entry.segments.map((segment) =>
+			Buffer.concat([
+				u32(segment.compressed ? 1 : 0),
+				u64(segment.offset),
+				u64(segment.original.length),
+				u64(segment.stored.length),
+			]),
+		),
+	);
+	return chunk(
+		"File",
+		Buffer.concat([
+			chunk("info", info),
+			chunk("segm", segmentTable),
+			chunk("adlr", u32(adler32(entry.content))),
+		]),
+	);
+}
+
+function indexBlock(indexData, { compressed, continued }) {
+	const stored = compressed ? deflateSync(indexData) : indexData;
+	const flag = (compressed ? 1 : 0) | (continued ? 0x80 : 0);
+	const header = compressed
+		? Buffer.concat([
+				Buffer.from([flag]),
+				u64(stored.length),
+				u64(indexData.length),
+			])
+		: Buffer.concat([Buffer.from([flag]), u64(stored.length)]);
+	return Buffer.concat([header, stored]);
+}
+
+function buildArchive(
+	definitions,
+	{ compressedIndex = true, continueAfter = undefined } = {},
+) {
+	const entries = prepareEntries(definitions);
+	const content = Buffer.concat(
+		entries.flatMap((entry) => entry.segments.map((segment) => segment.stored)),
+	);
+	const indexOffset = 19n + BigInt(content.length);
+	let index;
+	if (continueAfter === undefined) {
+		index = indexBlock(Buffer.concat(entries.map(fileChunk)), {
+			compressed: compressedIndex,
+			continued: false,
+		});
+	} else {
+		const firstData = Buffer.concat(
+			entries.slice(0, continueAfter).map(fileChunk),
+		);
+		const secondData = Buffer.concat(
+			entries.slice(continueAfter).map(fileChunk),
+		);
+		const first = indexBlock(firstData, { compressed: false, continued: true });
+		const secondOffset = indexOffset + BigInt(first.length) + 8n;
+		const second = indexBlock(secondData, {
+			compressed: true,
+			continued: false,
+		});
+		index = Buffer.concat([first, u64(secondOffset), second]);
+	}
+	const archive = Buffer.concat([signature, u64(indexOffset), content, index]);
+	return { archive, entries };
+}
+
+const definitions = [
+	{ path: "hello.txt", content: Buffer.from("hello xp3\n") },
+	{
+		path: "scripts\\startup.tjs",
+		content: Buffer.from("System.title = 'fixture';\n"),
+		split: [8, 18],
+		compressedSegments: [1],
+	},
+	{
+		path: "画像\\サンプル.bin",
+		content: Buffer.from([0, 1, 2, 3, 0xfe, 0xff]),
+		compressedSegments: [0],
+	},
+];
+
+const basic = buildArchive(definitions);
+const continued = buildArchive(definitions, {
+	compressedIndex: false,
+	continueAfter: 1,
+});
+const protectedArchive = buildArchive([
+	{
+		path: "secret.bin",
+		content: Buffer.from("encrypted-placeholder"),
+		protected: true,
+	},
+]);
+
+await mkdir(outputDirectory, { recursive: true });
+await writeFile(resolve(outputDirectory, "basic.xp3"), basic.archive);
+await writeFile(resolve(outputDirectory, "continued.xp3"), continued.archive);
+await writeFile(
+	resolve(outputDirectory, "protected.xp3"),
+	protectedArchive.archive,
+);
+
+const manifest = {
+	source:
+		"Deterministic synthetic fixtures generated by scripts/generate-xp3-fixtures.mjs",
+	archives: {
+		"basic.xp3": definitions.map((entry, id) => ({
+			id: String(id),
+			path: entry.path.replaceAll("\\", "/"),
+			size: String(entry.content.length),
+			sha256: createHash("sha256").update(entry.content).digest("hex"),
+		})),
+		"continued.xp3": definitions.map((entry, id) => ({
+			id: String(id),
+			path: entry.path.replaceAll("\\", "/"),
+			size: String(entry.content.length),
+			sha256: createHash("sha256").update(entry.content).digest("hex"),
+		})),
+	},
+};
+await writeFile(
+	resolve(outputDirectory, "manifest.json"),
+	`${JSON.stringify(manifest, null, 2)}\n`,
+);

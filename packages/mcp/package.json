@@ -1,0 +1,21 @@
+{
+	"name": "@garbro-mcp/mcp",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./server": {
+			"types": "./dist/server.d.ts",
+			"default": "./dist/server.js"
+		}
+	},
+	"bin": {
+		"garbro-mcp-server": "./dist/index.js"
+	},
+	"dependencies": {
+		"@garbro-mcp/core": "workspace:*",
+		"@garbro-mcp/formats": "workspace:*",
+		"@modelcontextprotocol/server": "^2.0.0",
+		"zod": "^4.6.2"
+	}
+}
