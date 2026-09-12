@@ -114,6 +114,7 @@ import { karFormat } from "./cadath/kar.js";
 import { asuraPakFormat } from "./asura/pak.js";
 import { pak2Format } from "./palette/pak2.js";
 import { snnFormat } from "./blue-gale/snn.js";
+import { vpkFormat } from "./black-cyc/vpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -209,6 +210,7 @@ export * from "./desire/index.js";
 export * from "./cadath/index.js";
 export * from "./asura/index.js";
 export * from "./blue-gale/index.js";
+export * from "./black-cyc/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -329,5 +331,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		asuraPakFormat,
 		pak2Format,
 		snnFormat,
+		vpkFormat,
 	]);
 }
