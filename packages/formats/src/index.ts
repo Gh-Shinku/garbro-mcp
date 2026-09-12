@@ -110,6 +110,7 @@ import { bmxFormat } from "./tanaka/bmx.js";
 import { dnsFormat } from "./marble/dns.js";
 import { panFormat } from "./pan/pan.js";
 import { dsvFormat } from "./desire/dsv.js";
+import { karFormat } from "./cadath/kar.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -202,6 +203,7 @@ export * from "./mmfass/index.js";
 export * from "./marble/index.js";
 export * from "./pan/index.js";
 export * from "./desire/index.js";
+export * from "./cadath/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -318,5 +320,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dnsFormat,
 		panFormat,
 		dsvFormat,
+		karFormat,
 	]);
 }

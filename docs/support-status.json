@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "KAR",
+				"class": "KarOpener",
+				"source": "ArcFormats/Cadath/ArcKAR.cs"
+			},
+			"localId": "cadath-kar",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"size-derived XOR deobfuscation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "000/DESIRE",
 				"class": "D000Opener",
 				"source": "Legacy/Desire/ArcDSV.cs"
