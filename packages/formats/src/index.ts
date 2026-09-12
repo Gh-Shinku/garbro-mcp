@@ -106,6 +106,7 @@ import { capybaraDatFormat } from "./winters/capybara.js";
 import { mykFormat } from "./cherry/myk.js";
 import { arcxFormat } from "./arcx/arc.js";
 import { sdaFormat } from "./mmfass/sda.js";
+import { bmxFormat } from "./tanaka/bmx.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -307,5 +308,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mykFormat,
 		arcxFormat,
 		sdaFormat,
+		bmxFormat,
 	]);
 }
