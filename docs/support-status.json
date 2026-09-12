@@ -6,6 +6,233 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/PLANTECH",
+				"class": "PacOpener",
+				"source": "Legacy/PlanTech/ArcPAC.cs"
+			},
+			"localId": "plantech-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"mirrored BMP size validation",
+				"single BMP extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/UNA",
+				"class": "DatOpener",
+				"source": "Legacy/Harvest/ArcDAT.cs"
+			},
+			"localId": "harvest-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"version tag validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/SCN",
+				"class": "ScnDatOpener",
+				"source": "ArcFormats/Software House Parsley/ArcScn.cs"
+			},
+			"localId": "parsley-scn",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"file-name detection",
+				"fixed 0x1400 index area",
+				"base-relative offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DPF",
+				"class": "DpfOpener",
+				"source": "Legacy/Mutation/ArcDPF.cs"
+			},
+			"localId": "mutation-dpf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"16-bit entry count",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PHS",
+				"class": "PhsOpener",
+				"source": "Legacy/Uran/ArcPHS.cs"
+			},
+			"localId": "uran-phs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"base-relative offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/MUSE",
+				"class": "DatOpener",
+				"source": "Legacy/Muse/ArcDAT.cs"
+			},
+			"localId": "muse-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x10b-strided index",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAK/REDZONE",
+				"class": "PakOpener",
+				"source": "Legacy/RedZone/ArcPAK.cs"
+			},
+			"localId": "redzone-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"index-following offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PEL",
+				"class": "PelOpener",
+				"source": "Legacy/Dall/ArcPEL.cs"
+			},
+			"localId": "dall-pel",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"sequential name/size/payload walk",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAC/CLIO",
+				"class": "PacOpener",
+				"source": "Legacy/Clio/ArcPAC.cs"
+			},
+			"localId": "clio-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"size-before-offset records",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "K5",
+				"class": "K5Opener",
+				"source": "Legacy/Gsx/ArcK5.cs"
+			},
+			"localId": "gsx-k5",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"UTF-16LE names",
+				"directory joining",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PKD/ZONE",
+				"class": "PkdOpener",
+				"source": "Legacy/Zone/ArcPKD.cs"
+			},
+			"localId": "zone-pkd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and marker detection",
+				"base-relative offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "IFX",
+				"class": "IfxOpener",
+				"source": "ArcFormats/Winters/ArcIFX.cs"
+			},
+			"localId": "winters-ifx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"fixed descriptor table",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PB",
 				"class": "PbOpener",
 				"source": "ArcFormats/Kaas/ArcPB.cs"
