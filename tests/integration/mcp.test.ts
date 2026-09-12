@@ -1,3 +1,4 @@
+import { createDefaultRegistry } from "@garbro-mcp/formats";
 import { buildServer } from "@garbro-mcp/mcp/server";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -53,31 +54,11 @@ describe("MCP server", () => {
 		});
 
 		const formats = await client.callTool({ name: "list_formats" });
+		const expectedIds = createDefaultRegistry()
+			.listFormats()
+			.map((format) => format.id);
 		expect(formats.structuredContent).toMatchObject({
-			formats: [
-				{ id: "xp3" },
-				{ id: "adpack32" },
-				{ id: "afs" },
-				{ id: "cpk" },
-				{ id: "ami" },
-				{ id: "bgi-arc" },
-				{ id: "buriko-arc" },
-				{ id: "drs" },
-				{ id: "ikura-gdl" },
-				{ id: "escude-bin" },
-				{ id: "gsp" },
-				{ id: "cat-system-int" },
-				{ id: "packdat" },
-				{ id: "kcap" },
-				{ id: "hypack" },
-				{ id: "nexton-lst" },
-				{ id: "majiro-arc" },
-				{ id: "nekopack-3" },
-				{ id: "nekopack-2" },
-				{ id: "nekopack-1" },
-				{ id: "favorite-acpx" },
-				{ id: "favorite-bin" },
-			],
+			formats: expectedIds.map((id) => ({ id })),
 		});
 
 		const detected = await client.callTool({

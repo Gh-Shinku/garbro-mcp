@@ -1,3 +1,4 @@
+import { createDefaultRegistry } from "@garbro-mcp/formats";
 import { execFile } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -25,31 +26,11 @@ describe("CLI", () => {
 			"formats",
 			"--json",
 		]);
+		const expectedIds = createDefaultRegistry()
+			.listFormats()
+			.map((format) => format.id);
 		expect(JSON.parse(stdout)).toMatchObject({
-			formats: [
-				{ id: "xp3" },
-				{ id: "adpack32" },
-				{ id: "afs" },
-				{ id: "cpk" },
-				{ id: "ami" },
-				{ id: "bgi-arc" },
-				{ id: "buriko-arc" },
-				{ id: "drs" },
-				{ id: "ikura-gdl" },
-				{ id: "escude-bin" },
-				{ id: "gsp" },
-				{ id: "cat-system-int" },
-				{ id: "packdat" },
-				{ id: "kcap" },
-				{ id: "hypack" },
-				{ id: "nexton-lst" },
-				{ id: "majiro-arc" },
-				{ id: "nekopack-3" },
-				{ id: "nekopack-2" },
-				{ id: "nekopack-1" },
-				{ id: "favorite-acpx" },
-				{ id: "favorite-bin" },
-			],
+			formats: expectedIds.map((id) => ({ id })),
 		});
 	});
 
