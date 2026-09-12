@@ -11,6 +11,7 @@ import { antiqueDatFormat } from "./antique/dat.js";
 import { gpk2Format } from "./gpk2/gpk2.js";
 import { kaasPbFormat } from "./kaas/pb.js";
 import { kpcFormat } from "./kscript/kpc.js";
+import { clioPacFormat } from "./clio/pac.js";
 import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
@@ -66,6 +67,7 @@ export * from "./artemis/index.js";
 export * from "./basil/index.js";
 export * from "./bishop/index.js";
 export * from "./black-rainbow/index.js";
+export * from "./clio/index.js";
 export * from "./cat-system/index.js";
 export * from "./cri/index.js";
 export * from "./abel/index.js";
@@ -147,6 +149,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaArc0Format,
 		tanakaWvxFormat,
 		mrg0Format,
+		clioPacFormat,
 		dallPelFormat,
 		dpfFormat,
 		unaDatFormat,
