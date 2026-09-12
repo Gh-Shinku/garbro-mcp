@@ -6,6 +6,7 @@ import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { dpfFormat } from "./mutation/dpf.js";
+import { circusPckFormat } from "./circus/pck.js";
 import { GspFormat } from "./black-rainbow/gsp.js";
 import { abelBinFormat } from "./abel/bin.js";
 import { antiqueDatFormat } from "./antique/dat.js";
@@ -76,6 +77,7 @@ export * from "./basil/index.js";
 export * from "./bishop/index.js";
 export * from "./black-rainbow/index.js";
 export * from "./clio/index.js";
+export * from "./circus/index.js";
 export * from "./cat-system/index.js";
 export * from "./cri/index.js";
 export * from "./abel/index.js";
@@ -129,6 +131,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		ailDatFormat,
+		circusPckFormat,
 		irrlichtPackFormat,
 		kissArcFormat,
 		lnk2Format,
