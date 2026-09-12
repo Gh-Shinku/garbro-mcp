@@ -71,6 +71,7 @@ describe("MCP server", () => {
 				{ id: "kcap" },
 				{ id: "hypack" },
 				{ id: "nexton-lst" },
+				{ id: "majiro-arc" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],

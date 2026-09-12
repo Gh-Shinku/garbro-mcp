@@ -12,6 +12,7 @@ import { FavoriteBinFormat } from "./favorite/bin.js";
 import { HyPackFormat } from "./hypatia/hypack.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
+import { MajiroArcFormat } from "./majiro/arc.js";
 import { LstFormat } from "./nexton/lst.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
@@ -27,6 +28,7 @@ export * from "./escude/index.js";
 export * from "./favorite/index.js";
 export * from "./hypatia/index.js";
 export * from "./ikura/index.js";
+export * from "./majiro/index.js";
 export * from "./nexton/index.js";
 export * from "./selene/index.js";
 export * from "./system-epsilon/index.js";
@@ -50,6 +52,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new KcapFormat(),
 		new HyPackFormat(),
 		new LstFormat(),
+		new MajiroArcFormat(),
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
 	]);

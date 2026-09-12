@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MAJIRO",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Majiro/ArcMajiro.cs"
+			},
+			"localId": "majiro-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"versions 1, 2, and 3",
+				"CP932 filenames",
+				"32-bit and 64-bit name hashes",
+				"sentinel and explicit-size indexes",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "LST",
 				"class": "LstOpener",
 				"source": "ArcFormats/Tactics/ArcLST.cs"
