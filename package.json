@@ -23,7 +23,7 @@
 		"lint:check": "biome lint .",
 		"typecheck": "tsc -b && tsc -p tsconfig.tests.json",
 		"test": "pnpm build && vitest run",
-		"test:differential": "pnpm build && node scripts/differential-xp3.mjs",
+		"test:differential": "pnpm build && node scripts/differential-archive.mjs",
 		"check": "pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test"
 	},
 	"devDependencies": {
