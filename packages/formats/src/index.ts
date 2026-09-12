@@ -24,6 +24,7 @@ import { NekoPack2Format } from "./nekopack/v2.js";
 import { NekoPack3Format } from "./nekopack/v3.js";
 import { LstFormat } from "./nexton/lst.js";
 import { KcapFormat } from "./selene/kcap.js";
+import { vsdFormat } from "./silky/vsd.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { Xp3Format } from "./xp3/format.js";
@@ -48,6 +49,7 @@ export * from "./microvision/index.js";
 export * from "./nekopack/index.js";
 export * from "./nexton/index.js";
 export * from "./selene/index.js";
+export * from "./silky/index.js";
 export * from "./sysd/index.js";
 export * from "./system-epsilon/index.js";
 export * from "./xp3/index.js";
@@ -83,5 +85,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
+		vsdFormat,
 	]);
 }
