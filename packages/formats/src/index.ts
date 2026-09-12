@@ -111,6 +111,7 @@ import { dnsFormat } from "./marble/dns.js";
 import { panFormat } from "./pan/pan.js";
 import { dsvFormat } from "./desire/dsv.js";
 import { karFormat } from "./cadath/kar.js";
+import { asuraPakFormat } from "./asura/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -204,6 +205,7 @@ export * from "./marble/index.js";
 export * from "./pan/index.js";
 export * from "./desire/index.js";
 export * from "./cadath/index.js";
+export * from "./asura/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -321,5 +323,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		panFormat,
 		dsvFormat,
 		karFormat,
+		asuraPakFormat,
 	]);
 }
