@@ -79,6 +79,7 @@ import { pkdFormat } from "./zone/pkd.js";
 import { Xp3Format } from "./xp3/format.js";
 import { alkFormat } from "./alicesoft/alk.js";
 import { cdpaPackFormat } from "./cdpa/pack.js";
+import { hyperworksPakFormat } from "./hyperworks/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -144,6 +145,7 @@ export * from "./zone/index.js";
 export * from "./xp3/index.js";
 export * from "./alicesoft/index.js";
 export * from "./cdpa/index.js";
+export * from "./hyperworks/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -229,5 +231,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		p8Format,
 		alkFormat,
 		cdpaPackFormat,
+		hyperworksPakFormat,
 	]);
 }

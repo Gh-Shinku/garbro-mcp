@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/ACE",
+				"class": "PakOpener",
+				"source": "Legacy/HyperWorks/ArcPAK.cs"
+			},
+			"localId": "hyperworks-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"declared index size",
+				"byte-length names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PACK/CDPA",
 				"class": "PackOpener",
 				"source": "ArcFormats/CDPA/ArcPACK.cs"
