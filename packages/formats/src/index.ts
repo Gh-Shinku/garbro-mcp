@@ -88,6 +88,7 @@ import { irisFpackFormat } from "./iris/fpack.js";
 import { herbPakFormat } from "./herb/pak.js";
 import { applePieArcFormat } from "./applepie/arc.js";
 import { pfdFormat } from "./artel/pfd.js";
+import { radFormat } from "./rsystem/rad.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -162,6 +163,7 @@ export * from "./iris/index.js";
 export * from "./herb/index.js";
 export * from "./applepie/index.js";
 export * from "./artel/index.js";
+export * from "./rsystem/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -256,5 +258,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		herbPakFormat,
 		applePieArcFormat,
 		pfdFormat,
+		radFormat,
 	]);
 }
