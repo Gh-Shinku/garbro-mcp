@@ -102,6 +102,7 @@ import { nscFormat } from "./nekotaro/nsc.js";
 import { taskforceDatFormat } from "./taskforce/dat.js";
 import { alphaSystemPakFormat } from "./alpha-system/pak.js";
 import { szsFormat } from "./slg/szs.js";
+import { capybaraDatFormat } from "./winters/capybara.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -296,5 +297,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		taskforceDatFormat,
 		alphaSystemPakFormat,
 		szsFormat,
+		capybaraDatFormat,
 	]);
 }
