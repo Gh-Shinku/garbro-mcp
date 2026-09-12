@@ -11,6 +11,7 @@ The project currently includes archive support for:
 - Amaterasu Translations AMI archives, including zlib-compressed images;
 - BGI/Ethornell PackFile and BURIKO ARC20 archives, including DSC and BSE data;
 - Digital Romance System DRS archives;
+- IKURA GDL (`SM2MPX10`) archives with built-in script transforms;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

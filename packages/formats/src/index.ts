@@ -6,6 +6,7 @@ import { CpkFormat } from "./cri/cpk.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { DrsFormat } from "./ikura/drs.js";
+import { MpxFormat } from "./ikura/mpx.js";
 import { Xp3Format } from "./xp3/format.js";
 
 export * from "./active-soft/index.js";
@@ -26,6 +27,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new BgiArcFormat(),
 		new BurikoArcFormat(),
 		new DrsFormat(),
+		new MpxFormat(),
 		new FavoriteBinFormat(),
 	]);
 }

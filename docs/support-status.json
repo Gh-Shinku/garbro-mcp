@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IKURA/GDL",
+				"class": "MpxOpener",
+				"source": "ArcFormats/Ikura/ArcDRS.cs"
+			},
+			"localId": "ikura-gdl",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"lowercased CP932 filenames",
+				"raw entry extraction",
+				"rotate, invert, and XOR script transforms",
+				"lossless raw fallback for secret-filtered scripts"
+			],
+			"unsupported": ["secret-table decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DRS",
 				"class": "DrsOpener",
 				"source": "ArcFormats/Ikura/ArcDRS.cs"
