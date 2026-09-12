@@ -6,10 +6,10 @@ import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
-import { mrg0Format } from "./fc01/mrg0.js";
 import { EscudeBinFormat } from "./escude/bin.js";
 import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
+import { mrg0Format } from "./fc01/mrg0.js";
 import { HyPackFormat } from "./hypatia/hypack.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
@@ -19,6 +19,7 @@ import { NekoPack2Format } from "./nekopack/v2.js";
 import { NekoPack3Format } from "./nekopack/v3.js";
 import { LstFormat } from "./nexton/lst.js";
 import { KcapFormat } from "./selene/kcap.js";
+import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { Xp3Format } from "./xp3/format.js";
 
@@ -37,6 +38,7 @@ export * from "./majiro/index.js";
 export * from "./nekopack/index.js";
 export * from "./nexton/index.js";
 export * from "./selene/index.js";
+export * from "./sysd/index.js";
 export * from "./system-epsilon/index.js";
 export * from "./xp3/index.js";
 
@@ -65,5 +67,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
 		mrg0Format,
+		dpkFormat,
 	]);
 }
