@@ -40,6 +40,48 @@ export function decodeCStringField(
 	return decodeCp932(terminator === -1 ? field : field.subarray(0, terminator));
 }
 
+/**
+ * Reads a null-terminated CP932 string at an arbitrary offset without loading the whole source.
+ * Matches GARbro's stream `ReadCString` behavior for unbounded names.
+ */
+export async function readCStringAt(
+	source: ByteSource,
+	offset: bigint,
+	maxLength = 0x400,
+): Promise<{ value: string; end: bigint }> {
+	const chunks: Buffer[] = [];
+	let position = offset;
+	let remaining = maxLength;
+	while (remaining > 0 && position < source.size) {
+		const length = Number(remaining < 0x100 ? remaining : 0x100);
+		const available = Number(
+			source.size - position < BigInt(length)
+				? source.size - position
+				: BigInt(length),
+		);
+		const chunk = await source.readAt(position, available);
+		const terminator = chunk.indexOf(0);
+		if (terminator !== -1) {
+			chunks.push(chunk.subarray(0, terminator));
+			return {
+				value: decodeCp932(
+					chunks.length === 1
+						? (chunks[0] ?? Buffer.alloc(0))
+						: Buffer.concat(chunks),
+				),
+				end: position + BigInt(terminator + 1),
+			};
+		}
+		chunks.push(chunk);
+		position += BigInt(available);
+		remaining -= available;
+	}
+	return {
+		value: decodeCp932(Buffer.concat(chunks)),
+		end: position,
+	};
+}
+
 /** Lowercase extension without the leading dot, as used for GARbro `HasExtension` checks. */
 export function sourceExtension(sourcePath: string): string {
 	return extname(sourcePath).slice(1).toLowerCase();

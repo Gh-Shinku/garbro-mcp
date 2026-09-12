@@ -47,6 +47,7 @@ import { plantechPacFormat } from "./plantech/pac.js";
 import { phsFormat } from "./uran/phs.js";
 import { redzonePakFormat } from "./redzone/pak.js";
 import { parsleyPacFormat } from "./parsley/pac.js";
+import { kissArcFormat } from "./kiss/arc.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { ivoryPxFormat } from "./ivory/px.js";
@@ -90,6 +91,7 @@ export * from "./irrlicht/index.js";
 export * from "./hypatia/index.js";
 export * from "./kaas/index.js";
 export * from "./kscript/index.js";
+export * from "./kiss/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./leaf/index.js";
@@ -128,6 +130,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Adpack32Format(),
 		ailDatFormat,
 		irrlichtPackFormat,
+		kissArcFormat,
 		lnk2Format,
 		nppFormat,
 		new AfsFormat(),
