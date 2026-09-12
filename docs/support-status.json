@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CLS",
+				"class": "ClsOpener",
+				"source": "ArcFormats/Lambda/ArcCLS.cs"
+			},
+			"localId": "lambda-cls",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"pointed-to index",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/FPK",
 				"class": "FpkOpener",
 				"source": "ArcFormats/Abel/ArcFPK.cs"
