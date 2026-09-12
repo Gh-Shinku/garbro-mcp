@@ -32,6 +32,7 @@ import { NekoPack2Format } from "./nekopack/v2.js";
 import { NekoPack3Format } from "./nekopack/v3.js";
 import { LstFormat } from "./nexton/lst.js";
 import { oneUpArcFormat } from "./oneup/arc.js";
+import { unaDatFormat } from "./myharvest/dat.js";
 import { mpkFormat } from "./nitroplus/mpk.js";
 import { plantechPacFormat } from "./plantech/pac.js";
 import { parsleyPacFormat } from "./parsley/pac.js";
@@ -74,6 +75,7 @@ export * from "./kscript/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./leaf/index.js";
+export * from "./myharvest/index.js";
 export * from "./majiro/index.js";
 export * from "./mg/index.js";
 export * from "./microvision/index.js";
@@ -134,6 +136,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaArc0Format,
 		tanakaWvxFormat,
 		mrg0Format,
+		unaDatFormat,
 		plantechPacFormat,
 		dpkFormat,
 		gsdFormat,
