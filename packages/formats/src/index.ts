@@ -38,6 +38,7 @@ import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { ivoryPxFormat } from "./ivory/px.js";
 import { silkyArcFormat } from "./silky/arc.js";
+import { silkyMfgFormat } from "./silky/mfg.js";
 import { vsdFormat } from "./silky/vsd.js";
 import { succubusArcFormat } from "./succubus/arc.js";
 import { tailPkgFormat } from "./tail/pkg.js";
@@ -140,6 +141,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ivoryPxFormat,
 		vsdFormat,
 		silkyArcFormat,
+		silkyMfgFormat,
 		ukFormat,
 		shaFormat,
 		mpkFormat,
