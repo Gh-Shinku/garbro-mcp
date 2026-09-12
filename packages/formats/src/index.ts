@@ -129,6 +129,7 @@ import { abelFpkFormat } from "./abel/fpk.js";
 import { clsFormat } from "./lambda/cls.js";
 import { ffaFormat } from "./ffa/arc.js";
 import { pogFormat } from "./ads/pog.js";
+import { irrlichtArkFormat } from "./irrlicht/ark.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -372,5 +373,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		clsFormat,
 		ffaFormat,
 		pogFormat,
+		irrlichtArkFormat,
 	]);
 }

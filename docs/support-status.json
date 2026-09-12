@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARK",
+				"class": "ArkOpener",
+				"source": "ArcFormats/Irrlicht/ArcARK.cs"
+			},
+			"localId": "irrlicht-ark",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"XOR-0xFF name and payload deobfuscation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "060/POG",
 				"class": "PogOpener",
 				"source": "ArcFormats/Ads/ArcPOG.cs"
