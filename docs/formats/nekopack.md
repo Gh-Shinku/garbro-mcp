@@ -34,13 +34,18 @@ global resource catalog.
 | Hexadecimal fallback names | Supported |
 | Version 2 dynamic MMX-style decryption | Supported |
 | Version 2 duplicated-size validation | Supported |
-| Version 3 | Planned separately |
+| Version 3 encrypted key-table initialization | Supported |
+| Version 3 CP932 directory and file names | Supported |
 | Archive creation | Unsupported |
 
 Version 2 retains the hashed directory layout but duplicates directory counts and encrypted size
 fields for validation. Its initial key generates four packed-lane transforms plus six key-register
 updates. The implementation models the 8-, 16-, 32-, and 64-bit unsigned wraparound explicitly.
 
+Version 3 stores CP932 directory and file names in its encrypted index. A 1 KiB header table is
+transformed between three and nine times, then reused to decrypt index metadata, relative file
+offsets, entry sizes, and entry data.
+
 Synthetic fixtures cover filename-hash vectors, fixed encrypted-block vectors, resolved and
-unresolved names, both encryption schemes, listing, and extraction. No real game data is used,
+unresolved names, all three encryption schemes, CP932 paths, listing, and extraction. No real game data is used,
 following the current migration policy.

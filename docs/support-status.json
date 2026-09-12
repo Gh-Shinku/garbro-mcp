@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "NEKOPACK/3",
+				"class": "Pak3Opener",
+				"source": "ArcFormats/Nekopack/ArcNEKO3.cs"
+			},
+			"localId": "nekopack-3",
+			"status": "partial",
+			"verification": "synthetic-fixtures-and-fixed-vectors",
+			"supported": [
+				"signature detection",
+				"encrypted key-table initialization",
+				"encrypted index and entry decoding",
+				"CP932 directory and file names",
+				"relative entry offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NEKOPACK/2",
 				"class": "Pak2Opener",
 				"source": "ArcFormats/Nekopack/ArcNEKO2.cs"

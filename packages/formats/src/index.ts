@@ -15,6 +15,7 @@ import { MpxFormat } from "./ikura/mpx.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
 import { NekoPack1Format } from "./nekopack/v1.js";
 import { NekoPack2Format } from "./nekopack/v2.js";
+import { NekoPack3Format } from "./nekopack/v3.js";
 import { LstFormat } from "./nexton/lst.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
@@ -56,6 +57,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new HyPackFormat(),
 		new LstFormat(),
 		new MajiroArcFormat(),
+		new NekoPack3Format(),
 		new NekoPack2Format(),
 		new NekoPack1Format(),
 		new AcpxFormat(),

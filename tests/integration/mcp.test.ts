@@ -72,6 +72,7 @@ describe("MCP server", () => {
 				{ id: "hypack" },
 				{ id: "nexton-lst" },
 				{ id: "majiro-arc" },
+				{ id: "nekopack-3" },
 				{ id: "nekopack-2" },
 				{ id: "nekopack-1" },
 				{ id: "favorite-acpx" },
