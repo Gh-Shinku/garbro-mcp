@@ -4,6 +4,7 @@ import { AmiFormat } from "./amaterasu/ami.js";
 import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopPkFormat } from "./bishop/pk.js";
+import { dpfFormat } from "./mutation/dpf.js";
 import { GspFormat } from "./black-rainbow/gsp.js";
 import { abelBinFormat } from "./abel/bin.js";
 import { antiqueDatFormat } from "./antique/dat.js";
@@ -77,6 +78,7 @@ export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./leaf/index.js";
 export * from "./myharvest/index.js";
+export * from "./mutation/index.js";
 export * from "./majiro/index.js";
 export * from "./mg/index.js";
 export * from "./microvision/index.js";
@@ -137,6 +139,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaArc0Format,
 		tanakaWvxFormat,
 		mrg0Format,
+		dpfFormat,
 		unaDatFormat,
 		parsleyScnFormat,
 		plantechPacFormat,
