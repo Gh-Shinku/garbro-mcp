@@ -125,6 +125,7 @@ import { cfpFormat } from "./winters/cfp.js";
 import { aryFormat } from "./pearl/ary.js";
 import { akatomboXFormat } from "./akatombo/x.js";
 import { crgFormat } from "./rhss/crg.js";
+import { abelFpkFormat } from "./abel/fpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -361,5 +362,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aryFormat,
 		akatomboXFormat,
 		crgFormat,
+		abelFpkFormat,
 	]);
 }
