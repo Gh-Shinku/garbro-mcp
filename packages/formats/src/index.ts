@@ -8,6 +8,7 @@ import { GspFormat } from "./black-rainbow/gsp.js";
 import { abelBinFormat } from "./abel/bin.js";
 import { antiqueDatFormat } from "./antique/dat.js";
 import { gpk2Format } from "./gpk2/gpk2.js";
+import { kaasPbFormat } from "./kaas/pb.js";
 import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
@@ -55,6 +56,7 @@ export * from "./favorite/index.js";
 export * from "./fc01/index.js";
 export * from "./gpk2/index.js";
 export * from "./hypatia/index.js";
+export * from "./kaas/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./majiro/index.js";
@@ -100,6 +102,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		abelBinFormat,
 		antiqueDatFormat,
 		gpk2Format,
+		kaasPbFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
