@@ -34,6 +34,7 @@ import { LstFormat } from "./nexton/lst.js";
 import { oneUpArcFormat } from "./oneup/arc.js";
 import { unaDatFormat } from "./myharvest/dat.js";
 import { mpkFormat } from "./nitroplus/mpk.js";
+import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
 import { parsleyPacFormat } from "./parsley/pac.js";
 import { KcapFormat } from "./selene/kcap.js";
@@ -137,6 +138,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaWvxFormat,
 		mrg0Format,
 		unaDatFormat,
+		parsleyScnFormat,
 		plantechPacFormat,
 		dpkFormat,
 		gsdFormat,
