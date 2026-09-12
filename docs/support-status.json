@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AMI",
+				"class": "AmiOpener",
+				"source": "ArcFormats/Amaterasu/ArcAMI.cs"
+			},
+			"localId": "ami",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"synthetic hexadecimal filenames",
+				"SCR, GRP, and DAT extension inference",
+				"raw entry extraction",
+				"zlib-compressed GRP extraction"
+			],
+			"unsupported": ["archive creation", "base-archive update creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CPK",
 				"class": "CpkOpener",
 				"source": "ArcFormats/Cri/ArcCPK.cs"

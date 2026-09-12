@@ -8,6 +8,7 @@ The project currently includes archive support for:
 
 - standard, unencrypted KiriKiri XP3 archives;
 - Active Soft ADPACK32 archives, including CP932 filenames;
+- Amaterasu Translations AMI archives, including zlib-compressed images;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

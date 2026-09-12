@@ -31,6 +31,7 @@ describe("CLI", () => {
 				{ id: "adpack32" },
 				{ id: "afs" },
 				{ id: "cpk" },
+				{ id: "ami" },
 				{ id: "favorite-bin" },
 			],
 		});
