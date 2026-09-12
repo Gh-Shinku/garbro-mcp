@@ -112,6 +112,7 @@ import { panFormat } from "./pan/pan.js";
 import { dsvFormat } from "./desire/dsv.js";
 import { karFormat } from "./cadath/kar.js";
 import { asuraPakFormat } from "./asura/pak.js";
+import { pak2Format } from "./palette/pak2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -324,5 +325,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dsvFormat,
 		karFormat,
 		asuraPakFormat,
+		pak2Format,
 	]);
 }

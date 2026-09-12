@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK2/Palette",
+				"class": "Pak2Opener",
+				"source": "ArcFormats/Palette/ArcPAK2.cs"
+			},
+			"localId": "palette-pak2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"length-prefixed XOR-0xFF names",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/ASURA",
 				"class": "PakOpener",
 				"source": "Legacy/Asura/ArcPAK.cs"
