@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/ALPHA",
+				"class": "PakOpener",
+				"source": "Legacy/AlphaSystem/ArcPAK.cs"
+			},
+			"localId": "alpha-system-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"first-offset validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/TASKFORCE",
 				"class": "DatOpener",
 				"source": "ArcFormats/Taskforce/ArcDAT.cs"
