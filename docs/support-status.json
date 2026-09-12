@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "000/DESIRE",
+				"class": "D000Opener",
+				"source": "Legacy/Desire/ArcDSV.cs"
+			},
+			"localId": "desire-dsv",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"zero-byte index terminator",
+				"sequential payloads",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAN",
 				"class": "PanOpener",
 				"source": "Legacy/Pan/ArcPAN.cs"
