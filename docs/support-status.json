@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "NAF",
+				"class": "NafOpener",
+				"source": "Legacy/Brownie/ArcNAF.cs"
+			},
+			"localId": "brownie-naf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"separate extension field",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/ACE",
 				"class": "PakOpener",
 				"source": "Legacy/HyperWorks/ArcPAK.cs"
