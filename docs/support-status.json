@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "FL2/AARU",
+				"class": "Fl2Opener",
+				"source": "Legacy/Aaru/ArcFL2.cs"
+			},
+			"localId": "aaru-fl2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"variable-length index records",
+				"PD2A and PD LZSS decompression",
+				"RD1.0 RLE decompression",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARK",
 				"class": "ArkOpener",
 				"source": "ArcFormats/Irrlicht/ArcARK.cs"
