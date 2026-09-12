@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "LPK/KOGADO",
+				"class": "LpkOpener",
+				"source": "ArcFormats/Hypatia/ArcLPK.cs"
+			},
+			"localId": "kogado-lpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"fixed name area",
+				"sentinel offset table",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VBD/SOUND",
 				"class": "SoundDataOpener",
 				"source": "Legacy/Witch/ArcVBD.cs"

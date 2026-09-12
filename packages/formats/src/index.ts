@@ -95,6 +95,7 @@ import { weaponVoiceFormat } from "./weapon/voice.js";
 import { palettePakFormat } from "./palette/pak.js";
 import { ml2Format } from "./mina/ml2.js";
 import { vbdFormat } from "./witch/vbd.js";
+import { lpkFormat } from "./hypatia/lpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -276,5 +277,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		palettePakFormat,
 		ml2Format,
 		vbdFormat,
+		lpkFormat,
 	]);
 }
