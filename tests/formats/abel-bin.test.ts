@@ -1,5 +1,5 @@
 import { encodeCp932 } from "@garbro-mcp/core";
-import { abelBinFormat, antiqueDatFormat } from "@garbro-mcp/formats";
+import { abelBinFormat } from "@garbro-mcp/formats";
 import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
 

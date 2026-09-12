@@ -6,6 +6,64 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/Ail",
+				"class": "DatOpener",
+				"source": "ArcFormats/Ail/ArcAil.cs"
+			},
+			"localId": "ail-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension detection",
+				"half-count slot table",
+				"absent-slot skipping",
+				"Ail LZSS decompression",
+				"common signature extension inference",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"full GARbro resource-catalog extension inference"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/LNK2",
+				"class": "Lnk2Opener",
+				"source": "ArcFormats/Ail/ArcLNK2.cs"
+			},
+			"localId": "ail-lnk2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"half-count slot table",
+				"Ail LZSS decompression",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"full GARbro resource-catalog extension inference"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+			"localId": "nitroplus-npp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"hierarchical CP932 names",
+				"default LZSS decompression",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/PLANTECH",
 				"class": "PacOpener",
 				"source": "Legacy/PlanTech/ArcPAC.cs"

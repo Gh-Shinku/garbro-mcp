@@ -1,5 +1,6 @@
 import { FormatRegistry } from "@garbro-mcp/core";
 import { Adpack32Format } from "./active-soft/adpack32.js";
+import { ailDatFormat, lnk2Format } from "./ail/dat.js";
 import { AmiFormat } from "./amaterasu/ami.js";
 import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
@@ -65,6 +66,7 @@ import { pkdFormat } from "./zone/pkd.js";
 import { Xp3Format } from "./xp3/format.js";
 
 export * from "./active-soft/index.js";
+export * from "./ail/index.js";
 export * from "./amaterasu/index.js";
 export * from "./artemis/index.js";
 export * from "./basil/index.js";
@@ -121,6 +123,8 @@ export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
 		new Xp3Format(),
 		new Adpack32Format(),
+		ailDatFormat,
+		lnk2Format,
 		new AfsFormat(),
 		new CpkFormat(),
 		new AmiFormat(),
