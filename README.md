@@ -17,6 +17,7 @@ The project currently includes archive support for:
 - Black Rainbow GSP archives;
 - CatSystem2 KIF/INT archives with 32-byte and 64-byte filename indexes;
 - SYSTEM-epsilon PACKDAT archives with script and rotating-XOR transforms;
+- Selene KCAP archives with default or programmatically supplied passphrases;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

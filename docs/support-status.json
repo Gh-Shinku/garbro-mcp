@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "KCAP",
+				"class": "PackOpener",
+				"source": "ArcFormats/Selene/ArcKCAP.cs"
+			},
+			"localId": "kcap",
+			"status": "partial",
+			"verification": "synthetic-fixtures-and-reference-vector",
+			"supported": [
+				"signature detection",
+				"CP932 hierarchical paths",
+				"raw entry extraction",
+				"default-passphrase decryption",
+				"programmatically supplied passphrases",
+				"signed Mersenne Twister key derivation"
+			],
+			"unsupported": ["CLI and MCP passphrase selection", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PACKDAT",
 				"class": "PakOpener",
 				"source": "ArcFormats/ArcPACKDAT.cs"

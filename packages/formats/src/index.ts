@@ -11,6 +11,7 @@ import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
+import { KcapFormat } from "./selene/kcap.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { Xp3Format } from "./xp3/format.js";
 
@@ -23,6 +24,7 @@ export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
 export * from "./ikura/index.js";
+export * from "./selene/index.js";
 export * from "./system-epsilon/index.js";
 export * from "./xp3/index.js";
 
@@ -41,6 +43,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new GspFormat(),
 		new IntFormat(),
 		new PackDatFormat(),
+		new KcapFormat(),
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
 	]);
