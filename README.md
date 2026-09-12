@@ -7,7 +7,8 @@ independent, streaming implementations of its core API, CLI, and MCP server.
 The project currently includes archive support for:
 
 - standard, unencrypted KiriKiri XP3 archives;
-- Active Soft ADPACK32 archives, including CP932 filenames.
+- Active Soft ADPACK32 archives, including CP932 filenames;
+- Favorite View Point v2 BIN archives (`BIN/FVP`).
 
 The XP3 implementation supports:
 

@@ -26,7 +26,7 @@ describe("CLI", () => {
 			"--json",
 		]);
 		expect(JSON.parse(stdout)).toMatchObject({
-			formats: [{ id: "xp3" }, { id: "adpack32" }],
+			formats: [{ id: "xp3" }, { id: "adpack32" }, { id: "favorite-bin" }],
 		});
 	});
 

@@ -123,6 +123,13 @@ function codeCell(lines) {
 		.join("<br>");
 }
 
+function sampleStatus(row) {
+	if (row.brand.includes("Favorite") && row.files.includes("*.bin")) {
+		return "`data/favorite/se_sys.bin` (local-only)";
+	}
+	return "Pending";
+}
+
 const rows = parseRows(await readFile(sourcePath, "utf8"));
 if (rows.length !== expectedRowCount) {
 	throw new Error(
@@ -162,7 +169,7 @@ for (const [index, row] of rows.entries()) {
 		fallbackRepresentatives.get(row.brand.join(" / ")) ??
 		"Generic format / no tested title listed";
 	output.push(
-		`| ${index + 1} | ${codeCell(row.files)} | ${codeCell(row.signatures)} | ${textCell(row.brand)} | ${escapeMarkdown(representative)} | Pending |`,
+		`| ${index + 1} | ${codeCell(row.files)} | ${codeCell(row.signatures)} | ${textCell(row.brand)} | ${escapeMarkdown(representative)} | ${sampleStatus(row)} |`,
 	);
 }
 

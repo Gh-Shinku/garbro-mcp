@@ -244,7 +244,7 @@ Total format rows: **472**.
 | 221 | `*.mv2` | `MV2X` | CMVS<br>CVNS | Alto | Pending |
 | 222 | `*.g2`<br>`*.stx` | - | GLib2 | Aniyome Dakara! | Pending |
 | 223 | `*.pgx` | `PGX` | GLib2 | Aniyome Dakara! | Pending |
-| 224 | `*.bin` | - | Favorite | AstralAir no Shiroki Towa | Pending |
+| 224 | `*.bin` | - | Favorite | AstralAir no Shiroki Towa | `data/favorite/se_sys.bin` (local-only) |
 | 225 | `*.hzc` | `hzc1` | Favorite | AstralAir no Shiroki Towa | Pending |
 | 226 | `*.bin` | `ESC-ARC1`<br>`ESC-ARC2` | Escu:de | Aristear Remain | Pending |
 | 227 | `*.pac` | - | Tmr-Hiro ADV System | Dennou Shinpan Kisaragi Sanjikan | Pending |
