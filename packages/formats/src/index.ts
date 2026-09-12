@@ -37,6 +37,7 @@ import { parsleyPacFormat } from "./parsley/pac.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { vsdFormat } from "./silky/vsd.js";
+import { succubusArcFormat } from "./succubus/arc.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { p8Format } from "./tinkerbell/p8.js";
@@ -75,6 +76,7 @@ export * from "./oneup/index.js";
 export * from "./nitroplus/index.js";
 export * from "./parsley/index.js";
 export * from "./seraphim/index.js";
+export * from "./succubus/index.js";
 export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
@@ -117,6 +119,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafTexFormat,
 		oneUpArcFormat,
 		seraphimMcFormat,
+		succubusArcFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
