@@ -25,6 +25,7 @@ import { dallPelFormat } from "./dall/pel.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
+import { k5Format } from "./gsx/k5.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafTexFormat } from "./leaf/tex.js";
 import { museDatFormat } from "./muse/dat.js";
@@ -77,6 +78,7 @@ export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
 export * from "./fc01/index.js";
+export * from "./gsx/index.js";
 export * from "./gpk2/index.js";
 export * from "./hypatia/index.js";
 export * from "./kaas/index.js";
@@ -158,6 +160,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		plantechPacFormat,
 		phsFormat,
 		redzonePakFormat,
+		k5Format,
 		dpkFormat,
 		gsdFormat,
 		mjaFormat,
