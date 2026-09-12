@@ -14,6 +14,7 @@ import { HyPackFormat } from "./hypatia/hypack.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
+import { gsdFormat } from "./microvision/gsd.js";
 import { NekoPack1Format } from "./nekopack/v1.js";
 import { NekoPack2Format } from "./nekopack/v2.js";
 import { NekoPack3Format } from "./nekopack/v3.js";
@@ -35,6 +36,7 @@ export * from "./fc01/index.js";
 export * from "./hypatia/index.js";
 export * from "./ikura/index.js";
 export * from "./majiro/index.js";
+export * from "./microvision/index.js";
 export * from "./nekopack/index.js";
 export * from "./nexton/index.js";
 export * from "./selene/index.js";
@@ -68,5 +70,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		new FavoriteBinFormat(),
 		mrg0Format,
 		dpkFormat,
+		gsdFormat,
 	]);
 }
