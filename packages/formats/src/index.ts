@@ -38,6 +38,7 @@ import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { vsdFormat } from "./silky/vsd.js";
 import { succubusArcFormat } from "./succubus/arc.js";
+import { tailPkgFormat } from "./tail/pkg.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { p8Format } from "./tinkerbell/p8.js";
@@ -80,6 +81,7 @@ export * from "./succubus/index.js";
 export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
+export * from "./tail/index.js";
 export * from "./system-epsilon/index.js";
 export * from "./tinkerbell/index.js";
 export * from "./ucom/index.js";
@@ -120,6 +122,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		oneUpArcFormat,
 		seraphimMcFormat,
 		succubusArcFormat,
+		tailPkgFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
