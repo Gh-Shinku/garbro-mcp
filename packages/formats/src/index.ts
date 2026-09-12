@@ -5,6 +5,7 @@ import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { GspFormat } from "./black-rainbow/gsp.js";
+import { abelBinFormat } from "./abel/bin.js";
 import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
@@ -44,6 +45,7 @@ export * from "./bishop/index.js";
 export * from "./black-rainbow/index.js";
 export * from "./cat-system/index.js";
 export * from "./cri/index.js";
+export * from "./abel/index.js";
 export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
@@ -91,6 +93,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new NekoPack1Format(),
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
+		abelBinFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
