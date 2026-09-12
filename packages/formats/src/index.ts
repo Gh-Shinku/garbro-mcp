@@ -97,6 +97,7 @@ import { ml2Format } from "./mina/ml2.js";
 import { vbdFormat } from "./witch/vbd.js";
 import { lpkFormat } from "./hypatia/lpk.js";
 import { ipacFormat } from "./ipac/pak.js";
+import { bldFormat } from "./bellda/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -178,6 +179,7 @@ export * from "./palette/index.js";
 export * from "./mina/index.js";
 export * from "./witch/index.js";
 export * from "./ipac/index.js";
+export * from "./bellda/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -281,5 +283,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		vbdFormat,
 		lpkFormat,
 		ipacFormat,
+		bldFormat,
 	]);
 }
