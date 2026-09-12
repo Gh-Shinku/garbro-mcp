@@ -25,6 +25,7 @@ import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafTexFormat } from "./leaf/tex.js";
+import { museDatFormat } from "./muse/dat.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
 import { shaFormat } from "./mg/sha.js";
 import { gsdFormat } from "./microvision/gsd.js";
@@ -78,6 +79,7 @@ export * from "./kscript/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./leaf/index.js";
+export * from "./muse/index.js";
 export * from "./myharvest/index.js";
 export * from "./mutation/index.js";
 export * from "./majiro/index.js";
@@ -143,6 +145,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mrg0Format,
 		dpfFormat,
 		unaDatFormat,
+		museDatFormat,
 		parsleyScnFormat,
 		plantechPacFormat,
 		phsFormat,
