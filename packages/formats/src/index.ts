@@ -101,6 +101,7 @@ import { bldFormat } from "./bellda/dat.js";
 import { nscFormat } from "./nekotaro/nsc.js";
 import { taskforceDatFormat } from "./taskforce/dat.js";
 import { alphaSystemPakFormat } from "./alpha-system/pak.js";
+import { szsFormat } from "./slg/szs.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -186,6 +187,7 @@ export * from "./bellda/index.js";
 export * from "./nekotaro/index.js";
 export * from "./taskforce/index.js";
 export * from "./alpha-system/index.js";
+export * from "./slg/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -293,5 +295,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nscFormat,
 		taskforceDatFormat,
 		alphaSystemPakFormat,
+		szsFormat,
 	]);
 }

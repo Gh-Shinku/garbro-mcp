@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SZS",
+				"class": "SzsOpener",
+				"source": "ArcFormats/Slg/ArcSZS.cs"
+			},
+			"localId": "slg-szs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and version detection",
+				"64-bit offsets",
+				"XOR-0x90 entry decryption",
+				"semicolon path mapping",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/ALPHA",
 				"class": "PakOpener",
 				"source": "Legacy/AlphaSystem/ArcPAK.cs"
