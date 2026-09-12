@@ -116,6 +116,7 @@ import { pak2Format } from "./palette/pak2.js";
 import { snnFormat } from "./blue-gale/snn.js";
 import { vpkFormat } from "./black-cyc/vpk.js";
 import { bndFormat } from "./tetratech/bnd.js";
+import { aosDatFormat } from "./aos/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -213,6 +214,7 @@ export * from "./asura/index.js";
 export * from "./blue-gale/index.js";
 export * from "./black-cyc/index.js";
 export * from "./tetratech/index.js";
+export * from "./aos/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -335,5 +337,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		snnFormat,
 		vpkFormat,
 		bndFormat,
+		aosDatFormat,
 	]);
 }
