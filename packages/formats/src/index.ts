@@ -22,6 +22,8 @@ import { HyPackFormat } from "./hypatia/hypack.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
+import { leafPxFormat } from "./leaf/px.js";
+import { leafTexFormat } from "./leaf/tex.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
 import { shaFormat } from "./mg/sha.js";
 import { gsdFormat } from "./microvision/gsd.js";
@@ -61,6 +63,7 @@ export * from "./kaas/index.js";
 export * from "./kscript/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
+export * from "./leaf/index.js";
 export * from "./majiro/index.js";
 export * from "./mg/index.js";
 export * from "./microvision/index.js";
@@ -106,6 +109,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		gpk2Format,
 		kaasPbFormat,
 		kpcFormat,
+		leafPxFormat,
+		leafTexFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
