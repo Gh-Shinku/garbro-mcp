@@ -82,6 +82,7 @@ import { cdpaPackFormat } from "./cdpa/pack.js";
 import { hyperworksPakFormat } from "./hyperworks/pak.js";
 import { nafFormat } from "./brownie/naf.js";
 import { cpaFormat } from "./aquarium/cpa.js";
+import { sceplayPakFormat } from "./sceplay/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -150,6 +151,7 @@ export * from "./cdpa/index.js";
 export * from "./hyperworks/index.js";
 export * from "./brownie/index.js";
 export * from "./aquarium/index.js";
+export * from "./sceplay/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -238,5 +240,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hyperworksPakFormat,
 		nafFormat,
 		cpaFormat,
+		sceplayPakFormat,
 	]);
 }

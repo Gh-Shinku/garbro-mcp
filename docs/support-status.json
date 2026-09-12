@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/SCEPLAY",
+				"class": "PakOpener",
+				"source": "Legacy/Sceplay/ArcPAK.cs"
+			},
+			"localId": "sceplay-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"sectioned names/sizes/offsets",
+				"absent-entry skipping",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CPA",
 				"class": "PakOpener",
 				"source": "Legacy/Aquarium/ArcCPA.cs"
