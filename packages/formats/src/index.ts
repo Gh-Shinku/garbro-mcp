@@ -40,6 +40,7 @@ import { LstFormat } from "./nexton/lst.js";
 import { oneUpArcFormat } from "./oneup/arc.js";
 import { unaDatFormat } from "./myharvest/dat.js";
 import { mpkFormat } from "./nitroplus/mpk.js";
+import { nppFormat } from "./nitroplus/npp.js";
 import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
 import { phsFormat } from "./uran/phs.js";
@@ -125,6 +126,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Adpack32Format(),
 		ailDatFormat,
 		lnk2Format,
+		nppFormat,
 		new AfsFormat(),
 		new CpkFormat(),
 		new AmiFormat(),
