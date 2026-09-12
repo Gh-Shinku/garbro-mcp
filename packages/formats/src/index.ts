@@ -39,6 +39,7 @@ import { mpkFormat } from "./nitroplus/mpk.js";
 import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
 import { phsFormat } from "./uran/phs.js";
+import { redzonePakFormat } from "./redzone/pak.js";
 import { parsleyPacFormat } from "./parsley/pac.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
@@ -96,6 +97,7 @@ export * from "./succubus/index.js";
 export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
+export * from "./redzone/index.js";
 export * from "./uran/index.js";
 export * from "./tail/index.js";
 export * from "./tanaka/index.js";
@@ -149,6 +151,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyScnFormat,
 		plantechPacFormat,
 		phsFormat,
+		redzonePakFormat,
 		dpkFormat,
 		gsdFormat,
 		mjaFormat,
