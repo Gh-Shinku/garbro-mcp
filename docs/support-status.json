@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MRG/mrg0",
+				"class": "Mrg0Opener",
+				"source": "ArcFormats/FC01/ArcMRG0.cs"
+			},
+			"localId": "fc01-mrg0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"sequential data offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NEKOPACK/3",
 				"class": "Pak3Opener",
 				"source": "ArcFormats/Nekopack/ArcNEKO3.cs"

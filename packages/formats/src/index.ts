@@ -6,6 +6,7 @@ import { IntFormat } from "./cat-system/int.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
+import { mrg0Format } from "./fc01/mrg0.js";
 import { EscudeBinFormat } from "./escude/bin.js";
 import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
@@ -29,6 +30,7 @@ export * from "./cri/index.js";
 export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
+export * from "./fc01/index.js";
 export * from "./hypatia/index.js";
 export * from "./ikura/index.js";
 export * from "./majiro/index.js";
@@ -62,5 +64,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		new NekoPack1Format(),
 		new AcpxFormat(),
 		new FavoriteBinFormat(),
+		mrg0Format,
 	]);
 }
