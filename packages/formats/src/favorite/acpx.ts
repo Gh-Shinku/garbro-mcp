@@ -2,7 +2,6 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	bigintToBufferLength,
 	BufferCursor,
 	GarbroError,
 	type ArchiveEntry,
@@ -11,12 +10,11 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
-import { decompressAcpLzw } from "./acp-lzw.js";
+import type { Readable } from "node:stream";
+import { inspectAcpEntry, openAcpEntry } from "./acp-entry.js";
 
 const ACPX_SIGNATURE = Buffer.from("ACPXPK01", "ascii");
 const ACP_ALTERNATE_SIGNATURE = Buffer.from("ACP_PK.1", "ascii");
-const ACP_ENTRY_SIGNATURE = Buffer.from([0x61, 0x63, 0x70, 0x00]);
 const HEADER_SIZE = 0x0c;
 const RECORD_SIZE = 0x28;
 const NAME_SIZE = 0x20;
@@ -93,22 +91,12 @@ async function readEntries(source: ByteSource): Promise<AcpxEntry[]> {
 				`ACPXPK entry points outside the archive: ${rawPath}`,
 			);
 		}
-		let size = packedSize;
-		let compressed = false;
-		if (packedSize > 8n) {
-			const entryHeader = await source.readAt(offset, 8);
-			if (entryHeader.subarray(0, 4).equals(ACP_ENTRY_SIGNATURE)) {
-				const unpackedSize = entryHeader.readInt32BE(4);
-				if (unpackedSize < 0) {
-					throw new GarbroError(
-						"INVALID_ARCHIVE",
-						`ACPXPK entry has an invalid output size: ${rawPath}`,
-					);
-				}
-				size = BigInt(unpackedSize);
-				compressed = true;
-			}
-		}
+		const { size, compressed } = await inspectAcpEntry(
+			source,
+			offset,
+			packedSize,
+			rawPath,
+		);
 		entries.push({
 			id: String(id),
 			path: rawPath.replaceAll("\\", "/"),
@@ -146,18 +134,7 @@ class AcpxArchiveHandle implements ArchiveHandle {
 				`Archive entry not found: ${entryId}`,
 			);
 		}
-		if (!entry.compressed) {
-			return this.#source.createReadStream(entry.offset, entry.packedSize);
-		}
-		const packed = await this.#source.readAt(
-			entry.offset + 8n,
-			bigintToBufferLength(entry.packedSize - 8n, "ACP LZW entry"),
-		);
-		const output = decompressAcpLzw(
-			packed,
-			bigintToBufferLength(entry.size, "ACP LZW output"),
-		);
-		return Readable.from([output]);
+		return openAcpEntry(this.#source, entry);
 	}
 
 	async close(): Promise<void> {
