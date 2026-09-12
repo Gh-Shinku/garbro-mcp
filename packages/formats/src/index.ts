@@ -113,6 +113,7 @@ import { dsvFormat } from "./desire/dsv.js";
 import { karFormat } from "./cadath/kar.js";
 import { asuraPakFormat } from "./asura/pak.js";
 import { pak2Format } from "./palette/pak2.js";
+import { snnFormat } from "./blue-gale/snn.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -207,6 +208,7 @@ export * from "./pan/index.js";
 export * from "./desire/index.js";
 export * from "./cadath/index.js";
 export * from "./asura/index.js";
+export * from "./blue-gale/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -326,5 +328,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		karFormat,
 		asuraPakFormat,
 		pak2Format,
+		snnFormat,
 	]);
 }
