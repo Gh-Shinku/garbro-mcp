@@ -6,6 +6,276 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DPK/SYSD",
+				"class": "DpkOpener",
+				"source": "ArcFormats/SysD/ArcDPK.cs"
+			},
+			"localId": "sysd-dpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and size-field detection",
+				"CP932 filenames",
+				"sequential payloads",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "GSD",
+				"class": "GsdOpener",
+				"source": "ArcFormats/MicroVision/ArcGSD.cs"
+			},
+			"localId": "microvision-gsd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"base-relative offsets",
+				"generated WAV names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "MJA",
+				"class": "MjaOpener",
+				"source": "ArcFormats/Artemis/ArcMJA.cs"
+			},
+			"localId": "artemis-mja",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"size-prefixed record walk",
+				"generated names",
+				"common signature extension inference",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"full GARbro resource-catalog extension inference",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "MIF",
+				"class": "PakOpener",
+				"source": "ArcFormats/Basil/ArcMIF.cs"
+			},
+			"localId": "basil-mif",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PK/BISHOP",
+				"class": "PkOpener",
+				"source": "ArcFormats/Bishop/ArcPK.cs"
+			},
+			"localId": "bishop-pk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x230-byte records",
+				"CP932 filenames",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "SG/cOBJ",
+				"class": "SgOpener",
+				"source": "ArcFormats/Ivory/ArcSG.cs"
+			},
+			"localId": "ivory-sg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"cOBJ chunk walk",
+				"fSG object listing",
+				"generated frame names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "VSD/AI5WIN",
+				"class": "VsdOpener",
+				"source": "ArcFormats/elf/ArcVSD.cs"
+			},
+			"localId": "silky-vsd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["signature detection", "single MPG stream extraction"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "UK",
+				"class": "UkOpener",
+				"source": "ArcFormats/Ucom/ArcUK.cs"
+			},
+			"localId": "ucom-uk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"16-bit entry count",
+				"CP932 filenames",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAC/SHA",
+				"class": "PacOpener",
+				"source": "ArcFormats/MangaGamer/ArcSHA.cs"
+			},
+			"localId": "mg-sha",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"UTF-8 filenames",
+				"0x50-byte records",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "MPK/MAGES",
+				"class": "MpkOpener",
+				"source": "ArcFormats/NitroPlus/ArcMPK.cs"
+			},
+			"localId": "nitroplus-mpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"64-bit offsets",
+				"CP932 filenames",
+				"unpacked-size metadata",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAC/PARSLEY",
+				"class": "PacOpener",
+				"source": "ArcFormats/Software House Parsley/ArcPAC.cs"
+			},
+			"localId": "parsley-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"absolute offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/VALKYRIA",
+				"class": "DatOpener",
+				"source": "ArcFormats/Valkyria/ArcDAT.cs"
+			},
+			"localId": "valkyria-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"index-size validation",
+				"CP932 filenames",
+				"base-relative offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "AM2",
+				"class": "Am2Opener",
+				"source": "ArcFormats/Valkyria/ArcAM2.cs"
+			},
+			"localId": "valkyria-am2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"base-relative frame offsets",
+				"generated MG2 frame names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAK/P8",
+				"class": "P8Opener",
+				"source": "ArcFormats/Cyberworks/ArcP8.cs"
+			},
+			"localId": "tinkerbell-p8",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"0x1c-byte records",
+				"empty-name skipping",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MRG/mrg0",
 				"class": "Mrg0Opener",
 				"source": "ArcFormats/FC01/ArcMRG0.cs"
