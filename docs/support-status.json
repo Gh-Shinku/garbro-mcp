@@ -6,6 +6,198 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK/Irrlicht",
+				"class": "PackOpener",
+				"source": "ArcFormats/Irrlicht/ArcPACK.cs"
+			},
+			"localId": "irrlicht-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"record-chain walk",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/KISS",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Kiss/ArcARC.cs"
+			},
+			"localId": "kiss-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"64-bit offsets",
+				"derived entry sizes",
+				"monotonic-offset validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PCK/CIRCUS",
+				"class": "PckOpener",
+				"source": "ArcFormats/Circus/ArcPCK.cs"
+			},
+			"localId": "circus-pck",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"index-boundary validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "SUD",
+				"class": "SudOpener",
+				"source": "ArcFormats/Triangle/ArcSUD.cs"
+			},
+			"localId": "triangle-sud",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"size-prefixed chunk walk",
+				"generated Ogg names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BSC",
+				"class": "BscOpener",
+				"source": "ArcFormats/Bishop/ArcBSC.cs"
+			},
+			"localId": "bishop-bsc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x40-byte frame headers",
+				"generated BSG names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "CCF",
+				"class": "CcfOpener",
+				"source": "ArcFormats/BlackRainbow/ArcCCF.cs"
+			},
+			"localId": "black-rainbow-ccf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"derived entry sizes",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "FPK/2.00",
+				"class": "Fpk2Opener",
+				"source": "ArcFormats/Interheart/ArcFPK2.cs"
+			},
+			"localId": "interheart-fpk2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and version detection",
+				"directory placeholder skipping",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "FPK/MFWY",
+				"class": "FpkOpener",
+				"source": "ArcFormats/AdvSys/ArcAdvSysT.cs"
+			},
+			"localId": "advsys-fpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"index-following offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "CMB/VOICE",
+				"class": "CmbAudioOpener",
+				"source": "Legacy/PineSoft/ArcVoice.cs"
+			},
+			"localId": "pinesoft-voice",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"header size validation",
+				"sentinel offset validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "FLK",
+				"class": "FlkOpener",
+				"source": "Legacy/Liddell/ArcFLK.cs"
+			},
+			"localId": "liddell-flk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"bit-packed descriptor chain",
+				"tail-size adjustment",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/Ail",
 				"class": "DatOpener",
 				"source": "ArcFormats/Ail/ArcAil.cs"
