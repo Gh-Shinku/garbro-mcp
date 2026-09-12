@@ -37,6 +37,7 @@ import { parsleyPacFormat } from "./parsley/pac.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { ivoryPxFormat } from "./ivory/px.js";
+import { silkyArcFormat } from "./silky/arc.js";
 import { vsdFormat } from "./silky/vsd.js";
 import { succubusArcFormat } from "./succubus/arc.js";
 import { tailPkgFormat } from "./tail/pkg.js";
@@ -138,6 +139,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ivorySgFormat,
 		ivoryPxFormat,
 		vsdFormat,
+		silkyArcFormat,
 		ukFormat,
 		shaFormat,
 		mpkFormat,
