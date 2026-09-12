@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/TASKFORCE",
+				"class": "DatOpener",
+				"source": "ArcFormats/Taskforce/ArcDAT.cs"
+			},
+			"localId": "taskforce-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"default LZSS decompression",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NSC",
 				"class": "NscOpener",
 				"source": "Legacy/Nekotaro/ArcNSC.cs"
