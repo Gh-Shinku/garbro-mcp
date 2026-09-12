@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARY",
+				"class": "AryOpener",
+				"source": "Legacy/Pearl/ArcARY.cs"
+			},
+			"localId": "pearl-ary",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"first-offset validation",
+				"sentinel offset validation",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CFP/CAPYBARA",
 				"class": "CfpOpener",
 				"source": "ArcFormats/Winters/ArcCFP.cs"

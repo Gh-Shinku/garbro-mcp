@@ -122,6 +122,7 @@ import { bcdFormat } from "./ransel/bcd.js";
 import { zipFormat } from "./pkware/zip.js";
 import { aimsPackFormat } from "./aims/pack.js";
 import { cfpFormat } from "./winters/cfp.js";
+import { aryFormat } from "./pearl/ary.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -224,6 +225,7 @@ export * from "./keroq/index.js";
 export * from "./ransel/index.js";
 export * from "./pkware/index.js";
 export * from "./aims/index.js";
+export * from "./pearl/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -352,5 +354,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		zipFormat,
 		aimsPackFormat,
 		cfpFormat,
+		aryFormat,
 	]);
 }
