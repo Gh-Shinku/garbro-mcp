@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK/AIMS",
+				"class": "PackOpener",
+				"source": "ArcFormats/Aims/ArcPACK.cs"
+			},
+			"localId": "aims-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"default-key Blowfish decryption",
+				"unpacked-size trimming",
+				"raw entries",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ZIP",
 				"class": "ZipOpener",
 				"source": "ArcFormats/PkWare/ArcZIP.cs"

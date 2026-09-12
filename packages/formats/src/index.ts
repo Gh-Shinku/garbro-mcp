@@ -120,6 +120,7 @@ import { aosDatFormat } from "./aos/dat.js";
 import { keroqDatFormat } from "./keroq/dat.js";
 import { bcdFormat } from "./ransel/bcd.js";
 import { zipFormat } from "./pkware/zip.js";
+import { aimsPackFormat } from "./aims/pack.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -221,6 +222,7 @@ export * from "./aos/index.js";
 export * from "./keroq/index.js";
 export * from "./ransel/index.js";
 export * from "./pkware/index.js";
+export * from "./aims/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -347,5 +349,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		keroqDatFormat,
 		bcdFormat,
 		zipFormat,
+		aimsPackFormat,
 	]);
 }
