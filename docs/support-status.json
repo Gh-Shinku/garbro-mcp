@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CHERRY",
+				"class": "DatOpener",
+				"source": "ArcFormats/Cherry/ArcMyk.cs"
+			},
+			"localId": "cherry-myk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dual signature detection",
+				"version marker validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CAPYBARA",
 				"class": "DatOpener",
 				"source": "ArcFormats/Winters/ArcDAT.cs"
