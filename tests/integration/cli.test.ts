@@ -44,6 +44,7 @@ describe("CLI", () => {
 				{ id: "hypack" },
 				{ id: "nexton-lst" },
 				{ id: "majiro-arc" },
+				{ id: "nekopack-1" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],

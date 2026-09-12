@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "NEKOPACK/1",
+				"class": "Pak1Opener",
+				"source": "ArcFormats/Nekopack/ArcNEKO.cs"
+			},
+			"localId": "nekopack-1",
+			"status": "partial",
+			"verification": "synthetic-fixtures-and-reference-vectors",
+			"supported": [
+				"signature detection",
+				"encrypted index decoding",
+				"encrypted entry extraction",
+				"known directory recovery",
+				"injected filename candidate recovery",
+				"hexadecimal fallback names"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MAJIRO",
 				"class": "ArcOpener",
 				"source": "ArcFormats/Majiro/ArcMajiro.cs"

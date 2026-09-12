@@ -21,6 +21,7 @@ The project currently includes archive support for:
 - Kogado HyPack v1-v3 archives with Mariel and XOR-FF entries;
 - Nexton LikeC data files with Moon or Nexton `.lst` companion indexes;
 - Majiro ARC versions 1, 2, and 3;
+- NekoPack version 1 archives with encrypted indexes and entries;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).
