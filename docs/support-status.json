@@ -6,6 +6,311 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PB",
+				"class": "PbOpener",
+				"source": "ArcFormats/Kaas/ArcPB.cs"
+			},
+			"localId": "kaas-pb",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"count bound validation",
+				"voice.pb naming",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "GPK2",
+				"class": "GpkOpener",
+				"source": "ArcFormats/Gpk2/ArcGPK2.cs"
+			},
+			"localId": "gpk2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"pointed-to index",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/ARC1",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Succubus/ArcARC.cs"
+			},
+			"localId": "succubus-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"pointed-to index",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "KPC",
+				"class": "KpcOpener",
+				"source": "ArcFormats/KScript/ArcKPC.cs"
+			},
+			"localId": "kscript-kpc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"XOR-0x45 index decryption",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "TEX/LEAF",
+				"class": "TexOpener",
+				"source": "ArcFormats/Leaf/ArcTEX.cs"
+			},
+			"localId": "leaf-tex",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"base-relative offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PX/LEAF",
+				"class": "PxOpener",
+				"source": "ArcFormats/Leaf/ArcPX.cs"
+			},
+			"localId": "leaf-px",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"derived frame sizes",
+				"generated frame names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["full GARbro resource-catalog type inference"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PX/IVORY",
+				"class": "PxOpener",
+				"source": "ArcFormats/Ivory/ArcPX.cs"
+			},
+			"localId": "ivory-px",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"total-size validation",
+				"cTRK chunk walk",
+				"track-number naming",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "WVX",
+				"class": "WrcOpener",
+				"source": "ArcFormats/Tanaka/ArcWRC.cs"
+			},
+			"localId": "tanaka-wvx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"total-size validation",
+				"derived entry sizes",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC0/WILL",
+				"class": "Arc0Opener",
+				"source": "ArcFormats/Tanaka/ArcARC0.cs"
+			},
+			"localId": "tanaka-arc0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dual signature detection",
+				"total-size validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/ONE-UP",
+				"class": "ArcOpener",
+				"source": "ArcFormats/OneUp/ArcARC.cs"
+			},
+			"localId": "oneup-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"UTF-16LE filenames",
+				"sequential payloads",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BIN/ABEL",
+				"class": "FilepakOpener",
+				"source": "ArcFormats/Abel/ArcBIN.cs"
+			},
+			"localId": "abel-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"in-index name table",
+				"leading separator stripping",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/ACHV",
+				"class": "PakOpener",
+				"source": "ArcFormats/Antique/ArcDAT.cs"
+			},
+			"localId": "antique-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"separate name section",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/SILKY'S",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Silky/ArcARC.cs"
+			},
+			"localId": "silky-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"duplicate-offset rejection",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "MFG",
+				"class": "MfgOpener",
+				"source": "ArcFormats/Silky/ArcMFG.cs"
+			},
+			"localId": "silky-mfg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"derived entry sizes",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PKG/ARCHIVE",
+				"class": "PkgOpener",
+				"source": "ArcFormats/Tail/ArcPKG.cs"
+			},
+			"localId": "tail-pkg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["full GARbro resource-catalog type inference"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "MC/SERAPH",
+				"class": "McOpener",
+				"source": "ArcFormats/Seraphim/ArcMC.cs"
+			},
+			"localId": "seraphim-mc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"size-prefixed frames",
+				"generated frame names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DPK/SYSD",
 				"class": "DpkOpener",
 				"source": "ArcFormats/SysD/ArcDPK.cs"
