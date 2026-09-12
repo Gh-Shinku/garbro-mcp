@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/PAC",
+				"class": "PacOpener",
+				"source": "Legacy/KeroQ/ArcDAT.cs"
+			},
+			"localId": "keroq-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"previous-numbered companion header",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PACK",
 				"class": "DatOpener",
 				"source": "Legacy/Aos/ArcDAT.cs"
