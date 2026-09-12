@@ -16,6 +16,7 @@ import { mrg0Format } from "./fc01/mrg0.js";
 import { HyPackFormat } from "./hypatia/hypack.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
+import { ivorySgFormat } from "./ivory/sg.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
 import { gsdFormat } from "./microvision/gsd.js";
 import { NekoPack1Format } from "./nekopack/v1.js";
@@ -41,6 +42,7 @@ export * from "./favorite/index.js";
 export * from "./fc01/index.js";
 export * from "./hypatia/index.js";
 export * from "./ikura/index.js";
+export * from "./ivory/index.js";
 export * from "./majiro/index.js";
 export * from "./microvision/index.js";
 export * from "./nekopack/index.js";
@@ -80,5 +82,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mjaFormat,
 		mifFormat,
 		bishopPkFormat,
+		ivorySgFormat,
 	]);
 }
