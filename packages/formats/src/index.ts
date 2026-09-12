@@ -93,6 +93,7 @@ import { k3Format } from "./gsx/k3.js";
 import { aqaFormat } from "./unknown/aqa.js";
 import { weaponVoiceFormat } from "./weapon/voice.js";
 import { palettePakFormat } from "./palette/pak.js";
+import { ml2Format } from "./mina/ml2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -171,6 +172,7 @@ export * from "./rsystem/index.js";
 export * from "./unknown/index.js";
 export * from "./weapon/index.js";
 export * from "./palette/index.js";
+export * from "./mina/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -270,5 +272,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aqaFormat,
 		weaponVoiceFormat,
 		palettePakFormat,
+		ml2Format,
 	]);
 }

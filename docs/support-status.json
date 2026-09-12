@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ML2",
+				"class": "Ml2Opener",
+				"source": "Legacy/Mina/ArcML2.cs"
+			},
+			"localId": "mina-ml2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"variable-length index records",
+				"terminator handling",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/FilePack",
 				"class": "FilePackOpener",
 				"source": "ArcFormats/Palette/ArcPAK.cs"
