@@ -31,6 +31,8 @@ import { vsdFormat } from "./silky/vsd.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { ukFormat } from "./ucom/uk.js";
+import { valkyriaAm2Format } from "./valkyria/am2.js";
+import { valkyriaDatFormat } from "./valkyria/dat.js";
 import { Xp3Format } from "./xp3/format.js";
 
 export * from "./active-soft/index.js";
@@ -60,6 +62,7 @@ export * from "./silky/index.js";
 export * from "./sysd/index.js";
 export * from "./system-epsilon/index.js";
 export * from "./ucom/index.js";
+export * from "./valkyria/index.js";
 export * from "./xp3/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
@@ -98,5 +101,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		shaFormat,
 		mpkFormat,
 		parsleyPacFormat,
+		valkyriaDatFormat,
+		valkyriaAm2Format,
 	]);
 }
