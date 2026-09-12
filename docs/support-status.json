@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CPA",
+				"class": "PakOpener",
+				"source": "Legacy/Aquarium/ArcCPA.cs"
+			},
+			"localId": "aquarium-cpa",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"inactive slot skipping",
+				"base-relative offsets",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NAF",
 				"class": "NafOpener",
 				"source": "Legacy/Brownie/ArcNAF.cs"
