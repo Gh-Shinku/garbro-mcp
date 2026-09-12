@@ -121,6 +121,7 @@ import { keroqDatFormat } from "./keroq/dat.js";
 import { bcdFormat } from "./ransel/bcd.js";
 import { zipFormat } from "./pkware/zip.js";
 import { aimsPackFormat } from "./aims/pack.js";
+import { cfpFormat } from "./winters/cfp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -350,5 +351,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bcdFormat,
 		zipFormat,
 		aimsPackFormat,
+		cfpFormat,
 	]);
 }
