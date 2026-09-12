@@ -33,6 +33,7 @@ import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
 import { k5Format } from "./gsx/k5.js";
+import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafTexFormat } from "./leaf/tex.js";
 import { museDatFormat } from "./muse/dat.js";
@@ -104,6 +105,7 @@ export * from "./kscript/index.js";
 export * from "./kiss/index.js";
 export * from "./ikura/index.js";
 export * from "./ivory/index.js";
+export * from "./liddell/index.js";
 export * from "./leaf/index.js";
 export * from "./muse/index.js";
 export * from "./myharvest/index.js";
@@ -145,6 +147,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		bishopBscFormat,
 		ccfFormat,
 		circusPckFormat,
+		flkFormat,
 		fpk2Format,
 		irrlichtPackFormat,
 		kissArcFormat,
