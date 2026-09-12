@@ -14,6 +14,7 @@ The project currently includes archive support for:
 - IKURA GDL (`SM2MPX10`) archives with built-in script transforms;
 - Favorite View Point ACPXPK archives with ACP LZW compression;
 - Escu:de ESC-ARC v1/v2 archives with encrypted indexes and ACP LZW entries;
+- Black Rainbow GSP archives;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

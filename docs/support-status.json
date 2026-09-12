@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GSP",
+				"class": "GspOpener",
+				"source": "ArcFormats/BlackRainbow/ArcGSP.cs"
+			},
+			"localId": "gsp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"CP932 filenames",
+				"entry listing",
+				"entry extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/ESC-ARC",
 				"class": "BinOpener",
 				"source": "ArcFormats/Escude/ArcBIN.cs"

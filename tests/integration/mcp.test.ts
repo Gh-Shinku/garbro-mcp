@@ -65,6 +65,7 @@ describe("MCP server", () => {
 				{ id: "drs" },
 				{ id: "ikura-gdl" },
 				{ id: "escude-bin" },
+				{ id: "gsp" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],
