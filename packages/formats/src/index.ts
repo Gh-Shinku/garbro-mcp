@@ -61,6 +61,7 @@ import { tanakaArc0Format } from "./tanaka/arc0.js";
 import { tanakaWvxFormat } from "./tanaka/wvx.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
+import { sudFormat } from "./triangle/sud.js";
 import { p8Format } from "./tinkerbell/p8.js";
 import { ukFormat } from "./ucom/uk.js";
 import { valkyriaAm2Format } from "./valkyria/am2.js";
@@ -116,6 +117,7 @@ export * from "./silky/index.js";
 export * from "./sysd/index.js";
 export * from "./redzone/index.js";
 export * from "./uran/index.js";
+export * from "./triangle/index.js";
 export * from "./tail/index.js";
 export * from "./tanaka/index.js";
 export * from "./system-epsilon/index.js";
@@ -134,6 +136,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		circusPckFormat,
 		irrlichtPackFormat,
 		kissArcFormat,
+		sudFormat,
 		lnk2Format,
 		nppFormat,
 		new AfsFormat(),
