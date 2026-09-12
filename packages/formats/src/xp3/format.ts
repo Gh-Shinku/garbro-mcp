@@ -397,6 +397,9 @@ class Xp3ArchiveHandle implements ArchiveHandle {
 
 export class Xp3Format implements ArchiveFormat {
 	readonly descriptor = xp3Descriptor;
+	readonly detection = {
+		signatures: [{ bytes: XP3_SIGNATURE }],
+	};
 
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < 19n) return false;

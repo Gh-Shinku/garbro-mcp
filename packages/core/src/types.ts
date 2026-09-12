@@ -53,8 +53,20 @@ export interface ArchiveHandle {
 	close(): Promise<void>;
 }
 
+export interface ByteSignature {
+	readonly bytes: Uint8Array;
+	readonly offset?: bigint;
+}
+
+export interface ArchiveDetectionHints {
+	readonly signatures?: readonly ByteSignature[];
+	readonly priority?: number;
+	readonly extensionFallback?: boolean;
+}
+
 export interface ArchiveFormat {
 	readonly descriptor: FormatDescriptor;
+	readonly detection?: ArchiveDetectionHints;
 	detect(source: ByteSource): Promise<boolean>;
 	open(source: ByteSource, sourcePath: string): Promise<ArchiveHandle>;
 }
