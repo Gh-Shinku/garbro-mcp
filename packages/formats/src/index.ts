@@ -21,6 +21,7 @@ import { EscudeBinFormat } from "./escude/bin.js";
 import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { mrg0Format } from "./fc01/mrg0.js";
+import { irrlichtPackFormat } from "./irrlicht/pack.js";
 import { HyPackFormat } from "./hypatia/hypack.js";
 import { dallPelFormat } from "./dall/pel.js";
 import { DrsFormat } from "./ikura/drs.js";
@@ -85,6 +86,7 @@ export * from "./favorite/index.js";
 export * from "./fc01/index.js";
 export * from "./gsx/index.js";
 export * from "./gpk2/index.js";
+export * from "./irrlicht/index.js";
 export * from "./hypatia/index.js";
 export * from "./kaas/index.js";
 export * from "./kscript/index.js";
@@ -125,6 +127,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		ailDatFormat,
+		irrlichtPackFormat,
 		lnk2Format,
 		nppFormat,
 		new AfsFormat(),
