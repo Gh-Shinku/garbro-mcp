@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CRG",
+				"class": "PakOpener",
+				"source": "Legacy/Rhss/ArcCRG.cs"
+			},
+			"localId": "rhss-crg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"zlib decompression",
+				"XOR-0xFF post-processing",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "X/AKATOMBO",
 				"class": "XOpener",
 				"source": "Legacy/Akatombo/ArcX.cs"
