@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/IPAC",
+				"class": "PakOpener",
+				"source": "ArcFormats/Ipac/ArcIPAC.cs"
+			},
+			"localId": "ipac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"IEL1 LZSS decompression",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "LPK/KOGADO",
 				"class": "LpkOpener",
 				"source": "ArcFormats/Hypatia/ArcLPK.cs"
