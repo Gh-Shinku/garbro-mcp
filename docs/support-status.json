@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CPK",
+				"class": "CpkOpener",
+				"source": "ArcFormats/Cri/ArcCPK.cs"
+			},
+			"localId": "cpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"plain and XOR-obscured UTF tables",
+				"TOC and ITOC indexes",
+				"entry listing",
+				"raw entry extraction",
+				"CRILAYLA decompression"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AFS",
 				"class": "AfsOpener",
 				"source": "ArcFormats/Cri/ArcAFS.cs"

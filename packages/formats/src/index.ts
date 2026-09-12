@@ -1,6 +1,7 @@
 import { FormatRegistry } from "@garbro-mcp/core";
 import { Adpack32Format } from "./active-soft/adpack32.js";
 import { AfsFormat } from "./cri/afs.js";
+import { CpkFormat } from "./cri/cpk.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { Xp3Format } from "./xp3/format.js";
 
@@ -14,6 +15,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		new AfsFormat(),
+		new CpkFormat(),
 		new FavoriteBinFormat(),
 	]);
 }

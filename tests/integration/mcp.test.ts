@@ -58,6 +58,7 @@ describe("MCP server", () => {
 				{ id: "xp3" },
 				{ id: "adpack32" },
 				{ id: "afs" },
+				{ id: "cpk" },
 				{ id: "favorite-bin" },
 			],
 		});
