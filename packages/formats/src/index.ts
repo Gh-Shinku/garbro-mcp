@@ -7,6 +7,7 @@ import { mifFormat } from "./basil/mif.js";
 import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { dpfFormat } from "./mutation/dpf.js";
+import { ccfFormat } from "./black-rainbow/ccf.js";
 import { circusPckFormat } from "./circus/pck.js";
 import { GspFormat } from "./black-rainbow/gsp.js";
 import { abelBinFormat } from "./abel/bin.js";
@@ -135,6 +136,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Adpack32Format(),
 		ailDatFormat,
 		bishopBscFormat,
+		ccfFormat,
 		circusPckFormat,
 		irrlichtPackFormat,
 		kissArcFormat,
