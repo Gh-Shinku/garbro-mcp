@@ -1,8 +1,12 @@
-import { adler32, Adler32, inflateZlibBuffer } from "@garbro-mcp/codecs";
+import { adler32, Adler32, crc32, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 
 describe("codecs", () => {
+	it("computes the standard CRC-32 check vector", () => {
+		expect(crc32(Buffer.from("123456789"))).toBe(0xcbf43926);
+	});
+
 	it("computes Adler-32 incrementally with unsigned overflow semantics", () => {
 		const first = Buffer.from("Wikipedia");
 		expect(adler32(first)).toBe(0x11e60398);
