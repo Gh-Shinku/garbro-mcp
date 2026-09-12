@@ -86,6 +86,7 @@ import { sceplayPakFormat } from "./sceplay/pak.js";
 import { tigermanPacFormat } from "./tigerman/pac.js";
 import { irisFpackFormat } from "./iris/fpack.js";
 import { herbPakFormat } from "./herb/pak.js";
+import { applePieArcFormat } from "./applepie/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -158,6 +159,7 @@ export * from "./sceplay/index.js";
 export * from "./tigerman/index.js";
 export * from "./iris/index.js";
 export * from "./herb/index.js";
+export * from "./applepie/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -250,5 +252,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tigermanPacFormat,
 		irisFpackFormat,
 		herbPakFormat,
+		applePieArcFormat,
 	]);
 }
