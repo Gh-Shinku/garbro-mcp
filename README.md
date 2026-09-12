@@ -8,6 +8,7 @@ The project currently includes archive support for:
 
 - standard, unencrypted KiriKiri XP3 archives;
 - Active Soft ADPACK32 archives, including CP932 filenames;
+- CRI AFS archives;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).
 
 The XP3 implementation supports:

@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AFS",
+				"class": "AfsOpener",
+				"source": "ArcFormats/Cri/ArcAFS.cs"
+			},
+			"localId": "afs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filename table",
+				"entry listing",
+				"entry extraction"
+			],
+			"unsupported": ["archive creation"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/FVP",
 				"class": "Bin2Opener",
 				"source": "ArcFormats/Favorite/ArcBIN.cs"

@@ -54,7 +54,12 @@ describe("MCP server", () => {
 
 		const formats = await client.callTool({ name: "list_formats" });
 		expect(formats.structuredContent).toMatchObject({
-			formats: [{ id: "xp3" }, { id: "adpack32" }, { id: "favorite-bin" }],
+			formats: [
+				{ id: "xp3" },
+				{ id: "adpack32" },
+				{ id: "afs" },
+				{ id: "favorite-bin" },
+			],
 		});
 
 		const detected = await client.callTool({
