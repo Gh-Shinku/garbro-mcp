@@ -67,6 +67,6 @@ export interface ArchiveDetectionHints {
 export interface ArchiveFormat {
 	readonly descriptor: FormatDescriptor;
 	readonly detection?: ArchiveDetectionHints;
-	detect(source: ByteSource): Promise<boolean>;
+	detect(source: ByteSource, sourcePath?: string): Promise<boolean>;
 	open(source: ByteSource, sourcePath: string): Promise<ArchiveHandle>;
 }

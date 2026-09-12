@@ -50,7 +50,7 @@ export class FormatRegistry {
 				source,
 				sourcePath,
 			)) {
-				if (await format.detect(source)) {
+				if (await format.detect(source, sourcePath)) {
 					return {
 						path: sourcePath,
 						size: source.size,
@@ -72,7 +72,7 @@ export class FormatRegistry {
 				source,
 				sourcePath,
 			)) {
-				if (await format.detect(source))
+				if (await format.detect(source, sourcePath))
 					return await format.open(source, sourcePath);
 			}
 			throw new GarbroError(
