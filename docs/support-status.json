@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/HERB",
+				"class": "PakOpener",
+				"source": "Legacy/Herb/ArcPAK.cs"
+			},
+			"localId": "herb-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"fixed 0x20000 data base",
+				"zero-sized record skipping",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/FPACK",
 				"class": "DatOpener",
 				"source": "Legacy/Iris/ArcFPACK.cs"
