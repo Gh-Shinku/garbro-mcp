@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ADPACK32",
+				"class": "Pak32Opener",
+				"source": "ArcFormats/ActiveSoft/ArcADPACK.cs"
+			},
+			"localId": "adpack32",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"entry listing",
+				"entry extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "XP3",
 				"class": "Xp3Opener",
 				"source": "ArcFormats/KiriKiri/ArcXP3.cs"

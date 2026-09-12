@@ -4,7 +4,12 @@ A modern TypeScript toolkit for parsing and extracting ADV/Galgame resource form
 uses [GARbro](https://github.com/morkt/GARbro) as a format and algorithm reference while providing
 independent, streaming implementations of its core API, CLI, and MCP server.
 
-The initial vertical slice supports standard, unencrypted KiriKiri XP3 archives:
+The project currently includes archive support for:
+
+- standard, unencrypted KiriKiri XP3 archives;
+- Active Soft ADPACK32 archives, including CP932 filenames.
+
+The XP3 implementation supports:
 
 - archive detection and metadata inspection;
 - raw and zlib-compressed indexes, including continued indexes;

@@ -228,6 +228,9 @@ importers:
       '@types/node':
         specifier: ^24.13.4
         version: 24.13.4
+      iconv-lite:
+        specifier: ^0.7.3
+        version: 0.7.3
       typescript:
         specifier: ^7.0.2
         version: 7.0.2

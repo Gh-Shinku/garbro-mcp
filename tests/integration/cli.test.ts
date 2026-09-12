@@ -25,7 +25,9 @@ describe("CLI", () => {
 			"formats",
 			"--json",
 		]);
-		expect(JSON.parse(stdout)).toMatchObject({ formats: [{ id: "xp3" }] });
+		expect(JSON.parse(stdout)).toMatchObject({
+			formats: [{ id: "xp3" }, { id: "adpack32" }],
+		});
 	});
 
 	it("detects an XP3 archive", async () => {

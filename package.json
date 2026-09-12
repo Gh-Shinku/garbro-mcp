@@ -35,6 +35,7 @@
 		"@garbro-mcp/mcp": "workspace:*",
 		"@modelcontextprotocol/client": "^2.0.0",
 		"@types/node": "^24.13.4",
+		"iconv-lite": "^0.7.3",
 		"typescript": "^7.0.2",
 		"vitest": "^5.0.0"
 	}
