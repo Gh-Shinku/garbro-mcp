@@ -40,6 +40,7 @@ import { vsdFormat } from "./silky/vsd.js";
 import { succubusArcFormat } from "./succubus/arc.js";
 import { tailPkgFormat } from "./tail/pkg.js";
 import { tanakaArc0Format } from "./tanaka/arc0.js";
+import { tanakaWvxFormat } from "./tanaka/wvx.js";
 import { dpkFormat } from "./sysd/dpk.js";
 import { PackDatFormat } from "./system-epsilon/packdat.js";
 import { p8Format } from "./tinkerbell/p8.js";
@@ -126,6 +127,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		succubusArcFormat,
 		tailPkgFormat,
 		tanakaArc0Format,
+		tanakaWvxFormat,
 		mrg0Format,
 		dpkFormat,
 		gsdFormat,
