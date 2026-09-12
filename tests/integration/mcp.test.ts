@@ -67,6 +67,7 @@ describe("MCP server", () => {
 				{ id: "escude-bin" },
 				{ id: "gsp" },
 				{ id: "cat-system-int" },
+				{ id: "packdat" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],

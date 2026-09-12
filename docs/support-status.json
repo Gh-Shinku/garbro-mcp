@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACKDAT",
+				"class": "PakOpener",
+				"source": "ArcFormats/ArcPACKDAT.cs"
+			},
+			"localId": "packdat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"CP932 filenames",
+				"raw entry extraction",
+				"rotating-XOR entry decoding",
+				"script inversion and combined transforms"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "INT",
 				"class": "IntOpener",
 				"source": "ArcFormats/CatSystem/ArcINT.cs"
