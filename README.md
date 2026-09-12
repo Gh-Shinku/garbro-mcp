@@ -19,6 +19,7 @@ The project currently includes archive support for:
 - SYSTEM-epsilon PACKDAT archives with script and rotating-XOR transforms;
 - Selene KCAP archives with default or programmatically supplied passphrases;
 - Kogado HyPack v1-v3 archives with Mariel and XOR-FF entries;
+- Nexton LikeC data files with Moon or Nexton `.lst` companion indexes;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

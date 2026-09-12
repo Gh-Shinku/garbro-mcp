@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "LST",
+				"class": "LstOpener",
+				"source": "ArcFormats/Tactics/ArcLST.cs"
+			},
+			"localId": "nexton-lst",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion-file detection",
+				"Moon and Nexton index layouts",
+				"XOR-decoded CP932 filenames",
+				"type-to-extension mapping",
+				"raw entry extraction",
+				"SNX script decoding"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/HyPack",
 				"class": "PakOpener",
 				"source": "ArcFormats/Hypatia/ArcKogado.cs"

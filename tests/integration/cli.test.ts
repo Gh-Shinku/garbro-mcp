@@ -42,6 +42,7 @@ describe("CLI", () => {
 				{ id: "packdat" },
 				{ id: "kcap" },
 				{ id: "hypack" },
+				{ id: "nexton-lst" },
 				{ id: "favorite-acpx" },
 				{ id: "favorite-bin" },
 			],
