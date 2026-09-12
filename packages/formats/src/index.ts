@@ -127,6 +127,7 @@ import { akatomboXFormat } from "./akatombo/x.js";
 import { crgFormat } from "./rhss/crg.js";
 import { abelFpkFormat } from "./abel/fpk.js";
 import { clsFormat } from "./lambda/cls.js";
+import { ffaFormat } from "./ffa/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -233,6 +234,7 @@ export * from "./pearl/index.js";
 export * from "./akatombo/index.js";
 export * from "./rhss/index.js";
 export * from "./lambda/index.js";
+export * from "./ffa/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -366,5 +368,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		crgFormat,
 		abelFpkFormat,
 		clsFormat,
+		ffaFormat,
 	]);
 }

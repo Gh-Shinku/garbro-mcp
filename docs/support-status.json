@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "FFA/ARC",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Ffa/ArcFFA.cs"
+			},
+			"localId": "ffa-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"header detection",
+				"trailing index pointer",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CLS",
 				"class": "ClsOpener",
 				"source": "ArcFormats/Lambda/ArcCLS.cs"
