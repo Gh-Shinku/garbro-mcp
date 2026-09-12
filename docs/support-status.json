@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK/CDPA",
+				"class": "PackOpener",
+				"source": "ArcFormats/CDPA/ArcPACK.cs"
+			},
+			"localId": "cdpa-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"index-following offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ALK",
 				"class": "AlkOpener",
 				"source": "ArcFormats/AliceSoft/ArcALK.cs"
