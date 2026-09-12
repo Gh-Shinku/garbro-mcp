@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/ACPXPK",
+				"class": "BinOpener",
+				"source": "ArcFormats/Favorite/ArcFVP.cs"
+			},
+			"localId": "favorite-acpx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ACPXPK01 and ACP_PK.1 signatures",
+				"CP932 hierarchical paths",
+				"raw entry extraction",
+				"ACP variable-width LZW decompression"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IKURA/GDL",
 				"class": "MpxOpener",
 				"source": "ArcFormats/Ikura/ArcDRS.cs"

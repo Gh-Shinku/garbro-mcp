@@ -4,6 +4,7 @@ import { AmiFormat } from "./amaterasu/ami.js";
 import { AfsFormat } from "./cri/afs.js";
 import { CpkFormat } from "./cri/cpk.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
+import { AcpxFormat } from "./favorite/acpx.js";
 import { FavoriteBinFormat } from "./favorite/bin.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
@@ -28,6 +29,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new BurikoArcFormat(),
 		new DrsFormat(),
 		new MpxFormat(),
+		new AcpxFormat(),
 		new FavoriteBinFormat(),
 	]);
 }
