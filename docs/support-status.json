@@ -22,7 +22,8 @@
 				"entry listing and extraction"
 			],
 			"unsupported": [
-				"full GARbro resource-catalog extension inference"
+				"full GARbro resource-catalog extension inference",
+				"archive creation"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
@@ -43,10 +44,18 @@
 				"entry listing and extraction"
 			],
 			"unsupported": [
-				"full GARbro resource-catalog extension inference"
+				"full GARbro resource-catalog extension inference",
+				"archive creation"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "NPP",
+				"class": "NppOpener",
+				"source": "ArcFormats/NitroPlus/ArcNPP.cs"
+			},
 			"localId": "nitroplus-npp",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
@@ -56,9 +65,7 @@
 				"default LZSS decompression",
 				"entry listing and extraction"
 			],
-			"unsupported": [
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
