@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAN",
+				"class": "PanOpener",
+				"source": "Legacy/Pan/ArcPAN.cs"
+			},
+			"localId": "pan",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"trailing index",
+				"default LZSS decompression",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DNS",
 				"class": "DnsOpener",
 				"source": "ArcFormats/Marble/ArcDNS.cs"
