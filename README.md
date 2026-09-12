@@ -10,6 +10,7 @@ The project currently includes archive support for:
 - Active Soft ADPACK32 archives, including CP932 filenames;
 - Amaterasu Translations AMI archives, including zlib-compressed images;
 - BGI/Ethornell PackFile and BURIKO ARC20 archives, including DSC and BSE data;
+- Digital Romance System DRS archives;
 - CRI AFS archives;
 - CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
 - Favorite View Point v2 BIN archives (`BIN/FVP`).

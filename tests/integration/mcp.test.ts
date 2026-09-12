@@ -62,6 +62,7 @@ describe("MCP server", () => {
 				{ id: "ami" },
 				{ id: "bgi-arc" },
 				{ id: "buriko-arc" },
+				{ id: "drs" },
 				{ id: "favorite-bin" },
 			],
 		});
