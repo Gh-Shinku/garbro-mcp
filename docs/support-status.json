@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/LNK",
+				"class": "LnkOpener",
+				"source": "ArcFormats/Kid/ArcDAT.cs"
+			},
+			"localId": "kid-lnk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"lnk signature",
+				"fixed size name records",
+				"packed flag in the size field",
+				"lnd stream unpacking",
+				"cps stream decryption",
+				"cps key resolution",
+				"trailing block zeroing"
+			],
+			"unsupported": [
+				"archive creation",
+				"lnd16 compression",
+				"image and audio decoding"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TAC",
 				"class": "TacOpener",
 				"source": "ArcFormats/TanukiSoft/ArcTAC.cs"
