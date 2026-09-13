@@ -6,6 +6,63 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAF2",
+				"class": "Daf2Opener",
+				"source": "ArcFormats/DenSDK/ArcDAF.cs"
+			},
+			"localId": "densdk-daf2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"DAF2 signature",
+				"key folded from four header bytes",
+				"exclusive-ored entry count",
+				"exclusive-ored index sizes",
+				"plain index behind the 0x30-byte prefix",
+				"zlib-packed index",
+				"payload base override for a packed index",
+				"exclusive-ored payload base",
+				"variable length records with scrambled fields",
+				"32-bit wrap-around of payload offsets",
+				"packed flag at +0x30",
+				"placement checks",
+				"hierarchical path normalization",
+				"zlib inflation of packed payloads"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAF1",
+				"class": "Daf1Opener",
+				"source": "ArcFormats/DenSDK/ArcDAF.cs"
+			},
+			"localId": "densdk-daf1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"DAF1 signature",
+				"index offset field",
+				"entry count",
+				"payload area offset",
+				"index reserved up to the payload area",
+				"variable length records with their own size",
+				"CP932 names with first-NUL decoding",
+				"absolute payload offsets",
+				"stored and unpacked sizes",
+				"packed flag at +0x14",
+				"placement checks",
+				"hierarchical path normalization",
+				"zlib inflation of packed payloads"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FLT",
 				"class": "FltOpener",
 				"source": "ArcFormats/FrontWing/ArcFLT.cs"

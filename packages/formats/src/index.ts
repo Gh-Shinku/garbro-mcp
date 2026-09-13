@@ -399,6 +399,8 @@ import { carriereScenarioFormat } from "./carriere/arc.js";
 import { kaguyaLin2Format } from "./kaguya/lin2.js";
 import { system98LibFormat } from "./system98/lib.js";
 import { frontWingFltFormat } from "./frontwing/flt.js";
+import { densdkDaf1Format } from "./densdk/daf.js";
+import { densdkDaf2Format } from "./densdk/daf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -652,6 +654,7 @@ export * from "./anime-game-system/index.js";
 export * from "./ast/index.js";
 export * from "./carriere/index.js";
 export * from "./system98/index.js";
+export * from "./densdk/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1056,5 +1059,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaguyaLin2Format,
 		system98LibFormat,
 		frontWingFltFormat,
+		densdkDaf1Format,
+		densdkDaf2Format,
 	]);
 }
