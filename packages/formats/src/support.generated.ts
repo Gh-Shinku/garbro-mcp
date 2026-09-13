@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "HBM",
+				class: "HbmFormat",
+				source: "ArcFormats/Rits/ImageHBM.cs",
+			},
+			localId: "rits-hbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"zlib decompression",
+				"flipped row placement",
+				"16bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "YGA",
 				class: "YgaFormat",
 				source: "Legacy/Yaneurao/ImageYGA.cs",

@@ -645,6 +645,7 @@ import { crowdZbmImageFormat } from "./crowd/zbm-image.js";
 import { bm1ImageFormat } from "./pisckiss/bm1-image.js";
 import { pisckissAudioFormat } from "./pisckiss/audio.js";
 import { ygaImageFormat } from "./yaneurao/yga-image.js";
+import { hbmImageFormat } from "./rits/hbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1620,5 +1621,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bm1ImageFormat,
 		pisckissAudioFormat,
 		ygaImageFormat,
+		hbmImageFormat,
 	]);
 }
