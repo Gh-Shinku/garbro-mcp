@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SPACK",
+				"class": "DatOpener",
+				"source": "ArcFormats/ArcSPack.cs"
+			},
+			"localId": "spack-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"head marker and version",
+				"entry count bounds",
+				"index with records",
+				"relative data offsets and both size words",
+				"method byte and crc word",
+				"entry placement validation",
+				"stored payloads",
+				"inverted payloads",
+				"lz payloads",
+				"verbatim fallback"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "UWF",
 				"class": "UwfOpener",
 				"source": "Legacy/WestGate/ArcUWF.cs"
