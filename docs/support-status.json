@@ -6,6 +6,51 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CG/PARSLEY/1",
+				"class": "CgV1Opener",
+				"source": "ArcFormats/Software House Parsley/ArcCG.cs"
+			},
+			"localId": "parsley-cg-v1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"cursor based name and offset index",
+				"derived entry sizes",
+				"archive name typing",
+				"packed ucg flag",
+				"cp932 names"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decoding",
+				"ucg payload unpacking",
+				"palette extraction"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/yanepack",
+				"class": "CgOpener",
+				"source": "ArcFormats/Software House Parsley/ArcCG.cs"
+			},
+			"localId": "parsley-yanepack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"yane marker validation",
+				"fixed size name records",
+				"index end validation",
+				"cp932 names",
+				"extension typing"
+			],
+			"unsupported": ["archive creation", "image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GsData",
 				"class": "DatOpener",
 				"source": "ArcFormats/GsPack/ArcGsPack.cs"

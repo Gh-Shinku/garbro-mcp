@@ -464,6 +464,8 @@ import { seraphimScnFormat } from "./seraphim/scnpac.js";
 import { seraphimScn95Format } from "./seraphim/scnpac.js";
 import { gsPackFormat } from "./gs-pack/archive.js";
 import { gsDataFormat } from "./gs-pack/archive.js";
+import { parsleyYanepackFormat } from "./parsley/cg.js";
+import { parsleyCgV1Format } from "./parsley/cg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1210,5 +1212,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		seraphimScn95Format,
 		gsPackFormat,
 		gsDataFormat,
+		parsleyYanepackFormat,
+		parsleyCgV1Format,
 	]);
 }
