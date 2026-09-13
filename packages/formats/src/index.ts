@@ -189,6 +189,7 @@ import { animFormat } from "./marble/anim.js";
 import { pochettePacFormat } from "./pochette/pac.js";
 import { cgdFormat } from "./kapp/cgd.js";
 import { ucomDataFormat } from "./ucom/data.js";
+import { ai5DatFormat } from "./elf/ai5dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -332,6 +333,7 @@ export * from "./umut/index.js";
 export * from "./airyu/index.js";
 export * from "./pochette/index.js";
 export * from "./kapp/index.js";
+export * from "./elf/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -527,5 +529,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pochettePacFormat,
 		cgdFormat,
 		ucomDataFormat,
+		ai5DatFormat,
 	]);
 }
