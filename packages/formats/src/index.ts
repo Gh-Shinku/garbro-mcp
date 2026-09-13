@@ -574,6 +574,7 @@ import { muwAudioFormat } from "./artel/muw-audio.js";
 import { um3AudioFormat } from "./bruns/um3-audio.js";
 import { dwvAudioFormat } from "./sysd/dwv-audio.js";
 import { qdoScriptFormat } from "./redzone/qdo-script.js";
+import { nsfAudioFormat } from "./pan/nsf-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1470,5 +1471,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		um3AudioFormat,
 		dwvAudioFormat,
 		qdoScriptFormat,
+		nsfAudioFormat,
 	]);
 }

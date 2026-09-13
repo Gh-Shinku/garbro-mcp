@@ -5,6 +5,25 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "NSF",
+				"class": "NsfAudio",
+				"source": "Legacy/Pan/AudioNSF.cs"
+			},
+			"localId": "pan-nsf-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"metadata",
+				"format consistency check"
+			],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "script",
 				"tag": "QDO",
 				"class": "QdoOpener",
