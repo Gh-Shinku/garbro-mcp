@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BBM",
+				"class": "BbmFormat",
+				"source": "ArcFormats/BlueGale/ImageBBM.cs"
+			},
+			"localId": "blue-gale-bbm-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"prefix unmasking",
+				"bitmap validation",
+				"bitmap trimming",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BM_",
 				"class": "Bm_Format",
 				"source": "ArcFormats/ImageLZ.cs"

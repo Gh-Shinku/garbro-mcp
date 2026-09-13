@@ -605,6 +605,7 @@ import { aloImageFormat } from "./bef/alo-image.js";
 import { ankhGpdImageFormat } from "./ankh/gpd-image.js";
 import { kgrImageFormat } from "./project-myu/kgr-image.js";
 import { lzBmpImageFormat } from "./misc/lz-bmp-image.js";
+import { bbmImageFormat } from "./blue-gale/bbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1537,5 +1538,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ankhGpdImageFormat,
 		kgrImageFormat,
 		lzBmpImageFormat,
+		bbmImageFormat,
 	]);
 }
