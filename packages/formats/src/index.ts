@@ -349,6 +349,7 @@ import { cswareDatFormat } from "./csware/dat.js";
 import { hcsystemPakFormat } from "./hcsystem/pak.js";
 import { vnsystemVfsFormat } from "./vnsystem/vfs.js";
 import { cromwellPakFormat } from "./cromwell/pak.js";
+import { cromwellOpkFormat } from "./cromwell/opk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -932,5 +933,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hcsystemPakFormat,
 		vnsystemVfsFormat,
 		cromwellPakFormat,
+		cromwellOpkFormat,
 	]);
 }

@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "OPK",
+				"class": "OpkOpener",
+				"source": "ArcFormats/Cromwell/ArcPAK.cs"
+			},
+			"localId": "cromwell-opk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"VoiceOggPackFile signature",
+				"record count",
+				"count+1 offset table",
+				"next-offset extents",
+				"audio typing",
+				"eight-byte c-string name table with ogg extension",
+				"verbatim extraction",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/cromwell",
 				"class": "GraphicPakOpener",
 				"source": "ArcFormats/Cromwell/ArcPAK.cs"
