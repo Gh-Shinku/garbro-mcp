@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "SFG",
+				"class": "SfgFormat",
+				"source": "Legacy/AlphaSystem/ImageSFG.cs"
+			},
+			"localId": "alpha-system-sfg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"indexed and 32bpp bitmap output",
+				"palette pass through",
+				"row padding",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "LPG",
 				"class": "LpgFormat",
 				"source": "ArcFormats/Hypatia/ImageLPG.cs"
