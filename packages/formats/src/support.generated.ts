@@ -9,6 +9,25 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BMP/MB",
+				class: "MbImageFormat",
+				source: "ArcFormats/ImageMB.cs",
+			},
+			localId: "bmp-mb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"bitmap marker restoration",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ARD",
 				class: "ArdFormat",
 				source: "Legacy/Acme/ImageARD.cs",

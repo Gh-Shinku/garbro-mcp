@@ -48,6 +48,35 @@ export function writeBmp32(
 }
 
 /**
+ * Reads the dimensions a bitmap header declares. The reference readers all go through GARbro's
+ * `Bmp.ReadMetaData`, which requires a `BM` tag, a DIB header of at least forty bytes and non-zero
+ * dimensions and bit depth; a `bfSize` that cannot describe the file it came from is rejected here too.
+ * Returns the fields the image ports report, with `fileSize` being the bitmap's own length.
+ */
+export function readBmpMetaData(
+	bmp: Buffer,
+):
+	| { width: number; height: number; bitsPerPixel: number; fileSize: number }
+	| undefined {
+	if (bmp.length < BMP_HEADER_SIZE) return undefined;
+	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
+	const fileSize = bmp.readUInt32LE(2);
+	if (fileSize < BMP_HEADER_SIZE || fileSize > bmp.length) return undefined;
+	if (bmp.readUInt32LE(14) < 40) return undefined;
+	const width = bmp.readInt32LE(18);
+	const signedHeight = bmp.readInt32LE(22);
+	if (width <= 0 || signedHeight === 0) return undefined;
+	const bitsPerPixel = bmp.readUInt16LE(28);
+	if (bitsPerPixel === 0) return undefined;
+	return {
+		width,
+		height: Math.abs(signedHeight),
+		bitsPerPixel,
+		fileSize,
+	};
+}
+
+/**
  * Wraps eight bit pixels in a grey bitmap. Bitmap rows are aligned to four bytes, so every row is
  * padded with zeros to `width` rounded up to a multiple of four; that padding is the only difference
  * from the stored pixels. As with `writeBmp32`, the stored rows are top down by default and
