@@ -9,6 +9,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ANI",
+				class: "AniOpener",
+				source: "ArcFormats/AnimeGameSystem/ArcANI.cs",
+			},
+			localId: "ags-ani",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"ani extension gate",
+				"frame table derived from the first offset",
+				"frame offsets validated against the payload area",
+				"frame type byte per distinct offset",
+				"type byte bounds",
+				"type one frames skipped",
+				"low nibble frame types",
+				"key frame tracking",
+				"four digit frame names",
+				"image entry metadata",
+				"frame type and key frame and frame index metadata",
+				"offset ordered size assignment",
+				"shared offset extents",
+			],
+			unsupported: [
+				"archive creation",
+				"extension based entry typing",
+				"CG image decoding and key frame chaining",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "AXR",
 				class: "AxrOpener",
 				source: "ArcFormats/VnEngine/ArcAXR.cs",

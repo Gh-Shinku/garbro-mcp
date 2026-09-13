@@ -388,6 +388,7 @@ import { glibGFormat } from "./glib/g.js";
 import { blackButterflyDatFormat } from "./black-butterfly/dat.js";
 import { debonosuPakFormat } from "./debonosu/pak.js";
 import { vnEngineAxrFormat } from "./vn-engine/axr.js";
+import { animeGameSystemAniFormat } from "./anime-game-system/ani.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -637,6 +638,7 @@ export * from "./glib/index.js";
 export * from "./black-butterfly/index.js";
 export * from "./debonosu/index.js";
 export * from "./vn-engine/index.js";
+export * from "./anime-game-system/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1030,5 +1032,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		blackButterflyDatFormat,
 		debonosuPakFormat,
 		vnEngineAxrFormat,
+		animeGameSystemAniFormat,
 	]);
 }
