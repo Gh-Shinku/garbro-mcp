@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "PNX",
+				class: "PnxFormat",
+				source: "ArcFormats/ImagePNX.cs",
+			},
+			localId: "misc-pnx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "png deobfuscation", "metadata"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WAV/TMR-HIRO",
 				class: "TmrHiroAudio",
