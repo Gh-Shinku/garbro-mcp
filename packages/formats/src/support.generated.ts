@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "OGV",
+				class: "OgvAudio",
+				source: "ArcFormats/ShiinaRio/AudioOGV.cs",
+			},
+			localId: "shiina-rio-ogv-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "fmt and data chunk walk"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "EDIM",
 				class: "EdimAudio",
 				source: "ArcFormats/Macromedia/AudioEDIM.cs",
