@@ -5,6 +5,20 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "AOG/SYS3",
+				"class": "AogAudio",
+				"source": "ArcFormats/Eushully/AudioAOG.cs"
+			},
+			"localId": "eushully-aog-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "container header skipping"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "MPK/KURUMI",
 				"class": "MpkOpener",
