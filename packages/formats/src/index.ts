@@ -560,6 +560,7 @@ import { ggfImageFormat } from "./yellowcap/ggf-image.js";
 import { befAlpImageFormat } from "./bef/alp-image.js";
 import { gamesystemAlpImageFormat } from "./gamesystem/alp-image.js";
 import { masysAlpImageFormat } from "./masys/alp-image.js";
+import { ardImageFormat } from "./acme/ard-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -870,6 +871,7 @@ export * from "./uncanny/index.js";
 export * from "./yellowcap/index.js";
 export * from "./eye/index.js";
 export * from "./bef/index.js";
+export * from "./acme/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1435,5 +1437,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		befAlpImageFormat,
 		gamesystemAlpImageFormat,
 		masysAlpImageFormat,
+		ardImageFormat,
 	]);
 }

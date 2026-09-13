@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ARD",
+				class: "ArdFormat",
+				source: "Legacy/Acme/ImageARD.cs",
+			},
+			localId: "acme-ard-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"channel rotation",
+				"bmp reassembly",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ALP/MEGU",
 				class: "AlpFormat",
 				source: "ArcFormats/Masys/ImageALP.cs",
