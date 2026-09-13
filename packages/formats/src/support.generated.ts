@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GPD/ANKH",
+				class: "GpdFormat",
+				source: "ArcFormats/Ankh/ImageGPD.cs",
+			},
+			localId: "ankh-gpd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"lzss decoding",
+				"short and long header layouts",
+				"zero fill",
+				"24bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ALO",
 				class: "AloFormat",
 				source: "ArcFormats/BeF/ImageALO.cs",
