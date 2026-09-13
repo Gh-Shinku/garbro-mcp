@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MGR",
+				"class": "MgrOpener",
+				"source": "ArcFormats/Propeller/ArcMGR.cs"
+			},
+			"localId": "propeller-mgr",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"mgr extension requirement",
+				"int16 frame count",
+				"multi-frame offset table",
+				"single-frame layout",
+				"bm marker probe",
+				"frame header unpacked and stored sizes",
+				"propeller back-reference decoder",
+				"frame naming with base hash index",
+				"image typing",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "OPK",
 				"class": "OpkOpener",
 				"source": "ArcFormats/Cromwell/ArcPAK.cs"
