@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CG/DESERT",
+				class: "DesertCgOpener",
+				source: "ArcFormats/Software House Parsley/ArcCG3.cs",
+			},
+			localId: "parsley-desert-cg",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"cg file name gating",
+				"offset table walking",
+				"descending offset rejection",
+				"size derivation from the next offset",
+				"executable name table lookup",
+				"generated fallback names",
+				"image typing",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/LAZYCREW",
 				class: "DatOpener",
 				source: "Legacy/Lazycrew/ArcDAT.cs",

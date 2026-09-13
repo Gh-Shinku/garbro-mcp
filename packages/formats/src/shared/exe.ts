@@ -31,6 +31,11 @@ const NE_SEGMENT_COUNT = 0x1c;
 const NE_SEGMENT_TABLE = 0x22;
 const NE_ALIGNMENT_SHIFT = 0x32;
 const NE_SEGMENT_ENTRY_SIZE = 8;
+/** The optional header announces a 32-bit image with this magic. */
+const OPTIONAL_HEADER_OFFSET = 0x18;
+const OPTIONAL_HEADER_MAGIC = 0x010b;
+const OPTIONAL_HEADER_IMAGE_BASE = OPTIONAL_HEADER_OFFSET + 0x1c;
+const SECTION_VIRTUAL_ADDRESS = 0xc;
 
 /**
  * Locates the overlay of a Windows executable, which is where several GARbro formats keep their
@@ -113,4 +118,55 @@ async function readNeOverlay(
 	}
 	if (lastEnd > source.size) return undefined;
 	return { offset: lastEnd, size: source.size - lastEnd };
+}
+
+/**
+ * Translates a virtual address inside a 32-bit PE image into a file offset, mirroring
+ * `ExeFile.GetAddressOffset` and `ExeFile.GetAddressSection`. Returns `undefined` when the file is not
+ * a 32-bit PE image, when the address lies below the image base, or when no section covers it.
+ *
+ * Note that the reference matches sections by their raw size rather than their virtual size, which this
+ * function reproduces.
+ */
+export async function findExecutableAddressOffset(
+	source: ByteSource,
+	address: number,
+): Promise<bigint | undefined> {
+	if (source.size < BigInt(DOS_HEADER_SIZE)) return undefined;
+	const dos = await source.readAt(0n, DOS_HEADER_SIZE);
+	if (!dos.subarray(0, MZ_SIGNATURE.length).equals(MZ_SIGNATURE))
+		return undefined;
+	const headerOffset = BigInt(dos.readUInt32LE(HEADER_POINTER_OFFSET));
+	if (headerOffset + BigInt(PE_HEADER_MARGIN) >= source.size) return undefined;
+	const pe = await source.readAt(headerOffset, PE_HEADER_MARGIN);
+	if (!pe.subarray(0, PE_SIGNATURE.length).equals(PE_SIGNATURE))
+		return undefined;
+	if (pe.readUInt16LE(OPTIONAL_HEADER_OFFSET) !== OPTIONAL_HEADER_MAGIC)
+		return undefined;
+	const imageBase = pe.readUInt32LE(OPTIONAL_HEADER_IMAGE_BASE);
+	if (address < imageBase) return undefined;
+	const rva = BigInt(address - imageBase);
+	const sectionCount = pe.readUInt16LE(COFF_SECTION_COUNT);
+	const optionalSize = pe.readUInt16LE(COFF_OPTIONAL_SIZE);
+	const sectionTable = headerOffset + BigInt(optionalSize + PE_OPTIONS_OFFSET);
+	if (
+		sectionTable + BigInt(SECTION_TABLE_ENTRY_SIZE * sectionCount) >=
+		source.size
+	)
+		return undefined;
+	const table = await source.readAt(
+		sectionTable,
+		SECTION_TABLE_ENTRY_SIZE * sectionCount,
+	);
+	for (let index = 0; index < sectionCount; index += 1) {
+		const entry = index * SECTION_TABLE_ENTRY_SIZE;
+		const virtualAddress = BigInt(
+			table.readUInt32LE(entry + SECTION_VIRTUAL_ADDRESS),
+		);
+		const rawSize = BigInt(table.readUInt32LE(entry + SECTION_RAW_SIZE));
+		if (rva < virtualAddress || rva >= virtualAddress + rawSize) continue;
+		const pointer = BigInt(table.readUInt32LE(entry + SECTION_RAW_POINTER));
+		return pointer + (rva - virtualAddress);
+	}
+	return undefined;
 }

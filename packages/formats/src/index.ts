@@ -456,6 +456,7 @@ import { xuseHFormat } from "./xuse/nt.js";
 import { xuseArcFormat } from "./xuse/miko.js";
 import { xuseKotoriFormat } from "./xuse/miko.js";
 import { lazycrewDatFormat } from "./lazycrew/dat.js";
+import { parsleyDesertCgFormat } from "./parsley/cg3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1192,5 +1193,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		xuseArcFormat,
 		xuseKotoriFormat,
 		lazycrewDatFormat,
+		parsleyDesertCgFormat,
 	]);
 }
