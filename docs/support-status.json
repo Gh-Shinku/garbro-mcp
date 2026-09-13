@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AXR",
+				"class": "AxrOpener",
+				"source": "ArcFormats/VnEngine/ArcAXR.cs"
+			},
+			"localId": "vnengine-axr",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"AXRe marker",
+				"header checksum over rotated bytes",
+				"index size from the mutated seed xor key",
+				"word-wise index cipher",
+				"zero padded index buffer",
+				"name records with absolute offsets and sizes",
+				"word aligned name padding",
+				"empty name terminator",
+				"payload keystream table",
+				"keystream xor at absolute offsets",
+				"keystream wrap at 0x400 bytes",
+				"placement validation"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/Debonosu",
 				"class": "PakOpener",
 				"source": "ArcFormats/Debonosu/ArcPAK.cs"
