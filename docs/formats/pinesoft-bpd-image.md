@@ -28,7 +28,7 @@ Pixel decoding and archive creation are out of scope.
 
 ## Follow-up
 
-The bitmap writer in this file is the third copy of the same 32 bit header layout (CGD, TBL and now
-BPD). Extracting a shared writer is deliberately *not* part of this change: it is a behaviour-neutral
-refactor of three formats and belongs in its own commit, which the existing per-format tests — all of
-them assert the bitmap bytes field by field — already cover.
+The bitmap writer in this file was the third copy of the same 32 bit header layout (CGD, TBL and BPD).
+It has since been extracted into `packages/formats/src/shared/bmp.ts` (`writeBmp32` and `writeBmp8`) by
+the `refactor(shared): extract shared bitmap writers` commit, which changed the three formats without
+changing behaviour; their tests, which assert the bitmap bytes field by field, verified that.
