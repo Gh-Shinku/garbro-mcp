@@ -537,6 +537,7 @@ import { gssImageFormat } from "./ags32i/gss-image.js";
 import { cgdImageFormat } from "./carriere/cgd-image.js";
 import { tblImageFormat } from "./pan/tbl-image.js";
 import { bpdImageFormat } from "./pinesoft/bpd-image.js";
+import { psmImageFormat } from "./psm/image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -840,6 +841,7 @@ export * from "./c4/index.js";
 export * from "./sviu/index.js";
 export * from "./macromedia/index.js";
 export * from "./ags32i/index.js";
+export * from "./psm/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1382,5 +1384,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cgdImageFormat,
 		tblImageFormat,
 		bpdImageFormat,
+		psmImageFormat,
 	]);
 }

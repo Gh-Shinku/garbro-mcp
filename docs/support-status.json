@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PSM",
+				"class": "PsmFormat",
+				"source": "ArcFormats/ImagePSM.cs"
+			},
+			"localId": "psm-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "png deobfuscation"],
+			"unsupported": ["archive creation", "pixel decoding", "png validation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BPD",
 				"class": "BpdFormat",
 				"source": "Legacy/PineSoft/ImageBPD.cs"
