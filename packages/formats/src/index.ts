@@ -594,6 +594,7 @@ import { tiareGraImageFormat } from "./tiare/gra-image.js";
 import { ugImageFormat } from "./ucom/ug-image.js";
 import { hillFieldImgImageFormat } from "./hillfield/img-image.js";
 import { pbmImageFormat } from "./nekopunch/pbm-image.js";
+import { kslImageFormat } from "./kscript/ksl-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1514,5 +1515,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ugImageFormat,
 		hillFieldImgImageFormat,
 		pbmImageFormat,
+		kslImageFormat,
 	]);
 }

@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "KSL",
+				class: "KslFormat",
+				source: "ArcFormats/KScript/ImageKSL.cs",
+			},
+			localId: "kscript-ksl-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"keyed unmasking",
+				"gray8 bitmap output",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PBM",
 				class: "PbmFormat",
 				source: "ArcFormats/Nekopunch/ImagePBM.cs",
