@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "KGP",
+				class: "KgpFormat",
+				source: "ArcFormats/KScript/ImageKGP.cs",
+			},
+			localId: "kscript-kgp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"xor decryption",
+				"offset rule",
+				"png header metadata",
+				"pass-through output",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IMG/PNG",
 				class: "ImgPngFormat",
 				source: "ArcFormats/Lilim/ImageIMG.cs",
