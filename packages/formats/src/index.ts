@@ -245,6 +245,7 @@ import { aos2Format } from "./lilim/aos2.js";
 import { aosFormat } from "./lilim/aos.js";
 import { azuriteFormat } from "./silky/azurite.js";
 import { ai6WinFormat } from "./silky/ai6win.js";
+import { nekopunchPakFormat } from "./nekopunch/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -421,6 +422,7 @@ export * from "./techgian/index.js";
 export * from "./speed/index.js";
 export * from "./luna-soft/index.js";
 export * from "./lilim/index.js";
+export * from "./nekopunch/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -672,5 +674,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aosFormat,
 		azuriteFormat,
 		ai6WinFormat,
+		nekopunchPakFormat,
 	]);
 }

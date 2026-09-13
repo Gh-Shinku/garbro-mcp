@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/NEKOPUNCH",
+				"class": "PakOpener",
+				"source": "ArcFormats/Nekopunch/ArcPAK.cs"
+			},
+			"localId": "nekopunch-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pack signature and pak extension",
+				"entry count validation",
+				"archive-wide packed flag",
+				"cp932 name field with blank rejection",
+				"unpacked size stored size and offset words",
+				"entry placement validation",
+				"lzss extraction with default settings"
+			],
+			"unsupported": ["dow audio resource alias", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/AI6WIN",
 				"class": "Ai6Opener",
 				"source": "ArcFormats/Silky/ArcAi6Win.cs"
