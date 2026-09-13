@@ -418,6 +418,7 @@ import { cyberworksDatFormat } from "./cyberworks/dat.js";
 import { cyberworksCsystemDatFormat } from "./cyberworks/dat.js";
 import { cyberworksCsystemDat2Format } from "./cyberworks/dat.js";
 import { pandoraPbxFormat } from "./pandora/pbx.js";
+import { nononoNpfFormat } from "./nonono/npf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -679,6 +680,7 @@ export * from "./advscripter/index.js";
 export * from "./apricot/index.js";
 export * from "./cyberworks/index.js";
 export * from "./pandora/index.js";
+export * from "./nonono/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1102,5 +1104,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cyberworksCsystemDatFormat,
 		cyberworksCsystemDat2Format,
 		pandoraPbxFormat,
+		nononoNpfFormat,
 	]);
 }

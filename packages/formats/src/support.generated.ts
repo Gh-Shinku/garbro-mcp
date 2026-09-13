@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "NPF",
+				class: "NpfOpener",
+				source: "ArcFormats/Nonono/ArcNPF.cs",
+			},
+			localId: "nonono-npf",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"seeded XOR encryption",
+				"two generator variants",
+				"fat directory header",
+				"per-entry names",
+				"CP932 names",
+				"payload extraction",
+			],
+			unsupported: ["archive creation", "real-game differential files"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PBX",
 				class: "PbxOpener",
 				source: "ArcFormats/Pandora/ArcPBX.cs",
