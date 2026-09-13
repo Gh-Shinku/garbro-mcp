@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "YK",
+				"class": "YkOpener",
+				"source": "Legacy/Rune/ArcYK.cs"
+			},
+			"localId": "rune-yk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"id-keyed records",
+				"encrypted name blob",
+				"key-derived byte rotation",
+				"named-entry filtering",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CG/PARSLEY/2",
 				"class": "CgV2Opener",
 				"source": "ArcFormats/Software House Parsley/ArcCG2.cs"

@@ -217,6 +217,7 @@ import { c24Format } from "./foster/c24.js";
 import { c25Format } from "./foster/c24.js";
 import { lb5Format } from "./jupiter/lb5.js";
 import { cgV2Format } from "./parsley/cg2.js";
+import { ykFormat } from "./rune/yk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -381,6 +382,7 @@ export * from "./tactics/index.js";
 export * from "./astronauts/index.js";
 export * from "./foster/index.js";
 export * from "./jupiter/index.js";
+export * from "./rune/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -604,5 +606,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		c25Format,
 		lb5Format,
 		cgV2Format,
+		ykFormat,
 	]);
 }
