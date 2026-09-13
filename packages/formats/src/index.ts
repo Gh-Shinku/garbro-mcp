@@ -178,6 +178,7 @@ import { ifpFormat } from "./winters/ifp.js";
 import { xarcFormat } from "./xuse/xarc.js";
 import { dafFormat } from "./cadath/daf.js";
 import { hotFormat } from "./hdl/hot.js";
+import { advSys3Format } from "./advsys/arc3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -498,5 +499,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		xarcFormat,
 		dafFormat,
 		hotFormat,
+		advSys3Format,
 	]);
 }

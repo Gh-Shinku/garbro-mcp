@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/ADVSYS3",
+				"class": "ArcOpener",
+				"source": "ArcFormats/AdvSys/ArcAdvSys3.cs"
+			},
+			"localId": "advsys3-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and file name prefix detection",
+				"sequential record chain",
+				"zero-size terminator",
+				"truncated final record",
+				"gwd extension rewrite",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/HOT",
 				"class": "HotOpener",
 				"source": "Legacy/Hdl/ArcHOT.cs"
