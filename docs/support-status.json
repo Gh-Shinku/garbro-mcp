@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "TEX/SZDD",
+				"class": "TexFormat",
+				"source": "Legacy/System21/ImageTEX.cs"
+			},
+			"localId": "system21-tex-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"szdd unpacking",
+				"dds passthrough",
+				"dds dimensions and pixel format",
+				"metadata"
+			],
+			"unsupported": ["dds decoding to bitmap", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MAL",
 				"class": "MalFormat",
 				"source": "ArcFormats/Valkyria/ImageMAL.cs"
