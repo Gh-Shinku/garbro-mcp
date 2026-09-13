@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PMX",
+				"class": "PmxOpener",
+				"source": "ArcFormats/ScenePlayer/ArcPMX.cs"
+			},
+			"localId": "sceneplayer-pmx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and xored zlib header detection",
+				"xor-0x21 and zlib decoding",
+				"sequential script records",
+				"blank and rooted name rejection",
+				"entry range validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GAMEDAT",
 				"class": "DatOpener",
 				"source": "ArcFormats/Pajamas/ArcGameDat.cs"
