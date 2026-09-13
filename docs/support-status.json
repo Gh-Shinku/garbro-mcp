@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/MUGI",
+				"class": "BinOpener",
+				"source": "ArcFormats/Mugi/ArcBIN.cs"
+			},
+			"localId": "mugi-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"fixed index layout",
+				"first offset equal to the index end",
+				"non-decreasing offset walk terminated by the file size",
+				"entry bound",
+				"derived sizes from offset gaps",
+				"unpacked size table",
+				"packed detection from size inequality",
+				"lzss extraction with default settings"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/NEKOPUNCH",
 				"class": "PakOpener",
 				"source": "ArcFormats/Nekopunch/ArcPAK.cs"
