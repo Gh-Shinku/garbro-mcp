@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ABM",
+				class: "AbmOpener",
+				source: "ArcFormats/Lilim/ArcABM.cs",
+			},
+			localId: "lilim-abm",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"frame listing",
+				"frame extraction",
+				"generated frame names",
+				"image metadata",
+			],
+			unsupported: ["archive creation", "abm image decoder"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "AFA",
 				class: "AfaOpener",
 				source: "ArcFormats/AliceSoft/ArcAFA.cs",

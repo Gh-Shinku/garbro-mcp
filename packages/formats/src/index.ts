@@ -502,6 +502,7 @@ import { discoveryDatFormat } from "./discovery/dat.js";
 import { entisEriFormat } from "./entis/eri.js";
 import { piasEncryptedFormat } from "./pias/encrypted-graph.js";
 import { alicesoftAfaFormat } from "./alicesoft/afa.js";
+import { abmFormat } from "./lilim/abm.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1305,5 +1306,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		entisEriFormat,
 		piasEncryptedFormat,
 		alicesoftAfaFormat,
+		abmFormat,
 	]);
 }
