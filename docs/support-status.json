@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "A5R",
+				"class": "A5rOpener",
+				"source": "Legacy/Pinky/ArcA5R.cs"
+			},
+			"localId": "pinky-a5r",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pcrs and plib signatures",
+				"complement word check",
+				"overlapping segment table",
+				"segment types and compression flag",
+				"generated numbered entry names",
+				"riff audio segment merging",
+				"segment concatenation",
+				"zlib segments"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decoding",
+				"entry type detection"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/WillV2",
 				"class": "Arc2Opener",
 				"source": "ArcFormats/Will/ArcPulltop.cs"

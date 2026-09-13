@@ -482,6 +482,7 @@ import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { ellefinEpkFormat } from "./ellefin/epk.js";
 import { g2PakFormat } from "./g2/pak.js";
 import { willArc2Format } from "./will/arc2.js";
+import { pinkyA5rFormat } from "./pinky/a5r.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -770,6 +771,7 @@ export * from "./strikes/index.js";
 export * from "./lucifen/index.js";
 export * from "./ellefin/index.js";
 export * from "./g2/index.js";
+export * from "./pinky/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1257,5 +1259,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ellefinEpkFormat,
 		g2PakFormat,
 		willArc2Format,
+		pinkyA5rFormat,
 	]);
 }
