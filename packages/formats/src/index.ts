@@ -419,6 +419,7 @@ import { cyberworksCsystemDatFormat } from "./cyberworks/dat.js";
 import { cyberworksCsystemDat2Format } from "./cyberworks/dat.js";
 import { pandoraPbxFormat } from "./pandora/pbx.js";
 import { nononoNpfFormat } from "./nonono/npf.js";
+import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1105,5 +1106,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cyberworksCsystemDat2Format,
 		pandoraPbxFormat,
 		nononoNpfFormat,
+		shiinaRioWarcFormat,
 	]);
 }
