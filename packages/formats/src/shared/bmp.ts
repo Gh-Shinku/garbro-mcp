@@ -5,7 +5,7 @@
 const BMP_HEADER_SIZE = 54;
 const GREY_PALETTE_SIZE = 256 * 4;
 
-function writeHeader(
+export function writeHeader(
 	width: number,
 	height: number,
 	bitsPerPixel: number,
