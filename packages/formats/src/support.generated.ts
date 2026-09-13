@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GTX",
+				class: "GpcFormat",
+				source: "ArcFormats/MicroVision/ImageGPC.cs",
+			},
+			localId: "microvision-gtx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction of the second variant",
+				"32bpp images",
+				"metadata",
+			],
+			unsupported: ["image encoding", "first variant pixels"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "UNH",
 				class: "UnhFormat",
 				source: "Legacy/Harvest/ImageUNH.cs",
