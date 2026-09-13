@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MFS",
+				"class": "MfOpener",
+				"source": "ArcFormats/ClickTeam/ArcMF.cs"
+			},
+			"localId": "clickteam-mfs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"wwww marker with reserved bytes",
+				"executable overlay lookup (MZ/PE and NE)",
+				"entry count",
+				"utf-16 names with code-unit lengths",
+				"reserved words",
+				"entry walk doubling as payload table",
+				"zlib payloads except mmfs2.dll",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AMPV",
 				"class": "AmvOpener",
 				"source": "ArcFormats/BlueGale/VideoAMV.cs"
