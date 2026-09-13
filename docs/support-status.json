@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SAF",
+				"class": "SafOpener",
+				"source": "ArcFormats/Rits/ArcSAF.cs"
+			},
+			"localId": "rits-saf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"version 5 fixed index",
+				"version 6 compact index with name blob",
+				"version based index decryption",
+				"descending name blob decryption",
+				"directory tree walk",
+				"hierarchical paths",
+				"0x800 byte offset units",
+				"packed entry detection",
+				"zlib and lzss payload unpacking"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decoding",
+				"STR to TXT resource alias"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PUREMAIL",
 				"class": "PmDatOpener",
 				"source": "ArcFormats/GameSystem/ArcPureMail.cs"
