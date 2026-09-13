@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AN21/KAGUYA",
+				"class": "An21Opener",
+				"source": "ArcFormats/Kaguya/ArcAN21.cs"
+			},
+			"localId": "kaguya-an21",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"table walk with types zero to five",
+				"counted name table and pic marker",
+				"frame count with stepped info block",
+				"raw first frame",
+				"later frames with step and declared output formula",
+				"shared interleaved rle",
+				"frame naming and metadata"
+			],
+			"unsupported": [
+				"frame accumulation and bitmap decoding",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PL10",
 				"class": "Pl10Opener",
 				"source": "ArcFormats/Kaguya/ArcPLT.cs"
