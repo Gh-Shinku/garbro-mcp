@@ -177,6 +177,7 @@ import { tanakaVpkFormat } from "./tanaka/vpk.js";
 import { ifpFormat } from "./winters/ifp.js";
 import { xarcFormat } from "./xuse/xarc.js";
 import { dafFormat } from "./cadath/daf.js";
+import { hotFormat } from "./hdl/hot.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -312,6 +313,7 @@ export * from "./mink/index.js";
 export * from "./yane-sdk/index.js";
 export * from "./shiina-rio/index.js";
 export * from "./patisserie/index.js";
+export * from "./hdl/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -495,5 +497,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ifpFormat,
 		xarcFormat,
 		dafFormat,
+		hotFormat,
 	]);
 }
