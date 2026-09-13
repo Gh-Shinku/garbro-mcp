@@ -519,6 +519,7 @@ import { ikmAudioFormat } from "./microvision/ikm-audio.js";
 import { keyOggpakAudioFormat } from "./key/oggpak-audio.js";
 import { vmdAudioFormat } from "./c4/vmd-audio.js";
 import { voiAudioFormat } from "./slg/voi-audio.js";
+import { eogAudioFormat } from "./crowd/eog-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1343,5 +1344,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		keyOggpakAudioFormat,
 		vmdAudioFormat,
 		voiAudioFormat,
+		eogAudioFormat,
 	]);
 }

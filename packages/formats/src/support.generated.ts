@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "EOG",
+				class: "EogAudio",
+				source: "ArcFormats/Crowd/AudioEOG.cs",
+			},
+			localId: "crowd-eog-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "eog and amb extensions"],
+			unsupported: ["archive creation", "audio writing", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "VOI",
 				class: "VoiAudio",
 				source: "ArcFormats/Slg/AudioVOI.cs",
