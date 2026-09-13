@@ -223,6 +223,7 @@ import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
 import { sdaSdFormat } from "./squadrad/sda.js";
 import { sqzFormat } from "./musica/sqz.js";
+import { mpkHgFormat } from "./tako/mpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -389,6 +390,7 @@ export * from "./foster/index.js";
 export * from "./jupiter/index.js";
 export * from "./rune/index.js";
 export * from "./musica/index.js";
+export * from "./tako/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -618,5 +620,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		arccFormat,
 		sdaSdFormat,
 		sqzFormat,
+		mpkHgFormat,
 	]);
 }

@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MPK/HG",
+				"class": "MpkOpener",
+				"source": "Legacy/Tako/ArcMPK.cs"
+			},
+			"localId": "tako-mpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection for both variants",
+				"size-carrying and offset-only layouts",
+				"derived sizes for the offset-only variant",
+				"companion 00.mpk name list",
+				"generated name fallback",
+				"list file rejection",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SQZ",
 				"class": "SqzOpener",
 				"source": "ArcFormats/Musica/ArcSQZ.cs"
