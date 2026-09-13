@@ -9,6 +9,36 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "AM/Leaf",
+				class: "AmOpener",
+				source: "ArcFormats/Leaf/ArcAM.cs",
+			},
+			localId: "leaf-am",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"am00 signature",
+				"index size field",
+				"index key byte",
+				"whole index exclusive-or",
+				"NUL terminated CP932 names",
+				"offsets relative to the end of the index",
+				"stored sizes",
+				"placement checks",
+				"walk to the end of the index",
+				"empty index handling",
+				"verbatim names without hierarchical normalization",
+			],
+			unsupported: [
+				"archive creation",
+				"user scheme decryption tables",
+				"extension based entry typing",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "AR2",
 				class: "Ar2Opener",
 				source: "ArcFormats/Leaf/ArcAR2.cs",

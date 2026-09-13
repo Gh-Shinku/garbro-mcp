@@ -393,6 +393,7 @@ import { animeGameSystemDatFormat } from "./anime-game-system/dat.js";
 import { maikaMk2Format } from "./maika/mk2.js";
 import { astArcFormat } from "./ast/arc.js";
 import { leafAr2Format } from "./leaf/ar2.js";
+import { leafAmFormat } from "./leaf/am.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1042,5 +1043,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		maikaMk2Format,
 		astArcFormat,
 		leafAr2Format,
+		leafAmFormat,
 	]);
 }
