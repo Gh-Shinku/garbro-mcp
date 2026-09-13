@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CRM",
+				"class": "CrmOpener",
+				"source": "ArcFormats/Circus/ArcCRM.cs"
+			},
+			"localId": "circus-crm",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x20-byte index records",
+				"offset sorting and derived sizes",
+				"shared-offset records",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CP3",
 				"class": "Cp3Opener",
 				"source": "ArcFormats/Seraphim/ArcCP3.cs"
