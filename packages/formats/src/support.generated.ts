@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/CSWARE",
+				class: "PakOpener",
+				source: "ArcFormats/CsWare/ArcDAT.cs",
+			},
+			localId: "csware-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"count and packed size validation",
+				"zlib marker check",
+				"zlib-compressed index at 0x08",
+				"0x18-byte cp932 names",
+				"index-relative payload offsets",
+				"entry placement validation",
+				"verbatim extraction",
+			],
+			unsupported: ["image decoding", "archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "CPZ2",
 				class: "Cpz2Opener",
 				source: "ArcFormats/Cmvs/ArcCPZ2.cs",
