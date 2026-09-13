@@ -188,6 +188,7 @@ import { airyuChrFormat } from "./airyu/chr.js";
 import { animFormat } from "./marble/anim.js";
 import { pochettePacFormat } from "./pochette/pac.js";
 import { cgdFormat } from "./kapp/cgd.js";
+import { ucomDataFormat } from "./ucom/data.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -525,5 +526,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		animFormat,
 		pochettePacFormat,
 		cgdFormat,
+		ucomDataFormat,
 	]);
 }

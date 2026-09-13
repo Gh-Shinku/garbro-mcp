@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DATA/UCOM",
+				"class": "DataOpener",
+				"source": "ArcFormats/Ucom/ArcDATA.cs"
+			},
+			"localId": "ucom-data",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"file name and signature detection",
+				"companion data01 index",
+				"index bounds validation",
+				"strided xor payload decryption",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CGD/SPIEL",
 				"class": "CgdOpener",
 				"source": "Legacy/KApp/ArcCGD.cs"
