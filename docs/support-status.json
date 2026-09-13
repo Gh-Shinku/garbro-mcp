@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/Tactics/0",
+				"class": "YuOpener",
+				"source": "ArcFormats/Tactics/ArcYU.cs"
+			},
+			"localId": "tactics-yu",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion dll index",
+				"0x55 name unmasking",
+				"content-type handling",
+				"derived entry sizes",
+				"type 3 payload decryption",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/ARC2",
 				"class": "Arc2Opener",
 				"source": "ArcFormats/CsWare/ArcARC2.cs"
