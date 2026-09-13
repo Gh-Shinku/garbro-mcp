@@ -257,6 +257,7 @@ import { nejiiCdtFormat } from "./nejii/cdt.js";
 import { rainBinFormat } from "./rain/bin.js";
 import { aarFormat } from "./alicesoft/aar.js";
 import { ucaFormat } from "./westgate/uca.js";
+import { uwfFormat } from "./westgate/uwf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -703,5 +704,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		rainBinFormat,
 		aarFormat,
 		ucaFormat,
+		uwfFormat,
 	]);
 }

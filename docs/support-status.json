@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "UWF",
+				"class": "UwfOpener",
+				"source": "Legacy/WestGate/ArcUWF.cs"
+			},
+			"localId": "westgate-uwf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"reserved head",
+				"first offset bounds and derived entry count",
+				"shared westgate index reader",
+				"riff header synthesis in front of pcm",
+				"verbatim extraction fallback",
+				"format and pcm size metadata",
+				"extension requirement"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "UCA",
 				"class": "UcaOpener",
 				"source": "Legacy/WestGate/ArcUCA.cs"
