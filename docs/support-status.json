@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IFP",
+				"class": "IfpOpener",
+				"source": "ArcFormats/Winters/ArcIFP.cs"
+			},
+			"localId": "winters-ifp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature marker and version detection",
+				"sentinel-adjusted record count",
+				"zero-type record skipping",
+				"type-to-extension mapping",
+				"bitmap mask entries",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VPK1",
 				"class": "VpkOpener",
 				"source": "ArcFormats/Tanaka/ArcVPK.cs"
