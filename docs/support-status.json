@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AAR",
+				"class": "AarOpener",
+				"source": "ArcFormats/AliceSoft/ArcAAR.cs"
+			},
+			"localId": "alicesoft-aar",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"aar signature and red extension",
+				"entry count validation",
+				"records with offset size flag and name",
+				"null-terminated cp932 names",
+				"entry placement validation",
+				"index flag exposure",
+				"zlb detection and per-entry header words",
+				"zlib extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/RAIN",
 				"class": "BinOpener",
 				"source": "Legacy/Rain/ArcBIN.cs"

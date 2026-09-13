@@ -255,6 +255,7 @@ import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
 import { nejiiCdtFormat } from "./nejii/cdt.js";
 import { rainBinFormat } from "./rain/bin.js";
+import { aarFormat } from "./alicesoft/aar.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -699,5 +700,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dl1Format,
 		nejiiCdtFormat,
 		rainBinFormat,
+		aarFormat,
 	]);
 }
