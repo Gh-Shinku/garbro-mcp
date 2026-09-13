@@ -342,6 +342,7 @@ import { nekosdkDatFormat } from "./nekosdk/dat.js";
 import { willWipFormat } from "./will/wip.js";
 import { leafAFormat } from "./leaf/a.js";
 import { seenFormat } from "./reallive/seen.js";
+import { gamesystemDatFormat } from "./gamesystem/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -567,6 +568,7 @@ export * from "./digital-works/index.js";
 export * from "./psp/index.js";
 export * from "./nekosdk/index.js";
 export * from "./will/index.js";
+export * from "./gamesystem/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -914,5 +916,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		willWipFormat,
 		leafAFormat,
 		seenFormat,
+		gamesystemDatFormat,
 	]);
 }

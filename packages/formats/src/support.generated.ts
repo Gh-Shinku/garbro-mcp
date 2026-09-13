@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/0verflow",
+				class: "DatOpener",
+				source: "ArcFormats/GameSystem/ArcDAT.cs",
+			},
+			localId: "gamesystem-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"sector-counted index header",
+				"index end matched against the first payload offset",
+				"six-bit packed name restoration",
+				"0x10 records with all-ones end marker",
+				"sector-aligned back-filled entry sizes",
+				"image typing for CRGB and CHAR names",
+				"verbatim extraction",
+			],
+			unsupported: ["image decoding", "archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SEEN",
 				class: "SeenOpener",
 				source: "ArcFormats/RealLive/ArcSEEN.cs",
