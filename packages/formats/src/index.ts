@@ -240,6 +240,7 @@ import { techgianBinFormat } from "./techgian/bin.js";
 import { speedArcFormat } from "./speed/arc.js";
 import { hzcMultiFormat } from "./favorite/hzc-multi.js";
 import { lunaPacFormat } from "./luna-soft/pac.js";
+import { fgaFormat } from "./lilim/fga.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -415,6 +416,7 @@ export * from "./techno-brain/index.js";
 export * from "./techgian/index.js";
 export * from "./speed/index.js";
 export * from "./luna-soft/index.js";
+export * from "./lilim/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -661,5 +663,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		speedArcFormat,
 		hzcMultiFormat,
 		lunaPacFormat,
+		fgaFormat,
 	]);
 }
