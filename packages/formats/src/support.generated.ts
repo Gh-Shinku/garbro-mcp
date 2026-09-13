@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "FGP",
+				class: "FgpFormat",
+				source: "Legacy/FazeX/ImageFGP.cs",
+			},
+			localId: "fazex-fgp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"lzss decompression",
+				"planar channel assembly",
+				"inverted alpha",
+				"32bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ABM",
 				class: "AbmFormat",
 				source: "ArcFormats/Lilim/ImageABM.cs",
