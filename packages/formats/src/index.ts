@@ -237,6 +237,7 @@ import { dxFormat } from "./black-rainbow/dx.js";
 import { smvFormat } from "./tanaka/smv.js";
 import { cgfFormat } from "./triangle/cgf.js";
 import { techgianBinFormat } from "./techgian/bin.js";
+import { speedArcFormat } from "./speed/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -410,6 +411,7 @@ export * from "./origin/index.js";
 export * from "./emic/index.js";
 export * from "./techno-brain/index.js";
 export * from "./techgian/index.js";
+export * from "./speed/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -653,5 +655,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		smvFormat,
 		cgfFormat,
 		techgianBinFormat,
+		speedArcFormat,
 	]);
 }

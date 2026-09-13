@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/REC",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Speed/ArcARC.cs"
+			},
+			"localId": "speed-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature validation",
+				"name table with record length",
+				"name and offset tables with padding",
+				"second header validation",
+				"cp932 filenames",
+				"32-bit offset table",
+				"derived entry sizes",
+				"size-word driven extraction",
+				"image and non-image prefix offsets via extension list"
+			],
+			"unsupported": ["image lz decoding to bgra", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/RFIL",
 				"class": "BinOpener",
 				"source": "ArcFormats/TechGian/ArcBIN.cs"
