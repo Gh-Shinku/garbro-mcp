@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CAF",
+				"class": "CafOpener",
+				"source": "ArcFormats/Tail/ArcCAF.cs"
+			},
+			"localId": "tail-caf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"caf0 signature",
+				"index and name blob offsets",
+				"directory name prefixes",
+				"relative payload offsets",
+				"pren run length decoding",
+				"cfp0 command decoding",
+				"hp tree decoding",
+				"chained payload layers"
+			],
+			"unsupported": ["archive creation", "image and audio decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "X/RARE",
 				"class": "XOpener",
 				"source": "Legacy/Rare/ArcX.cs"
