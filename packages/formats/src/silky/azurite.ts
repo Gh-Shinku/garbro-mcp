@@ -2,7 +2,6 @@
 // ArcFormats/Silky/ArcAi6Win.cs (`Ai6Opener.OpenEntry`).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { inflateLzssAll } from "@garbro-mcp/codecs";
 import {
 	bigintToBufferLength,
 	decodeCp932,
@@ -11,7 +10,6 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -20,6 +18,7 @@ import {
 	sourceExtension,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { openAi6Entry } from "./lzss-entry.js";
 
 const EXTENSION = "arc";
 const INDEX_SIZE_OFFSET = 0;
@@ -129,20 +128,6 @@ async function readAzuriteIndex(
 	return entries;
 }
 
-/** GARbro `Ai6Opener.OpenEntry`: packed entries are plain LZSS streams with default settings. */
-async function openAzuriteEntry(
-	source: ByteSource,
-	entry: FixedEntry,
-): Promise<Readable> {
-	if (!entry.compressed)
-		return source.createReadStream(entry.offset, entry.size);
-	const stored = await source.readAt(
-		entry.offset,
-		bigintToBufferLength(entry.packedSize, "LZSS entry"),
-	);
-	return Readable.from([inflateLzssAll(stored)]);
-}
-
 export const azuriteFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: azuriteDescriptor,
 	async detect(source: ByteSource, sourcePath: string): Promise<boolean> {
@@ -155,5 +140,5 @@ export const azuriteFormat: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Azurite index layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
-	openEntry: openAzuriteEntry,
+	openEntry: openAi6Entry,
 });

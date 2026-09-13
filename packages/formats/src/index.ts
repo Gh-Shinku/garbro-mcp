@@ -244,6 +244,7 @@ import { fgaFormat } from "./lilim/fga.js";
 import { aos2Format } from "./lilim/aos2.js";
 import { aosFormat } from "./lilim/aos.js";
 import { azuriteFormat } from "./silky/azurite.js";
+import { ai6WinFormat } from "./silky/ai6win.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -670,5 +671,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aos2Format,
 		aosFormat,
 		azuriteFormat,
+		ai6WinFormat,
 	]);
 }

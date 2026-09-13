@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/AI6WIN",
+				"class": "Ai6Opener",
+				"source": "ArcFormats/Silky/ArcAi6Win.cs"
+			},
+			"localId": "silky-ai6win",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arc extension requirement",
+				"entry count validation",
+				"fixed 0x110 byte records",
+				"name obfuscation and length validation",
+				"invalid file name character rejection",
+				"big-endian size and offset words",
+				"data offset behind the index",
+				"entry placement validation",
+				"lzss extraction with default settings"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/AZURITE",
 				"class": "SilkyArcOpener",
 				"source": "ArcFormats/Silky/ArcAzurite.cs"
