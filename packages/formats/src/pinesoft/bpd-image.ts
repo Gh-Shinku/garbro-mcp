@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -48,25 +49,6 @@ async function readLayout(source: ByteSource): Promise<BpdLayout | undefined> {
 	} catch {
 		return undefined;
 	}
-}
-
-/**
- * Wraps top down BGRA pixels in a 32 bit bitmap. A negative height records a top down image, which
- * keeps the stored byte order.
- */
-function writeBitmap(width: number, height: number, pixels: Buffer): Buffer {
-	const header = Buffer.alloc(54);
-	header.write("BM", 0, "latin1");
-	header.writeUInt32LE(header.length + pixels.length, 2);
-	header.writeUInt32LE(header.length, 10);
-	header.writeUInt32LE(40, 14);
-	header.writeInt32LE(width, 18);
-	header.writeInt32LE(-height, 22);
-	header.writeUInt16LE(1, 26);
-	header.writeUInt16LE(BITS_PER_PIXEL, 28);
-	header.writeUInt32LE(0, 30);
-	header.writeUInt32LE(pixels.length, 34);
-	return Buffer.concat([header, pixels]);
 }
 
 export const bpdImageDescriptor: FormatDescriptor = {
@@ -134,6 +116,6 @@ export const bpdImageFormat: ArchiveFormat = defineFixedArchive({
 		const pixels = Buffer.from(
 			await source.readAt(BigInt(layout.pixelOffset), layout.pixelSize),
 		);
-		return Readable.from([writeBitmap(layout.width, layout.height, pixels)]);
+		return Readable.from([writeBmp32(layout.width, layout.height, pixels)]);
 	},
 });

@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp8 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -22,11 +23,6 @@ const HEADER_SIZE = 0x14;
 const WIDTH_OFFSET = 0xc;
 const HEIGHT_OFFSET = 0x10;
 const BITS_PER_PIXEL = 8;
-const BMP_HEADER_SIZE = 54;
-/** An eight bit bitmap needs a palette; the reference reports the pixels as `Gray8`. */
-const PALETTE_ENTRIES = 256;
-const PALETTE_SIZE = PALETTE_ENTRIES * 4;
-const DATA_OFFSET = BMP_HEADER_SIZE + PALETTE_SIZE;
 
 interface TblLayout {
 	width: number;
@@ -65,40 +61,6 @@ async function readLayout(source: ByteSource): Promise<TblLayout | undefined> {
 	} catch {
 		return undefined;
 	}
-}
-
-/**
- * Wraps the pixels in an eight bit bitmap with a grey palette. The reference reports them with
- * `ImageData.Create`, i.e. top down, so the bitmap uses a negative height.
- */
-function writeBitmap(layout: TblLayout, pixels: Buffer): Buffer {
-	const imageSize = layout.stride * layout.height;
-	const header = Buffer.alloc(BMP_HEADER_SIZE);
-	header.write("BM", 0, "latin1");
-	header.writeUInt32LE(DATA_OFFSET + imageSize, 2);
-	header.writeUInt32LE(DATA_OFFSET, 10);
-	header.writeUInt32LE(40, 14);
-	header.writeInt32LE(layout.width, 18);
-	header.writeInt32LE(-layout.height, 22);
-	header.writeUInt16LE(1, 26);
-	header.writeUInt16LE(BITS_PER_PIXEL, 28);
-	header.writeUInt32LE(0, 30);
-	header.writeUInt32LE(imageSize, 34);
-	header.writeUInt32LE(PALETTE_ENTRIES, 46);
-	const palette = Buffer.alloc(PALETTE_SIZE);
-	for (let i = 0; i < PALETTE_ENTRIES; i += 1) {
-		palette[i * 4] = i;
-		palette[i * 4 + 1] = i;
-		palette[i * 4 + 2] = i;
-	}
-	// Rows are copied and then padded, because eight bit rows are aligned to four bytes.
-	const rows: Buffer[] = [];
-	for (let row = 0; row < layout.height; row += 1) {
-		const line = Buffer.alloc(layout.stride);
-		pixels.copy(line, 0, row * layout.width, row * layout.width + layout.width);
-		rows.push(line);
-	}
-	return Buffer.concat([header, palette, ...rows]);
 }
 
 export const tblImageDescriptor: FormatDescriptor = {
@@ -166,6 +128,6 @@ export const tblImageFormat: ArchiveFormat = defineFixedArchive({
 		const pixels = Buffer.from(
 			await source.readAt(BigInt(layout.pixelOffset), layout.pixelSize),
 		);
-		return Readable.from([writeBitmap(layout, pixels)]);
+		return Readable.from([writeBmp8(layout.width, layout.height, pixels)]);
 	},
 });
