@@ -532,6 +532,7 @@ import { bgiAudioFormat } from "./ethornell/bw-audio.js";
 import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { ogvAudioFormat } from "./shiina-rio/ogv-audio.js";
 import { agsAudioFormat } from "./ags32i/wav-audio.js";
+import { kwfAudioFormat } from "./dice/kwf-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1372,5 +1373,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		edimAudioFormat,
 		ogvAudioFormat,
 		agsAudioFormat,
+		kwfAudioFormat,
 	]);
 }

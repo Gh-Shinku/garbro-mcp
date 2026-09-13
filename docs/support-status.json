@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "KWF",
+				"class": "KwfAudio",
+				"source": "Legacy/Dice/AudioKWF.cs"
+			},
+			"localId": "dice-kwf-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "wave container wrapping"],
+			"unsupported": [
+				"archive creation",
+				"audio writing",
+				"compression method 3 other methods"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "WAV/AGS32I",
 				"class": "AgsAudio",
 				"source": "Legacy/Ags32i/AudioAGS.cs"
