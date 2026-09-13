@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CHR/AIRYU",
+				"class": "ChrOpener",
+				"source": "Legacy/Airyu/ArcCHR.cs"
+			},
+			"localId": "airyu-chr",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"image size probing",
+				"exact multiple requirement",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/UMPK",
 				"class": "PakOpener",
 				"source": "ArcFormats/StudioJikkenshitsu/ArcUMPK.cs"

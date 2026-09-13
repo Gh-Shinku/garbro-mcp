@@ -184,6 +184,7 @@ import { kasaneAr2Format } from "./kasane/ar2.js";
 import { witchDatFormat } from "./witch/dat.js";
 import { mnvFormat } from "./mno-violet/dat.js";
 import { umpkFormat } from "./umut/pak.js";
+import { airyuChrFormat } from "./airyu/chr.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -324,6 +325,7 @@ export * from "./neon/index.js";
 export * from "./kasane/index.js";
 export * from "./mno-violet/index.js";
 export * from "./umut/index.js";
+export * from "./airyu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -514,5 +516,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		witchDatFormat,
 		mnvFormat,
 		umpkFormat,
+		airyuChrFormat,
 	]);
 }
