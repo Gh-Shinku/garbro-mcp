@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CSF",
+				class: "CsfFormat",
+				source: "Legacy/Eye/ImageCSF.cs",
+			},
+			localId: "eye-csf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"lzss decoding",
+				"bitmap passthrough",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GEF",
 				class: "GefFormat",
 				source: "Legacy/YellowCap/ImageGEF.cs",
