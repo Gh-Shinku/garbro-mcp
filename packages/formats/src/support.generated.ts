@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "LAX",
+				class: "LaxOpener",
+				source: "ArcFormats/Lambda/ArcLAX.cs",
+			},
+			localId: "lambda-lax",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"trailer index pointer",
+				"chunked lax stream",
+				"lzss chunk decoding",
+				"huffman chunk decoding",
+				"stored chunk passthrough",
+				"multi chunk payloads",
+				"image type marking",
+			],
+			unsupported: ["archive creation", "double compressed chunks"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "GAN",
 				class: "GanOpener",
 				source: "ArcFormats/Ikura/ArcGAN.cs",
