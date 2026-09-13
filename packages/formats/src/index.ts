@@ -324,6 +324,7 @@ import { studioSakuraDatFormat } from "./studio-sakura/dat.js";
 import { fwaFormat } from "./nug/fwa.js";
 import { riddlePacFormat } from "./riddle/pac.js";
 import { myAdvPacFormat } from "./myadv/pac.js";
+import { maikaMik01Format } from "./maika/mik01.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -538,6 +539,7 @@ export * from "./studio-sakura/index.js";
 export * from "./nug/index.js";
 export * from "./riddle/index.js";
 export * from "./myadv/index.js";
+export * from "./maika/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -799,6 +801,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		fwaFormat,
 		riddlePacFormat,
 		myAdvPacFormat,
+		maikaMik01Format,
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
