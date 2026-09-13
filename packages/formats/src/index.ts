@@ -215,6 +215,7 @@ import { yuFormat } from "./tactics/yu.js";
 import { gxpFormat } from "./astronauts/gxp.js";
 import { c24Format } from "./foster/c24.js";
 import { c25Format } from "./foster/c24.js";
+import { lb5Format } from "./jupiter/lb5.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -378,6 +379,7 @@ export * from "./csware/index.js";
 export * from "./tactics/index.js";
 export * from "./astronauts/index.js";
 export * from "./foster/index.js";
+export * from "./jupiter/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -599,5 +601,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gxpFormat,
 		c24Format,
 		c25Format,
+		lb5Format,
 	]);
 }
