@@ -459,6 +459,7 @@ import { lazycrewDatFormat } from "./lazycrew/dat.js";
 import { parsleyDesertCgFormat } from "./parsley/cg3.js";
 import { rareXFormat } from "./rare/x.js";
 import { tailCafFormat } from "./tail/caf.js";
+import { gameSystemChrFormat } from "./gamesystem/chr.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1199,5 +1200,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyDesertCgFormat,
 		rareXFormat,
 		tailCafFormat,
+		gameSystemChrFormat,
 	]);
 }

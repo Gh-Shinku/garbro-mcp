@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CHR/GAMESYSTEM",
+				class: "ChrOpener",
+				source: "ArcFormats/GameSystem/ArcCHR.cs",
+			},
+			localId: "gamesystem-chr",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"chr extension gating",
+				"declared size validation",
+				"rgb plane metadata checks",
+				"rgb and overlay entry split",
+				"frame count validation",
+				"image typing",
+			],
+			unsupported: [
+				"archive creation",
+				"chr image decoding",
+				"overlay compositing",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "CAF",
 				class: "CafOpener",
 				source: "ArcFormats/Tail/ArcCAF.cs",
