@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "FA2",
+				class: "Fa2Opener",
+				source: "ArcFormats/Foster/ArcFA2.cs",
+			},
+			localId: "foster-fa2",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"versioned header and index pointer",
+				"plain and packed indexes",
+				"long offset copy forms",
+				"short two byte copies",
+				"counted copy lengths",
+				"overlapping copies",
+				"end marker handling",
+				"sixteen byte payload alignment",
+				"packed entry unwrapping",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK/vav",
 				class: "PakOpener",
 				source: "ArcFormats/FrontWing/ArcVAV.cs",
