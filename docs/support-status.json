@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PCD/NEJII",
+				"class": "PcdOpener",
+				"source": "ArcFormats/Nejii/ArcPCD.cs"
+			},
+			"localId": "nejii-pcd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and wave format validation",
+				"chained record walk",
+				"stored size word handling",
+				"per-record wave format in the generated header",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "WVB",
 				"class": "WvbOpener",
 				"source": "ArcFormats/Xuse/ArcWVB.cs"
