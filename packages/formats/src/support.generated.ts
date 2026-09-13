@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "P16",
+				class: "P16Audio",
+				source: "ArcFormats/Leaf/AudioP16.cs",
+			},
+			localId: "leaf-p16-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wave container wrapping"],
+			unsupported: ["archive creation", "audio writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "AOG/SYS3",
 				class: "AogAudio",
 				source: "ArcFormats/Eushully/AudioAOG.cs",

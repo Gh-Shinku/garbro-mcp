@@ -514,6 +514,7 @@ import { mrg2Format } from "./fc01/mrg2.js";
 import { valkyriaOdnFormat } from "./valkyria/odn.js";
 import { kurumiMpkFormat } from "./kurumi/mpk.js";
 import { eushullyAogAudioFormat } from "./eushully/aog-audio.js";
+import { leafP16AudioFormat } from "./leaf/p16-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1332,5 +1333,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		valkyriaOdnFormat,
 		kurumiMpkFormat,
 		eushullyAogAudioFormat,
+		leafP16AudioFormat,
 	]);
 }
