@@ -531,6 +531,7 @@ import { brownieWavAudioFormat } from "./brownie/wav-audio.js";
 import { bgiAudioFormat } from "./ethornell/bw-audio.js";
 import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { ogvAudioFormat } from "./shiina-rio/ogv-audio.js";
+import { agsAudioFormat } from "./ags32i/wav-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -833,6 +834,7 @@ export * from "./kurumi/index.js";
 export * from "./c4/index.js";
 export * from "./sviu/index.js";
 export * from "./macromedia/index.js";
+export * from "./ags32i/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1369,5 +1371,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bgiAudioFormat,
 		edimAudioFormat,
 		ogvAudioFormat,
+		agsAudioFormat,
 	]);
 }

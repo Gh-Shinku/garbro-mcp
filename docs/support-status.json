@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "WAV/AGS32I",
+				"class": "AgsAudio",
+				"source": "Legacy/Ags32i/AudioAGS.cs"
+			},
+			"localId": "ags32i-wav-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"ags32transform keystream decryption"
+			],
+			"unsupported": [
+				"archive creation",
+				"wave decoding",
+				"transformfinalblock bug reproduction"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "OGV",
 				"class": "OgvAudio",
 				"source": "ArcFormats/ShiinaRio/AudioOGV.cs"
