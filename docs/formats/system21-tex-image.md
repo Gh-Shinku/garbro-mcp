@@ -45,6 +45,14 @@ than a lesson:
 > A format's `detect` must verify everything `readLayout` depends on, including its own signature. The registry
 > gate is a filter for the dispatcher, not a precondition for the format.
 
+A sweep of every ported format for that rule — `scripts/audit-signature-checks.mjs`, which reports files that
+register a signature but never mention any signature-like constant — turned up four candidates, and all four
+turned out to re-check by other means: `emon/eme` compares the literal `RREDATA ` in its index reader,
+`riddle/pac` compares `SIG`, `sceneplayer/pmx` compares a first byte through `ZLIB_FIRST_BYTE`, and
+`reallive/g00` gates on a `g00` extension, which is stricter than the single byte signature it registers. So the
+rule holds across the codebase; the three formats where it did not were all fixed when their tests caught them,
+which is the argument for writing the flipping test in the first place.
+
 ## Notes
 
 * Block compressed surfaces report a bit count of zero, so the depth comes from the four character code instead:
