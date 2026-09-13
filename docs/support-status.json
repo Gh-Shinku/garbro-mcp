@@ -5,6 +5,27 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "BMZ",
+				"class": "BmzFormat",
+				"source": "ArcFormats/BlackRainbow/ImageBMZ.cs"
+			},
+			"localId": "black-rainbow-bmz-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"zlib decoding",
+				"bitmap validation",
+				"bitmap trimming",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "EZS",
 				"class": "EzsAudio",

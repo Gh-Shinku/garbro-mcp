@@ -5,3 +5,4 @@ export * from "./gsp.js";
 export * from "./imp.js";
 export * from "./melty.js";
 export * from "./sp.js";
+export * from "./bmz-image.js";
