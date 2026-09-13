@@ -642,6 +642,7 @@ import { ap3ImageFormat } from "./kaguya/ap3-image.js";
 import { aps3ImageFormat } from "./kaguya/aps3-image.js";
 import { apsImageFormat } from "./kaguya/aps-image.js";
 import { crowdZbmImageFormat } from "./crowd/zbm-image.js";
+import { bm1ImageFormat } from "./pisckiss/bm1-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -966,6 +967,7 @@ export * from "./hillfield/index.js";
 export * from "./project-myu/index.js";
 export * from "./wildbug/index.js";
 export * from "./primesoft/index.js";
+export * from "./pisckiss/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1613,5 +1615,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aps3ImageFormat,
 		apsImageFormat,
 		crowdZbmImageFormat,
+		bm1ImageFormat,
 	]);
 }

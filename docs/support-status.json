@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BMP/PISCKISS",
+				"class": "Bm1Format",
+				"source": "Legacy/Pisckiss/Image1.cs"
+			},
+			"localId": "pisckiss-bm1-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"nibble packed dimensions",
+				"exact length check",
+				"stored stride pass through",
+				"24bpp bitmap output",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "ZBM",
 				"class": "ZbmFormat",
 				"source": "ArcFormats/Crowd/ImageZBM.cs"
