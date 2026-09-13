@@ -6,7 +6,8 @@ export function inflateRiddleCmp(
 	if (!Number.isSafeInteger(outputLength) || outputLength < 0)
 		throw new RangeError("output length must be non-negative");
 	const output = Buffer.alloc(outputLength);
-	const frame = Buffer.alloc(0x800, 0x20);
+	const frame = Buffer.alloc(0x800);
+	frame.fill(0x20, 0, 0x7ef);
 	let framePos = 0x7ef,
 		dst = 0,
 		src = 0,
