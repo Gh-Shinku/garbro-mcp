@@ -451,6 +451,8 @@ import { flkDatFormat } from "./splush-wave/flk.js";
 import { asdKToolFormat } from "./kapp/asd.js";
 import { asdSpielFormat } from "./kapp/asd.js";
 import { kaguyaAriFormat } from "./kaguya/ari.js";
+import { xuseBgFormat } from "./xuse/nt.js";
+import { xuseHFormat } from "./xuse/nt.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1181,5 +1183,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		asdKToolFormat,
 		asdSpielFormat,
 		kaguyaAriFormat,
+		xuseBgFormat,
+		xuseHFormat,
 	]);
 }

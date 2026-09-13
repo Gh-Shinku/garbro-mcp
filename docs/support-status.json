@@ -6,6 +6,46 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "H/Xuse",
+				"class": "HOpener",
+				"source": "ArcFormats/Xuse/ArcNT.cs"
+			},
+			"localId": "xuse-h",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"name prefix gating",
+				"equal record splitting",
+				"trailing marker record sizing",
+				"generated entry names",
+				"image typing"
+			],
+			"unsupported": ["archive creation", "image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BG/Xuse",
+				"class": "BgOpener",
+				"source": "ArcFormats/Xuse/ArcNT.cs"
+			},
+			"localId": "xuse-bg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"name prefix gating",
+				"equal record splitting",
+				"generated entry names",
+				"image typing",
+				"lowercase prefix record sizing"
+			],
+			"unsupported": ["archive creation", "image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/ARI",
 				"class": "ArcOpener",
 				"source": "ArcFormats/Kaguya/ArcKaguya.cs"
