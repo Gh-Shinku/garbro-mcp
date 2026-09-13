@@ -3,3 +3,4 @@ export * from "./cmp.js";
 export * from "./dat.js";
 export * from "./puremail.js";
 export * from "./alp-image.js";
+export * from "./texb-image.js";

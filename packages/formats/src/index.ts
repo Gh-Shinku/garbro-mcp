@@ -579,6 +579,7 @@ import { htfImageFormat } from "./jam-creation/htf-image.js";
 import { advgImageFormat } from "./advgsys/bmp-image.js";
 import { mwpImageFormat } from "./emic/mwp-image.js";
 import { leafWAudioFormat } from "./leaf/w-audio.js";
+import { texbImageFormat } from "./gamesystem/texb-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1481,5 +1482,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		advgImageFormat,
 		mwpImageFormat,
 		leafWAudioFormat,
+		texbImageFormat,
 	]);
 }
