@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CDT/UMA",
+				"class": "CdtOpener",
+				"source": "Legacy/Uma/ArcCDT.cs"
+			},
+			"localId": "uma-cdt",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"sequential record walk",
+				"default LZSS decompression",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/MIRIS",
 				"class": "DatOpener",
 				"source": "ArcFormats/Eternity/ArcMiris.cs"

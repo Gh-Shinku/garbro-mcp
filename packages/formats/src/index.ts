@@ -139,6 +139,7 @@ import { typesArcFormat } from "./types/arc.js";
 import { gdFormat } from "./xuse/gd.js";
 import { aapFormat } from "./aquarium/aap.js";
 import { mirisDatFormat } from "./eternity/miris.js";
+import { cdtFormat } from "./uma/cdt.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -252,6 +253,7 @@ export * from "./gscripter/index.js";
 export * from "./types/index.js";
 export * from "./xuse/index.js";
 export * from "./eternity/index.js";
+export * from "./uma/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -397,5 +399,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gdFormat,
 		aapFormat,
 		mirisDatFormat,
+		cdtFormat,
 	]);
 }
