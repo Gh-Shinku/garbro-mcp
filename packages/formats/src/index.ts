@@ -359,6 +359,7 @@ import { ebgSystemBinFormat } from "./ebg-system/bin.js";
 import { alternaBinFormat } from "./alterna/bin.js";
 import { ebisuEp1Format } from "./ebisu/ep1.js";
 import { umeSoftBinFormat } from "./ume-soft/bin.js";
+import { penguinPacFormat } from "./penguin/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -592,6 +593,7 @@ export * from "./sohfu/index.js";
 export * from "./ebg-system/index.js";
 export * from "./alterna/index.js";
 export * from "./ebisu/index.js";
+export * from "./penguin/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -956,5 +958,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		alternaBinFormat,
 		ebisuEp1Format,
 		umeSoftBinFormat,
+		penguinPacFormat,
 	]);
 }

@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/PENGUIN",
+				"class": "PacOpener",
+				"source": "Legacy/PenguinWorks/ArcPAC.cs"
+			},
+			"localId": "penguin-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pac extension requirement",
+				"record count",
+				"0x0c records with archive-derived names",
+				"know content extension table",
+				"ike marker probe with three-byte unpacked size",
+				"shared ike lz decoding",
+				"verbatim extraction",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/UME",
 				"class": "BinOpener",
 				"source": "Legacy/UMeSoft/ArcBIN.cs"
