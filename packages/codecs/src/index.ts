@@ -5,4 +5,5 @@ export * from "./huffman.js";
 export * from "./lzss.js";
 export * from "./msb-bit-reader.js";
 export * from "./qlie-pack.js";
+export * from "./riddle-cmp.js";
 export * from "./zlib.js";
