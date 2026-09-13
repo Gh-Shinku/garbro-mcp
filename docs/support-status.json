@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ALD",
+				"class": "AldOpener",
+				"source": "ArcFormats/AliceSoft/ArcALD.cs"
+			},
+			"localId": "alicesoft-ald",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"trailer detection for both known versions",
+				"24-bit shifted offset table",
+				"zero-offset terminator",
+				"per-record header parsing",
+				"index length validation",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PCD/NEJII",
 				"class": "PcdOpener",
 				"source": "ArcFormats/Nejii/ArcPCD.cs"

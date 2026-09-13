@@ -194,6 +194,7 @@ import { awfFormat } from "./silky/awf.js";
 import { mgdFormat } from "./masys/mgd.js";
 import { wvbFormat } from "./xuse/wvb.js";
 import { pcdFormat } from "./nejii/pcd.js";
+import { aldFormat } from "./alicesoft/ald.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -540,5 +541,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mgdFormat,
 		wvbFormat,
 		pcdFormat,
+		aldFormat,
 	]);
 }
