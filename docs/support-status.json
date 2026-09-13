@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TPF",
+				"class": "TpfOpener",
+				"source": "ArcFormats/Nexas/ArcTPF.cs"
+			},
+			"localId": "giga-tpf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"TPF FILE signature and entry count",
+				"fixed 0x30-byte index records",
+				"cp932 names",
+				"next-record stored size derivation",
+				"zero-unpacked-size record skipping",
+				"entry placement validation",
+				"default lzss extraction",
+				"huffman then lzss extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/arcx",
 				"class": "ArcOpener",
 				"source": "Legacy/Pinpai/ArcARC.cs"
