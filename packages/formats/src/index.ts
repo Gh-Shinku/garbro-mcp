@@ -596,6 +596,7 @@ import { hillFieldImgImageFormat } from "./hillfield/img-image.js";
 import { pbmImageFormat } from "./nekopunch/pbm-image.js";
 import { kslImageFormat } from "./kscript/ksl-image.js";
 import { pmpImageFormat } from "./sceneplayer/pmp-image.js";
+import { vzyAudioFormat } from "./bef/vzy-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1518,5 +1519,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pbmImageFormat,
 		kslImageFormat,
 		pmpImageFormat,
+		vzyAudioFormat,
 	]);
 }

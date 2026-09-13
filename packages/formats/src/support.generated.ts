@@ -8,6 +8,27 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "VZY",
+				class: "VzyAudio",
+				source: "ArcFormats/BeF/AudioVZY.cs",
+			},
+			localId: "bef-vzy-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"marker reconstruction",
+				"wave validation",
+				"canonical wav output",
+				"metadata",
+			],
+			unsupported: ["audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "PMP",
 				class: "PmpFormat",
