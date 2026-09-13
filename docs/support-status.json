@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AAP",
+				"class": "AapOpener",
+				"source": "Legacy/Aquarium/ArcAAP.cs"
+			},
+			"localId": "aquarium-aap",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"Cp2 LZ decompression",
+				"base-relative offsets",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GD/Xuse",
 				"class": "GdOpener",
 				"source": "ArcFormats/Xuse/ArcGD.cs"

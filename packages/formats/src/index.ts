@@ -137,6 +137,7 @@ import { chrFormat } from "./tigerman/chr.js";
 import { witchArcFormat } from "./witch/arc.js";
 import { typesArcFormat } from "./types/arc.js";
 import { gdFormat } from "./xuse/gd.js";
+import { aapFormat } from "./aquarium/aap.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -392,5 +393,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		witchArcFormat,
 		typesArcFormat,
 		gdFormat,
+		aapFormat,
 	]);
 }
