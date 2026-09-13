@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/PUREMAIL",
+				class: "PmDatOpener",
+				source: "ArcFormats/GameSystem/ArcPureMail.cs",
+			},
+			localId: "gamesystem-puremail",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"trailer index descriptor",
+				"xored sizes",
+				"0x50 byte index records",
+				"lzss index unpacking",
+				"flag based packed and stored size entries",
+				"per entry lzss unpacking",
+				"extension based image typing",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PD/KAAS",
 				class: "PdOpener",
 				source: "ArcFormats/Kaas/ArcKAAS.cs",

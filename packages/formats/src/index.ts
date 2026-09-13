@@ -473,6 +473,7 @@ import { kidLnkFormat } from "./kid/lnk.js";
 import { leafKcapFormat } from "./leaf/kcap.js";
 import { zyxBdfFormat } from "./zyx/bdf.js";
 import { kaasPdFormat } from "./kaas/pd.js";
+import { gamesystemPuremailFormat } from "./gamesystem/puremail.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1232,5 +1233,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafKcapFormat,
 		zyxBdfFormat,
 		kaasPdFormat,
+		gamesystemPuremailFormat,
 	]);
 }
