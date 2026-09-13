@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MMA",
+				class: "MmaOpener",
+				source: "ArcFormats/Mnp/ArcMMA.cs",
+			},
+			localId: "mnp-mma",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"packed name list",
+				"lz streams",
+				"masked payloads",
+				"payload type hints",
+			],
+			unsupported: ["archive creation", "mme image decoders"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/HED",
 				class: "HedDatOpener",
 				source: "ArcFormats/Origin/ArcDAT.cs",
