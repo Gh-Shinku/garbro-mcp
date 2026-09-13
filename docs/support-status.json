@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/AR",
+				"class": "ArcOpener",
+				"source": "ArcFormats/PalmTree/ArcAR.cs"
+			},
+			"localId": "palm-tree-ar",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arc extension requirement",
+				"ar signatures for the three zip blocks",
+				"central directory walk and listing",
+				"stored and deflated extraction",
+				"cp932 names for non utf8 entries",
+				"unsupported encryption and methods reported"
+			],
+			"unsupported": ["zip64 archives", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MAI",
 				"class": "ArcOpener",
 				"source": "ArcFormats/MAI/ArcMAI.cs"

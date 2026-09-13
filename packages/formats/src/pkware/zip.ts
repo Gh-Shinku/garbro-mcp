@@ -17,9 +17,22 @@ import {
 import type { Readable } from "node:stream";
 import { createInflateRaw } from "node:zlib";
 
-const END_OF_CENTRAL_DIRECTORY = Buffer.from("PK\x05\x06", "binary");
-const CENTRAL_DIRECTORY_ENTRY = Buffer.from("PK\x01\x02", "binary");
-const LOCAL_FILE_HEADER = Buffer.from("PK\x03\x04", "binary");
+/**
+ * The three signatures a ZIP archive is built from. GARbro's PalmTree variant only replaces the leading
+ * `PK` of each with `AR`, so the rest of this module is parameterised by them.
+ */
+export interface ZipSignatures {
+	readonly endOfCentralDirectory: Buffer;
+	readonly centralDirectory: Buffer;
+	readonly localHeader: Buffer;
+}
+
+/** The signatures of an ordinary ZIP archive. */
+export const PK_SIGNATURES: ZipSignatures = {
+	endOfCentralDirectory: Buffer.from("PK\x05\x06", "binary"),
+	centralDirectory: Buffer.from("PK\x01\x02", "binary"),
+	localHeader: Buffer.from("PK\x03\x04", "binary"),
+};
 const ZIP64_END_OF_CENTRAL_DIRECTORY = Buffer.from("PK\x06\x06", "binary");
 const ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR = Buffer.from(
 	"PK\x06\x07",
@@ -82,6 +95,7 @@ function findSignatureBackwards(tail: Buffer, signature: Buffer): number {
 
 async function readEndOfCentralDirectory(
 	source: ByteSource,
+	signatures: ZipSignatures,
 ): Promise<EndOfCentralDirectory | undefined> {
 	const tailSize = Number(
 		source.size < BigInt(MAXIMUM_TAIL_SIZE)
@@ -91,7 +105,10 @@ async function readEndOfCentralDirectory(
 	if (tailSize < EOCD_SIZE) return undefined;
 	const tailOffset = source.size - BigInt(tailSize);
 	const tail = await source.readAt(tailOffset, tailSize);
-	const position = findSignatureBackwards(tail, END_OF_CENTRAL_DIRECTORY);
+	const position = findSignatureBackwards(
+		tail,
+		signatures.endOfCentralDirectory,
+	);
 	if (position === -1) return undefined;
 	const eocd = tail.subarray(position, position + EOCD_SIZE);
 	let entryCount = eocd.readUInt16LE(10);
@@ -182,6 +199,7 @@ function decodeName(name: Buffer, flags: number): string {
 async function readDirectory(
 	source: ByteSource,
 	eocd: EndOfCentralDirectory,
+	signatures: ZipSignatures,
 ): Promise<ZipEntry[]> {
 	const directory = await source.readAt(
 		eocd.directoryOffset,
@@ -194,7 +212,7 @@ async function readDirectory(
 		if (
 			!directory
 				.subarray(position, position + 4)
-				.equals(CENTRAL_DIRECTORY_ENTRY)
+				.equals(signatures.centralDirectory)
 		) {
 			throw new GarbroError(
 				"INVALID_ARCHIVE",
@@ -268,6 +286,7 @@ async function readDirectory(
 async function openZipEntry(
 	source: ByteSource,
 	entry: ZipEntry,
+	signatures: ZipSignatures,
 ): Promise<Readable> {
 	if (entry.encrypted) {
 		throw new GarbroError(
@@ -285,7 +304,7 @@ async function openZipEntry(
 		throw new GarbroError("INVALID_ARCHIVE", "ZIP local header is truncated");
 	}
 	const localHeader = await source.readAt(entry.localHeaderOffset, 30);
-	if (!localHeader.subarray(0, 4).equals(LOCAL_FILE_HEADER)) {
+	if (!localHeader.subarray(0, 4).equals(signatures.localHeader)) {
 		throw new GarbroError(
 			"INVALID_ARCHIVE",
 			`ZIP local header signature is invalid: ${entry.path}`,
@@ -310,15 +329,24 @@ async function openZipEntry(
 
 class ZipArchiveHandle implements ArchiveHandle {
 	readonly sourcePath: string;
-	readonly format = zipDescriptor;
+	readonly format: FormatDescriptor;
 	readonly size: bigint;
 	readonly metadata: Record<string, unknown>;
 	readonly entries: readonly ZipEntry[];
 	readonly #source: ByteSource;
+	readonly #signatures: ZipSignatures;
 
-	constructor(source: ByteSource, sourcePath: string, entries: ZipEntry[]) {
+	constructor(
+		source: ByteSource,
+		sourcePath: string,
+		entries: ZipEntry[],
+		signatures: ZipSignatures,
+		descriptor: FormatDescriptor,
+	) {
 		this.#source = source;
+		this.#signatures = signatures;
 		this.sourcePath = sourcePath;
+		this.format = descriptor;
 		this.size = source.size;
 		this.entries = entries;
 		this.metadata = { entryCount: entries.length };
@@ -332,7 +360,7 @@ class ZipArchiveHandle implements ArchiveHandle {
 				`Archive entry not found: ${entryId}`,
 			);
 		}
-		return openZipEntry(this.#source, entry);
+		return openZipEntry(this.#source, entry, this.#signatures);
 	}
 
 	async close(): Promise<void> {
@@ -341,21 +369,36 @@ class ZipArchiveHandle implements ArchiveHandle {
 }
 
 export class ZipFormat implements ArchiveFormat {
-	readonly descriptor = zipDescriptor;
+	readonly descriptor: FormatDescriptor;
 	readonly detection = { extensionFallback: true };
+	readonly #signatures: ZipSignatures;
+
+	constructor(
+		signatures: ZipSignatures = PK_SIGNATURES,
+		descriptor: FormatDescriptor = zipDescriptor,
+	) {
+		this.#signatures = signatures;
+		this.descriptor = descriptor;
+	}
 
 	async detect(source: ByteSource): Promise<boolean> {
-		const eocd = await readEndOfCentralDirectory(source);
+		const eocd = await readEndOfCentralDirectory(source, this.#signatures);
 		return eocd !== undefined;
 	}
 
 	async open(source: ByteSource, sourcePath: string): Promise<ArchiveHandle> {
-		const eocd = await readEndOfCentralDirectory(source);
+		const eocd = await readEndOfCentralDirectory(source, this.#signatures);
 		if (!eocd) {
 			throw new GarbroError("INVALID_ARCHIVE", "ZIP end record was not found");
 		}
-		const entries = await readDirectory(source, eocd);
-		return new ZipArchiveHandle(source, sourcePath, entries);
+		const entries = await readDirectory(source, eocd, this.#signatures);
+		return new ZipArchiveHandle(
+			source,
+			sourcePath,
+			entries,
+			this.#signatures,
+			this.descriptor,
+		);
 	}
 }
 
