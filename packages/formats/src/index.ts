@@ -511,6 +511,7 @@ import { originHedDatFormat } from "./origin/dat-hed.js";
 import { mmaFormat } from "./mnp/mma.js";
 import { mrgFormat } from "./fc01/mrg.js";
 import { mrg2Format } from "./fc01/mrg2.js";
+import { valkyriaOdnFormat } from "./valkyria/odn.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1325,5 +1326,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mmaFormat,
 		mrgFormat,
 		mrg2Format,
+		valkyriaOdnFormat,
 	]);
 }

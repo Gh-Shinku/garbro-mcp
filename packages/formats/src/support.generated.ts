@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ODN",
+				class: "OdnOpener",
+				source: "ArcFormats/Valkyria/ArcODN.cs",
+			},
+			localId: "valkyria-odn",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"three index layouts",
+				"countdown index mask",
+				"script payload mask",
+				"ogg payload mask",
+				"riff audio header",
+			],
+			unsupported: ["archive creation", "image decoder", "pni scheme ini"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "MRG/2",
 				class: "Mrg2Opener",
 				source: "ArcFormats/FC01/ArcMRG.cs",
