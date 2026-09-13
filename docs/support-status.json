@@ -6,6 +6,53 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ABMP7",
+				"class": "Abmp7Opener",
+				"source": "ArcFormats/Qlie/ArcABMP.cs"
+			},
+			"localId": "qlie-abmp7",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"abmp signature with digit seven",
+				"first frame behind size word",
+				"later frames behind size words",
+				"zero size ending the list",
+				"frame span breaking",
+				"generated names",
+				"pack codec expansion with fallback"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ABMP/QLIE",
+				"class": "AbmpOpener",
+				"source": "ArcFormats/Qlie/ArcABMP.cs"
+			},
+			"localId": "qlie-abmp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature version range and zero byte",
+				"abmp extension requirement",
+				"sixteen byte tag walk",
+				"abdata records with generated names",
+				"image and sound containers",
+				"utf16 and narrow name layouts",
+				"tag dependent trailers",
+				"invalid character replacement",
+				"unknown tags running to the end",
+				"pack codec expansion with fallback"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GRP/EXHIBIT",
 				"class": "GrpOpener",
 				"source": "ArcFormats/ExHibit/ArcGRP.cs"

@@ -310,6 +310,8 @@ import { arcgFormat } from "./tanaka/arcg.js";
 import { vcPakFormat } from "./circus/vc.js";
 import { xflFormat } from "./liar/xfl.js";
 import { exhGRPFormat } from "./ex-hibit/grp.js";
+import { abmpFormat } from "./q-lie/abmp.js";
+import { abmp7Format } from "./q-lie/abmp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -514,6 +516,7 @@ export * from "./eushully/index.js";
 export * from "./aoi/index.js";
 export * from "./manga-gamer/index.js";
 export * from "./ex-hibit/index.js";
+export * from "./q-lie/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -830,5 +833,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		vcPakFormat,
 		xflFormat,
 		exhGRPFormat,
+		abmpFormat,
+		abmp7Format,
 	]);
 }
