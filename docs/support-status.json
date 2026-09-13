@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AOS",
+				"class": "AosOpener",
+				"source": "ArcFormats/Lilim/ArcAOS.cs"
+			},
+			"localId": "lilim-aos",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"non-zero first byte requirement",
+				"first record pointer alignment and field check",
+				"link records with arbitrary skips",
+				"zero-byte index end",
+				"consecutive duplicate rejection",
+				"empty name rejection",
+				"cp932 filenames",
+				"huffman decoding of scr entries",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AOSv2",
 				"class": "Aos2Opener",
 				"source": "ArcFormats/Lilim/ArcAOS.cs"
