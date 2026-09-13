@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GPC/UCOM",
+				class: "GpcFormat",
+				source: "ArcFormats/Ucom/ImageGPC.cs",
+			},
+			localId: "ucom-gpc-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"8/24/32bpp images",
+				"indexed palette",
+				"full palette default",
+				"run length pixels",
+				"row alignment bytes",
+				"bottom up row storage",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GPD",
 				class: "GpdFormat",
 				source: "ArcFormats/Antique/ImageGPD.cs",
