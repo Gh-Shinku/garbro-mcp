@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARCC",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Hexenhaus/ArcARCC.cs"
+			},
+			"localId": "hexenhaus-arcc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"chunk walk",
+				"0x69 name unmasking",
+				"file record marker",
+				"zero-size record filtering",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SERAPH/VOICE",
 				"class": "VoiceDatOpener",
 				"source": "ArcFormats/Seraphim/ArcVoice.cs"
