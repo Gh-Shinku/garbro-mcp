@@ -515,6 +515,8 @@ import { valkyriaOdnFormat } from "./valkyria/odn.js";
 import { kurumiMpkFormat } from "./kurumi/mpk.js";
 import { eushullyAogAudioFormat } from "./eushully/aog-audio.js";
 import { leafP16AudioFormat } from "./leaf/p16-audio.js";
+import { ikmAudioFormat } from "./microvision/ikm-audio.js";
+import { keyOggpakAudioFormat } from "./key/oggpak-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1334,5 +1336,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kurumiMpkFormat,
 		eushullyAogAudioFormat,
 		leafP16AudioFormat,
+		ikmAudioFormat,
+		keyOggpakAudioFormat,
 	]);
 }

@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "IKM",
+				class: "IkmAudio",
+				source: "ArcFormats/MicroVision/AudioIKM.cs",
+			},
+			localId: "microvision-ikm-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "P16",
 				class: "P16Audio",
 				source: "ArcFormats/Leaf/AudioP16.cs",
