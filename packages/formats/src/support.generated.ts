@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MGF",
+				class: "MgfFormat",
+				source: "ArcFormats/Malie/ImageMGF.cs",
+			},
+			localId: "malie-mgf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"png signature restoration",
+				"byte exact passthrough",
+				"IHDR dimensions and depth",
+				"metadata",
+			],
+			unsupported: [
+				"png decoding to bitmap",
+				"image encoding",
+				"archive creation",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PAC/PLANTECH",
 				class: "PacFormat",
 				source: "Legacy/PlanTech/ImagePAC.cs",
