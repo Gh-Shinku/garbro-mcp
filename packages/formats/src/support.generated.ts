@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WAV/0",
+				class: "Audio1",
+				source: "Legacy/Pisckiss/Audio0.cs",
+			},
+			localId: "pisckiss-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"lfsr decryption",
+				"riff wave reserialisation",
+				"ogg pass through",
+				"metadata",
+			],
+			unsupported: ["ogg decoding", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "BMP/PISCKISS",
 				class: "Bm1Format",
