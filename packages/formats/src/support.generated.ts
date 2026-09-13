@@ -8,6 +8,27 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "YGA",
+				class: "YgaFormat",
+				source: "Legacy/Yaneurao/ImageYGA.cs",
+			},
+			localId: "yaneurao-yga-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"lzss decompression",
+				"32bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WAV/0",
 				class: "Audio1",
