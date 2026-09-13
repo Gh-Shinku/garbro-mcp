@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAQ/FORCE",
+				"class": "PaqOpener",
+				"source": "Legacy/Force/ArcPAQ.cs"
+			},
+			"localId": "force-paq",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"8-byte size records",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "LWG",
 				"class": "LwgOpener",
 				"source": "ArcFormats/Liar/ArcLWG.cs"
