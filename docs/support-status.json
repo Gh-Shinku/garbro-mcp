@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IFL",
+				"class": "IflOpener",
+				"source": "ArcFormats/Silky/ArcIFL.cs"
+			},
+			"localId": "silky-ifl",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and data offset",
+				"entry count validation",
+				"records with name field",
+				"cp932 names with blank rejection",
+				"entry placement validation",
+				"cmp marker detection with header",
+				"lzss extraction with ring fill override",
+				"grd passthrough",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ZLK",
 				"class": "ZlkOpener",
 				"source": "Legacy/Nyoken/ArcZLK.cs"

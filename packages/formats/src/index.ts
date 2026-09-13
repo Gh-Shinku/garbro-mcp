@@ -315,6 +315,7 @@ import { abmp7Format } from "./q-lie/abmp.js";
 import { spPakFormat } from "./black-rainbow/sp.js";
 import { meltyPakFormat } from "./black-rainbow/melty.js";
 import { zlkFormat } from "./nyoken/zlk.js";
+import { iflFormat } from "./silky/ifl.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -842,5 +843,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		spPakFormat,
 		meltyPakFormat,
 		zlkFormat,
+		iflFormat,
 	]);
 }
