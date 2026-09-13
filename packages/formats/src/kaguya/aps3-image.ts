@@ -30,7 +30,7 @@ const MAX_PIXEL_BYTES = 256 * 1024 * 1024;
 /** The depth is not stored: a tile set is always thirty two bit. */
 const BITS_PER_PIXEL = 32;
 
-interface Aps3Layout {
+export interface Aps3Layout {
 	width: number;
 	height: number;
 	/** Zero means the payload is stored as it is; one means the KaGuYa LZ codec. */
@@ -38,6 +38,56 @@ interface Aps3Layout {
 	packedSize: number;
 	unpackedSize: number;
 	dataOffset: number;
+}
+
+/** The compression header that ends every container's metadata. */
+export interface ApsCompression {
+	compression: number;
+	packedSize: number;
+	unpackedSize: number;
+	dataOffset: number;
+}
+
+/**
+ * `ReadCompressionMetaData`, shared by both generations of the container. The word before it says how long the
+ * payload is, but nothing else uses it; what matters here is the mode, which is either zero or one, and the
+ * sizes. The data offset is wherever this leaves the reader.
+ */
+export function readApsCompression(
+	stored: Buffer,
+	position: number,
+): ApsCompression | undefined {
+	if (position + 2 > stored.length) return undefined;
+	const compression = stored.readInt16LE(position);
+	position += 2;
+	if (compression !== 0 && compression !== 1) return undefined;
+	let packedSize = 0;
+	if (compression === 1) {
+		if (position + 4 > stored.length) return undefined;
+		packedSize = stored.readUInt32LE(position);
+		position += 4;
+	}
+	if (position + 4 > stored.length) return undefined;
+	const unpackedSize = stored.readUInt32LE(position);
+	position += 4;
+	return { compression, packedSize, unpackedSize, dataOffset: position };
+}
+
+/**
+ * The bounding box of everything seen, starting at the origin — so the origin is always inside it. The port
+ * keeps the reference's `Rectangle.Union` arithmetic rather than a tighter reading of the tile rectangles.
+ */
+export function unionRectangle(
+	rect: { left: number; top: number; right: number; bottom: number },
+	x: number,
+	y: number,
+	farX: number,
+	farY: number,
+): void {
+	rect.left = Math.min(rect.left, x);
+	rect.top = Math.min(rect.top, y);
+	rect.right = Math.max(rect.right, farX);
+	rect.bottom = Math.max(rect.bottom, farY);
 }
 
 /**
@@ -56,10 +106,7 @@ async function readFields(source: ByteSource): Promise<Aps3Layout | undefined> {
 		const count = stored.readInt32LE(COUNT_POSITION);
 		if (count < 0 || count > 1000) return undefined;
 		let position = COUNT_POSITION + 4;
-		let left = 0;
-		let top = 0;
-		let right = 0;
-		let bottom = 0;
+		const rect = { left: 0, top: 0, right: 0, bottom: 0 };
 		for (let index = 0; index < count; index += 1) {
 			if (position + 13 > stored.length) return undefined;
 			position += 4; // a per part value the reference reads and discards
@@ -72,10 +119,7 @@ async function readFields(source: ByteSource): Promise<Aps3Layout | undefined> {
 			const farY = stored.readInt32LE(position + 12);
 			position += 16;
 			if (nameLength > 0) {
-				left = Math.min(left, x);
-				top = Math.min(top, y);
-				right = Math.max(right, farX);
-				bottom = Math.max(bottom, farY);
+				unionRectangle(rect, x, y, farX, farY);
 			}
 			position += TILE_TRAILER;
 			if (position > stored.length) return undefined;
@@ -85,28 +129,19 @@ async function readFields(source: ByteSource): Promise<Aps3Layout | undefined> {
 		const dataSize = stored.readUInt32LE(position);
 		position += 4;
 		if (dataSize > stored.length - position) return undefined;
-		if (position + 2 > stored.length) return undefined;
-		const compression = stored.readInt16LE(position);
-		position += 2;
-		if (compression !== 0 && compression !== 1) return undefined;
-		const packedSize = compression === 1 ? stored.readUInt32LE(position) : 0;
-		if (compression === 1) position += 4;
-		const unpackedSize = stored.readUInt32LE(position);
-		position += 4;
-		const width = right - left;
-		const height = bottom - top;
+		const header = readApsCompression(stored, position);
+		if (!header) return undefined;
+		const width = rect.right - rect.left;
+		const height = rect.bottom - rect.top;
 		if (width < 0 || height < 0) return undefined;
 		if ((width * height * BITS_PER_PIXEL) / 8 > MAX_PIXEL_BYTES)
 			return undefined;
-		if (packedSize > stored.length - position) return undefined;
-		if (unpackedSize > MAX_PIXEL_BYTES) return undefined;
+		if (header.packedSize > stored.length - header.dataOffset) return undefined;
+		if (header.unpackedSize > MAX_PIXEL_BYTES) return undefined;
 		return {
 			width,
 			height,
-			compression,
-			packedSize,
-			unpackedSize,
-			dataOffset: position,
+			...header,
 		};
 	} catch {
 		return undefined;
