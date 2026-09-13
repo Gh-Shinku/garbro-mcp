@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VPK1",
+				"class": "VpkOpener",
+				"source": "ArcFormats/Tanaka/ArcVPK.cs"
+			},
+			"localId": "will-vpk1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection for both versions",
+				"version-dependent record layout",
+				"version-dependent name field width",
+				"composed wav entry names",
+				"data and index size validation",
+				"entry placement validation",
+				"cp932 name stems",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ABB/RAW",
 				"class": "RawOpener",
 				"source": "ArcFormats/Patisserie/ArcRAW.cs"

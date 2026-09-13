@@ -173,6 +173,7 @@ import { s25Format } from "./shiina-rio/s25.js";
 import { hg2Format } from "./cat-system/hg2.js";
 import { hg3Format } from "./cat-system/hg3.js";
 import { patisserieRawFormat } from "./patisserie/raw.js";
+import { tanakaVpkFormat } from "./tanaka/vpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -487,5 +488,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hg2Format,
 		hg3Format,
 		patisserieRawFormat,
+		tanakaVpkFormat,
 	]);
 }
