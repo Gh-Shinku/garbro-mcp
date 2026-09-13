@@ -512,6 +512,7 @@ import { mmaFormat } from "./mnp/mma.js";
 import { mrgFormat } from "./fc01/mrg.js";
 import { mrg2Format } from "./fc01/mrg2.js";
 import { valkyriaOdnFormat } from "./valkyria/odn.js";
+import { kurumiMpkFormat } from "./kurumi/mpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -810,6 +811,7 @@ export * from "./lune/index.js";
 export * from "./discovery/index.js";
 export * from "./flying-shine/index.js";
 export * from "./mnp/index.js";
+export * from "./kurumi/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1327,5 +1329,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mrgFormat,
 		mrg2Format,
 		valkyriaOdnFormat,
+		kurumiMpkFormat,
 	]);
 }

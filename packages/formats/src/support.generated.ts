@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MPK/KURUMI",
+				class: "MpkOpener",
+				source: "Legacy/Kurumi/ArcMPK.cs",
+			},
+			localId: "kurumi-mpk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"unpacked index blocks",
+				"unpacked payload blocks",
+			],
+			unsupported: ["archive creation", "mpkcompression codec"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ODN",
 				class: "OdnOpener",
 				source: "ArcFormats/Valkyria/ArcODN.cs",
