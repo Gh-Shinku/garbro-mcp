@@ -478,6 +478,7 @@ import { ritsSafFormat } from "./rits/saf.js";
 import { supernekoxGpc7Format } from "./supernekox/gpc.js";
 import { gssLsdFormat } from "./gss/lsd.js";
 import { strikesPckFormat } from "./strikes/pck.js";
+import { lucifenLpkFormat } from "./lucifen/lpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -763,6 +764,7 @@ export * from "./rits/index.js";
 export * from "./supernekox/index.js";
 export * from "./gss/index.js";
 export * from "./strikes/index.js";
+export * from "./lucifen/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1246,5 +1248,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		supernekoxGpc7Format,
 		gssLsdFormat,
 		strikesPckFormat,
+		lucifenLpkFormat,
 	]);
 }

@@ -9,6 +9,37 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "LPK",
+				class: "LpkOpener",
+				source: "ArcFormats/Lucifen/ArcLPK.cs",
+			},
+			localId: "lucifen-lpk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"lpk1 header",
+				"base name key derivation",
+				"index flag word",
+				"letter table prefix tree",
+				"two and four byte name offsets",
+				"prefix entries",
+				"lzss entries",
+				"entry cipher",
+				"whole content cipher",
+				"patch archive handling",
+				"aligned payload offsets",
+			],
+			unsupported: [
+				"archive creation",
+				"alternate encryption schemes",
+				"per-file key import from script lpk",
+				"image decoding",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PCK/AVG",
 				class: "PckOpener",
 				source: "ArcFormats/Strikes/ArcPCK.cs",
