@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "LIBU",
+				"class": "LibUOpener",
+				"source": "ArcFormats/Malie/ArcLIBU.cs"
+			},
+			"localId": "malie-libu",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"libu block signature",
+				"nested directory blocks with per-block base offsets",
+				"entry counts per block",
+				"variable length records with utf-16 names",
+				"sizes and relative offsets",
+				"dot rule for directory detection",
+				"path prefixing of nested entries",
+				"raw payload extraction",
+				"placement validation",
+				"depth guard for crafted archives"
+			],
+			"unsupported": ["archive creation", "malie decryptor scheme"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FFA/JDAT",
 				"class": "JDatOpener",
 				"source": "ArcFormats/Ffa/ArcBlackPackage.cs"

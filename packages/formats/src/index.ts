@@ -369,6 +369,7 @@ import { ankhDatFormat } from "./ankh/dat.js";
 import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
 import { ffaDatFormat } from "./ffa/dat.js";
 import { ffaJdatFormat } from "./ffa/dat.js";
+import { malieLibuFormat } from "./malie/libu.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -608,6 +609,7 @@ export * from "./misc/index.js";
 export * from "./ponytail/index.js";
 export * from "./ankh/index.js";
 export * from "./shapeshifter/index.js";
+export * from "./malie/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -982,5 +984,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		shapeShifterBndFormat,
 		ffaDatFormat,
 		ffaJdatFormat,
+		malieLibuFormat,
 	]);
 }
