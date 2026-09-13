@@ -148,6 +148,7 @@ import { triangleDatFormat } from "./triangle/dat.js";
 import { rpmArcFormat } from "./rpm/arc.js";
 import { rpmZenosFormat } from "./rpm/zenos.js";
 import { cabFormat } from "./entexec/cab.js";
+import { glnkFormat } from "./eternity/glnk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -421,5 +422,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		rpmArcFormat,
 		rpmZenosFormat,
 		cabFormat,
+		glnkFormat,
 	]);
 }

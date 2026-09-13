@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GLNK/MIRIS",
+				"class": "GlnkOpener",
+				"source": "ArcFormats/Eternity/ArcGLNK.cs"
+			},
+			"localId": "miris-glnk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"version-dependent record tails",
+				"index length accounting",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CAB/PackDat3",
 				"class": "CabOpener",
 				"source": "ArcFormats/EntExec/ArcCAB.cs"
