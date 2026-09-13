@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/vf",
+				"class": "VffOpener",
+				"source": "ArcFormats/LiveMaker/ArcVF.cs"
+			},
+			"localId": "livemaker-dat-vf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"vff header",
+				"exe overlay",
+				"direct and ext index locations",
+				"scrambled names",
+				"scrambled offset chain",
+				"flag driven extraction",
+				"chunk reshuffling",
+				"deflate entries",
+				"numbered archive parts"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "EME",
 				"class": "EmeOpener",
 				"source": "ArcFormats/EmonEngine/ArcEME.cs"
