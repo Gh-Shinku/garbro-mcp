@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "WM2",
+				class: "Wm2Format",
+				source: "ArcFormats/FC01/ImageWM2.cs",
+			},
+			localId: "fc01-wm2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"row table patching",
+				"shared pool offsets",
+				"8bpp gray bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "LGF",
 				class: "LgfFormat",
 				source: "ArcFormats/Leaf/ImageLGF.cs",
