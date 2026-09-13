@@ -9,6 +9,61 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/MINA/SPT",
+				class: "ScriptPakOpener",
+				source: "Legacy/Mina/ArcPAK.cs",
+			},
+			localId: "mina-pak-spt",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"script pak name gate",
+				"line records",
+				"byte rotation",
+				"line break insertion",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
+				tag: "PAK/MINA/WAV",
+				class: "WavPakOpener",
+				source: "Legacy/Mina/ArcPAK.cs",
+			},
+			localId: "mina-pak-wav",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"audio header probe",
+				"size and format chunk layout",
+				"riff container rebuilding",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
+				tag: "PAK/MINA/BMP",
+				class: "BmpPakOpener",
+				source: "Legacy/Mina/ArcPAK.cs",
+			},
+			localId: "mina-pak-bmp",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"bitmap header probe",
+				"back to back entries",
+				"generated entry spans",
+			],
+			unsupported: ["archive creation", "bitmap image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "WAG",
 				class: "WagOpener",
 				source: "ArcFormats/Xuse/ArcWAG.cs",

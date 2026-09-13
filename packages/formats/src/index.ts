@@ -488,6 +488,9 @@ import { kogadoArcFormat } from "./kogado/arc.js";
 import { willArcFormat } from "./will/arc.js";
 import { realliveKoeFormat } from "./reallive/koe.js";
 import { xuseWagFormat } from "./xuse/wag.js";
+import { minaBmpPakFormat } from "./mina/pak.js";
+import { minaWavPakFormat } from "./mina/pak.js";
+import { minaScriptPakFormat } from "./mina/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1272,5 +1275,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		willArcFormat,
 		realliveKoeFormat,
 		xuseWagFormat,
+		minaBmpPakFormat,
+		minaWavPakFormat,
+		minaScriptPakFormat,
 	]);
 }
