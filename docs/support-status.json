@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VCT",
+				"class": "VctOpener",
+				"source": "Legacy/Unison/ArcVCT.cs"
+			},
+			"localId": "unison-vct",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection through the leading byte count",
+				"three byte subindex records",
+				"entry count after the subindex",
+				"0x20 byte records with trimmed names and three character extensions",
+				"payload offsets and sizes",
+				"lzs payload detection through the marker header",
+				"lzs control byte and ring match decoding",
+				"bitmap alpha repair",
+				"path normalization",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/BK",
 				"class": "BkOpener",
 				"source": "ArcFormats/Maika/ArcBK.cs"
