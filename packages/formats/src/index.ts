@@ -381,6 +381,7 @@ import { dogenzakaGameDatFormat } from "./dogenzaka/bin.js";
 import { sophiaNorFormat } from "./sophia/nor.js";
 import { maikaBkFormat } from "./maika/bk.js";
 import { unisonVctFormat } from "./unison/vct.js";
+import { factorResFormat } from "./factor/res.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -624,6 +625,7 @@ export * from "./malie/index.js";
 export * from "./dogenzaka/index.js";
 export * from "./sophia/index.js";
 export * from "./unison/index.js";
+export * from "./factor/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1010,5 +1012,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		sophiaNorFormat,
 		maikaBkFormat,
 		unisonVctFormat,
+		factorResFormat,
 	]);
 }

@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PACK/FACTOR",
+				class: "PackOpener",
+				source: "Legacy/Factor/ArcRES.cs",
+			},
+			localId: "factor-res",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"name based detection through the pack digit pattern",
+				"empty extension requirement",
+				"unnamed walk of size prefixed payloads",
+				"four digit generated entry names",
+				"zero size entries",
+				"res name inversion branch",
+				"placement validation",
+			],
+			unsupported: ["archive creation", "commented out name table"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "VCT",
 				class: "VctOpener",
 				source: "Legacy/Unison/ArcVCT.cs",
