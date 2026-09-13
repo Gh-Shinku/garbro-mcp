@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "WAV/BROWNIE",
+				class: "WavAudio",
+				source: "Legacy/Brownie/AudioWAV.cs",
+			},
+			localId: "brownie-wav-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wave header restoration"],
+			unsupported: ["archive creation", "audio writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "STR",
 				class: "WstrAudio",
 				source: "Legacy/UMeSoft/AudioSTR.cs",
