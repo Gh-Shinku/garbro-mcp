@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/DAF",
+				"class": "DafOpener",
+				"source": "ArcFormats/Cadath/ArcDAF.cs"
+			},
+			"localId": "cadath-daf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"flat 0x20-byte record index",
+				"rolling-key snr decryption",
+				"cgf 32-bit xor stream",
+				"snr zlib inflation",
+				"raw fallback for invalid snr payloads",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "XARC/XUSE",
 				"class": "XarcOpener",
 				"source": "ArcFormats/Xuse/ArcXARC.cs"

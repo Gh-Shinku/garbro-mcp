@@ -176,6 +176,7 @@ import { patisserieRawFormat } from "./patisserie/raw.js";
 import { tanakaVpkFormat } from "./tanaka/vpk.js";
 import { ifpFormat } from "./winters/ifp.js";
 import { xarcFormat } from "./xuse/xarc.js";
+import { dafFormat } from "./cadath/daf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -493,5 +494,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanakaVpkFormat,
 		ifpFormat,
 		xarcFormat,
+		dafFormat,
 	]);
 }
