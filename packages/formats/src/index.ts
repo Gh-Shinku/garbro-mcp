@@ -317,6 +317,7 @@ import { meltyPakFormat } from "./black-rainbow/melty.js";
 import { zlkFormat } from "./nyoken/zlk.js";
 import { iflFormat } from "./silky/ifl.js";
 import { libidoArcFormat } from "./libido/arc.js";
+import { tlzFormat } from "./otemoto/tlz.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -524,6 +525,7 @@ export * from "./ex-hibit/index.js";
 export * from "./q-lie/index.js";
 export * from "./nyoken/index.js";
 export * from "./libido/index.js";
+export * from "./otemoto/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -847,5 +849,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		zlkFormat,
 		iflFormat,
 		libidoArcFormat,
+		tlzFormat,
 	]);
 }

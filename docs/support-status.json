@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TLZ",
+				"class": "TlzOpener",
+				"source": "ArcFormats/Otemoto/ArcTLZ.cs"
+			},
+			"localId": "otemoto-tlz",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"TLZ1 header and variable index records",
+				"cp932 names and placement validation",
+				"default lzss extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARBro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/LIBIDO",
 				"class": "ArcOpener",
 				"source": "Legacy/Libido/ArcARC.cs"
