@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BM_",
+				class: "Bm_Format",
+				source: "ArcFormats/ImageLZ.cs",
+			},
+			localId: "misc-lz-bmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"szdd lzss decoding with custom frame settings",
+				"bitmap validation",
+				"bitmap trimming",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "KGR",
 				class: "KgrFormat",
 				source: "Legacy/ProjectMyu/ImageKGR.cs",
