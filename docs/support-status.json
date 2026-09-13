@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "NGW",
+				"class": "NgwFormat",
+				"source": "Legacy/Brownie/ImageNGW.cs"
+			},
+			"localId": "brownie-ngw-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"bitmap marker restoration",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BMP/MB",
 				"class": "MbImageFormat",
 				"source": "ArcFormats/ImageMB.cs"
