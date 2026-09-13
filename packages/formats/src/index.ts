@@ -615,6 +615,7 @@ import { mgfImageFormat } from "./malie/mgf-image.js";
 import { hotImageFormat } from "./hdl/hot-image.js";
 import { pgaImageFormat } from "./palette/pga-image.js";
 import { bpicImageFormat } from "./softpal/bpic-image.js";
+import { rmtImageFormat } from "./elf/rmt-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1558,5 +1559,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hotImageFormat,
 		pgaImageFormat,
 		bpicImageFormat,
+		rmtImageFormat,
 	]);
 }

@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "RMT",
+				class: "RmtFormat",
+				source: "ArcFormats/elf/ImageRMT.cs",
+			},
+			localId: "ai5-rmt-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"lzss decoding",
+				"delta reconstruction",
+				"32bpp bgra bitmap output",
+				"bottom up rows",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BPIC",
 				class: "BpicFormat",
 				source: "ArcFormats/Softpal/ImageBPIC.cs",
