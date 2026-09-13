@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PD/2",
+				class: "FlyingShinePdOpener",
+				source: "ArcFormats/FlyingShine/ArcPD.cs",
+			},
+			localId: "flying-shine-pd2",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"masked records",
+				"keyed scripts",
+				"ogg page fix",
+			],
+			unsupported: ["archive creation", "pd and pd version 3 tags"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PD",
 				class: "PdOpener",
 				source: "ArcFormats/FlyingShine/ArcPD.cs",
