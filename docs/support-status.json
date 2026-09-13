@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MAI",
+				"class": "ArcOpener",
+				"source": "ArcFormats/MAI/ArcMAI.cs"
+			},
+			"localId": "mai-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature with trailing byte",
+				"file size cross-check",
+				"entry count validation",
+				"index covering file and folder records",
+				"folder level and count handling",
+				"folder name prefixing from its own index",
+				"entry placement validation",
+				"cp932 names with blank rejection",
+				"type classification by extension",
+				"verbatim extraction"
+			],
+			"unsupported": ["mask.arc special case", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/ScrPlayer",
 				"class": "PakOpener",
 				"source": "ArcFormats/ScrPlayer/ArcPAK.cs"
