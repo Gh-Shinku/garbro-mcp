@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/MELTY",
+				"class": "PakOpener",
+				"source": "ArcFormats/BlackRainbow/ArcPAK.cs"
+			},
+			"localId": "black-rainbow-melty-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"trailing index count and size",
+				"pak extension requirement",
+				"records with offset and sizes",
+				"utf16 names with character count",
+				"stored sentinel versus deflated payloads",
+				"name length bounds and offset validation",
+				"zlib extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/SP",
 				"class": "SpPakOpener",
 				"source": "ArcFormats/BlackRainbow/ArcSPPAK.cs"
