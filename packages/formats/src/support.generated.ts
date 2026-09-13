@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "KOG",
+				class: "KogAudio",
+				source: "ArcFormats/Sviu/AudioKOG.cs",
+			},
+			localId: "sviu-kog-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "zero signature and header size"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "EOG",
 				class: "EogAudio",
 				source: "ArcFormats/Crowd/AudioEOG.cs",

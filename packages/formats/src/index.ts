@@ -520,6 +520,7 @@ import { keyOggpakAudioFormat } from "./key/oggpak-audio.js";
 import { vmdAudioFormat } from "./c4/vmd-audio.js";
 import { voiAudioFormat } from "./slg/voi-audio.js";
 import { eogAudioFormat } from "./crowd/eog-audio.js";
+import { kogAudioFormat } from "./sviu/kog-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -820,6 +821,7 @@ export * from "./flying-shine/index.js";
 export * from "./mnp/index.js";
 export * from "./kurumi/index.js";
 export * from "./c4/index.js";
+export * from "./sviu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1345,5 +1347,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		vmdAudioFormat,
 		voiAudioFormat,
 		eogAudioFormat,
+		kogAudioFormat,
 	]);
 }
