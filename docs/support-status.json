@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/MICROVISION",
+				"class": "ArcOpener",
+				"source": "ArcFormats/MicroVision/ArcARC.cs"
+			},
+			"localId": "microvision-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"strided header and index words",
+				"aligned index requirement",
+				"name blob at absolute offsets",
+				"packed and stored entry layouts",
+				"engine lz decompression",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ANI/PAZ",
 				"class": "AniOpener",
 				"source": "ArcFormats/Musica/ArcANI.cs"
