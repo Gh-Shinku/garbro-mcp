@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/?",
+				"class": "BinOpener",
+				"source": "ArcFormats/Misc/ArcBIN.cs"
+			},
+			"localId": "misc-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"entry count with first-offset check",
+				"eight-byte index records",
+				"archive-derived names",
+				"msg layout with unpacked sizes in the index and stored sizes in payloads",
+				"lzss frame streams",
+				"generic position word with flagged unpacked sizes",
+				"stored and packed variants",
+				"prefix signature probe",
+				"ogg/riff/bmp typing with extension renames",
+				"raw index range fallback",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MFS",
 				"class": "MfOpener",
 				"source": "ArcFormats/ClickTeam/ArcMF.cs"
