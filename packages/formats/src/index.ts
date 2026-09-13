@@ -394,6 +394,8 @@ import { maikaMk2Format } from "./maika/mk2.js";
 import { astArcFormat } from "./ast/arc.js";
 import { leafAr2Format } from "./leaf/ar2.js";
 import { leafAmFormat } from "./leaf/am.js";
+import { carriereArcFormat } from "./carriere/arc.js";
+import { carriereScenarioFormat } from "./carriere/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -645,6 +647,7 @@ export * from "./debonosu/index.js";
 export * from "./vn-engine/index.js";
 export * from "./anime-game-system/index.js";
 export * from "./ast/index.js";
+export * from "./carriere/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1044,5 +1047,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		astArcFormat,
 		leafAr2Format,
 		leafAmFormat,
+		carriereArcFormat,
+		carriereScenarioFormat,
 	]);
 }
