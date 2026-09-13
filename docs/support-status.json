@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/OZ",
+				"class": "BinOpener",
+				"source": "ArcFormats/Patisserie/ArcBIN.cs"
+			},
+			"localId": "patisserie-oz",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"offset table index",
+				"plain payload ranges",
+				"dflt zlib payloads",
+				"data payload headers",
+				"sibling lst names",
+				"shared lists index names",
+				"generated five digit names",
+				"audio base name handling",
+				"payload signature typing"
+			],
+			"unsupported": ["archive creation", "full shared signature table typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IDA",
 				"class": "IdaOpener",
 				"source": "Legacy/Inspire/ArcIDA.cs"
