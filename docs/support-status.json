@@ -6,6 +6,77 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/Csystem/2",
+				"class": "OldDatOpener2",
+				"source": "ArcFormats/Cyberworks/ArcDAT.cs"
+			},
+			"localId": "cyberworks-csystem-dat2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"old archive name mapping",
+				"numeric table parsing",
+				"typed entry names",
+				"stored and packed payload extraction"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decryption schemes",
+				"real-game differential files"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/Csystem",
+				"class": "OldDatOpener",
+				"source": "ArcFormats/Cyberworks/ArcDAT.cs"
+			},
+			"localId": "cyberworks-csystem-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"old archive name mapping",
+				"comma separated table parsing",
+				"typed entry names",
+				"stored and packed payload extraction",
+				"placement validation"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decryption schemes",
+				"real-game differential files"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/Cyberworks",
+				"class": "DatOpener",
+				"source": "ArcFormats/Cyberworks/ArcDAT.cs"
+			},
+			"localId": "cyberworks-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"game meta archive lookup",
+				"archive name parsers",
+				"sub-archive selection",
+				"typed entry names",
+				"stored and packed payload extraction"
+			],
+			"unsupported": [
+				"archive creation",
+				"image decryption schemes",
+				"real-game differential files"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "APP/Csystem",
 				"class": "AppOpener",
 				"source": "ArcFormats/Cyberworks/ArcAPP.cs"

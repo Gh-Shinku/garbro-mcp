@@ -414,6 +414,9 @@ import { advscripterPakFormat } from "./advscripter/pak.js";
 import { uranNclFormat } from "./uran/ncl.js";
 import { apricotDatFormat } from "./apricot/dat.js";
 import { cyberworksAppendixFormat } from "./cyberworks/appendix.js";
+import { cyberworksDatFormat } from "./cyberworks/dat.js";
+import { cyberworksCsystemDatFormat } from "./cyberworks/dat.js";
+import { cyberworksCsystemDat2Format } from "./cyberworks/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1093,5 +1096,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		uranNclFormat,
 		apricotDatFormat,
 		cyberworksAppendixFormat,
+		cyberworksDatFormat,
+		cyberworksCsystemDatFormat,
+		cyberworksCsystemDat2Format,
 	]);
 }

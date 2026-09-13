@@ -81,6 +81,8 @@ export async function unpackToc(
 export interface TocTypeOutcome {
 	/** Reject the record, which the archive reader uses to select one archive out of many. */
 	skip?: boolean;
+	/** Reject the whole table, which a reader does when a record size disagrees with its layout. */
+	reject?: boolean;
 	/** Extension the record's numeric name is completed with. */
 	extension?: string;
 	/** Entry type the record declares. */
@@ -136,6 +138,7 @@ export function readTocIndex(
 		const offset = BigInt(index.readUInt32LE(infoPosition + 12));
 		const outcome = readType(index, infoPosition + 16, entrySize);
 		position += 4 + entrySize;
+		if (outcome.reject === true) return undefined;
 		if (outcome.skip === true) continue;
 		// The reference marks the archive while it reads a type, before it checks placement.
 		if (outcome.image === true) hasImages = true;
