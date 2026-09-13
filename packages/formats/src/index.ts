@@ -398,6 +398,7 @@ import { carriereArcFormat } from "./carriere/arc.js";
 import { carriereScenarioFormat } from "./carriere/arc.js";
 import { kaguyaLin2Format } from "./kaguya/lin2.js";
 import { system98LibFormat } from "./system98/lib.js";
+import { frontWingFltFormat } from "./frontwing/flt.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1054,5 +1055,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		carriereScenarioFormat,
 		kaguyaLin2Format,
 		system98LibFormat,
+		frontWingFltFormat,
 	]);
 }
