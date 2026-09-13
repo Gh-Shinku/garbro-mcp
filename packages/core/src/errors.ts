@@ -1,9 +1,12 @@
 export type GarbroErrorCode =
 	| "INVALID_ARCHIVE"
+	| "INVALID_ARGUMENT"
 	| "UNSUPPORTED_FEATURE"
 	| "ENTRY_NOT_FOUND"
 	| "UNSAFE_PATH"
 	| "OUTPUT_EXISTS"
+	| "LIMIT_EXCEEDED"
+	| "CANCELLED"
 	| "IO_ERROR";
 
 export class GarbroError extends Error {

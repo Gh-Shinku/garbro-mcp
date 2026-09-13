@@ -29,6 +29,9 @@ const WINDOWS_RESERVED_NAME = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
 export interface ExtractOptions {
 	outputDirectory: string;
 	overwrite?: boolean;
+	/** Root used when checking every output directory component for symbolic links. */
+	safetyRoot?: string;
+	signal?: AbortSignal;
 }
 
 export interface ExtractedEntry {
@@ -194,7 +197,10 @@ export async function extractEntry(
 
 	const outputDirectory = resolve(options.outputDirectory);
 	const outputPath = resolveEntryOutputPath(outputDirectory, entry.path);
-	await ensureDirectoryWithoutSymlinks(outputDirectory, dirname(outputPath));
+	await ensureDirectoryWithoutSymlinks(
+		resolve(options.safetyRoot ?? outputDirectory),
+		dirname(outputPath),
+	);
 	if (!options.overwrite && (await pathExists(outputPath))) {
 		throw new GarbroError(
 			"OUTPUT_EXISTS",
@@ -218,7 +224,9 @@ export async function extractEntry(
 
 	try {
 		const input = await archive.openEntry(entry.id);
-		await pipeline(input, meter, createWriteStream(tempPath, { flags: "wx" }));
+		await pipeline(input, meter, createWriteStream(tempPath, { flags: "wx" }), {
+			...(options.signal === undefined ? {} : { signal: options.signal }),
+		});
 		// Entries whose output size is not declared report the bytes the decoder produced.
 		if (entry.sizeKnown !== false && bytesWritten !== entry.size) {
 			throw new GarbroError(
