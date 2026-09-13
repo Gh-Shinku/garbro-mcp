@@ -441,6 +441,7 @@ import { fjsysFormat } from "./n-system/fjsys.js";
 import { idaFormat } from "./inspire/ida.js";
 import { ozFormat } from "./patisserie/bin.js";
 import { fpkFormat } from "./interheart/fpk.js";
+import { pcsFormat } from "./csware/pcs.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1159,5 +1160,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		idaFormat,
 		ozFormat,
 		fpkFormat,
+		pcsFormat,
 	]);
 }

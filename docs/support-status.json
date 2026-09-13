@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PCS",
+				"class": "PcsOpener",
+				"source": "ArcFormats/CsWare/ArcPCS.cs"
+			},
+			"localId": "csware-pcs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"versioned index layouts",
+				"repeated name fields",
+				"rotated name decryption",
+				"checksum keyed footer descrambling",
+				"mersenne twister index shuffle",
+				"version six payload header shuffle",
+				"first 512 byte payload descrambling",
+				"sha1 name hash"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FPK",
 				"class": "FpkOpener",
 				"source": "ArcFormats/Interheart/ArcFPK.cs"
