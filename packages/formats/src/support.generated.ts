@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "OWP",
+				class: "OwpAudio",
+				source: "ArcFormats/RealLive/AudioOWP.cs",
+			},
+			localId: "reallive-owp-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "masked ogg unmasking"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "BGM/SOFTPAL",
 				class: "BgmAudio",
 				source: "ArcFormats/Softpal/AudioBGM.cs",
