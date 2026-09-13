@@ -186,6 +186,7 @@ import { mnvFormat } from "./mno-violet/dat.js";
 import { umpkFormat } from "./umut/pak.js";
 import { airyuChrFormat } from "./airyu/chr.js";
 import { animFormat } from "./marble/anim.js";
+import { pochettePacFormat } from "./pochette/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -327,6 +328,7 @@ export * from "./kasane/index.js";
 export * from "./mno-violet/index.js";
 export * from "./umut/index.js";
 export * from "./airyu/index.js";
+export * from "./pochette/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -519,5 +521,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		umpkFormat,
 		airyuChrFormat,
 		animFormat,
+		pochettePacFormat,
 	]);
 }
