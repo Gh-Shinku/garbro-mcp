@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "TIM/SLG",
+				"class": "TimFormat",
+				"source": "ArcFormats/Slg/ImageTIM.cs"
+			},
+			"localId": "slg-tim-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"header decryption",
+				"pixel decryption",
+				"24bpp images",
+				"extension gate",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "YPF/NABE",
 				"class": "YpfFormat",
 				"source": "Legacy/Nabe/ImageYPF.cs"
