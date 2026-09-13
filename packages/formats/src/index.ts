@@ -517,6 +517,8 @@ import { eushullyAogAudioFormat } from "./eushully/aog-audio.js";
 import { leafP16AudioFormat } from "./leaf/p16-audio.js";
 import { ikmAudioFormat } from "./microvision/ikm-audio.js";
 import { keyOggpakAudioFormat } from "./key/oggpak-audio.js";
+import { vmdAudioFormat } from "./c4/vmd-audio.js";
+import { voiAudioFormat } from "./slg/voi-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -816,6 +818,7 @@ export * from "./discovery/index.js";
 export * from "./flying-shine/index.js";
 export * from "./mnp/index.js";
 export * from "./kurumi/index.js";
+export * from "./c4/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1338,5 +1341,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafP16AudioFormat,
 		ikmAudioFormat,
 		keyOggpakAudioFormat,
+		vmdAudioFormat,
+		voiAudioFormat,
 	]);
 }

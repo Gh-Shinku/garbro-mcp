@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "VMD",
+				class: "VmdAudio",
+				source: "ArcFormats/C4/AudioVMD.cs",
+			},
+			localId: "c4-vmd-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "masked mp3 unmasking"],
+			unsupported: ["archive creation", "mp3 decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "OGGPAK",
 				class: "OggPakAudio",
 				source: "ArcFormats/Key/AudioOGGPAK.cs",
