@@ -260,6 +260,7 @@ import { ucaFormat } from "./westgate/uca.js";
 import { uwfFormat } from "./westgate/uwf.js";
 import { spackFormat } from "./spack/dat.js";
 import { pkkFormat } from "./electriciteit/pkk.js";
+import { jamDatFormat } from "./jam-creation/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -444,6 +445,7 @@ export * from "./melonpan/index.js";
 export * from "./scoop/index.js";
 export * from "./rain/index.js";
 export * from "./spack/index.js";
+export * from "./jam-creation/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -710,5 +712,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		uwfFormat,
 		spackFormat,
 		pkkFormat,
+		jamDatFormat,
 	]);
 }

@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/JAM",
+				"class": "DatOpener",
+				"source": "ArcFormats/JamCreation/ArcDAT.cs"
+			},
+			"localId": "jam-creation-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion index requirement",
+				"dat extension and self index rejection",
+				"index version word",
+				"five index sections",
+				"delta cipher over sections and pools",
+				"archive name lookup by volume",
+				"directory records and slash-joined names",
+				"identifier filtering per volume",
+				"placement failures skipped",
+				"cp932 names",
+				"zlib extraction for packed entries",
+				"delta decryption for encrypted entries",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PKK",
 				"class": "PkkOpener",
 				"source": "Legacy/Electriciteit/ArcPKK.cs"
