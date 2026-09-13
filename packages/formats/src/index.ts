@@ -621,6 +621,7 @@ import { lgfImageFormat } from "./leaf/lgf-image.js";
 import { wm2ImageFormat } from "./fc01/wm2-image.js";
 import { malImageFormat } from "./valkyria/mal-image.js";
 import { texImageFormat } from "./system21/tex-image.js";
+import { ggaImageFormat } from "./ikura/gga-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1570,5 +1571,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wm2ImageFormat,
 		malImageFormat,
 		texImageFormat,
+		ggaImageFormat,
 	]);
 }

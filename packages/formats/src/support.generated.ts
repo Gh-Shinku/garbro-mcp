@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GGA",
+				class: "GgaFormat",
+				source: "ArcFormats/Ikura/ImageGGA.cs",
+			},
+			localId: "ikura-gga-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection by extension",
+				"listing",
+				"extraction",
+				"lzss unpacking",
+				"signed size check",
+				"top down 24bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "TEX/SZDD",
 				class: "TexFormat",
 				source: "Legacy/System21/ImageTEX.cs",
