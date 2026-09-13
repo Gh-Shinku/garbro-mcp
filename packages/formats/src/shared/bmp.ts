@@ -145,6 +145,32 @@ export function writeBmp8Palette(
 }
 
 /**
+ * Wraps twenty four bit pixels in a bitmap. The stored order is already BGR, which is also what a 24 bit
+ * bitmap holds, so the only change is that rows are aligned to four bytes and padded. `ImageData.Create`
+ * readers keep their rows top down, while `CreateFlipped` readers store them bottom up and pass `bottomUp`.
+ */
+export function writeBmp24(
+	width: number,
+	height: number,
+	pixels: Buffer,
+	bottomUp = false,
+): Buffer {
+	const sourceStride = width * 3;
+	const stride = (sourceStride + 3) & ~3;
+	const imageSize = stride * height;
+	const rows: Buffer[] = [];
+	for (let row = 0; row < height; row += 1) {
+		const line = Buffer.alloc(stride);
+		pixels.copy(line, 0, row * sourceStride, row * sourceStride + sourceStride);
+		rows.push(line);
+	}
+	return Buffer.concat([
+		writeHeader(width, height, 24, BMP_HEADER_SIZE, imageSize, 0, bottomUp),
+		...rows,
+	]);
+}
+
+/**
  * Wraps four bit pixels in a palette bitmap. The stored pixels are already packed two per byte with a
  * stride of half the width rounded up, so the only change is that bitmap rows are aligned to four bytes
  * and therefore padded. `palette` holds up to sixteen RGB triples, which become the bitmap's sixteen

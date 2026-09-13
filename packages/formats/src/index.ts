@@ -592,6 +592,7 @@ import { desImageFormat } from "./desire/des-image.js";
 import { dpcImageFormat } from "./desire/dpc-image.js";
 import { tiareGraImageFormat } from "./tiare/gra-image.js";
 import { ugImageFormat } from "./ucom/ug-image.js";
+import { hillFieldImgImageFormat } from "./hillfield/img-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -912,6 +913,7 @@ export * from "./bruns/index.js";
 export * from "./advgsys/index.js";
 export * from "./regrips/index.js";
 export * from "./tiare/index.js";
+export * from "./hillfield/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1509,5 +1511,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dpcImageFormat,
 		tiareGraImageFormat,
 		ugImageFormat,
+		hillFieldImgImageFormat,
 	]);
 }

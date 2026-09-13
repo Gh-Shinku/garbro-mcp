@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "IMG/HF",
+				class: "ImgFormat",
+				source: "Legacy/HillField/ImageIMG.cs",
+			},
+			localId: "hillfield-img-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"length validation",
+				"24bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "UG",
 				class: "UgFormat",
 				source: "Legacy/Ucom/ImageUG.cs",
