@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "KGR",
+				"class": "KgrFormat",
+				"source": "Legacy/ProjectMyu/ImageKGR.cs"
+			},
+			"localId": "project-myu-kgr-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"extension gate",
+				"16bpp bgr565",
+				"24bpp bitmap output",
+				"packed row handling",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GPD/ANKH",
 				"class": "GpdFormat",
 				"source": "ArcFormats/Ankh/ImageGPD.cs"
