@@ -470,6 +470,7 @@ import { paletteChrFormat } from "./palette/chr.js";
 import { mngFormat } from "./mng/mng.js";
 import { tanukiTacFormat } from "./tanuki/tac.js";
 import { kidLnkFormat } from "./kid/lnk.js";
+import { leafKcapFormat } from "./leaf/kcap.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1225,5 +1226,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mngFormat,
 		tanukiTacFormat,
 		kidLnkFormat,
+		leafKcapFormat,
 	]);
 }

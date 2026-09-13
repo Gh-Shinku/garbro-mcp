@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/KCAP",
+				"class": "KcapOpener",
+				"source": "ArcFormats/Leaf/ArcPAK.cs"
+			},
+			"localId": "leaf-kcap",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"kcap signature",
+				"four index layout probes",
+				"per version record fields",
+				"packed flag handling",
+				"zero size record skipping",
+				"eight byte payload header",
+				"lzss payload unpacking"
+			],
+			"unsupported": ["archive creation", "image and audio decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/LNK",
 				"class": "LnkOpener",
 				"source": "ArcFormats/Kid/ArcDAT.cs"
