@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ZLK",
+				"class": "ZlkOpener",
+				"source": "Legacy/Nyoken/ArcZLK.cs"
+			},
+			"localId": "nyoken-zlk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and version range",
+				"entry count validation",
+				"variable stride records",
+				"packed and unpacked sizes with flag byte",
+				"cp932 names with length validation",
+				"entry placement validation",
+				"zlib extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/MELTY",
 				"class": "PakOpener",
 				"source": "ArcFormats/BlackRainbow/ArcPAK.cs"
