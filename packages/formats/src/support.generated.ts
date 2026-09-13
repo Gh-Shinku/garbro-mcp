@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "FJSYS",
+				class: "FjsysOpener",
+				source: "ArcFormats/NSystem/ArcFJSYS.cs",
+			},
+			localId: "n-system-fjsys",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"name blob offsets",
+				"64 bit payload offsets",
+				"script type marking",
+				"backslash name normalization",
+			],
+			unsupported: [
+				"archive creation",
+				"msd script decryption with per-title passwords",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "LAX",
 				class: "LaxOpener",
 				source: "ArcFormats/Lambda/ArcLAX.cs",
