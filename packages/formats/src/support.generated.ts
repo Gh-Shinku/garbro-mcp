@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PCK/AVG",
+				class: "PckOpener",
+				source: "ArcFormats/Strikes/ArcPCK.cs",
+			},
+			localId: "strikes-pck",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"avgdatas file gate",
+				"obfuscated trailer header",
+				"lagged fibonacci generator",
+				"checksum validation",
+				"chunk reader with header shifting",
+				"lzss index and payload unpacking",
+				"directory blocks with hex prefixes",
+				"big endian records",
+				"entry decryption",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARC/LSD",
 				class: "LsdOpener",
 				source: "ArcFormats/Gss/ArcARC.cs",
