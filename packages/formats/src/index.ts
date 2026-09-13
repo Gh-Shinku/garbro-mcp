@@ -528,6 +528,7 @@ import { nsOpenerFormat } from "./nscripter/script.js";
 import { esdAudioFormat } from "./tamasoft/esd-audio.js";
 import { wstrAudioFormat } from "./ume-soft/str-audio.js";
 import { brownieWavAudioFormat } from "./brownie/wav-audio.js";
+import { bgiAudioFormat } from "./ethornell/bw-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1362,5 +1363,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		esdAudioFormat,
 		wstrAudioFormat,
 		brownieWavAudioFormat,
+		bgiAudioFormat,
 	]);
 }

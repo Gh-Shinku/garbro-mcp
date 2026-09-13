@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "BW",
+				class: "BgiAudio",
+				source: "ArcFormats/Ethornell/AudioBGI.cs",
+			},
+			localId: "ethornell-bw-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "offset word and bw marker"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WAV/BROWNIE",
 				class: "WavAudio",
 				source: "Legacy/Brownie/AudioWAV.cs",
