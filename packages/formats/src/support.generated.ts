@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "BMP/IKE",
+				class: "IkeFormat",
+				source: "Legacy/UMeSoft/ImageIKE.cs",
+			},
+			localId: "ume-soft-ike-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"ike unpacking",
+				"bitmap header probe",
+				"bitmap passthrough",
+				"metadata",
+			],
+			unsupported: ["bitmap decoding to pixels", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "PCM/ICE",
 				class: "IceAudio",
