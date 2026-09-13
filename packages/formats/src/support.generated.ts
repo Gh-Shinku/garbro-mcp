@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/ADVENGINE",
+				class: "ArcOpener",
+				source: "ArcFormats/Abel/ArcARC.cs",
+			},
+			localId: "abel-arc",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"arc signature",
+				"count and base offset validation",
+				"lzss-compressed index at 0x18",
+				"0x26 records with 30-byte cp932 names",
+				"record relative payload offsets",
+				"CMP container lzss extraction",
+				"CMP raw fallback",
+				"ACD payload XOR",
+				"script typing for acd names",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/0verflow",
 				class: "DatOpener",
 				source: "ArcFormats/GameSystem/ArcDAT.cs",
