@@ -552,6 +552,7 @@ import { whcAudioFormat } from "./basil/whc-audio.js";
 import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 import { pnxEncryptedImageFormat } from "./misc/pnx-image.js";
 import { pcgImageFormat } from "./parsley/pcg-image.js";
+import { gefImageFormat } from "./yellowcap/gef-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -859,6 +860,7 @@ export * from "./psm/index.js";
 export * from "./ocarina/index.js";
 export * from "./zenos/index.js";
 export * from "./uncanny/index.js";
+export * from "./yellowcap/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1416,5 +1418,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tmrHiroAudioFormat,
 		pnxEncryptedImageFormat,
 		pcgImageFormat,
+		gefImageFormat,
 	]);
 }
