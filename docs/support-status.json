@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DPM",
+				"class": "DpmOpener",
+				"source": "ArcFormats/HSP/ArcDPM.cs"
+			},
+			"localId": "hsp-dpm",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"DPMX archives",
+				"plain text index",
+				"keyed entry decoding",
+				"backslash name normalization"
+			],
+			"unsupported": [
+				"archive creation",
+				"archives embedded in executables",
+				"game specific seed keys for embedded archives"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MCA",
 				"class": "McaOpener",
 				"source": "ArcFormats/FC01/ArcMCA.cs"

@@ -431,6 +431,7 @@ import { nexasPacFormat } from "./nexas/pac.js";
 import { aaruFl4Format } from "./aaru/fl4.js";
 import { wagFormat } from "./hexenhaus/wag.js";
 import { mcaFormat } from "./fc01/mca.js";
+import { dpmFormat } from "./hsp/dpm.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -698,6 +699,7 @@ export * from "./yuka/index.js";
 export * from "./moko-pro/index.js";
 export * from "./eve/index.js";
 export * from "./nexas/index.js";
+export * from "./hsp/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1134,5 +1136,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aaruFl4Format,
 		wagFormat,
 		mcaFormat,
+		dpmFormat,
 	]);
 }
