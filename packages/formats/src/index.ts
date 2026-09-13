@@ -546,6 +546,7 @@ import { redImageFormat } from "./ocarina/red-image.js";
 import { pnxImageFormat } from "./zenos/pnx-image.js";
 import { grdImageFormat } from "./silky/grd-image.js";
 import { sedAudioFormat } from "./myharvest/sed-audio.js";
+import { mskImageFormat } from "./cmvs/msk-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1403,5 +1404,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pnxImageFormat,
 		grdImageFormat,
 		sedAudioFormat,
+		mskImageFormat,
 	]);
 }

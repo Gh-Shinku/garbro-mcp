@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "MSK0",
+				class: "MskFormat",
+				source: "ArcFormats/Cmvs/ImageMSK.cs",
+			},
+			localId: "cmvs-msk-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "grey bitmap reassembly"],
+			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "SED/HARVEST",
 				class: "SedAudio",
