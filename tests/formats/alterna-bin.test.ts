@@ -11,7 +11,6 @@ const MAIN_NAME = "archive.bin";
 const LIST_NAME = "archive.lst";
 const INDEX_OFFSET = 0x10;
 const RECORD_SIZE = 0x30;
-const NAME_SIZE = 0x20;
 const NAME_KEY = 0x80;
 const LZSS_HEADER_SIZE = 8;
 

@@ -5,7 +5,6 @@ import { inflateLzssAll } from "@garbro-mcp/codecs";
 import {
 	type ArchiveFormat,
 	type ByteSource,
-	decodeCp932,
 	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
