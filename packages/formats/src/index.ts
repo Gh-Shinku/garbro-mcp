@@ -165,6 +165,7 @@ import { fgFormat } from "./frontwing/fg.js";
 import { cp3Format } from "./seraphim/cp3.js";
 import { crmFormat } from "./circus/crm.js";
 import { pkgFormat } from "./yatagarasu/pkg.js";
+import { gpkFormat } from "./black-cyc/gpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -466,5 +467,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cp3Format,
 		crmFormat,
 		pkgFormat,
+		gpkFormat,
 	]);
 }
