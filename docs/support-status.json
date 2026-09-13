@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "G00/JPEG",
+				"class": "G00JpegFormat",
+				"source": "ArcFormats/RealLive/ImageG00Jpeg.cs"
+			},
+			"localId": "reallive-g00-jpeg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"xor pad decryption",
+				"jpeg header parsing",
+				"bitmap pass through",
+				"metadata"
+			],
+			"unsupported": ["jpeg decoding", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "RBM",
 				"class": "RbmFormat",
 				"source": "Legacy/Mutation/ImageRBM.cs"
