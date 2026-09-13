@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "A/Leaf",
+				"class": "AOpener",
+				"source": "ArcFormats/Leaf/ArcA.cs"
+			},
+			"localId": "leaf-a",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"0xAF1E signature",
+				"0x20 records with 0x17-byte cp932 names",
+				"record-relative payload offsets",
+				"key byte packed flag",
+				"declared unpacked size prefix",
+				"LZSS extraction",
+				"alpha fix-up for keys 0x7f-0x89",
+				"verbatim extraction",
+				"entry placement validation"
+			],
+			"unsupported": ["image decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "WIP/MULTI",
 				"class": "WipOpener",
 				"source": "ArcFormats/Will/ArcWIP.cs"

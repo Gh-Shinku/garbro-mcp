@@ -340,6 +340,7 @@ import { pspQpkFormat } from "./psp/qpk.js";
 import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { nekosdkDatFormat } from "./nekosdk/dat.js";
 import { willWipFormat } from "./will/wip.js";
+import { leafAFormat } from "./leaf/a.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -910,5 +911,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nitroplusPakFormat,
 		nekosdkDatFormat,
 		willWipFormat,
+		leafAFormat,
 	]);
 }
