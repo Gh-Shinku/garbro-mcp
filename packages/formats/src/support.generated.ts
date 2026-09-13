@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "script",
+				tag: "NScripter",
+				class: "NSOpener",
+				source: "ArcFormats/NScripter/Script.cs",
+			},
+			localId: "nscripter-script",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "script unmasking"],
+			unsupported: ["archive creation", "script re-encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "OWP",
 				class: "OwpAudio",
