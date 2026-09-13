@@ -162,6 +162,7 @@ import { mbfFormat } from "./tanaka/mbf.js";
 import { blackRainbowDatFormat } from "./black-rainbow/dat.js";
 import { iksFormat } from "./xiks/iks.js";
 import { fgFormat } from "./frontwing/fg.js";
+import { cp3Format } from "./seraphim/cp3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -459,5 +460,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		blackRainbowDatFormat,
 		iksFormat,
 		fgFormat,
+		cp3Format,
 	]);
 }
