@@ -251,6 +251,7 @@ import { crowdPckFormat } from "./crowd/pck.js";
 import { dlbFormat } from "./aypio/dlb.js";
 import { dlbV0Format } from "./aypio/dlb.js";
 import { ttdFormat } from "./melonpan/ttd.js";
+import { gxFormat } from "./scoop/gx.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -432,6 +433,7 @@ export * from "./mugi/index.js";
 export * from "./crowd/index.js";
 export * from "./aypio/index.js";
 export * from "./melonpan/index.js";
+export * from "./scoop/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -689,5 +691,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dlbFormat,
 		dlbV0Format,
 		ttdFormat,
+		gxFormat,
 	]);
 }

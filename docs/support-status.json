@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GX",
+				"class": "GxOpener",
+				"source": "ArcFormats/Scoop/ArcGX.cs"
+			},
+			"localId": "scoop-gx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"parrot header signature",
+				"entry count validation",
+				"index size bound covering records and names",
+				"name offset inside the index region",
+				"cp932 filenames",
+				"compression word with stored and packed levels",
+				"entry placement validation",
+				"zlib extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TTD",
 				"class": "TtdOpener",
 				"source": "Legacy/Melonpan/ArcTTD.cs"
