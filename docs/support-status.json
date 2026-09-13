@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/LAZYCREW",
+				"class": "DatOpener",
+				"source": "Legacy/Lazycrew/ArcDAT.cs"
+			},
+			"localId": "lazycrew-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"volume name patterns",
+				"companion index lookup",
+				"self index for the first volume",
+				"directory tables",
+				"per volume entry filtering",
+				"keyed pcm decryption",
+				"riff wave wrapping",
+				"audio signature stripping"
+			],
+			"unsupported": ["archive creation", "image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "KOTORI/Xuse",
 				"class": "KotoriOpener",
 				"source": "ArcFormats/Xuse/ArcXuse.cs"
