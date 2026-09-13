@@ -652,6 +652,7 @@ import { g00JpegImageFormat } from "./reallive/g00-jpeg-image.js";
 import { abmImageFormat } from "./lilim/abm-image.js";
 import { fgpImageFormat } from "./fazex/fgp-image.js";
 import { grpImageFormat } from "./herb/grp-image.js";
+import { imaImageFormat } from "./hillfield/ima-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1635,5 +1636,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		abmImageFormat,
 		fgpImageFormat,
 		grpImageFormat,
+		imaImageFormat,
 	]);
 }

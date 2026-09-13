@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "IMA",
+				class: "ImaFormat",
+				source: "Legacy/HillField/ImageIMA.cs",
+			},
+			localId: "hillfield-ima-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"planar colour block",
+				"inverted alpha",
+				"32bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GRP/HERB",
 				class: "GrpFormat",
 				source: "Legacy/Herb/ImageGRP.cs",
