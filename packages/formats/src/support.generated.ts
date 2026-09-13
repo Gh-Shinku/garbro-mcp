@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PNA",
+				class: "PnaOpener",
+				source: "ArcFormats/Will/ArcPNA.cs",
+			},
+			localId: "will-pna",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"PNAP signature",
+				"frame count at 0x10",
+				"0x28 byte frame table from 0x14",
+				"frame geometry metadata (x/y/width/height/bpp)",
+				"zero-size frames skipped without advancing the payload cursor",
+				"record-index based frame names",
+				"placement validation",
+				"raw frame extraction",
+			],
+			unsupported: ["archive creation", "PNA pixel decoding (image layer)"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "LIBU",
 				class: "LibUOpener",
 				source: "ArcFormats/Malie/ArcLIBU.cs",

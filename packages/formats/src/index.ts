@@ -370,6 +370,7 @@ import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
 import { ffaDatFormat } from "./ffa/dat.js";
 import { ffaJdatFormat } from "./ffa/dat.js";
 import { malieLibuFormat } from "./malie/libu.js";
+import { willPnaFormat } from "./will/pna.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -985,5 +986,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ffaDatFormat,
 		ffaJdatFormat,
 		malieLibuFormat,
+		willPnaFormat,
 	]);
 }
