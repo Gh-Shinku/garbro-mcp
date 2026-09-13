@@ -6,6 +6,50 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/AMUSE",
+				"class": "Pac2Opener",
+				"source": "ArcFormats/Softpal/ArcPAC.cs"
+			},
+			"localId": "softpal-amuse-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pac signature and count at 8",
+				"index with wide name field",
+				"first offset alignment check",
+				"entry placement validation",
+				"cp932 names with blank rejection",
+				"marked payload transform behind sixteen byte prefix"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAC/SOFTPAL",
+				"class": "PacOpener",
+				"source": "ArcFormats/Softpal/ArcPAC.cs"
+			},
+			"localId": "softpal-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pac extension requirement",
+				"entry count validation",
+				"wide and narrow name fields with first match ordering",
+				"first offset alignment check",
+				"index bound and entry placement validation",
+				"cp932 names with blank rejection",
+				"marked payload transform behind sixteen byte prefix",
+				"image and audio exemption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PK/B-ROOM/E",
 				"class": "EncryptedPkOpener",
 				"source": "Legacy/BRoom/ArcPK.cs"
