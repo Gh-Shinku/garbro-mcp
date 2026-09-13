@@ -533,6 +533,7 @@ import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { ogvAudioFormat } from "./shiina-rio/ogv-audio.js";
 import { agsAudioFormat } from "./ags32i/wav-audio.js";
 import { kwfAudioFormat } from "./dice/kwf-audio.js";
+import { gssImageFormat } from "./ags32i/gss-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1374,5 +1375,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ogvAudioFormat,
 		agsAudioFormat,
 		kwfAudioFormat,
+		gssImageFormat,
 	]);
 }

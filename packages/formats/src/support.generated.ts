@@ -8,6 +8,25 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "GSS",
+				class: "GssFormat",
+				source: "Legacy/Ags32i/ImageGSS.cs",
+			},
+			localId: "ags32i-gss-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"ags32transform decryption",
+				"zlib inflation",
+			],
+			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "KWF",
 				class: "KwfAudio",

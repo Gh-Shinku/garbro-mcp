@@ -49,9 +49,9 @@ function keystreamWord(key: number, blockIndex: number): number {
 /**
  * Decrypts a range of the stream in place. The reference's `TransformFinalBlock` uses a buggy index
  * expression that garbles up to three trailing bytes; the port keeps the plain per-byte formula for
- * every byte and documents the deviation.
+ * every byte and documents the deviation. Exported because `GssFormat` reuses the same cipher.
  */
-function decrypt(data: Buffer, key: number, position = 0): Buffer {
+export function decryptAgs32(data: Buffer, key: number, position = 0): Buffer {
 	const output: Buffer = Buffer.alloc(data.length);
 	for (let i = 0; i < data.length; i += 1) {
 		const absolute = position + i;
@@ -71,7 +71,7 @@ async function readKey(source: ByteSource): Promise<number | undefined> {
 		if (!SIGNATURES.some((allowed) => allowed.equals(stored))) return undefined;
 		const key = (stored.readUInt32LE(0) ^ RIFF_SIGNATURE) >>> 0;
 		if (key === 0) return undefined;
-		const plain = decrypt(header, key);
+		const plain = decryptAgs32(header, key);
 		return plain.subarray(WAVE_OFFSET, WAVE_OFFSET + 4).equals(WAVE)
 			? key
 			: undefined;
@@ -130,6 +130,6 @@ export const agsAudioFormat: ArchiveFormat = defineFixedArchive({
 			await source.readAt(entry.offset, Number(entry.size)),
 		);
 		// The cipher is a keystream, so decrypting keeps the length.
-		return Readable.from([decrypt(data, key)]);
+		return Readable.from([decryptAgs32(data, key)]);
 	},
 });
