@@ -169,8 +169,10 @@ function retypeEntry(
  * The inspection recognizes the archive's own containers — TPW, HDJ and zfd — which reveal whether the
  * payload is compressed, where it starts and how large it expands, and otherwise types the entry from an
  * inline Ogg, RIFF/WAV, MP3 or raw-PCM header.
+ *
+ * Exported because the Ankh DAT opener inherits this pass unchanged.
  */
-async function detectFileTypes(
+export async function detectFileTypes(
 	source: ByteSource,
 	entries: readonly FixedEntry[],
 ): Promise<void> {
@@ -330,9 +332,9 @@ async function openAudio(
  * declared size, HDJ and zfd run through their own decoders, an inline RIFF payload is either packed
  * samples or an LZSS stream behind a one-byte prefix, and anything else stays an LZSS stream. The
  * reference swallows every decoding error and hands out the stored payload instead, which the port
- * mirrors.
+ * mirrors. Exported because the Ankh DAT opener inherits it unchanged.
  */
-const grpEntryOpener: FixedEntryOpener = async (source, entry) => {
+export const grpEntryOpener: FixedEntryOpener = async (source, entry) => {
 	if (entry.compressed && entry.packedSize > MIN_DETECT_SIZE) {
 		try {
 			const prefix = await source.readAt(entry.offset, PREFIX_SIZE * 2);

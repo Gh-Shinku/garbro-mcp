@@ -365,6 +365,7 @@ import { clickTeamMfsFormat } from "./clickteam/mf.js";
 import { miscBinFormat } from "./misc/bin.js";
 import { ponytailBndFormat } from "./ponytail/bnd.js";
 import { ankhGrpFormat } from "./ankh/grp.js";
+import { ankhDatFormat } from "./ankh/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -973,5 +974,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		miscBinFormat,
 		ponytailBndFormat,
 		ankhGrpFormat,
+		ankhDatFormat,
 	]);
 }

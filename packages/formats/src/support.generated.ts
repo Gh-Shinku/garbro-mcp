@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/ANKH",
+				class: "DatOpener",
+				source: "ArcFormats/Ankh/ArcDAT.cs",
+			},
+			localId: "ankh-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"extension check",
+				"entry count",
+				"first-offset check",
+				"twelve-byte names with empty-name rejection",
+				"0x14 records with size and payload offsets",
+				"inherited payload detection and extraction",
+				"tpw and hdj and zfd containers",
+				"inline ogg and riff payloads",
+				"packed samples",
+				"type and extension retyping",
+				"placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "GRP/ICE",
 				class: "GrpOpener",
 				source: "ArcFormats/Ankh/ArcGRP.cs",
