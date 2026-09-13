@@ -1,4 +1,4 @@
-// Format reference: GARBro ArcFormats/Cmvs/ArcCPZ1.cs (LZSS variant in ArcCPZ.cs)
+// Format reference: GARBro ArcFormats/Cmvs/ArcCPZ1.cs (LZSS variant in ArcCPZ.cs, see ./cpz.ts)
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
@@ -9,6 +9,7 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { CPZ_LZSS_HEADER_SIZE, unpackCpzLzss } from "./cpz.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -39,12 +40,8 @@ const KEY = Buffer.from([
 const KEY_MASK = 0x3f;
 const KEY_SUBTRACT = 0x6c;
 const PSS_MARKER = Buffer.from("PSS0", "ascii");
-const LZSS_HEADER_SIZE = 0x30;
+const LZSS_HEADER_SIZE = CPZ_LZSS_HEADER_SIZE;
 const LZSS_UNPACKED_SIZE_OFFSET = 0x28;
-const LZSS_FRAME_SIZE = 0x800;
-const LZSS_FRAME_MASK = 0x7ff;
-const LZSS_FRAME_INIT = 0x7df;
-const MATCH_BASE = 2;
 
 export const cpz1Descriptor: FormatDescriptor = {
 	id: "cmvs-cpz1",
@@ -81,48 +78,6 @@ function decryptData(data: Buffer): void {
 				KEY_SUBTRACT) &
 			0xff;
 	}
-}
-
-/**
- * GARbro `CpzOpener.UnpackLzss`: a 0x800-byte frame with an initial position of 0x7df, a control
- * byte holding eight flags, and a declared unpacked size behind a 0x30-byte header.
- */
-function unpackLzss(data: Buffer): Buffer {
-	const unpackedSize = data.readInt32LE(LZSS_UNPACKED_SIZE_OFFSET);
-	const output = Buffer.alloc(LZSS_HEADER_SIZE + Math.max(0, unpackedSize));
-	const headerLength = Math.min(LZSS_HEADER_SIZE, data.length);
-	data.copy(output, 0, 0, headerLength);
-	const frame = Buffer.alloc(LZSS_FRAME_SIZE);
-	let framePosition = LZSS_FRAME_INIT;
-	let source = LZSS_HEADER_SIZE;
-	let destination = LZSS_HEADER_SIZE;
-	let control = 1;
-	while (destination < output.length && source < data.length) {
-		if (control === 1) control = (data[source++] ?? 0) | 0x100;
-		if ((control & 1) !== 0) {
-			const value = data[source++] ?? 0;
-			output[destination++] = value;
-			frame[framePosition++] = value;
-			framePosition &= LZSS_FRAME_MASK;
-		} else {
-			const low = data[source++] ?? 0;
-			const high = data[source++] ?? 0;
-			const offset = low | ((high & 0xe0) << 3);
-			const count = (high & 0x1f) + MATCH_BASE;
-			for (
-				let index = 0;
-				index < count && destination < output.length;
-				index += 1
-			) {
-				const value = frame[(offset + index) & LZSS_FRAME_MASK] ?? 0;
-				output[destination++] = value;
-				frame[framePosition++] = value;
-				framePosition &= LZSS_FRAME_MASK;
-			}
-		}
-		control >>= 1;
-	}
-	return output;
 }
 
 interface CpzIndex {
@@ -198,7 +153,7 @@ async function readCpz1Index(
 const cpz1EntryOpener: FixedEntryOpener = async (source, entry) => {
 	const payload = await source.readAt(entry.offset, Number(entry.packedSize));
 	decryptData(payload);
-	if (entry.compressed === true) return Readable.from([unpackLzss(payload)]);
+	if (entry.compressed === true) return Readable.from([unpackCpzLzss(payload)]);
 	return Readable.from([payload]);
 };
 
