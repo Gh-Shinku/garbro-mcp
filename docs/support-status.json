@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/WillV2",
+				"class": "Arc2Opener",
+				"source": "ArcFormats/Will/ArcPulltop.cs"
+			},
+			"localId": "will-arc2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signatureless index detection",
+				"interleaved records and utf16 names",
+				"relative payload offsets",
+				"exact index consumption check",
+				"script byte rotation",
+				"model archive exception",
+				"psp ring buffer lzss"
+			],
+			"unsupported": [
+				"archive creation",
+				"entry type detection",
+				"psp to psb resource alias",
+				"image decoding"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/G2",
 				"class": "PakOpener",
 				"source": "ArcFormats/G2/ArcGCEX.cs"

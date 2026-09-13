@@ -481,6 +481,7 @@ import { strikesPckFormat } from "./strikes/pck.js";
 import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { ellefinEpkFormat } from "./ellefin/epk.js";
 import { g2PakFormat } from "./g2/pak.js";
+import { willArc2Format } from "./will/arc2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1255,5 +1256,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		lucifenLpkFormat,
 		ellefinEpkFormat,
 		g2PakFormat,
+		willArc2Format,
 	]);
 }
