@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ISA",
+				"class": "IsaOpener",
+				"source": "ArcFormats/Ism/ArcISA.cs"
+			},
+			"localId": "ism-isa",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and marker",
+				"entry count and version words",
+				"version driven layout ordering",
+				"both record layouts",
+				"skipped word and offset and size per record",
+				"entry placement validation",
+				"cp932 names with empty rejection",
+				"truncated extension repair as metadata",
+				"encryption flag ignored",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/SYSTEM21",
 				"class": "PakOpener",
 				"source": "Legacy/System21/ArcPAK.cs"
