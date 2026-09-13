@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/arcx",
+				"class": "ArcOpener",
+				"source": "Legacy/Pinpai/ArcARC.cs"
+			},
+			"localId": "pinpai-arcx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arcx signature and signed entry count",
+				"fixed 0x20-byte index records",
+				"cp932 names and placement validation",
+				"filename-driven packed and stored modes",
+				"declared unpacked size word",
+				"default lzss extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/MIK01",
 				"class": "MikOpener",
 				"source": "ArcFormats/Maika/ArcMIK01.cs"
