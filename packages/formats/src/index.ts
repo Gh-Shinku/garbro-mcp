@@ -521,6 +521,7 @@ import { vmdAudioFormat } from "./c4/vmd-audio.js";
 import { voiAudioFormat } from "./slg/voi-audio.js";
 import { eogAudioFormat } from "./crowd/eog-audio.js";
 import { kogAudioFormat } from "./sviu/kog-audio.js";
+import { aoiAogAudioFormat } from "./aoi/aog-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1348,5 +1349,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		voiAudioFormat,
 		eogAudioFormat,
 		kogAudioFormat,
+		aoiAogAudioFormat,
 	]);
 }
