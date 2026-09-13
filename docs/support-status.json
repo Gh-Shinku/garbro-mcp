@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/AZURITE",
+				"class": "SilkyArcOpener",
+				"source": "ArcFormats/Silky/ArcAzurite.cs"
+			},
+			"localId": "silky-azurite",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arc extension requirement",
+				"index size bounds",
+				"non-zero first index byte",
+				"index name obfuscation and length validation",
+				"big-endian size and offset words",
+				"data offset behind the index",
+				"entry placement validation",
+				"packed detection from size inequality",
+				"lzss extraction with default settings"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AOS",
 				"class": "AosOpener",
 				"source": "ArcFormats/Lilim/ArcAOS.cs"

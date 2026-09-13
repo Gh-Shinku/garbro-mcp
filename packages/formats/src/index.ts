@@ -243,6 +243,7 @@ import { lunaPacFormat } from "./luna-soft/pac.js";
 import { fgaFormat } from "./lilim/fga.js";
 import { aos2Format } from "./lilim/aos2.js";
 import { aosFormat } from "./lilim/aos.js";
+import { azuriteFormat } from "./silky/azurite.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -668,5 +669,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fgaFormat,
 		aos2Format,
 		aosFormat,
+		azuriteFormat,
 	]);
 }
