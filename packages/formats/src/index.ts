@@ -641,6 +641,7 @@ import { ap2ImageFormat } from "./kaguya/ap2-image.js";
 import { ap3ImageFormat } from "./kaguya/ap3-image.js";
 import { aps3ImageFormat } from "./kaguya/aps3-image.js";
 import { apsImageFormat } from "./kaguya/aps-image.js";
+import { crowdZbmImageFormat } from "./crowd/zbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1611,5 +1612,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ap3ImageFormat,
 		aps3ImageFormat,
 		apsImageFormat,
+		crowdZbmImageFormat,
 	]);
 }

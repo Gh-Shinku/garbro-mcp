@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ZBM",
+				class: "ZbmFormat",
+				source: "ArcFormats/Crowd/ImageZBM.cs",
+			},
+			localId: "crowd-zbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"lzss decompression",
+				"xor obfuscation",
+				"bitmap pass through",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "APS",
 				class: "ApsFormat",
 				source: "ArcFormats/Kaguya/ImageAPS.cs",
