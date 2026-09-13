@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AWF",
+				"class": "AwfOpener",
+				"source": "ArcFormats/Silky/ArcAWF.cs"
+			},
+			"localId": "silky-awf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"0x34-byte index records",
+				"mp3 naming for voice.awf",
+				"generated wav headers for raw payloads",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/AI5WIN",
 				"class": "DatAI5Opener",
 				"source": "ArcFormats/elf/ArcAi5DAT.cs"
