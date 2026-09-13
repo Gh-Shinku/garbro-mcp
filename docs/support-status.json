@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/RPM",
+				"class": "ArcOpener",
+				"source": "ArcFormats/RPM/ArcARC.cs"
+			},
+			"localId": "rpm-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"compression flag validation",
+				"0x20 and 0x18 name fields",
+				"keyword recovery",
+				"index decryption",
+				"instdata.arc keyword override",
+				"default LZSS decompression",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["user-supplied keyword fallback", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/TRIANGLE",
 				"class": "DatOpener",
 				"source": "ArcFormats/Triangle/ArcDAT.cs"
