@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/AGS",
+				"class": "DatOpener",
+				"source": "ArcFormats/AnimeGameSystem/ArcDAT.cs"
+			},
+			"localId": "ags-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pack marker and 16 bit entry count",
+				"fixed 0x18 index records",
+				"sixteen byte CP932 name fields first null termination",
+				"payload offsets and stored sizes",
+				"index reservation check",
+				"placement validation",
+				"path normalization",
+				"raw payload extraction"
+			],
+			"unsupported": [
+				"archive creation",
+				"extension based entry typing",
+				"archives encrypted through user schemes"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ANI",
 				"class": "AniOpener",
 				"source": "ArcFormats/AnimeGameSystem/ArcANI.cs"

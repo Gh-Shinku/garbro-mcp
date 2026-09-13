@@ -389,6 +389,7 @@ import { blackButterflyDatFormat } from "./black-butterfly/dat.js";
 import { debonosuPakFormat } from "./debonosu/pak.js";
 import { vnEngineAxrFormat } from "./vn-engine/axr.js";
 import { animeGameSystemAniFormat } from "./anime-game-system/ani.js";
+import { animeGameSystemDatFormat } from "./anime-game-system/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1033,5 +1034,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		debonosuPakFormat,
 		vnEngineAxrFormat,
 		animeGameSystemAniFormat,
+		animeGameSystemDatFormat,
 	]);
 }
