@@ -484,6 +484,7 @@ import { g2PakFormat } from "./g2/pak.js";
 import { willArc2Format } from "./will/arc2.js";
 import { pinkyA5rFormat } from "./pinky/a5r.js";
 import { piasDatFormat } from "./pias/dat.js";
+import { kogadoArcFormat } from "./kogado/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -774,6 +775,7 @@ export * from "./ellefin/index.js";
 export * from "./g2/index.js";
 export * from "./pinky/index.js";
 export * from "./pias/index.js";
+export * from "./kogado/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1263,5 +1265,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		willArc2Format,
 		pinkyA5rFormat,
 		piasDatFormat,
+		kogadoArcFormat,
 	]);
 }

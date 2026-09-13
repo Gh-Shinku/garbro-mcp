@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/KOGADO",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Kogado/ArcARC.cs"
+			},
+			"localId": "kogado-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arcw signature",
+				"xor ff masked lzss chunks",
+				"utf-16le name table",
+				"plain dds and ova sections",
+				"dds image metadata",
+				"ova inline headers",
+				"hierarchical entry names"
+			],
+			"unsupported": ["archive creation", "dds image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PIAS",
 				"class": "DatOpener",
 				"source": "Legacy/Pias/ArcDAT.cs"
