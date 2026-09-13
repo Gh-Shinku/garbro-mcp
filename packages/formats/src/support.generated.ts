@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CPZ2",
+				class: "Cpz2Opener",
+				source: "ArcFormats/Cmvs/ArcCPZ2.cs",
+			},
+			localId: "cmvs-cpz2",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"CPZ2 signature and cpz extension",
+				"masked count and index size",
+				"table-based index decryption",
+				"per-entry payload keys",
+				"variable-length records with self size",
+				"index-relative payload offsets",
+				"PSS0 LZSS unpacking",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARC/ADVENGINE",
 				class: "ArcOpener",
 				source: "ArcFormats/Abel/ArcARC.cs",

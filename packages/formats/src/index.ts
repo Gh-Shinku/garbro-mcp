@@ -344,6 +344,7 @@ import { leafAFormat } from "./leaf/a.js";
 import { seenFormat } from "./reallive/seen.js";
 import { gamesystemDatFormat } from "./gamesystem/dat.js";
 import { abelArcFormat } from "./abel/arc.js";
+import { cpz2Format } from "./cmvs/cpz2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -919,5 +920,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		seenFormat,
 		gamesystemDatFormat,
 		abelArcFormat,
+		cpz2Format,
 	]);
 }
