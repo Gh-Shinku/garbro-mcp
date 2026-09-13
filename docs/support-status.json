@@ -5,6 +5,29 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "BIZ/2",
+				"class": "Biz2Format",
+				"source": "Legacy/Adviz/ImageBIZ2.cs"
+			},
+			"localId": "adviz-biz2-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"lzss decompression",
+				"optional alpha plane",
+				"24bpp bitmap output",
+				"32bpp bitmap output",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "WAV/CSWARE",
 				"class": "WavAudio",

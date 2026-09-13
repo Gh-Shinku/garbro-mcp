@@ -655,6 +655,7 @@ import { grpImageFormat } from "./herb/grp-image.js";
 import { imaImageFormat } from "./hillfield/ima-image.js";
 import { mtgImageFormat } from "./asura/mtg-image.js";
 import { cswareWavAudioFormat } from "./csware/wav-audio.js";
+import { biz2ImageFormat } from "./adviz/biz2-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -981,6 +982,7 @@ export * from "./wildbug/index.js";
 export * from "./primesoft/index.js";
 export * from "./pisckiss/index.js";
 export * from "./fazex/index.js";
+export * from "./adviz/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1641,5 +1643,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		imaImageFormat,
 		mtgImageFormat,
 		cswareWavAudioFormat,
+		biz2ImageFormat,
 	]);
 }
