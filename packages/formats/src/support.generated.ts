@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "WHC",
+				class: "WhcAudio",
+				source: "ArcFormats/Basil/AudioWHC.cs",
+			},
+			localId: "basil-whc-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wav header reassembly"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "CWV",
 				class: "CwvAudio",
 				source: "Legacy/Uncanny/AudioCWV.cs",
