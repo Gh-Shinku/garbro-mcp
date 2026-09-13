@@ -647,6 +647,7 @@ import { pisckissAudioFormat } from "./pisckiss/audio.js";
 import { ygaImageFormat } from "./yaneurao/yga-image.js";
 import { hbmImageFormat } from "./rits/hbm-image.js";
 import { ibmImageFormat } from "./ice/ibm-image.js";
+import { rbmImageFormat } from "./mutation/rbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1624,5 +1625,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ygaImageFormat,
 		hbmImageFormat,
 		ibmImageFormat,
+		rbmImageFormat,
 	]);
 }
