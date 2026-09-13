@@ -172,6 +172,7 @@ import { yaneDatFormat } from "./yane-sdk/dat.js";
 import { s25Format } from "./shiina-rio/s25.js";
 import { hg2Format } from "./cat-system/hg2.js";
 import { hg3Format } from "./cat-system/hg3.js";
+import { patisserieRawFormat } from "./patisserie/raw.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -306,6 +307,7 @@ export * from "./mixwill/index.js";
 export * from "./mink/index.js";
 export * from "./yane-sdk/index.js";
 export * from "./shiina-rio/index.js";
+export * from "./patisserie/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -484,5 +486,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		s25Format,
 		hg2Format,
 		hg3Format,
+		patisserieRawFormat,
 	]);
 }

@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ABB/RAW",
+				"class": "RawOpener",
+				"source": "ArcFormats/Patisserie/ArcRAW.cs"
+			},
+			"localId": "patisserie-raw",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"dimension-derived frame sizes",
+				"declared frame area end",
+				"generated frame names",
+				"frame metadata",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "HG3",
 				"class": "Hg3Opener",
 				"source": "ArcFormats/CatSystem/ArcHG3.cs"
