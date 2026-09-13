@@ -495,6 +495,7 @@ import { emonEmeFormat } from "./emon/eme.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
 import { circusVcPacFormat } from "./circus/vc.js";
 import { caramelBoxArc3Format } from "./caramel-box/arc3.js";
+import { caramelBoxArc4Format } from "./caramel-box/arc4.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1289,5 +1290,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		livemakerVfFormat,
 		circusVcPacFormat,
 		caramelBoxArc3Format,
+		caramelBoxArc4Format,
 	]);
 }

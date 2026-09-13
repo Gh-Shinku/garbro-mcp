@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC4",
+				"class": "Arc4Opener",
+				"source": "ArcFormats/CaramelBox/ArcARC4.cs"
+			},
+			"localId": "caramel-box-arc4",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ARC4 signature",
+				"compressed index with tZ marker",
+				"big endian 24 bit name positions",
+				"segment table",
+				"segment alignment and base offset",
+				"big endian segment headers",
+				"stored and packed TzCompression blocks",
+				"running key block decryption",
+				"three widths of back reference",
+				"multi segment entries"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC3",
 				"class": "Arc3Opener",
 				"source": "ArcFormats/CaramelBox/ArcARC3.cs"
