@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "UM3",
+				"class": "Um3Audio",
+				"source": "ArcFormats/Bruns/AudioUM3.cs"
+			},
+			"localId": "bruns-um3-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "byte inversion", "metadata"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "MUW",
 				"class": "MuwAudio",
 				"source": "Legacy/Artel/AudioMUW.cs"
