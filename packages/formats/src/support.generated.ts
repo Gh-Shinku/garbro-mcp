@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MWP",
+				class: "MwpFormat",
+				source: "ArcFormats/Emic/ImageMWP.cs",
+			},
+			localId: "emic-mwp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"bgra32 pixels",
+				"metadata",
+				"two signatures",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMP/ADVG",
 				class: "AdvgFormat",
 				source: "Legacy/ADVGSys/ImageBMP.cs",

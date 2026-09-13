@@ -577,6 +577,7 @@ import { qdoScriptFormat } from "./redzone/qdo-script.js";
 import { nsfAudioFormat } from "./pan/nsf-audio.js";
 import { htfImageFormat } from "./jam-creation/htf-image.js";
 import { advgImageFormat } from "./advgsys/bmp-image.js";
+import { mwpImageFormat } from "./emic/mwp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1477,5 +1478,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nsfAudioFormat,
 		htfImageFormat,
 		advgImageFormat,
+		mwpImageFormat,
 	]);
 }
