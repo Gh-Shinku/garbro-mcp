@@ -6,3 +6,4 @@ export * from "./pl10.js";
 export * from "./plt.js";
 export * from "./uf.js";
 export * from "./ap-image.js";
+export * from "./ao-image.js";

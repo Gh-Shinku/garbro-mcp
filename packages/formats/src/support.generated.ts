@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "AO/KAGUYA",
+				class: "AoFormat",
+				source: "ArcFormats/Kaguya/ImageAO.cs",
+			},
+			localId: "kaguya-ao-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"signed origin",
+				"row reversal",
+				"32bpp bitmap output",
+				"reuse of base class helpers",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "AP",
 				class: "ApFormat",
 				source: "ArcFormats/Kaguya/ImageAP.cs",
