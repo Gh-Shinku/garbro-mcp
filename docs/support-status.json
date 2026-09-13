@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IMP",
+				"class": "ImpOpener",
+				"source": "ArcFormats/BlackRainbow/ArcIMP.cs"
+			},
+			"localId": "black-rainbow-imp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"0x3D66 and 0x59E8 scheme signatures",
+				"per-scheme xor keys",
+				"offset table of 0xFF frames from 0x04",
+				"frames relative to 0x404",
+				"archive-name frame numbering",
+				"0x10 byte frame size filter",
+				"image typing",
+				"raw frame extraction",
+				"key exposed in archive metadata"
+			],
+			"unsupported": ["archive creation", "IMP pixel decoding (image layer)"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/LAC",
 				"class": "PakOpener",
 				"source": "ArcFormats/Leaf/ArcLAC.cs"

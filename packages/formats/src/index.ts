@@ -375,6 +375,7 @@ import { yaneuraoDatDxFormat } from "./yaneurao/dat.js";
 import { yaneuraoDatExFormat } from "./yaneurao/dat.js";
 import { leafLacFormat } from "./leaf/lac.js";
 import { leafLacPakFormat } from "./leaf/lac.js";
+import { blackRainbowImpFormat } from "./black-rainbow/imp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -995,5 +996,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yaneuraoDatExFormat,
 		leafLacFormat,
 		leafLacPakFormat,
+		blackRainbowImpFormat,
 	]);
 }
