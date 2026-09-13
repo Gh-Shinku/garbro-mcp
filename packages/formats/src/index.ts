@@ -132,6 +132,7 @@ import { pogFormat } from "./ads/pog.js";
 import { irrlichtArkFormat } from "./irrlicht/ark.js";
 import { fl2Format } from "./aaru/fl2.js";
 import { fl3Format } from "./aaru/fl2.js";
+import { gscripterDataFormat } from "./gscripter/data.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -241,6 +242,7 @@ export * from "./lambda/index.js";
 export * from "./ffa/index.js";
 export * from "./ads/index.js";
 export * from "./aaru/index.js";
+export * from "./gscripter/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -379,5 +381,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		irrlichtArkFormat,
 		fl2Format,
 		fl3Format,
+		gscripterDataFormat,
 	]);
 }

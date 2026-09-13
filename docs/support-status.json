@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/GScripter",
+				"class": "DataOpener",
+				"source": "ArcFormats/GScripter/ArcDATA.cs"
+			},
+			"localId": "gscripter-data",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion .info index",
+				"CP932 filenames",
+				"resource type inference from the archive name",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FL3/AARU",
 				"class": "Fl3Opener",
 				"source": "Legacy/Aaru/ArcFL3.cs"
