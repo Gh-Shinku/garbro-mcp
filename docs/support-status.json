@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "XARC/XUSE",
+				"class": "XarcOpener",
+				"source": "ArcFormats/Xuse/ArcXARC.cs"
+			},
+			"localId": "xuse-xarc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"first-offset validation",
+				"data record markers",
+				"nibble-rotated names",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IFP",
 				"class": "IfpOpener",
 				"source": "ArcFormats/Winters/ArcIFP.cs"

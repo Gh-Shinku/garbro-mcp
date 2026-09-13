@@ -175,6 +175,7 @@ import { hg3Format } from "./cat-system/hg3.js";
 import { patisserieRawFormat } from "./patisserie/raw.js";
 import { tanakaVpkFormat } from "./tanaka/vpk.js";
 import { ifpFormat } from "./winters/ifp.js";
+import { xarcFormat } from "./xuse/xarc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -491,5 +492,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		patisserieRawFormat,
 		tanakaVpkFormat,
 		ifpFormat,
+		xarcFormat,
 	]);
 }
