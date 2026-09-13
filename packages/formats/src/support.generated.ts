@@ -9,6 +9,33 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "QPK",
+				class: "PakOpener",
+				source: "ArcFormats/Psp/ArcQPK.cs",
+			},
+			localId: "psp-qpk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"QPK signature",
+				"companion QPI index",
+				"synthesized names from the archive base name",
+				"index records from 0x1c",
+				"high-bit and zero-size record skipping",
+				"back-filled stored sizes",
+				"CZL zlib extraction",
+				"verbatim extraction",
+				"image typing for TGA archives",
+			],
+			unsupported: [
+				"entry type inference beyond TGA names",
+				"archive creation",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAC/HED",
 				class: "PacOpener",
 				source: "ArcFormats/DigitalWorks/ArcPAC.cs",
