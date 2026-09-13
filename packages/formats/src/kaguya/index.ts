@@ -9,3 +9,4 @@ export * from "./ap-image.js";
 export * from "./ao-image.js";
 export * from "./ap0-image.js";
 export * from "./ap2-image.js";
+export * from "./ap3-image.js";
