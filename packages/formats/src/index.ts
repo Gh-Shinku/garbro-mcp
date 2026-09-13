@@ -619,6 +619,7 @@ import { rmtImageFormat } from "./elf/rmt-image.js";
 import { picImageFormat } from "./misc/pic-image.js";
 import { lgfImageFormat } from "./leaf/lgf-image.js";
 import { wm2ImageFormat } from "./fc01/wm2-image.js";
+import { malImageFormat } from "./valkyria/mal-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1566,5 +1567,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		picImageFormat,
 		lgfImageFormat,
 		wm2ImageFormat,
+		malImageFormat,
 	]);
 }

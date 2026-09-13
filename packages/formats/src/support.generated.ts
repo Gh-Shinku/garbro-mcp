@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MAL",
+				class: "MalFormat",
+				source: "ArcFormats/Valkyria/ImageMAL.cs",
+			},
+			localId: "valkyria-mal-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"rle and raw packet stream",
+				"slack tolerance",
+				"8bpp gray bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "WM2",
 				class: "Wm2Format",
 				source: "ArcFormats/FC01/ImageWM2.cs",
