@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/UMPK",
+				"class": "PakOpener",
+				"source": "ArcFormats/StudioJikkenshitsu/ArcUMPK.cs"
+			},
+			"localId": "umut-umpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and version detection",
+				"variable-length header name",
+				"reserved word validation",
+				"variable-length records",
+				"derived per-entry xor keys",
+				"zero-key fallback 0x37",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MNV",
 				"class": "DatOpener",
 				"source": "ArcFormats/MnoViolet/ArcMnoViolet.cs"

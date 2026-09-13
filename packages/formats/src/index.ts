@@ -183,6 +183,7 @@ import { neonAr2Format } from "./neon/ar2.js";
 import { kasaneAr2Format } from "./kasane/ar2.js";
 import { witchDatFormat } from "./witch/dat.js";
 import { mnvFormat } from "./mno-violet/dat.js";
+import { umpkFormat } from "./umut/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -322,6 +323,7 @@ export * from "./hdl/index.js";
 export * from "./neon/index.js";
 export * from "./kasane/index.js";
 export * from "./mno-violet/index.js";
+export * from "./umut/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -511,5 +513,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kasaneAr2Format,
 		witchDatFormat,
 		mnvFormat,
+		umpkFormat,
 	]);
 }
