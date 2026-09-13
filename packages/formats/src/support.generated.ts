@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/G2",
+				class: "PakOpener",
+				source: "ArcFormats/G2/ArcGCEX.cs",
+			},
+			localId: "g2-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"gcex header",
+				"index offset",
+				"packed and plain index",
+				"gce0 stored segments",
+				"gce1 control stream",
+				"lz77 with context table",
+				"implicit payload offsets",
+				"cp932 names",
+				"zero sized record skipping",
+			],
+			unsupported: [
+				"archive creation",
+				"entry type detection",
+				"image decoding",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "EPK/Ellefin",
 				class: "EpkOpener",
 				source: "ArcFormats/Ellefin/ArcEPK.cs",

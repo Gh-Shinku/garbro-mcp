@@ -480,6 +480,7 @@ import { gssLsdFormat } from "./gss/lsd.js";
 import { strikesPckFormat } from "./strikes/pck.js";
 import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { ellefinEpkFormat } from "./ellefin/epk.js";
+import { g2PakFormat } from "./g2/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -767,6 +768,7 @@ export * from "./gss/index.js";
 export * from "./strikes/index.js";
 export * from "./lucifen/index.js";
 export * from "./ellefin/index.js";
+export * from "./g2/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1252,5 +1254,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		strikesPckFormat,
 		lucifenLpkFormat,
 		ellefinEpkFormat,
+		g2PakFormat,
 	]);
 }
