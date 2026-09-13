@@ -9,6 +9,25 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "MRG",
+				class: "MrgAudio",
+				source: "Legacy/Regrips/AudioWRG.cs",
+			},
+			localId: "regrips-mrg-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"byte inversion",
+				"mp3 validation",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WRG",
 				class: "WrgAudio",
 				source: "Legacy/Regrips/AudioWRG.cs",
