@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VFS/AOI",
+				"class": "VfsOpener",
+				"source": "ArcFormats/Aoi/ArcVFS.cs"
+			},
+			"localId": "aoi-vfs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures with file length cross check",
+				"version count stride and index size validation",
+				"version one records with in record names",
+				"announced stride honoured",
+				"version two records with utf16 name pool",
+				"pool header skipping and index validation",
+				"entry placement validation",
+				"packed flag as metadata",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VOL/ELF",
 				"class": "VolOpener",
 				"source": "ArcFormats/elf/ArcVOL.cs"

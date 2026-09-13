@@ -296,6 +296,7 @@ import { anmFormat } from "./kaguya/anm.js";
 import { an10Format } from "./kaguya/anm.js";
 import { an20Format } from "./kaguya/anm.js";
 import { volFormat } from "./elf/vol.js";
+import { vfsFormat } from "./aoi/vfs.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -497,6 +498,7 @@ export * from "./studio-ego/index.js";
 export * from "./shsystem/index.js";
 export * from "./dd-system/index.js";
 export * from "./eushully/index.js";
+export * from "./aoi/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -799,5 +801,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		an10Format,
 		an20Format,
 		volFormat,
+		vfsFormat,
 	]);
 }
