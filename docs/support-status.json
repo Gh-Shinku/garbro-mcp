@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/MK",
+				"class": "DatOpener",
+				"source": "Legacy/Witch/ArcDAT.cs"
+			},
+			"localId": "witch-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"length-prefixed name records",
+				"image metadata",
+				"zero name length rejection",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AR2/IDX",
 				"class": "Ar2Opener",
 				"source": "Legacy/Kasane/ArcAR2.cs"

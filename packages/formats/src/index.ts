@@ -181,6 +181,7 @@ import { hotFormat } from "./hdl/hot.js";
 import { advSys3Format } from "./advsys/arc3.js";
 import { neonAr2Format } from "./neon/ar2.js";
 import { kasaneAr2Format } from "./kasane/ar2.js";
+import { witchDatFormat } from "./witch/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -506,5 +507,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		advSys3Format,
 		neonAr2Format,
 		kasaneAr2Format,
+		witchDatFormat,
 	]);
 }
