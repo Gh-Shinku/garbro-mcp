@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/YaneSDK",
+				"class": "PakOpener",
+				"source": "ArcFormats/YaneSDK/ArcDAT.cs"
+			},
+			"localId": "yane-sdk-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"xored signed record count",
+				"constant-key index decryption",
+				"partial entry prefix decryption",
+				"fully encrypted entries",
+				"entry placement and data offset validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GRP/MINK",
 				"class": "GrpOpener",
 				"source": "Legacy/Mink/ArcMINK.cs"
