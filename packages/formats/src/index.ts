@@ -341,6 +341,7 @@ import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { nekosdkDatFormat } from "./nekosdk/dat.js";
 import { willWipFormat } from "./will/wip.js";
 import { leafAFormat } from "./leaf/a.js";
+import { seenFormat } from "./reallive/seen.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -912,5 +913,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nekosdkDatFormat,
 		willWipFormat,
 		leafAFormat,
+		seenFormat,
 	]);
 }

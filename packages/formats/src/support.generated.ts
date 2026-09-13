@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "SEEN",
+				class: "SeenOpener",
+				source: "ArcFormats/RealLive/ArcSEEN.cs",
+			},
+			localId: "reallive-seen",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"PACL signature",
+				"0x20 records with 0x10-byte cp932 names",
+				"payload offset/size/unpacked size/packed flag fields",
+				"zero-size record skipping",
+				"entry placement validation",
+				"PACK container detection",
+				"private LZ decoder",
+				"verbatim extraction",
+			],
+			unsupported: ["script decoding", "archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "A/Leaf",
 				class: "AOpener",
 				source: "ArcFormats/Leaf/ArcA.cs",
