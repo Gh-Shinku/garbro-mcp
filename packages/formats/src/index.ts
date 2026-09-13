@@ -397,6 +397,7 @@ import { leafAmFormat } from "./leaf/am.js";
 import { carriereArcFormat } from "./carriere/arc.js";
 import { carriereScenarioFormat } from "./carriere/arc.js";
 import { kaguyaLin2Format } from "./kaguya/lin2.js";
+import { system98LibFormat } from "./system98/lib.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -649,6 +650,7 @@ export * from "./vn-engine/index.js";
 export * from "./anime-game-system/index.js";
 export * from "./ast/index.js";
 export * from "./carriere/index.js";
+export * from "./system98/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1051,5 +1053,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		carriereArcFormat,
 		carriereScenarioFormat,
 		kaguyaLin2Format,
+		system98LibFormat,
 	]);
 }
