@@ -247,6 +247,7 @@ import { azuriteFormat } from "./silky/azurite.js";
 import { ai6WinFormat } from "./silky/ai6win.js";
 import { nekopunchPakFormat } from "./nekopunch/pak.js";
 import { mugiBinFormat } from "./mugi/bin.js";
+import { crowdPckFormat } from "./crowd/pck.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -425,6 +426,7 @@ export * from "./luna-soft/index.js";
 export * from "./lilim/index.js";
 export * from "./nekopunch/index.js";
 export * from "./mugi/index.js";
+export * from "./crowd/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -678,5 +680,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ai6WinFormat,
 		nekopunchPakFormat,
 		mugiBinFormat,
+		crowdPckFormat,
 	]);
 }

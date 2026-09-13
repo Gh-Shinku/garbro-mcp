@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PCK",
+				"class": "PckOpener",
+				"source": "ArcFormats/Crowd/ArcPCK.cs"
+			},
+			"localId": "crowd-pck",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"entry count bounds",
+				"index records",
+				"offset beyond the index size",
+				"entry placement validation",
+				"null-terminated names bounded by 260 bytes",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["pkwv audio archive", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/MUGI",
 				"class": "BinOpener",
 				"source": "ArcFormats/Mugi/ArcBIN.cs"
