@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/Will",
+				class: "ArcOpener",
+				source: "ArcFormats/Will/ArcWILL.cs",
+			},
+			localId: "will-arc",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"extension record table",
+				"9 and 13 byte name width fallback",
+				"lowercased names",
+				"extension replacement",
+				"script byte rotation",
+			],
+			unsupported: ["archive creation", "name width selection"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARC/KOGADO",
 				class: "ArcOpener",
 				source: "ArcFormats/Kogado/ArcARC.cs",

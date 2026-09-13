@@ -485,6 +485,7 @@ import { willArc2Format } from "./will/arc2.js";
 import { pinkyA5rFormat } from "./pinky/a5r.js";
 import { piasDatFormat } from "./pias/dat.js";
 import { kogadoArcFormat } from "./kogado/arc.js";
+import { willArcFormat } from "./will/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1266,5 +1267,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pinkyA5rFormat,
 		piasDatFormat,
 		kogadoArcFormat,
+		willArcFormat,
 	]);
 }
