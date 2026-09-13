@@ -210,6 +210,7 @@ import { mcdFormat } from "./tsd/mcd.js";
 import { igaFormat } from "./noesis/iga.js";
 import { djDatFormat } from "./djsystem/dat.js";
 import { cpz1Format } from "./cmvs/cpz1.js";
+import { arc2Format } from "./csware/arc2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -369,6 +370,7 @@ export * from "./tsd/index.js";
 export * from "./noesis/index.js";
 export * from "./djsystem/index.js";
 export * from "./cmvs/index.js";
+export * from "./csware/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -585,5 +587,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		igaFormat,
 		djDatFormat,
 		cpz1Format,
+		arc2Format,
 	]);
 }

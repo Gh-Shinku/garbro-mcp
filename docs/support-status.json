@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/ARC2",
+				"class": "Arc2Opener",
+				"source": "ArcFormats/CsWare/ArcARC2.cs"
+			},
+			"localId": "csware-arc2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x20-byte records",
+				"duplicate name skipping",
+				"fibonacci key chain reversal",
+				"partial trailing word handling",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CPZ1",
 				"class": "Cpz1Opener",
 				"source": "ArcFormats/Cmvs/ArcCPZ1.cs"
