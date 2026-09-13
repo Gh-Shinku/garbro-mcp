@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "GAN",
+				class: "GanOpener",
+				source: "ArcFormats/Ikura/ArcGAN.cs",
+			},
+			localId: "ikura-gan",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"fixed frame table",
+				"declared frame sizes",
+				"frame id and reference metadata",
+				"two digit frame naming",
+			],
+			unsupported: [
+				"archive creation",
+				"GAN frame image decoding and frame references",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAC/DAI",
 				class: "PacOpener",
 				source: "ArcFormats/DaiSystem/ArcPAC.cs",

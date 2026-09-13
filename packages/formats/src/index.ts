@@ -435,6 +435,7 @@ import { dpmFormat } from "./hsp/dpm.js";
 import { detFormat } from "./ugos/det.js";
 import { pcdImageFormat } from "./witch/pcd.js";
 import { daiPacFormat } from "./dai-system/pac.js";
+import { ganFormat } from "./ikura/gan.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1145,5 +1146,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dpmFormat,
 		detFormat,
 		daiPacFormat,
+		ganFormat,
 	]);
 }
