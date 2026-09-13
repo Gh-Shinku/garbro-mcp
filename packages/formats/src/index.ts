@@ -205,6 +205,7 @@ import { electriciteitDatFormat } from "./electriciteit/dat.js";
 import { dskFormat } from "./abogado/dsk.js";
 import { pkDatFormat } from "./paprika/pkdat.js";
 import { plaFormat } from "./squadrad/pla.js";
+import { cpnFormat } from "./marron/cpn.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -359,6 +360,7 @@ export * from "./electriciteit/index.js";
 export * from "./abogado/index.js";
 export * from "./paprika/index.js";
 export * from "./squadrad/index.js";
+export * from "./marron/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -570,5 +572,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dskFormat,
 		pkDatFormat,
 		plaFormat,
+		cpnFormat,
 	]);
 }
