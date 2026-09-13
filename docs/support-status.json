@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SAR",
+				"class": "SarOpener",
+				"source": "ArcFormats/NScripter/ArcSAR.cs"
+			},
+			"localId": "nscripter-sar",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"big endian count and payload offset",
+				"per entry room checks",
+				"plain null terminated cp932 names",
+				"big endian relative offset and size records",
+				"entry placement validation",
+				"structural detection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AN21/KAGUYA",
 				"class": "An21Opener",
 				"source": "ArcFormats/Kaguya/ArcAN21.cs"

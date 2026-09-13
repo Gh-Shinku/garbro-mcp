@@ -281,6 +281,7 @@ import { wbpFormat } from "./wild-bug/wbp.js";
 import { kaguyaPltFormat } from "./kaguya/plt.js";
 import { kaguyaPl10Format } from "./kaguya/pl10.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
+import { nscripterSarFormat } from "./nscripter/sar.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -476,6 +477,7 @@ export * from "./mai/index.js";
 export * from "./palm-tree/index.js";
 export * from "./wild-bug/index.js";
 export * from "./kaguya/index.js";
+export * from "./nscripter/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -763,5 +765,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaguyaPltFormat,
 		kaguyaPl10Format,
 		kaguyaAn21Format,
+		nscripterSarFormat,
 	]);
 }
