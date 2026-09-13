@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "HG3",
+				"class": "Hg3Opener",
+				"source": "ArcFormats/CatSystem/ArcHG3.cs"
+			},
+			"localId": "cat-system-hg3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"stdinfo section walk",
+				"img chunk requirement",
+				"zero-size final section",
+				"section-indexed entry names",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "HG2",
 				"class": "Hg2Opener",
 				"source": "ArcFormats/CatSystem/ArcHG2.cs"

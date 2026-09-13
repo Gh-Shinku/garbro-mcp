@@ -171,6 +171,7 @@ import { minkGrpFormat } from "./mink/grp.js";
 import { yaneDatFormat } from "./yane-sdk/dat.js";
 import { s25Format } from "./shiina-rio/s25.js";
 import { hg2Format } from "./cat-system/hg2.js";
+import { hg3Format } from "./cat-system/hg3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -482,5 +483,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yaneDatFormat,
 		s25Format,
 		hg2Format,
+		hg3Format,
 	]);
 }
