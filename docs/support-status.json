@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "G/SYSTEM98",
+				"class": "GFormat",
+				"source": "Legacy/System98/ImageG.cs"
+			},
+			"localId": "system98-g-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"bit-packed decoding",
+				"4bpp bitmap output",
+				"palette conversion",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "CBF/MA",
 				"class": "CbfFormat",
 				"source": "Legacy/hmp/ImageCBF.cs"

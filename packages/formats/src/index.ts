@@ -587,6 +587,7 @@ import { kurumiGraImageFormat } from "./kurumi/gra-image.js";
 import { gr1ImageFormat } from "./anotherroom/gr1-image.js";
 import { bgraImageFormat } from "./g2/bgra-image.js";
 import { cbfImageFormat } from "./hmp/cbf-image.js";
+import { system98GImageFormat } from "./system98/g-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1498,5 +1499,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gr1ImageFormat,
 		bgraImageFormat,
 		cbfImageFormat,
+		system98GImageFormat,
 	]);
 }

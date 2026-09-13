@@ -145,6 +145,47 @@ export function writeBmp8Palette(
 }
 
 /**
+ * Wraps four bit pixels in a palette bitmap. The stored pixels are already packed two per byte with a
+ * stride of half the width rounded up, so the only change is that bitmap rows are aligned to four bytes
+ * and therefore padded. `palette` holds up to sixteen RGB triples, which become the bitmap's sixteen
+ * entries; the reference formats that use this writer all declare sixteen colours. As with the other
+ * writers, `bottomUp` is for readers that use `ImageData.CreateFlipped`.
+ */
+export function writeBmp4(
+	width: number,
+	height: number,
+	pixels: Buffer,
+	palette: Buffer,
+	bottomUp = false,
+): Buffer {
+	const sourceStride = (width + 1) >> 1;
+	const stride = (sourceStride + 3) & ~3;
+	const imageSize = stride * height;
+	const paletteSize = 16 * 4;
+	const dataOffset = BMP_HEADER_SIZE + paletteSize;
+	const entries = Buffer.alloc(paletteSize);
+	for (let i = 0; i < 16; i += 1) {
+		const source = i * 3;
+		if (source + 2 >= palette.length) break;
+		entries[i * 4] = palette[source + 2] ?? 0;
+		entries[i * 4 + 1] = palette[source + 1] ?? 0;
+		entries[i * 4 + 2] = palette[source] ?? 0;
+	}
+	const rows: Buffer[] = [];
+	for (let row = 0; row < height; row += 1) {
+		const line = Buffer.alloc(stride);
+		pixels.copy(line, 0, row * sourceStride, row * sourceStride + sourceStride);
+		rows.push(line);
+	}
+	const body = Buffer.concat(rows);
+	return Buffer.concat([
+		writeHeader(width, height, 4, dataOffset, imageSize, 16, bottomUp),
+		entries,
+		body,
+	]);
+}
+
+/**
  * Wraps eight bit pixels in a grey bitmap. Bitmap rows are aligned to four bytes, so every row is
  * padded with zeros to `width` rounded up to a multiple of four; that padding is the only difference
  * from the stored pixels. As with `writeBmp32`, the stored rows are top down by default and
