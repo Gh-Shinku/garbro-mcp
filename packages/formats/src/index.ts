@@ -446,6 +446,7 @@ import { vavFormat } from "./frontwing/vav.js";
 import { fa2Format } from "./foster/fa2.js";
 import { cherryPakFormat } from "./cherry/pak.js";
 import { cherryPak2Format } from "./cherry/pak.js";
+import { grooverPcgFormat } from "./groover/pcg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -718,6 +719,7 @@ export * from "./ugos/index.js";
 export * from "./dai-system/index.js";
 export * from "./n-system/index.js";
 export * from "./inspire/index.js";
+export * from "./groover/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1169,5 +1171,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fa2Format,
 		cherryPakFormat,
 		cherryPak2Format,
+		grooverPcgFormat,
 	]);
 }
