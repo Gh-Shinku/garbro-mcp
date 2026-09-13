@@ -466,6 +466,7 @@ import { gsPackFormat } from "./gs-pack/archive.js";
 import { gsDataFormat } from "./gs-pack/archive.js";
 import { parsleyYanepackFormat } from "./parsley/cg.js";
 import { parsleyCgV1Format } from "./parsley/cg.js";
+import { paletteChrFormat } from "./palette/chr.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1214,5 +1215,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gsDataFormat,
 		parsleyYanepackFormat,
 		parsleyCgV1Format,
+		paletteChrFormat,
 	]);
 }
