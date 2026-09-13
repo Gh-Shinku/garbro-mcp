@@ -404,6 +404,7 @@ import { densdkDaf2Format } from "./densdk/daf.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
 import { eushullyAlfFormat } from "./eushully/alf.js";
+import { gamesystemCmpFormat } from "./gamesystem/cmp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1068,5 +1069,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pfsFormat,
 		tmrHiroPacFormat,
 		eushullyAlfFormat,
+		gamesystemCmpFormat,
 	]);
 }

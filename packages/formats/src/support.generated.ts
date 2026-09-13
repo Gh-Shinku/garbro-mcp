@@ -9,6 +9,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CMP",
+				class: "CmpOpener",
+				source: "ArcFormats/GameSystem/ArcCMP.cs",
+			},
+			localId: "gamesystem-cmp",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"end of file index trailer",
+				"PACK signature detection",
+				"32-bit index offset",
+				"unpacked index size word",
+				"LZ stream decoded until the output is full",
+				"custom LZ decoder with literal runs",
+				"match runs with overlapping copies",
+				"record walk with a zero name length ending the list",
+				"UTF-16LE hierarchical names",
+				"packed flag handling",
+				"per-entry unpacked size word",
+				"stored size as the gap to the next payload",
+				"payload decoding with a bounded LZ stream",
+				"placement checks against the index offset",
+			],
+			unsupported: [
+				"archive creation",
+				"signature-keyed indexes from external scheme files",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ALF",
 				class: "AlfOpener",
 				source: "ArcFormats/Eushully/ArcALF.cs",
