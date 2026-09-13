@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "WBM/HYPATIA",
+				class: "WbmFormat",
+				source: "ArcFormats/Hypatia/ImageWBM.cs",
+			},
+			localId: "hypatia-wbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"companion act palette",
+				"rgb to bgrx conversion",
+				"grey fallback",
+				"8bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WPN",
 				class: "WpnAudio",
