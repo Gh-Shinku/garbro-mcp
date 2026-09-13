@@ -30,7 +30,7 @@ const MAX_PIXEL_BYTES = 256 * 1024 * 1024;
 /** The depth is not stored: a tile set is always thirty two bit. */
 const BITS_PER_PIXEL = 32;
 
-export interface Aps3Layout {
+export interface ApsLayout {
 	width: number;
 	height: number;
 	/** Zero means the payload is stored as it is; one means the KaGuYa LZ codec. */
@@ -96,7 +96,7 @@ export function unionRectangle(
  * origin, a part at (10, 10) makes the image fifteen by fifteen rather than five by five. That is the
  * reference's arithmetic and a test pins it.
  */
-async function readFields(source: ByteSource): Promise<Aps3Layout | undefined> {
+async function readFields(source: ByteSource): Promise<ApsLayout | undefined> {
 	if (source.size < BigInt(COUNT_POSITION + 4)) return undefined;
 	try {
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
@@ -146,6 +146,37 @@ async function readFields(source: ByteSource): Promise<Aps3Layout | undefined> {
 	} catch {
 		return undefined;
 	}
+}
+
+/**
+ * The payload reader both container generations share: read the packed or stored bytes, run the KaGuYa LZ codec
+ * when the mode says so, and then treat what comes out as a complete `AP` image — the base format's fields and
+ * pixels, with its bottom-up rows, rendered into a top-down bitmap.
+ */
+export async function readApsPayload(
+	source: ByteSource,
+	layout: ApsLayout,
+): Promise<Buffer> {
+	const payload = Buffer.from(
+		await source.readAt(
+			BigInt(layout.dataOffset),
+			layout.compression === 1 ? layout.packedSize : layout.unpackedSize,
+		),
+	);
+	const inner =
+		layout.compression === 1
+			? unpackKaguyaLz(payload, layout.unpackedSize)
+			: payload;
+	const innerSource = new BufferByteSource(inner);
+	const apLayout = await readApFields(innerSource);
+	if (!apLayout)
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"KaGuYa APS payload is not an AP image",
+		);
+	const pixels = await readApBitmap(innerSource, apLayout, AP_HEADER_SIZE);
+	// `ImageData.Create` is top down, which a bitmap records as a negative height.
+	return writeBmp32(apLayout.width, apLayout.height, pixels, false);
 }
 
 export const aps3ImageDescriptor: FormatDescriptor = {
@@ -212,28 +243,6 @@ export const aps3ImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readFields(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid KaGuYa APS3 image");
-		const payload = Buffer.from(
-			await source.readAt(
-				BigInt(layout.dataOffset),
-				layout.compression === 1 ? layout.packedSize : layout.unpackedSize,
-			),
-		);
-		const inner =
-			layout.compression === 1
-				? unpackKaguyaLz(payload, layout.unpackedSize)
-				: payload;
-		// What comes out of the tile container is an ordinary `AP` image, so the base format's reader runs on
-		// it — including its bottom-up rows and its thirty two bit bitmap.
-		const innerSource = new BufferByteSource(inner);
-		const apLayout = await readApFields(innerSource);
-		if (!apLayout)
-			throw new GarbroError(
-				"INVALID_ARCHIVE",
-				"KaGuYa APS3 payload is not an AP image",
-			);
-		const pixels = await readApBitmap(innerSource, apLayout, AP_HEADER_SIZE);
-		return Readable.from([
-			writeBmp32(apLayout.width, apLayout.height, pixels, false),
-		]);
+		return Readable.from([await readApsPayload(source, layout)]);
 	},
 });

@@ -12,3 +12,4 @@ export * from "./ap2-image.js";
 export * from "./ap3-image.js";
 export * from "./kaguya-lz.js";
 export * from "./aps3-image.js";
+export * from "./aps-image.js";

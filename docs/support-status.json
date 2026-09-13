@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "APS",
+				"class": "ApsFormat",
+				"source": "ArcFormats/Kaguya/ImageAPS.cs"
+			},
+			"localId": "kaguya-aps-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"name and tile tables",
+				"rectangle union",
+				"embedded AP payload",
+				"kaguya lz decompression",
+				"32bpp bitmap output",
+				"metadata"
+			],
+			"unsupported": ["image encoding", "tile recomposition"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "APS3",
 				"class": "Aps3Format",
 				"source": "ArcFormats/Kaguya/ImageAPS.cs"
