@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/cromwell",
+				"class": "GraphicPakOpener",
+				"source": "ArcFormats/Cromwell/ArcPAK.cs"
+			},
+			"localId": "cromwell-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"Graphic PackData and Voice PackData signatures",
+				"record count",
+				"0xc-byte cp932 names",
+				"absolute payload offsets",
+				"next-offset stored extents",
+				"voice-named graphic override",
+				"image and audio typing",
+				"zlib extraction",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VFS/VNSYSTEM",
 				"class": "VfsOpener",
 				"source": "ArcFormats/VnSystem/ArcVFS.cs"

@@ -348,6 +348,7 @@ import { cpz2Format } from "./cmvs/cpz2.js";
 import { cswareDatFormat } from "./csware/dat.js";
 import { hcsystemPakFormat } from "./hcsystem/pak.js";
 import { vnsystemVfsFormat } from "./vnsystem/vfs.js";
+import { cromwellPakFormat } from "./cromwell/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -576,6 +577,7 @@ export * from "./will/index.js";
 export * from "./gamesystem/index.js";
 export * from "./hcsystem/index.js";
 export * from "./vnsystem/index.js";
+export * from "./cromwell/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -929,5 +931,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cswareDatFormat,
 		hcsystemPakFormat,
 		vnsystemVfsFormat,
+		cromwellPakFormat,
 	]);
 }
