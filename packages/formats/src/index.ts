@@ -277,6 +277,7 @@ import { scrPlayerPakFormat } from "./scrplayer/pak.js";
 import { maiFormat } from "./mai/arc.js";
 import { arFormat } from "./palm-tree/ar.js";
 import { a98Format } from "./active-soft/a98.js";
+import { wbpFormat } from "./wild-bug/wbp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -470,6 +471,7 @@ export * from "./softpal/index.js";
 export * from "./scrplayer/index.js";
 export * from "./mai/index.js";
 export * from "./palm-tree/index.js";
+export * from "./wild-bug/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -753,5 +755,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		maiFormat,
 		arFormat,
 		a98Format,
+		wbpFormat,
 	]);
 }

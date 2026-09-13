@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "WBP",
+				"class": "WbpOpener",
+				"source": "ArcFormats/WildBug/ArcWBP.cs"
+			},
+			"localId": "wildbug-wbp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"head with version and tail marker",
+				"version range and header field validation",
+				"version 2 and 3 records",
+				"version 4 hash tables",
+				"hash byte and name checksum validation",
+				"directory name trimming and join",
+				"unknown directory id rejection",
+				"placement validation for versions 2 and 3",
+				"chain bound for version 4",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "A98",
 				"class": "PakOpener",
 				"source": "ArcFormats/ActiveSoft/ArcADPACK.cs"
