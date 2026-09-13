@@ -29,6 +29,8 @@ export function inflateMaikaBpr(
 		if (control === rleCode) {
 			if (position >= source.length) break;
 			const value = source[position++] ?? 0;
+			if (count > maxOutputLength - outputLength)
+				throw new RangeError("BPR output exceeds the configured limit");
 			if (count > 0) append(Buffer.alloc(count, value));
 			continue;
 		}

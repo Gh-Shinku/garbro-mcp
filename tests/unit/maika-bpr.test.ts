@@ -30,7 +30,7 @@ describe("MAIKA BPR", () => {
 	it("bounds output from malformed counts", () => {
 		const input = Buffer.alloc(6);
 		input[0] = 3;
-		input.writeInt32LE(4, 1);
+		input.writeInt32LE(0x7fffffff, 1);
 		input[5] = 0x41;
 		expect(() => inflateMaikaBpr(input, 3, 3)).toThrow(RangeError);
 	});
