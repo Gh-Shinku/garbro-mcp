@@ -6,6 +6,71 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AN20/KAGUYA",
+				"class": "An20Opener",
+				"source": "ArcFormats/Kaguya/ArcANM.cs"
+			},
+			"localId": "kaguya-an20",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"shared typed preamble walk",
+				"frame count behind the preamble",
+				"frame headers with width height and depth",
+				"derived spans with bound checking",
+				"generated frame names and metadata",
+				"verbatim extraction"
+			],
+			"unsupported": ["bitmap decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "AN10/KAGUYA",
+				"class": "An10Opener",
+				"source": "ArcFormats/Kaguya/ArcANM.cs"
+			},
+			"localId": "kaguya-an10",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"two count frame table",
+				"frame headers with a channel word",
+				"derived spans with bound checking",
+				"generated frame names and metadata",
+				"verbatim extraction"
+			],
+			"unsupported": ["bitmap decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ANM/KAGUYA",
+				"class": "AnmOpener",
+				"source": "ArcFormats/Kaguya/ArcANM.cs"
+			},
+			"localId": "kaguya-anm",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"two count frame table",
+				"frame headers with width and height",
+				"fixed thirty two bit pixels",
+				"derived spans with bound checking",
+				"generated frame names and metadata",
+				"verbatim extraction"
+			],
+			"unsupported": ["bitmap decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SND",
 				"class": "SndOpener",
 				"source": "ArcFormats/Eushully/ArcGPC.cs"

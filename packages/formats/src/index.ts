@@ -292,6 +292,9 @@ import { ddp3Format } from "./dd-system/ddp.js";
 import { gpcFormat } from "./eushully/gpc.js";
 import { sndFormat } from "./eushully/gpc.js";
 import { snrFormat } from "./eushully/gpc.js";
+import { anmFormat } from "./kaguya/anm.js";
+import { an10Format } from "./kaguya/anm.js";
+import { an20Format } from "./kaguya/anm.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -791,5 +794,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		gpcFormat,
 		sndFormat,
 		snrFormat,
+		anmFormat,
+		an10Format,
+		an20Format,
 	]);
 }

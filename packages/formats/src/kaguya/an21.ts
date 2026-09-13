@@ -62,32 +62,19 @@ export const kaguyaAn21Descriptor: FormatDescriptor = {
 };
 
 /**
- * GARBro `An21Opener.TryOpen`. The word at 4 counts a table whose records start at 8: a type byte of zero
- * contributes nothing, one skips eight bytes, two to five skip four, and any other value rejects the archive.
- * Behind the table sits a marker spelling `[PIC]10` after a counted, eight-byte-stride name table, so the
- * whole preamble has to be walked to find where the frames begin.
+ * GARBro's shared animation preamble walk, used by `An21Opener.TryOpen` and by `An20Opener.SkipFrameTable`. The
+ * word at 4 counts a table whose records start at 8: a type byte of zero contributes nothing, one skips eight
+ * bytes, two to five skip four, and any other value rejects the archive. Behind the table comes a counted name
+ * table of eight-byte entries, and the helper returns the position it ends at.
  *
- * The marker is followed by a frame count and then a gap of 0x12 bytes, after which an information block
- * gives the offsets, the width, the height and a channel word the reference multiplies by eight for the bits
- * per pixel. The first frame follows that 0x14-byte block as a raw image of channels × width × height bytes.
- * Every later frame carries a step byte and a packed size ahead of RLE pixels whose *declared* output length
- * is channels × (offsetX + width) × (offsetY + height) rather than the image size, which is how the reference
- * accounts for neighbouring frame data; the port mirrors that formula and records the image size separately.
- *
- * A step byte of zero rejects the archive, as in the reference, and packed frames are expanded with the same
- * interleaved RLE that the sibling `PL10` format uses, whose decoder is shared here.
+ * The version 21 reader additionally requires the `[PIC]10` marker there, while version 20 does not.
  */
-async function readAn21Index(
+export async function skipKaguyaFrameTable(
 	source: ByteSource,
-	sourcePath: string,
-): Promise<FixedEntry[] | undefined> {
-	if (source.size < BigInt(FIRST_TABLE_OFFSET)) return undefined;
-	const head = await source.readAt(0n, FIRST_TABLE_OFFSET);
-	if (!head.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
-	const tableCount = head.readUInt16LE(TABLE_COUNT_OFFSET);
-	if (!isSaneCount(tableCount)) return undefined;
-
-	let cursor = BigInt(FIRST_TABLE_OFFSET);
+	start: bigint,
+	tableCount: number,
+): Promise<bigint | undefined> {
+	let cursor = start;
 	for (let id = 0; id < tableCount; id += 1) {
 		if (cursor + 1n > source.size) return undefined;
 		const type = (await source.readAt(cursor, 1)).readUInt8(0);
@@ -110,6 +97,43 @@ async function readAn21Index(
 	cursor += BigInt(
 		NAME_TABLE_COUNT_SIZE + nameTableCount * NAME_TABLE_ENTRY_SIZE,
 	);
+	if (cursor > source.size) return undefined;
+	return cursor;
+}
+
+/**
+ * GARBro `An21Opener.TryOpen`. The word at 4 counts a table whose records start at 8: a type byte of zero
+ * contributes nothing, one skips eight bytes, two to five skip four, and any other value rejects the archive.
+ * Behind the table sits a marker spelling `[PIC]10` after a counted, eight-byte-stride name table, so the
+ * whole preamble has to be walked to find where the frames begin.
+ *
+ * The marker is followed by a frame count and then a gap of 0x12 bytes, after which an information block
+ * gives the offsets, the width, the height and a channel word the reference multiplies by eight for the bits
+ * per pixel. The first frame follows that 0x14-byte block as a raw image of channels × width × height bytes.
+ * Every later frame carries a step byte and a packed size ahead of RLE pixels whose *declared* output length
+ * is channels × (offsetX + width) × (offsetY + height) rather than the image size, which is how the reference
+ * accounts for neighbouring frame data; the port mirrors that formula and records the image size separately.
+ *
+ * A step byte of zero rejects the archive, as in the reference, and packed frames are expanded with the same
+ * interleaved RLE that the sibling `PL10` format uses, whose decoder is shared here.
+ */
+async function readAn21Index(
+	source: ByteSource,
+	sourcePath: string,
+): Promise<FixedEntry[] | undefined> {
+	if (source.size < BigInt(FIRST_TABLE_OFFSET)) return undefined;
+	const head = await source.readAt(0n, FIRST_TABLE_OFFSET);
+	if (!head.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
+	// The reference reads the table count without a sanity check, and the walk below bounds itself.
+	const tableCount = head.readUInt16LE(TABLE_COUNT_OFFSET);
+
+	const tableEnd = await skipKaguyaFrameTable(
+		source,
+		BigInt(FIRST_TABLE_OFFSET),
+		tableCount,
+	);
+	if (tableEnd === undefined) return undefined;
+	let cursor = tableEnd;
 	if (cursor + BigInt(MARKER.length) > source.size) return undefined;
 	const marker = await source.readAt(cursor, MARKER.length);
 	if (!marker.equals(MARKER)) return undefined;
