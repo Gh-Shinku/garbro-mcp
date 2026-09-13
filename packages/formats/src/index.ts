@@ -135,6 +135,7 @@ import { fl3Format } from "./aaru/fl2.js";
 import { gscripterDataFormat } from "./gscripter/data.js";
 import { chrFormat } from "./tigerman/chr.js";
 import { witchArcFormat } from "./witch/arc.js";
+import { typesArcFormat } from "./types/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -245,6 +246,7 @@ export * from "./ffa/index.js";
 export * from "./ads/index.js";
 export * from "./aaru/index.js";
 export * from "./gscripter/index.js";
+export * from "./types/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -386,5 +388,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gscripterDataFormat,
 		chrFormat,
 		witchArcFormat,
+		typesArcFormat,
 	]);
 }
