@@ -6,6 +6,49 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DLB/V0",
+				"class": "Dlb0Opener",
+				"source": "Legacy/AyPio/ArcDLB.cs"
+			},
+			"localId": "aypio-dlb-v0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dlb extension requirement",
+				"entry count validation",
+				"index at offset 2",
+				"first offset alignment check as detection",
+				"cp932 filenames",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DLB",
+				"class": "DlbOpener",
+				"source": "Legacy/AyPio/ArcDLB.cs"
+			},
+			"localId": "aypio-dlb",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"header signature",
+				"entry count validation",
+				"fixed name fields with record width",
+				"cp932 filenames",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PCK",
 				"class": "PckOpener",
 				"source": "ArcFormats/Crowd/ArcPCK.cs"
