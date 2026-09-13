@@ -268,6 +268,7 @@ import { omiDatFormat } from "./omi/dat.js";
 import { system21PakFormat } from "./system21/pak.js";
 import { isaFormat } from "./ism/isa.js";
 import { circusDatFormat } from "./circus/dat.js";
+import { mgxFormat } from "./ume-soft/mgx.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -456,6 +457,7 @@ export * from "./jam-creation/index.js";
 export * from "./omi/index.js";
 export * from "./system21/index.js";
 export * from "./ism/index.js";
+export * from "./ume-soft/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -730,5 +732,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		system21PakFormat,
 		isaFormat,
 		circusDatFormat,
+		mgxFormat,
 	]);
 }

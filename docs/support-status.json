@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MGX",
+				"class": "MgxOpener",
+				"source": "ArcFormats/UMeSoft/ArcMGX.cs"
+			},
+			"localId": "umeseoft-mgx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature with trailing byte",
+				"frame count validation",
+				"offset index with derived sizes",
+				"generated frame names",
+				"offset bound and placement validation",
+				"image classification as metadata",
+				"verbatim extraction"
+			],
+			"unsupported": ["frame decoding and metadata", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CIRCUS",
 				"class": "DatOpener",
 				"source": "ArcFormats/Circus/ArcCircus.cs"
