@@ -410,6 +410,7 @@ import { youkaiDatGrpFormat } from "./youkai/dat.js";
 import { youkaiDatSoundFormat } from "./youkai/dat.js";
 import { youkaiDatVoiceFormat } from "./youkai/dat.js";
 import { crowdPkwvFormat } from "./crowd/pck.js";
+import { advscripterPakFormat } from "./advscripter/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -667,6 +668,7 @@ export * from "./densdk/index.js";
 export * from "./tmr-hiro/index.js";
 export * from "./tamasoft/index.js";
 export * from "./youkai/index.js";
+export * from "./advscripter/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1082,5 +1084,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		youkaiDatSoundFormat,
 		youkaiDatVoiceFormat,
 		crowdPkwvFormat,
+		advscripterPakFormat,
 	]);
 }
