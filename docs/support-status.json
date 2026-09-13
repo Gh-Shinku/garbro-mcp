@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK/LUNE",
+				"class": "PackOpener",
+				"source": "Legacy/Lune/ArcPACK.cs"
+			},
+			"localId": "lune-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"offset and size index",
+				"record aligned first offset",
+				"generated five digit entry names",
+				"base name from the file name",
+				"entry type from the file extension",
+				"zero sized record skipping",
+				"placement checks",
+				"RIFF PCM wrapping for wda and bgm"
+			],
+			"unsupported": ["archive creation", "image decoders"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC4",
 				"class": "Arc4Opener",
 				"source": "ArcFormats/CaramelBox/ArcARC4.cs"
