@@ -506,6 +506,7 @@ import { abmFormat } from "./lilim/abm.js";
 import { flyingShinePd3Format } from "./flying-shine/pd.js";
 import { flyingShinePdFormat } from "./flying-shine/pd-legacy.js";
 import { flyingShinePd2Format } from "./flying-shine/pd2.js";
+import { vafsFormat } from "./softpal/vafs.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1314,5 +1315,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		flyingShinePd3Format,
 		flyingShinePdFormat,
 		flyingShinePd2Format,
+		vafsFormat,
 	]);
 }

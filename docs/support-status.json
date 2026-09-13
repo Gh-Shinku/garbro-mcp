@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VAFS",
+				"class": "VafsOpener",
+				"source": "ArcFormats/Softpal/ArcVAFS.cs"
+			},
+			"localId": "softpal-vafs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"tp slot layouts",
+				"generated names",
+				"payload type detection"
+			],
+			"unsupported": [
+				"archive creation",
+				"chunked audio reconstruction",
+				"voice entry decoders"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PD/2",
 				"class": "FlyingShinePdOpener",
 				"source": "ArcFormats/FlyingShine/ArcPD.cs"
