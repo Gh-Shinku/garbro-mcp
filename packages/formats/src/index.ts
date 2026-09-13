@@ -358,6 +358,7 @@ import { archangelDatFormat } from "./seraphim/dat.js";
 import { ebgSystemBinFormat } from "./ebg-system/bin.js";
 import { alternaBinFormat } from "./alterna/bin.js";
 import { ebisuEp1Format } from "./ebisu/ep1.js";
+import { umeSoftBinFormat } from "./ume-soft/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -954,5 +955,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ebgSystemBinFormat,
 		alternaBinFormat,
 		ebisuEp1Format,
+		umeSoftBinFormat,
 	]);
 }

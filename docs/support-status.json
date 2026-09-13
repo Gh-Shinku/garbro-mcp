@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/UME",
+				"class": "BinOpener",
+				"source": "Legacy/UMeSoft/ArcBIN.cs"
+			},
+			"localId": "umesoft-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"packed count word with zero low half",
+				"0x0c records with five-digit names",
+				"kibibyte-scaled payload offsets",
+				"ike marker probe with three-byte unpacked size",
+				"ike lz decoding",
+				"payload signature typing for bmp riff and oggs",
+				"verbatim extraction",
+				"entry placement validation"
+			],
+			"unsupported": [
+				"archive creation",
+				"registry-wide signature typing beyond the reference special cases"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "EP1",
 				"class": "Ep1Opener",
 				"source": "Legacy/StudioEbisu/ArcEP1.cs"
