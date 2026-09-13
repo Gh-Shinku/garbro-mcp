@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "UG",
+				class: "UgFormat",
+				source: "Legacy/Ucom/ImageUG.cs",
+			},
+			localId: "ucom-ug-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"vertical bit-packed decoding",
+				"4bpp bitmap output",
+				"palette conversion",
+				"source rectangle",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"hand-traced vertical pixel values",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GRA/TIARE",
 				class: "GraFormat",
 				source: "Legacy/Tiare/ImageGRA.cs",

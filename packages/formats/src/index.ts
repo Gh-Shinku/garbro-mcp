@@ -591,6 +591,7 @@ import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
 import { dpcImageFormat } from "./desire/dpc-image.js";
 import { tiareGraImageFormat } from "./tiare/gra-image.js";
+import { ugImageFormat } from "./ucom/ug-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1507,5 +1508,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		desImageFormat,
 		dpcImageFormat,
 		tiareGraImageFormat,
+		ugImageFormat,
 	]);
 }

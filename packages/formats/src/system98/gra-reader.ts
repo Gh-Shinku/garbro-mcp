@@ -82,12 +82,13 @@ class GraBitReader {
 
 export class GraBaseReader {
 	protected readonly geometry: GraGeometry;
-	private readonly reader: GraBitReader;
+	protected readonly reader: GraBitReader;
 	/** The ring buffer, as bytes, with a pair view for the aligned accesses the reference makes. */
-	private buffer = new Uint8Array(0);
-	private pairView = new Uint16Array(0);
+	protected buffer = new Uint8Array(0);
+	protected pairView = new Uint16Array(0);
 	private frame = new Uint8Array(0x100);
-	private dst = 0;
+	/** Pixel write position, which is what the reference calls `m_dst`. */
+	protected dst = 0;
 	readonly pixels: Uint8Array;
 	readonly stride: number;
 
@@ -115,7 +116,7 @@ export class GraBaseReader {
 		return this.pixels;
 	}
 
-	private getNextBit(): number {
+	protected getNextBit(): number {
 		return this.reader.getNextBit();
 	}
 
@@ -250,7 +251,7 @@ export class GraBaseReader {
 		this.pairView[index] = value;
 	}
 
-	private unpackBitsInternal(): void {
+	protected unpackBitsInternal(): void {
 		const { rowBytes, bufferBytes, initialDst, previousRow, fillCount } =
 			this.geometry;
 		// The pair view shares the buffer's storage, so byte level copies are visible through it.
