@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/DJSYSTEM",
+				"class": "DatOpener",
+				"source": "ArcFormats/DjSystem/ArcDAT.cs"
+			},
+			"localId": "djsystem-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"marker detection",
+				"cp932 text index",
+				"tab-separated offset records",
+				"encode script unwrapping",
+				"no-encode crlf collapse and xor",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IGA",
 				"class": "IgaOpener",
 				"source": "ArcFormats/Noesis/ArcIGA.cs"

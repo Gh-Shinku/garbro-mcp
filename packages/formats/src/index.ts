@@ -208,6 +208,7 @@ import { plaFormat } from "./squadrad/pla.js";
 import { cpnFormat } from "./marron/cpn.js";
 import { mcdFormat } from "./tsd/mcd.js";
 import { igaFormat } from "./noesis/iga.js";
+import { djDatFormat } from "./djsystem/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -365,6 +366,7 @@ export * from "./squadrad/index.js";
 export * from "./marron/index.js";
 export * from "./tsd/index.js";
 export * from "./noesis/index.js";
+export * from "./djsystem/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -579,5 +581,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cpnFormat,
 		mcdFormat,
 		igaFormat,
+		djDatFormat,
 	]);
 }
