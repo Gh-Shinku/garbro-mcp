@@ -39,3 +39,11 @@ The port exposes the resource as a single entry:
 The reference class declares no extension list, so the descriptor registers `isd`.
 
 Encoding and archive creation are out of scope.
+
+## Sharing the marker with the bitmap format
+
+`TPW\x01` also starts `IbmFormat`, an image format whose second word is the size of a compressed bitmap. The
+reference keeps the two in different format lists, so it never has to choose; a single registry does. Detection
+here therefore decompresses the same fifty six byte prefix the bitmap format inspects and steps aside when it is
+a bitmap header — see `docs/formats/ice-ibm-image.md`. Naming and extraction are unchanged, and a cross-format
+test asserts that each file reaches exactly one of the two.

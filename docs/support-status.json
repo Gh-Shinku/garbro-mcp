@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "IBM/ICE",
+				"class": "IbmFormat",
+				"source": "ArcFormats/Ice/ImageIBM.cs"
+			},
+			"localId": "ice-ibm-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"tpw decompression",
+				"bitmap pass through",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "HBM",
 				"class": "HbmFormat",
 				"source": "ArcFormats/Rits/ImageHBM.cs"

@@ -9,6 +9,7 @@ import type {
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
 import { unpackTpw } from "../ankh/grp-unpack.js";
+import { readBmpHeaderFields } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -24,6 +25,8 @@ const UNPACKED_SIZE_OFFSET = 4;
 const PAYLOAD_OFFSET = HEADER_SIZE;
 /** Guards against a hostile header asking for an unreasonable allocation. */
 const MAX_OUTPUT = 0x4000000;
+/** The prefix the bitmap format's probe examines, which is enough for a bitmap header. */
+const BITMAP_PROBE_SIZE = 56;
 
 interface IsdLayout {
 	unpackedSize: number;
@@ -74,11 +77,29 @@ export const isdScriptDescriptor: FormatDescriptor = {
 	],
 };
 
+/**
+ * The same four bytes start an ISD script and an Ice Soft bitmap. In the reference the two live in different
+ * format lists — a script panel and an image panel — so nothing there ever has to choose between them; one
+ * registry does. The bitmap's probe is the stricter of the two, so a file whose decompressed prefix is a bitmap
+ * header belongs to the image format and detection leaves it alone. Extraction is untouched.
+ */
+async function looksLikeBitmap(source: ByteSource): Promise<boolean> {
+	try {
+		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
+		const probe: Buffer = Buffer.alloc(BITMAP_PROBE_SIZE, 0x00);
+		unpackTpw(stored, probe);
+		return readBmpHeaderFields(probe) !== undefined;
+	} catch {
+		return false;
+	}
+}
+
 export const isdScriptFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: isdScriptDescriptor,
 	detection: { signatures: [{ bytes: SIGNATURE }] },
 	async detect(source: ByteSource): Promise<boolean> {
-		return (await readLayout(source)) !== undefined;
+		if ((await readLayout(source)) === undefined) return false;
+		return !(await looksLikeBitmap(source));
 	},
 	async read(source: ByteSource, sourcePath: string) {
 		const layout = await readLayout(source);
