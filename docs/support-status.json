@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CGF",
+				"class": "CgfOpener",
+				"source": "ArcFormats/Triangle/ArcCGF.cs"
+			},
+			"localId": "triangle-cgf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"record-width selection from the index end",
+				"flag-bit masking of offsets",
+				"name validation",
+				"entry placement validation",
+				"route2 layout rejection",
+				"size limit check",
+				"cp932 filenames",
+				"entry listing",
+				"prefixed-header extraction",
+				"raw extraction for flag 1 and iaf"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SMV",
 				"class": "SmvOpener",
 				"source": "ArcFormats/Tanaka/ArcSMV.cs"
