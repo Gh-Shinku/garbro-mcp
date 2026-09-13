@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PIC/SPRITE",
+				"class": "PicFormat",
+				"source": "ArcFormats/ImagePIC.cs"
+			},
+			"localId": "misc-pic-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"bitmap file header rebuild",
+				"byte exact passthrough",
+				"palette and pixel preservation",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "RMT",
 				"class": "RmtFormat",
 				"source": "ArcFormats/elf/ImageRMT.cs"
