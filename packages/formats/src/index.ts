@@ -142,6 +142,7 @@ import { mirisDatFormat } from "./eternity/miris.js";
 import { cdtFormat } from "./uma/cdt.js";
 import { usfFormat } from "./westgate/usf.js";
 import { iafFormat } from "./triangle/iaf.js";
+import { lwgFormat } from "./liar/lwg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -257,6 +258,7 @@ export * from "./xuse/index.js";
 export * from "./eternity/index.js";
 export * from "./uma/index.js";
 export * from "./westgate/index.js";
+export * from "./liar/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -405,5 +407,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cdtFormat,
 		usfFormat,
 		iafFormat,
+		lwgFormat,
 	]);
 }
