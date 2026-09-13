@@ -263,6 +263,7 @@ import { pkkFormat } from "./electriciteit/pkk.js";
 import { jamDatFormat } from "./jam-creation/dat.js";
 import { adsPacFormat } from "./ads/pac.js";
 import { bsaFormat } from "./bishop/bsa.js";
+import { ivoryPkFormat } from "./ivory/pk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -717,5 +718,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		jamDatFormat,
 		adsPacFormat,
 		bsaFormat,
+		ivoryPkFormat,
 	]);
 }
