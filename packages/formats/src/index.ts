@@ -631,6 +631,7 @@ import { ptiImageFormat } from "./misc/pti-image.js";
 import { wafAudioFormat } from "./kid/waf-audio.js";
 import { antImageFormat } from "./studio-ego/ant-image.js";
 import { dbmImageFormat } from "./sysd/dbm-image.js";
+import { wstAudioFormat } from "./ipac/wst-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1591,5 +1592,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wafAudioFormat,
 		antImageFormat,
 		dbmImageFormat,
+		wstAudioFormat,
 	]);
 }
