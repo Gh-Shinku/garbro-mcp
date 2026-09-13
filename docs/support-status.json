@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AOSv2",
+				"class": "Aos2Opener",
+				"source": "ArcFormats/Lilim/ArcAOS.cs"
+			},
+			"localId": "lilim-aos2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"aos extension requirement",
+				"zero first word requirement",
+				"base offset and index validation",
+				"record count validation",
+				"cp932 filenames with empty name rejection",
+				"entry placement validation",
+				"huffman decoding of scr entries",
+				"cmp decoding with rename to abm"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FGA",
 				"class": "FgaOpener",
 				"source": "ArcFormats/Lilim/ArcFGA.cs"

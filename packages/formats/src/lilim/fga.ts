@@ -2,15 +2,12 @@
 // ArcFormats/Lilim/ArcAOS.cs (classes `AosOpener`, `PackedEntry`).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { decompressHuffman } from "@garbro-mcp/codecs";
 import {
-	bigintToBufferLength,
 	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -20,6 +17,7 @@ import {
 	sourceExtension,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { openPackedHuffmanEntry } from "./packed.js";
 
 const EXTENSION = "fga";
 /** Every index block is exactly this long. */
@@ -105,13 +103,13 @@ async function readFgaIndex(
 			if (entries.length >= MAX_ENTRIES) return undefined;
 			const packed = sourceExtension(name) === PACKED_EXTENSION;
 			let size = storedSize;
-			let packedSize = storedSize;
+			// `packedSize` keeps the whole stored span, including the unpacked size word.
+			const packedSize = storedSize;
 			let metadata: Record<string, unknown> | undefined;
 			if (packed && size >= BigInt(PACKED_HEADER_SIZE)) {
 				const unpackedSize = (
 					await source.readAt(offset, PACKED_HEADER_SIZE)
 				).readUInt32LE(0);
-				packedSize = size - BigInt(PACKED_HEADER_SIZE);
 				size = BigInt(unpackedSize);
 				metadata = { unpackedSize };
 			}
@@ -134,34 +132,6 @@ async function readFgaIndex(
 	return undefined;
 }
 
-/**
- * GARBro `AosOpener.OpenEntry`. A packed entry declares its unpacked size in its first four bytes and
- * holds a Huffman stream behind it; the decoder stops quietly at the end of that stream.
- */
-async function openFgaEntry(
-	source: ByteSource,
-	entry: FixedEntry,
-): Promise<Readable> {
-	if (!entry.compressed)
-		return source.createReadStream(entry.offset, entry.size);
-	if (entry.size > source.size) {
-		throw new GarbroError(
-			"INVALID_ARCHIVE",
-			"Packed entry exceeds the archive",
-		);
-	}
-	const packed = await source.readAt(
-		entry.offset + BigInt(PACKED_HEADER_SIZE),
-		bigintToBufferLength(entry.packedSize, "Huffman entry"),
-	);
-	return Readable.from([
-		decompressHuffman(
-			packed,
-			bigintToBufferLength(entry.size, "Huffman output"),
-		),
-	]);
-}
-
 export const fgaFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: fgaDescriptor,
 	async detect(source: ByteSource, sourcePath: string): Promise<boolean> {
@@ -174,5 +144,5 @@ export const fgaFormat: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid FGA index layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
-	openEntry: openFgaEntry,
+	openEntry: openPackedHuffmanEntry,
 });

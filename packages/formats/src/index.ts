@@ -241,6 +241,7 @@ import { speedArcFormat } from "./speed/arc.js";
 import { hzcMultiFormat } from "./favorite/hzc-multi.js";
 import { lunaPacFormat } from "./luna-soft/pac.js";
 import { fgaFormat } from "./lilim/fga.js";
+import { aos2Format } from "./lilim/aos2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -664,5 +665,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hzcMultiFormat,
 		lunaPacFormat,
 		fgaFormat,
+		aos2Format,
 	]);
 }
