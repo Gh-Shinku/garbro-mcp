@@ -9,6 +9,25 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GDF",
+				class: "GdfFormat",
+				source: "Legacy/Mink/ImageGDF.cs",
+			},
+			localId: "mink-gdf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"bitmap marker restoration",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "NGW",
 				class: "NgwFormat",
 				source: "Legacy/Brownie/ImageNGW.cs",
