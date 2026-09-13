@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "G00/v2",
+				"class": "G00Opener",
+				"source": "ArcFormats/RealLive/ArcG00.cs"
+			},
+			"localId": "reallive-g00",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension gated detection",
+				"file header parsing",
+				"packed frame table decompression",
+				"frame listing with original indices",
+				"frame payload extraction"
+			],
+			"unsupported": [
+				"archive creation",
+				"G00 image tile decoding",
+				"frame geometry metadata"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "WAR/1.0",
 				"class": "War0Opener",
 				"source": "ArcFormats/ShiinaRio/ArcWARC1.0.cs"
