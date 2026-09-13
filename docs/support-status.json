@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CATF",
+				"class": "DatOpener",
+				"source": "Legacy/SystemAqua/ArcDAT.cs"
+			},
+			"localId": "system-aqua-catf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"fixed record index parsing",
+				"payload signature typing",
+				"packed header type decryption",
+				"windowed LZ decompression",
+				"bitmap header reconstruction",
+				"entry extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/NITRO+",
 				"class": "PakOpener",
 				"source": "ArcFormats/NitroPlus/ArcNitro.cs"

@@ -422,6 +422,7 @@ import { nononoNpfFormat } from "./nonono/npf.js";
 import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
 import { realliveG00Format } from "./reallive/g00.js";
 import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
+import { systemAquaCatfFormat } from "./system-aqua/catf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -684,6 +685,7 @@ export * from "./apricot/index.js";
 export * from "./cyberworks/index.js";
 export * from "./pandora/index.js";
 export * from "./nonono/index.js";
+export * from "./system-aqua/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1111,5 +1113,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		shiinaRioWarcFormat,
 		realliveG00Format,
 		nitroplusNitroPakFormat,
+		systemAquaCatfFormat,
 	]);
 }
