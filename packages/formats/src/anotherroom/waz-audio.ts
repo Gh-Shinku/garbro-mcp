@@ -9,75 +9,21 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { writeRiffHeader } from "../kapp/asd.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { readWave, type WavLayout, writeWave } from "../shared/wav.js";
 
 /**
  * The reference's signature is `0x464952FF`: the first byte is the LZSS control byte for eight literals,
  * and the next three are the start of the literal run, which reads `RIF`.
  */
 const SIGNATURE = Buffer.from([0xff, 0x52, 0x49, 0x46]);
-const RIFF_HEADER_SIZE = 12;
 /** Guards against a hostile stream asking for an unreasonable allocation. */
 const MAX_OUTPUT = 0x4000000;
-
-interface WavFormat {
-	formatTag: number;
-	channels: number;
-	sampleRate: number;
-	averageBytesPerSecond: number;
-	blockAlign: number;
-	bitsPerSample: number;
-}
-
-interface WazLayout {
-	format: WavFormat;
-	/** The `data` chunk payload inside the decompressed wave file. */
-	dataOffset: number;
-	dataSize: number;
-}
-
-/**
- * The equivalent of GARbro's `Wav.TryOpen`, which walks the chunks of the decompressed stream and takes
- * the format from the `fmt ` chunk and the PCM from the `data` chunk. Chunks are word aligned, and a
- * `data` size reaching past the stream is shortened rather than rejected, which is how a region behaves.
- */
-function readWave(buffer: Buffer): WazLayout | undefined {
-	if (buffer.length < RIFF_HEADER_SIZE) return undefined;
-	if (buffer.toString("latin1", 0, 4) !== "RIFF") return undefined;
-	if (buffer.toString("latin1", 8, 12) !== "WAVE") return undefined;
-	let format: WavFormat | undefined;
-	let dataOffset = -1;
-	let dataSize = 0;
-	let pos = RIFF_HEADER_SIZE;
-	while (pos + 8 <= buffer.length) {
-		const id = buffer.toString("latin1", pos, pos + 4);
-		const size = buffer.readUInt32LE(pos + 4);
-		const body = pos + 8;
-		if (id === "fmt " && size >= 16 && body + 16 <= buffer.length) {
-			format = {
-				formatTag: buffer.readUInt16LE(body),
-				channels: buffer.readUInt16LE(body + 2),
-				sampleRate: buffer.readUInt32LE(body + 4),
-				averageBytesPerSecond: buffer.readUInt32LE(body + 8),
-				blockAlign: buffer.readUInt16LE(body + 12),
-				bitsPerSample: buffer.readUInt16LE(body + 14),
-			};
-		} else if (id === "data") {
-			dataOffset = body;
-			dataSize = Math.max(0, Math.min(size, buffer.length - body));
-		}
-		// Chunks are padded to an even length.
-		pos = body + size + (size & 1);
-	}
-	if (!format || dataOffset < 0) return undefined;
-	return { format, dataOffset, dataSize };
-}
 
 /** Decompresses the stored stream; the reference wraps the whole file from offset zero. */
 async function readWaveFile(source: ByteSource): Promise<Buffer | undefined> {
@@ -92,7 +38,7 @@ async function readWaveFile(source: ByteSource): Promise<Buffer | undefined> {
 	}
 }
 
-async function readLayout(source: ByteSource): Promise<WazLayout | undefined> {
+async function readLayout(source: ByteSource): Promise<WavLayout | undefined> {
 	const wave = await readWaveFile(source);
 	if (!wave) return undefined;
 	return readWave(wave);
@@ -165,17 +111,6 @@ export const wazAudioFormat: ArchiveFormat = defineFixedArchive({
 		const pcm = Buffer.from(
 			wave.subarray(layout.dataOffset, layout.dataOffset + layout.dataSize),
 		);
-		const riff = writeRiffHeader(
-			{
-				formatTag: layout.format.formatTag,
-				channels: layout.format.channels,
-				sampleRate: layout.format.sampleRate,
-				averageBytesPerSecond: layout.format.averageBytesPerSecond,
-				blockAlign: layout.format.blockAlign,
-				bitsPerSample: layout.format.bitsPerSample,
-			},
-			pcm.length,
-		);
-		return Readable.from([Buffer.concat([riff, pcm])]);
+		return Readable.from([writeWave(layout.format, pcm)]);
 	},
 });
