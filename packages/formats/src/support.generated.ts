@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "ANT",
+				class: "AntFormat",
+				source: "ArcFormats/StudioEgo/ImageANT.cs",
+			},
+			localId: "studio-ego-ant-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"run length unpacking",
+				"transparent skip runs",
+				"32bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WAF",
 				class: "WafAudio",
