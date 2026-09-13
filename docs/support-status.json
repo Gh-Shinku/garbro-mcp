@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/SGS",
+				"class": "SgsDatOpener",
+				"source": "Legacy/Sogna/ArcSGS.cs"
+			},
+			"localId": "sogna-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"SGS.DAT 1.00 signature and entry count",
+				"fixed 0x20-byte index records",
+				"cp932 names and placement validation",
+				"packed flag with stored and unpacked sizes",
+				"sogna lz extraction with overlapped copies",
+				"verbatim extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TPF",
 				"class": "TpfOpener",
 				"source": "ArcFormats/Nexas/ArcTPF.cs"

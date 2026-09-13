@@ -328,6 +328,7 @@ import { myAdvPacFormat } from "./myadv/pac.js";
 import { maikaMik01Format } from "./maika/mik01.js";
 import { pinpaiArcxFormat } from "./pinpai/arcx.js";
 import { gigaTpfFormat } from "./giga/tpf.js";
+import { sognaDatFormat } from "./sogna/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -545,6 +546,7 @@ export * from "./myadv/index.js";
 export * from "./maika/index.js";
 export * from "./pinpai/index.js";
 export * from "./giga/index.js";
+export * from "./sogna/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -878,5 +880,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ttdFormat,
 		pinpaiArcxFormat,
 		gigaTpfFormat,
+		sognaDatFormat,
 	]);
 }
