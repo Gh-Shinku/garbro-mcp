@@ -276,6 +276,7 @@ import { amusePacFormat } from "./softpal/pac.js";
 import { scrPlayerPakFormat } from "./scrplayer/pak.js";
 import { maiFormat } from "./mai/arc.js";
 import { arFormat } from "./palm-tree/ar.js";
+import { a98Format } from "./active-soft/a98.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -751,5 +752,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		scrPlayerPakFormat,
 		maiFormat,
 		arFormat,
+		a98Format,
 	]);
 }

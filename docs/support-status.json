@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "A98",
+				"class": "PakOpener",
+				"source": "ArcFormats/ActiveSoft/ArcADPACK.cs"
+			},
+			"localId": "adpack-a98",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pak extension requirement",
+				"count validation and voice marker",
+				"plain layout with derived sizes",
+				"plain layout extra offset slot",
+				"voice layout with stored sizes",
+				"early stop at file end in voice listing",
+				"name and extension fields with trimming",
+				"offset and placement validation",
+				"type classification by extension",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/AR",
 				"class": "ArcOpener",
 				"source": "ArcFormats/PalmTree/ArcAR.cs"
