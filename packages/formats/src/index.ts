@@ -153,6 +153,7 @@ import { advdxPkdFormat } from "./advdx/pkd.js";
 import { dmotionPackFormat } from "./dmotion/pack.js";
 import { ovkFormat } from "./reallive/ovk.js";
 import { propellerMpkFormat } from "./propeller/mpk.js";
+import { tcd1Format } from "./topcat/tcd1.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -276,6 +277,7 @@ export * from "./advdx/index.js";
 export * from "./dmotion/index.js";
 export * from "./reallive/index.js";
 export * from "./propeller/index.js";
+export * from "./topcat/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -435,5 +437,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dmotionPackFormat,
 		ovkFormat,
 		propellerMpkFormat,
+		tcd1Format,
 	]);
 }

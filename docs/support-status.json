@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TCD1",
+				"class": "Tcd1Opener",
+				"source": "ArcFormats/TopCat/ArcTCD1.cs"
+			},
+			"localId": "topcat-tcd1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"position-dependent offset correction",
+				"0x57 name unmasking",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MPK",
 				"class": "MpkOpener",
 				"source": "ArcFormats/Propeller/ArcMPK.cs"
