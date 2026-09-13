@@ -568,6 +568,7 @@ import { isdScriptFormat } from "./ice/isd-script.js";
 import { wazAudioFormat } from "./anotherroom/waz-audio.js";
 import { harvestBgmAudioFormat } from "./myharvest/bgm-audio.js";
 import { hiddenJpegImageFormat } from "./gaia/jpeg-image.js";
+import { frmImageFormat } from "./logg/frm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1456,5 +1457,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wazAudioFormat,
 		harvestBgmAudioFormat,
 		hiddenJpegImageFormat,
+		frmImageFormat,
 	]);
 }

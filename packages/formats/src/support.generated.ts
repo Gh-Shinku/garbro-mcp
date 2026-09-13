@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "FRM",
+				class: "FrmFormat",
+				source: "Legacy/Logg/ImageFRM.cs",
+			},
+			localId: "logg-frm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"palette",
+				"metadata",
+				"row stride compaction",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "JPG/HIDDEN",
 				class: "HiddenJpegFormat",
 				source: "Legacy/Gaia/ImageJPG.cs",
