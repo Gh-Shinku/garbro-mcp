@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MD",
+				"class": "MdFormat",
+				"source": "Legacy/Mina/ImageMD.cs"
+			},
+			"localId": "mina-md-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"lzss decompression",
+				"bitmap reassembly"
+			],
+			"unsupported": [
+				"archive creation",
+				"pixel decoding",
+				"os/2 core headers"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "CP3",
 				"class": "Cp3Format",
 				"source": "ArcFormats/Seraphim/ImageCP3.cs"
