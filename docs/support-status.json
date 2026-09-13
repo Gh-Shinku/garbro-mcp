@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "YKC",
+				"class": "YkcOpener",
+				"source": "ArcFormats/Yuka/ArcYKC.cs"
+			},
+			"localId": "yuka-ykc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"version 1 shift-jis names",
+				"version 2 utf-8 names",
+				"index record parsing",
+				"nested path listing",
+				"script payload decryption",
+				"entry extraction"
+			],
+			"unsupported": ["archive creation", "script authoring"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CATF",
 				"class": "DatOpener",
 				"source": "Legacy/SystemAqua/ArcDAT.cs"
