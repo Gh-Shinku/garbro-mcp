@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "XFL",
+				"class": "XflOpener",
+				"source": "ArcFormats/Liar/ArcXFL.cs"
+			},
+			"localId": "liar-xfl",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"lb signature with version word",
+				"directory region size count and record bounds",
+				"records with name field",
+				"relative data offsets and stored sizes",
+				"recursion into nested xfl archives",
+				"nested name fallback",
+				"region scoped placement validation",
+				"depth cap and blank name rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/VC",
 				"class": "VcPakOpener",
 				"source": "ArcFormats/Circus/ArcValkyrieComplex.cs"
