@@ -159,6 +159,7 @@ import { nfsFormat } from "./nags/nfs.js";
 import { xpkFormat } from "./kirikiri/xpk.js";
 import { xuseBinFormat } from "./xuse/bin.js";
 import { mbfFormat } from "./tanaka/mbf.js";
+import { blackRainbowDatFormat } from "./black-rainbow/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -451,5 +452,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		xpkFormat,
 		xuseBinFormat,
 		mbfFormat,
+		blackRainbowDatFormat,
 	]);
 }
