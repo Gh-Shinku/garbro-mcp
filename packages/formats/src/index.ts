@@ -160,6 +160,7 @@ import { xpkFormat } from "./kirikiri/xpk.js";
 import { xuseBinFormat } from "./xuse/bin.js";
 import { mbfFormat } from "./tanaka/mbf.js";
 import { blackRainbowDatFormat } from "./black-rainbow/dat.js";
+import { iksFormat } from "./xiks/iks.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -287,6 +288,7 @@ export * from "./topcat/index.js";
 export * from "./hexenhaus/index.js";
 export * from "./nags/index.js";
 export * from "./kirikiri/index.js";
+export * from "./xiks/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -453,5 +455,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		xuseBinFormat,
 		mbfFormat,
 		blackRainbowDatFormat,
+		iksFormat,
 	]);
 }

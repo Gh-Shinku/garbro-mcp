@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IKS",
+				"class": "IksOpener",
+				"source": "ArcFormats/ArcIKS.cs"
+			},
+			"localId": "xiks-iks",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x28-byte index records",
+				"name length clamping",
+				"payload xor decryption",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/BR",
 				"class": "DatOpener",
 				"source": "ArcFormats/BlackRainbow/ArcDAT.cs"
