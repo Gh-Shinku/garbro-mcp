@@ -427,6 +427,7 @@ import { yukaYkcFormat } from "./yuka/ykc.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
 import { eveGmFormat } from "./eve/gm.js";
 import { studioEgoPak0Format } from "./studio-ego/pak0.js";
+import { nexasPacFormat } from "./nexas/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -693,6 +694,7 @@ export * from "./system-aqua/index.js";
 export * from "./yuka/index.js";
 export * from "./moko-pro/index.js";
 export * from "./eve/index.js";
+export * from "./nexas/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1125,5 +1127,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mokoProNnnnFormat,
 		eveGmFormat,
 		studioEgoPak0Format,
+		nexasPacFormat,
 	]);
 }

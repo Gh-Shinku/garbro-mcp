@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAC",
+				class: "PacOpener",
+				source: "ArcFormats/Nexas/ArcPAC.cs",
+			},
+			localId: "nexas-pac",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"old index layout",
+				"sixty four byte name retry",
+				"complemented huffman index layout",
+				"lzss payload decompression",
+				"huffman payload decompression",
+				"deflate payload decompression",
+				"stored payload passthrough",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK0/EGO",
 				class: "Pak0Opener",
 				source: "ArcFormats/StudioEgo/ArcPAK0.cs",
