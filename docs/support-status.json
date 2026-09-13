@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SQZ",
+				"class": "SqzOpener",
+				"source": "ArcFormats/Musica/ArcSQZ.cs"
+			},
+			"localId": "musica-sqz",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"doubled frame count",
+				"eight-byte frame records",
+				"frame metadata",
+				"generated frame names",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SDA/SD",
 				"class": "SdaOpener",
 				"source": "Legacy/SquadraD/ArcSDA.cs"

@@ -222,6 +222,7 @@ import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
 import { sdaSdFormat } from "./squadrad/sda.js";
+import { sqzFormat } from "./musica/sqz.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -387,6 +388,7 @@ export * from "./astronauts/index.js";
 export * from "./foster/index.js";
 export * from "./jupiter/index.js";
 export * from "./rune/index.js";
+export * from "./musica/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -615,5 +617,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		voiceFormat,
 		arccFormat,
 		sdaSdFormat,
+		sqzFormat,
 	]);
 }
