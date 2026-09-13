@@ -440,6 +440,7 @@ import { laxFormat } from "./lambda/lax.js";
 import { fjsysFormat } from "./n-system/fjsys.js";
 import { idaFormat } from "./inspire/ida.js";
 import { ozFormat } from "./patisserie/bin.js";
+import { fpkFormat } from "./interheart/fpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1157,5 +1158,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fjsysFormat,
 		idaFormat,
 		ozFormat,
+		fpkFormat,
 	]);
 }

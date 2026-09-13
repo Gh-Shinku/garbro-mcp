@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "FPK",
+				class: "FpkOpener",
+				source: "ArcFormats/Interheart/ArcFPK.cs",
+			},
+			localId: "interheart-fpk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"plain index layouts",
+				"sixteen and twenty four byte name fields",
+				"encrypted index with a sign flagged count",
+				"xor index key",
+				"zlc2 payload unwrapping",
+				"nested zlc2 layers",
+				"overlapping lz copies",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BIN/OZ",
 				class: "BinOpener",
 				source: "ArcFormats/Patisserie/ArcBIN.cs",
