@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CSPACK",
+				"class": "DatOpener",
+				"source": "ArcFormats/CatSystem/ArcDAT.cs"
+			},
+			"localId": "cat-system-cspack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"derived record count",
+				"base-40 name decoding",
+				"optional three-character extension",
+				"xor-chained entry sizes",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"digits outside the reference alphabet",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TAN/DO",
 				"class": "TanOpener",
 				"source": "ArcFormats/Ikura/ArcTAN.cs"
