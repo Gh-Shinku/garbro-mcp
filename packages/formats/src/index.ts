@@ -295,6 +295,7 @@ import { snrFormat } from "./eushully/gpc.js";
 import { anmFormat } from "./kaguya/anm.js";
 import { an10Format } from "./kaguya/anm.js";
 import { an20Format } from "./kaguya/anm.js";
+import { volFormat } from "./elf/vol.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -797,5 +798,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		anmFormat,
 		an10Format,
 		an20Format,
+		volFormat,
 	]);
 }

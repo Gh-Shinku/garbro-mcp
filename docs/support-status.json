@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "VOL/ELF",
+				"class": "VolOpener",
+				"source": "ArcFormats/elf/ArcVOL.cs"
+			},
+			"localId": "elf-vol",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"vol extension requirement",
+				"first offset bounds and alignment",
+				"count derived from first offset",
+				"non decreasing offset table with early termination",
+				"derived sizes from consecutive offsets",
+				"zero length span skipping",
+				"generated four digit names",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"type classification by content signature",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AN20/KAGUYA",
 				"class": "An20Opener",
 				"source": "ArcFormats/Kaguya/ArcANM.cs"
