@@ -134,6 +134,7 @@ import { fl2Format } from "./aaru/fl2.js";
 import { fl3Format } from "./aaru/fl2.js";
 import { gscripterDataFormat } from "./gscripter/data.js";
 import { chrFormat } from "./tigerman/chr.js";
+import { witchArcFormat } from "./witch/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -384,5 +385,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fl3Format,
 		gscripterDataFormat,
 		chrFormat,
+		witchArcFormat,
 	]);
 }
