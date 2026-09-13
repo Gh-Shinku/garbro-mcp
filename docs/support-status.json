@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/ScrPlayer",
+				"class": "PakOpener",
+				"source": "ArcFormats/ScrPlayer/ArcPAK.cs"
+			},
+			"localId": "scrplayer-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"two signatures",
+				"index size bounds",
+				"encrypted index with word key",
+				"alignment inference with fallback",
+				"records with offset size and name length",
+				"zero offset terminator",
+				"entry placement validation",
+				"cp932 names with blank rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/AMUSE",
 				"class": "Pac2Opener",
 				"source": "ArcFormats/Softpal/ArcPAC.cs"

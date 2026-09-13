@@ -273,6 +273,7 @@ import { broomPkFormat } from "./broom/pk.js";
 import { broomEncryptedPkFormat } from "./broom/pk.js";
 import { softpalPacFormat } from "./softpal/pac.js";
 import { amusePacFormat } from "./softpal/pac.js";
+import { scrPlayerPakFormat } from "./scrplayer/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -463,6 +464,7 @@ export * from "./system21/index.js";
 export * from "./ism/index.js";
 export * from "./ume-soft/index.js";
 export * from "./softpal/index.js";
+export * from "./scrplayer/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -742,5 +744,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		broomEncryptedPkFormat,
 		softpalPacFormat,
 		amusePacFormat,
+		scrPlayerPakFormat,
 	]);
 }
