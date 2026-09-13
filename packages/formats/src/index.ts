@@ -576,6 +576,7 @@ import { dwvAudioFormat } from "./sysd/dwv-audio.js";
 import { qdoScriptFormat } from "./redzone/qdo-script.js";
 import { nsfAudioFormat } from "./pan/nsf-audio.js";
 import { htfImageFormat } from "./jam-creation/htf-image.js";
+import { advgImageFormat } from "./advgsys/bmp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -893,6 +894,7 @@ export * from "./anotherroom/index.js";
 export * from "./gaia/index.js";
 export * from "./hmp/index.js";
 export * from "./bruns/index.js";
+export * from "./advgsys/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1474,5 +1476,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		qdoScriptFormat,
 		nsfAudioFormat,
 		htfImageFormat,
+		advgImageFormat,
 	]);
 }
