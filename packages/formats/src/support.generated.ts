@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "GPC7",
+				class: "GpcOpener",
+				source: "ArcFormats/SuperNekoX/ArcGPC.cs",
+			},
+			localId: "supernekox-gpc7",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"gpc7 signature",
+				"offset table with spans",
+				"per entry payload headers",
+				"outer lz unpacking",
+				"inner lz77 unpacking",
+				"tga and shared signature typing",
+				"generated entry names",
+			],
+			unsupported: ["archive creation", "catalog wide signature typing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SAF",
 				class: "SafOpener",
 				source: "ArcFormats/Rits/ArcSAF.cs",

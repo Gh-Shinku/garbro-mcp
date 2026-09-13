@@ -475,6 +475,7 @@ import { zyxBdfFormat } from "./zyx/bdf.js";
 import { kaasPdFormat } from "./kaas/pd.js";
 import { gamesystemPuremailFormat } from "./gamesystem/puremail.js";
 import { ritsSafFormat } from "./rits/saf.js";
+import { supernekoxGpc7Format } from "./supernekox/gpc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -757,6 +758,7 @@ export * from "./tanuki/index.js";
 export * from "./kid/index.js";
 export * from "./zyx/index.js";
 export * from "./rits/index.js";
+export * from "./supernekox/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1237,5 +1239,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaasPdFormat,
 		gamesystemPuremailFormat,
 		ritsSafFormat,
+		supernekoxGpc7Format,
 	]);
 }
