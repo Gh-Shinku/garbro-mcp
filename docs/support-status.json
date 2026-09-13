@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/EBG_SYSTEM",
+				"class": "BinOpener",
+				"source": "Legacy/EbgSystem/ArcBIN.cs"
+			},
+			"localId": "ebgsystem-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"0000.bin file name requirement",
+				"fixed 0x96000 bitmap stride",
+				"count derived from the file length",
+				"numbered bmp names",
+				"image typing",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"archive creation",
+				"gui image decoding",
+				"opener is registered in debug builds only"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/ARCH",
 				"class": "DatOpener",
 				"source": "ArcFormats/Seraphim/ArcArchAngel.cs"
