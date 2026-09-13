@@ -617,6 +617,7 @@ import { pgaImageFormat } from "./palette/pga-image.js";
 import { bpicImageFormat } from "./softpal/bpic-image.js";
 import { rmtImageFormat } from "./elf/rmt-image.js";
 import { picImageFormat } from "./misc/pic-image.js";
+import { lgfImageFormat } from "./leaf/lgf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1562,5 +1563,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bpicImageFormat,
 		rmtImageFormat,
 		picImageFormat,
+		lgfImageFormat,
 	]);
 }

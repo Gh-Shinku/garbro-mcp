@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "LGF",
+				"class": "LgfFormat",
+				"source": "ArcFormats/Leaf/ImageLGF.cs"
+			},
+			"localId": "leaf-lgf-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"rgb to bgr palette swap",
+				"8/24/32 bpp bitmap output",
+				"exact payload length",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PIC/SPRITE",
 				"class": "PicFormat",
 				"source": "ArcFormats/ImagePIC.cs"
