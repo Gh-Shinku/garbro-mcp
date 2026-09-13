@@ -86,6 +86,7 @@ export function writeBmp16(
 	height: number,
 	pixels: Buffer,
 	bottomUp = false,
+	masks: BitmapMasks = RGB555_MASKS,
 ): Buffer {
 	const stride = (width * 2 + 3) & ~3;
 	const imageSize = stride * height;
@@ -101,18 +102,42 @@ export function writeBmp16(
 	);
 	// `BI_BITFIELDS` tells readers to look for the colour masks that follow.
 	header.writeUInt32LE(3, 30);
-	const masks: Buffer = Buffer.alloc(12);
-	masks.writeUInt32LE(0x7c00, 0);
-	masks.writeUInt32LE(0x03e0, 4);
-	masks.writeUInt32LE(0x001f, 8);
+	const maskBytes: Buffer = Buffer.alloc(12);
+	maskBytes.writeUInt32LE(masks.red, 0);
+	maskBytes.writeUInt32LE(masks.green, 4);
+	maskBytes.writeUInt32LE(masks.blue, 8);
 	const rows: Buffer[] = [];
 	for (let row = 0; row < height; row += 1) {
 		const line = Buffer.alloc(stride);
 		pixels.copy(line, 0, row * width * 2, (row + 1) * width * 2);
 		rows.push(line);
 	}
-	return Buffer.concat([header, masks, ...rows]);
+	return Buffer.concat([header, maskBytes, ...rows]);
 }
+
+/**
+ * The colour masks a sixteen bit bitmap declares. Five bits per channel is the layout GARbro's own writers
+ * use, while several legacy engines store six green bits instead, so the caller picks.
+ */
+export interface BitmapMasks {
+	red: number;
+	green: number;
+	blue: number;
+}
+
+/** Five bits per channel, the layout the existing ports and GARbro itself use. */
+export const RGB555_MASKS: BitmapMasks = {
+	red: 0x7c00,
+	green: 0x03e0,
+	blue: 0x001f,
+};
+
+/** Six green bits, as stored by the Project-Myu reader and other legacy engines. */
+export const RGB565_MASKS: BitmapMasks = {
+	red: 0xf800,
+	green: 0x07e0,
+	blue: 0x001f,
+};
 
 /**
  * Wraps eight bit pixels in a bitmap with a caller supplied palette, which the Logg images carry. The
