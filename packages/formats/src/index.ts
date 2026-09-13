@@ -373,6 +373,8 @@ import { malieLibuFormat } from "./malie/libu.js";
 import { willPnaFormat } from "./will/pna.js";
 import { yaneuraoDatDxFormat } from "./yaneurao/dat.js";
 import { yaneuraoDatExFormat } from "./yaneurao/dat.js";
+import { leafLacFormat } from "./leaf/lac.js";
+import { leafLacPakFormat } from "./leaf/lac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -991,5 +993,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		willPnaFormat,
 		yaneuraoDatDxFormat,
 		yaneuraoDatExFormat,
+		leafLacFormat,
+		leafLacPakFormat,
 	]);
 }

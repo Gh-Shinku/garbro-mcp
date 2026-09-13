@@ -6,6 +6,58 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/LAC",
+				"class": "PakOpener",
+				"source": "ArcFormats/Leaf/ArcLAC.cs"
+			},
+			"localId": "leaf-lac-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"LAC signature with pak extension",
+				"count at 0x04",
+				"0x20 byte name fields masked with 0xff",
+				"flag byte past the name field",
+				"size and 32-bit offset pairs",
+				"compression header stripped from compressed payloads",
+				"default lzss unpacking",
+				"four byte entries left stored",
+				"placement validation"
+			],
+			"unsupported": [
+				"archive creation",
+				"trailing null characters in masked names"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "LAC",
+				"class": "LacOpener",
+				"source": "ArcFormats/Leaf/ArcLAC.cs"
+			},
+			"localId": "leaf-lac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"LAC signature",
+				"count at 0x04",
+				"0x78 byte records with cp932 names",
+				"stored and unpacked size fields",
+				"64-bit absolute offsets",
+				"compression flag byte",
+				"lzss unpacking with a space filled frame",
+				"store pass through",
+				"path normalization",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/yanepkEx",
 				"class": "PackExOpener",
 				"source": "Legacy/Yaneurao/ArcDAT.cs"
