@@ -267,6 +267,7 @@ import { ivoryPkFormat } from "./ivory/pk.js";
 import { omiDatFormat } from "./omi/dat.js";
 import { system21PakFormat } from "./system21/pak.js";
 import { isaFormat } from "./ism/isa.js";
+import { circusDatFormat } from "./circus/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -728,5 +729,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		omiDatFormat,
 		system21PakFormat,
 		isaFormat,
+		circusDatFormat,
 	]);
 }

@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/CIRCUS",
+				"class": "DatOpener",
+				"source": "ArcFormats/Circus/ArcCircus.cs"
+			},
+			"localId": "circus-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dat extension requirement",
+				"entry count above one and limit",
+				"decremented count",
+				"three candidate name widths with first match ordering",
+				"derived sizes with last entry to file end",
+				"first name tail heuristic rejection",
+				"offset compared against index size",
+				"entry placement validation",
+				"cp932 names with empty rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ISA",
 				"class": "IsaOpener",
 				"source": "ArcFormats/Ism/ArcISA.cs"
