@@ -86,4 +86,65 @@ describe("safe extraction", () => {
 		await extractEntry(archive, "0", { outputDirectory, overwrite: true });
 		expect(await readFile(first.outputPath, "utf8")).toBe("payload");
 	});
+
+	it("accepts entries whose output size is not declared", async () => {
+		const outputDirectory = await temporaryDirectory();
+		const archive: ArchiveHandle = {
+			sourcePath: "memory",
+			format: descriptor,
+			size: 4n,
+			metadata: {},
+			entries: [
+				{
+					id: "0",
+					path: "stream.bin",
+					// The decoder produces more bytes than the stored size, which is allowed when the
+					// entry declares that its size is not exact.
+					size: 4n,
+					sizeKnown: false,
+					packedSize: 4n,
+					compressed: true,
+					encrypted: false,
+				},
+			],
+			async openEntry() {
+				return Readable.from([Buffer.from("decompressed payload")]);
+			},
+			async close() {},
+		};
+
+		const extracted = await extractEntry(archive, "0", { outputDirectory });
+		expect(extracted.bytesWritten).toBe(20n);
+		expect(await readFile(extracted.outputPath, "utf8")).toBe(
+			"decompressed payload",
+		);
+	});
+
+	it("still rejects an undeclared size mismatch", async () => {
+		const outputDirectory = await temporaryDirectory();
+		const archive: ArchiveHandle = {
+			sourcePath: "memory",
+			format: descriptor,
+			size: 4n,
+			metadata: {},
+			entries: [
+				{
+					id: "0",
+					path: "short.bin",
+					size: 4n,
+					packedSize: 4n,
+					compressed: true,
+					encrypted: false,
+				},
+			],
+			async openEntry() {
+				return Readable.from([Buffer.from("x")]);
+			},
+			async close() {},
+		};
+
+		await expect(
+			extractEntry(archive, "0", { outputDirectory }),
+		).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
+	});
 });

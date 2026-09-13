@@ -22,6 +22,7 @@ export function entryToWire(entry: ArchiveEntry): Record<string, unknown> {
 		path: entry.path,
 		...(entry.rawPath === undefined ? {} : { rawPath: entry.rawPath }),
 		size: entry.size.toString(),
+		...(entry.sizeKnown === undefined ? {} : { sizeKnown: entry.sizeKnown }),
 		packedSize: entry.packedSize.toString(),
 		compressed: entry.compressed,
 		encrypted: entry.encrypted,

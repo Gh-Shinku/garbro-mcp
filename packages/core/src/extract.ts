@@ -219,7 +219,8 @@ export async function extractEntry(
 	try {
 		const input = await archive.openEntry(entry.id);
 		await pipeline(input, meter, createWriteStream(tempPath, { flags: "wx" }));
-		if (bytesWritten !== entry.size) {
+		// Entries whose output size is not declared report the bytes the decoder produced.
+		if (entry.sizeKnown !== false && bytesWritten !== entry.size) {
 			throw new GarbroError(
 				"INVALID_ARCHIVE",
 				`Extracted size mismatch for ${entry.path}`,

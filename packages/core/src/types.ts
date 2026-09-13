@@ -33,6 +33,12 @@ export interface ArchiveEntry {
 	path: string;
 	rawPath?: string;
 	size: bigint;
+	/**
+	 * Whether `size` is the exact extracted size. Formats that decode an entry on extraction without a
+	 * declared output size set this to `false`; extraction then reports the real byte count instead of
+	 * failing a length check.
+	 */
+	sizeKnown?: boolean;
 	packedSize: bigint;
 	compressed: boolean;
 	encrypted: boolean;

@@ -1,4 +1,9 @@
-import { createInflate, inflate } from "node:zlib";
+import {
+	createInflate,
+	createInflateRaw,
+	inflate,
+	inflateRaw,
+} from "node:zlib";
 import type { Readable } from "node:stream";
 
 export function createZlibInflateStream(input: Readable): Readable {
@@ -23,4 +28,17 @@ export async function inflateZlibBuffer(
 		);
 	}
 	return output;
+}
+
+export function createRawInflateStream(input: Readable): Readable {
+	return input.pipe(createInflateRaw());
+}
+
+export async function inflateRawBuffer(input: Uint8Array): Promise<Buffer> {
+	return await new Promise<Buffer>((resolve, reject) => {
+		inflateRaw(input, (error, result) => {
+			if (error) reject(error);
+			else resolve(result);
+		});
+	});
 }
