@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/RAIN",
+				"class": "BinOpener",
+				"source": "Legacy/Rain/ArcBIN.cs"
+			},
+			"localId": "rain-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pack name pattern and derived extension",
+				"count word with high flag masked",
+				"unique entry numbers bounded",
+				"records with offset and size",
+				"data offset behind the index",
+				"entry placement validation",
+				"szdd detection",
+				"lzss extraction with overridden fill and ring position",
+				"verbatim extraction"
+			],
+			"unsupported": ["cgd image decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CDT",
 				"class": "CdtOpener",
 				"source": "ArcFormats/Nejii/ArcCDT.cs"

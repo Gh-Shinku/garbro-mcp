@@ -254,6 +254,7 @@ import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
 import { nejiiCdtFormat } from "./nejii/cdt.js";
+import { rainBinFormat } from "./rain/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -436,6 +437,7 @@ export * from "./crowd/index.js";
 export * from "./aypio/index.js";
 export * from "./melonpan/index.js";
 export * from "./scoop/index.js";
+export * from "./rain/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -696,5 +698,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
+		rainBinFormat,
 	]);
 }
