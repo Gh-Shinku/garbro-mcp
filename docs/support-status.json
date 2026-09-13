@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/SP",
+				"class": "SpPakOpener",
+				"source": "ArcFormats/BlackRainbow/ArcSPPAK.cs"
+			},
+			"localId": "black-rainbow-sp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures with their key bytes",
+				"entry count validation",
+				"offset table with derived sizes",
+				"entries running to the end",
+				"generated four digit names",
+				"offset bound and placement validation",
+				"keyed payload extraction with rotation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ABMP7",
 				"class": "Abmp7Opener",
 				"source": "ArcFormats/Qlie/ArcABMP.cs"

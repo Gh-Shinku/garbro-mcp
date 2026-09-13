@@ -312,6 +312,7 @@ import { xflFormat } from "./liar/xfl.js";
 import { exhGRPFormat } from "./ex-hibit/grp.js";
 import { abmpFormat } from "./q-lie/abmp.js";
 import { abmp7Format } from "./q-lie/abmp.js";
+import { spPakFormat } from "./black-rainbow/sp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -835,5 +836,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		exhGRPFormat,
 		abmpFormat,
 		abmp7Format,
+		spPakFormat,
 	]);
 }
