@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "ESD",
+				class: "EsdAudio",
+				source: "ArcFormats/TamaSoft/AudioESD.cs",
+			},
+			localId: "tamasoft-esd-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wave container wrapping"],
+			unsupported: ["archive creation", "audio writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "script",
 				tag: "NScripter",
 				class: "NSOpener",

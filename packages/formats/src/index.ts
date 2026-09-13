@@ -525,6 +525,7 @@ import { aoiAogAudioFormat } from "./aoi/aog-audio.js";
 import { softpalBgmAudioFormat } from "./softpal/bgm-audio.js";
 import { realliveOwpAudioFormat } from "./reallive/owp-audio.js";
 import { nsOpenerFormat } from "./nscripter/script.js";
+import { esdAudioFormat } from "./tamasoft/esd-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1356,5 +1357,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		softpalBgmAudioFormat,
 		realliveOwpAudioFormat,
 		nsOpenerFormat,
+		esdAudioFormat,
 	]);
 }
