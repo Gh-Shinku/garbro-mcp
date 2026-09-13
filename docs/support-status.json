@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GR2/PACK",
+				"class": "Gr2Opener",
+				"source": "ArcFormats/AdvSys/ArcGR2.cs"
+			},
+			"localId": "umesoft-gr2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and signature detection",
+				"data base validation",
+				"0x18-byte records",
+				"ll5 run-length decompression",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PMA",
 				"class": "PmaOpener",
 				"source": "ArcFormats/ScenePlayer/ArcPMA.cs"

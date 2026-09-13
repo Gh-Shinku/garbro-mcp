@@ -199,6 +199,7 @@ import { yaneSdaFormat } from "./yaneurao/sda.js";
 import { gameDatFormat } from "./pajamas/gamedat.js";
 import { pmxFormat } from "./sceneplayer/pmx.js";
 import { pmaFormat } from "./sceneplayer/pma.js";
+import { gr2Format } from "./umesoft/gr2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -348,6 +349,7 @@ export * from "./nejii/index.js";
 export * from "./yaneurao/index.js";
 export * from "./pajamas/index.js";
 export * from "./sceneplayer/index.js";
+export * from "./umesoft/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -553,5 +555,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameDatFormat,
 		pmxFormat,
 		pmaFormat,
+		gr2Format,
 	]);
 }
