@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MCD/TSD",
+				"class": "McdOpener",
+				"source": "Legacy/Tsd/ArcMCD.cs"
+			},
+			"localId": "tsd-mcd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and marker detection",
+				"trailing index",
+				"eight-byte records",
+				"signature-based classification metadata",
+				"entry placement validation",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CPN",
 				"class": "DatOpener",
 				"source": "Legacy/Marron/ArcCPN.cs"
