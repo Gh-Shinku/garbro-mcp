@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "SED/HARVEST",
+				class: "SedAudio",
+				source: "Legacy/Harvest/AudioSED.cs",
+			},
+			localId: "myharvest-sed-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wav header reassembly"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GRD",
 				class: "GrdFormat",
