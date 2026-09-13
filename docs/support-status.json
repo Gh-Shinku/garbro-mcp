@@ -5,6 +5,26 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "MSK/ANKH",
+				"class": "MskFormat",
+				"source": "ArcFormats/Ankh/ImageMSK.cs"
+			},
+			"localId": "ankh-msk-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"lzss decoding",
+				"header size selection",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "MRG",
 				"class": "MrgAudio",
