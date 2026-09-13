@@ -216,6 +216,7 @@ import { gxpFormat } from "./astronauts/gxp.js";
 import { c24Format } from "./foster/c24.js";
 import { c25Format } from "./foster/c24.js";
 import { lb5Format } from "./jupiter/lb5.js";
+import { cgV2Format } from "./parsley/cg2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -602,5 +603,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		c24Format,
 		c25Format,
 		lb5Format,
+		cgV2Format,
 	]);
 }
