@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BSA",
+				"class": "BsaOpener",
+				"source": "ArcFormats/Bishop/ArcBSA.cs"
+			},
+			"localId": "bishop-bsa",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and marker letter",
+				"version range and entry count validation",
+				"index offset bound",
+				"version 1 records with fixed name fields",
+				"version 2 records with trailing name pool",
+				"fallback from wider to narrower layout",
+				"directory push and pop markers",
+				"slash-joined paths",
+				"cp932 names",
+				"entry placement validation",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/ADS",
 				"class": "PacOpener",
 				"source": "ArcFormats/Ads/ArcPAC.cs"
