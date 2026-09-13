@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CPZ1",
+				"class": "Cpz1Opener",
+				"source": "ArcFormats/Cmvs/ArcCPZ1.cs"
+			},
+			"localId": "cmvs-cpz1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and extension detection",
+				"fixed-key index decryption",
+				"variable-length records",
+				"relative data offsets",
+				"payload decryption",
+				"pss0 lzss unpacking",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/DJSYSTEM",
 				"class": "DatOpener",
 				"source": "ArcFormats/DjSystem/ArcDAT.cs"
