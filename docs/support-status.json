@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GXP",
+				"class": "PakOpener",
+				"source": "ArcFormats/Astronauts/ArcGXP.cs"
+			},
+			"localId": "astronauts-gxp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"length obfuscation key word",
+				"position-dependent record decryption",
+				"utf-16 names",
+				"64-bit relative data offsets",
+				"payload decryption",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/Tactics/0",
 				"class": "YuOpener",
 				"source": "ArcFormats/Tactics/ArcYU.cs"
