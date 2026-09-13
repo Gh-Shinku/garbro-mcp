@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PMP",
+				class: "PmpFormat",
+				source: "ArcFormats/ScenePlayer/ImagePMP.cs",
+			},
+			localId: "sceneplayer-pmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"byte mask",
+				"zlib decoding",
+				"bitmap trimming",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "KSL",
 				class: "KslFormat",
 				source: "ArcFormats/KScript/ImageKSL.cs",
