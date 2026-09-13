@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MTG",
+				class: "MtgFormat",
+				source: "Legacy/Asura/ImageMTG.cs",
+			},
+			localId: "asura-mtg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extension gate",
+				"listing",
+				"extraction",
+				"24bpp bitmap output",
+				"32bpp bitmap output",
+				"alpha channel",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IMA",
 				class: "ImaFormat",
 				source: "Legacy/HillField/ImageIMA.cs",
