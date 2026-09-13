@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC1",
+				"class": "PacOpener",
+				"source": "ArcFormats/RiddleSoft/ArcPAC.cs"
+			},
+			"localId": "riddle-pac1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"PAC1 fixed CP932 index",
+				"sequential payload placement validation",
+				"CMP1 script detection and extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARBro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/FWA",
 				"class": "FwaOpener",
 				"source": "Legacy/Nug/ArcDAT.cs"
