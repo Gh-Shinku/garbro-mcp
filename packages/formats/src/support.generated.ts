@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/NekoSDK",
+				class: "DatOpener",
+				source: "ArcFormats/NekoSDK/ArcDAT.cs",
+			},
+			localId: "nekosdk-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"dat extension detection",
+				"0xCACACA masked record fields",
+				"0x8C record layout with 0x80-byte cp932 names",
+				"first-offset derived record count",
+				"packed/unpacked size handling",
+				"LZSS extraction",
+				"verbatim extraction",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK/MAGI",
 				class: "PakOpener",
 				source: "ArcFormats/NitroPlus/ArcPAK.cs",
