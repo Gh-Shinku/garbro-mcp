@@ -559,6 +559,7 @@ import { cmbAudioFormat } from "./pinesoft/cmb-audio.js";
 import { ggfImageFormat } from "./yellowcap/ggf-image.js";
 import { befAlpImageFormat } from "./bef/alp-image.js";
 import { gamesystemAlpImageFormat } from "./gamesystem/alp-image.js";
+import { masysAlpImageFormat } from "./masys/alp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1433,5 +1434,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ggfImageFormat,
 		befAlpImageFormat,
 		gamesystemAlpImageFormat,
+		masysAlpImageFormat,
 	]);
 }

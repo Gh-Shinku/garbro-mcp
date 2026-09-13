@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ALP/MEGU",
+				class: "AlpFormat",
+				source: "ArcFormats/Masys/ImageALP.cs",
+			},
+			localId: "masys-alp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"run length decoding",
+				"bmp reassembly",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ALP/GAMESYSTEM",
 				class: "AlpFormat",
 				source: "ArcFormats/GameSystem/ImageALP.cs",
