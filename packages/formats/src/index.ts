@@ -157,6 +157,7 @@ import { tcd1Format } from "./topcat/tcd1.js";
 import { odioFormat } from "./hexenhaus/odio.js";
 import { nfsFormat } from "./nags/nfs.js";
 import { xpkFormat } from "./kirikiri/xpk.js";
+import { xuseBinFormat } from "./xuse/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -447,5 +448,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		odioFormat,
 		nfsFormat,
 		xpkFormat,
+		xuseBinFormat,
 	]);
 }

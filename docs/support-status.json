@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/Xuse",
+				"class": "BinOpener",
+				"source": "ArcFormats/Xuse/ArcBIN.cs"
+			},
+			"localId": "xuse-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"0x10-byte record table",
+				"zero-offset terminator",
+				"monotonic offset validation",
+				"entry placement validation",
+				"generated entry stems",
+				"entry listing and extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "XPK",
 				"class": "XpkOpener",
 				"source": "ArcFormats/KiriKiri/ArcXPK.cs"
