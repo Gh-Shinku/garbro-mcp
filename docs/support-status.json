@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/electr",
+				"class": "DatOpener",
+				"source": "Legacy/Electriciteit/ArcDAT.cs"
+			},
+			"localId": "electriciteit-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"0x2c-byte records",
+				"name validation",
+				"first-offset validation",
+				"entry placement validation",
+				"bitmap archive flag",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SPD/SLG",
 				"class": "SpdOpener",
 				"source": "ArcFormats/Slg/ArcSPD.cs"

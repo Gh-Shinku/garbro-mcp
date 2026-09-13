@@ -201,6 +201,7 @@ import { pmxFormat } from "./sceneplayer/pmx.js";
 import { pmaFormat } from "./sceneplayer/pma.js";
 import { gr2Format } from "./umesoft/gr2.js";
 import { spdFormat } from "./slg/spd.js";
+import { electriciteitDatFormat } from "./electriciteit/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -351,6 +352,7 @@ export * from "./yaneurao/index.js";
 export * from "./pajamas/index.js";
 export * from "./sceneplayer/index.js";
 export * from "./umesoft/index.js";
+export * from "./electriciteit/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -558,5 +560,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pmaFormat,
 		gr2Format,
 		spdFormat,
+		electriciteitDatFormat,
 	]);
 }
