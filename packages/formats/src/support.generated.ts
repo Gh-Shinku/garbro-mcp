@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "YPF/NABE",
+				class: "YpfFormat",
+				source: "Legacy/Nabe/ImageYPF.cs",
+			},
+			localId: "nabe-ypf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"24bpp images",
+				"32bpp images with alpha",
+				"extension gate",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BRG",
 				class: "BrgFormat",
 				source: "Legacy/Regrips/ImagePRG.cs",

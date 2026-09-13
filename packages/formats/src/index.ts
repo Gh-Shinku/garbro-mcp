@@ -659,6 +659,7 @@ import { biz2ImageFormat } from "./adviz/biz2-image.js";
 import { rbpImageFormat } from "./dice/rbp-image.js";
 import { prgImageFormat } from "./regrips/prg-image.js";
 import { brgImageFormat } from "./regrips/brg-image.js";
+import { ypfImageFormat } from "./nabe/ypf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -986,6 +987,7 @@ export * from "./primesoft/index.js";
 export * from "./pisckiss/index.js";
 export * from "./fazex/index.js";
 export * from "./adviz/index.js";
+export * from "./nabe/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1650,5 +1652,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		rbpImageFormat,
 		prgImageFormat,
 		brgImageFormat,
+		ypfImageFormat,
 	]);
 }
