@@ -13,6 +13,7 @@ import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
+	decodeCStringField,
 	defineFixedArchive,
 	isSaneCount,
 	normalizeEntryPath,
@@ -393,4 +394,95 @@ export const vcPakFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	openEntry: openVcEntry,
+});
+
+// GARbro `VcPacOpener`: a plain index of fixed size name records. The head of the file is a version
+// word, which GARbro declares as the format signature but never verifies itself.
+const PAC_SIGNATURE = Buffer.from([1, 0, 0, 0]);
+const PAC_COUNT_OFFSET = 4;
+const PAC_BASE_OFFSET = 8;
+const PAC_FILE_SIZE_OFFSET = 0xc;
+const PAC_INDEX_OFFSET = 0x20;
+const PAC_NAME_SIZE = 0x20;
+const PAC_RECORD_SIZE = 0x38;
+const PAC_FIELD_OFFSET = 0x20;
+
+export const circusVcPacDescriptor: FormatDescriptor = {
+	id: "circus-vc-pac",
+	name: "Valkyrie Complex resource archive",
+	extensions: ["pac"],
+	capabilities: {
+		detect: true,
+		list: true,
+		extract: true,
+		create: false,
+		encryption: false,
+	},
+	attribution: [
+		{
+			project: "GARbro",
+			source: "ArcFormats/Circus/ArcValkyrieComplex.cs",
+			license: "MIT",
+			commit: "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
+		},
+	],
+};
+
+/** GARbro `VcPacOpener.TryOpen`: a fixed record per entry, with offsets shifted by a base offset. */
+async function readVcPacIndex(
+	source: ByteSource,
+): Promise<FixedEntry[] | undefined> {
+	if (source.size < BigInt(PAC_INDEX_OFFSET)) return undefined;
+	const head = Buffer.from(await source.readAt(0n, PAC_INDEX_OFFSET));
+	const count = head.readInt32LE(PAC_COUNT_OFFSET);
+	if (!isSaneCount(count)) return undefined;
+	const baseOffset = head.readUInt32LE(PAC_BASE_OFFSET);
+	const fileSize = head.readUInt32LE(PAC_FILE_SIZE_OFFSET);
+	if (BigInt(baseOffset) >= source.size || BigInt(fileSize) !== source.size)
+		return undefined;
+	const indexSize = count * PAC_RECORD_SIZE;
+	if (BigInt(PAC_INDEX_OFFSET) + BigInt(indexSize) > source.size)
+		return undefined;
+	const index = Buffer.from(
+		await source.readAt(BigInt(PAC_INDEX_OFFSET), indexSize),
+	);
+	const entries: FixedEntry[] = [];
+	for (let i = 0; i < count; i += 1) {
+		const position = i * PAC_RECORD_SIZE;
+		const name = decodeCStringField(index, position, PAC_NAME_SIZE);
+		const size = index.readUInt32LE(position + PAC_FIELD_OFFSET);
+		const offset =
+			BigInt(index.readUInt32LE(position + PAC_FIELD_OFFSET + 4)) +
+			BigInt(baseOffset);
+		if (!checkPlacement(offset, BigInt(size), source.size)) return undefined;
+		entries.push(
+			createFixedEntry({
+				id: i,
+				...normalizeEntryPath(name),
+				offset,
+				size: BigInt(size),
+			}),
+		);
+	}
+	return entries;
+}
+
+export const circusVcPacFormat: ArchiveFormat = defineFixedArchive({
+	descriptor: circusVcPacDescriptor,
+	detection: { signatures: [{ bytes: PAC_SIGNATURE }] },
+	async detect(source: ByteSource): Promise<boolean> {
+		return (await readVcPacIndex(source)) !== undefined;
+	},
+	async read(source: ByteSource) {
+		const entries = await readVcPacIndex(source);
+		if (!entries)
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"Invalid Valkyrie Complex layout",
+			);
+		return {
+			entries,
+			metadata: { entryCount: entries.length },
+		};
+	},
 });

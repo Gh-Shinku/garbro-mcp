@@ -493,6 +493,7 @@ import { minaWavPakFormat } from "./mina/pak.js";
 import { minaScriptPakFormat } from "./mina/pak.js";
 import { emonEmeFormat } from "./emon/eme.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
+import { circusVcPacFormat } from "./circus/vc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1284,5 +1285,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		minaScriptPakFormat,
 		emonEmeFormat,
 		livemakerVfFormat,
+		circusVcPacFormat,
 	]);
 }

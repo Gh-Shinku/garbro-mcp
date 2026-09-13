@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAC/VC",
+				class: "VcPacOpener",
+				source: "ArcFormats/Circus/ArcValkyrieComplex.cs",
+			},
+			localId: "circus-vc-pac",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"version signature",
+				"capped entry count",
+				"base offset range check",
+				"file size check",
+				"fixed size name records",
+				"verbatim extraction",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/vf",
 				class: "VffOpener",
 				source: "ArcFormats/LiveMaker/ArcVF.cs",
