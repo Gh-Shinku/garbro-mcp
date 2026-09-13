@@ -632,6 +632,7 @@ import { wafAudioFormat } from "./kid/waf-audio.js";
 import { antImageFormat } from "./studio-ego/ant-image.js";
 import { dbmImageFormat } from "./sysd/dbm-image.js";
 import { wstAudioFormat } from "./ipac/wst-audio.js";
+import { lpgImageFormat } from "./hypatia/lpg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1593,5 +1594,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		antImageFormat,
 		dbmImageFormat,
 		wstAudioFormat,
+		lpgImageFormat,
 	]);
 }

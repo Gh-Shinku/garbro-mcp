@@ -5,6 +5,28 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "LPG",
+				"class": "LpgFormat",
+				"source": "ArcFormats/Hypatia/ImageLPG.cs"
+			},
+			"localId": "hypatia-lpg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"palette expansion",
+				"indexed and 32bpp bitmap output",
+				"extension gate",
+				"metadata"
+			],
+			"unsupported": ["image encoding", "true 24bpp handling"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "WST",
 				"class": "WstAudio",
