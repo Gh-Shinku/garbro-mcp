@@ -668,6 +668,7 @@ import { unhImageFormat } from "./myharvest/unh-image.js";
 import { gtxImageFormat } from "./microvision/gtx-image.js";
 import { gpdImageFormat } from "./antique/gpd-image.js";
 import { ucomGpcImageFormat } from "./ucom/gpc-image.js";
+import { risaSygImageFormat } from "./risa/syg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -996,6 +997,7 @@ export * from "./pisckiss/index.js";
 export * from "./fazex/index.js";
 export * from "./adviz/index.js";
 export * from "./nabe/index.js";
+export * from "./risa/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1669,5 +1671,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gtxImageFormat,
 		gpdImageFormat,
 		ucomGpcImageFormat,
+		risaSygImageFormat,
 	]);
 }

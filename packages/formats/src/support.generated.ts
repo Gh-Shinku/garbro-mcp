@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "SYG",
+				class: "SygFormat",
+				source: "ArcFormats/Risa/ImageSYG.cs",
+			},
+			localId: "risa-syg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"24bpp images",
+				"external alpha block",
+				"zero fill",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GPC",
 				class: "GpcFormat",
 				source: "ArcFormats/Ucom/ImageGPC.cs",
