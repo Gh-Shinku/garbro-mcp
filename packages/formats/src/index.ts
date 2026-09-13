@@ -382,6 +382,7 @@ import { sophiaNorFormat } from "./sophia/nor.js";
 import { maikaBkFormat } from "./maika/bk.js";
 import { unisonVctFormat } from "./unison/vct.js";
 import { factorResFormat } from "./factor/res.js";
+import { nekoSdkPakFormat } from "./nekosdk/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1013,5 +1014,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		maikaBkFormat,
 		unisonVctFormat,
 		factorResFormat,
+		nekoSdkPakFormat,
 	]);
 }

@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "NEKOPACK/4",
+				class: "PakOpener",
+				source: "ArcFormats/NekoSDK/ArcPAK.cs",
+			},
+			localId: "nekosdk-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"NEKOPACK4 marker and A and S version layouts",
+				"index records with name length and names",
+				"index key from signed name bytes",
+				"offset and size xor decoding",
+				"zero length terminator",
+				"unpacked size trailer for entries of eight bytes or more",
+				"four byte header decryption",
+				"payload middle range",
+				"zlib payload decompression",
+				"path normalization",
+				"placement validation",
+			],
+			unsupported: ["archive creation", "extension based entry typing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PACK/FACTOR",
 				class: "PackOpener",
 				source: "Legacy/Factor/ArcRES.cs",
