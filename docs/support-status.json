@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CAB/PackDat3",
+				"class": "CabOpener",
+				"source": "ArcFormats/EntExec/ArcCAB.cs"
+			},
+			"localId": "entexec-cab",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x100-byte CP932 names",
+				"entry placement validation",
+				"declared unpacked size metadata",
+				"entry listing and extraction"
+			],
+			"unsupported": ["unpacked size decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/ZENOS",
 				"class": "ZenosOpener",
 				"source": "ArcFormats/RPM/ArcZENOS.cs"
