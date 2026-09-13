@@ -612,6 +612,7 @@ import { surImageFormat } from "./tamasoft/sur-image.js";
 import { btnImageFormat } from "./tamasoft/btn-image.js";
 import { plantechPacImageFormat } from "./plantech/pac-image.js";
 import { mgfImageFormat } from "./malie/mgf-image.js";
+import { hotImageFormat } from "./hdl/hot-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1552,5 +1553,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		btnImageFormat,
 		plantechPacImageFormat,
 		mgfImageFormat,
+		hotImageFormat,
 	]);
 }
