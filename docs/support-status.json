@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/KEY",
+				"class": "PakOpener",
+				"source": "ArcFormats/Key/ArcPAK.cs"
+			},
+			"localId": "key-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"count and block size validation",
+				"payload start as block multiple",
+				"index located by scanning",
+				"names pool behind a pointer word",
+				"generated five digit names",
+				"utf8 null terminated names",
+				"block number records with sizes",
+				"entry placement validation",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"type classification by content signature",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SAR",
 				"class": "SarOpener",
 				"source": "ArcFormats/NScripter/ArcSAR.cs"

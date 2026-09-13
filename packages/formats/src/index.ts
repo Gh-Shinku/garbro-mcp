@@ -282,6 +282,7 @@ import { kaguyaPltFormat } from "./kaguya/plt.js";
 import { kaguyaPl10Format } from "./kaguya/pl10.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
 import { nscripterSarFormat } from "./nscripter/sar.js";
+import { keyPakFormat } from "./key/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -478,6 +479,7 @@ export * from "./palm-tree/index.js";
 export * from "./wild-bug/index.js";
 export * from "./kaguya/index.js";
 export * from "./nscripter/index.js";
+export * from "./key/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -766,5 +768,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaguyaPl10Format,
 		kaguyaAn21Format,
 		nscripterSarFormat,
+		keyPakFormat,
 	]);
 }
