@@ -6,6 +6,36 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/MK2",
+				"class": "Mk2Opener",
+				"source": "ArcFormats/Maika/ArcMK2.cs"
+			},
+			"localId": "maika-mk2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"six archive id signatures",
+				"header fields with base offset and index bounds",
+				"group headers with relative pointers and record counts",
+				"512 group walk cap",
+				"minus one terminator resolution",
+				"variable length records with byte name lengths",
+				"payload offsets relative to the base offset",
+				"placement against the index start",
+				"stored payload extraction",
+				"C1 D1 E1 and F1 packed headers",
+				"packed header bounds",
+				"E1 prefix descrambling",
+				"default and AR scramble schemes",
+				"LZSS decoding to end of stream",
+				"BPR01 and BPR02 expansion"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/AGS",
 				"class": "DatOpener",
 				"source": "ArcFormats/AnimeGameSystem/ArcDAT.cs"

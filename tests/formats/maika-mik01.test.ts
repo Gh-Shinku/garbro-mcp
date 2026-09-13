@@ -12,12 +12,12 @@ interface Entry {
 function packedEntry(
 	signature: "C1" | "E1",
 	content: Buffer,
-	scheme: "default" | "usg" = "default",
+	scheme: "default" | "ar" = "default",
 ): Buffer {
 	const packed = Buffer.from(literalLzssStream(content));
 	if (signature === "E1") {
 		const pairs: readonly (readonly [number, number])[] =
-			scheme === "usg"
+			scheme === "ar"
 				? [
 						[7, 13],
 						[9, 14],
@@ -116,7 +116,7 @@ describe("MAIKA MIK01 resource archive", () => {
 
 	it("restores the USG01 E1 prefix with the alternate scheme", async () => {
 		const content = Buffer.from("USG01 scrambled E1 payload");
-		const payload = packedEntry("E1", content, "usg");
+		const payload = packedEntry("E1", content, "ar");
 		await expectArchive({
 			format: maikaMik01Format,
 			archive: buildMik([{ name: "e1.bin", payload }], "USG01"),

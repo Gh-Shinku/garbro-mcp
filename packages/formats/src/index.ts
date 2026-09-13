@@ -390,6 +390,7 @@ import { debonosuPakFormat } from "./debonosu/pak.js";
 import { vnEngineAxrFormat } from "./vn-engine/axr.js";
 import { animeGameSystemAniFormat } from "./anime-game-system/ani.js";
 import { animeGameSystemDatFormat } from "./anime-game-system/dat.js";
+import { maikaMk2Format } from "./maika/mk2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1035,5 +1036,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		vnEngineAxrFormat,
 		animeGameSystemAniFormat,
 		animeGameSystemDatFormat,
+		maikaMk2Format,
 	]);
 }
