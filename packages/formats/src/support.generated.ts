@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BPD",
+				class: "BpdFormat",
+				source: "Legacy/PineSoft/ImageBPD.cs",
+			},
+			localId: "pinesoft-bpd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "bitmap reassembly"],
+			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "TBL/PAN",
 				class: "TblFormat",
 				source: "Legacy/Pan/ImageTBL.cs",

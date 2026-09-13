@@ -536,6 +536,7 @@ import { kwfAudioFormat } from "./dice/kwf-audio.js";
 import { gssImageFormat } from "./ags32i/gss-image.js";
 import { cgdImageFormat } from "./carriere/cgd-image.js";
 import { tblImageFormat } from "./pan/tbl-image.js";
+import { bpdImageFormat } from "./pinesoft/bpd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1380,5 +1381,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gssImageFormat,
 		cgdImageFormat,
 		tblImageFormat,
+		bpdImageFormat,
 	]);
 }
