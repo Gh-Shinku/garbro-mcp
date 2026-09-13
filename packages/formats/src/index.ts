@@ -457,6 +457,7 @@ import { xuseArcFormat } from "./xuse/miko.js";
 import { xuseKotoriFormat } from "./xuse/miko.js";
 import { lazycrewDatFormat } from "./lazycrew/dat.js";
 import { parsleyDesertCgFormat } from "./parsley/cg3.js";
+import { rareXFormat } from "./rare/x.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -732,6 +733,7 @@ export * from "./inspire/index.js";
 export * from "./groover/index.js";
 export * from "./splush-wave/index.js";
 export * from "./lazycrew/index.js";
+export * from "./rare/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1194,5 +1196,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		xuseKotoriFormat,
 		lazycrewDatFormat,
 		parsleyDesertCgFormat,
+		rareXFormat,
 	]);
 }

@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "X/RARE",
+				class: "XOpener",
+				source: "Legacy/Rare/ArcX.cs",
+			},
+			localId: "rare-x",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"pp.x file name gating",
+				"index executable requirement",
+				"hard coded index layout",
+				"derived entry names",
+				"image typing",
+				"rare lz frame decoding",
+			],
+			unsupported: ["archive creation", "bitmap image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "CG/DESERT",
 				class: "DesertCgOpener",
 				source: "ArcFormats/Software House Parsley/ArcCG3.cs",
