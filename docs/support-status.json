@@ -6,6 +6,55 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DDP3",
+				"class": "Ddp3Opener",
+				"source": "ArcFormats/DDSystem/ArcDDP.cs"
+			},
+			"localId": "ddsystem-ddp3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and count",
+				"shared section descriptor walk",
+				"section entry walk",
+				"names from the index",
+				"payload driven size pair",
+				"plain and compressed payloads through the shared codec",
+				"index size hints as metadata"
+			],
+			"unsupported": [
+				"type classification by content signature",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DDP2",
+				"class": "Ddp2Opener",
+				"source": "ArcFormats/DDSystem/ArcDDP.cs"
+			},
+			"localId": "ddsystem-ddp2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and count",
+				"index records",
+				"payload driven size pair",
+				"plain and compressed payloads through the shared codec",
+				"index size hints as metadata",
+				"generated names"
+			],
+			"unsupported": [
+				"type classification by content signature",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "HIM5",
 				"class": "Him5Opener",
 				"source": "ArcFormats/SHSystem/ArcHXP.cs"

@@ -191,7 +191,7 @@ export function decompressShs(input: Buffer, outputLength: number): Buffer {
  * classify the entry through its catalog, which the port leaves out since neither version names its entries by
  * extension in a way that classification would change.
  */
-async function buildEntry(
+export async function buildShsEntry(
 	source: ByteSource,
 	id: number,
 	offset: bigint,
@@ -214,6 +214,25 @@ async function buildEntry(
 		compressed: packed,
 		metadata: { storedSize, unpackedSize: unpacked },
 	});
+}
+
+export interface ShsSection {
+	readonly offset: number;
+	readonly size: number;
+}
+
+/**
+ * GARBro `Him5Opener.ReadIndex`: section descriptors of a size and an offset, where a zero size marks an
+ * absent section. The DDSystem format reads its sections through the same helper.
+ */
+export function readShsSections(index: Buffer, count: number): ShsSection[] {
+	const sections: ShsSection[] = [];
+	for (let id = 0; id < count; id += 1) {
+		const size = index.readInt32LE(id * SECTION_RECORD_SIZE);
+		const offset = index.readInt32LE(id * SECTION_RECORD_SIZE + WORD_SIZE);
+		if (size !== 0) sections.push({ offset, size });
+	}
+	return sections;
 }
 
 /**
@@ -241,7 +260,7 @@ async function readHim4Index(
 	let offset = BigInt(header.readUInt32LE(HIM4_FIRST_OFFSET_FIELD));
 	for (let id = 0; id < count; id += 1) {
 		if (offset > source.size) return undefined;
-		const entry = await buildEntry(source, id, offset, source.size);
+		const entry = await buildShsEntry(source, id, offset, source.size);
 		if (!entry) return undefined;
 		entry.path = String(id).padStart(GENERATED_NAME_DIGITS, "0");
 		entries.push(entry);
@@ -281,15 +300,10 @@ async function readHim5Index(
 	);
 
 	const entries: FixedEntry[] = [];
-	for (let sectionId = 0; sectionId < count; sectionId += 1) {
-		const sectionSize = index.readInt32LE(sectionId * SECTION_RECORD_SIZE);
-		const sectionOffset = index.readInt32LE(
-			sectionId * SECTION_RECORD_SIZE + WORD_SIZE,
-		);
-		if (sectionSize === 0) continue;
-		if (sectionOffset < 0) return undefined;
-		let position = sectionOffset;
-		let remaining = sectionSize;
+	for (const section of readShsSections(index, count)) {
+		if (section.offset < 0) return undefined;
+		let position = section.offset;
+		let remaining = section.size;
 		while (remaining > 0) {
 			if (BigInt(position) + 1n > source.size) return undefined;
 			const lengthField = await source.readAt(BigInt(position), 1);
@@ -305,7 +319,7 @@ async function readHim5Index(
 				terminator === -1 ? nameField : nameField.subarray(0, terminator),
 			);
 			if (name.length === 0) return undefined;
-			const entry = await buildEntry(
+			const entry = await buildShsEntry(
 				source,
 				entries.length,
 				offset,

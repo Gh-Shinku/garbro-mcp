@@ -287,6 +287,8 @@ import { egoDatFormat } from "./studio-ego/ego-dat.js";
 import { egoOldDatFormat } from "./studio-ego/ego-dat.js";
 import { him4Format } from "./shsystem/hxp.js";
 import { him5Format } from "./shsystem/hxp.js";
+import { ddp2Format } from "./dd-system/ddp.js";
+import { ddp3Format } from "./dd-system/ddp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -486,6 +488,7 @@ export * from "./nscripter/index.js";
 export * from "./key/index.js";
 export * from "./studio-ego/index.js";
 export * from "./shsystem/index.js";
+export * from "./dd-system/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -779,5 +782,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		egoOldDatFormat,
 		him4Format,
 		him5Format,
+		ddp2Format,
+		ddp3Format,
 	]);
 }
