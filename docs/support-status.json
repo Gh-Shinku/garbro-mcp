@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SDT/UMA",
+				"class": "SdtOpener",
+				"source": "Legacy/Uma/ArcSDT.cs"
+			},
+			"localId": "uma-sdt",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"sdt extension gate and first word check",
+				"sequential records with a packed flag",
+				"cp932 names and placement validation",
+				"stored and unpacked size fields",
+				"synthesized riff wave wrapper",
+				"default lzss extraction",
+				"verbatim payload extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "RLZ",
 				"class": "RlzOpener",
 				"source": "Legacy/Dice/ArcRLZ.cs"
