@@ -253,6 +253,7 @@ import { dlbV0Format } from "./aypio/dlb.js";
 import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
+import { nejiiCdtFormat } from "./nejii/cdt.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -694,5 +695,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ttdFormat,
 		gxFormat,
 		dl1Format,
+		nejiiCdtFormat,
 	]);
 }
