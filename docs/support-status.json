@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GRP/EXHIBIT",
+				"class": "GrpOpener",
+				"source": "ArcFormats/ExHibit/ArcGRP.cs"
+			},
+			"localId": "exhibit-grp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"res digits grp name pattern and aifs rejection",
+				"sibling table search by rewriting digits",
+				"contiguous run requirement and rising reference number",
+				"resource count and reference check",
+				"marker word with its four byte shift",
+				"skipping blocks of other archives",
+				"start index and record walk with zero size skipping",
+				"placement validation against the archive",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "XFL",
 				"class": "XflOpener",
 				"source": "ArcFormats/Liar/ArcXFL.cs"
