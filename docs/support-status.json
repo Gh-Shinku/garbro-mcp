@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MNG",
+				"class": "MngOpener",
+				"source": "ArcFormats/ImageMNG.cs"
+			},
+			"localId": "mng",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"mng signature",
+				"header chunk validation",
+				"embedded png discovery",
+				"frame splitting",
+				"bounded chunk walk",
+				"generated frame names",
+				"image typing"
+			],
+			"unsupported": ["archive creation", "mng encoding", "image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CHR/Palette",
 				"class": "ChrOpener",
 				"source": "ArcFormats/Palette/ArcCHR.cs"
