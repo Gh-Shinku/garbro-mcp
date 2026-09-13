@@ -566,6 +566,7 @@ import { ngwImageFormat } from "./brownie/ngw-image.js";
 import { gdfImageFormat } from "./mink/gdf-image.js";
 import { isdScriptFormat } from "./ice/isd-script.js";
 import { wazAudioFormat } from "./anotherroom/waz-audio.js";
+import { harvestBgmAudioFormat } from "./myharvest/bgm-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1451,5 +1452,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gdfImageFormat,
 		isdScriptFormat,
 		wazAudioFormat,
+		harvestBgmAudioFormat,
 	]);
 }

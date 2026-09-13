@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "BGM/HARVEST",
+				class: "BgmAudio",
+				source: "Legacy/Harvest/AudioBGM.cs",
+			},
+			localId: "myharvest-bgm-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "metadata"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WAZ",
 				class: "WazAudio",
 				source: "Legacy/AnotherRoom/AudioWAZ.cs",
