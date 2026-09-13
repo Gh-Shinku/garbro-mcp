@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/DISCOVERY",
+				class: "DatOpener",
+				source: "Legacy/Discovery/ArcDAT.cs",
+			},
+			localId: "discovery-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"bdata edata and vdata name schemes",
+				"word descrambler with seed 13",
+				"byte descrambler with seed 7",
+				"index mask 0xD6",
+				"vdata index mask 0xDE",
+				"cp932 names",
+				"packed edata header and body",
+				"lzss header and body streams",
+				"placement checks",
+			],
+			unsupported: ["archive creation", "bdata image decoder"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "NPA-SG",
 				class: "NpaSteinsGateOpener",
 				source: "ArcFormats/NitroPlus/ArcSteinsGate.cs",
