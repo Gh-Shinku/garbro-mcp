@@ -238,6 +238,7 @@ import { smvFormat } from "./tanaka/smv.js";
 import { cgfFormat } from "./triangle/cgf.js";
 import { techgianBinFormat } from "./techgian/bin.js";
 import { speedArcFormat } from "./speed/arc.js";
+import { hzcMultiFormat } from "./favorite/hzc-multi.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -656,5 +657,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cgfFormat,
 		techgianBinFormat,
 		speedArcFormat,
+		hzcMultiFormat,
 	]);
 }

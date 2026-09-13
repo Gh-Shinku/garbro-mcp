@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "HZC/MULTI",
+				"class": "HzcOpener",
+				"source": "ArcFormats/Favorite/ArcHZC.cs"
+			},
+			"localId": "fvp-hzc-multi",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature validation",
+				"image metadata validation",
+				"frame count with zero default",
+				"frame directory with padded names",
+				"frame size derivation and guard",
+				"metadata exposure",
+				"zlib frame extraction with early exit"
+			],
+			"unsupported": ["image decoding to bitmaps", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/REC",
 				"class": "ArcOpener",
 				"source": "ArcFormats/Speed/ArcARC.cs"
