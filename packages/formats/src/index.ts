@@ -402,6 +402,7 @@ import { frontWingFltFormat } from "./frontwing/flt.js";
 import { densdkDaf1Format } from "./densdk/daf.js";
 import { densdkDaf2Format } from "./densdk/daf.js";
 import { pfsFormat } from "./artemis/pfs.js";
+import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -656,6 +657,7 @@ export * from "./ast/index.js";
 export * from "./carriere/index.js";
 export * from "./system98/index.js";
 export * from "./densdk/index.js";
+export * from "./tmr-hiro/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1063,5 +1065,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		densdkDaf1Format,
 		densdkDaf2Format,
 		pfsFormat,
+		tmrHiroPacFormat,
 	]);
 }
