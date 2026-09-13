@@ -20,6 +20,7 @@ import {
 	type FixedEntry,
 	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
+import { detectFileType } from "../shared/detect-type.js";
 
 const COUNT_OFFSET = 0;
 const FIRST_OFFSET = 4;
@@ -34,37 +35,6 @@ const SIZE_MASK = 0x3fffffff;
 /** Packed payloads may carry a one-byte prefix followed by the file signature. */
 const SIGNATURE_NIBBLE = 0xf;
 const SIGNATURE_OFFSET = 1;
-
-/** GARbro `AutoEntry.DetectFileType`, limited to the two special cases. */
-const DETECTED_TYPES: readonly {
-	signature: number;
-	type: string;
-	extension: string;
-}[] = [
-	{ signature: 0x5367674f, type: "audio", extension: "ogg" },
-	{ signature: 0x46464952, type: "audio", extension: "wav" },
-];
-const BMP_SIGNATURE = 0x4d42;
-
-interface DetectedType {
-	type: string;
-	extension: string;
-}
-
-/**
- * GARbro `AutoEntry.DetectFileType`, restricted to the Ogg, RIFF and bitmap special cases; the
- * catalog-wide signature lookup is not reproduced, so an unknown signature leaves the entry alone.
- */
-function detectFileType(signature: number): DetectedType | undefined {
-	if (signature === 0) return undefined;
-	const match = DETECTED_TYPES.find(
-		(candidate) => candidate.signature === signature,
-	);
-	if (match) return { type: match.type, extension: match.extension };
-	if ((signature & 0xffff) === BMP_SIGNATURE)
-		return { type: "image", extension: "bmp" };
-	return undefined;
-}
 
 interface BinHeader {
 	entries: FixedEntry[];
