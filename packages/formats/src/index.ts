@@ -606,6 +606,7 @@ import { ankhGpdImageFormat } from "./ankh/gpd-image.js";
 import { kgrImageFormat } from "./project-myu/kgr-image.js";
 import { lzBmpImageFormat } from "./misc/lz-bmp-image.js";
 import { bbmImageFormat } from "./blue-gale/bbm-image.js";
+import { wpnAudioFormat } from "./wildbug/wpn-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -928,6 +929,7 @@ export * from "./regrips/index.js";
 export * from "./tiare/index.js";
 export * from "./hillfield/index.js";
 export * from "./project-myu/index.js";
+export * from "./wildbug/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1539,5 +1541,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kgrImageFormat,
 		lzBmpImageFormat,
 		bbmImageFormat,
+		wpnAudioFormat,
 	]);
 }

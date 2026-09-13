@@ -8,6 +8,26 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WPN",
+				class: "WpnAudio",
+				source: "ArcFormats/WildBug/AudioWPN.cs",
+			},
+			localId: "wildbug-wpn-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"offset directed chunk reassembly",
+				"canonical wav output",
+				"metadata",
+			],
+			unsupported: ["audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "BBM",
 				class: "BbmFormat",
