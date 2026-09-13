@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "OVK",
+				"class": "OvkOpener",
+				"source": "ArcFormats/RealLive/ArcOVK.cs"
+			},
+			"localId": "reallive-ovk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"0x10 and 0x0c record widths",
+				"generated audio names with padded ids",
+				"first-offset validation",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "256/DMOTION",
 				"class": "PakOpener",
 				"source": "Legacy/DMotion/ArcDM.cs"
