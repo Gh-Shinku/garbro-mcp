@@ -438,6 +438,7 @@ import { daiPacFormat } from "./dai-system/pac.js";
 import { ganFormat } from "./ikura/gan.js";
 import { laxFormat } from "./lambda/lax.js";
 import { fjsysFormat } from "./n-system/fjsys.js";
+import { idaFormat } from "./inspire/ida.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -709,6 +710,7 @@ export * from "./hsp/index.js";
 export * from "./ugos/index.js";
 export * from "./dai-system/index.js";
 export * from "./n-system/index.js";
+export * from "./inspire/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1152,5 +1154,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ganFormat,
 		laxFormat,
 		fjsysFormat,
+		idaFormat,
 	]);
 }

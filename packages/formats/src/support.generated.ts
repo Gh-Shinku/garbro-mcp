@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "IDA",
+				class: "IdaOpener",
+				source: "Legacy/Inspire/ArcIDA.cs",
+			},
+			localId: "inspire-ida",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"fixed index records",
+				"serialized name lengths",
+				"wide utf16 names",
+				"key chained entry decryption",
+				"add xor and complement flags",
+				"rle payload decompression",
+				"zlib payload inflation",
+				"adjacent sizes for packed archives",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "FJSYS",
 				class: "FjsysOpener",
 				source: "ArcFormats/NSystem/ArcFJSYS.cs",
