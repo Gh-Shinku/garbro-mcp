@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "PCM/ICE",
+				"class": "IceAudio",
+				"source": "ArcFormats/Ankh/AudioPCM.cs"
+			},
+			"localId": "ankh-ice-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"pcm framing",
+				"wave output",
+				"metadata"
+			],
+			"unsupported": ["audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "WAV/IKE",
 				"class": "IkeAudio",
 				"source": "Legacy/UMeSoft/AudioIKE.cs"
