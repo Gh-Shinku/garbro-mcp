@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MNV",
+				"class": "DatOpener",
+				"source": "ArcFormats/MnoViolet/ArcMnoViolet.cs"
+			},
+			"localId": "mno-violet-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"name width probing",
+				"first-offset validation",
+				"per-record validation with candidate retry",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/MK",
 				"class": "DatOpener",
 				"source": "Legacy/Witch/ArcDAT.cs"
