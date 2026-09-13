@@ -504,6 +504,7 @@ import { piasEncryptedFormat } from "./pias/encrypted-graph.js";
 import { alicesoftAfaFormat } from "./alicesoft/afa.js";
 import { abmFormat } from "./lilim/abm.js";
 import { flyingShinePd3Format } from "./flying-shine/pd.js";
+import { flyingShinePdFormat } from "./flying-shine/pd-legacy.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1310,5 +1311,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		alicesoftAfaFormat,
 		abmFormat,
 		flyingShinePd3Format,
+		flyingShinePdFormat,
 	]);
 }
