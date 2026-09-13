@@ -97,6 +97,12 @@ export function createFixedEntry(input: {
 	rawPath?: string;
 	offset: bigint;
 	size: bigint;
+	/**
+	 * Number of bytes actually stored for the entry. Defaults to `size`. Compressed entries pass
+	 * the unpacked size as `size` and the stored size here, so extraction can verify the decoder
+	 * against the declared output size.
+	 */
+	packedSize?: bigint;
 	compressed?: boolean;
 	encrypted?: boolean;
 	metadata?: Record<string, unknown>;
@@ -105,7 +111,7 @@ export function createFixedEntry(input: {
 		id: String(input.id),
 		path: input.path,
 		size: input.size,
-		packedSize: input.size,
+		packedSize: input.packedSize ?? input.size,
 		compressed: input.compressed ?? false,
 		encrypted: input.encrypted ?? false,
 		offset: input.offset,
