@@ -28,10 +28,9 @@ function literalLz1Stream(data: Uint8Array): Buffer {
 /** Builds an archive whose index sits behind the payloads. */
 function buildBnd(records: readonly Record[]): Buffer {
 	const firstPayload = 0x13;
-	const indexOffset = firstPayload + records.reduce(
-		(sum, record) => sum + record.payload.length,
-		0,
-	);
+	const indexOffset =
+		firstPayload +
+		records.reduce((sum, record) => sum + record.payload.length, 0);
 	const header = Buffer.alloc(firstPayload);
 	header.write("Bind", 0, "ascii");
 	header.write(" ver.0", 4, "ascii");
@@ -67,9 +66,7 @@ describe("Ponytail BND resource archive", () => {
 		const content = Buffer.from("bitmap payload");
 		await expectArchive({
 			format: ponytailBndFormat,
-			archive: buildBnd([
-				{ name: "PIC", extension: "BMP", payload: content },
-			]),
+			archive: buildBnd([{ name: "PIC", extension: "BMP", payload: content }]),
 			entries: [{ path: "PIC.BMP", size: content.length, content }],
 		});
 	});
@@ -93,9 +90,7 @@ describe("Ponytail BND resource archive", () => {
 		const content = Buffer.from("raw payload");
 		await expectArchive({
 			format: ponytailBndFormat,
-			archive: buildBnd([
-				{ name: "DATA", extension: "Z", payload: content },
-			]),
+			archive: buildBnd([{ name: "DATA", extension: "Z", payload: content }]),
 			entries: [{ path: "DATA.Z", size: content.length, content }],
 		});
 	});

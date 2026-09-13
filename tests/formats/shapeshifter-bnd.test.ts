@@ -55,9 +55,7 @@ describe("ShapeShifter BND resource archive", () => {
 			format: shapeShifterBndFormat,
 			archive: buildBnd([{ content }]),
 			sourcePath: "/games/DATA.BND",
-			entries: [
-				{ path: "DATA#0000.bmp", size: content.length, content },
-			],
+			entries: [{ path: "DATA#0000.bmp", size: content.length, content }],
 		});
 	});
 
