@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "FG",
+				"class": "FgOpener",
+				"source": "ArcFormats/FrontWing/ArcFG.cs"
+			},
+			"localId": "frontwing-fg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x1ac-byte layer records",
+				"name directory stripping",
+				"layer metadata",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IKS",
 				"class": "IksOpener",
 				"source": "ArcFormats/ArcIKS.cs"
