@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/SYSTEM21",
+				"class": "PakOpener",
+				"source": "Legacy/System21/ArcPAK.cs"
+			},
+			"localId": "system21-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures",
+				"version dependent candidate ordering",
+				"data offset and derived index size",
+				"fixed width name candidates with divisibility test",
+				"accumulated payload offsets",
+				"entry placement validation",
+				"cp932 names with empty rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/OMI",
 				"class": "DatOpener",
 				"source": "Legacy/Omi/ArcDAT.cs"
