@@ -564,6 +564,7 @@ import { ardImageFormat } from "./acme/ard-image.js";
 import { mbImageFormat } from "./mb/image.js";
 import { ngwImageFormat } from "./brownie/ngw-image.js";
 import { gdfImageFormat } from "./mink/gdf-image.js";
+import { isdScriptFormat } from "./ice/isd-script.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -876,6 +877,7 @@ export * from "./eye/index.js";
 export * from "./bef/index.js";
 export * from "./acme/index.js";
 export * from "./mb/index.js";
+export * from "./ice/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1445,5 +1447,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mbImageFormat,
 		ngwImageFormat,
 		gdfImageFormat,
+		isdScriptFormat,
 	]);
 }

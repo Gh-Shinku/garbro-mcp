@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "script",
+				tag: "ISD",
+				class: "IsdScript",
+				source: "ArcFormats/Ice/ScriptISD.cs",
+			},
+			localId: "ice-isd-script",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "tpw decoding", "metadata"],
+			unsupported: ["archive creation", "script compilation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GDF",
 				class: "GdfFormat",
