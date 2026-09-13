@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/NITRO+",
+				class: "PakOpener",
+				source: "ArcFormats/NitroPlus/ArcNitro.cs",
+			},
+			localId: "nitroplus-nitro-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"version 2 index parsing",
+				"version 3 index parsing",
+				"compressed index decompression",
+				"name keyed record decryption",
+				"version 3 payload prefix decryption",
+				"nested path listing",
+				"entry extraction",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "G00/v2",
 				class: "G00Opener",
 				source: "ArcFormats/RealLive/ArcG00.cs",

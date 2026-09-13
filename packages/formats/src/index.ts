@@ -421,6 +421,7 @@ import { pandoraPbxFormat } from "./pandora/pbx.js";
 import { nononoNpfFormat } from "./nonono/npf.js";
 import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
 import { realliveG00Format } from "./reallive/g00.js";
+import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1109,5 +1110,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nononoNpfFormat,
 		shiinaRioWarcFormat,
 		realliveG00Format,
+		nitroplusNitroPakFormat,
 	]);
 }
