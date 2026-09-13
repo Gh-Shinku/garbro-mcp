@@ -386,6 +386,7 @@ import { nekoSdkPakFormat } from "./nekosdk/pak.js";
 import { loggArfFormat } from "./logg/arf.js";
 import { glibGFormat } from "./glib/g.js";
 import { blackButterflyDatFormat } from "./black-butterfly/dat.js";
+import { debonosuPakFormat } from "./debonosu/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -633,6 +634,7 @@ export * from "./factor/index.js";
 export * from "./logg/index.js";
 export * from "./glib/index.js";
 export * from "./black-butterfly/index.js";
+export * from "./debonosu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1024,5 +1026,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		loggArfFormat,
 		glibGFormat,
 		blackButterflyDatFormat,
+		debonosuPakFormat,
 	]);
 }

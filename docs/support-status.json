@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/Debonosu",
+				"class": "PakOpener",
+				"source": "ArcFormats/Debonosu/ArcPAK.cs"
+			},
+			"localId": "debonosu-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"PAK marker and index offset",
+				"zero word at 0x0A",
+				"index header with info size and root count",
+				"raw deflate packed index",
+				"directory records with child counts",
+				"recursive path prefixes",
+				"CP932 null terminated names",
+				"relative payload offsets",
+				"unpacked and stored sizes",
+				"raw deflate payload extraction",
+				"depth limit for hostile indexes",
+				"placement validation"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PITA",
 				"class": "DatOpener",
 				"source": "Legacy/BlackButterfly/ArcDAT.cs"
