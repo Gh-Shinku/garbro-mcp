@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/ZENOS",
+				"class": "ZenosOpener",
+				"source": "ArcFormats/RPM/ArcZENOS.cs"
+			},
+			"localId": "rpm-zenos",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"0x1c-byte records",
+				"keyword recovery",
+				"index decryption",
+				"default LZSS decompression",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/RPM",
 				"class": "ArcOpener",
 				"source": "ArcFormats/RPM/ArcARC.cs"

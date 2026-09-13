@@ -146,6 +146,7 @@ import { lwgFormat } from "./liar/lwg.js";
 import { paqFormat } from "./force/paq.js";
 import { triangleDatFormat } from "./triangle/dat.js";
 import { rpmArcFormat } from "./rpm/arc.js";
+import { rpmZenosFormat } from "./rpm/zenos.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -416,5 +417,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		paqFormat,
 		triangleDatFormat,
 		rpmArcFormat,
+		rpmZenosFormat,
 	]);
 }
