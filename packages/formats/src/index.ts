@@ -411,6 +411,7 @@ import { youkaiDatSoundFormat } from "./youkai/dat.js";
 import { youkaiDatVoiceFormat } from "./youkai/dat.js";
 import { crowdPkwvFormat } from "./crowd/pck.js";
 import { advscripterPakFormat } from "./advscripter/pak.js";
+import { uranNclFormat } from "./uran/ncl.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1085,5 +1086,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		youkaiDatVoiceFormat,
 		crowdPkwvFormat,
 		advscripterPakFormat,
+		uranNclFormat,
 	]);
 }
