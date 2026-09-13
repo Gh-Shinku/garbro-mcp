@@ -499,6 +499,7 @@ import { caramelBoxArc4Format } from "./caramel-box/arc4.js";
 import { lunePackFormat } from "./lune/pack.js";
 import { nitroplusNpaSteinsGateFormat } from "./nitroplus/npa-sg.js";
 import { discoveryDatFormat } from "./discovery/dat.js";
+import { entisEriFormat } from "./entis/eri.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1299,5 +1300,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		lunePackFormat,
 		nitroplusNpaSteinsGateFormat,
 		discoveryDatFormat,
+		entisEriFormat,
 	]);
 }

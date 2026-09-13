@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ERI/MULTI",
+				"class": "EriOpener",
+				"source": "ArcFormats/Entis/ArcERI.cs"
+			},
+			"localId": "entis-eri",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"Enti signature",
+				"identifier word and string gates",
+				"section chain with 64 bit lengths",
+				"FileHdr metadata",
+				"ImageInf metadata",
+				"descript section decode",
+				"frame count limit",
+				"ImageFrm and DiffeFrm frames",
+				"stream and palette record skipping",
+				"placement checks"
+			],
+			"unsupported": ["archive creation", "entis image decoder"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/DISCOVERY",
 				"class": "DatOpener",
 				"source": "Legacy/Discovery/ArcDAT.cs"
