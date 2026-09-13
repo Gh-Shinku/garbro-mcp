@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "UNH",
+				"class": "UnhFormat",
+				"source": "Legacy/Harvest/ImageUNH.cs"
+			},
+			"localId": "myharvest-unh-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"16-bit lzss word stream",
+				"565 output",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "KGP",
 				"class": "KgpFormat",
 				"source": "ArcFormats/KScript/ImageKGP.cs"

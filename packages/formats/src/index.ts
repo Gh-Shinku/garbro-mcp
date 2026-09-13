@@ -664,6 +664,7 @@ import { timImageFormat } from "./slg/tim-image.js";
 import { imgBmpImageFormat } from "./lilim/img-bmp-image.js";
 import { imgPngImageFormat } from "./lilim/img-png-image.js";
 import { kgpImageFormat } from "./kscript/kgp-image.js";
+import { unhImageFormat } from "./myharvest/unh-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1661,5 +1662,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		imgBmpImageFormat,
 		imgPngImageFormat,
 		kgpImageFormat,
+		unhImageFormat,
 	]);
 }
