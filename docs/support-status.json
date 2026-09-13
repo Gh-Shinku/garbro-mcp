@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/VC",
+				"class": "VcPakOpener",
+				"source": "ArcFormats/Circus/ArcValkyrieComplex.cs"
+			},
+			"localId": "circus-vc-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"trial and retail signatures with key bytes",
+				"masked count and index size",
+				"keyed index bytes",
+				"records with names behind them",
+				"cs decrement",
+				"cps layouts zero to three",
+				"unknown cps layout passthrough",
+				"lsb stream reader",
+				"entry placement validation",
+				"inexact size marking"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARCG",
 				"class": "ArcGOpener",
 				"source": "ArcFormats/Tanaka/ArcARCG.cs"
