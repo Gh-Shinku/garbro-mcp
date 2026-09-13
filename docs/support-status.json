@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/TRIANGLE",
+				"class": "DatOpener",
+				"source": "ArcFormats/Triangle/ArcDAT.cs"
+			},
+			"localId": "triangle-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"first-offset validation",
+				"0x11-byte records",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAQ/FORCE",
 				"class": "PaqOpener",
 				"source": "Legacy/Force/ArcPAQ.cs"

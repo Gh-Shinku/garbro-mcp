@@ -144,6 +144,7 @@ import { usfFormat } from "./westgate/usf.js";
 import { iafFormat } from "./triangle/iaf.js";
 import { lwgFormat } from "./liar/lwg.js";
 import { paqFormat } from "./force/paq.js";
+import { triangleDatFormat } from "./triangle/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -411,5 +412,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		iafFormat,
 		lwgFormat,
 		paqFormat,
+		triangleDatFormat,
 	]);
 }
