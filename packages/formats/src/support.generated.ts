@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "RBP",
+				class: "RbpFormat",
+				source: "Legacy/Dice/ImageRBP.cs",
+			},
+			localId: "dice-rbp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"24bpp packed pixel expansion",
+				"32bpp bitmap output",
+				"six bit alpha scaling",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BIZ/2",
 				class: "Biz2Format",
 				source: "Legacy/Adviz/ImageBIZ2.cs",
