@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "WIP/MULTI",
+				"class": "WipOpener",
+				"source": "ArcFormats/Will/ArcWIP.cs"
+			},
+			"localId": "will-wip",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"WIPF signature",
+				"0x18 frame index records",
+				"index-derived frame names",
+				"back-to-back frame offsets",
+				"8bpp palette padding",
+				"synthesized frame headers",
+				"prefix-wrapped extraction"
+			],
+			"unsupported": ["image decoding", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/NekoSDK",
 				"class": "DatOpener",
 				"source": "ArcFormats/NekoSDK/ArcDAT.cs"

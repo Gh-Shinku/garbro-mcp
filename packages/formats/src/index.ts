@@ -339,6 +339,7 @@ import { digitalWorksPacFormat } from "./digital-works/pac.js";
 import { pspQpkFormat } from "./psp/qpk.js";
 import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { nekosdkDatFormat } from "./nekosdk/dat.js";
+import { willWipFormat } from "./will/wip.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -563,6 +564,7 @@ export * from "./entis/index.js";
 export * from "./digital-works/index.js";
 export * from "./psp/index.js";
 export * from "./nekosdk/index.js";
+export * from "./will/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -907,5 +909,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pspQpkFormat,
 		nitroplusPakFormat,
 		nekosdkDatFormat,
+		willWipFormat,
 	]);
 }
