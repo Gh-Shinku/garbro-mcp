@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/BK",
+				"class": "BkOpener",
+				"source": "ArcFormats/Maika/ArcBK.cs"
+			},
+			"localId": "maika-bk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection through the trailing index",
+				"index offset and size at 0x00 that must cover the file tail",
+				"lz bits index decompression",
+				"fixed width records with offset, stored and unpacked sizes and padded names",
+				"compression flag from the size mismatch",
+				"lz bits payload decompression",
+				"output limited to the unpacked size",
+				"gpa inversion",
+				"gpt image typing",
+				"path normalization",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NOR",
 				"class": "NorOpener",
 				"source": "Legacy/Sophia/ArcNOR.cs"

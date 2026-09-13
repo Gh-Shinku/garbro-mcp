@@ -379,6 +379,7 @@ import { blackRainbowImpFormat } from "./black-rainbow/imp.js";
 import { dogenzakaBinFormat } from "./dogenzaka/bin.js";
 import { dogenzakaGameDatFormat } from "./dogenzaka/bin.js";
 import { sophiaNorFormat } from "./sophia/nor.js";
+import { maikaBkFormat } from "./maika/bk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1005,5 +1006,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dogenzakaBinFormat,
 		dogenzakaGameDatFormat,
 		sophiaNorFormat,
+		maikaBkFormat,
 	]);
 }
