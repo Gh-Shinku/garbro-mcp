@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PACK/DX",
+				"class": "PackOpener",
+				"source": "ArcFormats/BlackRainbow/ArcDX.cs"
+			},
+			"localId": "black-rainbow-dx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and extension detection",
+				"recursive directory index",
+				"nested base-offset accumulation",
+				"nested index offset validation",
+				"cyclic index rejection",
+				"hse payload inversion",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/MICROVISION",
 				"class": "ArcOpener",
 				"source": "ArcFormats/MicroVision/ArcARC.cs"
