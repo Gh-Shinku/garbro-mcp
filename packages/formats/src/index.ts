@@ -551,6 +551,7 @@ import { cwvAudioFormat } from "./uncanny/cwv-audio.js";
 import { whcAudioFormat } from "./basil/whc-audio.js";
 import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 import { pnxEncryptedImageFormat } from "./misc/pnx-image.js";
+import { pcgImageFormat } from "./parsley/pcg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1414,5 +1415,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		whcAudioFormat,
 		tmrHiroAudioFormat,
 		pnxEncryptedImageFormat,
+		pcgImageFormat,
 	]);
 }

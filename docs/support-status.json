@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PCG",
+				"class": "PcgFormat",
+				"source": "ArcFormats/Software House Parsley/ImagePCG.cs"
+			},
+			"localId": "parsley-pcg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "metadata", "bmp reassembly"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PNX",
 				"class": "PnxFormat",
 				"source": "ArcFormats/ImagePNX.cs"
