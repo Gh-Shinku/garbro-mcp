@@ -169,6 +169,7 @@ import { gpkFormat } from "./black-cyc/gpk.js";
 import { arc0Format } from "./mixwill/arc0.js";
 import { minkGrpFormat } from "./mink/grp.js";
 import { yaneDatFormat } from "./yane-sdk/dat.js";
+import { s25Format } from "./shiina-rio/s25.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -302,6 +303,7 @@ export * from "./yatagarasu/index.js";
 export * from "./mixwill/index.js";
 export * from "./mink/index.js";
 export * from "./yane-sdk/index.js";
+export * from "./shiina-rio/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -477,5 +479,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		arc0Format,
 		minkGrpFormat,
 		yaneDatFormat,
+		s25Format,
 	]);
 }
