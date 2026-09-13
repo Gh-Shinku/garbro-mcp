@@ -150,6 +150,7 @@ import { rpmZenosFormat } from "./rpm/zenos.js";
 import { cabFormat } from "./entexec/cab.js";
 import { glnkFormat } from "./eternity/glnk.js";
 import { advdxPkdFormat } from "./advdx/pkd.js";
+import { dmotionPackFormat } from "./dmotion/pack.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -270,6 +271,7 @@ export * from "./force/index.js";
 export * from "./rpm/index.js";
 export * from "./entexec/index.js";
 export * from "./advdx/index.js";
+export * from "./dmotion/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -426,5 +428,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cabFormat,
 		glnkFormat,
 		advdxPkdFormat,
+		dmotionPackFormat,
 	]);
 }

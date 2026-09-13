@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "256/DMOTION",
+				"class": "PakOpener",
+				"source": "Legacy/DMotion/ArcDM.cs"
+			},
+			"localId": "dmotion-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"header and marker detection",
+				"per-extension directories",
+				"stem and extension name composition",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PKD",
 				"class": "PkdOpener",
 				"source": "ArcFormats/AdvDx/ArcPKD.cs"
