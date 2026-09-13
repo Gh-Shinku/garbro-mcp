@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAC/TERIOS",
+				class: "PacOpener",
+				source: "ArcFormats/Entis/ArcPAC.cs",
+			},
+			localId: "entis-pac",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"pac extension gate",
+				"flat name offset and size records",
+				"space terminated names with control byte rejection",
+				"offsets relative to 0x40000",
+				"entry placement validation",
+				"default password xor extraction",
+				"verbatim extraction",
+			],
+			unsupported: ["entry type inference", "archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/YOX",
 				class: "DatOpener",
 				source: "ArcFormats/Yox/ArcYOX.cs",
