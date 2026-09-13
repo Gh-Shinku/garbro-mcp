@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SPD/SLG",
+				"class": "SpdOpener",
+				"source": "ArcFormats/Slg/ArcSPD.cs"
+			},
+			"localId": "slg-spd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion spl index",
+				"name-blob derived record count",
+				"alignment factor scaling",
+				"name-blob validation",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GR2/PACK",
 				"class": "Gr2Opener",
 				"source": "ArcFormats/AdvSys/ArcGR2.cs"

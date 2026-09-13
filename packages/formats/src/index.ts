@@ -200,6 +200,7 @@ import { gameDatFormat } from "./pajamas/gamedat.js";
 import { pmxFormat } from "./sceneplayer/pmx.js";
 import { pmaFormat } from "./sceneplayer/pma.js";
 import { gr2Format } from "./umesoft/gr2.js";
+import { spdFormat } from "./slg/spd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -556,5 +557,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pmxFormat,
 		pmaFormat,
 		gr2Format,
+		spdFormat,
 	]);
 }
