@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "CMB/PCM",
+				class: "CmbAudio",
+				source: "Legacy/PineSoft/AudioCMB.cs",
+			},
+			localId: "pinesoft-cmb-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wav header reassembly"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "MSF",
 				class: "MsfAudio",
 				source: "Legacy/Unknown/AudioMSF.cs",
