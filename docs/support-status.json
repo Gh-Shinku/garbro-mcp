@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "NOR",
+				"class": "NorOpener",
+				"source": "Legacy/Sophia/ArcNOR.cs"
+			},
+			"localId": "sophia-nor",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection through the NRCOMB01 marker",
+				"count at 0x00",
+				"records of offset and size with null terminated names from 0x10",
+				"placement validation",
+				"ncmb payload header resolution",
+				"stored method payloads behind a 0x2c header",
+				"packed payloads with the tree codec",
+				"ncmb bit stream and node table decoding",
+				"path normalization"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/Dogenzaka/2",
 				"class": "GamedatOpener",
 				"source": "ArcFormats/Dogenzaka/ArcBIN.cs"

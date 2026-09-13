@@ -378,6 +378,7 @@ import { leafLacPakFormat } from "./leaf/lac.js";
 import { blackRainbowImpFormat } from "./black-rainbow/imp.js";
 import { dogenzakaBinFormat } from "./dogenzaka/bin.js";
 import { dogenzakaGameDatFormat } from "./dogenzaka/bin.js";
+import { sophiaNorFormat } from "./sophia/nor.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -619,6 +620,7 @@ export * from "./ankh/index.js";
 export * from "./shapeshifter/index.js";
 export * from "./malie/index.js";
 export * from "./dogenzaka/index.js";
+export * from "./sophia/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1002,5 +1004,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		blackRainbowImpFormat,
 		dogenzakaBinFormat,
 		dogenzakaGameDatFormat,
+		sophiaNorFormat,
 	]);
 }
