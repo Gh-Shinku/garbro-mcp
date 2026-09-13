@@ -491,6 +491,7 @@ import { xuseWagFormat } from "./xuse/wag.js";
 import { minaBmpPakFormat } from "./mina/pak.js";
 import { minaWavPakFormat } from "./mina/pak.js";
 import { minaScriptPakFormat } from "./mina/pak.js";
+import { emonEmeFormat } from "./emon/eme.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -782,6 +783,7 @@ export * from "./g2/index.js";
 export * from "./pinky/index.js";
 export * from "./pias/index.js";
 export * from "./kogado/index.js";
+export * from "./emon/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1278,5 +1280,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		minaBmpPakFormat,
 		minaWavPakFormat,
 		minaScriptPakFormat,
+		emonEmeFormat,
 	]);
 }

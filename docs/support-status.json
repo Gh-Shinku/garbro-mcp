@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "EME",
+				"class": "EmeOpener",
+				"source": "ArcFormats/EmonEngine/ArcEME.cs"
+			},
+			"localId": "emon-eme",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"eight byte signature",
+				"back to front decrypt bytecode",
+				"decrypted fixed size index",
+				"script header handling",
+				"lzss frame settings",
+				"type five header wrapping",
+				"raw extraction for other subtypes"
+			],
+			"unsupported": ["archive creation", "image decoding for subtype four"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/MINA/SPT",
 				"class": "ScriptPakOpener",
 				"source": "Legacy/Mina/ArcPAK.cs"
