@@ -231,6 +231,7 @@ import { airFormat } from "./adobe/air.js";
 import { gafFormat } from "./origin/gaf.js";
 import { emicFormat } from "./emic/pack.js";
 import { ipqFormat } from "./techno-brain/ipq.js";
+import { aniFormat } from "./musica/ani.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -640,5 +641,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gafFormat,
 		emicFormat,
 		ipqFormat,
+		aniFormat,
 	]);
 }

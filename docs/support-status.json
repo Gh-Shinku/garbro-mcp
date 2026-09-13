@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ANI/PAZ",
+				"class": "AniOpener",
+				"source": "ArcFormats/Musica/ArcANI.cs"
+			},
+			"localId": "musica-ani",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"version and reserved word detection",
+				"nul-terminated frame names",
+				"dimension-derived frame sizes",
+				"sequential frame walk",
+				"frame metadata",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IPQ",
 				"class": "IpqOpener",
 				"source": "ArcFormats/TechnoBrain/ArcIPQ.cs"
