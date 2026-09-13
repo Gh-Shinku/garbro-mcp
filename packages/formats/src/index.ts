@@ -195,6 +195,7 @@ import { mgdFormat } from "./masys/mgd.js";
 import { wvbFormat } from "./xuse/wvb.js";
 import { pcdFormat } from "./nejii/pcd.js";
 import { aldFormat } from "./alicesoft/ald.js";
+import { yaneSdaFormat } from "./yaneurao/sda.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -341,6 +342,7 @@ export * from "./kapp/index.js";
 export * from "./elf/index.js";
 export * from "./masys/index.js";
 export * from "./nejii/index.js";
+export * from "./yaneurao/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -542,5 +544,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wvbFormat,
 		pcdFormat,
 		aldFormat,
+		yaneSdaFormat,
 	]);
 }

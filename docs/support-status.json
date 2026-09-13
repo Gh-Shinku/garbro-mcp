@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SDA/yane",
+				"class": "SdaOpener",
+				"source": "Legacy/Yaneurao/ArcSDA.cs"
+			},
+			"localId": "yaneurao-sda",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"directory records and file counts",
+				"directory-qualified names",
+				"extension rewriting",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ALD",
 				"class": "AldOpener",
 				"source": "ArcFormats/AliceSoft/ArcALD.cs"
