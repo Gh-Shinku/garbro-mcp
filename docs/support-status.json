@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/ARCH",
+				"class": "DatOpener",
+				"source": "ArcFormats/Seraphim/ArcArchAngel.cs"
+			},
+			"localId": "archangel-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ARCHPAC.DAT file name requirement",
+				"int16 file count and 32-bit size table",
+				"section records with dynamic walk bound",
+				"section base offsets with per-file sizes",
+				"default three-section typing",
+				"section-numbered entry names",
+				"script section packing flag",
+				"archangel lz decoding with raw fallback",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PK",
 				"class": "PkOpener",
 				"source": "ArcFormats/UMeSoft/ArcPK.cs"

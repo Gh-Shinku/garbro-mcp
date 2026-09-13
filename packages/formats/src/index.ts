@@ -354,6 +354,7 @@ import { propellerMgrFormat } from "./propeller/mgr.js";
 import { sohfuSkaFormat } from "./sohfu/ska.js";
 import { kaguyaUfFormat } from "./kaguya/uf.js";
 import { umeSoftPkFormat } from "./ume-soft/pk.js";
+import { archangelDatFormat } from "./seraphim/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -943,5 +944,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		sohfuSkaFormat,
 		kaguyaUfFormat,
 		umeSoftPkFormat,
+		archangelDatFormat,
 	]);
 }
