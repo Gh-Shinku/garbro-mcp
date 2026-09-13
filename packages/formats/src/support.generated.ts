@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CBF/MA",
+				class: "CbfFormat",
+				source: "Legacy/hmp/ImageCBF.cs",
+			},
+			localId: "hmp-cbf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"555 bitmap output",
+				"pixel offset gap",
+				"short pixel handling",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BGRA",
 				class: "BgraFormat",
 				source: "ArcFormats/G2/ImageBGRA.cs",

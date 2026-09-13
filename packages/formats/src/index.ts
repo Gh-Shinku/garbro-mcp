@@ -586,6 +586,7 @@ import { ankhMskImageFormat } from "./ankh/msk-image.js";
 import { kurumiGraImageFormat } from "./kurumi/gra-image.js";
 import { gr1ImageFormat } from "./anotherroom/gr1-image.js";
 import { bgraImageFormat } from "./g2/bgra-image.js";
+import { cbfImageFormat } from "./hmp/cbf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1496,5 +1497,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kurumiGraImageFormat,
 		gr1ImageFormat,
 		bgraImageFormat,
+		cbfImageFormat,
 	]);
 }
