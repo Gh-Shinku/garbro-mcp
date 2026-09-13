@@ -580,6 +580,7 @@ import { advgImageFormat } from "./advgsys/bmp-image.js";
 import { mwpImageFormat } from "./emic/mwp-image.js";
 import { leafWAudioFormat } from "./leaf/w-audio.js";
 import { texbImageFormat } from "./gamesystem/texb-image.js";
+import { wrgAudioFormat } from "./regrips/wrg-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -898,6 +899,7 @@ export * from "./gaia/index.js";
 export * from "./hmp/index.js";
 export * from "./bruns/index.js";
 export * from "./advgsys/index.js";
+export * from "./regrips/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1483,5 +1485,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mwpImageFormat,
 		leafWAudioFormat,
 		texbImageFormat,
+		wrgAudioFormat,
 	]);
 }

@@ -8,6 +8,26 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WRG",
+				class: "WrgAudio",
+				source: "Legacy/Regrips/AudioWRG.cs",
+			},
+			localId: "regrips-wrg-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"byte inversion",
+				"wav reserialisation",
+				"metadata",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "TEXB",
 				class: "TexbFormat",
