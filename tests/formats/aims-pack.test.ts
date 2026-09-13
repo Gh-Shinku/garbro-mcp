@@ -79,7 +79,7 @@ describe("AIMS PACK archive", () => {
 				{ path: "plain.bin", size: 2, content: Buffer.from("aa") },
 				{
 					path: "scene.mus",
-					size: BigInt(8 + Math.ceil(secret.length / 8) * 8),
+					size: 8 + Math.ceil(secret.length / 8) * 8,
 					content: secret,
 				},
 			],
