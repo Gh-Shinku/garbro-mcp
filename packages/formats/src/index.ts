@@ -453,6 +453,8 @@ import { asdSpielFormat } from "./kapp/asd.js";
 import { kaguyaAriFormat } from "./kaguya/ari.js";
 import { xuseBgFormat } from "./xuse/nt.js";
 import { xuseHFormat } from "./xuse/nt.js";
+import { xuseArcFormat } from "./xuse/miko.js";
+import { xuseKotoriFormat } from "./xuse/miko.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1185,5 +1187,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaguyaAriFormat,
 		xuseBgFormat,
 		xuseHFormat,
+		xuseArcFormat,
+		xuseKotoriFormat,
 	]);
 }

@@ -6,6 +6,53 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "KOTORI/Xuse",
+				"class": "KotoriOpener",
+				"source": "ArcFormats/Xuse/ArcXuse.cs"
+			},
+			"localId": "xuse-kotori",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"header marker and code validation",
+				"flat offset table",
+				"generated ogg names",
+				"trailing record sizing",
+				"keyed payload decryption",
+				"plain payload passthrough"
+			],
+			"unsupported": ["archive creation", "audio decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ARC/Xuse",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Xuse/ArcXuse.cs"
+			},
+			"localId": "xuse-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"miko and xarc signatures",
+				"version field validation",
+				"dfnm names table",
+				"ndix and ctif markers",
+				"cadr offset table",
+				"complemented cp932 names",
+				"data record sizing"
+			],
+			"unsupported": [
+				"archive creation",
+				"unsupported archive modes",
+				"image decoding"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "H/Xuse",
 				"class": "HOpener",
 				"source": "ArcFormats/Xuse/ArcNT.cs"
