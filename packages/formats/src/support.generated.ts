@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GRP/HERB",
+				class: "GrpFormat",
+				source: "Legacy/Herb/ImageGRP.cs",
+			},
+			localId: "herb-grp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"zlib decompression",
+				"row stride repacking",
+				"16bpp bitmap output",
+				"8bpp palette swap",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "FGP",
 				class: "FgpFormat",
 				source: "Legacy/FazeX/ImageFGP.cs",
