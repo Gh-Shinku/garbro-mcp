@@ -319,6 +319,7 @@ import { iflFormat } from "./silky/ifl.js";
 import { libidoArcFormat } from "./libido/arc.js";
 import { tlzFormat } from "./otemoto/tlz.js";
 import { dmFormat } from "./digital-monkey/dm.js";
+import { morningTtdFormat } from "./morning/ttd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -528,6 +529,7 @@ export * from "./nyoken/index.js";
 export * from "./libido/index.js";
 export * from "./otemoto/index.js";
 export * from "./digital-monkey/index.js";
+export * from "./morning/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -784,7 +786,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		crowdPckFormat,
 		dlbFormat,
 		dlbV0Format,
-		ttdFormat,
+		morningTtdFormat,
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
@@ -853,5 +855,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		libidoArcFormat,
 		tlzFormat,
 		dmFormat,
+		ttdFormat,
 	]);
 }

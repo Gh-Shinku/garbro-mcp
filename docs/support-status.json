@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TTD",
+				"class": "TtdOpener",
+				"source": "ArcFormats/Morning/ArcTTD.cs"
+			},
+			"localId": "morning-ttd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"FRC header and XOR index",
+				"cp932 names and placement validation",
+				"DSFF LZSS extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARBro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DM",
 				"class": "DmOpener",
 				"source": "Legacy/DigitalMonkey/ArcDM.cs"
