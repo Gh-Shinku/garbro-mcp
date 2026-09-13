@@ -630,6 +630,7 @@ import { opfImageFormat } from "./hcsystem/opf-image.js";
 import { ptiImageFormat } from "./misc/pti-image.js";
 import { wafAudioFormat } from "./kid/waf-audio.js";
 import { antImageFormat } from "./studio-ego/ant-image.js";
+import { dbmImageFormat } from "./sysd/dbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1589,5 +1590,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ptiImageFormat,
 		wafAudioFormat,
 		antImageFormat,
+		dbmImageFormat,
 	]);
 }

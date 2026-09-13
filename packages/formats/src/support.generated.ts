@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DBM",
+				class: "DbmFormat",
+				source: "ArcFormats/SysD/ImageDBM.cs",
+			},
+			localId: "sysd-dbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"lzss decompression",
+				"24bpp bitmap output",
+				"row padding",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ANT",
 				class: "AntFormat",
 				source: "ArcFormats/StudioEgo/ImageANT.cs",
