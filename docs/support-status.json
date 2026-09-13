@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "IMG/BMP",
+				"class": "ImgBmpFormat",
+				"source": "ArcFormats/Lilim/ImageIMG.cs"
+			},
+			"localId": "lilim-img-bmp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"prefix deobfuscation",
+				"bmp header metadata",
+				"pass-through output"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TIM/SLG",
 				"class": "TimFormat",
 				"source": "ArcFormats/Slg/ImageTIM.cs"

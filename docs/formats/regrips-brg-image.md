@@ -19,7 +19,11 @@ GARbro behavior.
 
 The reference reads two bytes and requires `BD B2`, which is `BM` xored — the bitmap tag it will see once the file
 is decrypted. It then rewinds and decrypts the whole file before reading the header, so a file that merely starts
-with those bytes is refused. That makes the prefix unambiguous next to the compressed bitmap format whose stored
+with those bytes is refused.
+
+The Lilim obfuscated bitmap stores the same two bytes and reads its header the same way, so a file of either kind
+passes both probes: the difference between them is where the obfuscation stops, not what the header says. Both
+probes are faithful to their references in that, and the ambiguity is noted in `lilim-img-bmp-image.md` too. That makes the prefix unambiguous next to the compressed bitmap format whose stored
 bytes begin with an xored `SZDD`: the two never start alike.
 
 ## Header
