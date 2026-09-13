@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PMA",
+				"class": "PmaOpener",
+				"source": "ArcFormats/ScenePlayer/ArcPMA.cs"
+			},
+			"localId": "sceneplayer-pma",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension and xored zlib header detection",
+				"xor-0x21 and zlib decoding",
+				"bitmap frame chain",
+				"bm marker validation",
+				"generated frame names",
+				"entry range validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PMX",
 				"class": "PmxOpener",
 				"source": "ArcFormats/ScenePlayer/ArcPMX.cs"
