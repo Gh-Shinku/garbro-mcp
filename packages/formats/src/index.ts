@@ -549,6 +549,7 @@ import { sedAudioFormat } from "./myharvest/sed-audio.js";
 import { mskImageFormat } from "./cmvs/msk-image.js";
 import { cwvAudioFormat } from "./uncanny/cwv-audio.js";
 import { whcAudioFormat } from "./basil/whc-audio.js";
+import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1410,5 +1411,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mskImageFormat,
 		cwvAudioFormat,
 		whcAudioFormat,
+		tmrHiroAudioFormat,
 	]);
 }

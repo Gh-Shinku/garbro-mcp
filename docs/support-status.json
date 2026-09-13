@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "WAV/TMR-HIRO",
+				"class": "TmrHiroAudio",
+				"source": "ArcFormats/Tmr-Hiro/AudioTmr.cs"
+			},
+			"localId": "tmr-hiro-wav-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "wav header reassembly"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "WHC",
 				"class": "WhcAudio",
 				"source": "ArcFormats/Basil/AudioWHC.cs"
