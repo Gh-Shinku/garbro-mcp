@@ -346,6 +346,7 @@ import { gamesystemDatFormat } from "./gamesystem/dat.js";
 import { abelArcFormat } from "./abel/arc.js";
 import { cpz2Format } from "./cmvs/cpz2.js";
 import { cswareDatFormat } from "./csware/dat.js";
+import { hcsystemPakFormat } from "./hcsystem/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -572,6 +573,7 @@ export * from "./psp/index.js";
 export * from "./nekosdk/index.js";
 export * from "./will/index.js";
 export * from "./gamesystem/index.js";
+export * from "./hcsystem/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -923,5 +925,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		abelArcFormat,
 		cpz2Format,
 		cswareDatFormat,
+		hcsystemPakFormat,
 	]);
 }

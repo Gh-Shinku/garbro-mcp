@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/HCSYSTEM",
+				class: "PakOpener",
+				source: "ArcFormats/HCSystem/ArcPAK.cs",
+			},
+			localId: "hcsystem-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"PACK signature",
+				"count validation",
+				"0x2c ascii and 0x4c unicode record layouts",
+				"first-offset index check",
+				"nibble-rotated encrypted index",
+				"header-field entry layout",
+				"packed/unpacked size handling",
+				"LZSS extraction",
+				"verbatim extraction",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/CSWARE",
 				class: "PakOpener",
 				source: "ArcFormats/CsWare/ArcDAT.cs",
