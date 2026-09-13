@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "VOI",
+				class: "VoiAudio",
+				source: "ArcFormats/Slg/AudioVOI.cs",
+			},
+			localId: "slg-voi-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "offset indirection"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "VMD",
 				class: "VmdAudio",
 				source: "ArcFormats/C4/AudioVMD.cs",
