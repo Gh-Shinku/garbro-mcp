@@ -124,13 +124,11 @@ export function normalizeEntryPath(rawPath: string): {
 	return path === rawPath ? { path } : { path, rawPath };
 }
 
-export interface FixedEntryOpener {
-	(
-		source: ByteSource,
-		entry: FixedEntry,
-		sourcePath: string,
-	): Promise<Readable>;
-}
+export type FixedEntryOpener = (
+	source: ByteSource,
+	entry: FixedEntry,
+	sourcePath: string,
+) => Promise<Readable>;
 
 /** Opens an entry as a raw read stream. Mirrors the default GARbro entry behavior. */
 export const rawEntryOpener: FixedEntryOpener = async (source, entry) =>
