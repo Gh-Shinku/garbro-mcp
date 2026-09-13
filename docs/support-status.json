@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/HED",
+				"class": "HedDatOpener",
+				"source": "ArcFormats/Origin/ArcDAT.cs"
+			},
+			"localId": "origin-dat-hed",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"masked names",
+				"generated names",
+				"payload type detection",
+				"image header metadata"
+			],
+			"unsupported": ["archive creation", "org image decoder"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VAFS",
 				"class": "VafsOpener",
 				"source": "ArcFormats/Softpal/ArcVAFS.cs"
