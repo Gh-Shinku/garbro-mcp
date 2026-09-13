@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GPD",
+				"class": "GpdFormat",
+				"source": "ArcFormats/Antique/ImageGPD.cs"
+			},
+			"localId": "antique-gpd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"8/24/32bpp images",
+				"indexed palette",
+				"lzss and raw pixel blocks",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GTX",
 				"class": "GpcFormat",
 				"source": "ArcFormats/MicroVision/ImageGPC.cs"

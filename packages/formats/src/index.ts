@@ -666,6 +666,7 @@ import { imgPngImageFormat } from "./lilim/img-png-image.js";
 import { kgpImageFormat } from "./kscript/kgp-image.js";
 import { unhImageFormat } from "./myharvest/unh-image.js";
 import { gtxImageFormat } from "./microvision/gtx-image.js";
+import { gpdImageFormat } from "./antique/gpd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1665,5 +1666,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kgpImageFormat,
 		unhImageFormat,
 		gtxImageFormat,
+		gpdImageFormat,
 	]);
 }
