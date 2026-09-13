@@ -383,6 +383,7 @@ import { maikaBkFormat } from "./maika/bk.js";
 import { unisonVctFormat } from "./unison/vct.js";
 import { factorResFormat } from "./factor/res.js";
 import { nekoSdkPakFormat } from "./nekosdk/pak.js";
+import { loggArfFormat } from "./logg/arf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -627,6 +628,7 @@ export * from "./dogenzaka/index.js";
 export * from "./sophia/index.js";
 export * from "./unison/index.js";
 export * from "./factor/index.js";
+export * from "./logg/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1015,5 +1017,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		unisonVctFormat,
 		factorResFormat,
 		nekoSdkPakFormat,
+		loggArfFormat,
 	]);
 }

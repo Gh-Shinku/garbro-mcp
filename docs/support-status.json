@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARF",
+				"class": "ArfOpener",
+				"source": "Legacy/Logg/ArcARF.cs"
+			},
+			"localId": "logg-arf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"record walk with payload offset and unpacked size",
+				"name length and CP932 names",
+				"index bound from the first payload offset",
+				"reverse gap pass for stored sizes",
+				"empty names dropped but kept as delimiters",
+				"stored size compared against unpacked size",
+				"LSB-first bit codec with match ladders",
+				"eight to twelve bit distances",
+				"overlapping copies"
+			],
+			"unsupported": ["archive creation", "entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NEKOPACK/4",
 				"class": "PakOpener",
 				"source": "ArcFormats/NekoSDK/ArcPAK.cs"
