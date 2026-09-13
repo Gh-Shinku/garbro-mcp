@@ -9,6 +9,33 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ALF",
+				class: "AlfOpener",
+				source: "ArcFormats/Eushully/ArcALF.cs",
+			},
+			localId: "eushully-alf",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"sys4ini.bin sys3ini.bin and archive AAI index candidates",
+				"S4AC packed index container",
+				"S4IC and S3IC packed index containers",
+				"S3IN plain index container",
+				"32-bit packed index size with an LZSS stream",
+				"0x100-byte archive name blocks",
+				"0x40-byte file name blocks",
+				"archive id and file number fields",
+				"32-bit payload offset and size fields",
+				"placeholder name skipping",
+				"case-insensitive per-archive entry selection",
+				"placement checks on the selected archive",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAC/TMR-HIRO",
 				class: "PacOpener",
 				source: "ArcFormats/Tmr-Hiro/ArcPAC.cs",

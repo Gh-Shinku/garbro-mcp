@@ -403,6 +403,7 @@ import { densdkDaf1Format } from "./densdk/daf.js";
 import { densdkDaf2Format } from "./densdk/daf.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
+import { eushullyAlfFormat } from "./eushully/alf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1066,5 +1067,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		densdkDaf2Format,
 		pfsFormat,
 		tmrHiroPacFormat,
+		eushullyAlfFormat,
 	]);
 }
