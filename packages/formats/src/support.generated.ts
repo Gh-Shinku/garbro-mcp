@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/vav",
+				class: "PakOpener",
+				source: "ArcFormats/FrontWing/ArcVAV.cs",
+			},
+			localId: "frontwing-vav",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"versioned index layouts",
+				"old and new name field sizes",
+				"huffman payload unpacking",
+				"rle payload unpacking",
+				"combined codec order",
+				"difference chain decryption",
+				"keyed payload decryption",
+				"voice archive typing",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PCS",
 				class: "PcsOpener",
 				source: "ArcFormats/CsWare/ArcPCS.cs",
