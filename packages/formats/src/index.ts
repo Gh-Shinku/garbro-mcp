@@ -534,6 +534,7 @@ import { ogvAudioFormat } from "./shiina-rio/ogv-audio.js";
 import { agsAudioFormat } from "./ags32i/wav-audio.js";
 import { kwfAudioFormat } from "./dice/kwf-audio.js";
 import { gssImageFormat } from "./ags32i/gss-image.js";
+import { cgdImageFormat } from "./carriere/cgd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1376,5 +1377,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		agsAudioFormat,
 		kwfAudioFormat,
 		gssImageFormat,
+		cgdImageFormat,
 	]);
 }

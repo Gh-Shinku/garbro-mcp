@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CGD/CARRIERE",
+				class: "CgdFormat",
+				source: "ArcFormats/Carriere/ImageCGD.cs",
+			},
+			localId: "carriere-cgd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "bitmap reassembly"],
+			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GSS",
 				class: "GssFormat",
 				source: "Legacy/Ags32i/ImageGSS.cs",
