@@ -6,6 +6,52 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "HIM5",
+				"class": "Him5Opener",
+				"source": "ArcFormats/SHSystem/ArcHXP.cs"
+			},
+			"localId": "shsystem-him5",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures",
+				"count and section descriptors",
+				"section entry walk",
+				"big endian entry offsets",
+				"names from the archive",
+				"size pair per payload",
+				"plain and compressed payloads through the shared codec"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "HIM4",
+				"class": "Him4Opener",
+				"source": "ArcFormats/SHSystem/ArcHXP.cs"
+			},
+			"localId": "shsystem-him4",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures",
+				"count and index with derived sizes",
+				"size pair per payload",
+				"plain and compressed payloads",
+				"shs lz codec",
+				"generated five digit names"
+			],
+			"unsupported": [
+				"type classification by content signature",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/EGO/0",
 				"class": "OldDatOpener",
 				"source": "ArcFormats/StudioEgo/ArcEGO.cs"

@@ -285,6 +285,8 @@ import { nscripterSarFormat } from "./nscripter/sar.js";
 import { keyPakFormat } from "./key/pak.js";
 import { egoDatFormat } from "./studio-ego/ego-dat.js";
 import { egoOldDatFormat } from "./studio-ego/ego-dat.js";
+import { him4Format } from "./shsystem/hxp.js";
+import { him5Format } from "./shsystem/hxp.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -483,6 +485,7 @@ export * from "./kaguya/index.js";
 export * from "./nscripter/index.js";
 export * from "./key/index.js";
 export * from "./studio-ego/index.js";
+export * from "./shsystem/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -774,5 +777,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		keyPakFormat,
 		egoDatFormat,
 		egoOldDatFormat,
+		him4Format,
+		him5Format,
 	]);
 }
