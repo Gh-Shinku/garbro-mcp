@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "WAG",
+				class: "WagOpener",
+				source: "ArcFormats/Xuse/ArcWAG.cs",
+			},
+			localId: "xuse-wag",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"wag and gaf4 signatures",
+				"name derived index offset",
+				"name key generation",
+				"title derived data key",
+				"absolute offset xor encryption",
+				"version 2 entry headers",
+				"version 3 dset chunks",
+				"pict image entries",
+				"ftag file names",
+				"generated fallback names",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "KOE",
 				class: "KoeOpener",
 				source: "ArcFormats/RealLive/ArcKOE.cs",

@@ -487,6 +487,7 @@ import { piasDatFormat } from "./pias/dat.js";
 import { kogadoArcFormat } from "./kogado/arc.js";
 import { willArcFormat } from "./will/arc.js";
 import { realliveKoeFormat } from "./reallive/koe.js";
+import { xuseWagFormat } from "./xuse/wag.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1270,5 +1271,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kogadoArcFormat,
 		willArcFormat,
 		realliveKoeFormat,
+		xuseWagFormat,
 	]);
 }
