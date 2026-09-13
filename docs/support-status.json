@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GTO",
+				"class": "GtoFormat",
+				"source": "Legacy/Yaneurao/ImageGTO.cs"
+			},
+			"localId": "yaneurao-gto-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"subtract 0x0c filter",
+				"bitmap pass through",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "SYG",
 				"class": "SygFormat",
 				"source": "ArcFormats/Risa/ImageSYG.cs"

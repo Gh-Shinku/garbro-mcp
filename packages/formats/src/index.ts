@@ -669,6 +669,7 @@ import { gtxImageFormat } from "./microvision/gtx-image.js";
 import { gpdImageFormat } from "./antique/gpd-image.js";
 import { ucomGpcImageFormat } from "./ucom/gpc-image.js";
 import { risaSygImageFormat } from "./risa/syg-image.js";
+import { yaneuraoGtoImageFormat } from "./yaneurao/gto-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1672,5 +1673,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gpdImageFormat,
 		ucomGpcImageFormat,
 		risaSygImageFormat,
+		yaneuraoGtoImageFormat,
 	]);
 }
