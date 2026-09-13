@@ -494,6 +494,7 @@ import { minaScriptPakFormat } from "./mina/pak.js";
 import { emonEmeFormat } from "./emon/eme.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
 import { circusVcPacFormat } from "./circus/vc.js";
+import { caramelBoxArc3Format } from "./caramel-box/arc3.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -787,6 +788,7 @@ export * from "./pias/index.js";
 export * from "./kogado/index.js";
 export * from "./emon/index.js";
 export * from "./livemaker/index.js";
+export * from "./caramel-box/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1286,5 +1288,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		emonEmeFormat,
 		livemakerVfFormat,
 		circusVcPacFormat,
+		caramelBoxArc3Format,
 	]);
 }

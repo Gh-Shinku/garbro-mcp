@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC3",
+				"class": "Arc3Opener",
+				"source": "ArcFormats/CaramelBox/ArcARC3.cs"
+			},
+			"localId": "caramel-box-arc3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"arc3 signature",
+				"big endian header",
+				"delta coded name buffer",
+				"big endian 24 bit offsets",
+				"entry header flags",
+				"bit inverted encrypted entries",
+				"lz payload prefix",
+				"ze chunk unpacking",
+				"msb bit reader with two byte fills",
+				"payload type detection"
+			],
+			"unsupported": ["archive creation", "longinfo name map"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/VC",
 				"class": "VcPacOpener",
 				"source": "ArcFormats/Circus/ArcValkyrieComplex.cs"
