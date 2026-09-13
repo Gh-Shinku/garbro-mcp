@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "RLZ",
+				"class": "RlzOpener",
+				"source": "Legacy/Dice/ArcRLZ.cs"
+			},
+			"localId": "dice-rlz",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"RLZ2 signature and entry count",
+				"fixed 0x34-byte index records",
+				"cp932 names and relative payload offsets",
+				"packed flag with stored and unpacked sizes",
+				"dice lz extraction with an absolute position frame",
+				"verbatim extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/SGS",
 				"class": "SgsDatOpener",
 				"source": "Legacy/Sogna/ArcSGS.cs"
