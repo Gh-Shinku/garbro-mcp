@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "BGM/SOFTPAL",
+				class: "BgmAudio",
+				source: "ArcFormats/Softpal/AudioBGM.cs",
+			},
+			localId: "softpal-bgm-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "ogg extension"],
+			unsupported: [
+				"archive creation",
+				"ogg decoding",
+				"loop timing interpretation",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "AOG",
 				class: "AogAudio",
 				source: "ArcFormats/Aoi/AudioAOG.cs",

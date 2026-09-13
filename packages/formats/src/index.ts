@@ -522,6 +522,7 @@ import { voiAudioFormat } from "./slg/voi-audio.js";
 import { eogAudioFormat } from "./crowd/eog-audio.js";
 import { kogAudioFormat } from "./sviu/kog-audio.js";
 import { aoiAogAudioFormat } from "./aoi/aog-audio.js";
+import { softpalBgmAudioFormat } from "./softpal/bgm-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1350,5 +1351,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		eogAudioFormat,
 		kogAudioFormat,
 		aoiAogAudioFormat,
+		softpalBgmAudioFormat,
 	]);
 }
