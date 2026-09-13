@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "WAG/IAF",
+				class: "WagOpener",
+				source: "ArcFormats/Hexenhaus/ArcWAG.cs",
+			},
+			localId: "hexenhaus-wag",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"offset index",
+				"rotated payloads",
+				"FNNE name sections",
+				"IMGD payload sections",
+				"unknown section skipping",
+				"MOZA section skipping",
+			],
+			unsupported: ["archive creation", "IMGD png payload decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "FL4/AARU",
 				class: "Fl4Opener",
 				source: "Legacy/Aaru/ArcFL4.cs",
