@@ -27,7 +27,6 @@ const SIZES_OFFSET = 2;
 const SIZE_FIELD_SIZE = 4;
 const SECTION_ENTRY_SIZE = 6;
 const SECTION_OFFSET_SIZE = 4;
-const SECTION_INDEX_SIZE = 2;
 /** Section tables are small, so the walk reads them in one chunk and refills if needed. */
 const SECTION_CHUNK_SIZE = 0x4000;
 const DEFAULT_SECTIONS = ["image", "script", ""];

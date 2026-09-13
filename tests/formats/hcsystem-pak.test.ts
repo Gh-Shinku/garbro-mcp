@@ -21,10 +21,6 @@ function rotateNibbles(byte: number): number {
 	return ((byte >>> 4) | (byte << 4)) & 0xff;
 }
 
-function rotateWordNibbles(value: number): number {
-	return (((value >>> 4) & 0x0f0f0f0f) | ((value << 4) & 0xf0f0f0f0)) >>> 0;
-}
-
 /** Builds a PAK with either the ASCII or the Unicode record layout and an optional encrypted index. */
 function buildPak(
 	entries: readonly Entry[],
