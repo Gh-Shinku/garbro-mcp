@@ -444,6 +444,8 @@ import { fpkFormat } from "./interheart/fpk.js";
 import { pcsFormat } from "./csware/pcs.js";
 import { vavFormat } from "./frontwing/vav.js";
 import { fa2Format } from "./foster/fa2.js";
+import { cherryPakFormat } from "./cherry/pak.js";
+import { cherryPak2Format } from "./cherry/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1165,5 +1167,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		pcsFormat,
 		vavFormat,
 		fa2Format,
+		cherryPakFormat,
+		cherryPak2Format,
 	]);
 }

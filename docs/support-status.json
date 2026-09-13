@@ -6,6 +6,48 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK/CHERRY2",
+				"class": "Pak2Opener",
+				"source": "ArcFormats/Cherry/ArcCherry.cs"
+			},
+			"localId": "cherry-pak2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"version two and three markers",
+				"plain index layouts",
+				"pair keyed compressed index",
+				"lzss index decompression",
+				"constant key header retry",
+				"keyed payload words",
+				"keyed payload pairs"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PAK/CHERRY",
+				"class": "PakOpener",
+				"source": "ArcFormats/Cherry/ArcCherry.cs"
+			},
+			"localId": "cherry-pak",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"count and index pointer validation",
+				"sixteen byte name fields",
+				"relative payload offsets",
+				"grp archive renaming",
+				"script text region decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "FA2",
 				"class": "Fa2Opener",
 				"source": "ArcFormats/Foster/ArcFA2.cs"
