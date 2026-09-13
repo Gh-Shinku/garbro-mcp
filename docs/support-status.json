@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/ODIO",
+				"class": "BinOpener",
+				"source": "ArcFormats/Hexenhaus/ArcODIO.cs"
+			},
+			"localId": "hexenhaus-odio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and marker detection",
+				"6-byte offset record table",
+				"generated ogg names",
+				"once container unwrapping",
+				"nibble-rotation payload decryption",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TCD1",
 				"class": "Tcd1Opener",
 				"source": "ArcFormats/TopCat/ArcTCD1.cs"
