@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "NFS",
+				"class": "NfsOpener",
+				"source": "ArcFormats/Nags/ArcNFS.cs"
+			},
+			"localId": "nags-nfs",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection",
+				"count-derived xor key for the index",
+				"index tail validation",
+				"scb payload inversion",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/ODIO",
 				"class": "BinOpener",
 				"source": "ArcFormats/Hexenhaus/ArcODIO.cs"
