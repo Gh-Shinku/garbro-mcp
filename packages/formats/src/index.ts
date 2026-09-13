@@ -185,6 +185,7 @@ import { witchDatFormat } from "./witch/dat.js";
 import { mnvFormat } from "./mno-violet/dat.js";
 import { umpkFormat } from "./umut/pak.js";
 import { airyuChrFormat } from "./airyu/chr.js";
+import { animFormat } from "./marble/anim.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -517,5 +518,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mnvFormat,
 		umpkFormat,
 		airyuChrFormat,
+		animFormat,
 	]);
 }
