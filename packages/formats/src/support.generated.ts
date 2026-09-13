@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ABM",
+				class: "AbmFormat",
+				source: "ArcFormats/Lilim/ImageABM.cs",
+			},
+			localId: "lilim-abm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"24bpp bitmap output",
+				"32bpp bitmap output",
+				"8bpp bitmap output",
+				"eight bit alpha stream",
+				"frame decoding",
+				"metadata",
+			],
+			unsupported: ["image encoding", "frame overlay"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "G00/JPEG",
 				class: "G00JpegFormat",
 				source: "ArcFormats/RealLive/ImageG00Jpeg.cs",

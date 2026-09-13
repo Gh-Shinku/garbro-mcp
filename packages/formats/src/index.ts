@@ -649,6 +649,7 @@ import { hbmImageFormat } from "./rits/hbm-image.js";
 import { ibmImageFormat } from "./ice/ibm-image.js";
 import { rbmImageFormat } from "./mutation/rbm-image.js";
 import { g00JpegImageFormat } from "./reallive/g00-jpeg-image.js";
+import { abmImageFormat } from "./lilim/abm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1628,5 +1629,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ibmImageFormat,
 		rbmImageFormat,
 		g00JpegImageFormat,
+		abmImageFormat,
 	]);
 }
