@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DM",
+				"class": "DmOpener",
+				"source": "Legacy/DigitalMonkey/ArcDM.cs"
+			},
+			"localId": "digital-monkey-dm",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dm extension and fixed index records",
+				"cp932 names and payload placement validation",
+				"zlib extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARBro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "TLZ",
 				"class": "TlzOpener",
 				"source": "ArcFormats/Otemoto/ArcTLZ.cs"
