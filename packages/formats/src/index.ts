@@ -460,6 +460,8 @@ import { parsleyDesertCgFormat } from "./parsley/cg3.js";
 import { rareXFormat } from "./rare/x.js";
 import { tailCafFormat } from "./tail/caf.js";
 import { gameSystemChrFormat } from "./gamesystem/chr.js";
+import { seraphimScnFormat } from "./seraphim/scnpac.js";
+import { seraphimScn95Format } from "./seraphim/scnpac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1201,5 +1203,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		rareXFormat,
 		tailCafFormat,
 		gameSystemChrFormat,
+		seraphimScnFormat,
+		seraphimScn95Format,
 	]);
 }

@@ -6,6 +6,47 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SCN/ARCH",
+				"class": "Scn95Opener",
+				"source": "ArcFormats/Seraphim/ArcSCN.cs"
+			},
+			"localId": "seraphim-scn95",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"scnpac.dat file name gating",
+				"size table layout",
+				"zlib payload inflation",
+				"archangel script decompression",
+				"raw fallback for undecodable scripts"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "SERAPH/SCN",
+				"class": "ScnOpener",
+				"source": "ArcFormats/Seraphim/ArcSCN.cs"
+			},
+			"localId": "seraphim-scn",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"scnpac.dat file name gating",
+				"offset table with closing offset",
+				"script entry naming",
+				"zlib payload inflation",
+				"archangel script decompression",
+				"raw fallback for undecodable scripts"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CHR/GAMESYSTEM",
 				"class": "ChrOpener",
 				"source": "ArcFormats/GameSystem/ArcCHR.cs"
