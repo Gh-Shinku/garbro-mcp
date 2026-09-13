@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/LIBIDO",
+				"class": "ArcOpener",
+				"source": "Legacy/Libido/ArcARC.cs"
+			},
+			"localId": "libido-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"fixed 0x20-byte index records",
+				"plain and XOR-obfuscated cp932 names",
+				"entry placement validation",
+				"default lzss extraction",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IFL",
 				"class": "IflOpener",
 				"source": "ArcFormats/Silky/ArcIFL.cs"
