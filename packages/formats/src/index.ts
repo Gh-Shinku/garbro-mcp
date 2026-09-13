@@ -556,6 +556,7 @@ import { gefImageFormat } from "./yellowcap/gef-image.js";
 import { csfImageFormat } from "./eye/csf-image.js";
 import { msfAudioFormat } from "./unknown/msf-audio.js";
 import { cmbAudioFormat } from "./pinesoft/cmb-audio.js";
+import { ggfImageFormat } from "./yellowcap/ggf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1426,5 +1427,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		csfImageFormat,
 		msfAudioFormat,
 		cmbAudioFormat,
+		ggfImageFormat,
 	]);
 }

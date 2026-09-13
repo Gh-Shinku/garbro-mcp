@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "GGF",
+				class: "GgfFormat",
+				source: "Legacy/YellowCap/ImageGGF.cs",
+			},
+			localId: "yellowcap-ggf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "bitmap passthrough", "metadata"],
+			unsupported: ["archive creation", "image encoding", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "CMB/PCM",
 				class: "CmbAudio",
