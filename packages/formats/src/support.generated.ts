@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/GM",
+				class: "GmDatOpener",
+				source: "Legacy/Eve/ArcGM.cs",
+			},
+			localId: "eve-gm",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"version string header parsing",
+				"index record parsing",
+				"shift-jis names",
+				"uncompressed payload passthrough",
+				"LZSS payload decompression",
+				"E header word swapping",
+				"BPR second stage decompression",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/NNNN",
 				class: "NNNNOpener",
 				source: "ArcFormats/MokoPro/CompressedFile.cs",

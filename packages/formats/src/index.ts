@@ -425,6 +425,7 @@ import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { systemAquaCatfFormat } from "./system-aqua/catf.js";
 import { yukaYkcFormat } from "./yuka/ykc.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
+import { eveGmFormat } from "./eve/gm.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -690,6 +691,7 @@ export * from "./nonono/index.js";
 export * from "./system-aqua/index.js";
 export * from "./yuka/index.js";
 export * from "./moko-pro/index.js";
+export * from "./eve/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1120,5 +1122,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		systemAquaCatfFormat,
 		yukaYkcFormat,
 		mokoProNnnnFormat,
+		eveGmFormat,
 	]);
 }
