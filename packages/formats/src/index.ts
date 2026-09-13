@@ -598,6 +598,7 @@ import { kslImageFormat } from "./kscript/ksl-image.js";
 import { pmpImageFormat } from "./sceneplayer/pmp-image.js";
 import { vzyAudioFormat } from "./bef/vzy-audio.js";
 import { nbmpImageFormat } from "./westgate/nbmp-image.js";
+import { pmwAudioFormat } from "./sceneplayer/pmw-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1522,5 +1523,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pmpImageFormat,
 		vzyAudioFormat,
 		nbmpImageFormat,
+		pmwAudioFormat,
 	]);
 }

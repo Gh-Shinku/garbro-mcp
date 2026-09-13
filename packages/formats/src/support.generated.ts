@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "PMW",
+				class: "PmwAudio",
+				source: "ArcFormats/ScenePlayer/AudioPMW.cs",
+			},
+			localId: "sceneplayer-pmw-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"byte mask",
+				"zlib decoding",
+				"wave validation",
+				"canonical wav output",
+				"metadata",
+			],
+			unsupported: ["audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "NBMP",
 				class: "NbmpFormat",
