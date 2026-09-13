@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IGA",
+				"class": "IgaOpener",
+				"source": "ArcFormats/Noesis/ArcIGA.cs"
+			},
+			"localId": "noesis-iga",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"packed integer index and name blob",
+				"packed per-character names",
+				"position-dependent payload xor",
+				"s script key",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": [
+				"values outside the reference packed-integer range",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MCD/TSD",
 				"class": "McdOpener",
 				"source": "Legacy/Tsd/ArcMCD.cs"
