@@ -141,6 +141,7 @@ import { aapFormat } from "./aquarium/aap.js";
 import { mirisDatFormat } from "./eternity/miris.js";
 import { cdtFormat } from "./uma/cdt.js";
 import { usfFormat } from "./westgate/usf.js";
+import { iafFormat } from "./triangle/iaf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -403,5 +404,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mirisDatFormat,
 		cdtFormat,
 		usfFormat,
+		iafFormat,
 	]);
 }
