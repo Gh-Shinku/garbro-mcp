@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/HED",
+				"class": "PakOpener",
+				"source": "ArcFormats/elf/ArcHED.cs"
+			},
+			"localId": "elf-hed",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"bin extension and cg voice name gate",
+				"hed magic and count validation",
+				"graphic and voice record widths",
+				"name list search upwards",
+				"block parsing with unknown types consumed",
+				"name trimming and count agreement",
+				"placement validation against the payload file",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MGPK0",
 				"class": "Mgpk0Opener",
 				"source": "ArcFormats/MangaGamer/ArcMGPK.cs"

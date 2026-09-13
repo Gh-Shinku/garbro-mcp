@@ -301,6 +301,7 @@ import { boxFormat } from "./aoi/box.js";
 import { aoimyFormat } from "./aoi/box.js";
 import { aoimyUnicodeFormat } from "./aoi/box.js";
 import { mgpk0Format } from "./manga-gamer/mgpk0.js";
+import { hedFormat } from "./elf/hed.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -811,5 +812,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aoimyFormat,
 		aoimyUnicodeFormat,
 		mgpk0Format,
+		hedFormat,
 	]);
 }
