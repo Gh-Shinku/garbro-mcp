@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/ADS",
+				"class": "PacOpener",
+				"source": "ArcFormats/Ads/ArcPAC.cs"
+			},
+			"localId": "ads-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pac extension requirement",
+				"index size bounds",
+				"directory tree with counts",
+				"root only name",
+				"inverted name slots",
+				"file records with size offset and method",
+				"data offset validated against the volume",
+				"subdirectory recursion with slash joined names",
+				"cp932 names",
+				"stored payloads",
+				"rle payloads with shared pattern buffer",
+				"verbatim payloads for other methods"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/JAM",
 				"class": "DatOpener",
 				"source": "ArcFormats/JamCreation/ArcDAT.cs"
