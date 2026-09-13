@@ -9,6 +9,25 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GRD",
+				class: "GrdFormat",
+				source: "ArcFormats/Silky/ImageGRD.cs",
+			},
+			localId: "silky-grd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"lzss decompression",
+				"bitmap reassembly",
+			],
+			unsupported: ["archive creation", "pixel decoding", "os/2 core headers"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PNX/ZENOS",
 				class: "PnxFormat",
 				source: "Legacy/Zenos/ImagePNX.cs",

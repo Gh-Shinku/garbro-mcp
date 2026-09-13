@@ -544,6 +544,7 @@ import { wmkImageFormat } from "./fc01/wmk-image.js";
 import { p4agImageFormat } from "./xuse/p4ag-image.js";
 import { redImageFormat } from "./ocarina/red-image.js";
 import { pnxImageFormat } from "./zenos/pnx-image.js";
+import { grdImageFormat } from "./silky/grd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1399,5 +1400,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		p4agImageFormat,
 		redImageFormat,
 		pnxImageFormat,
+		grdImageFormat,
 	]);
 }
