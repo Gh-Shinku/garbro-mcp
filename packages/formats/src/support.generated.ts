@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "DWV",
+				class: "DwvAudio",
+				source: "ArcFormats/SysD/AudioDWV.cs",
+			},
+			localId: "sysd-dwv-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "derived bit depth", "metadata"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "UM3",
 				class: "Um3Audio",
 				source: "ArcFormats/Bruns/AudioUM3.cs",
