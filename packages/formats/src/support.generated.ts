@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BPIC",
+				class: "BpicFormat",
+				source: "ArcFormats/Softpal/ImageBPIC.cs",
+			},
+			localId: "softpal-bpic-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"channel swap",
+				"8/24/32 bpp bitmap output",
+				"exact payload length",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PGA",
 				class: "PgaFormat",
 				source: "ArcFormats/Palette/ImagePGA.cs",
