@@ -8,6 +8,27 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WAV/CSWARE",
+				class: "WavAudio",
+				source: "ArcFormats/CsWare/AudioWAV.cs",
+			},
+			localId: "csware-wav-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"sample table expansion",
+				"wave header writing",
+				"metadata",
+			],
+			unsupported: ["audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "MTG",
 				class: "MtgFormat",

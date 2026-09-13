@@ -654,6 +654,7 @@ import { fgpImageFormat } from "./fazex/fgp-image.js";
 import { grpImageFormat } from "./herb/grp-image.js";
 import { imaImageFormat } from "./hillfield/ima-image.js";
 import { mtgImageFormat } from "./asura/mtg-image.js";
+import { cswareWavAudioFormat } from "./csware/wav-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1639,5 +1640,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		grpImageFormat,
 		imaImageFormat,
 		mtgImageFormat,
+		cswareWavAudioFormat,
 	]);
 }
