@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/UNKNOWN",
+				class: "DatOpener",
+				source: "Legacy/Unknown/ArcDAT.cs",
+			},
+			localId: "unknown-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"header with count stride and payload offset",
+				"stride bounds of 12 to 0x10",
+				"nibble rotated index",
+				"derived archive hash id names",
+				"payload placement validation",
+				"nibble rotated payload extraction",
+			],
+			unsupported: ["entry type inference", "archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SDT/UMA",
 				class: "SdtOpener",
 				source: "Legacy/Uma/ArcSDT.cs",
