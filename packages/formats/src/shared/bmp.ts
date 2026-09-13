@@ -48,14 +48,16 @@ export function writeBmp32(
 }
 
 /**
- * Wraps top down eight bit pixels in a grey bitmap. Bitmap rows are aligned to four bytes, so every
- * row is padded with zeros to `width` rounded up to a multiple of four; that padding is the only
- * difference from the stored pixels.
+ * Wraps eight bit pixels in a grey bitmap. Bitmap rows are aligned to four bytes, so every row is
+ * padded with zeros to `width` rounded up to a multiple of four; that padding is the only difference
+ * from the stored pixels. As with `writeBmp32`, the stored rows are top down by default and
+ * `ImageData.CreateFlipped` readers pass `bottomUp`.
  */
 export function writeBmp8(
 	width: number,
 	height: number,
 	pixels: Buffer,
+	bottomUp = false,
 ): Buffer {
 	const stride = (width + 3) & ~3;
 	const imageSize = stride * height;
@@ -73,7 +75,7 @@ export function writeBmp8(
 		rows.push(line);
 	}
 	return Buffer.concat([
-		writeHeader(width, height, 8, dataOffset, imageSize, 256, false),
+		writeHeader(width, height, 8, dataOffset, imageSize, 256, bottomUp),
 		palette,
 		...rows,
 	]);

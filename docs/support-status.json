@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "ALP/GAMESYSTEM",
+				"class": "AlpFormat",
+				"source": "ArcFormats/GameSystem/ImageALP.cs"
+			},
+			"localId": "gamesystem-alp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "bmp reassembly", "metadata"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "ALP/BeF",
 				"class": "AlpFormat",
 				"source": "Legacy/hmp/ImageALP.cs"
