@@ -6,6 +6,93 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "WSM4",
+				"class": "Wsm4Opener",
+				"source": "ArcFormats/Tanaka/ArcWSM.cs"
+			},
+			"localId": "tanaka-wsm4",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and data offset",
+				"table with direct offset and size pairs",
+				"names at a fixed stride",
+				"table versus count bound",
+				"entry placement validation",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "WSM2",
+				"class": "Wsm2Opener",
+				"source": "ArcFormats/Tanaka/ArcWSM.cs"
+			},
+			"localId": "tanaka-wsm2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"both signatures with version word",
+				"index at 0x40 with relative pointers",
+				"bias adjusted table records",
+				"version three extra size word",
+				"name records with entry index",
+				"unique name checking with prefixes",
+				"entry placement validation",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "WSM1",
+				"class": "Wsm1Opener",
+				"source": "ArcFormats/Tanaka/ArcWSM.cs"
+			},
+			"localId": "tanaka-wsm1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and shared index walk",
+				"per entry channel bits and rate fields",
+				"derived block alignment and average byte rate",
+				"synthesized wave header",
+				"entry placement validation",
+				"inexact size marking"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "WSM0",
+				"class": "Wsm0Opener",
+				"source": "ArcFormats/Tanaka/ArcWSM.cs"
+			},
+			"localId": "tanaka-wsm0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and index size",
+				"indirect records inside the index",
+				"name length including terminator",
+				"default wave format",
+				"synthesized wave header",
+				"entry placement validation",
+				"inexact size marking"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/HED",
 				"class": "PakOpener",
 				"source": "ArcFormats/elf/ArcHED.cs"

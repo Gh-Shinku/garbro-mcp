@@ -302,6 +302,10 @@ import { aoimyFormat } from "./aoi/box.js";
 import { aoimyUnicodeFormat } from "./aoi/box.js";
 import { mgpk0Format } from "./manga-gamer/mgpk0.js";
 import { hedFormat } from "./elf/hed.js";
+import { wsm0Format } from "./tanaka/wsm.js";
+import { wsm1Format } from "./tanaka/wsm.js";
+import { wsm2Format } from "./tanaka/wsm.js";
+import { wsm4Format } from "./tanaka/wsm.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -813,5 +817,9 @@ export function createDefaultRegistry(): FormatRegistry {
 		aoimyUnicodeFormat,
 		mgpk0Format,
 		hedFormat,
+		wsm0Format,
+		wsm1Format,
+		wsm2Format,
+		wsm4Format,
 	]);
 }

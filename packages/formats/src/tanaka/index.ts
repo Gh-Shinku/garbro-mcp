@@ -4,3 +4,4 @@ export * from "./bmx.js";
 export * from "./mbf.js";
 export * from "./vpk.js";
 export * from "./smv.js";
+export * from "./wsm.js";
