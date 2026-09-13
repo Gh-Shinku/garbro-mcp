@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "DES98",
+				"class": "DesFormat",
+				"source": "Legacy/Desire/ImageDES.cs"
+			},
+			"localId": "desire-des-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"bit-packed decoding",
+				"4bpp bitmap output",
+				"palette conversion",
+				"failure-timing split",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "G/SYSTEM98",
 				"class": "GFormat",
 				"source": "Legacy/System98/ImageG.cs"
