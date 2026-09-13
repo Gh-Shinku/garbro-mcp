@@ -337,6 +337,7 @@ import { entisPacFormat } from "./entis/pac.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
 import { digitalWorksPacFormat } from "./digital-works/pac.js";
 import { pspQpkFormat } from "./psp/qpk.js";
+import { nitroplusPakFormat } from "./nitroplus/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -902,5 +903,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		triangleBmxFormat,
 		digitalWorksPacFormat,
 		pspQpkFormat,
+		nitroplusPakFormat,
 	]);
 }

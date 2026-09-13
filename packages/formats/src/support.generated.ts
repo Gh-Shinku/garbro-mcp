@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/MAGI",
+				class: "PakOpener",
+				source: "ArcFormats/NitroPlus/ArcPAK.cs",
+			},
+			localId: "nitroplus-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"version 3 and 4 signatures",
+				"entry count validation",
+				"zlib-compressed index at 0x118",
+				"index-relative payload offsets",
+				"version 4 directory records with running prefixes",
+				"zlib extraction",
+				"verbatim extraction",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "QPK",
 				class: "PakOpener",
 				source: "ArcFormats/Psp/ArcQPK.cs",
