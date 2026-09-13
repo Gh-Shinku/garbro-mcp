@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AR2/IDX",
+				"class": "Ar2Opener",
+				"source": "Legacy/Kasane/ArcAR2.cs"
+			},
+			"localId": "kasane-ar2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"companion idx index",
+				"variable-length records",
+				"xor-decrypted names",
+				"data record headers",
+				"xor-decrypted payloads",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AR2/NEON",
 				"class": "Ar2Opener",
 				"source": "Legacy/Neon/ArcAR2.cs"

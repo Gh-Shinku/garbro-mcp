@@ -180,6 +180,7 @@ import { dafFormat } from "./cadath/daf.js";
 import { hotFormat } from "./hdl/hot.js";
 import { advSys3Format } from "./advsys/arc3.js";
 import { neonAr2Format } from "./neon/ar2.js";
+import { kasaneAr2Format } from "./kasane/ar2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -317,6 +318,7 @@ export * from "./shiina-rio/index.js";
 export * from "./patisserie/index.js";
 export * from "./hdl/index.js";
 export * from "./neon/index.js";
+export * from "./kasane/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -503,5 +505,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hotFormat,
 		advSys3Format,
 		neonAr2Format,
+		kasaneAr2Format,
 	]);
 }
