@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TTD",
+				"class": "TtdOpener",
+				"source": "Legacy/Melonpan/ArcTTD.cs"
+			},
+			"localId": "melonpan-ttd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"four-byte signature",
+				"entry count validation",
+				"derived name width with minimum",
+				"fixed-width record walk",
+				"cp932 filenames",
+				"entry placement validation",
+				"dsff detection and unpacked size word",
+				"lzss extraction with ring position override",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DLB/V0",
 				"class": "Dlb0Opener",
 				"source": "Legacy/AyPio/ArcDLB.cs"

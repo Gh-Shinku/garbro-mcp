@@ -250,6 +250,7 @@ import { mugiBinFormat } from "./mugi/bin.js";
 import { crowdPckFormat } from "./crowd/pck.js";
 import { dlbFormat } from "./aypio/dlb.js";
 import { dlbV0Format } from "./aypio/dlb.js";
+import { ttdFormat } from "./melonpan/ttd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -430,6 +431,7 @@ export * from "./nekopunch/index.js";
 export * from "./mugi/index.js";
 export * from "./crowd/index.js";
 export * from "./aypio/index.js";
+export * from "./melonpan/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -686,5 +688,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		crowdPckFormat,
 		dlbFormat,
 		dlbV0Format,
+		ttdFormat,
 	]);
 }
