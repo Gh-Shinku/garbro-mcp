@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "G/GML",
+				class: "GOpener",
+				source: "ArcFormats/GLib/ArcG.cs",
+			},
+			localId: "glib-g",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"GML_ARC marker",
+				"packed index xored with 0xFF",
+				"LZSS index decompression",
+				"256 byte substitution table",
+				"entry count",
+				"name length and CP932 names",
+				"index relative payload offsets",
+				"stored sizes and four byte entry headers",
+				"placement validation",
+				"payload substitution from the fifth byte",
+				"entry header restoration",
+			],
+			unsupported: ["archive creation", "extension based entry typing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARF",
 				class: "ArfOpener",
 				source: "Legacy/Logg/ArcARF.cs",
