@@ -540,6 +540,7 @@ import { bpdImageFormat } from "./pinesoft/bpd-image.js";
 import { psmImageFormat } from "./psm/image.js";
 import { cp3ImageFormat } from "./seraphim/cp3-image.js";
 import { mdImageFormat } from "./mina/md-image.js";
+import { wmkImageFormat } from "./fc01/wmk-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1389,5 +1390,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		psmImageFormat,
 		cp3ImageFormat,
 		mdImageFormat,
+		wmkImageFormat,
 	]);
 }

@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "WMK",
+				"class": "WmkFormat",
+				"source": "ArcFormats/FC01/ImageWMK.cs"
+			},
+			"localId": "fc01-wmk-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "grey bitmap reassembly"],
+			"unsupported": ["archive creation", "pixel decoding", "image writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MD",
 				"class": "MdFormat",
 				"source": "Legacy/Mina/ImageMD.cs"
