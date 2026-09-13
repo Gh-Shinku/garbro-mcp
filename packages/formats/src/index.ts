@@ -213,6 +213,8 @@ import { cpz1Format } from "./cmvs/cpz1.js";
 import { arc2Format } from "./csware/arc2.js";
 import { yuFormat } from "./tactics/yu.js";
 import { gxpFormat } from "./astronauts/gxp.js";
+import { c24Format } from "./foster/c24.js";
+import { c25Format } from "./foster/c24.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -375,6 +377,7 @@ export * from "./cmvs/index.js";
 export * from "./csware/index.js";
 export * from "./tactics/index.js";
 export * from "./astronauts/index.js";
+export * from "./foster/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -594,5 +597,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		arc2Format,
 		yuFormat,
 		gxpFormat,
+		c24Format,
+		c25Format,
 	]);
 }
