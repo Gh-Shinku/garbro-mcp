@@ -191,6 +191,7 @@ import { cgdFormat } from "./kapp/cgd.js";
 import { ucomDataFormat } from "./ucom/data.js";
 import { ai5DatFormat } from "./elf/ai5dat.js";
 import { awfFormat } from "./silky/awf.js";
+import { mgdFormat } from "./masys/mgd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -335,6 +336,7 @@ export * from "./airyu/index.js";
 export * from "./pochette/index.js";
 export * from "./kapp/index.js";
 export * from "./elf/index.js";
+export * from "./masys/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -532,5 +534,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ucomDataFormat,
 		ai5DatFormat,
 		awfFormat,
+		mgdFormat,
 	]);
 }

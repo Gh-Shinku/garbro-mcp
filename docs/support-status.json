@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MGD",
+				"class": "MgdOpener",
+				"source": "ArcFormats/Masys/ArcMGD.cs"
+			},
+			"localId": "masys-mgd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"length-prefixed name records",
+				"flagged name decryption",
+				"zero name length rejection",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AWF",
 				"class": "AwfOpener",
 				"source": "ArcFormats/Silky/ArcAWF.cs"
