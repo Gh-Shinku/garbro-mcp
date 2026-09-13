@@ -306,6 +306,7 @@ import { wsm0Format } from "./tanaka/wsm.js";
 import { wsm1Format } from "./tanaka/wsm.js";
 import { wsm2Format } from "./tanaka/wsm.js";
 import { wsm4Format } from "./tanaka/wsm.js";
+import { arcgFormat } from "./tanaka/arcg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -821,5 +822,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wsm1Format,
 		wsm2Format,
 		wsm4Format,
+		arcgFormat,
 	]);
 }

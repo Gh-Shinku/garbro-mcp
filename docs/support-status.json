@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARCG",
+				"class": "ArcGOpener",
+				"source": "ArcFormats/Tanaka/ArcARCG.cs"
+			},
+			"localId": "tanaka-arcg",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature marker and header fields",
+				"registered extensions",
+				"directory records followed by file blocks",
+				"absolute directory offsets",
+				"name lengths counting length byte and terminator",
+				"full width question mark replacement",
+				"entry placement validation",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"companion bmi index with volume bound key",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "WSM4",
 				"class": "Wsm4Opener",
 				"source": "ArcFormats/Tanaka/ArcWSM.cs"
