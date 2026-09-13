@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PRG",
+				class: "PrgFormat",
+				source: "Legacy/Regrips/ImagePRG.cs",
+			},
+			localId: "regrips-prg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"xor decryption",
+				"png header metadata",
+				"pass-through output",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "RBP",
 				class: "RbpFormat",
 				source: "Legacy/Dice/ImageRBP.cs",
