@@ -335,6 +335,7 @@ import { unknownDatFormat } from "./unknown/dat.js";
 import { yoxDatFormat } from "./yox/dat.js";
 import { entisPacFormat } from "./entis/pac.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
+import { digitalWorksPacFormat } from "./digital-works/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -556,6 +557,7 @@ export * from "./sogna/index.js";
 export * from "./dice/index.js";
 export * from "./yox/index.js";
 export * from "./entis/index.js";
+export * from "./digital-works/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -896,5 +898,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yoxDatFormat,
 		entisPacFormat,
 		triangleBmxFormat,
+		digitalWorksPacFormat,
 	]);
 }

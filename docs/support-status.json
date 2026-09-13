@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/HED",
+				"class": "PacOpener",
+				"source": "ArcFormats/DigitalWorks/ArcPAC.cs"
+			},
+			"localId": "digital-works-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"PPAC-PAC signature",
+				"companion PPAC-HED index",
+				"fixed 0x20-byte records with cp932 names",
+				"payload offsets biased by 0x10",
+				"entry placement validation",
+				"LZS marker with declared unpacked size",
+				"default lzss extraction",
+				"nested LZS double decoding",
+				"verbatim extraction"
+			],
+			"unsupported": ["entry type inference", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BMX/TRIANGLE",
 				"class": "BmxOpener",
 				"source": "ArcFormats/Triangle/ArcBMX.cs"
