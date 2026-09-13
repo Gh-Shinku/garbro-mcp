@@ -289,6 +289,9 @@ import { him4Format } from "./shsystem/hxp.js";
 import { him5Format } from "./shsystem/hxp.js";
 import { ddp2Format } from "./dd-system/ddp.js";
 import { ddp3Format } from "./dd-system/ddp.js";
+import { gpcFormat } from "./eushully/gpc.js";
+import { sndFormat } from "./eushully/gpc.js";
+import { snrFormat } from "./eushully/gpc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -489,6 +492,7 @@ export * from "./key/index.js";
 export * from "./studio-ego/index.js";
 export * from "./shsystem/index.js";
 export * from "./dd-system/index.js";
+export * from "./eushully/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -784,5 +788,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		him5Format,
 		ddp2Format,
 		ddp3Format,
+		gpcFormat,
+		sndFormat,
+		snrFormat,
 	]);
 }

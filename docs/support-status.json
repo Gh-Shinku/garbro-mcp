@@ -6,6 +6,73 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SND",
+				"class": "SndOpener",
+				"source": "ArcFormats/Eushully/ArcGPC.cs"
+			},
+			"localId": "eushully-snd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion index name from extension",
+				"appended wav extension",
+				"offset sorting with derived sizes",
+				"synthesized riff header",
+				"verbatim fallback for short payloads",
+				"inexact size marking"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "SNR",
+				"class": "SnrOpener",
+				"source": "ArcFormats/Eushully/ArcGPC.cs"
+			},
+			"localId": "eushully-snr",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion index name from extension",
+				"extension rejection rules",
+				"inverted name bytes",
+				"names used as stored",
+				"offset sorting with derived sizes",
+				"case insensitive companion lookup",
+				"cp932 names",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "GPC",
+				"class": "GpcOpener",
+				"source": "ArcFormats/Eushully/ArcGPC.cs"
+			},
+			"localId": "eushully-gpc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion index name from extension",
+				"extension rejection rules",
+				"inverted name bytes",
+				"fixed appended extension",
+				"offset sorting with derived sizes",
+				"case insensitive companion lookup",
+				"cp932 names",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DDP3",
 				"class": "Ddp3Opener",
 				"source": "ArcFormats/DDSystem/ArcDDP.cs"
