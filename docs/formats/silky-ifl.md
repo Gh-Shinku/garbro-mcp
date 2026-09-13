@@ -22,10 +22,10 @@ and every payload is checked against the file.
 The reference decides lazily whether a payload is packed. A payload qualifies when its span exceeds twelve bytes,
 its name is not a `.grd` image that another Silky format owns, and its first four bytes spell `CMP_`. Qualifying
 payloads declare their expanded length in the word at +4 and hold an LZSS stream from +12, decoded with a ring fill
-of 0x20 instead of the default. The port performs the same inspection while reading the index so listing and
-extraction agree, and marks those entries as having an inexact size because the decoder stops at the end of the
-stored stream. Everything else is emitted verbatim, which is also what happens for a `.grd` name even when its
-payload carries the marker.
+of 0x20 instead of the default. GARBro bounds decoding to that declared size; a truncated stream leaves the unread
+tail zero-filled. The port performs the same inspection while reading the index so listing and extraction agree.
+Everything else is emitted verbatim, which is also what happens for a `.grd` name even when its payload carries the
+marker.
 
 ## Support
 
@@ -42,5 +42,5 @@ payload carries the marker.
 | Verbatim extraction otherwise | Supported |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover a stored payload, a marked payload expanded with the overridden ring fill, a `.grd` name
-left stored, a blank name, and a data offset outside the file.
+Synthetic fixtures cover a stored payload, a marked payload expanded with the overridden ring fill, a declaration
+that bounds a longer LZSS stream, a `.grd` name left stored, a blank name, and a data offset outside the file.

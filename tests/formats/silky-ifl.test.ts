@@ -72,6 +72,20 @@ describe("Silky IFL resource archive", () => {
 		});
 	});
 
+	it("does not decode past the declared unpacked length", async () => {
+		await expectArchive({
+			format: iflFormat,
+			archive: buildIfl([
+				{
+					name: "bounded.dat",
+					payload: packed(1, Buffer.from([0xff, ...Buffer.from("ABCDEFGH")])),
+				},
+			]),
+			sourcePath: "sample.ifl",
+			entries: [{ path: "bounded.dat", size: 1, content: Buffer.from("A") }],
+		});
+	});
+
 	it("rejects a blank name", async () => {
 		const payload = Buffer.from("body");
 		const archive = buildIfl([{ name: "one.dat", payload }]);

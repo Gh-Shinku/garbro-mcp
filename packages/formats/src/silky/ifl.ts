@@ -1,7 +1,7 @@
 // Format reference: GARBro ArcFormats/Silky/ArcIFL.cs, class `IflOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { inflateLzssAll } from "@garbro-mcp/codecs";
+import { inflateLzss } from "@garbro-mcp/codecs";
 import {
 	bigintToBufferLength,
 	GarbroError,
@@ -119,7 +119,6 @@ async function readIflIndex(
 			packedSize: storedSize,
 			compressed: packed,
 		});
-		if (packed) entry.sizeKnown = false;
 		entries.push(entry);
 	}
 	return entries;
@@ -142,8 +141,17 @@ async function openIflEntry(
 			"LZSS entry",
 		),
 	);
+	const outputLength = bigintToBufferLength(entry.size, "LZSS output");
+	const unpacked = inflateLzss(stored, {
+		frameFill: LZSS_FRAME_FILL,
+		outputLength,
+	});
+	// GARBro's LzssReader allocates the declared output buffer up front. A truncated stream therefore
+	// leaves its unread tail zero-filled rather than exposing bytes beyond the declared length.
 	return Readable.from([
-		inflateLzssAll(stored, { frameFill: LZSS_FRAME_FILL }),
+		unpacked.length === outputLength
+			? unpacked
+			: Buffer.concat([unpacked, Buffer.alloc(outputLength - unpacked.length)]),
 	]);
 }
 
