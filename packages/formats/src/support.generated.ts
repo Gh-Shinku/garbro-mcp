@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PD/3",
+				class: "Pd3Opener",
+				source: "ArcFormats/FlyingShine/ArcPD.cs",
+			},
+			localId: "flying-shine-pd3",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"empty index slots",
+				"script byte rotation",
+			],
+			unsupported: ["archive creation", "pd and pd version 2 tags"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ABM",
 				class: "AbmOpener",
 				source: "ArcFormats/Lilim/ArcABM.cs",

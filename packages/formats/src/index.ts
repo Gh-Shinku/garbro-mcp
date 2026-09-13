@@ -503,6 +503,7 @@ import { entisEriFormat } from "./entis/eri.js";
 import { piasEncryptedFormat } from "./pias/encrypted-graph.js";
 import { alicesoftAfaFormat } from "./alicesoft/afa.js";
 import { abmFormat } from "./lilim/abm.js";
+import { flyingShinePd3Format } from "./flying-shine/pd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -799,6 +800,7 @@ export * from "./livemaker/index.js";
 export * from "./caramel-box/index.js";
 export * from "./lune/index.js";
 export * from "./discovery/index.js";
+export * from "./flying-shine/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1307,5 +1309,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		piasEncryptedFormat,
 		alicesoftAfaFormat,
 		abmFormat,
+		flyingShinePd3Format,
 	]);
 }
