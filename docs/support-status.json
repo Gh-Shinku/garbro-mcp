@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CGD/SPIEL",
+				"class": "CgdOpener",
+				"source": "Legacy/KApp/ArcCGD.cs"
+			},
+			"localId": "kapp-cgd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x10-byte image records",
+				"image metadata",
+				"generated entry names",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/IDX",
 				"class": "PacOpener",
 				"source": "Legacy/Pochette/ArcPAC.cs"
