@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PKD",
+				"class": "PkdOpener",
+				"source": "ArcFormats/AdvDx/ArcPKD.cs"
+			},
+			"localId": "advdx-pkd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"xor-encrypted index",
+				"xor-encrypted payloads",
+				"blank-name rejection",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GLNK/MIRIS",
 				"class": "GlnkOpener",
 				"source": "ArcFormats/Eternity/ArcGLNK.cs"
