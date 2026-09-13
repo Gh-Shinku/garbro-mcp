@@ -283,6 +283,8 @@ import { kaguyaPl10Format } from "./kaguya/pl10.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
 import { nscripterSarFormat } from "./nscripter/sar.js";
 import { keyPakFormat } from "./key/pak.js";
+import { egoDatFormat } from "./studio-ego/ego-dat.js";
+import { egoOldDatFormat } from "./studio-ego/ego-dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -480,6 +482,7 @@ export * from "./wild-bug/index.js";
 export * from "./kaguya/index.js";
 export * from "./nscripter/index.js";
 export * from "./key/index.js";
+export * from "./studio-ego/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -769,5 +772,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaguyaAn21Format,
 		nscripterSarFormat,
 		keyPakFormat,
+		egoDatFormat,
+		egoOldDatFormat,
 	]);
 }

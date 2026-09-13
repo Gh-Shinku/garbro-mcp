@@ -6,6 +6,52 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/EGO/0",
+				"class": "OldDatOpener",
+				"source": "ArcFormats/StudioEgo/ArcEGO.cs"
+			},
+			"localId": "studio-ego-dat-0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"index region length and bounds",
+				"variable length records with older header",
+				"record length limits",
+				"name field with empty rejection",
+				"data offset and size fields",
+				"offset and placement validation",
+				"structural detection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/EGO/1",
+				"class": "DatOpener",
+				"source": "ArcFormats/StudioEgo/ArcEGO.cs"
+			},
+			"localId": "studio-ego-dat-1",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"index region length and bounds",
+				"variable length records with header",
+				"record length limits",
+				"name field with empty rejection",
+				"data offset and size fields",
+				"offset and placement validation",
+				"structural detection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAK/KEY",
 				"class": "PakOpener",
 				"source": "ArcFormats/Key/ArcPAK.cs"
