@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GAMEDAT",
+				"class": "DatOpener",
+				"source": "ArcFormats/Pajamas/ArcGameDat.cs"
+			},
+			"localId": "pajamas-gamedat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and version detection",
+				"16-byte and 32-byte name fields",
+				"relative offset index",
+				"rolling-xor textdata.bin decryption",
+				"marker-gated decryption",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SDA/yane",
 				"class": "SdaOpener",
 				"source": "Legacy/Yaneurao/ArcSDA.cs"
