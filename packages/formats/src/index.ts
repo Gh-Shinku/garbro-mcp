@@ -569,6 +569,7 @@ import { wazAudioFormat } from "./anotherroom/waz-audio.js";
 import { harvestBgmAudioFormat } from "./myharvest/bgm-audio.js";
 import { hiddenJpegImageFormat } from "./gaia/jpeg-image.js";
 import { frmImageFormat } from "./logg/frm-image.js";
+import { mbpImageFormat } from "./hmp/mbp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -884,6 +885,7 @@ export * from "./mb/index.js";
 export * from "./ice/index.js";
 export * from "./anotherroom/index.js";
 export * from "./gaia/index.js";
+export * from "./hmp/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1458,5 +1460,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		harvestBgmAudioFormat,
 		hiddenJpegImageFormat,
 		frmImageFormat,
+		mbpImageFormat,
 	]);
 }

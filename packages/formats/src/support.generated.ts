@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MBP",
+				class: "MbpFormat",
+				source: "Legacy/hmp/ImageMBP.cs",
+			},
+			localId: "hmp-mbp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "bgr555 bitmaps", "metadata"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "FRM",
 				class: "FrmFormat",
 				source: "Legacy/Logg/ImageFRM.cs",

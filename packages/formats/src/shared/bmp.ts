@@ -77,6 +77,44 @@ export function readBmpMetaData(
 }
 
 /**
+ * Wraps 16 bit pixels in a bitmap using `BI_BITFIELDS` with the VGA 555 masks, which is how GARbro
+ * writes `Bgr555` data: the three masks follow the forty byte DIB header, so the pixel data starts at
+ * offset 66. Rows are aligned to four bytes like every other bitmap here.
+ */
+export function writeBmp16(
+	width: number,
+	height: number,
+	pixels: Buffer,
+	bottomUp = false,
+): Buffer {
+	const stride = (width * 2 + 3) & ~3;
+	const imageSize = stride * height;
+	const dataOffset = BMP_HEADER_SIZE + 12;
+	const header = writeHeader(
+		width,
+		height,
+		16,
+		dataOffset,
+		imageSize,
+		0,
+		bottomUp,
+	);
+	// `BI_BITFIELDS` tells readers to look for the colour masks that follow.
+	header.writeUInt32LE(3, 30);
+	const masks: Buffer = Buffer.alloc(12);
+	masks.writeUInt32LE(0x7c00, 0);
+	masks.writeUInt32LE(0x03e0, 4);
+	masks.writeUInt32LE(0x001f, 8);
+	const rows: Buffer[] = [];
+	for (let row = 0; row < height; row += 1) {
+		const line = Buffer.alloc(stride);
+		pixels.copy(line, 0, row * width * 2, (row + 1) * width * 2);
+		rows.push(line);
+	}
+	return Buffer.concat([header, masks, ...rows]);
+}
+
+/**
  * Wraps eight bit pixels in a bitmap with a caller supplied palette, which the Logg images carry. The
  * palette is copied verbatim and zero padded to 256 entries, so whatever byte order the reference passes
  * through reaches the bitmap unchanged; rows are padded the same way as in `writeBmp8`.
