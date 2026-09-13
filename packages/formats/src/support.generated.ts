@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/LSD",
+				class: "LsdOpener",
+				source: "ArcFormats/Gss/ArcARC.cs",
+			},
+			localId: "gss-lsd",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"companion bin index",
+				"lsdarc signature",
+				"record based listing",
+				"payload signature check",
+				"pack method dispatch",
+				"r literal fill skip and end commands",
+				"unknown pack method fallback",
+			],
+			unsupported: [
+				"archive creation",
+				"image decoding",
+				"pack methods D H and W",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "GPC7",
 				class: "GpcOpener",
 				source: "ArcFormats/SuperNekoX/ArcGPC.cs",
