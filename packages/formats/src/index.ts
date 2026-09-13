@@ -430,6 +430,7 @@ import { studioEgoPak0Format } from "./studio-ego/pak0.js";
 import { nexasPacFormat } from "./nexas/pac.js";
 import { aaruFl4Format } from "./aaru/fl4.js";
 import { wagFormat } from "./hexenhaus/wag.js";
+import { mcaFormat } from "./fc01/mca.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1132,5 +1133,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nexasPacFormat,
 		aaruFl4Format,
 		wagFormat,
+		mcaFormat,
 	]);
 }

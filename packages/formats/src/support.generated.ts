@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MCA",
+				class: "McaOpener",
+				source: "ArcFormats/FC01/ArcMCA.cs",
+			},
+			localId: "fc01-mca",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"frame offset table",
+				"base name frame numbering",
+				"palette skipping for eight bit archives",
+				"frame drop below thirty three bytes",
+			],
+			unsupported: [
+				"archive creation",
+				"MCA frame image decoding with a user key",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "WAG/IAF",
 				class: "WagOpener",
 				source: "ArcFormats/Hexenhaus/ArcWAG.cs",
