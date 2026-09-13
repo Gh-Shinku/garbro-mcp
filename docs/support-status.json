@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PKK",
+				"class": "PkkOpener",
+				"source": "Legacy/Electriciteit/ArcPKK.cs"
+			},
+			"localId": "electriciteit-pkk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"encrypted signature matching",
+				"version word limited",
+				"index offset and entry count validation",
+				"records with names",
+				"cp932 names with blank rejection",
+				"entry placement validation",
+				"repeating-key xor over header index and payloads",
+				"extensions as hints"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SPACK",
 				"class": "DatOpener",
 				"source": "ArcFormats/ArcSPack.cs"

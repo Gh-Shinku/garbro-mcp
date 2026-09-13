@@ -259,6 +259,7 @@ import { aarFormat } from "./alicesoft/aar.js";
 import { ucaFormat } from "./westgate/uca.js";
 import { uwfFormat } from "./westgate/uwf.js";
 import { spackFormat } from "./spack/dat.js";
+import { pkkFormat } from "./electriciteit/pkk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -708,5 +709,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ucaFormat,
 		uwfFormat,
 		spackFormat,
+		pkkFormat,
 	]);
 }
