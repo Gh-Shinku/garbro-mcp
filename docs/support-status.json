@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "KOE",
+				"class": "KoeOpener",
+				"source": "ArcFormats/RealLive/ArcKOE.cs"
+			},
+			"localId": "reallive-koe",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"koepac signature",
+				"flat chunk index",
+				"4 bit adpcm decoding",
+				"8 bit pcm lookup chunks",
+				"silence chunks",
+				"generated wav entry names",
+				"riff wrapping with stereo 16 bit pcm"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/Will",
 				"class": "ArcOpener",
 				"source": "ArcFormats/Will/ArcWILL.cs"
