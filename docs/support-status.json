@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DSK/PFT",
+				"class": "DskOpener",
+				"source": "ArcFormats/Abogado/ArcDSK.cs"
+			},
+			"localId": "abogado-dsk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion pft index",
+				"header and cluster sizes",
+				"variable-length records with empty-name skipping",
+				"cluster-scaled data offsets",
+				"archive name to extension mapping",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/electr",
 				"class": "DatOpener",
 				"source": "Legacy/Electriciteit/ArcDAT.cs"
