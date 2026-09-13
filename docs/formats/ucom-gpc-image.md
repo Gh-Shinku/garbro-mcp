@@ -7,7 +7,7 @@ the alignment bytes behind every row are part of the compressed stream.
 
 | Element | Value |
 | --- | --- |
-| Tag | `GPC/UCOM` — the reference calls it `GPC`, which the Advanced 98 and SuperNekoX readers also use |
+| Tag | `GPC` — the Advanced 98 and SuperNekoX readers carry that tag as well, so the status record's own id names the engine |
 | Class | `GpcFormat` (`ArcFormats/Ucom/ImageGPC.cs`) |
 | Signature | `0x00285047`, which reads back as `GP(` and a null |
 | Extensions | None declared |

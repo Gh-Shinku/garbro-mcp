@@ -6,7 +6,7 @@
 		{
 			"reference": {
 				"type": "image",
-				"tag": "GPC/UCOM",
+				"tag": "GPC",
 				"class": "GpcFormat",
 				"source": "ArcFormats/Ucom/ImageGPC.cs"
 			},
