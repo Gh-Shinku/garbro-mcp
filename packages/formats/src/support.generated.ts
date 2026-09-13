@@ -9,6 +9,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PFS",
+				class: "PfsOpener",
+				source: "ArcFormats/Artemis/ArcPFS.cs",
+			},
+			localId: "artemis-pfs",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"pf signature with a version digit",
+				"pf6 and pf8 shared index layout",
+				"index size field",
+				"entry count inside the index",
+				"name length records with a four-byte gap",
+				"payload offsets and sizes",
+				"placement checks",
+				"SHA-1 index key for pf8",
+				"absolute-position key indexing",
+				"payload remainder after the key length",
+				"pf2 count in the file header",
+				"pf2 index header and twelve-byte record gap",
+				"hierarchical path normalization",
+			],
+			unsupported: [
+				"archive creation",
+				"alternate UTF-8 name encoding",
+				"extension based entry typing",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAF2",
 				class: "Daf2Opener",
 				source: "ArcFormats/DenSDK/ArcDAF.cs",
