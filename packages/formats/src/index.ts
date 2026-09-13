@@ -601,6 +601,7 @@ import { nbmpImageFormat } from "./westgate/nbmp-image.js";
 import { pmwAudioFormat } from "./sceneplayer/pmw-audio.js";
 import { ezsAudioFormat } from "./broom/ezs-audio.js";
 import { bmzImageFormat } from "./black-rainbow/bmz-image.js";
+import { aloImageFormat } from "./bef/alo-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1528,5 +1529,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pmwAudioFormat,
 		ezsAudioFormat,
 		bmzImageFormat,
+		aloImageFormat,
 	]);
 }

@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ALO",
+				class: "AloFormat",
+				source: "ArcFormats/BeF/ImageALO.cs",
+			},
+			localId: "bef-alo-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"marker reconstruction",
+				"bitmap trimming",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMZ",
 				class: "BmzFormat",
 				source: "ArcFormats/BlackRainbow/ImageBMZ.cs",
