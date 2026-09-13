@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PNX/ZENOS",
+				class: "PnxFormat",
+				source: "Legacy/Zenos/ImagePNX.cs",
+			},
+			localId: "zenos-pnx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "png signature reconstruction"],
+			unsupported: ["archive creation", "pixel decoding", "png validation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "RED",
 				class: "RedFormat",
 				source: "Legacy/Ocarina/ImageRED.cs",

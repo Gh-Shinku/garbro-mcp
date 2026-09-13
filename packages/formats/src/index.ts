@@ -543,6 +543,7 @@ import { mdImageFormat } from "./mina/md-image.js";
 import { wmkImageFormat } from "./fc01/wmk-image.js";
 import { p4agImageFormat } from "./xuse/p4ag-image.js";
 import { redImageFormat } from "./ocarina/red-image.js";
+import { pnxImageFormat } from "./zenos/pnx-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -848,6 +849,7 @@ export * from "./macromedia/index.js";
 export * from "./ags32i/index.js";
 export * from "./psm/index.js";
 export * from "./ocarina/index.js";
+export * from "./zenos/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1396,5 +1398,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wmkImageFormat,
 		p4agImageFormat,
 		redImageFormat,
+		pnxImageFormat,
 	]);
 }
