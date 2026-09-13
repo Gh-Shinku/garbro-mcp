@@ -658,6 +658,7 @@ import { cswareWavAudioFormat } from "./csware/wav-audio.js";
 import { biz2ImageFormat } from "./adviz/biz2-image.js";
 import { rbpImageFormat } from "./dice/rbp-image.js";
 import { prgImageFormat } from "./regrips/prg-image.js";
+import { brgImageFormat } from "./regrips/brg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1648,5 +1649,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		biz2ImageFormat,
 		rbpImageFormat,
 		prgImageFormat,
+		brgImageFormat,
 	]);
 }

@@ -1,3 +1,4 @@
 export * from "./wrg-audio.js";
 export * from "./mrg-audio.js";
 export * from "./prg-image.js";
+export * from "./brg-image.js";
