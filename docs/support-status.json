@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CPC",
+				"class": "CpcOpener",
+				"source": "Legacy/BRoom/ArcCPC.cs"
+			},
+			"localId": "broom-cpc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"obfuscated count and flag",
+				"name-key decryption",
+				"encrypted offset and size tables",
+				"unencrypted position-dependent masks",
+				"key index validation",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/CSPACK",
 				"class": "DatOpener",
 				"source": "ArcFormats/CatSystem/ArcDAT.cs"

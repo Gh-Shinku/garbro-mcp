@@ -226,6 +226,7 @@ import { sqzFormat } from "./musica/sqz.js";
 import { mpkHgFormat } from "./tako/mpk.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
+import { cpcFormat } from "./broom/cpc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -393,6 +394,7 @@ export * from "./jupiter/index.js";
 export * from "./rune/index.js";
 export * from "./musica/index.js";
 export * from "./tako/index.js";
+export * from "./broom/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -625,5 +627,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mpkHgFormat,
 		tanFormat,
 		csPackFormat,
+		cpcFormat,
 	]);
 }
