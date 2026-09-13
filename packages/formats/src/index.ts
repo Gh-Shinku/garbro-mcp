@@ -164,6 +164,7 @@ import { iksFormat } from "./xiks/iks.js";
 import { fgFormat } from "./frontwing/fg.js";
 import { cp3Format } from "./seraphim/cp3.js";
 import { crmFormat } from "./circus/crm.js";
+import { pkgFormat } from "./yatagarasu/pkg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -293,6 +294,7 @@ export * from "./nags/index.js";
 export * from "./kirikiri/index.js";
 export * from "./xiks/index.js";
 export * from "./frontwing/index.js";
+export * from "./yatagarasu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -463,5 +465,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fgFormat,
 		cp3Format,
 		crmFormat,
+		pkgFormat,
 	]);
 }
