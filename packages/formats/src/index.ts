@@ -360,6 +360,7 @@ import { alternaBinFormat } from "./alterna/bin.js";
 import { ebisuEp1Format } from "./ebisu/ep1.js";
 import { umeSoftBinFormat } from "./ume-soft/bin.js";
 import { penguinPacFormat } from "./penguin/pac.js";
+import { blueGaleAmvFormat } from "./blue-gale/amv.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -959,5 +960,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ebisuEp1Format,
 		umeSoftBinFormat,
 		penguinPacFormat,
+		blueGaleAmvFormat,
 	]);
 }

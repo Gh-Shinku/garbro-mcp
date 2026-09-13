@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "AMPV",
+				class: "AmvOpener",
+				source: "ArcFormats/BlueGale/VideoAMV.cs",
+			},
+			localId: "bluegale-amv",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"ampV signature with version check",
+				"frame-sized unpacked size",
+				"frame count and geometry",
+				"zbm compressed frames",
+				"bitmap header synthesis",
+				"frame naming with base hash index",
+				"image typing",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAC/PENGUIN",
 				class: "PacOpener",
 				source: "Legacy/PenguinWorks/ArcPAC.cs",
