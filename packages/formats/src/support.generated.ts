@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DPC",
+				class: "DpcFormat",
+				source: "Legacy/Desire/ImageDPC.cs",
+			},
+			localId: "desire-dpc-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"bit-packed decoding",
+				"4bpp bitmap output",
+				"packed palette words",
+				"source rectangle",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "DES98",
 				class: "DesFormat",
 				source: "Legacy/Desire/ImageDES.cs",
