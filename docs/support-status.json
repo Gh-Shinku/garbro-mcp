@@ -5,6 +5,28 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "WAV/IKE",
+				"class": "IkeAudio",
+				"source": "Legacy/UMeSoft/AudioIKE.cs"
+			},
+			"localId": "ume-soft-ike-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"ike unpacking",
+				"wave parsing",
+				"canonical wave output",
+				"metadata"
+			],
+			"unsupported": ["audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "THP",
 				"class": "ThpFormat",

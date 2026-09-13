@@ -623,6 +623,7 @@ import { malImageFormat } from "./valkyria/mal-image.js";
 import { texImageFormat } from "./system21/tex-image.js";
 import { ggaImageFormat } from "./ikura/gga-image.js";
 import { thpImageFormat } from "./primesoft/thp-image.js";
+import { ikeAudioFormat } from "./ume-soft/ike-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1575,5 +1576,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		texImageFormat,
 		ggaImageFormat,
 		thpImageFormat,
+		ikeAudioFormat,
 	]);
 }
