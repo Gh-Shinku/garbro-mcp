@@ -279,6 +279,7 @@ import { arFormat } from "./palm-tree/ar.js";
 import { a98Format } from "./active-soft/a98.js";
 import { wbpFormat } from "./wild-bug/wbp.js";
 import { kaguyaPltFormat } from "./kaguya/plt.js";
+import { kaguyaPl10Format } from "./kaguya/pl10.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -759,5 +760,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		a98Format,
 		wbpFormat,
 		kaguyaPltFormat,
+		kaguyaPl10Format,
 	]);
 }

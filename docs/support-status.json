@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PL10",
+				"class": "Pl10Opener",
+				"source": "ArcFormats/Kaguya/ArcPLT.cs"
+			},
+			"localId": "kaguya-pl10",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"frame count validation",
+				"raw first frame",
+				"later frames with step and packed size",
+				"interleaved rle with simple and extended runs",
+				"frame naming by index",
+				"frame metadata",
+				"zero step and span bound rejection"
+			],
+			"unsupported": [
+				"frame accumulation and bitmap decoding",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PLT/KAGUYA",
 				"class": "Pl00Opener",
 				"source": "ArcFormats/Kaguya/ArcPLT.cs"
