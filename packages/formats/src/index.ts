@@ -434,6 +434,7 @@ import { mcaFormat } from "./fc01/mca.js";
 import { dpmFormat } from "./hsp/dpm.js";
 import { detFormat } from "./ugos/det.js";
 import { pcdImageFormat } from "./witch/pcd.js";
+import { daiPacFormat } from "./dai-system/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -703,6 +704,7 @@ export * from "./eve/index.js";
 export * from "./nexas/index.js";
 export * from "./hsp/index.js";
 export * from "./ugos/index.js";
+export * from "./dai-system/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1142,5 +1144,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mcaFormat,
 		dpmFormat,
 		detFormat,
+		daiPacFormat,
 	]);
 }

@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/DAI",
+				"class": "PacOpener",
+				"source": "ArcFormats/DaiSystem/ArcPAC.cs"
+			},
+			"localId": "dai-system-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dai_system index decryption",
+				"comma terminated names",
+				"big endian offset fields",
+				"adjacent payload sizing",
+				"ha0 header skipping",
+				"interleave pipeline step",
+				"summed pipeline step",
+				"packed bit ladder pipeline step"
+			],
+			"unsupported": [
+				"archive creation",
+				"game specific ha0 payload type classification"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PCD/IMAGE",
 				"class": "ImageDataOpener",
 				"source": "Legacy/Witch/ArcPCD.cs"
