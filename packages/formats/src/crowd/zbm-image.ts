@@ -9,6 +9,7 @@ import type {
 } from "@garbro-mcp/core";
 import { inflateLzss } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
+import { readBmpHeaderFields } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -44,15 +45,9 @@ interface ZbmLayout {
 
 /** `Bmp.ReadMetaData` over a decompressed header, without the file size check a whole file would need. */
 function readBitmapFields(header: Buffer): ZbmLayout | undefined {
-	if (header.length < BMP_HEADER_SIZE) return undefined;
-	if ((header[0] ?? 0) !== 0x42 || (header[1] ?? 0) !== 0x4d) return undefined;
-	const dibSize = header.readUInt32LE(14);
-	if (dibSize < 40) return undefined;
-	const width = header.readUInt32LE(18);
-	const height = Math.abs(header.readInt32LE(22));
-	const bitsPerPixel = header.readUInt16LE(28);
-	if (width === 0 || height === 0) return undefined;
-	return { width, height, bitsPerPixel, dataLength: 0 };
+	const fields = readBmpHeaderFields(header);
+	if (!fields) return undefined;
+	return { ...fields, dataLength: 0 };
 }
 
 /**

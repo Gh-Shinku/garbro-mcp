@@ -59,21 +59,31 @@ export function readBmpMetaData(
 	| { width: number; height: number; bitsPerPixel: number; fileSize: number }
 	| undefined {
 	if (bmp.length < BMP_HEADER_SIZE) return undefined;
-	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
 	const fileSize = bmp.readUInt32LE(2);
 	if (fileSize < BMP_HEADER_SIZE || fileSize > bmp.length) return undefined;
+	const fields = readBmpHeaderFields(bmp);
+	if (!fields) return undefined;
+	return { ...fields, fileSize };
+}
+
+/**
+ * The header checks alone, for callers that hold a bitmap's header without the whole file — a decompressed
+ * prefix, for instance, whose `bfSize` still describes the image it came from and so cannot be compared with
+ * the buffer it is in. Same requirements as above otherwise: a `BM` tag, a DIB header of at least forty bytes,
+ * a positive width, a non-zero height and a non-zero bit depth.
+ */
+export function readBmpHeaderFields(
+	bmp: Buffer,
+): { width: number; height: number; bitsPerPixel: number } | undefined {
+	if (bmp.length < BMP_HEADER_SIZE) return undefined;
+	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
 	if (bmp.readUInt32LE(14) < 40) return undefined;
 	const width = bmp.readInt32LE(18);
 	const signedHeight = bmp.readInt32LE(22);
 	if (width <= 0 || signedHeight === 0) return undefined;
 	const bitsPerPixel = bmp.readUInt16LE(28);
 	if (bitsPerPixel === 0) return undefined;
-	return {
-		width,
-		height: Math.abs(signedHeight),
-		bitsPerPixel,
-		fileSize,
-	};
+	return { width, height: Math.abs(signedHeight), bitsPerPixel };
 }
 
 /**
