@@ -221,6 +221,7 @@ import { ykFormat } from "./rune/yk.js";
 import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
+import { sdaSdFormat } from "./squadrad/sda.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -613,5 +614,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ucgFormat,
 		voiceFormat,
 		arccFormat,
+		sdaSdFormat,
 	]);
 }
