@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "script",
+				tag: "QDO",
+				class: "QdoOpener",
+				source: "Legacy/RedZone/ScriptQDO.cs",
+			},
+			localId: "redzone-qdo-script",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "body deobfuscation", "metadata"],
+			unsupported: ["archive creation", "script encryption"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "DWV",
 				class: "DwvAudio",

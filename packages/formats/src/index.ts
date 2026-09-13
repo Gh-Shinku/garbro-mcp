@@ -573,6 +573,7 @@ import { mbpImageFormat } from "./hmp/mbp-image.js";
 import { muwAudioFormat } from "./artel/muw-audio.js";
 import { um3AudioFormat } from "./bruns/um3-audio.js";
 import { dwvAudioFormat } from "./sysd/dwv-audio.js";
+import { qdoScriptFormat } from "./redzone/qdo-script.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1468,5 +1469,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		muwAudioFormat,
 		um3AudioFormat,
 		dwvAudioFormat,
+		qdoScriptFormat,
 	]);
 }
