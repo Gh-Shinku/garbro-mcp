@@ -428,6 +428,7 @@ import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
 import { eveGmFormat } from "./eve/gm.js";
 import { studioEgoPak0Format } from "./studio-ego/pak0.js";
 import { nexasPacFormat } from "./nexas/pac.js";
+import { aaruFl4Format } from "./aaru/fl4.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1128,5 +1129,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		eveGmFormat,
 		studioEgoPak0Format,
 		nexasPacFormat,
+		aaruFl4Format,
 	]);
 }

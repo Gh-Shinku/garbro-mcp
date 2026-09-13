@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "FL4/AARU",
+				class: "Fl4Opener",
+				source: "Legacy/Aaru/ArcFL4.cs",
+			},
+			localId: "aaru-fl4",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"index with terminator",
+				"PD payload lzss",
+				"PD2A payload lzss",
+				"RD1.0 payload rle chunks",
+				"stored payload passthrough",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAC",
 				class: "PacOpener",
 				source: "ArcFormats/Nexas/ArcPAC.cs",
