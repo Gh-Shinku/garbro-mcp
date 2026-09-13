@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MGPK0",
+				"class": "Mgpk0Opener",
+				"source": "ArcFormats/MangaGamer/ArcMGPK.cs"
+			},
+			"localId": "mangagamer-mgpk0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"mgpk signature with zero version word",
+				"pac extension requirement",
+				"count validation",
+				"records with utf8 names",
+				"offset and placement validation",
+				"encryption flagging for png and txt names",
+				"stored extraction without a key"
+			],
+			"unsupported": [
+				"user key scheme and keyed decryption",
+				"lzf decompression of txt payloads",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AOIMY/UNICODE",
 				"class": "AoiMyUnicodeOpener",
 				"source": "ArcFormats/Aoi/ArcBOX.cs"

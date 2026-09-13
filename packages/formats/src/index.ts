@@ -300,6 +300,7 @@ import { vfsFormat } from "./aoi/vfs.js";
 import { boxFormat } from "./aoi/box.js";
 import { aoimyFormat } from "./aoi/box.js";
 import { aoimyUnicodeFormat } from "./aoi/box.js";
+import { mgpk0Format } from "./manga-gamer/mgpk0.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -502,6 +503,7 @@ export * from "./shsystem/index.js";
 export * from "./dd-system/index.js";
 export * from "./eushully/index.js";
 export * from "./aoi/index.js";
+export * from "./manga-gamer/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -808,5 +810,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		boxFormat,
 		aoimyFormat,
 		aoimyUnicodeFormat,
+		mgpk0Format,
 	]);
 }
