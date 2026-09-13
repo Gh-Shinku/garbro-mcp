@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/EMIC",
+				"class": "PacOpener",
+				"source": "ArcFormats/Emic/ArcPACK.cs"
+			},
+			"localId": "emic-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and extension detection",
+				"primary and secondary header layouts",
+				"masked key extraction",
+				"encrypted index decryption",
+				"offset-aligned payload decryption",
+				"entry placement validation",
+				"cp932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GAF/ORIGIN",
 				"class": "GafOpener",
 				"source": "ArcFormats/Origin/ArcGAF.cs"

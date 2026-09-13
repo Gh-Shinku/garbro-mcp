@@ -229,6 +229,7 @@ import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
 import { airFormat } from "./adobe/air.js";
 import { gafFormat } from "./origin/gaf.js";
+import { emicFormat } from "./emic/pack.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -399,6 +400,7 @@ export * from "./tako/index.js";
 export * from "./broom/index.js";
 export * from "./adobe/index.js";
 export * from "./origin/index.js";
+export * from "./emic/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -634,5 +636,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cpcFormat,
 		airFormat,
 		gafFormat,
+		emicFormat,
 	]);
 }
