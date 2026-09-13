@@ -5,6 +5,20 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "MUW",
+				"class": "MuwAudio",
+				"source": "Legacy/Artel/AudioMUW.cs"
+			},
+			"localId": "artel-muw-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detection", "extraction", "metadata", "chunk distance"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "MBP",
 				"class": "MbpFormat",
