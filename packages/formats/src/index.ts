@@ -264,6 +264,7 @@ import { jamDatFormat } from "./jam-creation/dat.js";
 import { adsPacFormat } from "./ads/pac.js";
 import { bsaFormat } from "./bishop/bsa.js";
 import { ivoryPkFormat } from "./ivory/pk.js";
+import { omiDatFormat } from "./omi/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -449,6 +450,7 @@ export * from "./scoop/index.js";
 export * from "./rain/index.js";
 export * from "./spack/index.js";
 export * from "./jam-creation/index.js";
+export * from "./omi/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -719,5 +721,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		adsPacFormat,
 		bsaFormat,
 		ivoryPkFormat,
+		omiDatFormat,
 	]);
 }

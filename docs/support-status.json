@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/OMI",
+				"class": "DatOpener",
+				"source": "Legacy/Omi/ArcDAT.cs"
+			},
+			"localId": "omi-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"exact scrdat file name",
+				"whole file cipher with offset derived key",
+				"text index with count and two lines per entry",
+				"sequential payload offsets",
+				"entry placement validation",
+				"image classification by extension",
+				"rle expansion for packed payloads",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PK/IVORY",
 				"class": "PakOpener",
 				"source": "ArcFormats/Ivory/ArcPK.cs"
