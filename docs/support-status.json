@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC0",
+				"class": "Arc0Opener",
+				"source": "ArcFormats/Mixwill/ArcARC0.cs"
+			},
+			"localId": "mixwill-arc0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"0x110-byte index records",
+				"position-xored name fields",
+				"empty name rejection",
+				"entry placement validation",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "GPK",
 				"class": "GpkOpener",
 				"source": "ArcFormats/BlackCyc/ArcGPK.cs"
