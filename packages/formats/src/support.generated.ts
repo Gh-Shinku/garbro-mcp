@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MRG",
+				class: "MrgOpener",
+				source: "ArcFormats/FC01/ArcMRG.cs",
+			},
+			localId: "fc01-mrg",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"key guessing",
+				"index decryption",
+				"lzss payloads",
+			],
+			unsupported: ["archive creation", "mrgdecoder payloads"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "MMA",
 				class: "MmaOpener",
 				source: "ArcFormats/Mnp/ArcMMA.cs",

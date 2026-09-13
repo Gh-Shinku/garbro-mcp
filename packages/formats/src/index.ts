@@ -509,6 +509,7 @@ import { flyingShinePd2Format } from "./flying-shine/pd2.js";
 import { vafsFormat } from "./softpal/vafs.js";
 import { originHedDatFormat } from "./origin/dat-hed.js";
 import { mmaFormat } from "./mnp/mma.js";
+import { mrgFormat } from "./fc01/mrg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1321,5 +1322,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		vafsFormat,
 		originHedDatFormat,
 		mmaFormat,
+		mrgFormat,
 	]);
 }
