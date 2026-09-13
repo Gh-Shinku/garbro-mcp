@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAC/MyAdv",
+				"class": "PacOpener",
+				"source": "ArcFormats/MyAdv/ArcPAC.cs"
+			},
+			"localId": "myadv-pac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"zlib-compressed CP932 names",
+				"hierarchical path normalization",
+				"fixed payload table and placement validation",
+				"zlib payload extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARBro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC1",
 				"class": "PacOpener",
 				"source": "ArcFormats/RiddleSoft/ArcPAC.cs"

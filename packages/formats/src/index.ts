@@ -323,6 +323,7 @@ import { morningTtdFormat } from "./morning/ttd.js";
 import { studioSakuraDatFormat } from "./studio-sakura/dat.js";
 import { fwaFormat } from "./nug/fwa.js";
 import { riddlePacFormat } from "./riddle/pac.js";
+import { myAdvPacFormat } from "./myadv/pac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -536,6 +537,7 @@ export * from "./morning/index.js";
 export * from "./studio-sakura/index.js";
 export * from "./nug/index.js";
 export * from "./riddle/index.js";
+export * from "./myadv/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -796,6 +798,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		studioSakuraDatFormat,
 		fwaFormat,
 		riddlePacFormat,
+		myAdvPacFormat,
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
