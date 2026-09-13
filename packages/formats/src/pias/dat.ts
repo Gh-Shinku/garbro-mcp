@@ -21,8 +21,9 @@ import {
 
 const ENCRYPTED_SIGNATURE = 0x03184767;
 const TEXT_OPCODE = 0x68;
-const AUDIO_HEADER_SIZE = 4;
-const IMAGE_HEADER_SIZE = 8;
+/** Resource payloads carry a four byte length for audio and a eight byte header for graphics. */
+export const AUDIO_HEADER_SIZE = 4;
+export const IMAGE_HEADER_SIZE = 8;
 const RIFF_HEADER_SIZE = 44;
 const RIFF_SIZE_BIAS = 0x24;
 const RIFF_TAG = 0x46464952;
@@ -31,10 +32,10 @@ const FMT_TAG = 0x20746d66;
 const DATA_TAG = 0x61746164;
 
 /** `ResourceType` selects the text.dat list that drives the directory. */
-type ResourceType = "undefined" | "graphics" | "sound";
+export type ResourceType = "undefined" | "graphics" | "sound";
 
 /** `DatOpener.TryOpen` picks the resource type from the archive file name. */
-function resourceTypeOf(sourcePath: string): ResourceType | undefined {
+export function resourceTypeOf(sourcePath: string): ResourceType | undefined {
 	const name = (sourcePath.split(/[\\/]/).pop() ?? "").toLowerCase();
 	if (name === "sound.dat") return "sound";
 	if (name === "graph.dat") return "graphics";
@@ -71,7 +72,7 @@ function readPackedInt(
  * `TextReader.GetResourceList`: walks the opcode records of text.dat and collects the offsets of the
  * record whose resource type matches. Records for other types are skipped.
  */
-function readTextOffsets(
+export function readTextOffsets(
 	data: Buffer,
 	resourceType: ResourceType,
 ): number[] | undefined {
@@ -109,7 +110,7 @@ function readTextOffsets(
 	return undefined;
 }
 
-interface PiasEntry {
+export interface PiasEntry {
 	name: string;
 	type: string;
 	offset: number;
@@ -120,9 +121,10 @@ interface PiasEntry {
  * `IndexReader.FillEntries`: text.dat offsets become index numbered entries, then the whole file is
  * walked as a chain of length prefixed resources.
  */
-async function buildPiasEntries(
+export async function buildPiasEntries(
 	source: ByteSource,
 	sourcePath: string,
+	textData?: Buffer,
 ): Promise<PiasEntry[] | undefined> {
 	const resourceType = resourceTypeOf(sourcePath);
 	if (!resourceType) return undefined;
@@ -132,8 +134,8 @@ async function buildPiasEntries(
 	const entries: PiasEntry[] = [];
 	const knownOffsets = new Set<number>();
 	if (resourceType !== "undefined") {
-		const textName = "text.dat";
-		const text = await readCompanionFile(sourcePath, textName);
+		// The encrypted flavour passes the decrypted text.dat list instead of reading the plain one.
+		const text = textData ?? (await readCompanionFile(sourcePath, "text.dat"));
 		if (!text) return undefined;
 		const offsets = readTextOffsets(text, resourceType);
 		if (!offsets) return undefined;
@@ -175,7 +177,7 @@ async function buildPiasEntries(
  * its streams the same way, which matters because text.dat offsets are not placement checked and can
  * describe an entry that runs past the end of the archive.
  */
-async function readClamped(
+export async function readClamped(
 	source: ByteSource,
 	offset: bigint,
 	size: number,
@@ -185,7 +187,7 @@ async function readClamped(
 	return Buffer.from(await source.readAt(offset, Math.min(size, available)));
 }
 
-async function readEntrySize(
+export async function readEntrySize(
 	source: ByteSource,
 	offset: number,
 	headerSize: number,
