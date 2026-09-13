@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "OGGPAK",
+				class: "OggPakAudio",
+				source: "ArcFormats/Key/AudioOGGPAK.cs",
+			},
+			localId: "key-oggpak-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction"],
+			unsupported: ["archive creation", "ogg decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "IKM",
 				class: "IkmAudio",
 				source: "ArcFormats/MicroVision/AudioIKM.cs",
