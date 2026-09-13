@@ -462,6 +462,8 @@ import { tailCafFormat } from "./tail/caf.js";
 import { gameSystemChrFormat } from "./gamesystem/chr.js";
 import { seraphimScnFormat } from "./seraphim/scnpac.js";
 import { seraphimScn95Format } from "./seraphim/scnpac.js";
+import { gsPackFormat } from "./gs-pack/archive.js";
+import { gsDataFormat } from "./gs-pack/archive.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -738,6 +740,7 @@ export * from "./groover/index.js";
 export * from "./splush-wave/index.js";
 export * from "./lazycrew/index.js";
 export * from "./rare/index.js";
+export * from "./gs-pack/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1205,5 +1208,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameSystemChrFormat,
 		seraphimScnFormat,
 		seraphimScn95Format,
+		gsPackFormat,
+		gsDataFormat,
 	]);
 }

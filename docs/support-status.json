@@ -6,6 +6,48 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GsData",
+				"class": "DatOpener",
+				"source": "ArcFormats/GsPack/ArcGsPack.cs"
+			},
+			"localId": "gs-data",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"symbol table header",
+				"keyed index decryption",
+				"compressed index",
+				"lzss payload unpacking",
+				"generated entry names"
+			],
+			"unsupported": ["archive creation", "image and audio decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "GsPack",
+				"class": "PakOpener",
+				"source": "ArcFormats/GsPack/ArcGsPack.cs"
+			},
+			"localId": "gs-pack",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"versioned markers",
+				"version dependent record width",
+				"plain and compressed index",
+				"index complement decryption",
+				"name derived payload decryption",
+				"archive name typing",
+				"signature based typing"
+			],
+			"unsupported": ["archive creation", "image and audio decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SCN/ARCH",
 				"class": "Scn95Opener",
 				"source": "ArcFormats/Seraphim/ArcSCN.cs"
