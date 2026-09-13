@@ -367,6 +367,8 @@ import { ponytailBndFormat } from "./ponytail/bnd.js";
 import { ankhGrpFormat } from "./ankh/grp.js";
 import { ankhDatFormat } from "./ankh/dat.js";
 import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
+import { ffaDatFormat } from "./ffa/dat.js";
+import { ffaJdatFormat } from "./ffa/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -978,5 +980,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ankhGrpFormat,
 		ankhDatFormat,
 		shapeShifterBndFormat,
+		ffaDatFormat,
+		ffaJdatFormat,
 	]);
 }

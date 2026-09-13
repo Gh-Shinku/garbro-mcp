@@ -6,6 +6,50 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "FFA/JDAT",
+				"class": "JDatOpener",
+				"source": "ArcFormats/Ffa/ArcBlackPackage.cs"
+			},
+			"localId": "ffa-jdat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"trailing index at the recorded offset",
+				"0x34 record exactness",
+				"0x20 byte names",
+				"payload offsets biased by four",
+				"inherited packed header detection and lzss unpacking",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "FFA/DAT",
+				"class": "DatOpener",
+				"source": "ArcFormats/Ffa/ArcBlackPackage.cs"
+			},
+			"localId": "ffa-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dat extension with lst companion index",
+				"record size exactness",
+				"sixteen-bit count limit",
+				"fourteen-byte names",
+				"payload offsets and sizes",
+				"so4 and so5 packed header detection",
+				"lzss unpacking to the declared size",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BND",
 				"class": "BndOpener",
 				"source": "Legacy/ShapeShifter/ArcBND.cs"
