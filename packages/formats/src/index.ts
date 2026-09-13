@@ -156,6 +156,7 @@ import { propellerMpkFormat } from "./propeller/mpk.js";
 import { tcd1Format } from "./topcat/tcd1.js";
 import { odioFormat } from "./hexenhaus/odio.js";
 import { nfsFormat } from "./nags/nfs.js";
+import { xpkFormat } from "./kirikiri/xpk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -282,6 +283,7 @@ export * from "./propeller/index.js";
 export * from "./topcat/index.js";
 export * from "./hexenhaus/index.js";
 export * from "./nags/index.js";
+export * from "./kirikiri/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -444,5 +446,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tcd1Format,
 		odioFormat,
 		nfsFormat,
+		xpkFormat,
 	]);
 }

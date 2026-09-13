@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "XPK",
+				"class": "XpkOpener",
+				"source": "ArcFormats/KiriKiri/ArcXPK.cs"
+			},
+			"localId": "kirikiri-xpk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"size-prefixed big-endian integers",
+				"null-terminated cp932 names",
+				"zero-length trailing entry",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["executable-embedded archives", "archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NFS",
 				"class": "NfsOpener",
 				"source": "ArcFormats/Nags/ArcNFS.cs"
