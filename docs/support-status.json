@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/MPF2",
+				"class": "Mpf2Opener",
+				"source": "ArcFormats/Apricot/ArcDAT.cs"
+			},
+			"localId": "apricot-dat",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"MPF2 signature detection",
+				"index length and payload base fields",
+				"zlib index decoded to its end",
+				"record walk driven by the record's own length",
+				"deleted records skipped while consuming their length",
+				"unreachable records skipped",
+				"relative 64-bit payload offsets",
+				"stored and unpacked size fields",
+				"zlib payload decoding",
+				"UTF-16LE hierarchical names",
+				"virtual offset space across a01 to a99 parts",
+				"payloads that span a part boundary"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "NCL",
 				"class": "NclOpener",
 				"source": "Legacy/Uran/ArcNCL.cs"
