@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PBM",
+				class: "PbmFormat",
+				source: "ArcFormats/Nekopunch/ImagePBM.cs",
+			},
+			localId: "nekopunch-pbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"lzss decoding",
+				"zero padding",
+				"bitmap trimming",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IMG/HF",
 				class: "ImgFormat",
 				source: "Legacy/HillField/ImageIMG.cs",

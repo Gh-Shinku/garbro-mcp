@@ -593,6 +593,7 @@ import { dpcImageFormat } from "./desire/dpc-image.js";
 import { tiareGraImageFormat } from "./tiare/gra-image.js";
 import { ugImageFormat } from "./ucom/ug-image.js";
 import { hillFieldImgImageFormat } from "./hillfield/img-image.js";
+import { pbmImageFormat } from "./nekopunch/pbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1512,5 +1513,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tiareGraImageFormat,
 		ugImageFormat,
 		hillFieldImgImageFormat,
+		pbmImageFormat,
 	]);
 }
