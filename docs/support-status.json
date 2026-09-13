@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "IPQ",
+				"class": "IpqOpener",
+				"source": "ArcFormats/TechnoBrain/ArcIPQ.cs"
+			},
+			"localId": "techno-brain-ipq",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"riff and format string validation",
+				"fmt chunk size validation",
+				"optional pal chunk skipping",
+				"anim index and frame offsets",
+				"backwards size derivation",
+				"generated frame names",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/EMIC",
 				"class": "PacOpener",
 				"source": "ArcFormats/Emic/ArcPACK.cs"
