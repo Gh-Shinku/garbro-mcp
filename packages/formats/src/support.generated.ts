@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PD/KAAS",
+				class: "PdOpener",
+				source: "ArcFormats/Kaas/ArcKAAS.cs",
+			},
+			localId: "kaas-pd",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"pd index descriptor",
+				"index offset and key fields",
+				"count masking",
+				"two index decryptors",
+				"index placement validation",
+				"zero size record skipping",
+				"generated entry names",
+				"image typing",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BDF",
 				class: "BdfOpener",
 				source: "ArcFormats/Zyx/ArcBDF.cs",

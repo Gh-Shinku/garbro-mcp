@@ -472,6 +472,7 @@ import { tanukiTacFormat } from "./tanuki/tac.js";
 import { kidLnkFormat } from "./kid/lnk.js";
 import { leafKcapFormat } from "./leaf/kcap.js";
 import { zyxBdfFormat } from "./zyx/bdf.js";
+import { kaasPdFormat } from "./kaas/pd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1230,5 +1231,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		kidLnkFormat,
 		leafKcapFormat,
 		zyxBdfFormat,
+		kaasPdFormat,
 	]);
 }
