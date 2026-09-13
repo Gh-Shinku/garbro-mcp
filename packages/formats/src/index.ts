@@ -192,6 +192,7 @@ import { ucomDataFormat } from "./ucom/data.js";
 import { ai5DatFormat } from "./elf/ai5dat.js";
 import { awfFormat } from "./silky/awf.js";
 import { mgdFormat } from "./masys/mgd.js";
+import { wvbFormat } from "./xuse/wvb.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -535,5 +536,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ai5DatFormat,
 		awfFormat,
 		mgdFormat,
+		wvbFormat,
 	]);
 }
