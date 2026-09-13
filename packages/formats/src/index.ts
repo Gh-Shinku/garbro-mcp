@@ -448,6 +448,8 @@ import { cherryPakFormat } from "./cherry/pak.js";
 import { cherryPak2Format } from "./cherry/pak.js";
 import { grooverPcgFormat } from "./groover/pcg.js";
 import { flkDatFormat } from "./splush-wave/flk.js";
+import { asdKToolFormat } from "./kapp/asd.js";
+import { asdSpielFormat } from "./kapp/asd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1175,5 +1177,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cherryPak2Format,
 		grooverPcgFormat,
 		flkDatFormat,
+		asdKToolFormat,
+		asdSpielFormat,
 	]);
 }

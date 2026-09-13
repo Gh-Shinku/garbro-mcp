@@ -6,6 +6,48 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ASD/SPIEL",
+				"class": "AsdAudioOpener",
+				"source": "Legacy/KApp/ArcASD.cs"
+			},
+			"localId": "kapp-asd-spiel",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension gated detection",
+				"terminated offset table",
+				"last entry sized to the end of the file",
+				"mp3 payload slicing",
+				"wave payload wrapping"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "ASD/KTOOL",
+				"class": "AsdKToolOpener",
+				"source": "Legacy/KApp/ArcASD.cs"
+			},
+			"localId": "kapp-asd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"offset table index",
+				"generated entry names",
+				"marker typed entries",
+				"ktool stored and rle methods",
+				"ktool huffman method",
+				"riff wave wrapping",
+				"image marker typing"
+			],
+			"unsupported": ["archive creation", "ktool image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/FLK",
 				"class": "DatOpener",
 				"source": "Legacy/SplushWave/ArcDAT.cs"
