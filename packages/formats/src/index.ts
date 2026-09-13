@@ -590,6 +590,7 @@ import { cbfImageFormat } from "./hmp/cbf-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
 import { dpcImageFormat } from "./desire/dpc-image.js";
+import { tiareGraImageFormat } from "./tiare/gra-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -909,6 +910,7 @@ export * from "./hmp/index.js";
 export * from "./bruns/index.js";
 export * from "./advgsys/index.js";
 export * from "./regrips/index.js";
+export * from "./tiare/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1504,5 +1506,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		system98GImageFormat,
 		desImageFormat,
 		dpcImageFormat,
+		tiareGraImageFormat,
 	]);
 }

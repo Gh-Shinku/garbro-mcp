@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GRA/TIARE",
+				class: "GraFormat",
+				source: "Legacy/Tiare/ImageGRA.cs",
+			},
+			localId: "tiare-gra-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"header scanning",
+				"optional palette",
+				"skip field",
+				"bit-packed decoding",
+				"4bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "DPC",
 				class: "DpcFormat",
 				source: "Legacy/Desire/ImageDPC.cs",
