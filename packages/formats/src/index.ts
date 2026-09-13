@@ -334,6 +334,7 @@ import { sdtFormat } from "./uma/sdt.js";
 import { unknownDatFormat } from "./unknown/dat.js";
 import { yoxDatFormat } from "./yox/dat.js";
 import { entisPacFormat } from "./entis/pac.js";
+import { triangleBmxFormat } from "./triangle/bmx.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -894,5 +895,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		unknownDatFormat,
 		yoxDatFormat,
 		entisPacFormat,
+		triangleBmxFormat,
 	]);
 }

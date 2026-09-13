@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BMX/TRIANGLE",
+				"class": "BmxOpener",
+				"source": "ArcFormats/Triangle/ArcBMX.cs"
+			},
+			"localId": "triangle-bmx",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"count with offset table and file size sentinel",
+				"gapless payload walk with placement validation",
+				"derived archive hash index names",
+				"fx and gx filename type defaults",
+				"fACE marker with xor masked unpacked size",
+				"triangle lz extraction",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"entry type inference by content",
+				"TRI bitmap decoding",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PAC/TERIOS",
 				"class": "PacOpener",
 				"source": "ArcFormats/Entis/ArcPAC.cs"
