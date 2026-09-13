@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "APP/Csystem",
+				class: "AppOpener",
+				source: "ArcFormats/Cyberworks/ArcAPP.cs",
+			},
+			localId: "cyberworks-appendix",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"LZSS-packed table of contents",
+				"type-driven entry names",
+				"stored and packed payload extraction",
+				"image and audio type metadata",
+				"placement validation",
+			],
+			unsupported: [
+				"archive creation",
+				"image decryption schemes",
+				"real-game differential files",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/MPF2",
 				class: "Mpf2Opener",
 				source: "ArcFormats/Apricot/ArcDAT.cs",

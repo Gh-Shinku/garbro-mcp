@@ -413,6 +413,7 @@ import { crowdPkwvFormat } from "./crowd/pck.js";
 import { advscripterPakFormat } from "./advscripter/pak.js";
 import { uranNclFormat } from "./uran/ncl.js";
 import { apricotDatFormat } from "./apricot/dat.js";
+import { cyberworksAppendixFormat } from "./cyberworks/appendix.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -672,6 +673,7 @@ export * from "./tamasoft/index.js";
 export * from "./youkai/index.js";
 export * from "./advscripter/index.js";
 export * from "./apricot/index.js";
+export * from "./cyberworks/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1090,5 +1092,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		advscripterPakFormat,
 		uranNclFormat,
 		apricotDatFormat,
+		cyberworksAppendixFormat,
 	]);
 }
