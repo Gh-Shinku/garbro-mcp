@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BGRA",
+				"class": "BgraFormat",
+				"source": "ArcFormats/G2/ImageBGRA.cs"
+			},
+			"localId": "g2-bgra-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"bgra32 bitmap output",
+				"failure-timing split",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GR1/LUVL",
 				"class": "Gr1Format",
 				"source": "Legacy/AnotherRoom/ImageGR1.cs"
