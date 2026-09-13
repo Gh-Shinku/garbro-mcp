@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "RED",
+				"class": "RedFormat",
+				"source": "Legacy/Ocarina/ImageRED.cs"
+			},
+			"localId": "ocarina-red-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"skip marker decoding",
+				"bitmap reassembly"
+			],
+			"unsupported": ["archive creation", "pixel encoding", "image writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "P/4AG",
 				"class": "P4AGFormat",
 				"source": "ArcFormats/Xuse/ImageP.cs"

@@ -542,6 +542,7 @@ import { cp3ImageFormat } from "./seraphim/cp3-image.js";
 import { mdImageFormat } from "./mina/md-image.js";
 import { wmkImageFormat } from "./fc01/wmk-image.js";
 import { p4agImageFormat } from "./xuse/p4ag-image.js";
+import { redImageFormat } from "./ocarina/red-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -846,6 +847,7 @@ export * from "./sviu/index.js";
 export * from "./macromedia/index.js";
 export * from "./ags32i/index.js";
 export * from "./psm/index.js";
+export * from "./ocarina/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1393,5 +1395,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mdImageFormat,
 		wmkImageFormat,
 		p4agImageFormat,
+		redImageFormat,
 	]);
 }
