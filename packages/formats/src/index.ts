@@ -426,6 +426,7 @@ import { systemAquaCatfFormat } from "./system-aqua/catf.js";
 import { yukaYkcFormat } from "./yuka/ykc.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
 import { eveGmFormat } from "./eve/gm.js";
+import { studioEgoPak0Format } from "./studio-ego/pak0.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1123,5 +1124,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yukaYkcFormat,
 		mokoProNnnnFormat,
 		eveGmFormat,
+		studioEgoPak0Format,
 	]);
 }

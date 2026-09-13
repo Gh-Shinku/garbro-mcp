@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PAK0/EGO",
+				"class": "Pak0Opener",
+				"source": "ArcFormats/StudioEgo/ArcPAK0.cs"
+			},
+			"localId": "studio-ego-pak0",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"directory tree index parsing",
+				"nested path listing",
+				"shift-jis names",
+				"script payload decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/GM",
 				"class": "GmDatOpener",
 				"source": "Legacy/Eve/ArcGM.cs"
