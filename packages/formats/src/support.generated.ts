@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "P/4AG",
+				class: "P4AGFormat",
+				source: "ArcFormats/Xuse/ImageP.cs",
+			},
+			localId: "xuse-p4ag-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "png prefix reconstruction"],
+			unsupported: ["archive creation", "pixel decoding", "png validation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "WMK",
 				class: "WmkFormat",
 				source: "ArcFormats/FC01/ImageWMK.cs",

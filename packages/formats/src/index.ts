@@ -541,6 +541,7 @@ import { psmImageFormat } from "./psm/image.js";
 import { cp3ImageFormat } from "./seraphim/cp3-image.js";
 import { mdImageFormat } from "./mina/md-image.js";
 import { wmkImageFormat } from "./fc01/wmk-image.js";
+import { p4agImageFormat } from "./xuse/p4ag-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1391,5 +1392,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cp3ImageFormat,
 		mdImageFormat,
 		wmkImageFormat,
+		p4agImageFormat,
 	]);
 }

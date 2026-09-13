@@ -5,3 +5,4 @@ export * from "./nt.js";
 export * from "./wvb.js";
 export * from "./xarc.js";
 export * from "./wag.js";
+export * from "./p4ag-image.js";
