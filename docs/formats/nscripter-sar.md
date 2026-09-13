@@ -37,7 +37,6 @@ implements archive creation, which is outside the scope of this read-only port.
 | Entry placement validation | Supported |
 | Structural detection without a signature | Supported |
 | Verbatim extraction | Supported |
-| Archive creation | Not ported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a two-entry archive, an empty count, a payload start too small for the count, and an
