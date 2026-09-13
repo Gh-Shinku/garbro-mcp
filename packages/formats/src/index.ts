@@ -269,6 +269,8 @@ import { system21PakFormat } from "./system21/pak.js";
 import { isaFormat } from "./ism/isa.js";
 import { circusDatFormat } from "./circus/dat.js";
 import { mgxFormat } from "./ume-soft/mgx.js";
+import { broomPkFormat } from "./broom/pk.js";
+import { broomEncryptedPkFormat } from "./broom/pk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -733,5 +735,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		isaFormat,
 		circusDatFormat,
 		mgxFormat,
+		broomPkFormat,
+		broomEncryptedPkFormat,
 	]);
 }

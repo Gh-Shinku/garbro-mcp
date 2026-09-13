@@ -6,6 +6,51 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PK/B-ROOM/E",
+				"class": "EncryptedPkOpener",
+				"source": "Legacy/BRoom/ArcPK.cs"
+			},
+			"localId": "broom-pk-encrypted",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"masked entry count",
+				"encrypted name bytes",
+				"name checksum folded into offset and size",
+				"extension replacement",
+				"index and placement validation",
+				"cp932 names with blank rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "PK/B-ROOM",
+				"class": "PkOpener",
+				"source": "Legacy/BRoom/ArcPK.cs"
+			},
+			"localId": "broom-pk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"pk and cpc extension requirement",
+				"entry count validation",
+				"records with skipped word",
+				"accumulated payload offsets",
+				"exact file coverage requirement",
+				"entry placement validation",
+				"cp932 names with blank rejection",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MGX",
 				"class": "MgxOpener",
 				"source": "ArcFormats/UMeSoft/ArcMGX.cs"
