@@ -351,6 +351,7 @@ import { vnsystemVfsFormat } from "./vnsystem/vfs.js";
 import { cromwellPakFormat } from "./cromwell/pak.js";
 import { cromwellOpkFormat } from "./cromwell/opk.js";
 import { propellerMgrFormat } from "./propeller/mgr.js";
+import { sohfuSkaFormat } from "./sohfu/ska.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -580,6 +581,7 @@ export * from "./gamesystem/index.js";
 export * from "./hcsystem/index.js";
 export * from "./vnsystem/index.js";
 export * from "./cromwell/index.js";
+export * from "./sohfu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -936,5 +938,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cromwellPakFormat,
 		cromwellOpkFormat,
 		propellerMgrFormat,
+		sohfuSkaFormat,
 	]);
 }

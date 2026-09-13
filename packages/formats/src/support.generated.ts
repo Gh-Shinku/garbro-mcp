@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "SKA/SOHFU",
+				class: "SkaOpener",
+				source: "ArcFormats/Sohfu/ArcSKA.cs",
+			},
+			localId: "sohfu-ska",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"IPF2 signature",
+				"record count",
+				"0x18-byte index records",
+				"name with nul terminator and cp932 extension field",
+				"extension replacement",
+				"payload offset and stored size",
+				"ls8b packed marker",
+				"unpacked size header",
+				"sohfu window lzss decoder",
+				"verbatim extraction",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "MGR",
 				class: "MgrOpener",
 				source: "ArcFormats/Propeller/ArcMGR.cs",
