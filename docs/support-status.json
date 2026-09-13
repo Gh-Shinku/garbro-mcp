@@ -13,12 +13,13 @@
 			"localId": "alicesoft-afa",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detection", "listing", "extraction"],
-			"unsupported": [
-				"archive creation",
-				"version three index",
-				"AFF payload decompression"
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"version three packed index"
 			],
+			"unsupported": ["archive creation", "AFF payload decompression"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

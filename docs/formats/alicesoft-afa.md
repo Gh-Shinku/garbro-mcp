@@ -7,10 +7,9 @@ Implementation: `packages/formats/src/alicesoft/afa.ts` (`alicesoft-afa`).
 
 ## Detection and variants
 
-`AfaOpener.TryOpen` first checks `AsciiEqual(8, "AlicArch")`; when that fails it falls back to the
-version three reader (`AfaIndexReader`, bit stream coded index), which is **not ported yet**, so a
-version three archive is declined. The ported variant keeps the `INFO` marker check at `0x1C`, so it
-is the header gate that distinguishes the two layouts.
+`AfaOpener.TryOpen` first checks `AsciiEqual(8, "AlicArch")`; when that fails it falls back to
+`TryOpenV3`, the bit stream coded index. Both layouts are implemented: the classic one requires the
+`INFO` marker at `0x1C`, while the third one carries the version word `3` at offset 8.
 
 ## Header
 
@@ -54,11 +53,29 @@ equals the declared size (the transform is length preserving, hence `sizeKnown` 
 without the marker are copied as is. There is **no** entry level decompression: the contained formats
 (`QNT`, `AJP`, `DCF`, `OGG`) own that, and their decoders are out of scope here.
 
+## Version three index
+
+The third layout stores `index_size` at offset 4 and the version word `3` at offset 8, and reads the
+MSB first bit stream from offset 12 up to `index_size + 8`; entry offsets are relative to that data
+offset.
+
+1. A packed **dictionary**: one discarded bit, then `ReadBytes`, which reads a size word followed by
+   that many bytes. Each element is preceded by `count + 1` unused bits, where `count` comes from a
+   `RandomGenerator` seeded with the element count and advanced once per element; the value itself is
+   eight bits. The stream continues with the packed and unpacked sizes of the compressed listing and
+   then the packed bytes.
+2. The packed bytes are inflated and read as a second bit stream: one discarded bit, the entry count
+   (`IsSaneCount`), then per entry a two bit marker (a truncated stream ends the listing instead of
+   failing it), `ReadEncryptedChars` (the same generator padded loop, two bytes per element, least
+   significant first), two skipped words, and `[i32 offset relative to the data offset][i32 size]`.
+3. Names are decoded through the dictionary: `byte = dict[char] ^ 0xA4`, then cp932. A character code
+   outside the dictionary declines the archive, matching the reference throwing on the same input.
+
+An archive without a single entry is declined.
+
 ## Deviations
 
-* The version three index reader (`AfaIndexReader`) is not implemented yet; such archives are
-  declined instead of listed. Its layout is an MSB first bit stream from offset 12 with a
-  dictionary, a packed size, an unpacked size and a packed byte array, then a zlib stream, with names
-  run through `DecryptString` and `RandomGenerator`.
 * The archive is exposed as a flat listing that preserves the stored paths; there is no hierarchical
   archive view beyond path normalisation.
+* A dictionary or character list whose declared size is negative or larger than a code unit is
+  declined before allocation.

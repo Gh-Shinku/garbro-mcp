@@ -227,3 +227,247 @@ describe("alicesoft afa", () => {
 		expect(await alicesoftAfaFormat.detect(sourceOf(file))).toBe(false);
 	});
 });
+
+/** Mirror of `AfaIndexReader.RandomGenerator`, the generator the bit stream pads itself with. */
+class AfaRandomMirror {
+	static readonly SIZE = 521;
+	readonly state = new Uint32Array(AfaRandomMirror.SIZE);
+	current = -1;
+
+	constructor(seed: number) {
+		let value = 0;
+		let state = seed >>> 0;
+		for (let i = 0; i < 17; i += 1) {
+			for (let j = 0; j < 32; j += 1) {
+				state = (Math.imul(1566083941, state) + 1) >>> 0;
+				value = ((state & 0x80000000) | (value >>> 1)) >>> 0;
+			}
+			this.state[i] = value;
+		}
+		this.state[16] =
+			((this.state[15] ?? 0) ^
+				((this.state[0] ?? 0) >>> 9) ^
+				((this.state[16] ?? 0) << 23)) >>>
+			0;
+		for (let i = 17; i < AfaRandomMirror.SIZE; i += 1) {
+			this.state[i] =
+				((this.state[i - 1] ?? 0) ^
+					((this.state[i - 16] ?? 0) >>> 9) ^
+					((this.state[i - 17] ?? 0) << 23)) >>>
+				0;
+		}
+		for (let pass = 0; pass < 4; pass += 1) this.shuffle();
+	}
+
+	getNext(): number {
+		this.current += 1;
+		if (this.current >= AfaRandomMirror.SIZE) {
+			this.shuffle();
+			this.current = 0;
+		}
+		return this.state[this.current] ?? 0;
+	}
+
+	shuffle(): void {
+		for (let i = 0; i < 32; i += 4) {
+			for (let j = 0; j < 4; j += 1)
+				this.state[i + j] =
+					((this.state[i + j] ?? 0) ^ (this.state[i + 489 + j] ?? 0)) >>> 0;
+		}
+		for (let i = 32; i < AfaRandomMirror.SIZE; i += 3) {
+			for (let j = 0; j < 3; j += 1)
+				this.state[i + j] =
+					((this.state[i + j] ?? 0) ^ (this.state[i - 32 + j] ?? 0)) >>> 0;
+		}
+	}
+}
+
+/** Most significant bit first bit writer, the ordering `MsbBitStream` reads. */
+class BitWriter {
+	readonly #bytes: number[] = [];
+	#current = 0;
+	#count = 0;
+
+	writeBits(value: number, count: number): void {
+		for (let index = count - 1; index >= 0; index -= 1)
+			this.#push((value >>> index) & 1);
+	}
+
+	#push(bit: number): void {
+		this.#current = (this.#current << 1) | bit;
+		this.#count += 1;
+		if (this.#count === 8) {
+			this.#bytes.push(this.#current);
+			this.#current = 0;
+			this.#count = 0;
+		}
+	}
+
+	toBuffer(): Buffer {
+		const output = Buffer.from(this.#bytes);
+		if (this.#count === 0) return output;
+		return Buffer.concat([
+			output,
+			Buffer.from([this.#current << (8 - this.#count)]),
+		]);
+	}
+}
+
+function writeV3Int32(writer: BitWriter, value: number): void {
+	for (let index = 0; index < 4; index += 1)
+		writer.writeBits((value >>> (8 * index)) & 0xff, 8);
+}
+
+/** Writes a size prefixed element list with the generator driven padding bits. */
+function writeV3Scattered(
+	writer: BitWriter,
+	values: number[],
+	wide: boolean,
+): void {
+	writeV3Int32(writer, values.length);
+	const random = new AfaRandomMirror(values.length);
+	for (const value of values) {
+		const count = random.getNext() & 3;
+		writer.writeBits(0, count + 1);
+		random.getNext();
+		writer.writeBits(value & 0xff, 8);
+		if (wide) writer.writeBits((value >>> 8) & 0xff, 8);
+	}
+}
+
+/**
+ * Builds a version three archive: an identity dictionary, then a zlib compressed listing whose entry
+ * offsets are relative to the end of the packed index stream.
+ */
+function buildV3(
+	entries: { name: Buffer; data: Buffer }[],
+	options: { count?: number } = {},
+): Buffer {
+	const dictionary = Array.from({ length: 0x100 }, (_, index) => index);
+	let stage1: Buffer = Buffer.alloc(0);
+	let records: { offset: number; size: number }[] = [];
+	let packed: Buffer = Buffer.alloc(0);
+	for (let pass = 0; pass < 8; pass += 1) {
+		const dataOffset = 12 + stage1.length;
+		let position = dataOffset;
+		records = entries.map((entry) => {
+			const offset = position;
+			position += entry.data.length;
+			return { offset, size: entry.data.length };
+		});
+		const listing = new BitWriter();
+		listing.writeBits(0, 1);
+		const count = options.count ?? entries.length;
+		writeV3Int32(listing, count);
+		for (let index = 0; index < count; index += 1) {
+			const entry = entries[index];
+			listing.writeBits(0, 2);
+			if (!entry) continue;
+			const chars = [...entry.name].map((byte) => byte ^ 0xa4);
+			writeV3Scattered(listing, chars, true);
+			writeV3Int32(listing, 0);
+			writeV3Int32(listing, 0);
+			writeV3Int32(listing, (records[index]?.offset ?? 0) - dataOffset);
+			writeV3Int32(listing, records[index]?.size ?? 0);
+		}
+		const listingBytes = listing.toBuffer();
+		packed = deflateSync(listingBytes);
+		const next = new BitWriter();
+		next.writeBits(0, 1);
+		writeV3Scattered(next, dictionary, false);
+		writeV3Int32(next, packed.length);
+		writeV3Int32(next, listingBytes.length);
+		for (const byte of packed) next.writeBits(byte, 8);
+		const candidate = next.toBuffer();
+		const stable = candidate.length === stage1.length;
+		stage1 = candidate;
+		if (stable) break;
+	}
+	// Recompute the layout with the final index stream length.
+	const dataOffset = 12 + stage1.length;
+	let position = dataOffset;
+	records = entries.map((entry) => {
+		const offset = position;
+		position += entry.data.length;
+		return { offset, size: entry.data.length };
+	});
+	const file = Buffer.alloc(position);
+	file.write("AFAH", 0, "latin1");
+	file.writeUInt32LE(4 + stage1.length, 4);
+	file.writeInt32LE(3, 8);
+	stage1.copy(file, 12);
+	entries.forEach((entry, index) => {
+		entry.data.copy(file, records[index]?.offset ?? 0);
+	});
+	return file;
+}
+
+describe("alicesoft afa version three", () => {
+	it("lists and extracts entries of the packed index", async () => {
+		const first = Buffer.from("version three payload");
+		const keyedPlain = Buffer.from("keyed body of the second entry");
+		const second = buildAff(keyedPlain);
+		const file = buildV3([
+			{ name: Buffer.from("FIRST.BIN", "latin1"), data: first },
+			{ name: Buffer.from("SECOND.QNT", "latin1"), data: second },
+		]);
+		const source = sourceOf(file);
+		expect(await alicesoftAfaFormat.detect(source)).toBe(true);
+		const archive = await alicesoftAfaFormat.open(source, "v3.afa");
+		try {
+			expect(archive.entries.map((entry) => entry.path)).toEqual([
+				"FIRST.BIN",
+				"SECOND.QNT",
+			]);
+			expect(archive.entries[0]?.encrypted).toBe(false);
+			expect(archive.entries[1]?.encrypted).toBe(true);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				first,
+			);
+			const keyed = archive.entries[1];
+			if (!keyed) throw new Error("missing entry");
+			const output = await consumeBuffer(await archive.openEntry(keyed.id));
+			expect(output.subarray(0x10)).toEqual(keyedPlain);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("decodes names through the dictionary as cp932", async () => {
+		const data = Buffer.from("japanese name payload");
+		const file = buildV3([
+			// The two bytes of a cp932 kana character, each stored as a dictionary index.
+			{ name: Buffer.from([0x82, 0xa0]), data },
+		]);
+		const source = sourceOf(file);
+		const archive = await alicesoftAfaFormat.open(source, "v3.afa");
+		try {
+			expect(archive.entries.map((entry) => entry.path)).toEqual(["\u3042"]);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				data,
+			);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("declines a file whose version is neither layout", async () => {
+		const file = buildV3([
+			{ name: Buffer.from("A.BIN", "latin1"), data: Buffer.from("x") },
+		]);
+		file.writeInt32LE(4, 8);
+		expect(await alicesoftAfaFormat.detect(sourceOf(file))).toBe(false);
+	});
+
+	it("declines a packed index with an insane count", async () => {
+		const file = buildV3(
+			[{ name: Buffer.from("A.BIN", "latin1"), data: Buffer.from("x") }],
+			{ count: 0x100000 },
+		);
+		expect(await alicesoftAfaFormat.detect(sourceOf(file))).toBe(false);
+	});
+});
