@@ -234,6 +234,7 @@ import { ipqFormat } from "./techno-brain/ipq.js";
 import { aniFormat } from "./musica/ani.js";
 import { microVisionArcFormat } from "./microvision/arc.js";
 import { dxFormat } from "./black-rainbow/dx.js";
+import { smvFormat } from "./tanaka/smv.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -646,5 +647,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aniFormat,
 		microVisionArcFormat,
 		dxFormat,
+		smvFormat,
 	]);
 }

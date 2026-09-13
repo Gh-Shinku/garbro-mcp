@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SMV",
+				"class": "SmvOpener",
+				"source": "ArcFormats/Tanaka/ArcSMV.cs"
+			},
+			"localId": "will-smv",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"file size cross-check",
+				"animation header and palette skipping",
+				"depth validation",
+				"frame records with offsets and sizes",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "PACK/DX",
 				"class": "PackOpener",
 				"source": "ArcFormats/BlackRainbow/ArcDX.cs"
