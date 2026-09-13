@@ -409,6 +409,7 @@ import { tamasoftEpkFormat } from "./tamasoft/epk.js";
 import { youkaiDatGrpFormat } from "./youkai/dat.js";
 import { youkaiDatSoundFormat } from "./youkai/dat.js";
 import { youkaiDatVoiceFormat } from "./youkai/dat.js";
+import { crowdPkwvFormat } from "./crowd/pck.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1080,5 +1081,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		youkaiDatGrpFormat,
 		youkaiDatSoundFormat,
 		youkaiDatVoiceFormat,
+		crowdPkwvFormat,
 	]);
 }
