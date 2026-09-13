@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "EZS",
+				class: "EzsAudio",
+				source: "Legacy/BRoom/AudioEZS.cs",
+			},
+			localId: "broom-ezs-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"extension gate",
+				"field chain decoding",
+				"canonical wav output",
+				"metadata",
+			],
+			unsupported: ["audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "PMW",
 				class: "PmwAudio",
 				source: "ArcFormats/ScenePlayer/AudioPMW.cs",
