@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "HG2",
+				"class": "Hg2Opener",
+				"source": "ArcFormats/CatSystem/ArcHG2.cs"
+			},
+			"localId": "cat-system-hg2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature and marker detection",
+				"section walk with self-declared sizes",
+				"zero-size final section",
+				"generated section names",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "S25",
 				"class": "S25Opener",
 				"source": "ArcFormats/ShiinaRio/ArcS25.cs"

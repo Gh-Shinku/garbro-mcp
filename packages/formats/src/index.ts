@@ -170,6 +170,7 @@ import { arc0Format } from "./mixwill/arc0.js";
 import { minkGrpFormat } from "./mink/grp.js";
 import { yaneDatFormat } from "./yane-sdk/dat.js";
 import { s25Format } from "./shiina-rio/s25.js";
+import { hg2Format } from "./cat-system/hg2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -480,5 +481,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		minkGrpFormat,
 		yaneDatFormat,
 		s25Format,
+		hg2Format,
 	]);
 }
