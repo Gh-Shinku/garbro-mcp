@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "SUR",
+				"class": "SurFormat",
+				"source": "ArcFormats/TamaSoft/ImageSUR.cs"
+			},
+			"localId": "tamasoft-sur-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"sur-lzss decoding",
+				"32bpp bgra bitmap output",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "WBM/HYPATIA",
 				"class": "WbmFormat",
 				"source": "ArcFormats/Hypatia/ImageWBM.cs"

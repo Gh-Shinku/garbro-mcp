@@ -608,6 +608,7 @@ import { lzBmpImageFormat } from "./misc/lz-bmp-image.js";
 import { bbmImageFormat } from "./blue-gale/bbm-image.js";
 import { wpnAudioFormat } from "./wildbug/wpn-audio.js";
 import { wbmImageFormat } from "./hypatia/wbm-image.js";
+import { surImageFormat } from "./tamasoft/sur-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1544,5 +1545,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		bbmImageFormat,
 		wpnAudioFormat,
 		wbmImageFormat,
+		surImageFormat,
 	]);
 }
