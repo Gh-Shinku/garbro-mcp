@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/ARI",
+				class: "ArcOpener",
+				source: "ArcFormats/Kaguya/ArcKaguya.cs",
+			},
+			localId: "kaguya-ari",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"inline index walk",
+				"side ari index",
+				"complemented cp932 names",
+				"leading separator stripping",
+				"mode based typing",
+				"packed payload lz decoding",
+				"sliding frame copies",
+			],
+			unsupported: ["archive creation", "contained format registry typing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ASD/SPIEL",
 				class: "AsdAudioOpener",
 				source: "Legacy/KApp/ArcASD.cs",
