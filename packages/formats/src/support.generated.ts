@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PBX",
+				class: "PbxOpener",
+				source: "ArcFormats/Pandora/ArcPBX.cs",
+			},
+			localId: "pandora-pbx",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"chained payload index",
+				"Pandora LZ unpacking",
+				"packed payload probing",
+				"stored payload extraction",
+				"CP932 names",
+			],
+			unsupported: ["archive creation", "real-game differential files"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARC/Csystem/2",
 				class: "OldDatOpener2",
 				source: "ArcFormats/Cyberworks/ArcDAT.cs",

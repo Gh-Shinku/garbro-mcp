@@ -417,6 +417,7 @@ import { cyberworksAppendixFormat } from "./cyberworks/appendix.js";
 import { cyberworksDatFormat } from "./cyberworks/dat.js";
 import { cyberworksCsystemDatFormat } from "./cyberworks/dat.js";
 import { cyberworksCsystemDat2Format } from "./cyberworks/dat.js";
+import { pandoraPbxFormat } from "./pandora/pbx.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -677,6 +678,7 @@ export * from "./youkai/index.js";
 export * from "./advscripter/index.js";
 export * from "./apricot/index.js";
 export * from "./cyberworks/index.js";
+export * from "./pandora/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1099,5 +1101,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cyberworksDatFormat,
 		cyberworksCsystemDatFormat,
 		cyberworksCsystemDat2Format,
+		pandoraPbxFormat,
 	]);
 }
