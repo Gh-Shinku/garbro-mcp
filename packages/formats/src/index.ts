@@ -396,6 +396,7 @@ import { leafAr2Format } from "./leaf/ar2.js";
 import { leafAmFormat } from "./leaf/am.js";
 import { carriereArcFormat } from "./carriere/arc.js";
 import { carriereScenarioFormat } from "./carriere/arc.js";
+import { kaguyaLin2Format } from "./kaguya/lin2.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1049,5 +1050,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafAmFormat,
 		carriereArcFormat,
 		carriereScenarioFormat,
+		kaguyaLin2Format,
 	]);
 }

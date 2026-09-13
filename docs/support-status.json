@@ -6,6 +6,37 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/LIN2",
+				"class": "Lin2Opener",
+				"source": "ArcFormats/Kaguya/ArcLIN2.cs"
+			},
+			"localId": "kaguya-lin2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"LIN2 signature",
+				"entry count",
+				"16-bit name lengths",
+				"0xFF-masked names",
+				"first-NUL name decoding",
+				"empty name rejection",
+				"record type words for packed and audio entries",
+				"payload offsets",
+				"stored sizes",
+				"placement checks",
+				"packed payload prefix with the unpacked size",
+				"format-specific LZSS variant with MSB-first control bits",
+				"shared match count nibble between consecutive matches",
+				"overlapping copies through the 0x100-byte ring",
+				"clean end of stream with a zeroed remainder",
+				"truncation errors"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/~ARCHIVE",
 				"class": "ScenarioArcOpener",
 				"source": "ArcFormats/Carriere/ArcARC.cs"
