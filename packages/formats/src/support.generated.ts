@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/PIAS",
+				class: "DatOpener",
+				source: "Legacy/Pias/ArcDAT.cs",
+			},
+			localId: "pias-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"file name gated detection",
+				"text dat resource lists",
+				"compact integer encoding",
+				"length prefixed chain walk",
+				"all ones marker gaps",
+				"offset numbered entry names",
+				"index numbered entry names",
+				"riff wrapping of 8 bit pcm",
+				"mono and stereo channel selection",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "A5R",
 				class: "A5rOpener",
 				source: "Legacy/Pinky/ArcA5R.cs",
