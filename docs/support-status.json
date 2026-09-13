@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "USF",
+				"class": "UsfOpener",
+				"source": "Legacy/WestGate/ArcUSF.cs"
+			},
+			"localId": "westgate-usf",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"record-tail offset chain",
+				"name validation and duplicate rejection",
+				"CP932 filenames",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CDT/UMA",
 				"class": "CdtOpener",
 				"source": "Legacy/Uma/ArcCDT.cs"

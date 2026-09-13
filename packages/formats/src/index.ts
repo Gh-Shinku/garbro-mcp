@@ -140,6 +140,7 @@ import { gdFormat } from "./xuse/gd.js";
 import { aapFormat } from "./aquarium/aap.js";
 import { mirisDatFormat } from "./eternity/miris.js";
 import { cdtFormat } from "./uma/cdt.js";
+import { usfFormat } from "./westgate/usf.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -254,6 +255,7 @@ export * from "./types/index.js";
 export * from "./xuse/index.js";
 export * from "./eternity/index.js";
 export * from "./uma/index.js";
+export * from "./westgate/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -400,5 +402,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aapFormat,
 		mirisDatFormat,
 		cdtFormat,
+		usfFormat,
 	]);
 }
