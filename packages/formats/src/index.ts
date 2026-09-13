@@ -433,6 +433,7 @@ import { wagFormat } from "./hexenhaus/wag.js";
 import { mcaFormat } from "./fc01/mca.js";
 import { dpmFormat } from "./hsp/dpm.js";
 import { detFormat } from "./ugos/det.js";
+import { pcdImageFormat } from "./witch/pcd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -803,6 +804,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		palettePakFormat,
 		ml2Format,
 		vbdFormat,
+		pcdImageFormat,
 		lpkFormat,
 		ipacFormat,
 		bldFormat,
