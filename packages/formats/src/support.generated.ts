@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PGA",
+				class: "PgaFormat",
+				source: "ArcFormats/Palette/ImagePGA.cs",
+			},
+			localId: "palette-pga-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"png signature restoration",
+				"keyed prefix deobfuscation",
+				"byte exact passthrough beyond the prefix",
+				"IHDR dimensions and depth",
+				"metadata",
+			],
+			unsupported: [
+				"png decoding to bitmap",
+				"image encoding",
+				"archive creation",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "HOT",
 				class: "HotFormat",
 				source: "Legacy/Hdl/ImageHOT.cs",
