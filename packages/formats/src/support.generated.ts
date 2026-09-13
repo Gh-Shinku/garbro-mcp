@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/PIAS/ENC",
+				class: "EncryptedDatOpener",
+				source: "Legacy/Pias/EncryptedGraphDat.cs",
+			},
+			localId: "pias-encrypted-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"graph and sound archive gate",
+				"encrypted text.dat list",
+				"text key shift register",
+				"graph key shift register",
+				"twenty bit size field",
+				"graphics size decryption walk",
+				"unnamed entry scan with underscore suffix",
+				"encrypted graphics payload extraction",
+				"sixteen bit stereo riff wrapping",
+			],
+			unsupported: ["archive creation", "encrypted graph image decoder"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ERI/MULTI",
 				class: "EriOpener",
 				source: "ArcFormats/Entis/ArcERI.cs",
