@@ -332,6 +332,7 @@ import { sognaDatFormat } from "./sogna/dat.js";
 import { diceRlzFormat } from "./dice/rlz.js";
 import { sdtFormat } from "./uma/sdt.js";
 import { unknownDatFormat } from "./unknown/dat.js";
+import { yoxDatFormat } from "./yox/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -551,6 +552,7 @@ export * from "./pinpai/index.js";
 export * from "./giga/index.js";
 export * from "./sogna/index.js";
 export * from "./dice/index.js";
+export * from "./yox/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -888,5 +890,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		diceRlzFormat,
 		sdtFormat,
 		unknownDatFormat,
+		yoxDatFormat,
 	]);
 }

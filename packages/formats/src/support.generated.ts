@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/YOX",
+				class: "DatOpener",
+				source: "ArcFormats/Yox/ArcYOX.cs",
+			},
+			localId: "yox-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"YOX signature with a zero fourth byte",
+				"eight byte records with a sixteen byte fallback",
+				"zero size and placement validation",
+				"packed YOX header detection with a 0x10 header skip",
+				"zlib extraction",
+				"verbatim extraction",
+			],
+			unsupported: [
+				"entry type inference and extension rename",
+				"archive creation",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DAT/UNKNOWN",
 				class: "DatOpener",
 				source: "Legacy/Unknown/ArcDAT.cs",
