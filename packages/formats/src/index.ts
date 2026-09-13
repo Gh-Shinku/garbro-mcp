@@ -224,6 +224,7 @@ import { arccFormat } from "./hexenhaus/arcc.js";
 import { sdaSdFormat } from "./squadrad/sda.js";
 import { sqzFormat } from "./musica/sqz.js";
 import { mpkHgFormat } from "./tako/mpk.js";
+import { tanFormat } from "./ikura/tan.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -621,5 +622,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		sdaSdFormat,
 		sqzFormat,
 		mpkHgFormat,
+		tanFormat,
 	]);
 }

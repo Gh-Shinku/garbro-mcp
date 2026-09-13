@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TAN/DO",
+				"class": "TanOpener",
+				"source": "ArcFormats/Ikura/ArcTAN.cs"
+			},
+			"localId": "ikura-tan",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"skipped first index",
+				"image metadata",
+				"palette block handling",
+				"second frame index with relative offsets",
+				"derived frame sizes",
+				"entry placement validation",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MPK/HG",
 				"class": "MpkOpener",
 				"source": "Legacy/Tako/ArcMPK.cs"
