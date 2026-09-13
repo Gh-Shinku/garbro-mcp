@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "MRG/2",
+				"class": "Mrg2Opener",
+				"source": "ArcFormats/FC01/ArcMRG.cs"
+			},
+			"localId": "fc01-mrg2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"name checksums",
+				"mask table decryption",
+				"lzss payloads"
+			],
+			"unsupported": ["archive creation", "mrgdecoder payloads"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MRG",
 				"class": "MrgOpener",
 				"source": "ArcFormats/FC01/ArcMRG.cs"

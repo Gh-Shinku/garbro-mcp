@@ -84,7 +84,7 @@ function decrypt(
  * one literal and a clear bit reads a 16 bit word whose top nibble counts the bytes to copy from the
  * sliding frame, masked into its low twelve bits.
  */
-function unpackMrgLzss(data: Buffer, outputLength: number): Buffer {
+export function unpackMrgLzss(data: Buffer, outputLength: number): Buffer {
 	const output = Buffer.alloc(outputLength);
 	const frame = Buffer.alloc(FRAME_SIZE);
 	let framePosition = FRAME_INIT_POSITION;
