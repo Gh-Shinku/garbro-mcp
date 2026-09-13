@@ -371,6 +371,8 @@ import { ffaDatFormat } from "./ffa/dat.js";
 import { ffaJdatFormat } from "./ffa/dat.js";
 import { malieLibuFormat } from "./malie/libu.js";
 import { willPnaFormat } from "./will/pna.js";
+import { yaneuraoDatDxFormat } from "./yaneurao/dat.js";
+import { yaneuraoDatExFormat } from "./yaneurao/dat.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -987,5 +989,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ffaJdatFormat,
 		malieLibuFormat,
 		willPnaFormat,
+		yaneuraoDatDxFormat,
+		yaneuraoDatExFormat,
 	]);
 }
