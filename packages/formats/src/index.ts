@@ -557,6 +557,7 @@ import { csfImageFormat } from "./eye/csf-image.js";
 import { msfAudioFormat } from "./unknown/msf-audio.js";
 import { cmbAudioFormat } from "./pinesoft/cmb-audio.js";
 import { ggfImageFormat } from "./yellowcap/ggf-image.js";
+import { befAlpImageFormat } from "./bef/alp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -866,6 +867,7 @@ export * from "./zenos/index.js";
 export * from "./uncanny/index.js";
 export * from "./yellowcap/index.js";
 export * from "./eye/index.js";
+export * from "./bef/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1428,5 +1430,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		msfAudioFormat,
 		cmbAudioFormat,
 		ggfImageFormat,
+		befAlpImageFormat,
 	]);
 }

@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "ALP/BeF",
+				"class": "AlpFormat",
+				"source": "Legacy/hmp/ImageALP.cs"
+			},
+			"localId": "bef-alp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"grey expansion",
+				"bmp reassembly",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GGF",
 				"class": "GgfFormat",
 				"source": "Legacy/YellowCap/ImageGGF.cs"
