@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "AP-2",
+				class: "Ap2Format",
+				source: "ArcFormats/Kaguya/ImageAP.cs",
+			},
+			localId: "kaguya-ap2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"signed origin",
+				"32bpp bitmap output",
+				"skipped header bytes",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "AP-0",
 				class: "Ap0Format",
 				source: "ArcFormats/Kaguya/ImageAP.cs",

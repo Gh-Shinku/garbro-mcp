@@ -637,6 +637,7 @@ import { sfgImageFormat } from "./alpha-system/sfg-image.js";
 import { apImageFormat } from "./kaguya/ap-image.js";
 import { aoImageFormat } from "./kaguya/ao-image.js";
 import { ap0ImageFormat } from "./kaguya/ap0-image.js";
+import { ap2ImageFormat } from "./kaguya/ap2-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1603,5 +1604,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		apImageFormat,
 		aoImageFormat,
 		ap0ImageFormat,
+		ap2ImageFormat,
 	]);
 }
