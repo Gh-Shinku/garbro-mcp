@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/UF01",
+				class: "UfOpener",
+				source: "ArcFormats/Kaguya/ArcUF.cs",
+			},
+			localId: "kaguya-uf",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"UF01 signature",
+				"index offset",
+				"sequential record walk with derived payload offsets",
+				"inverted cp932 names",
+				"leading separator trimming",
+				"packed flag",
+				"four-byte unpacked size prefix",
+				"msb bit stream frame decoder",
+				"empty packed payloads",
+				"verbatim extraction",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SKA/SOHFU",
 				class: "SkaOpener",
 				source: "ArcFormats/Sohfu/ArcSKA.cs",
