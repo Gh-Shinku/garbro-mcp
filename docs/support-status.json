@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "CHR/TIGERMAN",
+				"class": "ChrOpener",
+				"source": "Legacy/Tigerman/ArcCHR.cs"
+			},
+			"localId": "tigerman-chr",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"ZT-tagged first frame",
+				"unused record slot skipping",
+				"generated ZIT frame names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/GScripter",
 				"class": "DataOpener",
 				"source": "ArcFormats/GScripter/ArcDATA.cs"
