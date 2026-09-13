@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "BDF",
+				class: "BdfOpener",
+				source: "ArcFormats/Zyx/ArcBDF.cs",
+			},
+			localId: "zyx-bdf",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"fixed size frame index",
+				"frame count range",
+				"zero size record skipping",
+				"frame placement validation",
+				"generated frame names",
+				"image typing",
+				"frame geometry metadata",
+			],
+			unsupported: [
+				"archive creation",
+				"image decoding",
+				"incremental frame reconstruction",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK/KCAP",
 				class: "KcapOpener",
 				source: "ArcFormats/Leaf/ArcPAK.cs",
