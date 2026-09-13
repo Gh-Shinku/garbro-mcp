@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "JPG/HIDDEN",
+				class: "HiddenJpegFormat",
+				source: "Legacy/Gaia/ImageJPG.cs",
+			},
+			localId: "gaia-hidden-jpeg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "metadata", "jpeg segment walk"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "BGM/HARVEST",
 				class: "BgmAudio",

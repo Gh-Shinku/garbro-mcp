@@ -567,6 +567,7 @@ import { gdfImageFormat } from "./mink/gdf-image.js";
 import { isdScriptFormat } from "./ice/isd-script.js";
 import { wazAudioFormat } from "./anotherroom/waz-audio.js";
 import { harvestBgmAudioFormat } from "./myharvest/bgm-audio.js";
+import { hiddenJpegImageFormat } from "./gaia/jpeg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -881,6 +882,7 @@ export * from "./acme/index.js";
 export * from "./mb/index.js";
 export * from "./ice/index.js";
 export * from "./anotherroom/index.js";
+export * from "./gaia/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1453,5 +1455,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		isdScriptFormat,
 		wazAudioFormat,
 		harvestBgmAudioFormat,
+		hiddenJpegImageFormat,
 	]);
 }
