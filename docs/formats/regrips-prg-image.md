@@ -37,6 +37,14 @@ places worth naming:
 The palette case is the reference's own choice rather than a bitmap's real depth, and the port keeps it. Because
 the fields end at offset twenty nine, a file shorter than that is rejected before anything is decrypted.
 
+## The shared signature
+
+The stored signature is the graphic's own, xored, which is exactly what the Lilim obfuscated image stores. That
+format xors only its first thirty two bytes and this one the whole file, but the graphic's header lies within
+those thirty two bytes, so each probe accepts the other's files — the references are no more discriminating than
+that, and neither are the ports. The extraction is where the difference tells: this format decrypts the whole
+file, so its result is a readable graphic whatever the input was named.
+
 ## Extraction
 
 The reference decodes the graphic and re-encodes it as a bitmap; the port hands the **decrypted original** over

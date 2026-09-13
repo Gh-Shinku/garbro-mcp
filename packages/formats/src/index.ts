@@ -662,6 +662,7 @@ import { brgImageFormat } from "./regrips/brg-image.js";
 import { ypfImageFormat } from "./nabe/ypf-image.js";
 import { timImageFormat } from "./slg/tim-image.js";
 import { imgBmpImageFormat } from "./lilim/img-bmp-image.js";
+import { imgPngImageFormat } from "./lilim/img-png-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1657,5 +1658,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ypfImageFormat,
 		timImageFormat,
 		imgBmpImageFormat,
+		imgPngImageFormat,
 	]);
 }

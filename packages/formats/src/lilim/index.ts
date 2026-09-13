@@ -4,3 +4,4 @@ export * from "./fga.js";
 export * from "./abm.js";
 export * from "./abm-image.js";
 export * from "./img-bmp-image.js";
+export * from "./img-png-image.js";
