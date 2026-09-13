@@ -6,6 +6,29 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PLA",
+				"class": "PlaOpener",
+				"source": "Legacy/SquadraD/ArcPLA.cs"
+			},
+			"localId": "squadrad-pla",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature size and check-word validation",
+				"parallel index tables",
+				"channel-sized sample table",
+				"backwards size derivation",
+				"audio parameter metadata",
+				"entry placement validation",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PAPRIKA",
 				"class": "PkDatOpener",
 				"source": "Legacy/Paprika/ArcPKDAT.cs"
