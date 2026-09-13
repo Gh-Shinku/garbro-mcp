@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "TAC",
+				class: "TacOpener",
+				source: "ArcFormats/TanukiSoft/ArcTAC.cs",
+			},
+			localId: "tanuki-tac",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"tarc signature and versions",
+				"blowfish index protection",
+				"zlib index unpacking",
+				"bucket hash completion",
+				"entry hash fallback names",
+				"deciphered signature typing",
+				"payload decryption",
+			],
+			unsupported: [
+				"external tanuki.lst name table",
+				"archive creation",
+				"image decoding",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "MNG",
 				class: "MngOpener",
 				source: "ArcFormats/ImageMNG.cs",

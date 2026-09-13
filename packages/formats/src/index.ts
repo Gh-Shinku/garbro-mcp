@@ -468,6 +468,7 @@ import { parsleyYanepackFormat } from "./parsley/cg.js";
 import { parsleyCgV1Format } from "./parsley/cg.js";
 import { paletteChrFormat } from "./palette/chr.js";
 import { mngFormat } from "./mng/mng.js";
+import { tanukiTacFormat } from "./tanuki/tac.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -746,6 +747,7 @@ export * from "./lazycrew/index.js";
 export * from "./rare/index.js";
 export * from "./gs-pack/index.js";
 export * from "./mng/index.js";
+export * from "./tanuki/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1219,5 +1221,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyCgV1Format,
 		paletteChrFormat,
 		mngFormat,
+		tanukiTacFormat,
 	]);
 }
