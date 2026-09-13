@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "VFS/VNSYSTEM",
+				class: "VfsOpener",
+				source: "ArcFormats/VnSystem/ArcVFS.cs",
+			},
+			localId: "vnsystem-vfs",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"VFS File signature",
+				"archive-wide compressed flag",
+				"0x1c records with 0x14-byte cp932 names",
+				"index-relative payload offsets",
+				"four-byte unpacked size prefix",
+				"msb bit stream dictionary decoder",
+				"verbatim extraction",
+				"entry placement validation",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK/HCSYSTEM",
 				class: "PakOpener",
 				source: "ArcFormats/HCSystem/ArcPAK.cs",
