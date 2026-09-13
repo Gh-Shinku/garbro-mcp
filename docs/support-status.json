@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/ARC1",
+				"class": "BinOpener",
+				"source": "Legacy/Alterna/ArcBIN.cs"
+			},
+			"localId": "alterna-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"companion lst file lookup with extension replacement",
+				"lst extension rejection",
+				"ARC1.00 signature",
+				"record count",
+				"0x30-byte records with inverted names",
+				"packed flag and unpacked size",
+				"lzss marker probe",
+				"lzss decoding with a 0xff0 frame init position",
+				"verbatim extraction",
+				"entry placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/EBG_SYSTEM",
 				"class": "BinOpener",
 				"source": "Legacy/EbgSystem/ArcBIN.cs"

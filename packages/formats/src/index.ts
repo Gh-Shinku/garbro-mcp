@@ -356,6 +356,7 @@ import { kaguyaUfFormat } from "./kaguya/uf.js";
 import { umeSoftPkFormat } from "./ume-soft/pk.js";
 import { archangelDatFormat } from "./seraphim/dat.js";
 import { ebgSystemBinFormat } from "./ebg-system/bin.js";
+import { alternaBinFormat } from "./alterna/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -587,6 +588,7 @@ export * from "./vnsystem/index.js";
 export * from "./cromwell/index.js";
 export * from "./sohfu/index.js";
 export * from "./ebg-system/index.js";
+export * from "./alterna/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -948,5 +950,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		umeSoftPkFormat,
 		archangelDatFormat,
 		ebgSystemBinFormat,
+		alternaBinFormat,
 	]);
 }
