@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "PLT/KAGUYA",
+				"class": "Pl00Opener",
+				"source": "ArcFormats/Kaguya/ArcPLT.cs"
+			},
+			"localId": "kaguya-plt",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"frame count validation",
+				"frames from 0x16 with header",
+				"sizes derived from depth width and height",
+				"generated frame names",
+				"frame metadata",
+				"derived span bound checking",
+				"verbatim extraction"
+			],
+			"unsupported": [
+				"frame decoding to bitmaps",
+				"pl10 variant",
+				"archive creation"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "WBP",
 				"class": "WbpOpener",
 				"source": "ArcFormats/WildBug/ArcWBP.cs"
