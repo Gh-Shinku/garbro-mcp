@@ -35,11 +35,19 @@ interface SurLayout {
 /**
  * `ReadMetaData` reads sixteen bytes and takes the dimensions from the last eight of them; the first eight are
  * never used, and neither are the sixteen bytes between the header and the compressed stream.
+ *
+ * The `BTN` button image embeds a whole SUR file at a computed offset and rebases every read on it, so the
+ * reader takes the offset the header sits at.
  */
-async function readLayout(source: ByteSource): Promise<SurLayout | undefined> {
-	if (source.size < BigInt(HEADER_SIZE)) return undefined;
+export async function readSurLayout(
+	source: ByteSource,
+	baseOffset = 0,
+): Promise<SurLayout | undefined> {
+	if (source.size < BigInt(baseOffset + HEADER_SIZE)) return undefined;
 	try {
-		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
+		const header = Buffer.from(
+			await source.readAt(BigInt(baseOffset), HEADER_SIZE),
+		);
 		if (!header.subarray(0, 4).equals(SIGNATURE)) return undefined;
 		const width = header.readUInt32LE(WIDTH_OFFSET);
 		const height = header.readUInt32LE(HEIGHT_OFFSET);
@@ -76,10 +84,10 @@ export const surImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: surImageDescriptor,
 	detection: { signatures: [{ bytes: SIGNATURE }] },
 	async detect(source: ByteSource): Promise<boolean> {
-		return (await readLayout(source)) !== undefined;
+		return (await readSurLayout(source)) !== undefined;
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const layout = await readLayout(source);
+		const layout = await readSurLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid TamaSoft SUR image");
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
@@ -112,7 +120,7 @@ export const surImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		const layout = await readLayout(source);
+		const layout = await readSurLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid TamaSoft SUR image");
 		const stored = Buffer.from(
