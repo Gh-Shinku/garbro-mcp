@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GD/Xuse",
+				"class": "GdOpener",
+				"source": "ArcFormats/Xuse/ArcGD.cs"
+			},
+			"localId": "xuse-gd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension-based detection",
+				"companion .dll index",
+				"monotonic offset validation",
+				"generated entry names",
+				"entry listing and extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "ARC/TYPES",
 				"class": "ArcOpener",
 				"source": "Legacy/Types/ArcARC.cs"
