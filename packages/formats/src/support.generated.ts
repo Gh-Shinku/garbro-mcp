@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "OPF",
+				class: "OpfFormat",
+				source: "ArcFormats/HCSystem/ImageOPF.cs",
+			},
+			localId: "hcsystem-opf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"stored stride handling",
+				"24 and 32bpp bitmap output",
+				"metadata",
+			],
+			unsupported: ["16bpp and other depths", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMP/IKE",
 				class: "IkeFormat",
 				source: "Legacy/UMeSoft/ImageIKE.cs",
