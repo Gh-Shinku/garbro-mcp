@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PTI",
+				class: "PtiFormat",
+				source: "ArcFormats/ImagePTI.cs",
+			},
+			localId: "misc-pti-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"bitmap header shift",
+				"short 24bpp tail marker",
+				"bitmap passthrough",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "OPF",
 				class: "OpfFormat",
 				source: "ArcFormats/HCSystem/ImageOPF.cs",
