@@ -391,6 +391,7 @@ import { vnEngineAxrFormat } from "./vn-engine/axr.js";
 import { animeGameSystemAniFormat } from "./anime-game-system/ani.js";
 import { animeGameSystemDatFormat } from "./anime-game-system/dat.js";
 import { maikaMk2Format } from "./maika/mk2.js";
+import { astArcFormat } from "./ast/arc.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -641,6 +642,7 @@ export * from "./black-butterfly/index.js";
 export * from "./debonosu/index.js";
 export * from "./vn-engine/index.js";
 export * from "./anime-game-system/index.js";
+export * from "./ast/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1037,5 +1039,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		animeGameSystemAniFormat,
 		animeGameSystemDatFormat,
 		maikaMk2Format,
+		astArcFormat,
 	]);
 }

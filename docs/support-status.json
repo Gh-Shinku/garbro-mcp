@@ -6,6 +6,35 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AST",
+				"class": "ArcOpener",
+				"source": "ArcFormats/ArcAST.cs"
+			},
+			"localId": "ast-arc",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ARC1 and ARC2 signatures",
+				"version from the fourth marker byte",
+				"header with the entry count",
+				"sequential record walk with variable length names",
+				"stored sizes from the next record offset",
+				"zero next offset meaning the unpacked size",
+				"last record running to the end of the file",
+				"placeholder records with zero or end offsets",
+				"placement checks",
+				"version 2 name unmasking",
+				"version 2 exclusive-ored PNG detection",
+				"LZSS decoding with a 0xFF ring fill",
+				"exclusive-or of decoded payloads",
+				"version 1 raw payloads"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/MK2",
 				"class": "Mk2Opener",
 				"source": "ArcFormats/Maika/ArcMK2.cs"
