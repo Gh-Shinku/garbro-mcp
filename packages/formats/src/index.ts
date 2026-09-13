@@ -363,6 +363,7 @@ import { penguinPacFormat } from "./penguin/pac.js";
 import { blueGaleAmvFormat } from "./blue-gale/amv.js";
 import { clickTeamMfsFormat } from "./clickteam/mf.js";
 import { miscBinFormat } from "./misc/bin.js";
+import { ponytailBndFormat } from "./ponytail/bnd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -599,6 +600,7 @@ export * from "./ebisu/index.js";
 export * from "./penguin/index.js";
 export * from "./clickteam/index.js";
 export * from "./misc/index.js";
+export * from "./ponytail/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -967,5 +969,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		blueGaleAmvFormat,
 		clickTeamMfsFormat,
 		miscBinFormat,
+		ponytailBndFormat,
 	]);
 }

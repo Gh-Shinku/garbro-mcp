@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BND/NMI",
+				"class": "BndOpener",
+				"source": "Legacy/Ponytail/ArcBND.cs"
+			},
+			"localId": "ponytail-bnd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"Bind signature with version string",
+				"entry count",
+				"index offset",
+				"8.3 names with trimming",
+				"stored size and payload offsets",
+				"lz1 marker probe",
+				"unpacked size and recovered extension character",
+				"lz1 literal and match decoding",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BIN/?",
 				"class": "BinOpener",
 				"source": "ArcFormats/Misc/ArcBIN.cs"
