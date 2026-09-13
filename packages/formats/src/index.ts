@@ -583,6 +583,7 @@ import { texbImageFormat } from "./gamesystem/texb-image.js";
 import { wrgAudioFormat } from "./regrips/wrg-audio.js";
 import { regripsMrgAudioFormat } from "./regrips/mrg-audio.js";
 import { ankhMskImageFormat } from "./ankh/msk-image.js";
+import { kurumiGraImageFormat } from "./kurumi/gra-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1490,5 +1491,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		wrgAudioFormat,
 		regripsMrgAudioFormat,
 		ankhMskImageFormat,
+		kurumiGraImageFormat,
 	]);
 }

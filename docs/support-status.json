@@ -6,6 +6,27 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GRA/VS",
+				"class": "GraFormat",
+				"source": "ArcFormats/Kurumi/ImageGRA.cs"
+			},
+			"localId": "kurumi-gra-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"xor unmasking",
+				"zlib decoding",
+				"bitmap trimming",
+				"metadata"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MSK/ANKH",
 				"class": "MskFormat",
 				"source": "ArcFormats/Ankh/ImageMSK.cs"
