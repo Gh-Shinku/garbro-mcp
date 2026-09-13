@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/NNNN",
+				class: "NNNNOpener",
+				source: "ArcFormats/MokoPro/CompressedFile.cs",
+			},
+			localId: "mokopro-nnnn",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"single payload listing",
+				"payload decryption",
+				"LZSS decompression with space filled window",
+				"partial stream tolerance",
+			],
+			unsupported: [
+				"archive creation",
+				"compressed bitmap decoding",
+				"compressed audio decoding",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "YKC",
 				class: "YkcOpener",
 				source: "ArcFormats/Yuka/ArcYKC.cs",
