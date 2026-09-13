@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PAC/PLANTECH",
+				class: "PacFormat",
+				source: "Legacy/PlanTech/ImagePAC.cs",
+			},
+			localId: "plantech-pac-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"embedded bitmap at offset 8",
+				"stored stride preservation",
+				"8/16/24/32 bpp output",
+				"gray eight bit samples",
+				"565 color masks",
+				"metadata",
+			],
+			unsupported: ["image encoding", "1 and 4 bpp"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BTN/SUR",
 				class: "BtnFormat",
 				source: "ArcFormats/TamaSoft/ImageBTN.cs",
