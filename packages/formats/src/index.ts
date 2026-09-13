@@ -218,6 +218,7 @@ import { c25Format } from "./foster/c24.js";
 import { lb5Format } from "./jupiter/lb5.js";
 import { cgV2Format } from "./parsley/cg2.js";
 import { ykFormat } from "./rune/yk.js";
+import { ucgFormat } from "./parsley/ucg.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -607,5 +608,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		lb5Format,
 		cgV2Format,
 		ykFormat,
+		ucgFormat,
 	]);
 }
