@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "AP",
+				"class": "ApFormat",
+				"source": "ArcFormats/Kaguya/ImageAP.cs"
+			},
+			"localId": "kaguya-ap-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"row reversal",
+				"32bpp bitmap output",
+				"shared subclass helpers",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "SFG",
 				"class": "SfgFormat",
 				"source": "Legacy/AlphaSystem/ImageSFG.cs"

@@ -5,3 +5,4 @@ export * from "./lin2.js";
 export * from "./pl10.js";
 export * from "./plt.js";
 export * from "./uf.js";
+export * from "./ap-image.js";
