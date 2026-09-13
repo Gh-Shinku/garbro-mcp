@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BND",
+				"class": "BndOpener",
+				"source": "Legacy/ShapeShifter/ArcBND.cs"
+			},
+			"localId": "shapeshifter-bnd",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"entry count",
+				"first-offset check",
+				"twelve-byte records with unpacked and stored sizes",
+				"compression flag from size mismatch",
+				"archive-name derived type and naming",
+				"bitmap marker detection with prefixed and plain variants",
+				"lzss payload decoding",
+				"placement validation",
+				"debug-only registration documented"
+			],
+			"unsupported": ["archive creation", "release-build registration"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/ANKH",
 				"class": "DatOpener",
 				"source": "ArcFormats/Ankh/ArcDAT.cs"

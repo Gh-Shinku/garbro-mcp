@@ -366,6 +366,7 @@ import { miscBinFormat } from "./misc/bin.js";
 import { ponytailBndFormat } from "./ponytail/bnd.js";
 import { ankhGrpFormat } from "./ankh/grp.js";
 import { ankhDatFormat } from "./ankh/dat.js";
+import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -604,6 +605,7 @@ export * from "./clickteam/index.js";
 export * from "./misc/index.js";
 export * from "./ponytail/index.js";
 export * from "./ankh/index.js";
+export * from "./shapeshifter/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -975,5 +977,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ponytailBndFormat,
 		ankhGrpFormat,
 		ankhDatFormat,
+		shapeShifterBndFormat,
 	]);
 }
