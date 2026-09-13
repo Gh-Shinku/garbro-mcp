@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "NPA-SG",
+				class: "NpaSteinsGateOpener",
+				source: "ArcFormats/NitroPlus/ArcSteinsGate.cs",
+			},
+			localId: "nitroplus-npa-sg",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"little endian index size gate",
+				"encrypted index region",
+				"entry count and average size checks",
+				"length prefixed names",
+				"encoding guess for ascii cp932 and utf-16",
+				"entry payload key phase",
+				"placement checks",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PACK/LUNE",
 				class: "PackOpener",
 				source: "Legacy/Lune/ArcPACK.cs",
