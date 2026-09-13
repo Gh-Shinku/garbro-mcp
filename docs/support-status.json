@@ -6,6 +6,69 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AOIMY/UNICODE",
+				"class": "AoiMyUnicodeOpener",
+				"source": "ArcFormats/Aoi/ArcBOX.cs"
+			},
+			"localId": "aoi-aoimy-unicode",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"utf16 tag with aoim signature word",
+				"count at 0x10 with big endian fields",
+				"utf16 name field with double null terminator",
+				"offset derived byte key function",
+				"entry placement validation",
+				"keyed payload decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "AOIMY",
+				"class": "AoiMyOpener",
+				"source": "ArcFormats/Aoi/ArcBOX.cs"
+			},
+			"localId": "aoi-aoimy",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"aoim signature with y01 tag",
+				"big endian fields",
+				"offset derived byte key function",
+				"entry placement validation",
+				"keyed payload decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BOX",
+				"class": "BoxOpener",
+				"source": "ArcFormats/Aoi/ArcBOX.cs"
+			},
+			"localId": "aoi-box",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"aoib signature and six version tags",
+				"per version key byte",
+				"named records",
+				"offset ladder",
+				"generated evt names with derived sizes",
+				"coverage and placement validation",
+				"single byte keyed payload decryption"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "VFS/AOI",
 				"class": "VfsOpener",
 				"source": "ArcFormats/Aoi/ArcVFS.cs"

@@ -297,6 +297,9 @@ import { an10Format } from "./kaguya/anm.js";
 import { an20Format } from "./kaguya/anm.js";
 import { volFormat } from "./elf/vol.js";
 import { vfsFormat } from "./aoi/vfs.js";
+import { boxFormat } from "./aoi/box.js";
+import { aoimyFormat } from "./aoi/box.js";
+import { aoimyUnicodeFormat } from "./aoi/box.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -802,5 +805,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		an20Format,
 		volFormat,
 		vfsFormat,
+		boxFormat,
+		aoimyFormat,
+		aoimyUnicodeFormat,
 	]);
 }
