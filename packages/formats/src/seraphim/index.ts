@@ -4,3 +4,4 @@ export * from "./mc.js";
 export * from "./scn-lz.js";
 export * from "./scnpac.js";
 export * from "./voice.js";
+export * from "./cp3-image.js";

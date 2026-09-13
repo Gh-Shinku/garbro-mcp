@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CP3",
+				class: "Cp3Format",
+				source: "ArcFormats/Seraphim/ImageCP3.cs",
+			},
+			localId: "seraphim-cp3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "bitmap reassembly"],
+			unsupported: [
+				"archive creation",
+				"pixel decoding",
+				"multi-frame traversal",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PSM",
 				class: "PsmFormat",
 				source: "ArcFormats/ImagePSM.cs",

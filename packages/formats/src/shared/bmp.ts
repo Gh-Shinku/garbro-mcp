@@ -12,6 +12,7 @@ function writeHeader(
 	dataOffset: number,
 	imageSize: number,
 	paletteEntries: number,
+	bottomUp: boolean,
 ): Buffer {
 	const header = Buffer.alloc(BMP_HEADER_SIZE);
 	header.write("BM", 0, "latin1");
@@ -19,7 +20,8 @@ function writeHeader(
 	header.writeUInt32LE(dataOffset, 10);
 	header.writeUInt32LE(40, 14);
 	header.writeInt32LE(width, 18);
-	header.writeInt32LE(-height, 22);
+	// A negative height records a top down image; a positive one keeps bottom up rows.
+	header.writeInt32LE(bottomUp ? height : -height, 22);
 	header.writeUInt16LE(1, 26);
 	header.writeUInt16LE(bitsPerPixel, 28);
 	header.writeUInt32LE(0, 30);
@@ -28,14 +30,19 @@ function writeHeader(
 	return header;
 }
 
-/** Wraps top down BGRA pixels in a 32 bit bitmap. */
+/**
+ * Wraps BGRA pixels in a 32 bit bitmap. The GARbro `ImageData.Create` readers store their rows top
+ * down, which a negative height records; `ImageData.CreateFlipped` readers store them bottom up and
+ * pass `bottomUp`.
+ */
 export function writeBmp32(
 	width: number,
 	height: number,
 	pixels: Buffer,
+	bottomUp = false,
 ): Buffer {
 	return Buffer.concat([
-		writeHeader(width, height, 32, BMP_HEADER_SIZE, pixels.length, 0),
+		writeHeader(width, height, 32, BMP_HEADER_SIZE, pixels.length, 0, bottomUp),
 		pixels,
 	]);
 }
@@ -66,7 +73,7 @@ export function writeBmp8(
 		rows.push(line);
 	}
 	return Buffer.concat([
-		writeHeader(width, height, 8, dataOffset, imageSize, 256),
+		writeHeader(width, height, 8, dataOffset, imageSize, 256, false),
 		palette,
 		...rows,
 	]);
