@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PK",
+				class: "PkOpener",
+				source: "ArcFormats/UMeSoft/ArcPK.cs",
+			},
+			localId: "umesoft-pk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"trailing index size word",
+				"index walk with zero-length terminator",
+				"one-byte name length with cp932 names",
+				"payload placement against the size field",
+				"size-prefixed lsb-bit lz stream for scr and tbl entries",
+				"xor-42 obfuscation",
+				"verbatim extraction",
+				"empty archive rejection",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "ARC/UF01",
 				class: "UfOpener",
 				source: "ArcFormats/Kaguya/ArcUF.cs",

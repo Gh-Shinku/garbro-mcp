@@ -353,6 +353,7 @@ import { cromwellOpkFormat } from "./cromwell/opk.js";
 import { propellerMgrFormat } from "./propeller/mgr.js";
 import { sohfuSkaFormat } from "./sohfu/ska.js";
 import { kaguyaUfFormat } from "./kaguya/uf.js";
+import { umeSoftPkFormat } from "./ume-soft/pk.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -941,5 +942,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		propellerMgrFormat,
 		sohfuSkaFormat,
 		kaguyaUfFormat,
+		umeSoftPkFormat,
 	]);
 }
