@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/FLK",
+				"class": "DatOpener",
+				"source": "Legacy/SplushWave/ArcDAT.cs"
+			},
+			"localId": "splush-wave-flk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"archive size validation",
+				"generated entry names",
+				"flag based payload unpacking",
+				"lzss frame decoding",
+				"image marker typing"
+			],
+			"unsupported": ["archive creation", "swg image decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PCG",
 				"class": "DatOpener",
 				"source": "ArcFormats/Groover/ArcPCG.cs"
