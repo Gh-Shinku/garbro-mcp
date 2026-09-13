@@ -376,6 +376,8 @@ import { yaneuraoDatExFormat } from "./yaneurao/dat.js";
 import { leafLacFormat } from "./leaf/lac.js";
 import { leafLacPakFormat } from "./leaf/lac.js";
 import { blackRainbowImpFormat } from "./black-rainbow/imp.js";
+import { dogenzakaBinFormat } from "./dogenzaka/bin.js";
+import { dogenzakaGameDatFormat } from "./dogenzaka/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -616,6 +618,7 @@ export * from "./ponytail/index.js";
 export * from "./ankh/index.js";
 export * from "./shapeshifter/index.js";
 export * from "./malie/index.js";
+export * from "./dogenzaka/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -997,5 +1000,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafLacFormat,
 		leafLacPakFormat,
 		blackRainbowImpFormat,
+		dogenzakaBinFormat,
+		dogenzakaGameDatFormat,
 	]);
 }

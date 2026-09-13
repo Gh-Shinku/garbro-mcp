@@ -6,6 +6,60 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/Dogenzaka/2",
+				"class": "GamedatOpener",
+				"source": "ArcFormats/Dogenzaka/ArcBIN.cs"
+			},
+			"localId": "dogenzaka-bin-2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection without a signature",
+				"count that includes the leading zero word",
+				"cumulative end offsets relative to the table end",
+				"zero length entry rejection",
+				"raw extraction",
+				"signature based retyping for ogg riff and bitmap payloads",
+				"four digit entry numbering",
+				"placement validation"
+			],
+			"unsupported": [
+				"archive creation",
+				"catalog wide type lookup beyond ogg riff and bitmap"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "BIN/Dogenzaka",
+				"class": "BinOpener",
+				"source": "ArcFormats/Dogenzaka/ArcBIN.cs"
+			},
+			"localId": "dogenzaka-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"structural detection without a signature",
+				"outer offset and size pairs",
+				"inner headers with a positive word and flagged size",
+				"payload offsets relative to the inner header",
+				"two bit compression flag",
+				"default lzss unpacking until input ends",
+				"store pass through",
+				"signature based retyping for ogg riff and bitmap payloads",
+				"five digit entry numbering",
+				"placement validation"
+			],
+			"unsupported": [
+				"archive creation",
+				"catalog wide type lookup beyond ogg riff and bitmap"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "IMP",
 				"class": "ImpOpener",
 				"source": "ArcFormats/BlackRainbow/ArcIMP.cs"
