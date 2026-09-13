@@ -8,6 +8,25 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "MSF",
+				class: "MsfAudio",
+				source: "Legacy/Unknown/AudioMSF.cs",
+			},
+			localId: "unknown-msf-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"extraction",
+				"header descrambling",
+				"wav header reassembly",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "CSF",
 				class: "CsfFormat",

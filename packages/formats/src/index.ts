@@ -554,6 +554,7 @@ import { pnxEncryptedImageFormat } from "./misc/pnx-image.js";
 import { pcgImageFormat } from "./parsley/pcg-image.js";
 import { gefImageFormat } from "./yellowcap/gef-image.js";
 import { csfImageFormat } from "./eye/csf-image.js";
+import { msfAudioFormat } from "./unknown/msf-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1422,5 +1423,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pcgImageFormat,
 		gefImageFormat,
 		csfImageFormat,
+		msfAudioFormat,
 	]);
 }
