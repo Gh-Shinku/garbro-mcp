@@ -236,6 +236,7 @@ import { microVisionArcFormat } from "./microvision/arc.js";
 import { dxFormat } from "./black-rainbow/dx.js";
 import { smvFormat } from "./tanaka/smv.js";
 import { cgfFormat } from "./triangle/cgf.js";
+import { techgianBinFormat } from "./techgian/bin.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -408,6 +409,7 @@ export * from "./adobe/index.js";
 export * from "./origin/index.js";
 export * from "./emic/index.js";
 export * from "./techno-brain/index.js";
+export * from "./techgian/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -650,5 +652,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dxFormat,
 		smvFormat,
 		cgfFormat,
+		techgianBinFormat,
 	]);
 }

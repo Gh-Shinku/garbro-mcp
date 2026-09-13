@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "BIN/RFIL",
+				"class": "BinOpener",
+				"source": "ArcFormats/TechGian/ArcBIN.cs"
+			},
+			"localId": "techgian-bin",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"signature detection",
+				"record count validation",
+				"index decryption with the c runtime generator",
+				"cp932 filenames",
+				"entry placement validation",
+				"entry listing",
+				"full payload key",
+				"partial payload keys",
+				"verbatim extraction"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "CGF",
 				"class": "CgfOpener",
 				"source": "ArcFormats/Triangle/ArcCGF.cs"
