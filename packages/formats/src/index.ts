@@ -321,6 +321,7 @@ import { tlzFormat } from "./otemoto/tlz.js";
 import { dmFormat } from "./digital-monkey/dm.js";
 import { morningTtdFormat } from "./morning/ttd.js";
 import { studioSakuraDatFormat } from "./studio-sakura/dat.js";
+import { fwaFormat } from "./nug/fwa.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -532,6 +533,7 @@ export * from "./otemoto/index.js";
 export * from "./digital-monkey/index.js";
 export * from "./morning/index.js";
 export * from "./studio-sakura/index.js";
+export * from "./nug/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -790,6 +792,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		dlbV0Format,
 		morningTtdFormat,
 		studioSakuraDatFormat,
+		fwaFormat,
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
