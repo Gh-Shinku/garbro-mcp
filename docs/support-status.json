@@ -5,6 +5,25 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "WAZ",
+				"class": "WazAudio",
+				"source": "Legacy/AnotherRoom/AudioWAZ.cs"
+			},
+			"localId": "anotherroom-waz-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"extraction",
+				"lzss decoding",
+				"wav reserialisation"
+			],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "script",
 				"tag": "ISD",
 				"class": "IsdScript",
