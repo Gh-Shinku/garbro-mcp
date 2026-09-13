@@ -6,6 +6,35 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "GRP/ICE",
+				"class": "GrpOpener",
+				"source": "ArcFormats/Ankh/ArcGRP.cs"
+			},
+			"localId": "ankh-grp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"word-aligned first-payload offset",
+				"derived entry count",
+				"offset table walk with file-end terminator",
+				"base hash index naming",
+				"zero-size entry skipping",
+				"tpw container with folded and stored variants",
+				"hdj container with variant retry",
+				"zfd zlib container",
+				"inline ogg and riff payloads",
+				"pcm adpcm and sample packing",
+				"mp3 frame sync typing",
+				"raw pcm layout typing",
+				"entry type and extension retyping",
+				"placement validation"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BND/NMI",
 				"class": "BndOpener",
 				"source": "Legacy/Ponytail/ArcBND.cs"
