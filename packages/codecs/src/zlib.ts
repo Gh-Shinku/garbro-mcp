@@ -29,6 +29,23 @@ export async function inflateZlibBuffer(
 	}
 	return output;
 }
+/**
+ * Decompresses a zlib stream with an upper bound on the output. Unlike `inflateZlibBuffer`, the bound is a
+ * cap rather than an expectation: streams that hold less than `maxOutputLength` are returned as they are,
+ * while anything larger fails instead of allocating. The formats that have to decompress during detection
+ * and do not know the unpacked size use this.
+ */
+export async function inflateZlibBufferCapped(
+	input: Uint8Array,
+	maxOutputLength: number,
+): Promise<Buffer> {
+	return new Promise<Buffer>((resolve, reject) => {
+		inflate(input, { maxOutputLength }, (error, result) => {
+			if (error) reject(error);
+			else resolve(result);
+		});
+	});
+}
 
 export function createRawInflateStream(input: Readable): Readable {
 	return input.pipe(createInflateRaw());
