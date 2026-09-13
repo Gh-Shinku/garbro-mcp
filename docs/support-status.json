@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "AR2",
+				"class": "Ar2Opener",
+				"source": "ArcFormats/Leaf/ArcAR2.cs"
+			},
+			"localId": "leaf-ar2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"ar21 signature",
+				"entry count",
+				"byte name lengths",
+				"variable length records",
+				"UTF-16 names with low bytes masked with the name length",
+				"per-record key bytes",
+				"offsets relative to the end of the index",
+				"offset rebasing after the index walk",
+				"placement checks",
+				"hierarchical path normalization",
+				"payload exclusive-or with the 512-byte key table"
+			],
+			"unsupported": ["archive creation", "extension based entry typing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "AST",
 				"class": "ArcOpener",
 				"source": "ArcFormats/ArcAST.cs"
