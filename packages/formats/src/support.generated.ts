@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "EP1",
+				class: "Ep1Opener",
+				source: "Legacy/StudioEbisu/ArcEP1.cs",
+			},
+			localId: "ebisu-ep1",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"EP1 signature",
+				"record chain walked to the end of the file",
+				"0x30-byte headers with 0x20-byte cp932 names",
+				"image width height and method metadata",
+				"payload size and placement validation",
+				"image typing",
+				"verbatim extraction",
+			],
+			unsupported: [
+				"archive creation",
+				"gui bitmap decoding (32bpp bgra rows with lzss for methods four to seven)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BIN/ARC1",
 				class: "BinOpener",
 				source: "Legacy/Alterna/ArcBIN.cs",

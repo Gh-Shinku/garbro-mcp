@@ -357,6 +357,7 @@ import { umeSoftPkFormat } from "./ume-soft/pk.js";
 import { archangelDatFormat } from "./seraphim/dat.js";
 import { ebgSystemBinFormat } from "./ebg-system/bin.js";
 import { alternaBinFormat } from "./alterna/bin.js";
+import { ebisuEp1Format } from "./ebisu/ep1.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -589,6 +590,7 @@ export * from "./cromwell/index.js";
 export * from "./sohfu/index.js";
 export * from "./ebg-system/index.js";
 export * from "./alterna/index.js";
+export * from "./ebisu/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -951,5 +953,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		archangelDatFormat,
 		ebgSystemBinFormat,
 		alternaBinFormat,
+		ebisuEp1Format,
 	]);
 }
