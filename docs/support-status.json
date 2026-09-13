@@ -6,6 +6,74 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "DAT/YOUKAI/3",
+				"class": "VoiceDatOpener",
+				"source": "ArcFormats/Youkai/ArcDAT.cs"
+			},
+			"localId": "youkai-dat-voice",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dat extension gate",
+				"data offset and entry count fields",
+				"0x108-byte index records",
+				"CP932 name fields with empty name rejection",
+				"stored size and payload offset fields",
+				"index bound against the data offset",
+				"payload placement checks"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/YOUKAI/2",
+				"class": "SoundDatOpener",
+				"source": "ArcFormats/Youkai/ArcDAT.cs"
+			},
+			"localId": "youkai-dat-sound",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dat extension gate",
+				"entry count field",
+				"alternating record and payload layout",
+				"CP932 name fields with empty name rejection",
+				"stored size field",
+				"payload placement checks",
+				"exact file end check"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DAT/YOUKAI/1",
+				"class": "GrpDatOpener",
+				"source": "ArcFormats/Youkai/ArcDAT.cs"
+			},
+			"localId": "youkai-dat-grp",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"dat extension gate",
+				"entry count and zero word",
+				"0x110-byte index records",
+				"CP932 name fields with empty name rejection",
+				"stored size and payload offset fields",
+				"payload area start check",
+				"payload placement checks",
+				"ACMPRS03 packed payload detection",
+				"LZSS payload decoding with a packed size at +0x14"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "EPK",
 				"class": "PakOpener",
 				"source": "ArcFormats/TamaSoft/ArcEPK.cs"
