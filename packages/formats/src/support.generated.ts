@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "EPK/Ellefin",
+				class: "EpkOpener",
+				source: "ArcFormats/Ellefin/ArcEPK.cs",
+			},
+			localId: "ellefin-epk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"epk signature and flags",
+				"base name key derivation",
+				"index length obfuscation",
+				"letter table index",
+				"flat index",
+				"prefix entries",
+				"lzss entries",
+				"entry cipher",
+				"whole content cipher",
+				"aligned offsets and sizes",
+			],
+			unsupported: ["archive creation", "image decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "LPK",
 				class: "LpkOpener",
 				source: "ArcFormats/Lucifen/ArcLPK.cs",
