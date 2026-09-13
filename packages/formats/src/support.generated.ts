@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "W/Leaf",
+				class: "WAudio",
+				source: "ArcFormats/Leaf/AudioW.cs",
+			},
+			localId: "leaf-w-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "header validation", "metadata"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "MWP",
 				class: "MwpFormat",

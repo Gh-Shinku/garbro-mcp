@@ -578,6 +578,7 @@ import { nsfAudioFormat } from "./pan/nsf-audio.js";
 import { htfImageFormat } from "./jam-creation/htf-image.js";
 import { advgImageFormat } from "./advgsys/bmp-image.js";
 import { mwpImageFormat } from "./emic/mwp-image.js";
+import { leafWAudioFormat } from "./leaf/w-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1479,5 +1480,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		htfImageFormat,
 		advgImageFormat,
 		mwpImageFormat,
+		leafWAudioFormat,
 	]);
 }
