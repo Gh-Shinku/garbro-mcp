@@ -3,6 +3,7 @@ export * from "./blowfish.js";
 export * from "./crc32.js";
 export * from "./huffman.js";
 export * from "./lzss.js";
+export * from "./maika-bpr.js";
 export * from "./msb-bit-reader.js";
 export * from "./qlie-pack.js";
 export * from "./riddle-cmp.js";
