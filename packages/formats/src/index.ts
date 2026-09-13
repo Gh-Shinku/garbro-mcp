@@ -622,6 +622,7 @@ import { wm2ImageFormat } from "./fc01/wm2-image.js";
 import { malImageFormat } from "./valkyria/mal-image.js";
 import { texImageFormat } from "./system21/tex-image.js";
 import { ggaImageFormat } from "./ikura/gga-image.js";
+import { thpImageFormat } from "./primesoft/thp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -945,6 +946,7 @@ export * from "./tiare/index.js";
 export * from "./hillfield/index.js";
 export * from "./project-myu/index.js";
 export * from "./wildbug/index.js";
+export * from "./primesoft/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1572,5 +1574,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		malImageFormat,
 		texImageFormat,
 		ggaImageFormat,
+		thpImageFormat,
 	]);
 }

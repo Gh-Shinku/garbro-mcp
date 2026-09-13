@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "THP",
+				"class": "ThpFormat",
+				"source": "Legacy/PrimeSoft/ImageTHP.cs"
+			},
+			"localId": "primesoft-thp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection by extension",
+				"listing",
+				"extraction",
+				"indexed run length unpacking",
+				"palette",
+				"stride faithful bitmap output",
+				"metadata"
+			],
+			"unsupported": ["image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GGA",
 				"class": "GgaFormat",
 				"source": "ArcFormats/Ikura/ImageGGA.cs"
