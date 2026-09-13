@@ -1,5 +1,8 @@
 import * as formats from "@garbro-mcp/formats";
-import { createDefaultRegistry } from "@garbro-mcp/formats";
+import {
+	createDefaultRegistry,
+	formatSupportCatalog,
+} from "@garbro-mcp/formats";
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -46,5 +49,22 @@ describe("format catalog integrity", () => {
 				!indexSource.includes(`export * from "./${directory}/index.js";`),
 		);
 		expect(missing).toEqual([]);
+	});
+
+	it("keeps the generated support catalog synchronized and registered", async () => {
+		const source = JSON.parse(
+			await readFile(resolve("docs/support-status.json"), "utf8"),
+		);
+		expect(formatSupportCatalog).toEqual(source);
+		const registeredIds = new Set(
+			createDefaultRegistry()
+				.listFormats()
+				.map((format) => format.id),
+		);
+		expect(
+			formatSupportCatalog.implementations
+				.map((implementation) => implementation.localId)
+				.filter((id) => !registeredIds.has(id)),
+		).toEqual([]);
 	});
 });

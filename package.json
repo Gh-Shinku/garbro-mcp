@@ -22,6 +22,7 @@
 		"lint": "biome lint --write .",
 		"lint:check": "biome lint .",
 		"inventory:garbro": "node scripts/generate-garbro-inventory.mjs",
+		"catalog:formats": "node scripts/generate-format-support.mjs",
 		"gap:garbro": "node scripts/garbro-gap.mjs",
 		"targets:garbro": "node scripts/generate-test-data-targets.mjs",
 		"typecheck": "tsc -b && tsc -p tsconfig.tests.json",
