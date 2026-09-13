@@ -628,6 +628,7 @@ import { iceAudioFormat } from "./ankh/ice-audio.js";
 import { ikeImageFormat } from "./ume-soft/ike-image.js";
 import { opfImageFormat } from "./hcsystem/opf-image.js";
 import { ptiImageFormat } from "./misc/pti-image.js";
+import { wafAudioFormat } from "./kid/waf-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1585,5 +1586,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikeImageFormat,
 		opfImageFormat,
 		ptiImageFormat,
+		wafAudioFormat,
 	]);
 }

@@ -5,6 +5,27 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "WAF",
+				"class": "WafAudio",
+				"source": "ArcFormats/Kid/AudioWAF.cs"
+			},
+			"localId": "kid-waf-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"ms adpcm wave header synthesis",
+				"codec coefficients",
+				"metadata"
+			],
+			"unsupported": ["audio encoding", "adpcm decoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "PTI",
 				"class": "PtiFormat",
