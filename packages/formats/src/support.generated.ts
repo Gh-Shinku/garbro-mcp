@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "CWV",
+				class: "CwvAudio",
+				source: "Legacy/Uncanny/AudioCWV.cs",
+			},
+			localId: "uncanny-cwv-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detection", "extraction", "wav decryption"],
+			unsupported: ["archive creation", "audio encoding", "wav validation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "MSK0",
 				class: "MskFormat",

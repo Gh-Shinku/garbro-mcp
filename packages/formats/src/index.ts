@@ -547,6 +547,7 @@ import { pnxImageFormat } from "./zenos/pnx-image.js";
 import { grdImageFormat } from "./silky/grd-image.js";
 import { sedAudioFormat } from "./myharvest/sed-audio.js";
 import { mskImageFormat } from "./cmvs/msk-image.js";
+import { cwvAudioFormat } from "./uncanny/cwv-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -853,6 +854,7 @@ export * from "./ags32i/index.js";
 export * from "./psm/index.js";
 export * from "./ocarina/index.js";
 export * from "./zenos/index.js";
+export * from "./uncanny/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1405,5 +1407,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		grdImageFormat,
 		sedAudioFormat,
 		mskImageFormat,
+		cwvAudioFormat,
 	]);
 }
