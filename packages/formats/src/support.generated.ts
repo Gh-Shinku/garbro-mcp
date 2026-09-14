@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "WBI",
+				class: "WbiFormat",
+				source: "Legacy/Tobe/ImageWBI.cs",
+			},
+			localId: "tobe-wbi-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GT/ApplePie",
 				class: "GtFormat",
 				source: "Legacy/ApplePie/ImageGT.cs",
