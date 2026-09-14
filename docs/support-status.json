@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MSK/G16",
+				"class": "Msk16Format",
+				"source": "ArcFormats/elf/ImageG24.cs"
+			},
+			"localId": "ai5-msk16-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "G24",
+				"class": "G24Format",
+				"source": "ArcFormats/elf/ImageG24.cs"
+			},
+			"localId": "ai5-g24-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract", "lzss"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MSK/AI5",
 				"class": "MskFormat",
 				"source": "ArcFormats/elf/ImageGP8.cs"

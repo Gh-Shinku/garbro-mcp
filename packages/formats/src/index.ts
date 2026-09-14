@@ -706,6 +706,8 @@ import { kurumiGraLegacyImageFormat } from "./kurumi/gra-legacy-image.js";
 import { tigermanChrImageFormat } from "./tigerman/chr-image.js";
 import { ai5Gp8ImageFormat } from "./elf/gp8-image.js";
 import { ai5MskImageFormat } from "./elf/gp8-image.js";
+import { ai5G24ImageFormat } from "./elf/g24-image.js";
+import { ai5Msk16ImageFormat } from "./elf/g24-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1749,5 +1751,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tigermanChrImageFormat,
 		ai5Gp8ImageFormat,
 		ai5MskImageFormat,
+		ai5G24ImageFormat,
+		ai5Msk16ImageFormat,
 	]);
 }
