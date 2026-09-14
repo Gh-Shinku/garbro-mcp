@@ -17,8 +17,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** `PIC`. */
-const SIGNATURE = Buffer.from("PIC", "ascii");
+/** `PIC` and a null: the reference's word `0x00434950`. */
+const SIGNATURE = Buffer.from("PIC\0", "latin1");
 const BMP_TAG = Buffer.from("BM", "ascii");
 /** Everything the reference replaces: the bitmap file header, fourteen bytes of it, minus its first ten. */
 const HEADER_SIZE = 10;
@@ -49,7 +49,8 @@ async function readLayout(source: ByteSource): Promise<PicLayout | undefined> {
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
 		// The port re-checks the tag itself rather than trusting the registry gate: the synthesized bitmap
 		// overwrites the bytes it lives in, so without this check any bitmap sized file would be accepted.
-		if (!stored.subarray(0, 3).equals(SIGNATURE)) return undefined;
+		if (!stored.subarray(0, SIGNATURE.length).equals(SIGNATURE))
+			return undefined;
 		const bmp = readBmpMetaData(synthesize(stored));
 		if (!bmp) return undefined;
 		return {

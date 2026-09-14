@@ -6,12 +6,12 @@ Reference: `GARbro/ArcFormats/ImagePIC.cs`, class `PicFormat`
 Implementation: `packages/formats/src/misc/pic-image.ts` (`picImageDescriptor`, `picImageFormat`, id
 `misc-pic-image`).
 
-A bitmap whose file header was replaced by a tag and seven bytes of engine data:
+A bitmap whose file header was replaced by a tag with a null and six bytes of engine data:
 
 | field | offset |
 |---|---|
-| tag `PIC` | 0 |
-| seven bytes the reference never reads | 3 |
+| tag `PIC` and a null | 0 |
+| six bytes the reference never reads | 4 |
 | `bfOffBits` | 10 |
 | information header | 14 |
 | palette and pixels, as the bitmap lays them out | `bfOffBits` |
@@ -29,13 +29,17 @@ begin with `PIC` at all. The format therefore re-checks the tag itself rather th
 signature gate, and a test that changes the first byte and still expects a decline is what found the omission.
 This is the same lesson the `BM_` port recorded, and the same fix.
 
+The reference registers its signature as a **four byte word**, `0x00434950`: the tag is `PIC` followed by a
+null, so a file whose fourth byte is anything else never reaches the format at all. The port compares all four
+bytes for the same reason.
+
 ## The round trip
 
 For a bitmap whose reserved field is already zero — which is every ordinary bitmap — the synthesized stream is
 the **original file, byte for byte**, and the strongest test here asserts exactly that. A second test fills the
 reserved field with `0xDEADBEEF` in the source and expects zeros in the output, because those four bytes are the
-ones the reference builds rather than ones it copies. A third fills the seven bytes between the tag and offset
-ten with a marker and shows they reach nothing.
+ones the reference builds rather than ones it copies. A third fills the six bytes between the tag's null and
+offset ten with a marker and shows they reach nothing.
 
 The palette and pixel bytes are carried through untouched, which a test checks for an eight bit image: the whole
 stored palette and its pixels appear in the output at the offsets a bitmap uses.

@@ -3,7 +3,7 @@ import { picImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
-const SIGNATURE = Buffer.from("PIC", "ascii");
+const SIGNATURE = Buffer.from("PIC\0", "latin1");
 const BMP_OFFSET = 10;
 const DIB_HEADER_SIZE = 40;
 const BMP_HEADER_SIZE = 14 + DIB_HEADER_SIZE;
@@ -56,7 +56,7 @@ function buildBmp(options: {
 	return Buffer.concat([header, palette, options.pixels]);
 }
 
-/** The engine's file: a tag, seven bytes of gap and the bitmap from its tenth byte. */
+/** The engine's file: a tag with a null, six bytes of gap and the bitmap from its tenth byte. */
 function buildPic(bmp: Buffer): Buffer {
 	const prefix: Buffer = Buffer.alloc(BMP_OFFSET, GAP_MARKER);
 	SIGNATURE.copy(prefix, 0);
@@ -115,13 +115,23 @@ describe("soft house pic image", () => {
 		expect(output.readInt32LE(22)).toBe(2);
 	});
 
-	it("ignores the seven bytes between the tag and the bitmap", async () => {
+	it("ignores the six bytes between the tag's null and the bitmap", async () => {
 		const pixels = buildPixels(strideOf(2, 24));
 		const bmp = buildBmp({ width: 2, height: 1, bitsPerPixel: 24, pixels });
 		const stored = buildPic(bmp);
-		expect(stored.subarray(3, BMP_OFFSET)).toEqual(Buffer.alloc(7, GAP_MARKER));
+		expect(stored.subarray(4, BMP_OFFSET)).toEqual(Buffer.alloc(6, GAP_MARKER));
 		const output = await extract(stored);
 		expect(output).toEqual(bmp);
+	});
+
+	it("declines a fourth byte that is not a null", async () => {
+		const pixels = buildPixels(strideOf(2, 24));
+		const bmp = buildBmp({ width: 2, height: 1, bitsPerPixel: 24, pixels });
+		const stored = buildPic(bmp);
+		stored[3] = GAP_MARKER;
+		expect(await picImageFormat.detect(sourceOf(stored), "SPR01.PIC")).toBe(
+			false,
+		);
 	});
 
 	it("zeroes the reserved field the source may have filled", async () => {
