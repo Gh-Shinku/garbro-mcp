@@ -710,6 +710,10 @@ import { ai5G24ImageFormat } from "./elf/g24-image.js";
 import { ai5Msk16ImageFormat } from "./elf/g24-image.js";
 import { ai5HizImageFormat } from "./elf/hiz-image.js";
 import { ai5HipImageFormat } from "./elf/hiz-image.js";
+import { seraphimCfImageFormat } from "./seraphim/seraph-image.js";
+import { seraphimCtImageFormat } from "./seraphim/seraph-image.js";
+import { seraphimCbImageFormat } from "./seraphim/seraph-image.js";
+import { seraphimCxImageFormat } from "./seraphim/seraph-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1757,5 +1761,9 @@ export function createDefaultRegistry(): FormatRegistry {
 		ai5Msk16ImageFormat,
 		ai5HizImageFormat,
 		ai5HipImageFormat,
+		seraphimCfImageFormat,
+		seraphimCtImageFormat,
+		seraphimCbImageFormat,
+		seraphimCxImageFormat,
 	]);
 }
