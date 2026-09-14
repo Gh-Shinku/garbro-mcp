@@ -1,83 +1,27 @@
 # garbro-mcp
 
+> [!WARNING]
+> This repository is under active development and is not ready for production or general use.
+> Format behavior, extraction results, and MCP contracts may change without notice.
+
 A modern TypeScript toolkit for parsing and extracting ADV/Galgame resource formats. The project
 uses [GARbro](https://github.com/morkt/GARbro) as a format and algorithm reference while providing
 independent, streaming implementations of its core API, CLI, and MCP server.
 
-The project currently includes archive support for:
+## Install the MCP server
 
-- standard, unencrypted KiriKiri XP3 archives;
-- Active Soft ADPACK32 archives, including CP932 filenames;
-- Amaterasu Translations AMI archives, including zlib-compressed images;
-- BGI/Ethornell PackFile and BURIKO ARC20 archives, including DSC and BSE data;
-- Digital Romance System DRS archives;
-- IKURA GDL (`SM2MPX10`) archives with built-in script transforms;
-- Favorite View Point ACPXPK archives with ACP LZW compression;
-- Escu:de ESC-ARC v1/v2 archives with encrypted indexes and ACP LZW entries;
-- Black Rainbow GSP archives;
-- CatSystem2 KIF/INT archives with 32-byte and 64-byte filename indexes;
-- SYSTEM-epsilon PACKDAT archives with script and rotating-XOR transforms;
-- Selene KCAP archives with default or programmatically supplied passphrases;
-- Kogado HyPack v1-v3 archives with Mariel and XOR-FF entries;
-- Nexton LikeC data files with Moon or Nexton `.lst` companion indexes;
-- Majiro ARC versions 1, 2, and 3;
-- NekoPack versions 1, 2, and 3 with encrypted indexes and entries;
-- CRI AFS archives;
-- CRI CPK archives, including TOC/ITOC indexes and CRILAYLA compression;
-- Favorite View Point v2 BIN archives (`BIN/FVP`).
+The server is currently available only by building this repository from source. Install Node.js 24
+or newer and pnpm 11, then run:
 
-The XP3 implementation supports:
-
-- archive detection and metadata inspection;
-- raw and zlib-compressed indexes, including continued indexes;
-- raw and zlib-compressed multi-segment files;
-- listing, single-entry extraction, and complete archive extraction through the CLI and MCP;
-- listing protected entries, with an explicit unsupported-feature error on extraction.
-
-Game-specific XP3 encryption, obfuscated indexes, PEXP3/EXE-embedded archives, and archive creation
-are not currently supported.
-
-## Requirements and installation
-
-- Node.js 24 or newer
-- pnpm 11
-
-```powershell
+```shell
+git clone https://github.com/Gh-Shinku/garbro-mcp.git
+cd garbro-mcp
 pnpm install
 pnpm build
-pnpm check
 ```
 
-All workspace packages are private:
-
-```text
-packages/core      bigint binary I/O, format interfaces, registry, safe extraction
-packages/codecs    reusable codecs
-packages/formats   engine and format implementations
-packages/cli       command-line interface
-packages/mcp       MCP stdio server
-```
-
-## CLI
-
-After building, invoke the CLI directly with Node:
-
-```powershell
-node packages/cli/dist/index.js formats
-node packages/cli/dist/index.js detect data.xp3 --json
-node packages/cli/dist/index.js list data.xp3
-node packages/cli/dist/index.js extract-entry data.xp3 0 --output extracted
-node packages/cli/dist/index.js extract-archive data.xp3 --output extracted
-```
-
-Extraction refuses to overwrite existing files by default. Add `--overwrite` explicitly to replace
-regular files. Absolute archive paths, path traversal, Windows alternate data streams and device
-names, and symbolic-link destinations are always rejected.
-
-## MCP
-
-The server uses stdio. Standard output is reserved for protocol messages, while diagnostics are
-written to standard error.
+Add the built stdio server to your MCP client configuration. Use absolute paths for the server,
+input roots, and output root:
 
 ```json
 {
@@ -94,37 +38,19 @@ written to standard error.
 }
 ```
 
-Input files are addressed as `{ "rootId": "games", "path": "title/data.xp3" }`; MCP callers
-cannot pass absolute paths or escape a configured root. If no roots are supplied, the server uses
-`workspace=<current directory>` and writes only below `<current directory>/garbro-output`.
+For filesystem policy, available tools, limits, and configuration details, read the
+[MCP guide](docs/mcp.md).
 
-The automation-oriented tools are:
+## Documentation
 
-- `get_server_info`
-- `list_formats`
-- `scan_archives`
-- `inspect_archive`
-- `list_entries`
-- `read_entry`
-- `extract_entries`
+- [MCP installation, configuration, and tool contracts](docs/mcp.md)
+- [Development setup, package layout, CLI, and testing](docs/development.md)
+- [Format support status and compatibility methodology](docs/support.md)
+- [Individual format notes](docs/formats/)
 
-See [docs/mcp.md](docs/mcp.md) for tool contracts, limits, and migration notes.
+## GARbro reference
 
-MCP tools return structured metadata and local paths only. All bigint values are encoded as decimal
-strings, and large Base64 payloads are never returned.
-
-## Tests and differential validation
-
-```powershell
-pnpm test
-pnpm test:differential -- --archive fixtures/private/sample.xp3 --reference fixtures/private/garbro-output
-```
-
-The regular test suite uses deterministic, redistributable synthetic fixtures committed to the
-repository. Differential tests compare this project's output with a private reference directory
-extracted by GARbro, matching path, size, and SHA-256. `fixtures/private/` is excluded from version
-control.
-
-See [docs/formats/xp3.md](docs/formats/xp3.md) for XP3 format notes, implementation sources, and
-known limitations. See [docs/support.md](docs/support.md) for the generated GARbro compatibility
-baseline, status definitions, and current migration progress.
+This project uses [GARbro](https://github.com/morkt/GARbro) as a behavioral reference for resource
+formats and decoding algorithms. It is an independent TypeScript reimplementation and is not
+affiliated with, endorsed by, or a distribution of GARbro. Source attribution and applicable
+licenses are recorded with each format implementation and in the format documentation.
