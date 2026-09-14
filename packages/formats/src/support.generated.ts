@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MSK/AI5",
+				class: "MskFormat",
+				source: "ArcFormats/elf/ImageGP8.cs",
+			},
+			localId: "ai5-msk-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract", "lzss"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "GP8",
+				class: "Gp8Format",
+				source: "ArcFormats/elf/ImageGP8.cs",
+			},
+			localId: "ai5-gp8-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract", "lzss"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CHR/TIGERMAN",
 				class: "ChrFormat",
 				source: "Legacy/Tigerman/ImageCHR.cs",

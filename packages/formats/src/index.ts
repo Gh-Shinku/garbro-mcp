@@ -704,6 +704,8 @@ import { agsPcmAudioFormat } from "./anime-game-system/pcm-audio.js";
 import { mixwillPb00ImageFormat } from "./mixwill/pb00-image.js";
 import { kurumiGraLegacyImageFormat } from "./kurumi/gra-legacy-image.js";
 import { tigermanChrImageFormat } from "./tigerman/chr-image.js";
+import { ai5Gp8ImageFormat } from "./elf/gp8-image.js";
+import { ai5MskImageFormat } from "./elf/gp8-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1745,5 +1747,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mixwillPb00ImageFormat,
 		kurumiGraLegacyImageFormat,
 		tigermanChrImageFormat,
+		ai5Gp8ImageFormat,
+		ai5MskImageFormat,
 	]);
 }
