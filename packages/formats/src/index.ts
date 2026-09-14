@@ -676,6 +676,7 @@ import { nagsNgpImageFormat } from "./nags/ngp-image.js";
 import { tanukiAmapImageFormat } from "./tanuki/amap-image.js";
 import { silkyMfgImageFormat } from "./silky/mfg-image.js";
 import { interheartKgImageFormat } from "./interheart/kg-image.js";
+import { mnoVioletGraImageFormat } from "./mnoviolet/gra-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1005,6 +1006,7 @@ export * from "./fazex/index.js";
 export * from "./adviz/index.js";
 export * from "./nabe/index.js";
 export * from "./risa/index.js";
+export * from "./mnoviolet/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1686,5 +1688,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanukiAmapImageFormat,
 		silkyMfgImageFormat,
 		interheartKgImageFormat,
+		mnoVioletGraImageFormat,
 	]);
 }

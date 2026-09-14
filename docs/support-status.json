@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GRA",
+				"class": "GraFormat",
+				"source": "ArcFormats/MnoViolet/ImageGRA.cs"
+			},
+			"localId": "mnoviolet-gra-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "KG",
 				"class": "KgFormat",
 				"source": "ArcFormats/Interheart/ImageKG.cs"
