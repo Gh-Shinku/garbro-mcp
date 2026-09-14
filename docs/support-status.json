@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "C24",
+				"class": "C24Format",
+				"source": "ArcFormats/Foster/ImageC24.cs"
+			},
+			"localId": "foster-c24-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MG1",
 				"class": "MgFormat",
 				"source": "Legacy/Mermaid/ImageMG1.cs"
