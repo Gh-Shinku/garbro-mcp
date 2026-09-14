@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "PCM/AGS",
+				class: "PcmAudio",
+				source: "ArcFormats/AnimeGameSystem/AudioPCM.cs",
+			},
+			localId: "ags-pcm-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "C25",
 				class: "C25Format",
