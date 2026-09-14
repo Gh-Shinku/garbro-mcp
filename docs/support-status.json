@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CLM",
+				"class": "ClmFormat",
+				"source": "ArcFormats/FC01/ImageCLM.cs"
+			},
+			"localId": "fc01-clm-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "HMP",
 				"class": "HmpFormat",
 				"source": "ArcFormats/Interheart/ImageHMP.cs"

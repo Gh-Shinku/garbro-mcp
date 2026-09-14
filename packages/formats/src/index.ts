@@ -678,6 +678,7 @@ import { silkyMfgImageFormat } from "./silky/mfg-image.js";
 import { interheartKgImageFormat } from "./interheart/kg-image.js";
 import { mnoVioletGraImageFormat } from "./mnoviolet/gra-image.js";
 import { interheartHmpImageFormat } from "./interheart/hmp-image.js";
+import { fc01ClmImageFormat } from "./fc01/clm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1691,5 +1692,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		interheartKgImageFormat,
 		mnoVioletGraImageFormat,
 		interheartHmpImageFormat,
+		fc01ClmImageFormat,
 	]);
 }
