@@ -63,7 +63,7 @@ async function extract(stored: Buffer): Promise<Buffer> {
 describe("hdl hot image", () => {
 	it("declares the HOT signature and no extension", () => {
 		expect(hotImageFormat.detection?.signatures).toEqual([
-			{ bytes: Buffer.from("HOT", "latin1") },
+			{ bytes: Buffer.from("HOT\0", "latin1") },
 		]);
 		expect(hotImageFormat.descriptor.extensions).toEqual([]);
 	});
@@ -190,5 +190,11 @@ describe("hdl hot image", () => {
 		);
 		const zero = buildHot({ width: 0, height: 1, tokens });
 		expect(await hotImageFormat.detect(sourceOf(zero), "CG01.HOT")).toBe(false);
+		// The reference's signature is the word 0x00544F48, so the fourth byte has to be a null too.
+		const wrongNull = buildHot({ width: 1, height: 1, tokens });
+		wrongNull[3] = 0x58;
+		expect(await hotImageFormat.detect(sourceOf(wrongNull), "CG01.HOT")).toBe(
+			false,
+		);
 	});
 });

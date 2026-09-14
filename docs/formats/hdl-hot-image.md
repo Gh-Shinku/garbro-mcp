@@ -11,7 +11,7 @@ A fifteen bit image with a run length step, and the same `HOT` signature as the 
 
 | field | offset |
 |---|---|
-| signature `HOT` | 0 |
+| signature `HOT` and a null | 0 |
 | flag byte (bits 0 and 5 must be set) | 7 |
 | width (`u16`) | 0x0C |
 | height (`u16`) | 0x0E |
@@ -41,6 +41,8 @@ are preserved, and each has a test:
 * Detection is the registered `HOT` signature plus the reference's flag bit test, which the format re-checks
   itself: `0x20` alone, `0x01` alone, neither and `0x41` (bit 6 set instead of bit 5) are all declined, while
   `0x31` with the two required bits set is accepted.
+* The signature is the reference's **four byte word** `0x00544F48`, so the marker is `HOT` followed by a null
+  and the port compares all four bytes; a file whose fourth byte differs never reaches the format in GARbro.
 * The entry is named after the source file with a `bmp` extension, covers the whole stored file and keeps
   `sizeKnown: false`; it is marked `compressed`. Metadata carries the dimensions and the fifteen bit depth, and
   the archive metadata names the `hot-rle` step. The reference declares no extensions and the port matches.

@@ -16,8 +16,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** `HOT`, which the archive of the same name shares. */
-const SIGNATURE = Buffer.from([0x48, 0x4f, 0x54]);
+/** `HOT` and a null, which the archive of the same name shares: the reference's word `0x00544F48`. */
+const SIGNATURE = Buffer.from([0x48, 0x4f, 0x54, 0x00]);
 const HEADER_SIZE = 0x20;
 const WIDTH_OFFSET = 0x0c;
 const HEIGHT_OFFSET = 0x0e;
@@ -41,7 +41,8 @@ async function readLayout(source: ByteSource): Promise<HotLayout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
-		if (!header.subarray(0, 3).equals(SIGNATURE)) return undefined;
+		if (!header.subarray(0, SIGNATURE.length).equals(SIGNATURE))
+			return undefined;
 		if (((header[FLAG_OFFSET] ?? 0) & FLAG_MASK) !== FLAG_MASK)
 			return undefined;
 		const width = header.readUInt16LE(WIDTH_OFFSET);
