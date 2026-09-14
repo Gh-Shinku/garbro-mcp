@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ACD",
+				class: "AcdFormat",
+				source: "ArcFormats/FC01/ImageACD.cs",
+			},
+			localId: "fc01-acd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IGF",
 				class: "IgfFormat",
 				source: "ArcFormats/Silky/ImageIGF.cs",
