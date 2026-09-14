@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "NG3",
+				class: "Ng3Format",
+				source: "ArcFormats/Basil/ImageNG3.cs",
+			},
+			localId: "basil-ng3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"24bpp images",
+				"palette",
+				"run tokens",
+				"raw triples",
+				"zero fill",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CBM",
 				class: "CbmFormat",
 				source: "Legacy/KeroQ/ImageCBM.cs",

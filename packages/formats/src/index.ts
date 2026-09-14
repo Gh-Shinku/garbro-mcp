@@ -671,6 +671,7 @@ import { ucomGpcImageFormat } from "./ucom/gpc-image.js";
 import { risaSygImageFormat } from "./risa/syg-image.js";
 import { yaneuraoGtoImageFormat } from "./yaneurao/gto-image.js";
 import { keroqCbmImageFormat } from "./keroq/cbm-image.js";
+import { basilNg3ImageFormat } from "./basil/ng3-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1676,5 +1677,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		risaSygImageFormat,
 		yaneuraoGtoImageFormat,
 		keroqCbmImageFormat,
+		basilNg3ImageFormat,
 	]);
 }
