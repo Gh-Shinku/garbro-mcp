@@ -3,7 +3,8 @@ import { ankhGpdImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
-const SIGNATURE = Buffer.from([0x67, 0x70, 0x64]);
+/** `gpd` and a null: the reference compares a whole little endian word, so the fourth byte counts. */
+const SIGNATURE = Buffer.from([0x67, 0x70, 0x64, 0x00]);
 const LONG_HEADER = 16;
 const BMP_HEADER_SIZE = 54;
 
@@ -80,7 +81,8 @@ describe("ankh gpd image", () => {
 		expect(ankhGpdImageFormat.detection?.signatures).toEqual([
 			{ bytes: SIGNATURE },
 		]);
-		expect(SIGNATURE.toString("latin1")).toBe("gpd");
+		// The reference compares a whole word, so the constant carries the null as well.
+		expect(SIGNATURE.toString("latin1")).toBe("gpd\u0000");
 	});
 
 	it("writes a bottom up 24 bit bitmap past a zero flag", async () => {
@@ -159,6 +161,12 @@ describe("ankh gpd image", () => {
 		expect(await ankhGpdImageFormat.detect(sourceOf(wrong), "CG01.GPD")).toBe(
 			false,
 		);
+		// The fourth byte is part of the word the reference compares, so it has to be a null as well.
+		const trailing = buildGpd();
+		trailing[3] = 0x58;
+		expect(
+			await ankhGpdImageFormat.detect(sourceOf(trailing), "CG01.GPD"),
+		).toBe(false);
 	});
 
 	it("carries the dimensions into the listing", async () => {

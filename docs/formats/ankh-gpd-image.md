@@ -11,7 +11,7 @@ stream starts:
 
 | field | offset |
 |---|---|
-| signature `gpd` | 0 |
+| signature `gpd` and a null | 0 |
 | width (`u32`) | 4 |
 | height (`u32`) | 8 |
 | layout flag (`i32`) | 0xC |
@@ -37,7 +37,11 @@ The port exposes the resource as a single entry:
   `compressed: true` with `sizeKnown: false`;
 * entry metadata carries `type: "image"`, the dimensions and `bitsPerPixel: 24`; the archive metadata records
   `image: "bmp"`, `compression: "lzss"`, the dimensions and the resolved `streamOffset`;
-* the signature `gpd` is registered, and the `.gpd` extension is declared as metadata.
+* the signature `gpd` and a null is registered, and the `.gpd` extension is declared as metadata.
+
+The signature deserves a note. GARbro reads the first four bytes of a file as one little endian word and compares it
+with the format's constant, so a constant of `0x647067` matches only a file whose fourth byte is **zero**. The probe
+here asks for the four bytes for that reason, and a file whose fourth byte is anything else is another format.
 
 Deviations, both tested: zero width or height is declined, where the reference would build an empty image, and a
 file shorter than the header is declined before any read.

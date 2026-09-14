@@ -19,7 +19,8 @@ import {
 } from "../shared/fixed-archive.js";
 
 /** `gpd`. */
-const SIGNATURE = Buffer.from([0x67, 0x70, 0x64]);
+/** `gpd` and a null: the reference compares a whole little endian word, so the fourth byte counts. */
+const SIGNATURE = Buffer.from([0x67, 0x70, 0x64, 0x00]);
 const HEADER_SIZE = 0x10;
 const WIDTH_OFFSET = 4;
 const HEIGHT_OFFSET = 8;
@@ -45,7 +46,7 @@ async function readLayout(source: ByteSource): Promise<GpdLayout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
-		if (!header.subarray(0, 3).equals(SIGNATURE)) return undefined;
+		if (!header.subarray(0, 4).equals(SIGNATURE)) return undefined;
 		const width = header.readUInt32LE(WIDTH_OFFSET);
 		const height = header.readUInt32LE(HEIGHT_OFFSET);
 		// The reference would build an empty image; nothing can be drawn from one.
