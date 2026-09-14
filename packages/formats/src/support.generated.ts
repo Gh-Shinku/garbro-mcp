@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "TIG",
+				class: "TigFormat",
+				source: "ArcFormats/Slg/ImageTIG.cs",
+			},
+			localId: "slg-tig-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PNG/RC4",
 				class: "Rc4PngFormat",
 				source: "ArcFormats/Dogenzaka/ImageRSA.cs",
