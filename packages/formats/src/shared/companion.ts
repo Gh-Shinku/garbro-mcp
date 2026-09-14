@@ -1,7 +1,7 @@
 // Shared helper for GARbro formats that keep their index in a sibling file.
 // GARbro references: VFS.ChangeFileName / Path.ChangeExtension usage in the individual openers.
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 /** Replaces the extension of a file name, mirroring `Path.ChangeExtension`. */
@@ -27,5 +27,36 @@ export async function readCompanionFile(
 		return await readFile(resolve(dirname(sourcePath), fileName));
 	} catch {
 		return undefined;
+	}
+}
+
+/**
+ * The companions a format looks for by pattern rather than by name: GARbro asks its own file system for
+ * `<name without extension>.*` beside the name it carries, so every file that shares a stem is a candidate.
+ * The file the pattern was asked from is left out, the same way the reference skips its own name, and the rest
+ * are returned sorted so the order is deterministic where a file system's own is not. A name that holds a
+ * directory — the references carry those — is resolved against the directory of `sourcePath`.
+ */
+export async function listCompanionFiles(
+	sourcePath: string,
+	nameWithPath: string,
+): Promise<string[]> {
+	const separator = Math.max(
+		nameWithPath.lastIndexOf("/"),
+		nameWithPath.lastIndexOf("\\"),
+	);
+	const directory = separator >= 0 ? nameWithPath.slice(0, separator) : "";
+	const base = changeExtension(nameWithPath.slice(separator + 1), "");
+	if (base.length === 0) return [];
+	try {
+		const directoryPath = resolve(dirname(sourcePath), directory);
+		const self = sourcePath.replace(/^.*[/\\]/, "");
+		const names = await readdir(directoryPath);
+		return names
+			.filter((name) => name !== self && name.startsWith(`${base}.`))
+			.sort()
+			.map((name) => resolve(directoryPath, name));
+	} catch {
+		return [];
 	}
 }

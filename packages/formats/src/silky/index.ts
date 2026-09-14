@@ -9,3 +9,4 @@ export * from "./grd-image.js";
 export * from "./mfg-image.js";
 export * from "./igf-image.js";
 export * from "./zit-image.js";
+export * from "./akb-image.js";
