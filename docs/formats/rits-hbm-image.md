@@ -7,7 +7,7 @@ Implementation: `packages/formats/src/rits/hbm-image.ts` (`hbmImageDescriptor`, 
 
 | field | offset |
 |---|---|
-| marker `HBM` | 0 |
+| marker `HBM` and a null | 0 |
 | width (`u32`) | 4 |
 | height (`u32`) | 8 |
 | flags | 0xC |

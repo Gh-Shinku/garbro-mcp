@@ -17,8 +17,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** `HBM`, three bytes. */
-const SIGNATURE = Buffer.from([0x48, 0x42, 0x4d]);
+/** `HBM` and a null: the reference compares a whole little endian word, so the fourth byte counts. */
+const SIGNATURE = Buffer.from([0x48, 0x42, 0x4d, 0x00]);
 const HEADER_SIZE = 0x10;
 /** The two flag bits of the byte at twelve; every other bit is ignored. */
 const COMPRESSED_BIT = 0x10;
@@ -46,7 +46,7 @@ async function readFields(source: ByteSource): Promise<HbmLayout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
-		if (!header.subarray(0, 3).equals(SIGNATURE)) return undefined;
+		if (!header.subarray(0, 4).equals(SIGNATURE)) return undefined;
 		const flags = header[12] ?? 0;
 		return {
 			width: header.readUInt32LE(4),

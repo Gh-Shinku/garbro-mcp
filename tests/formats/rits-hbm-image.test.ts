@@ -66,9 +66,9 @@ async function extract(file: Buffer, name = "CG_01.hbm"): Promise<Buffer> {
 }
 
 describe("rit's image format", () => {
-	it("declares the three byte marker and no extension", () => {
+	it("declares the marker word and no extension", () => {
 		expect(hbmImageFormat.detection?.signatures).toEqual([
-			{ bytes: Buffer.from([0x48, 0x42, 0x4d]) },
+			{ bytes: Buffer.from([0x48, 0x42, 0x4d, 0x00]) },
 		]);
 		expect(hbmImageFormat.descriptor.extensions).toEqual([]);
 		expect(hbmImageFormat.descriptor.id).toBe("rits-hbm-image");
