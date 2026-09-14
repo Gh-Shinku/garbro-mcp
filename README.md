@@ -84,19 +84,31 @@ written to standard error.
   "mcpServers": {
     "garbro": {
       "command": "node",
-      "args": ["C:/path/to/garbro-mcp/packages/mcp/dist/index.js"]
+      "args": [
+        "C:/path/to/garbro-mcp/packages/mcp/dist/index.js",
+        "--input-root", "games=D:/Games",
+        "--output-root", "D:/garbro-output"
+      ]
     }
   }
 }
 ```
 
-The following tools are available:
+Input files are addressed as `{ "rootId": "games", "path": "title/data.xp3" }`; MCP callers
+cannot pass absolute paths or escape a configured root. If no roots are supplied, the server uses
+`workspace=<current directory>` and writes only below `<current directory>/garbro-output`.
 
-- `detect_archive`
-- `list_entries`
-- `extract_entry`
-- `extract_archive`
+The automation-oriented tools are:
+
+- `get_server_info`
 - `list_formats`
+- `scan_archives`
+- `inspect_archive`
+- `list_entries`
+- `read_entry`
+- `extract_entries`
+
+See [docs/mcp.md](docs/mcp.md) for tool contracts, limits, and migration notes.
 
 MCP tools return structured metadata and local paths only. All bigint values are encoded as decimal
 strings, and large Base64 payloads are never returned.

@@ -1,7 +1,6 @@
-import { createDefaultRegistry } from "@garbro-mcp/formats";
 import { buildServer } from "@garbro-mcp/mcp/server";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
-import { mkdtemp, rm } from "node:fs/promises";
+import { copyFile, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -18,101 +17,161 @@ afterEach(async () => {
 	);
 });
 
-describe("MCP server", () => {
-	it("registers the stable tools and returns structured archive metadata", async () => {
-		const [clientTransport, serverTransport] =
-			InMemoryTransport.createLinkedPair();
-		const server = buildServer();
-		const client = new Client({ name: "garbro-mcp-test", version: "0.0.0" });
-		closers.push(
-			async () => client.close(),
-			async () => server.close(),
-		);
-		await server.connect(serverTransport);
-		await client.connect(clientTransport);
+async function connect() {
+	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
+	const output = await mkdtemp(resolve(tmpdir(), "garbro-mcp-output-"));
+	temporaryDirectories.push(root, output);
+	await copyFile(resolve("fixtures/xp3/basic.xp3"), resolve(root, "basic.xp3"));
+	const [clientTransport, serverTransport] =
+		InMemoryTransport.createLinkedPair();
+	const server = buildServer({
+		inputRoots: { games: root },
+		outputRoot: output,
+	});
+	const client = new Client({ name: "garbro-mcp-test", version: "0.0.0" });
+	closers.push(
+		async () => client.close(),
+		async () => server.close(),
+	);
+	await server.connect(serverTransport);
+	await client.connect(clientTransport);
+	return { client, root, output };
+}
 
+describe("MCP server", () => {
+	it("exposes the automation-oriented tools and support catalog", async () => {
+		const { client, root, output } = await connect();
 		const tools = await client.listTools();
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual(
 			[
-				"detect_archive",
-				"extract_archive",
-				"extract_entry",
-				"list_entries",
+				"get_server_info",
 				"list_formats",
+				"scan_archives",
+				"inspect_archive",
+				"list_entries",
+				"read_entry",
+				"extract_entries",
 			].sort(),
 		);
 
-		const result = await client.callTool({
-			name: "list_entries",
-			arguments: { archivePath: resolve("fixtures/xp3/basic.xp3"), limit: 2 },
-		});
-		expect(result.isError).not.toBe(true);
-		expect(result.structuredContent).toMatchObject({
-			total: 3,
-			nextOffset: 2,
-			format: { id: "xp3" },
+		const info = await client.callTool({ name: "get_server_info" });
+		expect(info.structuredContent).toMatchObject({
+			inputRoots: [{ id: "games", path: root }],
+			outputRoot: output,
+			capabilities: { archiveCreation: false },
 		});
 
-		const formats = await client.callTool({ name: "list_formats" });
-		const expectedIds = createDefaultRegistry()
-			.listFormats()
-			.map((format) => format.id);
+		const formats = await client.callTool({
+			name: "list_formats",
+			arguments: { resourceType: "archive", extension: "xp3" },
+		});
 		expect(formats.structuredContent).toMatchObject({
-			formats: expectedIds.map((id) => ({ id })),
+			total: 1,
+			formats: [
+				{
+					id: "xp3",
+					support: {
+						reference: { type: "archive", tag: "XP3" },
+						status: "partial",
+					},
+				},
+			],
+		});
+	});
+
+	it("scans, inspects, filters, and previews by logical path", async () => {
+		const { client } = await connect();
+		const source = { rootId: "games", path: "basic.xp3" };
+
+		const scanned = await client.callTool({
+			name: "scan_archives",
+			arguments: { rootId: "games", path: "." },
+		});
+		expect(scanned.structuredContent).toMatchObject({
+			scanned: 1,
+			archives: [{ source, format: { id: "xp3" } }],
+			complete: true,
 		});
 
-		const detected = await client.callTool({
-			name: "detect_archive",
-			arguments: { archivePath: resolve("fixtures/xp3/basic.xp3") },
+		const inspected = await client.callTool({
+			name: "inspect_archive",
+			arguments: { source },
 		});
-		expect(detected.structuredContent).toMatchObject({
-			detected: true,
+		expect(inspected.structuredContent).toMatchObject({
+			recognized: true,
 			format: { id: "xp3" },
+			summary: { entryCount: 3 },
 		});
 
-		const entryOutput = await mkdtemp(resolve(tmpdir(), "garbro-mcp-entry-"));
-		const archiveOutput = await mkdtemp(
-			resolve(tmpdir(), "garbro-mcp-archive-"),
+		const entries = await client.callTool({
+			name: "list_entries",
+			arguments: { source, includeGlobs: ["**/*.tjs"] },
+		});
+		expect(entries.structuredContent).toMatchObject({
+			archiveTotal: 3,
+			matchedTotal: 1,
+			entries: [{ id: "1", path: "scripts/startup.tjs", size: "26" }],
+		});
+
+		const preview = await client.callTool({
+			name: "read_entry",
+			arguments: { source, entryId: "0", maxBytes: 5 },
+		});
+		expect(preview.structuredContent).toMatchObject({
+			entry: { id: "0" },
+			preview: { kind: "text", bytesRead: 5, truncated: true },
+		});
+	});
+
+	it("batch extracts per item and confines writes", async () => {
+		const { client, output } = await connect();
+		const source = { rootId: "games", path: "basic.xp3" };
+		const progress: number[] = [];
+		const extracted = await client.callTool(
+			{
+				name: "extract_entries",
+				arguments: {
+					source,
+					selection: { mode: "ids", entryIds: ["0", "missing"] },
+				},
+			},
+			{ onprogress: (update) => progress.push(update.progress) },
 		);
-		temporaryDirectories.push(entryOutput, archiveOutput);
-		const extractedEntry = await client.callTool({
-			name: "extract_entry",
-			arguments: {
-				archivePath: resolve("fixtures/xp3/basic.xp3"),
-				entryId: "0",
-				outputDirectory: entryOutput,
-			},
-		});
-		expect(extractedEntry.structuredContent).toMatchObject({
+		expect(extracted.isError).not.toBe(true);
+		expect(extracted.structuredContent).toMatchObject({
+			status: "partial",
+			extracted: 1,
+			failed: 1,
 			bytesWritten: "10",
+			items: [
+				{ entryId: "0", status: "extracted" },
+				{
+					entryId: "missing",
+					status: "failed",
+					error: { code: "ENTRY_NOT_FOUND" },
+				},
+			],
 		});
+		expect(progress).toEqual([1, 2]);
+		expect(
+			await readFile(
+				resolve(output, "games/basic.xp3.extracted/hello.txt"),
+				"utf8",
+			),
+		).toHaveLength(10);
 
-		const extractedArchive = await client.callTool({
-			name: "extract_archive",
+		const unsafe = await client.callTool({
+			name: "inspect_archive",
 			arguments: {
-				archivePath: resolve("fixtures/xp3/basic.xp3"),
-				outputDirectory: archiveOutput,
+				source: {
+					rootId: "games",
+					path: resolve("fixtures/xp3/basic.xp3"),
+				},
 			},
 		});
-		expect(extractedArchive.structuredContent).toMatchObject({
-			extractedEntries: 3,
-			bytesWritten: "42",
-		});
-
-		const unsupported = await client.callTool({
-			name: "extract_entry",
-			arguments: {
-				archivePath: resolve("fixtures/xp3/protected.xp3"),
-				entryId: "0",
-				outputDirectory: entryOutput,
-				overwrite: true,
-			},
-		});
-		expect(unsupported).toMatchObject({
+		expect(unsafe).toMatchObject({
 			isError: true,
-			structuredContent: {
-				error: { code: "UNSUPPORTED_FEATURE" },
-			},
+			structuredContent: { error: { code: "UNSAFE_PATH" } },
 		});
 	});
 });
