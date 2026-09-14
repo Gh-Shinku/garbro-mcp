@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "TIL",
+				class: "TilFormat",
+				source: "ArcFormats/FC01/ImageTIL.cs",
+			},
+			localId: "fc01-til-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "TB1",
 				class: "Tb1Format",
 				source: "ArcFormats/Cyberworks/ImageTB1.cs",
