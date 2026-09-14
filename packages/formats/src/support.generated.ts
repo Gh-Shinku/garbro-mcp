@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "TB1",
+				class: "Tb1Format",
+				source: "ArcFormats/Cyberworks/ImageTB1.cs",
+			},
+			localId: "tinkerbell-tb1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CLM",
 				class: "ClmFormat",
 				source: "ArcFormats/FC01/ImageCLM.cs",
