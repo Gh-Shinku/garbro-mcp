@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "TIM2",
+				class: "Tim2Format",
+				source: "ArcFormats/DigitalWorks/ImageTM2.cs",
+			},
+			localId: "digital-works-tim2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ZIT",
 				class: "ZitFormat",
 				source: "ArcFormats/Silky/ImageZIT.cs",

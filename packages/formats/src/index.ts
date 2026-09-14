@@ -690,6 +690,7 @@ import { slgTicImageFormat } from "./slg/tic-image.js";
 import { silkyIgfImageFormat } from "./silky/igf-image.js";
 import { fc01AcdImageFormat } from "./fc01/acd-image.js";
 import { silkyZitImageFormat } from "./silky/zit-image.js";
+import { digitalWorksTim2ImageFormat } from "./digital-works/tim2-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1715,5 +1716,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		silkyIgfImageFormat,
 		fc01AcdImageFormat,
 		silkyZitImageFormat,
+		digitalWorksTim2ImageFormat,
 	]);
 }
