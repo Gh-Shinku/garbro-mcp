@@ -687,6 +687,7 @@ import { interheartEpfImageFormat } from "./interheart/epf-image.js";
 import { dogenzakaRc4PngImageFormat } from "./dogenzaka/rc4-png-image.js";
 import { slgTigImageFormat } from "./slg/tig-image.js";
 import { slgTicImageFormat } from "./slg/tic-image.js";
+import { silkyIgfImageFormat } from "./silky/igf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1709,5 +1710,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		dogenzakaRc4PngImageFormat,
 		slgTigImageFormat,
 		slgTicImageFormat,
+		silkyIgfImageFormat,
 	]);
 }
