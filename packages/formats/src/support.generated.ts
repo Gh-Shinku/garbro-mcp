@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GT/ApplePie",
+				class: "GtFormat",
+				source: "Legacy/ApplePie/ImageGT.cs",
+			},
+			localId: "applepie-gt-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GP1",
 				class: "Gp1Format",
 				source: "Legacy/Mermaid/ImageGP1.cs",

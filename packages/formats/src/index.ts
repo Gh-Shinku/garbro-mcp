@@ -695,6 +695,7 @@ import { silkyAkbImageFormat } from "./silky/akb-image.js";
 import { fc01PakFormat } from "./fc01/pak-agsi.js";
 import { fc01BdtFormat } from "./fc01/bdt.js";
 import { mermaidGp1ImageFormat } from "./mermaid/gp1-image.js";
+import { applePieGtImageFormat } from "./applepie/gt-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1726,5 +1727,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fc01PakFormat,
 		fc01BdtFormat,
 		mermaidGp1ImageFormat,
+		applePieGtImageFormat,
 	]);
 }
