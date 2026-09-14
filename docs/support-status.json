@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MG1",
+				"class": "MgFormat",
+				"source": "Legacy/Mermaid/ImageMG1.cs"
+			},
+			"localId": "mermaid-mg1-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "WBI",
 				"class": "WbiFormat",
 				"source": "Legacy/Tobe/ImageWBI.cs"
