@@ -708,6 +708,8 @@ import { ai5Gp8ImageFormat } from "./elf/gp8-image.js";
 import { ai5MskImageFormat } from "./elf/gp8-image.js";
 import { ai5G24ImageFormat } from "./elf/g24-image.js";
 import { ai5Msk16ImageFormat } from "./elf/g24-image.js";
+import { ai5HizImageFormat } from "./elf/hiz-image.js";
+import { ai5HipImageFormat } from "./elf/hiz-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1753,5 +1755,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ai5MskImageFormat,
 		ai5G24ImageFormat,
 		ai5Msk16ImageFormat,
+		ai5HizImageFormat,
+		ai5HipImageFormat,
 	]);
 }

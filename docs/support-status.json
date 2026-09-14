@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "HIP",
+				"class": "HipFormat",
+				"source": "ArcFormats/elf/ImageHIZ.cs"
+			},
+			"localId": "ai5-hip-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract", "lzss"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "HIZ",
+				"class": "HizFormat",
+				"source": "ArcFormats/elf/ImageHIZ.cs"
+			},
+			"localId": "ai5-hiz-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract", "lzss"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MSK/G16",
 				"class": "Msk16Format",
 				"source": "ArcFormats/elf/ImageG24.cs"
