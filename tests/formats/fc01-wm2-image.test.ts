@@ -3,7 +3,7 @@ import { wm2ImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
-const SIGNATURE = Buffer.from("2.0", "ascii");
+const SIGNATURE = Buffer.from("2.0\0", "latin1");
 const HEADER_SIZE = 12;
 const TABLE_ROW_SIZE = 16;
 const BMP_HEADER_SIZE = 54;
@@ -65,8 +65,20 @@ describe("fc01 wm2 mask", () => {
 		expect(wm2ImageFormat.detection?.signatures).toEqual([
 			{ bytes: SIGNATURE },
 		]);
-		expect(SIGNATURE.toString("latin1")).toBe("2.0");
+		// The reference's word is 0x00302E32, so the fourth byte has to be a null.
+		expect(SIGNATURE).toEqual(Buffer.from([0x32, 0x2e, 0x30, 0x00]));
 		expect(wm2ImageFormat.descriptor.extensions).toEqual([]);
+	});
+
+	it("declines a fourth byte that is not a null", async () => {
+		const stored = buildWm2({
+			width: 4,
+			height: 1,
+			rows: [null],
+			pool: Buffer.alloc(0),
+		});
+		stored[3] = 0x58;
+		expect(await wm2ImageFormat.detect(sourceOf(stored), "A.WM2")).toBe(false);
 	});
 
 	it("patches the rows from the pool after the table", async () => {

@@ -17,8 +17,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** `2.0`. */
-const SIGNATURE = Buffer.from("2.0", "ascii");
+/** `2.0` and a null: the reference's word `0x00302E32`. */
+const SIGNATURE = Buffer.from("2.0\0", "latin1");
 const HEADER_SIZE = 12;
 const WIDTH_OFFSET = 4;
 const HEIGHT_OFFSET = 8;
@@ -45,7 +45,8 @@ async function readLayout(source: ByteSource): Promise<Wm2Layout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
-		if (!header.subarray(0, 3).equals(SIGNATURE)) return undefined;
+		if (!header.subarray(0, SIGNATURE.length).equals(SIGNATURE))
+			return undefined;
 		const width = header.readUInt32LE(WIDTH_OFFSET);
 		const height = header.readUInt32LE(HEIGHT_OFFSET);
 		if (width === 0 || width > MAX_DIMENSION) return undefined;

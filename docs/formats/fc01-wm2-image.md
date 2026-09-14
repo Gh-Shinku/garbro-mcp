@@ -10,7 +10,7 @@ An eight bit mask whose rows are **patched from a table** rather than stored in 
 
 | field | offset |
 |---|---|
-| signature `2.0` | 0 |
+| signature `2.0` and a null | 0 |
 | width (`u32`), non zero and at most 0x8000 | 4 |
 | height (`u32`), the same limits | 8 |
 | table, sixteen bytes a row | 12 |
@@ -20,6 +20,10 @@ An eight bit mask whose rows are **patched from a table** rather than stored in 
 0x8000; the depth is always eight and the table is not read until extraction, so a file truncated inside the
 table still lists. The port adds one recorded deviation: a pixel count above 256 MiB is declined, where the
 reference would simply try to allocate it.
+
+The reference registers its signature as a **four byte word**, `0x00302E32`: the marker is `2.0` followed by
+a null, and a file whose fourth byte is anything else is never handed to the format. The port compares all
+four bytes for the same reason.
 
 ## The four words
 
