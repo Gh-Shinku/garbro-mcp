@@ -675,6 +675,7 @@ import { basilNg3ImageFormat } from "./basil/ng3-image.js";
 import { nagsNgpImageFormat } from "./nags/ngp-image.js";
 import { tanukiAmapImageFormat } from "./tanuki/amap-image.js";
 import { silkyMfgImageFormat } from "./silky/mfg-image.js";
+import { interheartKgImageFormat } from "./interheart/kg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1684,5 +1685,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		nagsNgpImageFormat,
 		tanukiAmapImageFormat,
 		silkyMfgImageFormat,
+		interheartKgImageFormat,
 	]);
 }
