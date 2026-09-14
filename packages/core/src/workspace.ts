@@ -122,7 +122,7 @@ export class WorkspacePolicy {
 		this.outputRoot = resolve(cwd, options.outputRoot ?? "garbro-output");
 	}
 
-	async prepare(): Promise<void> {
+	async prepare(options: { createOutput?: boolean } = {}): Promise<void> {
 		for (const root of this.inputRoots) {
 			const info = await stat(root.path);
 			if (!info.isDirectory())
@@ -131,7 +131,8 @@ export class WorkspacePolicy {
 					`Input root is not a directory: ${root.path}`,
 				);
 		}
-		await ensureDirectoryTree(this.outputRoot);
+		if (options.createOutput ?? true)
+			await ensureDirectoryTree(this.outputRoot);
 	}
 
 	async resolveInput(

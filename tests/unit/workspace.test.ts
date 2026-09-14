@@ -1,5 +1,12 @@
 import { GarbroError, WorkspacePolicy } from "@garbro-mcp/core";
-import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import {
+	access,
+	mkdir,
+	mkdtemp,
+	rm,
+	symlink,
+	writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -40,6 +47,18 @@ describe("WorkspacePolicy", () => {
 			absolutePath: resolve(directory, "assets/game.xp3"),
 			relativePath: "assets/game.xp3",
 		});
+	});
+
+	it("can validate input roots without creating the output root", async () => {
+		const directory = await temporaryDirectory();
+		const outputRoot = resolve(directory, "not-created");
+		const workspace = new WorkspacePolicy({
+			inputRoots: { games: directory },
+			outputRoot,
+		});
+
+		await workspace.prepare({ createOutput: false });
+		await expect(access(outputRoot)).rejects.toMatchObject({ code: "ENOENT" });
 	});
 
 	it.each(["../outside", "/absolute", "C:\\drive", "folder/../outside"])(
