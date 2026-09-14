@@ -57,11 +57,14 @@ export interface C24ImageLayout {
 export async function readC24ImageLayout(
 	source: ByteSource,
 	bitsPerPixel: number,
+	signature: Buffer,
 ): Promise<C24ImageLayout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
 		if (header.length < HEADER_SIZE) return undefined;
+		if (!header.subarray(0, signature.length).equals(signature))
+			return undefined;
 		// The count is the archive's frame count, which the reference asks to be positive and nothing else.
 		if (header.readInt32LE(COUNT_FIELD) <= 0) return undefined;
 		const offset = header.readUInt32LE(INDEX_OFFSET_FIELD);
@@ -74,7 +77,8 @@ export async function readC24ImageLayout(
 		const width = frame.readUInt32LE(WIDTH_FIELD);
 		const height = frame.readUInt32LE(HEIGHT_FIELD);
 		if (width === 0 || height === 0) return undefined;
-		if (width * height * BYTES_PER_PIXEL > MAX_IMAGE_BYTES) return undefined;
+		const bytesPerPixel = Math.ceil(bitsPerPixel / 8);
+		if (width * height * bytesPerPixel > MAX_IMAGE_BYTES) return undefined;
 		return {
 			width,
 			height,
@@ -217,10 +221,20 @@ export const fosterC24ImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: fosterC24ImageDescriptor,
 	detection: { signatures: [{ bytes: C24_IMAGE_SIGNATURE }] },
 	async detect(source: ByteSource): Promise<boolean> {
-		return (await readC24ImageLayout(source, BITS_PER_PIXEL)) !== undefined;
+		return (
+			(await readC24ImageLayout(
+				source,
+				BITS_PER_PIXEL,
+				C24_IMAGE_SIGNATURE,
+			)) !== undefined
+		);
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const layout = await readC24ImageLayout(source, BITS_PER_PIXEL);
+		const layout = await readC24ImageLayout(
+			source,
+			BITS_PER_PIXEL,
+			C24_IMAGE_SIGNATURE,
+		);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Foster image");
 		const entry: FixedEntry = {
@@ -255,7 +269,11 @@ export const fosterC24ImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		const layout = await readC24ImageLayout(source, BITS_PER_PIXEL);
+		const layout = await readC24ImageLayout(
+			source,
+			BITS_PER_PIXEL,
+			C24_IMAGE_SIGNATURE,
+		);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Foster image");
 		const { width, height, dataOffset } = layout;

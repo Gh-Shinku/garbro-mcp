@@ -699,6 +699,7 @@ import { applePieGtImageFormat } from "./applepie/gt-image.js";
 import { tobeWbiImageFormat } from "./tobe/wbi-image.js";
 import { mermaidMg1ImageFormat } from "./mermaid/mg1-image.js";
 import { fosterC24ImageFormat } from "./foster/c24-image.js";
+import { fosterC25ImageFormat } from "./foster/c25-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1735,5 +1736,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		tobeWbiImageFormat,
 		mermaidMg1ImageFormat,
 		fosterC24ImageFormat,
+		fosterC25ImageFormat,
 	]);
 }

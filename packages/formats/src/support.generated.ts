@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "C25",
+				class: "C25Format",
+				source: "ArcFormats/Foster/ImageC25.cs",
+			},
+			localId: "foster-c25-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "C24",
 				class: "C24Format",
 				source: "ArcFormats/Foster/ImageC24.cs",
