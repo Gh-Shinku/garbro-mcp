@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "NGP",
+				class: "NgpFormat",
+				source: "ArcFormats/Nags/ImageNGP.cs",
+			},
+			localId: "nags-ngp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"8/24/32bpp images",
+				"zlib pixel blocks",
+				"grey images",
+				"metadata",
+			],
+			unsupported: ["image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "NG3",
 				class: "Ng3Format",
 				source: "ArcFormats/Basil/ImageNG3.cs",

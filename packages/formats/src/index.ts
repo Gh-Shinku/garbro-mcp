@@ -672,6 +672,7 @@ import { risaSygImageFormat } from "./risa/syg-image.js";
 import { yaneuraoGtoImageFormat } from "./yaneurao/gto-image.js";
 import { keroqCbmImageFormat } from "./keroq/cbm-image.js";
 import { basilNg3ImageFormat } from "./basil/ng3-image.js";
+import { nagsNgpImageFormat } from "./nags/ngp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1678,5 +1679,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yaneuraoGtoImageFormat,
 		keroqCbmImageFormat,
 		basilNg3ImageFormat,
+		nagsNgpImageFormat,
 	]);
 }
