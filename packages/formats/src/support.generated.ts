@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "AMAP",
+				class: "AmapFormat",
+				source: "ArcFormats/TanukiSoft/ImageAF.cs",
+			},
+			localId: "tanuki-amap-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "NGP",
 				class: "NgpFormat",
 				source: "ArcFormats/Nags/ImageNGP.cs",
