@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GRA/KURUMI",
+				"class": "GraFormat",
+				"source": "Legacy/Kurumi/ImageGRA.cs"
+			},
+			"localId": "kurumi-gra-legacy-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract", "decryption"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PB00",
 				"class": "Pb00Format",
 				"source": "ArcFormats/Mixwill/ImagePB00.cs"
