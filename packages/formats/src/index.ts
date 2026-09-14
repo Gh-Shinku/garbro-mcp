@@ -694,6 +694,7 @@ import { digitalWorksTim2ImageFormat } from "./digital-works/tim2-image.js";
 import { silkyAkbImageFormat } from "./silky/akb-image.js";
 import { fc01PakFormat } from "./fc01/pak-agsi.js";
 import { fc01BdtFormat } from "./fc01/bdt.js";
+import { mermaidGp1ImageFormat } from "./mermaid/gp1-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1024,6 +1025,7 @@ export * from "./adviz/index.js";
 export * from "./nabe/index.js";
 export * from "./risa/index.js";
 export * from "./mnoviolet/index.js";
+export * from "./mermaid/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1723,5 +1725,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		silkyAkbImageFormat,
 		fc01PakFormat,
 		fc01BdtFormat,
+		mermaidGp1ImageFormat,
 	]);
 }

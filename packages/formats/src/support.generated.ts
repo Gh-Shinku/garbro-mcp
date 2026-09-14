@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "GP1",
+				class: "Gp1Format",
+				source: "Legacy/Mermaid/ImageGP1.cs",
+			},
+			localId: "mermaid-gp1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "BDT",
 				class: "BdtOpener",
