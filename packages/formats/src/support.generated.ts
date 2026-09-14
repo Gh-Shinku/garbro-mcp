@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MFG",
+				class: "MfgFormat",
+				source: "ArcFormats/Silky/ImageMFG.cs",
+			},
+			localId: "silky-mfg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "AMAP",
 				class: "AmapFormat",
 				source: "ArcFormats/TanukiSoft/ImageAF.cs",

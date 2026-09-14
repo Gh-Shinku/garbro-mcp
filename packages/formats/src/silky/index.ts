@@ -6,3 +6,4 @@ export * from "./mfg.js";
 export * from "./vsd.js";
 export * from "./ifl.js";
 export * from "./grd-image.js";
+export * from "./mfg-image.js";
