@@ -692,6 +692,7 @@ import { fc01AcdImageFormat } from "./fc01/acd-image.js";
 import { silkyZitImageFormat } from "./silky/zit-image.js";
 import { digitalWorksTim2ImageFormat } from "./digital-works/tim2-image.js";
 import { silkyAkbImageFormat } from "./silky/akb-image.js";
+import { fc01PakFormat } from "./fc01/pak-agsi.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1719,5 +1720,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		silkyZitImageFormat,
 		digitalWorksTim2ImageFormat,
 		silkyAkbImageFormat,
+		fc01PakFormat,
 	]);
 }

@@ -7,3 +7,4 @@ export * from "./wm2-image.js";
 export * from "./clm-image.js";
 export * from "./til-image.js";
 export * from "./acd-image.js";
+export * from "./pak-agsi.js";
