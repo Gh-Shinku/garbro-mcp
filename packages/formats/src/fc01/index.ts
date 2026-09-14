@@ -8,3 +8,5 @@ export * from "./clm-image.js";
 export * from "./til-image.js";
 export * from "./acd-image.js";
 export * from "./pak-agsi.js";
+export * from "./bdt-tables.js";
+export * from "./bdt.js";

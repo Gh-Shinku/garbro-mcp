@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "BDT",
+				class: "BdtOpener",
+				source: "ArcFormats/FC01/ArcBDT.cs",
+			},
+			localId: "fc01-bdt",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "PAK/AGSI",
 				class: "PakOpener",
 				source: "ArcFormats/FC01/ArcPAK.cs",

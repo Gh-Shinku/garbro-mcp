@@ -12,6 +12,7 @@ import {
 	MersenneTwister,
 	MsbBitReader,
 } from "@garbro-mcp/codecs";
+import { createDecipheriv } from "node:crypto";
 import { Readable } from "node:stream";
 import {
 	checkPlacement,
@@ -36,6 +37,10 @@ const INDEX_SEED = 7524;
 const ROTATE_MASK = 7;
 /** A method of three or more, up to five or seven, means the entry is encrypted as well as packed. */
 const ENCRYPTED_METHODS = new Set([3, 4, 5, 7]);
+/** How much of an encrypted entry is unwrapped with its key, and how much of a longer one. */
+const ENCRYPTED_HEAD_SIZE = 1024;
+const ENCRYPTED_HEAD_EXACT_SIZE = 1032;
+const DES_BLOCK_SIZE = 8;
 const STORED_METHODS = new Set([0, 3]);
 const RLE_METHODS = new Set([1, 4]);
 const BIT_STREAM_METHODS = new Set([2, 5]);
@@ -240,6 +245,109 @@ export function decodeLzBitStream(
 	return Buffer.from(output.subarray(0, destination));
 }
 
+/**
+ * GARbro `PakOpener.OpenEncryptedEntry`. A thousand and twenty four bytes of an entry are unwrapped with the
+ * key its game's own table supplies, or a thousand and thirty two of a longer one; whatever follows the head
+ * of a longer entry is left as it stands. The last four bytes of the unwrapped head say how many of its bytes
+ * belong to the entry, except for the one name the reference treats specially, where that count is the entry's
+ * own unpacked size.
+ *
+ * The unwrapped head is read with the cipher's own padding of zeroes, which carries a last part block over, so
+ * a head whose length is not a whole number of blocks is completed with zeroes of its own first.
+ */
+function decryptEntryHead(
+	body: Buffer,
+	unpackedSize: number,
+	special: boolean,
+	key: Uint8Array,
+): Buffer {
+	const headSize =
+		body.length > ENCRYPTED_HEAD_SIZE ? ENCRYPTED_HEAD_EXACT_SIZE : body.length;
+	const padded: Buffer = Buffer.alloc(
+		Math.ceil(headSize / DES_BLOCK_SIZE) * DES_BLOCK_SIZE,
+		0x00,
+	);
+	body.copy(padded, 0, 0, Math.min(body.length, headSize, padded.length));
+	// The reference asks for plain DES in electronic code book mode, which OpenSSL 3 keeps out of its default
+	// provider. Running the same key through the three key slots of triple DES is the same cipher: the middle
+	// step unwraps exactly what the first one wrapped.
+	const cipher = createDecipheriv(
+		"des-ede3",
+		Buffer.concat([Buffer.from(key), Buffer.from(key), Buffer.from(key)]),
+		null,
+	);
+	cipher.setAutoPadding(false);
+	const unwrapped = Buffer.concat([cipher.update(padded), cipher.final()]);
+	const head: Buffer = Buffer.alloc(headSize, 0x00);
+	unwrapped.copy(head, 0, 0, Math.min(unwrapped.length, headSize));
+	const headerSize = special ? unpackedSize : head.readInt32LE(headSize - 4);
+	if (!special && headerSize > unpackedSize) {
+		throw new GarbroError("INVALID_ARCHIVE", "Invalid AGSI encryption scheme");
+	}
+	if (headerSize < 0 || headerSize > headSize) {
+		throw new GarbroError("INVALID_ARCHIVE", "Invalid AGSI entry length");
+	}
+	if (!special && body.length > headSize) {
+		// The rest of a longer entry is carried as it stands, behind the unwrapped head.
+		return Buffer.concat([
+			head.subarray(0, headerSize),
+			body.subarray(headSize),
+		]);
+	}
+	return Buffer.from(head.subarray(0, headerSize));
+}
+
+/**
+ * The bytes of one entry before its packing method is applied: as they stand, or unwrapped with the key the
+ * caller supplies. The reference reads a non-encrypted entry plainly even when its archive has a key.
+ */
+export async function readAgsiEntryPayload(
+	source: ByteSource,
+	entry: FixedEntry,
+	key?: Uint8Array,
+): Promise<Buffer> {
+	const body = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.size)),
+	);
+	const method = Number(entry.metadata?.method ?? 0);
+	if (key === undefined || !ENCRYPTED_METHODS.has(method)) return body;
+	return decryptEntryHead(
+		body,
+		Number(entry.metadata?.unpackedSize ?? 0),
+		entry.metadata?.special === true,
+		key,
+	);
+}
+
+/**
+ * GARbro `PakOpener.OpenEntry`'s own switch: which of the packing methods turns an entry's bytes into what it
+ * holds. The reference's run length decompressor is the one method it never implemented.
+ */
+export function decodeAgsiMethod(
+	payload: Buffer,
+	method: number,
+	unpackedSize: number,
+): Buffer {
+	if (STORED_METHODS.has(method)) return payload;
+	if (RLE_METHODS.has(method)) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			"the reference does not implement the AGSI run length decoder",
+		);
+	}
+	if (BIT_STREAM_METHODS.has(method)) {
+		return decodeLzBitStream(payload, unpackedSize);
+	}
+	if (LZSS_METHODS.has(method)) {
+		// The reference hands the whole body to its own LZSS stream and reads it to the end.
+		return inflateLzssAll(payload);
+	}
+	throw new GarbroError(
+		"INVALID_ARCHIVE",
+		`Unknown AGSI packing method ${method}`,
+	);
+}
+
 export const fc01PakDescriptor: FormatDescriptor = {
 	id: "fc01-pak-agsi",
 	name: "AGSI engine resource archive",
@@ -286,29 +394,14 @@ export const fc01PakFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource, entry: FixedEntry) {
-		const method = Number(entry.metadata?.method ?? 0);
-		const unpackedSize = Number(entry.metadata?.unpackedSize ?? 0);
-		const body = Buffer.from(
-			await source.readAt(entry.offset, Number(entry.size)),
-		);
-		if (STORED_METHODS.has(method)) return Readable.from([body]);
-		if (RLE_METHODS.has(method)) {
-			// The reference's own `RleDecompressor.Unpack` throws `NotImplementedException`.
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"the reference does not implement the AGSI run length decoder",
-			);
-		}
-		if (BIT_STREAM_METHODS.has(method)) {
-			return Readable.from([decodeLzBitStream(body, unpackedSize)]);
-		}
-		if (LZSS_METHODS.has(method)) {
-			// The reference hands the whole body to its own LZSS stream and reads it to the end.
-			return Readable.from([inflateLzssAll(body)]);
-		}
-		throw new GarbroError(
-			"INVALID_ARCHIVE",
-			`Unknown AGSI packing method ${method}`,
-		);
+		// The port declines every archive whose entries would need a key, so none reaches this point.
+		const payload = await readAgsiEntryPayload(source, entry);
+		return Readable.from([
+			decodeAgsiMethod(
+				payload,
+				Number(entry.metadata?.method ?? 0),
+				Number(entry.metadata?.unpackedSize ?? 0),
+			),
+		]);
 	},
 });
