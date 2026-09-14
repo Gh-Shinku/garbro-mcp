@@ -279,3 +279,49 @@ export function writeBmp8(
 		...rows,
 	]);
 }
+
+/**
+ * Wraps one bit pixels in a two colour bitmap. The palette is two blue, green, red, unused entries, the
+ * same verbatim order `writeBmp8Palette` takes, and the rows are bit packed and padded to four bytes.
+ */
+export function writeBmp1(
+	width: number,
+	height: number,
+	pixels: Buffer,
+	palette: Buffer,
+	bottomUp = false,
+): Buffer {
+	const sourceStride = (width + 7) >> 3;
+	const stride = (sourceStride + 3) & ~3;
+	const imageSize = stride * height;
+	const paletteEntries = 2;
+	const paletteSize = paletteEntries * 4;
+	const dataOffset = BMP_HEADER_SIZE + paletteSize;
+	const entries: Buffer = Buffer.alloc(paletteSize, 0x00);
+	for (let i = 0; i < paletteEntries; i += 1) {
+		const source = i * 4;
+		if (source + 3 >= palette.length) break;
+		entries[i * 4] = palette[source] ?? 0;
+		entries[i * 4 + 1] = palette[source + 1] ?? 0;
+		entries[i * 4 + 2] = palette[source + 2] ?? 0;
+	}
+	const rows: Buffer[] = [];
+	for (let row = 0; row < height; row += 1) {
+		const line: Buffer = Buffer.alloc(stride, 0x00);
+		pixels.copy(line, 0, row * sourceStride, row * sourceStride + sourceStride);
+		rows.push(line);
+	}
+	return Buffer.concat([
+		writeHeader(
+			width,
+			height,
+			1,
+			dataOffset,
+			imageSize,
+			paletteEntries,
+			bottomUp,
+		),
+		entries,
+		Buffer.concat(rows),
+	]);
+}

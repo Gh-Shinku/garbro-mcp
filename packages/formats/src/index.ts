@@ -683,6 +683,7 @@ import { tinkerbellTb1ImageFormat } from "./tinkerbell/tb1-image.js";
 import { fc01TilImageFormat } from "./fc01/til-image.js";
 import { digitalWorksTxImageFormat } from "./digital-works/tx-image.js";
 import { interheartBmpRleImageFormat } from "./interheart/bmp-rle-image.js";
+import { interheartEpfImageFormat } from "./interheart/epf-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1701,5 +1702,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fc01TilImageFormat,
 		digitalWorksTxImageFormat,
 		interheartBmpRleImageFormat,
+		interheartEpfImageFormat,
 	]);
 }
