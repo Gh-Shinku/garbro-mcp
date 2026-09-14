@@ -8,7 +8,7 @@ Implementation: `packages/formats/src/leaf/lgf-image.ts` (`lgfImageDescriptor`, 
 
 | field | offset |
 |---|---|
-| `lff` | 0 |
+| `lfg` plus one of `0x18`, `0x20`, `0x09` | 0 |
 | depth | 3 |
 | width (`u16`) | 4 |
 | height (`u16`) | 6 |

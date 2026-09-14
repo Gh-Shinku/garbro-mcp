@@ -17,8 +17,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** The first three bytes, `lff`, which every signature starts with. */
-const SIGNATURE = Buffer.from("lff", "latin1");
+/** The three characters every signature starts with: the reference's constants read back as `lfg`. */
+const SIGNATURE = Buffer.from("lfg", "latin1");
 /**
  * The fourth byte is the depth, and the reference declares exactly three signatures because of it:
  * `0x1866676C`, `0x2066676C` and `0x0966676C`, i.e. fourth bytes 0x18, 0x20 and 0x09.

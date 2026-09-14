@@ -3,7 +3,7 @@ import { lgfImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
-const SIGNATURE = Buffer.from("lff", "latin1");
+const SIGNATURE = Buffer.from("lfg", "latin1");
 const HEADER_SIZE = 8;
 const PALETTE_OFFSET = 12;
 const PALETTE_SIZE = 1024;
@@ -71,7 +71,7 @@ describe("leaf lgf image", () => {
 		expect(lgfImageFormat.detection?.signatures).toEqual([
 			{ bytes: SIGNATURE },
 		]);
-		expect(SIGNATURE.toString("latin1")).toBe("lff");
+		expect(SIGNATURE.toString("latin1")).toBe("lfg");
 		expect(lgfImageFormat.descriptor.extensions).toEqual([]);
 	});
 
