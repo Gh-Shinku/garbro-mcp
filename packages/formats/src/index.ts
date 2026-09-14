@@ -701,6 +701,7 @@ import { mermaidMg1ImageFormat } from "./mermaid/mg1-image.js";
 import { fosterC24ImageFormat } from "./foster/c24-image.js";
 import { fosterC25ImageFormat } from "./foster/c25-image.js";
 import { agsPcmAudioFormat } from "./anime-game-system/pcm-audio.js";
+import { mixwillPb00ImageFormat } from "./mixwill/pb00-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1739,5 +1740,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		fosterC24ImageFormat,
 		fosterC25ImageFormat,
 		agsPcmAudioFormat,
+		mixwillPb00ImageFormat,
 	]);
 }

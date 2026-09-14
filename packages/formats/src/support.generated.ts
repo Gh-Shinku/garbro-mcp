@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "PB00",
+				class: "Pb00Format",
+				source: "ArcFormats/Mixwill/ImagePB00.cs",
+			},
+			localId: "mixwill-pb00-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "PCM/AGS",
 				class: "PcmAudio",
