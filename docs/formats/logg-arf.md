@@ -71,3 +71,11 @@ large; the port reports both cases, and a symbol that is cut off by the end of t
 Synthetic fixtures cover stored entries, a repeated-byte match, the middle and widest count and distance ladders, a
 nameless delimiter record, a wrapped stored size, an insane count, an offset inside the index, an index that overruns
 the first payload, a name that reaches past the archive, and a truncated compressed stream.
+
+## The other archive of the same engine
+
+`Legacy/Logg/ArcMBM.cs` (`MbmOpener`, tag `MBM`) is a second Logg archive, and it is **not** ported: it has no
+index of its own. It recognizes a file by its exact length against three constants, and takes the offsets and
+names of the entries out of one of three per-game file lists — `logg_pl.lst`, `logg_ak.lst` and `logg_th.lst` —
+that GARbro reads from its own data directory rather than from the archive. With those lists absent the reference
+declines every file, and so does this project; the format is deferred until they can be supplied.
