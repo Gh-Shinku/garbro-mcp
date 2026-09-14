@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BMP/RLE",
+				"class": "BmpRleFormat",
+				"source": "ArcFormats/Interheart/ImageBMP.cs"
+			},
+			"localId": "interheart-bmp-rle-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TX",
 				"class": "TxFormat",
 				"source": "ArcFormats/DigitalWorks/ImageTX.cs"
