@@ -703,6 +703,7 @@ import { fosterC25ImageFormat } from "./foster/c25-image.js";
 import { agsPcmAudioFormat } from "./anime-game-system/pcm-audio.js";
 import { mixwillPb00ImageFormat } from "./mixwill/pb00-image.js";
 import { kurumiGraLegacyImageFormat } from "./kurumi/gra-legacy-image.js";
+import { tigermanChrImageFormat } from "./tigerman/chr-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1743,5 +1744,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		agsPcmAudioFormat,
 		mixwillPb00ImageFormat,
 		kurumiGraLegacyImageFormat,
+		tigermanChrImageFormat,
 	]);
 }

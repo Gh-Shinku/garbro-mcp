@@ -23,12 +23,14 @@ import {
 const TYPE_BGR = 0x1803;
 const TYPE_BGRA = 0x2084;
 const TYPE_PALETTE = 0x8803;
-const SIGNATURES: Buffer[] = [TYPE_BGR, TYPE_BGRA, TYPE_PALETTE].map((type) => {
-	const bytes: Buffer = Buffer.alloc(4, 0x00);
-	bytes.write("ZT", 0, "latin1");
-	bytes.writeUInt16LE(type, 2);
-	return bytes;
-});
+export const ZIT_SIGNATURES: Buffer[] = [TYPE_BGR, TYPE_BGRA, TYPE_PALETTE].map(
+	(type) => {
+		const bytes: Buffer = Buffer.alloc(4, 0x00);
+		bytes.write("ZT", 0, "latin1");
+		bytes.writeUInt16LE(type, 2);
+		return bytes;
+	},
+);
 const EXTENSIONS: string[] = [];
 const HEADER_SIZE = 0x10;
 const TYPE_FIELD = 2;
@@ -44,19 +46,22 @@ const PALETTE_KEY_WORD = 0xff00;
 const PALETTE_ENTRY_SIZE = 3;
 const MAX_IMAGE_BYTES = 256 * 1024 * 1024;
 
-interface ZitLayout {
+export interface ZitLayout {
 	width: number;
 	height: number;
 	imageType: number;
 	colors: number;
 }
 
-async function readLayout(source: ByteSource): Promise<ZitLayout | undefined> {
+/** The header of a Silky's image, read the way the reference's metadata reader reads it. */
+export async function readZitImageLayout(
+	source: ByteSource,
+): Promise<ZitLayout | undefined> {
 	if (source.size < BigInt(HEADER_SIZE)) return undefined;
 	try {
 		const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
 		const signature = header.subarray(0, 4);
-		if (!SIGNATURES.some((candidate) => candidate.equals(signature)))
+		if (!ZIT_SIGNATURES.some((candidate) => candidate.equals(signature)))
 			return undefined;
 		const imageType = header.readUInt16LE(TYPE_FIELD);
 		// The reference throws for a type its reader does not know, which its own registration makes unreachable.
@@ -125,13 +130,13 @@ export const silkyZitImageDescriptor: FormatDescriptor = {
 
 export const silkyZitImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: silkyZitImageDescriptor,
-	detection: { signatures: SIGNATURES.map((bytes) => ({ bytes })) },
+	detection: { signatures: ZIT_SIGNATURES.map((bytes) => ({ bytes })) },
 	async detect(source: ByteSource, sourcePath: string): Promise<boolean> {
 		void sourcePath;
-		return (await readLayout(source)) !== undefined;
+		return (await readZitImageLayout(source)) !== undefined;
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const layout = await readLayout(source);
+		const layout = await readZitImageLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Silky's image");
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
@@ -166,79 +171,77 @@ export const silkyZitImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		const layout = await readLayout(source);
+		const layout = await readZitImageLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Silky's image");
 		const file = Buffer.from(await source.readAt(0n, Number(source.size)));
-		const pixels: Buffer = Buffer.alloc(layout.width * layout.height * 4, 0x00);
-		let position = HEADER_SIZE;
-		if (layout.imageType === TYPE_BGR) {
-			// Three bytes a pixel, blue, green and red, with the green colour a key rather than a colour.
-			for (let destination = 0; destination < pixels.length; destination += 4) {
-				if (position + 3 > file.length) {
-					throw new GarbroError(
-						"INVALID_ARCHIVE",
-						"Silky's image is truncated",
-					);
-				}
-				const blue = file[position] ?? 0;
-				const green = file[position + 1] ?? 0;
-				const red = file[position + 2] ?? 0;
-				position += 3;
-				if (blue === KEY_BLUE && green === KEY_GREEN && red === KEY_RED) {
-					writeKeyWord(pixels, destination, BGR_KEY_WORD);
-				} else {
-					writePixel(pixels, destination, blue, green, red, 0xff);
-				}
-			}
-		} else if (layout.imageType === TYPE_BGRA) {
-			// Four bytes a pixel, straight into the bitmap. The reference ignores how much its read returned, so
-			// a body that stops short leaves the pixels it did not reach as they were allocated.
-			file.copy(
-				pixels,
-				0,
-				position,
-				Math.min(file.length, position + pixels.length),
-			);
-		} else {
-			const paletteSize = layout.colors * PALETTE_ENTRY_SIZE;
-			if (position + paletteSize > file.length) {
-				throw new GarbroError(
-					"INVALID_ARCHIVE",
-					"Silky's palette is truncated",
-				);
-			}
-			const palette = file.subarray(position, position + paletteSize);
-			position += paletteSize;
-			for (let destination = 0; destination < pixels.length; destination += 4) {
-				if (position >= file.length) {
-					throw new GarbroError(
-						"INVALID_ARCHIVE",
-						"Silky's image is truncated",
-					);
-				}
-				const index = (file[position] ?? 0) * PALETTE_ENTRY_SIZE;
-				position += 1;
-				if (index + PALETTE_ENTRY_SIZE > palette.length) {
-					throw new GarbroError(
-						"INVALID_ARCHIVE",
-						"Silky's palette index is out of range",
-					);
-				}
-				const blue = palette[index] ?? 0;
-				const green = palette[index + 1] ?? 0;
-				const red = palette[index + 2] ?? 0;
-				if (blue === KEY_BLUE && green === KEY_GREEN && red === KEY_RED) {
-					// The palette kind writes a different word than the three byte kind does.
-					writeKeyWord(pixels, destination, PALETTE_KEY_WORD);
-				} else {
-					writePixel(pixels, destination, blue, green, red, 0xff);
-				}
-			}
-		}
 		// `ImageData.Create` with no flip: the bitmap is top down with tight rows.
-		return Readable.from([
-			writeBmp32(layout.width, layout.height, pixels, false),
-		]);
+		return Readable.from([renderZitImage(file, layout)]);
 	},
 });
+
+/**
+ * The reference's reader, as a picture: whatever the kind of the file, the pixels come out as blue, green, red
+ * and alpha of their own. Exported because a compound image of another format carries one of these images inside
+ * it and reads it with the same reader.
+ */
+export function renderZitImage(file: Buffer, layout: ZitLayout): Buffer {
+	const pixels: Buffer = Buffer.alloc(layout.width * layout.height * 4, 0x00);
+	let position = HEADER_SIZE;
+	if (layout.imageType === TYPE_BGR) {
+		// Three bytes a pixel, blue, green and red, with the green colour a key rather than a colour.
+		for (let destination = 0; destination < pixels.length; destination += 4) {
+			if (position + 3 > file.length) {
+				throw new GarbroError("INVALID_ARCHIVE", "Silky's image is truncated");
+			}
+			const blue = file[position] ?? 0;
+			const green = file[position + 1] ?? 0;
+			const red = file[position + 2] ?? 0;
+			position += 3;
+			if (blue === KEY_BLUE && green === KEY_GREEN && red === KEY_RED) {
+				writeKeyWord(pixels, destination, BGR_KEY_WORD);
+			} else {
+				writePixel(pixels, destination, blue, green, red, 0xff);
+			}
+		}
+	} else if (layout.imageType === TYPE_BGRA) {
+		// Four bytes a pixel, straight into the bitmap. The reference ignores how much its read returned, so
+		// a body that stops short leaves the pixels it did not reach as they were allocated.
+		file.copy(
+			pixels,
+			0,
+			position,
+			Math.min(file.length, position + pixels.length),
+		);
+	} else {
+		const paletteSize = layout.colors * PALETTE_ENTRY_SIZE;
+		if (position + paletteSize > file.length) {
+			throw new GarbroError("INVALID_ARCHIVE", "Silky's palette is truncated");
+		}
+		const palette = file.subarray(position, position + paletteSize);
+		position += paletteSize;
+		for (let destination = 0; destination < pixels.length; destination += 4) {
+			if (position >= file.length) {
+				throw new GarbroError("INVALID_ARCHIVE", "Silky's image is truncated");
+			}
+			const index = (file[position] ?? 0) * PALETTE_ENTRY_SIZE;
+			position += 1;
+			if (index + PALETTE_ENTRY_SIZE > palette.length) {
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					"Silky's palette index is out of range",
+				);
+			}
+			const blue = palette[index] ?? 0;
+			const green = palette[index + 1] ?? 0;
+			const red = palette[index + 2] ?? 0;
+			if (blue === KEY_BLUE && green === KEY_GREEN && red === KEY_RED) {
+				// The palette kind writes a different word than the three byte kind does.
+				writeKeyWord(pixels, destination, PALETTE_KEY_WORD);
+			} else {
+				writePixel(pixels, destination, blue, green, red, 0xff);
+			}
+		}
+	}
+	return writeBmp32(layout.width, layout.height, pixels, false);
+}
