@@ -281,8 +281,9 @@ export function writeBmp8(
 }
 
 /**
- * Wraps one bit pixels in a two colour bitmap. The palette is two blue, green, red, unused entries, the
- * same verbatim order `writeBmp8Palette` takes, and the rows are bit packed and padded to four bytes.
+ * Wraps one bit pixels in a two colour bitmap. The caller's palette holds two entries in the same blue,
+ * green, red order a bitmap stores them; the fourth byte of an entry is left at zero as a bitmap requires.
+ * Rows are bit packed and padded to four bytes.
  */
 export function writeBmp1(
 	width: number,
@@ -324,4 +325,90 @@ export function writeBmp1(
 		entries,
 		Buffer.concat(rows),
 	]);
+}
+
+/** A bitmap read back into the pieces the writers of this module take. */
+export interface BmpImage {
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	/** The colour entries as the file stores them, four bytes each, empty when there is no palette. */
+	palette: Buffer;
+	/** The pixels with the row padding taken out, top down, in the order the matching writer takes them. */
+	pixels: Buffer;
+	/** The colour masks a sixteen bit bitmap declares, which the file always carries for that depth. */
+	masks?: BitmapMasks;
+}
+
+const DIB_HEADER_SIZE = 40;
+const SUPPORTED_DEPTHS = new Set([1, 4, 8, 16, 24, 32]);
+
+/**
+ * Reads a bitmap this module could have written back into its measurements, its palette and its pixels.
+ * Only the two uncompressed layouts are read, `BI_RGB` and `BI_BITFIELDS`: a run length bitmap is not
+ * something the writers here produce, and the ports that meet one carry their own decoder. Returns
+ * nothing for anything the writers could not have written, which is what the ports report as a failure.
+ *
+ * The returned palette is the file's own four byte entries, which is the order `writeBmp8Palette` and
+ * `writeBmp1` take; `writeBmp4` takes three byte triples instead and its callers convert.
+ */
+export function readBmpImage(bmp: Buffer): BmpImage | undefined {
+	if (bmp.length < BMP_HEADER_SIZE) return undefined;
+	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
+	const dataOffset = bmp.readUInt32LE(10);
+	const dibHeaderSize = bmp.readUInt32LE(14);
+	if (dibHeaderSize < DIB_HEADER_SIZE || dataOffset < 14 + dibHeaderSize)
+		return undefined;
+	const width = bmp.readInt32LE(18);
+	const signedHeight = bmp.readInt32LE(22);
+	if (width <= 0 || signedHeight === 0) return undefined;
+	const height = Math.abs(signedHeight);
+	if (bmp.readUInt16LE(26) !== 1) return undefined;
+	const bitsPerPixel = bmp.readUInt16LE(28);
+	if (!SUPPORTED_DEPTHS.has(bitsPerPixel)) return undefined;
+	const compression = bmp.readUInt32LE(30);
+	if (compression !== 0 && compression !== 3) return undefined;
+	if (compression === 3 && bitsPerPixel !== 16 && bitsPerPixel !== 32)
+		return undefined;
+	// A four byte entry to a colour, with the count falling back to the whole palette the depth allows.
+	let palette: Buffer = Buffer.alloc(0);
+	if (bitsPerPixel <= 8) {
+		const declared = bmp.readUInt32LE(46);
+		const colors = 0 === declared ? 1 << bitsPerPixel : declared;
+		if (colors > 1 << bitsPerPixel) return undefined;
+		const paletteOffset = 14 + dibHeaderSize;
+		if (paletteOffset + colors * 4 > bmp.length) return undefined;
+		palette = Buffer.from(
+			bmp.subarray(paletteOffset, paletteOffset + colors * 4),
+		);
+	}
+	let masks: BitmapMasks | undefined;
+	if (3 === compression) {
+		if (BMP_HEADER_SIZE + 12 > bmp.length) return undefined;
+		masks = {
+			red: bmp.readUInt32LE(BMP_HEADER_SIZE),
+			green: bmp.readUInt32LE(BMP_HEADER_SIZE + 4),
+			blue: bmp.readUInt32LE(BMP_HEADER_SIZE + 8),
+		};
+	}
+	const rowBytes = Math.ceil((width * bitsPerPixel) / 8);
+	const stride = (rowBytes + 3) & ~3;
+	const imageSize = stride * height;
+	if (!Number.isSafeInteger(imageSize) || dataOffset + imageSize > bmp.length)
+		return undefined;
+	const pixels: Buffer = Buffer.alloc(rowBytes * height);
+	// A positive height records bottom up rows, which the writers here only produce on request.
+	const bottomUp = signedHeight > 0;
+	for (let row = 0; row < height; row += 1) {
+		const stored = bottomUp ? height - 1 - row : row;
+		bmp.copy(
+			pixels,
+			row * rowBytes,
+			dataOffset + stored * stride,
+			dataOffset + stored * stride + rowBytes,
+		);
+	}
+	const image: BmpImage = { width, height, bitsPerPixel, palette, pixels };
+	if (masks) image.masks = masks;
+	return image;
 }
