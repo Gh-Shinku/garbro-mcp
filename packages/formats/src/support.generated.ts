@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "VRS/DO",
+				class: "DoFormat",
+				source: "ArcFormats/Ikura/ImageVRS.cs",
+			},
+			localId: "ikura-vrs-do-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "B5",
 				class: "B5Format",
 				source: "ArcFormats/CsWare/ImageB5.cs",

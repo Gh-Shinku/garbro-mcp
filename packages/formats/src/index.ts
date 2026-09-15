@@ -762,6 +762,7 @@ import { pandoraXl24ImageFormat } from "./pandora/xl24-image.js";
 import { jamesJmgImageFormat } from "./james/jmg-image.js";
 import { ethornellBgiImageFormat } from "./ethornell/bgi-image.js";
 import { cswareB5ImageFormat } from "./csware/b5-image.js";
+import { ikuraDoImageFormat } from "./ikura/do-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1871,5 +1872,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		jamesJmgImageFormat,
 		ethornellBgiImageFormat,
 		cswareB5ImageFormat,
+		ikuraDoImageFormat,
 	]);
 }
