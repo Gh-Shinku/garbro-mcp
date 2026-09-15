@@ -770,6 +770,7 @@ import { ikuraGgpImageFormat } from "./ikura/ggp-image.js";
 import { ikuraYgpImageFormat } from "./ikura/ygp-image.js";
 import { crowdCwdImageFormat } from "./crowd/cwl-image.js";
 import { crowdCwlImageFormat } from "./crowd/cwl-image.js";
+import { qsoftBpeImageFormat } from "./qsoft/bpe-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1113,6 +1114,7 @@ export * from "./yu-ris/index.js";
 export * from "./saiki/index.js";
 export * from "./james/index.js";
 export * from "./sas5/index.js";
+export * from "./qsoft/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1888,5 +1890,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikuraYgpImageFormat,
 		crowdCwdImageFormat,
 		crowdCwlImageFormat,
+		qsoftBpeImageFormat,
 	]);
 }
