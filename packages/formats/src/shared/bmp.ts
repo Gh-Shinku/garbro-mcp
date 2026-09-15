@@ -341,6 +341,8 @@ export interface BmpImage {
 }
 
 const DIB_HEADER_SIZE = 40;
+/** The older, shorter header, whose measurements are words and whose colours are stored three bytes long. */
+const CORE_HEADER_SIZE = 12;
 const SUPPORTED_DEPTHS = new Set([1, 4, 8, 16, 24, 32]);
 
 /**
@@ -353,34 +355,54 @@ const SUPPORTED_DEPTHS = new Set([1, 4, 8, 16, 24, 32]);
  * `writeBmp1` take; `writeBmp4` takes three byte triples instead and its callers convert.
  */
 export function readBmpImage(bmp: Buffer): BmpImage | undefined {
-	if (bmp.length < BMP_HEADER_SIZE) return undefined;
+	// Two bytes of tag, the two words behind them, then a header whose own length says how long it is: the
+	// older one is short enough that a bitmap carrying it need not reach the fifty four bytes the writers here
+	// produce.
+	if (bmp.length < 18) return undefined;
 	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
 	const dataOffset = bmp.readUInt32LE(10);
 	const dibHeaderSize = bmp.readUInt32LE(14);
-	if (dibHeaderSize < DIB_HEADER_SIZE || dataOffset < 14 + dibHeaderSize)
+	const core = CORE_HEADER_SIZE === dibHeaderSize;
+	if (
+		(!core && dibHeaderSize < DIB_HEADER_SIZE) ||
+		dataOffset < 14 + dibHeaderSize ||
+		bmp.length < 14 + dibHeaderSize
+	) {
 		return undefined;
-	const width = bmp.readInt32LE(18);
-	const signedHeight = bmp.readInt32LE(22);
-	if (width <= 0 || signedHeight === 0) return undefined;
-	const height = Math.abs(signedHeight);
-	if (bmp.readUInt16LE(26) !== 1) return undefined;
-	const bitsPerPixel = bmp.readUInt16LE(28);
+	}
+	// The older header holds its four fields as words, each two bytes earlier than the full header's, and
+	// stores its rows bottom up.
+	const width = core ? bmp.readUInt16LE(18) : bmp.readInt32LE(18);
+	const rows = core ? bmp.readUInt16LE(20) : bmp.readInt32LE(22);
+	if (width <= 0 || rows === 0) return undefined;
+	const height = Math.abs(rows);
+	if ((core ? bmp.readUInt16LE(22) : bmp.readUInt16LE(26)) !== 1)
+		return undefined;
+	const bitsPerPixel = core ? bmp.readUInt16LE(24) : bmp.readUInt16LE(28);
 	if (!SUPPORTED_DEPTHS.has(bitsPerPixel)) return undefined;
-	const compression = bmp.readUInt32LE(30);
+	const compression = core ? 0 : bmp.readUInt32LE(30);
 	if (compression !== 0 && compression !== 3) return undefined;
 	if (compression === 3 && bitsPerPixel !== 16 && bitsPerPixel !== 32)
 		return undefined;
-	// A four byte entry to a colour, with the count falling back to the whole palette the depth allows.
+	// A four byte entry to a colour for the full header and three for the older one, whose count is however
+	// many colours the depth allows.
 	let palette: Buffer = Buffer.alloc(0);
 	if (bitsPerPixel <= 8) {
-		const declared = bmp.readUInt32LE(46);
+		const declared = core ? 0 : bmp.readUInt32LE(46);
 		const colors = 0 === declared ? 1 << bitsPerPixel : declared;
 		if (colors > 1 << bitsPerPixel) return undefined;
+		const entrySize = core ? 3 : 4;
 		const paletteOffset = 14 + dibHeaderSize;
-		if (paletteOffset + colors * 4 > bmp.length) return undefined;
-		palette = Buffer.from(
-			bmp.subarray(paletteOffset, paletteOffset + colors * 4),
-		);
+		if (paletteOffset + colors * entrySize > bmp.length) return undefined;
+		palette = Buffer.alloc(colors * 4);
+		for (let i = 0; i < colors; i += 1) {
+			bmp.copy(
+				palette,
+				i * 4,
+				paletteOffset + i * entrySize,
+				paletteOffset + i * entrySize + entrySize,
+			);
+		}
 	}
 	let masks: BitmapMasks | undefined;
 	if (3 === compression) {
@@ -397,8 +419,9 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 	if (!Number.isSafeInteger(imageSize) || dataOffset + imageSize > bmp.length)
 		return undefined;
 	const pixels: Buffer = Buffer.alloc(rowBytes * height);
-	// A positive height records bottom up rows, which the writers here only produce on request.
-	const bottomUp = signedHeight > 0;
+	// A positive height records bottom up rows, which the writers here only produce on request, and the older
+	// header always stores its rows that way.
+	const bottomUp = core || rows > 0;
 	for (let row = 0; row < height; row += 1) {
 		const stored = bottomUp ? height - 1 - row : row;
 		bmp.copy(

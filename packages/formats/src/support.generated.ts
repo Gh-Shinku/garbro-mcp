@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BMP",
+				class: "BmpFormat",
+				source: "GameRes/ImageBMP.cs",
+			},
+			localId: "gameres-bmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"run length bitmaps",
+				"appended alpha plane",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "NCL",
 				class: "NclFormat",
 				source: "Legacy/Powerd/ImageNCL.cs",

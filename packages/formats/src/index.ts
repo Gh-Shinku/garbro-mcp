@@ -719,6 +719,7 @@ import { discoveryPr1ImageFormat } from "./discovery/pr1-image.js";
 import { discoveryAn1ImageFormat } from "./discovery/an1-image.js";
 import { uranNclImageFormat } from "./uran/ncl-image.js";
 import { powerdNclImageFormat } from "./powerd/ncl-image.js";
+import { gameresBmpImageFormat } from "./gameres/bmp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1052,6 +1053,7 @@ export * from "./mnoviolet/index.js";
 export * from "./mermaid/index.js";
 export * from "./tobe/index.js";
 export * from "./powerd/index.js";
+export * from "./gameres/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1776,5 +1778,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		discoveryAn1ImageFormat,
 		uranNclImageFormat,
 		powerdNclImageFormat,
+		gameresBmpImageFormat,
 	]);
 }

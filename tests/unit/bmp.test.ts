@@ -230,3 +230,81 @@ describe("bitmap expansion", () => {
 		);
 	});
 });
+
+describe("bitmap reader with the older header", () => {
+	/**
+	 * A bitmap with the twelve byte header: words to a measurement and three bytes to a colour. The colour map
+	 * is padded out to the number of colours the depth allows, which is what such a header implies.
+	 */
+	function coreHeaderBmp(
+		width: number,
+		height: number,
+		bitsPerPixel: number,
+		palette: number[],
+		pixels: number[],
+		pad = true,
+	): Buffer {
+		const colors = 1 << bitsPerPixel;
+		const entries: Buffer = pad
+			? Buffer.from([
+					...palette,
+					...new Array(Math.max(0, colors * 3 - palette.length)).fill(0),
+				])
+			: Buffer.from(palette);
+		const rowBytes = Math.ceil((width * bitsPerPixel) / 8);
+		const stride = (rowBytes + 3) & ~3;
+		const header: Buffer = Buffer.alloc(14 + 12, 0x00);
+		header.write("BM", 0, "latin1");
+		header.writeUInt32LE(header.length + entries.length + stride * height, 2);
+		header.writeUInt32LE(header.length + entries.length, 10);
+		header.writeUInt32LE(12, 14);
+		header.writeUInt16LE(width, 18);
+		header.writeUInt16LE(height, 20);
+		header.writeUInt16LE(1, 22);
+		header.writeUInt16LE(bitsPerPixel, 24);
+		const rows: Buffer[] = [];
+		for (let row = 0; row < height; row += 1) {
+			const line: Buffer = Buffer.alloc(stride, 0x00);
+			for (let i = 0; i < rowBytes; i += 1) {
+				line[i] = pixels[row * rowBytes + i] ?? 0;
+			}
+			rows.push(line);
+		}
+		return Buffer.concat([header, entries, ...rows]);
+	}
+
+	it("reads a palette bitmap stored with three byte colours", () => {
+		// Two rows of two pixels, stored bottom up as the older header requires.
+		const bmp = coreHeaderBmp(2, 2, 8, [10, 20, 30, 40, 50, 60], [1, 2, 3, 4]);
+		const image = readBmpImage(bmp);
+		expect(image).toMatchObject({ width: 2, height: 2, bitsPerPixel: 8 });
+		// The rows come back top down and without the padding the file stores them with: what the file stored
+		// last is the first row of the picture.
+		expect(image?.pixels.subarray(0, 4)).toEqual(Buffer.from([3, 4, 1, 2]));
+		expect(image?.palette.subarray(0, 8)).toEqual(
+			Buffer.from([10, 20, 30, 0, 40, 50, 60, 0]),
+		);
+		// The colour map of two hundred and fifty six entries the depth allows is what a full header needs.
+		expect(image?.palette.length).toBe(256 * 4);
+	});
+
+	it("reads one bit pixels stored with the older header", () => {
+		const bmp = coreHeaderBmp(
+			9,
+			1,
+			1,
+			[1, 2, 3, 4, 5, 6],
+			[0b11000000, 0b10000000],
+		);
+		const image = readBmpImage(bmp);
+		expect(image).toMatchObject({ width: 9, height: 1, bitsPerPixel: 1 });
+		expect(image?.pixels.subarray(0, 2)).toEqual(
+			Buffer.from([0b11000000, 0b10000000]),
+		);
+	});
+
+	it("refuses an older header whose colours do not fit", () => {
+		const bmp = coreHeaderBmp(2, 1, 8, [1, 2, 3], [0, 1], false);
+		expect(readBmpImage(bmp)).toBeUndefined();
+	});
+});
