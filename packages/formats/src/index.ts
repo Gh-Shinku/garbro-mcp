@@ -763,6 +763,7 @@ import { jamesJmgImageFormat } from "./james/jmg-image.js";
 import { ethornellBgiImageFormat } from "./ethornell/bgi-image.js";
 import { cswareB5ImageFormat } from "./csware/b5-image.js";
 import { ikuraDoImageFormat } from "./ikura/do-image.js";
+import { sas5IarImageFormat } from "./sas5/iar-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1105,6 +1106,7 @@ export * from "./rina/index.js";
 export * from "./yu-ris/index.js";
 export * from "./saiki/index.js";
 export * from "./james/index.js";
+export * from "./sas5/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1873,5 +1875,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ethornellBgiImageFormat,
 		cswareB5ImageFormat,
 		ikuraDoImageFormat,
+		sas5IarImageFormat,
 	]);
 }
