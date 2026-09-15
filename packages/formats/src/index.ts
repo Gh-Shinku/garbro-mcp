@@ -737,6 +737,7 @@ import { qlieAbmpImageFormat } from "./qlie/abmp-image.js";
 import { minkDatImageFormat } from "./mink/dat-image.js";
 import { leafBjrImageFormat } from "./leaf/bjr-image.js";
 import { vnEngineZawImageFormat } from "./vn-engine/zaw-image.js";
+import { propellerMgrImageFormat } from "./propeller/mgr-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1816,5 +1817,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		minkDatImageFormat,
 		leafBjrImageFormat,
 		vnEngineZawImageFormat,
+		propellerMgrImageFormat,
 	]);
 }

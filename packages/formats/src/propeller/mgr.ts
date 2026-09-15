@@ -33,11 +33,13 @@ const LITERAL_LIMIT = 0x20;
  * bytes, while larger values encode a back reference: the low five bits shifted left by eight plus one
  * give the distance, and the top three bits give the length minus two, with a top value of seven
  * extending the length by one more byte. Zero bytes are never copied and the reference raises an
- * invalid-format error when a reference reaches past the start of the output.
+ * invalid-format error when a reference reaches past the start of the output. With `strict` set, a stream
+ * that stops before the output is full is refused rather than padded with zeroes.
  */
 export function decompressMgrFrame(
 	input: Buffer,
 	unpackedSize: number,
+	strict = false,
 ): Buffer {
 	const output = Buffer.alloc(unpackedSize);
 	let source = 0;
@@ -68,6 +70,15 @@ export function decompressMgrFrame(
 			}
 			destination += count;
 		}
+	}
+	// The callers that unfold a fixed amount — the header of a bitmap, or the whole of one — check that the
+	// stream gave as much as was asked for, which the reference does by comparing the count its own
+	// decompressor returns.
+	if (strict && destination < output.length) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"MGR stream is cut short of its frame",
+		);
 	}
 	return output;
 }
