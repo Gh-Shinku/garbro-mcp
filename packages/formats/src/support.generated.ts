@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "XL24",
+				class: "Xl24Format",
+				source: "ArcFormats/Pandora/ImageXL24.cs",
+			},
+			localId: "pandora-xl24-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMX",
 				class: "BmxFormat",
 				source: "Legacy/Saiki/ImageJPX.cs",

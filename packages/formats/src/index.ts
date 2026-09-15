@@ -758,6 +758,7 @@ import { abogadoPakFormat } from "./abogado/pak.js";
 import { marbleYpImageFormat } from "./marble/yp-image.js";
 import { saikiJpxImageFormat } from "./saiki/obfuscated-image.js";
 import { saikiBmxImageFormat } from "./saiki/obfuscated-image.js";
+import { pandoraXl24ImageFormat } from "./pandora/xl24-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1862,5 +1863,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		marbleYpImageFormat,
 		saikiJpxImageFormat,
 		saikiBmxImageFormat,
+		pandoraXl24ImageFormat,
 	]);
 }
