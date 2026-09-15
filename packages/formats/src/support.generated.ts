@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "TRI",
+				class: "TriFormat",
+				source: "ArcFormats/Triangle/ImageTRI.cs",
+			},
+			localId: "triangle-tri-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMP",
 				class: "BmpFormat",
 				source: "GameRes/ImageBMP.cs",
