@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BET/SZDD",
+				class: "LzBetFormat",
+				source: "Legacy/System21/ImageBET.cs",
+			},
+			localId: "system21-bet-szdd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "BET",
+				class: "BetFormat",
+				source: "Legacy/System21/ImageBET.cs",
+			},
+			localId: "system21-bet-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BM2",
 				class: "Bm2Format",
 				source: "Legacy/Aaru/ImageBM2.cs",
