@@ -730,6 +730,7 @@ import { reallivePdtImageFormat } from "./reallive/pdt-image.js";
 import { eaglsGrImageFormat } from "./eagls/gr-image.js";
 import { zoneBmImageFormat } from "./zone/bm-image.js";
 import { scoopScpImageFormat } from "./scoop/scp-image.js";
+import { hypatiaLsgImageFormat } from "./hypatia/lsg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1801,5 +1802,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		eaglsGrImageFormat,
 		zoneBmImageFormat,
 		scoopScpImageFormat,
+		hypatiaLsgImageFormat,
 	]);
 }
