@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "ADP/HYPATIA",
+				class: "AdpAudio",
+				source: "ArcFormats/Hypatia/AudioADP.cs",
+			},
+			localId: "hypatia-adp-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WV3",
 				class: "Wv3Audio",
 				source: "Legacy/Eve/AudioWV.cs",
