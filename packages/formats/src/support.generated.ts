@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ZAW",
+				class: "ZawFormat",
+				source: "ArcFormats/VnEngine/ImageZAW.cs",
+			},
+			localId: "vn-engine-zaw-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BJR",
 				class: "BjrFormat",
 				source: "ArcFormats/Leaf/ImageBJR.cs",
