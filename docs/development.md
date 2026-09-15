@@ -72,6 +72,7 @@ recorded here with the reason, so that a later pass does not have to read them a
 | `LPC` | `ArcFormats/Hypatia/ArcLPC.cs` | unimplementable from the reference, which is itself incomplete upstream. |
 | `ACV` | `ArcFormats/NonColor/ArcACV.cs` | needs a scheme of unencrypted file names the user has to supply. |
 | `DAT/MINATO` | `ArcFormats/NonColor/ArcMinato.cs` | needs the same kind of scheme, with CRC-32 names. |
+| `PAK/MORNING` | `ArcFormats/Morning/ArcPAK.cs` | the index is encrypted with a key the user has to supply; the reference's own scheme holds none. |
 | `OGG/TINK` | `ArcFormats/Cyberworks/AudioTINK.cs` | needs keys the user has to supply. |
 | `RPGMVO`, `RPGMVP` | `Experimental/RPGMaker/AudioRPGMV.cs` | needs a key the user has to supply. |
 | `DSM/UNITY` | `ArcFormats/Unity/ArcDSM.cs` | encrypted with Rijndael and a password the user has to supply. |
