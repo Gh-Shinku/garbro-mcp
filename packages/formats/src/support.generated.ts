@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BM2",
+				class: "Bm2Format",
+				source: "Legacy/Aaru/ImageBM2.cs",
+			},
+			localId: "aaru-bm2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "UTAGE",
 				class: "UtageFormat",
 				source: "ArcFormats/Unity/Utage/ImageUTAGE.cs",

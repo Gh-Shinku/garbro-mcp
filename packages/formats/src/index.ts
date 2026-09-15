@@ -743,6 +743,7 @@ import { gsxK2ImageFormat } from "./gsx/k2-image.js";
 import { projectMyuGamImageFormat } from "./project-myu/gam-image.js";
 import { keroqKgd1ImageFormat } from "./keroq/kgd1-image.js";
 import { utageImageFormat } from "./unity/utage-image.js";
+import { aaruBm2ImageFormat } from "./aaru/bm2-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1829,5 +1830,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		projectMyuGamImageFormat,
 		keroqKgd1ImageFormat,
 		utageImageFormat,
+		aaruBm2ImageFormat,
 	]);
 }
