@@ -714,6 +714,7 @@ import { seraphimCfImageFormat } from "./seraphim/seraph-image.js";
 import { seraphimCtImageFormat } from "./seraphim/seraph-image.js";
 import { seraphimCbImageFormat } from "./seraphim/seraph-image.js";
 import { seraphimCxImageFormat } from "./seraphim/seraph-image.js";
+import { amaterasuGrpImageFormat } from "./amaterasu/grp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1765,5 +1766,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		seraphimCtImageFormat,
 		seraphimCbImageFormat,
 		seraphimCxImageFormat,
+		amaterasuGrpImageFormat,
 	]);
 }

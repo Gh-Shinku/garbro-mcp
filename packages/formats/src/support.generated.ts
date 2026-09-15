@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GRP",
+				class: "GrpFormat",
+				source: "ArcFormats/Amaterasu/ImageGRP.cs",
+			},
+			localId: "amaterasu-grp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CX",
 				class: "SeraphCxImage",
 				source: "ArcFormats/Seraphim/ImageSeraph.cs",
