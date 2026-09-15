@@ -771,6 +771,7 @@ import { ikuraYgpImageFormat } from "./ikura/ygp-image.js";
 import { crowdCwdImageFormat } from "./crowd/cwl-image.js";
 import { crowdCwlImageFormat } from "./crowd/cwl-image.js";
 import { qsoftBpeImageFormat } from "./qsoft/bpe-image.js";
+import { blueGaleZbmImageFormat } from "./blue-gale/zbm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1891,5 +1892,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		crowdCwdImageFormat,
 		crowdCwlImageFormat,
 		qsoftBpeImageFormat,
+		blueGaleZbmImageFormat,
 	]);
 }

@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "ZBM/BLUEGALE",
+				class: "ZbmFormat",
+				source: "ArcFormats/BlueGale/ImageZBM.cs",
+			},
+			localId: "blue-gale-zbm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BPE",
 				class: "BpeFormat",
 				source: "Legacy/QSoft/ImageBPE.cs",
