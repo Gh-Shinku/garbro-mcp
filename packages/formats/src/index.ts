@@ -733,6 +733,7 @@ import { scoopScpImageFormat } from "./scoop/scp-image.js";
 import { hypatiaLsgImageFormat } from "./hypatia/lsg-image.js";
 import { mermaidPwvAudioFormat } from "./mermaid/pwv-audio.js";
 import { forceDzpImageFormat } from "./force/dzp-image.js";
+import { qlieAbmpImageFormat } from "./qlie/abmp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1069,6 +1070,7 @@ export * from "./powerd/index.js";
 export * from "./gameres/index.js";
 export * from "./melody/index.js";
 export * from "./eagls/index.js";
+export * from "./qlie/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1807,5 +1809,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		hypatiaLsgImageFormat,
 		mermaidPwvAudioFormat,
 		forceDzpImageFormat,
+		qlieAbmpImageFormat,
 	]);
 }
