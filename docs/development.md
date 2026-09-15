@@ -58,3 +58,30 @@ control.
 Format-specific sources, implementation details, and limitations belong under `docs/formats/`.
 The generated GARBro compatibility baseline and status definitions are documented in
 [support.md](support.md).
+
+## Formats that are not ported
+
+Some GARbro formats cannot be reimplemented faithfully, or at all, from the reference sources. They are
+recorded here with the reason, so that a later pass does not have to read them again:
+
+| format | reference | why |
+| --- | --- | --- |
+| `BIN/DXLIB` | `ArcFormats/DxLib/ArcDX8.cs` | dead source: `TryOpen` always returns null, its decryption and decompression are left as `TODO`. The base DXA opener it extends is ported. |
+| `AF2` | `ArcFormats/CsWare/AudioAF2.cs` | dead source, noted in `docs/formats/csware-wav-audio.md` as well. |
+| `MCP` | `Legacy/Mink/ImageMCP.cs` | the reference source is incomplete. |
+| `LPC` | `ArcFormats/Hypatia/ArcLPC.cs` | unimplementable from the reference, which is itself incomplete upstream. |
+| `ACV` | `ArcFormats/NonColor/ArcACV.cs` | needs a scheme of unencrypted file names the user has to supply. |
+| `DAT/MINATO` | `ArcFormats/NonColor/ArcMinato.cs` | needs the same kind of scheme, with CRC-32 names. |
+| `OGG/TINK` | `ArcFormats/Cyberworks/AudioTINK.cs` | needs keys the user has to supply. |
+| `RPGMVO`, `RPGMVP` | `Experimental/RPGMaker/AudioRPGMV.cs` | needs a key the user has to supply. |
+| `DSM/UNITY` | `ArcFormats/Unity/ArcDSM.cs` | encrypted with Rijndael and a password the user has to supply. |
+| `DSM/UTAGE` | `ArcFormats/Unity/ScriptDSM.cs` | the same, with a password of its own. |
+| `BYTES/UNITY` | `ArcFormats/Unity/ArcSpVM.cs` | its index is a .NET `BinaryFormatter` stream, a format of its own that this project does not read. |
+| `MBM` | `Legacy/Logg/ArcMBM.cs` | needs a file list that lives outside the archive. |
+| `S5I` | `ArcFormats/rUGP/ImageS5I.cs` | needs the CRio decompressor. |
+| `SPC` | `ArcFormats/Cri/ImageSPC.cs` | needs the XTX codec. |
+| `PNG/ISM` | `ArcFormats/Ism/ImagePNG.cs` | needs a portable network graphic decoder, which this project does not have. |
+| `JBP` | `ArcFormats/Sviu/ImageJBP.cs` | a lossy transform codec, parked rather than declined. |
+| `AIFF` | `ArcFormats/AudioAIFF.cs` | delegates to the NAudio library's own reader. |
+| `CAB` | `Experimental/Cabinet/ArcCAB.cs` | delegates to the WiX compression library. |
+| `AI5WIN`, `ARC` | `ArcFormats/Elf/ArcAI5Win.cs` and `ArcARC.cs` | need the user's own scheme database, noted in `docs/formats/elf-ai5dat.md`. |
