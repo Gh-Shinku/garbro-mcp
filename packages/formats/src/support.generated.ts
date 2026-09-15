@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "MP3",
+				class: "Mp3Audio",
+				source: "ArcFormats/AudioMP3.cs",
+			},
+			localId: "gameres-mp3-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "JPEG",
 				class: "JpegFormat",
