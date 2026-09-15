@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CWL",
+				"class": "CwlFormat",
+				"source": "ArcFormats/Crowd/ImageCWL.cs"
+			},
+			"localId": "crowd-cwl-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "CWD",
+				"class": "CwdFormat",
+				"source": "ArcFormats/Crowd/ImageCWL.cs"
+			},
+			"localId": "crowd-cwd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "YGP",
 				"class": "YgpFormat",
 				"source": "ArcFormats/Ikura/ImageYGP.cs"

@@ -768,6 +768,8 @@ import { akatomboFbImageFormat } from "./akatombo/fb-image.js";
 import { ikuraGgsImageFormat } from "./ikura/ggs-image.js";
 import { ikuraGgpImageFormat } from "./ikura/ggp-image.js";
 import { ikuraYgpImageFormat } from "./ikura/ygp-image.js";
+import { crowdCwdImageFormat } from "./crowd/cwl-image.js";
+import { crowdCwlImageFormat } from "./crowd/cwl-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1884,5 +1886,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikuraGgsImageFormat,
 		ikuraGgpImageFormat,
 		ikuraYgpImageFormat,
+		crowdCwdImageFormat,
+		crowdCwlImageFormat,
 	]);
 }
