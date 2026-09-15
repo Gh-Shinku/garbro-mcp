@@ -775,6 +775,7 @@ import { blueGaleZbmImageFormat } from "./blue-gale/zbm-image.js";
 import { eveWv3AudioFormat } from "./eve/wv3-audio.js";
 import { hypatiaAdpAudioFormat } from "./hypatia/adp-audio.js";
 import { ivoryMoeImageFormat } from "./ivory/moe-image.js";
+import { ivoryMmdImageFormat } from "./ivory/mmd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1899,5 +1900,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		eveWv3AudioFormat,
 		hypatiaAdpAudioFormat,
 		ivoryMoeImageFormat,
+		ivoryMmdImageFormat,
 	]);
 }
