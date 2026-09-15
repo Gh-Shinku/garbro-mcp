@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "SND",
+				class: "SndAudio",
+				source: "ArcFormats/Macromedia/AudioSND.cs",
+			},
+			localId: "macromedia-snd-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "MP3",
 				class: "Mp3Audio",
 				source: "ArcFormats/AudioMP3.cs",

@@ -748,6 +748,7 @@ import { betImageFormat } from "./system21/bet-image.js";
 import { lzBetImageFormat } from "./system21/bet-image.js";
 import { gameresJpegImageFormat } from "./gameres/jpeg-image.js";
 import { gameresMp3AudioFormat } from "./gameres/mp3-audio.js";
+import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1839,5 +1840,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		lzBetImageFormat,
 		gameresJpegImageFormat,
 		gameresMp3AudioFormat,
+		macromediaSndAudioFormat,
 	]);
 }
