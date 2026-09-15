@@ -11,6 +11,7 @@ import type {
 import { Readable } from "node:stream";
 import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { copyOverlapped } from "../shared/copy.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -129,33 +130,14 @@ function fillBytes(
 	for (let i = 0; i < count; i += 1) writeByte(target, offset + i, value);
 }
 
-/**
- * The reference's `Binary.CopyOverlapped`: a copy that repeats what it has already written when the destination
- * is in front of the source, and a plain move otherwise. Its own bounds are those of a block copy, so a range
- * outside the picture is the exception the reference would raise.
- */
-function copyOverlapped(
+/** The copy the whole-format unpackers lean on, with this format's own failure for a range outside it. */
+function copyInto(
 	data: Buffer,
 	source: number,
 	destination: number,
 	count: number,
 ): void {
-	if (
-		count < 0 ||
-		source < 0 ||
-		destination < 0 ||
-		destination + count > data.length ||
-		source + count > data.length
-	) {
-		throw invalidStream();
-	}
-	if (destination > source) {
-		for (let i = 0; i < count; i += 1) {
-			data[destination + i] = data[source + i] ?? 0;
-		}
-	} else {
-		data.copy(data, destination, source, source + count);
-	}
+	if (!copyOverlapped(data, source, destination, count)) throw invalidStream();
 }
 
 /**
@@ -194,15 +176,15 @@ function unpackRgb(
 					break;
 				case 1:
 					count += 1;
-					copyOverlapped(output, destination - stride, destination, count);
+					copyInto(output, destination - stride, destination, count);
 					break;
 				case 2:
 					count += 1;
-					copyOverlapped(output, destination - 2 * stride, destination, count);
+					copyInto(output, destination - 2 * stride, destination, count);
 					break;
 				default:
 					count += 1;
-					copyOverlapped(output, destination - 4 * stride, destination, count);
+					copyInto(output, destination - 4 * stride, destination, count);
 					break;
 			}
 		} else if (0 === (control & 0x30)) {
@@ -210,7 +192,7 @@ function unpackRgb(
 			let run = pixelSize;
 			if (0 !== (control & 8)) run *= 2;
 			stream.read(output, destination, run);
-			copyOverlapped(output, destination, destination + run, count * run);
+			copyInto(output, destination, destination + run, count * run);
 			count += 1;
 			count *= run;
 		} else if (0 === (control & 0x20)) {
@@ -218,11 +200,11 @@ function unpackRgb(
 			count = stream.readByte() + 1;
 			const source = destination - pixelSize * offset;
 			count = Math.min(count * pixelSize, output.length - destination);
-			copyOverlapped(output, source, destination, count);
+			copyInto(output, source, destination, count);
 		} else {
 			const offset = stream.readByte() + ((control & 0x0f) << 8) + 1;
 			count = stream.readByte() + 1;
-			copyOverlapped(output, destination - offset, destination, count);
+			copyInto(output, destination - offset, destination, count);
 		}
 		if (0 === count) throw invalidOpcode();
 		destination += count;
@@ -268,15 +250,15 @@ function unpackBytes(
 					break;
 				case 1:
 					count += 1;
-					copyOverlapped(output, destination - width, destination, count);
+					copyInto(output, destination - width, destination, count);
 					break;
 				case 2:
 					count += 1;
-					copyOverlapped(output, destination - 2 * width, destination, count);
+					copyInto(output, destination - 2 * width, destination, count);
 					break;
 				default:
 					count += 1;
-					copyOverlapped(output, destination - 4 * width, destination, count);
+					copyInto(output, destination - 4 * width, destination, count);
 					break;
 			}
 		} else if (0 === (control & 0x20)) {
@@ -284,13 +266,13 @@ function unpackBytes(
 			// Two, four, eight or sixteen bytes of pattern, which the opcode repeats.
 			const run = 2 << ((control >> 3) & 3);
 			stream.read(output, destination, run);
-			copyOverlapped(output, destination, destination + run, count * run);
+			copyInto(output, destination, destination + run, count * run);
 			count += 1;
 			count *= run;
 		} else {
 			const offset = stream.readByte() | ((control & 0x0f) << 8);
 			count = stream.readByte() + 1;
-			copyOverlapped(output, destination - 1 - offset, destination, count);
+			copyInto(output, destination - 1 - offset, destination, count);
 		}
 		destination += count;
 	}

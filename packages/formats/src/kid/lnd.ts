@@ -1,16 +1,7 @@
 // Format reference: GARbro "ArcFormats/Kid/ArcDAT.cs", class `LnkOpener` and its helper routines.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-/** Copies `count` bytes from `source` to `destination` inside one buffer, allowing overlap. */
-function copyOverlapped(
-	buffer: Buffer,
-	source: number,
-	destination: number,
-	count: number,
-): void {
-	for (let index = 0; index < count; index += 1)
-		buffer[destination + index] = buffer[source + index] ?? 0;
-}
+import { copyOverlapped } from "../shared/copy.js";
 
 /**
  * `LnkOpener.UnpackLnd`: a byte oriented LZ scheme with a single byte run, a back reference and a
