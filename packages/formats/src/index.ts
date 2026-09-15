@@ -777,6 +777,7 @@ import { hypatiaAdpAudioFormat } from "./hypatia/adp-audio.js";
 import { ivoryMoeImageFormat } from "./ivory/moe-image.js";
 import { ivoryMmdImageFormat } from "./ivory/mmd-image.js";
 import { miscLzsImageFormat } from "./misc/lzs-image.js";
+import { umesoftGrxImageFormat } from "./umesoft/grx-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1903,5 +1904,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ivoryMoeImageFormat,
 		ivoryMmdImageFormat,
 		miscLzsImageFormat,
+		umesoftGrxImageFormat,
 	]);
 }
