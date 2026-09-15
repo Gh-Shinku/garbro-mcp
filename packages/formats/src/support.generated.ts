@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "UTAGE",
+				class: "UtageFormat",
+				source: "ArcFormats/Unity/Utage/ImageUTAGE.cs",
+			},
+			localId: "unity-utage-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image writing",
+				"decoding the picture",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "KGD1",
 				class: "Kgd1Format",
 				source: "Legacy/KeroQ/ImageKGD1.cs",

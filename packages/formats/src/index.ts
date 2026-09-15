@@ -742,6 +742,7 @@ import { gameSystemBgdImageFormat } from "./gamesystem/bgd-image.js";
 import { gsxK2ImageFormat } from "./gsx/k2-image.js";
 import { projectMyuGamImageFormat } from "./project-myu/gam-image.js";
 import { keroqKgd1ImageFormat } from "./keroq/kgd1-image.js";
+import { utageImageFormat } from "./unity/utage-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1079,6 +1080,7 @@ export * from "./gameres/index.js";
 export * from "./melody/index.js";
 export * from "./eagls/index.js";
 export * from "./qlie/index.js";
+export * from "./unity/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1826,5 +1828,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gsxK2ImageFormat,
 		projectMyuGamImageFormat,
 		keroqKgd1ImageFormat,
+		utageImageFormat,
 	]);
 }
