@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MGO",
+				"class": "MgoFormat",
+				"source": "Legacy/Melody/ImageMGO.cs"
+			},
+			"localId": "melody-mgo-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TRI",
 				"class": "TriFormat",
 				"source": "ArcFormats/Triangle/ImageTRI.cs"

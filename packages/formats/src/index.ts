@@ -721,6 +721,7 @@ import { uranNclImageFormat } from "./uran/ncl-image.js";
 import { powerdNclImageFormat } from "./powerd/ncl-image.js";
 import { gameresBmpImageFormat } from "./gameres/bmp-image.js";
 import { triangleTriImageFormat } from "./triangle/tri-image.js";
+import { melodyMgoImageFormat } from "./melody/mgo-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1055,6 +1056,7 @@ export * from "./mermaid/index.js";
 export * from "./tobe/index.js";
 export * from "./powerd/index.js";
 export * from "./gameres/index.js";
+export * from "./melody/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1781,5 +1783,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		powerdNclImageFormat,
 		gameresBmpImageFormat,
 		triangleTriImageFormat,
+		melodyMgoImageFormat,
 	]);
 }
