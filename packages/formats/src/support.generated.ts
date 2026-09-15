@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BM_/ZONE",
+				class: "Bm_Format",
+				source: "Legacy/Zone/ImageBM_.cs",
+			},
+			localId: "zone-bm-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GR",
 				class: "GrFormat",
 				source: "ArcFormats/Eagls/ImageGR.cs",

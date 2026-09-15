@@ -728,6 +728,7 @@ import { riddleGcpImageFormat } from "./riddle/gcp-image.js";
 import { cswareGdtImageFormat } from "./csware/gdt-image.js";
 import { reallivePdtImageFormat } from "./reallive/pdt-image.js";
 import { eaglsGrImageFormat } from "./eagls/gr-image.js";
+import { zoneBmImageFormat } from "./zone/bm-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1797,5 +1798,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cswareGdtImageFormat,
 		reallivePdtImageFormat,
 		eaglsGrImageFormat,
+		zoneBmImageFormat,
 	]);
 }
