@@ -761,6 +761,7 @@ import { saikiBmxImageFormat } from "./saiki/obfuscated-image.js";
 import { pandoraXl24ImageFormat } from "./pandora/xl24-image.js";
 import { jamesJmgImageFormat } from "./james/jmg-image.js";
 import { ethornellBgiImageFormat } from "./ethornell/bgi-image.js";
+import { cswareB5ImageFormat } from "./csware/b5-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1869,5 +1870,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pandoraXl24ImageFormat,
 		jamesJmgImageFormat,
 		ethornellBgiImageFormat,
+		cswareB5ImageFormat,
 	]);
 }
