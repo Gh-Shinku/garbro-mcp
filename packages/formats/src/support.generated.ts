@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GCP",
+				class: "GcpFormat",
+				source: "ArcFormats/RiddleSoft/ImageGCP.cs",
+			},
+			localId: "riddle-gcp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "TGF",
 				class: "TgfFormat",
 				source: "ArcFormats/Tactics/ImageTGF.cs",
