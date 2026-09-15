@@ -5,6 +5,20 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "MOE",
+				"class": "MoeFormat",
+				"source": "ArcFormats/Ivory/ImageMOE.cs"
+			},
+			"localId": "ivory-moe-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "ADP/HYPATIA",
 				"class": "AdpAudio",
