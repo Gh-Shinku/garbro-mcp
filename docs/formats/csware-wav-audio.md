@@ -58,3 +58,10 @@ can wrap to zero.
 The two doubled words are the interesting part of the port: `AverageBytesPerSecond` is doubled as a `uint` and
 `BlockAlign` as a `ushort`, so a fixture with `0x80000000` and `0x8000` in those fields produces zeros in the output
 header, which the tests pin.
+
+## The sibling AF2 audio
+
+`ArcFormats/CsWare/AudioAF2.cs` declares an `Af2Audio` format, `'aFq2'` with the extensions `.af2` and `.pmd`,
+whose `TryOpen` reads a big-endian wave format out of the first thirty two bytes and then **returns nothing at
+all**: the method has no return statement, and the file is not named by any project file in the reference tree, so
+it does not build and no build of GARbro can reach it. The port leaves it alone for that reason.
