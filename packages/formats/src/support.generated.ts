@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "PRS/YP",
+				class: "YpFormat",
+				source: "ArcFormats/Marble/ImageYP.cs",
+			},
+			localId: "marble-yp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "PAK/ABOGADO",
 				class: "PakOpener",
