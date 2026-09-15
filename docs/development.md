@@ -81,6 +81,7 @@ recorded here with the reason, so that a later pass does not have to read them a
 | `S5I` | `ArcFormats/rUGP/ImageS5I.cs` | needs the CRio decompressor. |
 | `SPC` | `ArcFormats/Cri/ImageSPC.cs` | needs the XTX codec. |
 | `PNG/ISM` | `ArcFormats/Ism/ImagePNG.cs` | needs a portable network graphic decoder, which this project does not have. |
+| `DPNG` | `ArcFormats/Qlie/ImageDPNG.cs` | the picture is a wall of packed tiles that has to be composed through a portable network graphic encoder, which this project does not have. |
 | `JBP` | `ArcFormats/Sviu/ImageJBP.cs` | a lossy transform codec, parked rather than declined. |
 | `AIFF` | `ArcFormats/AudioAIFF.cs` | delegates to the NAudio library's own reader. |
 | `CAB` | `Experimental/Cabinet/ArcCAB.cs` | delegates to the WiX compression library. |
