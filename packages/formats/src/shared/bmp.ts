@@ -412,3 +412,39 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 	if (masks) image.masks = masks;
 	return image;
 }
+
+/** The three colour bytes of every palette entry, in the order `writeBmp4` takes them. */
+export function paletteTriples(palette: Buffer): Buffer {
+	const triples: Buffer = Buffer.alloc(Math.floor(palette.length / 4) * 3);
+	for (let i = 0; i * 4 + 3 < palette.length; i += 1) {
+		triples[i * 3] = palette[i * 4 + 2] ?? 0;
+		triples[i * 3 + 1] = palette[i * 4 + 1] ?? 0;
+		triples[i * 3 + 2] = palette[i * 4] ?? 0;
+	}
+	return triples;
+}
+
+/** Writes a bitmap this module read back, keeping the depth it was stored in. */
+export function writeBmpImage(image: BmpImage): Buffer {
+	const { width, height, bitsPerPixel, palette, pixels } = image;
+	switch (bitsPerPixel) {
+		case 1:
+			return writeBmp1(width, height, pixels, palette);
+		case 4:
+			return writeBmp4(width, height, pixels, paletteTriples(palette));
+		case 8:
+			return writeBmp8Palette(width, height, pixels, palette);
+		case 16:
+			return writeBmp16(
+				width,
+				height,
+				pixels,
+				false,
+				image.masks ?? RGB555_MASKS,
+			);
+		case 24:
+			return writeBmp24(width, height, pixels);
+		default:
+			return writeBmp32(width, height, pixels);
+	}
+}

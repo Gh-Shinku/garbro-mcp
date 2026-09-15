@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "NCL/URAN",
+				"class": "NclFormat",
+				"source": "Legacy/Uran/ImageNCL.cs"
+			},
+			"localId": "uran-ncl-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "AN1",
 				"class": "An1Format",
 				"source": "Legacy/Discovery/ImageAN1.cs"

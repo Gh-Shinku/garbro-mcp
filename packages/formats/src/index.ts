@@ -717,6 +717,7 @@ import { seraphimCxImageFormat } from "./seraphim/seraph-image.js";
 import { amaterasuGrpImageFormat } from "./amaterasu/grp-image.js";
 import { discoveryPr1ImageFormat } from "./discovery/pr1-image.js";
 import { discoveryAn1ImageFormat } from "./discovery/an1-image.js";
+import { uranNclImageFormat } from "./uran/ncl-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1771,5 +1772,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		amaterasuGrpImageFormat,
 		discoveryPr1ImageFormat,
 		discoveryAn1ImageFormat,
+		uranNclImageFormat,
 	]);
 }
