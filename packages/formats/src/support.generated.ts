@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "AN1",
+				class: "An1Format",
+				source: "Legacy/Discovery/ImageAN1.cs",
+			},
+			localId: "discovery-an1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PR1",
 				class: "Pr1Format",
 				source: "Legacy/Discovery/ImagePR1.cs",

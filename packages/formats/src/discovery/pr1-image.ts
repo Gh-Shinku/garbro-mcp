@@ -22,7 +22,7 @@ const PALETTE_OFFSET = 0xc;
 const PALETTE_ENTRIES = 16;
 const PALETTE_BYTES = PALETTE_ENTRIES * 3;
 /** Where the compressed stream begins: the header, then the colour map the reference reads with it. */
-const PIXEL_OFFSET = PALETTE_OFFSET + PALETTE_BYTES;
+export const PIXEL_OFFSET = PALETTE_OFFSET + PALETTE_BYTES;
 const PLANE_COUNT = 4;
 /** Four windows of two hundred and fifty six groups of four bytes, and the room an append needs. */
 const WINDOW_SIZE = 0x410;
@@ -75,7 +75,7 @@ class PrStream {
 }
 
 /** The colour map, sixteen colours of three bytes in the order green, red, blue, each scaled by seventeen. */
-function readPrPalette(stored: Buffer): Buffer {
+export function readPrPalette(stored: Buffer): Buffer {
 	const palette: Buffer = Buffer.alloc(PALETTE_ENTRIES * 3, 0x00);
 	for (let i = 0; i < PALETTE_ENTRIES; i += 1) {
 		const source = PALETTE_OFFSET + i * 3;
@@ -282,6 +282,14 @@ export function flattenPrPlanes(
 ): void {
 	let destination = 0;
 	for (let source = from; source < planeSize; source += 1) {
+		if (source >= (planes[0]?.length ?? 0)) {
+			// The animation resource asks for more frames than its planes hold, which the reference's own
+			// flattening walks past the end of an array for.
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"Discovery image flattening reaches past a plane",
+			);
+		}
 		const b0 = planes[0]?.[source] ?? 0;
 		const b1 = planes[1]?.[source] ?? 0;
 		const b2 = planes[2]?.[source] ?? 0;
