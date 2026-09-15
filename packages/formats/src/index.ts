@@ -756,6 +756,8 @@ import { shiinaRioChdImageFormat } from "./shiina-rio/chd-image.js";
 import { bellDaCpImageFormat } from "./bellda/cp-image.js";
 import { abogadoPakFormat } from "./abogado/pak.js";
 import { marbleYpImageFormat } from "./marble/yp-image.js";
+import { saikiJpxImageFormat } from "./saiki/obfuscated-image.js";
+import { saikiBmxImageFormat } from "./saiki/obfuscated-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1096,6 +1098,7 @@ export * from "./qlie/index.js";
 export * from "./unity/index.js";
 export * from "./rina/index.js";
 export * from "./yu-ris/index.js";
+export * from "./saiki/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1857,5 +1860,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		bellDaCpImageFormat,
 		abogadoPakFormat,
 		marbleYpImageFormat,
+		saikiJpxImageFormat,
+		saikiBmxImageFormat,
 	]);
 }

@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BMX",
+				class: "BmxFormat",
+				source: "Legacy/Saiki/ImageJPX.cs",
+			},
+			localId: "saiki-bmx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "JPX",
+				class: "JpxFormat",
+				source: "Legacy/Saiki/ImageJPX.cs",
+			},
+			localId: "saiki-jpx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PRS/YP",
 				class: "YpFormat",
 				source: "ArcFormats/Marble/ImageYP.cs",
