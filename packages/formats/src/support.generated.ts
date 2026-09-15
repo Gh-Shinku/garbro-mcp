@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GDT",
+				class: "GdtFormat",
+				source: "Legacy/Pochette/ImageGDT.cs",
+			},
+			localId: "pochette-gdt-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MGO",
 				class: "MgoFormat",
 				source: "Legacy/Melody/ImageMGO.cs",
