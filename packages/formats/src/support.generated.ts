@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WV3",
+				class: "Wv3Audio",
+				source: "Legacy/Eve/AudioWV.cs",
+			},
+			localId: "eve-wv3-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "ZBM/BLUEGALE",
 				class: "ZbmFormat",

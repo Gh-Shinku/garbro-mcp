@@ -772,6 +772,7 @@ import { crowdCwdImageFormat } from "./crowd/cwl-image.js";
 import { crowdCwlImageFormat } from "./crowd/cwl-image.js";
 import { qsoftBpeImageFormat } from "./qsoft/bpe-image.js";
 import { blueGaleZbmImageFormat } from "./blue-gale/zbm-image.js";
+import { eveWv3AudioFormat } from "./eve/wv3-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1893,5 +1894,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		crowdCwlImageFormat,
 		qsoftBpeImageFormat,
 		blueGaleZbmImageFormat,
+		eveWv3AudioFormat,
 	]);
 }
