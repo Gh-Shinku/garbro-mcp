@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CHD",
+				"class": "ChdFormat",
+				"source": "ArcFormats/ShiinaRio/ImageCHD.cs"
+			},
+			"localId": "shiina-rio-chd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "YCG",
 				"class": "YcgFormat",
 				"source": "ArcFormats/YuRis/ImageYCG.cs"

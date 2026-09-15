@@ -752,6 +752,7 @@ import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
 import { rinaRadImageFormat } from "./rina/rad-image.js";
 import { yuRisYcgImageFormat } from "./yu-ris/ycg-image.js";
+import { shiinaRioChdImageFormat } from "./shiina-rio/chd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1849,5 +1850,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		gsPackPicImageFormat,
 		rinaRadImageFormat,
 		yuRisYcgImageFormat,
+		shiinaRioChdImageFormat,
 	]);
 }
