@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GDF/BMP",
+				class: "DatFormat",
+				source: "Legacy/Mink/ImageDAT.cs",
+			},
+			localId: "mink-dat-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "B/ABMP6",
 				class: "AbmpFormat",
 				source: "ArcFormats/Qlie/ImageABMP.cs",

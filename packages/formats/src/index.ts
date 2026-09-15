@@ -734,6 +734,7 @@ import { hypatiaLsgImageFormat } from "./hypatia/lsg-image.js";
 import { mermaidPwvAudioFormat } from "./mermaid/pwv-audio.js";
 import { forceDzpImageFormat } from "./force/dzp-image.js";
 import { qlieAbmpImageFormat } from "./qlie/abmp-image.js";
+import { minkDatImageFormat } from "./mink/dat-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1810,5 +1811,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		mermaidPwvAudioFormat,
 		forceDzpImageFormat,
 		qlieAbmpImageFormat,
+		minkDatImageFormat,
 	]);
 }
