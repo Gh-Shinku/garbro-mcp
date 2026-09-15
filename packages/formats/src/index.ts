@@ -746,6 +746,7 @@ import { utageImageFormat } from "./unity/utage-image.js";
 import { aaruBm2ImageFormat } from "./aaru/bm2-image.js";
 import { betImageFormat } from "./system21/bet-image.js";
 import { lzBetImageFormat } from "./system21/bet-image.js";
+import { gameresJpegImageFormat } from "./gameres/jpeg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1835,5 +1836,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		aaruBm2ImageFormat,
 		betImageFormat,
 		lzBetImageFormat,
+		gameresJpegImageFormat,
 	]);
 }

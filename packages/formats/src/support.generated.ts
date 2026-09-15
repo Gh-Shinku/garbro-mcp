@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "JPEG",
+				class: "JpegFormat",
+				source: "GameRes/ImageJPEG.cs",
+			},
+			localId: "gameres-jpeg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BET/SZDD",
 				class: "LzBetFormat",
 				source: "Legacy/System21/ImageBET.cs",
