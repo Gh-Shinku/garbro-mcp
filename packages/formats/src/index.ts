@@ -738,6 +738,7 @@ import { minkDatImageFormat } from "./mink/dat-image.js";
 import { leafBjrImageFormat } from "./leaf/bjr-image.js";
 import { vnEngineZawImageFormat } from "./vn-engine/zaw-image.js";
 import { propellerMgrImageFormat } from "./propeller/mgr-image.js";
+import { gameSystemBgdImageFormat } from "./gamesystem/bgd-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1818,5 +1819,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafBjrImageFormat,
 		vnEngineZawImageFormat,
 		propellerMgrImageFormat,
+		gameSystemBgdImageFormat,
 	]);
 }
