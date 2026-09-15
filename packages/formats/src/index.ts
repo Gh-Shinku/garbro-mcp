@@ -751,6 +751,7 @@ import { gameresMp3AudioFormat } from "./gameres/mp3-audio.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
 import { rinaRadImageFormat } from "./rina/rad-image.js";
+import { yuRisYcgImageFormat } from "./yu-ris/ycg-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1090,6 +1091,7 @@ export * from "./eagls/index.js";
 export * from "./qlie/index.js";
 export * from "./unity/index.js";
 export * from "./rina/index.js";
+export * from "./yu-ris/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1846,5 +1848,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		macromediaSndAudioFormat,
 		gsPackPicImageFormat,
 		rinaRadImageFormat,
+		yuRisYcgImageFormat,
 	]);
 }
