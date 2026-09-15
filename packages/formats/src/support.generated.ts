@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BMP/CP",
+				class: "CpFormat",
+				source: "ArcFormats/BellDa/ImageCP.cs",
+			},
+			localId: "bell-da-cp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CHD",
 				class: "ChdFormat",
 				source: "ArcFormats/ShiinaRio/ImageCHD.cs",
