@@ -731,6 +731,7 @@ import { eaglsGrImageFormat } from "./eagls/gr-image.js";
 import { zoneBmImageFormat } from "./zone/bm-image.js";
 import { scoopScpImageFormat } from "./scoop/scp-image.js";
 import { hypatiaLsgImageFormat } from "./hypatia/lsg-image.js";
+import { mermaidPwvAudioFormat } from "./mermaid/pwv-audio.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1803,5 +1804,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		zoneBmImageFormat,
 		scoopScpImageFormat,
 		hypatiaLsgImageFormat,
+		mermaidPwvAudioFormat,
 	]);
 }

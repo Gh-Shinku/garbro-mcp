@@ -5,6 +5,20 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "PWV",
+				"class": "PwvAudio",
+				"source": "Legacy/Mermaid/AudioPWV.cs"
+			},
+			"localId": "mermaid-pwv-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "LSG",
 				"class": "LsgFormat",
