@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "SCP",
+				"class": "ScpFormat",
+				"source": "ArcFormats/Scoop/ImageSCP.cs"
+			},
+			"localId": "scoop-scp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BM_/ZONE",
 				"class": "Bm_Format",
 				"source": "Legacy/Zone/ImageBM_.cs"
