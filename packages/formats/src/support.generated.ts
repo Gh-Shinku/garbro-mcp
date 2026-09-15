@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "FB",
+				class: "FbFormat",
+				source: "Legacy/Akatombo/ImageFB.cs",
+			},
+			localId: "akatombo-fb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IAR/IMAGE",
 				class: "IarFormat",
 				source: "ArcFormats/Sas5/ImageIAR.cs",

@@ -764,6 +764,7 @@ import { ethornellBgiImageFormat } from "./ethornell/bgi-image.js";
 import { cswareB5ImageFormat } from "./csware/b5-image.js";
 import { ikuraDoImageFormat } from "./ikura/do-image.js";
 import { sas5IarImageFormat } from "./sas5/iar-image.js";
+import { akatomboFbImageFormat } from "./akatombo/fb-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1876,5 +1877,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		cswareB5ImageFormat,
 		ikuraDoImageFormat,
 		sas5IarImageFormat,
+		akatomboFbImageFormat,
 	]);
 }
