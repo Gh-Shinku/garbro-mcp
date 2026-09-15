@@ -725,6 +725,7 @@ import { melodyMgoImageFormat } from "./melody/mgo-image.js";
 import { pochetteGdtImageFormat } from "./pochette/gdt-image.js";
 import { tacticsTgfImageFormat } from "./tactics/tgf-image.js";
 import { riddleGcpImageFormat } from "./riddle/gcp-image.js";
+import { cswareGdtImageFormat } from "./csware/gdt-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1790,5 +1791,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		pochetteGdtImageFormat,
 		tacticsTgfImageFormat,
 		riddleGcpImageFormat,
+		cswareGdtImageFormat,
 	]);
 }
