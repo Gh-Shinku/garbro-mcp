@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "LZS",
+				class: "LzsFormat",
+				source: "ArcFormats/ImageLZS.cs",
+			},
+			localId: "misc-lzs-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MOE/MMD",
 				class: "MmdFormat",
 				source: "ArcFormats/Ivory/ImageMMD.cs",
