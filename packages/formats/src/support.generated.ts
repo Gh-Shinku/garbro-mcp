@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "archive",
+				tag: "PAK/ABOGADO",
+				class: "PakOpener",
+				source: "ArcFormats/Abogado/ArcPAK.cs",
+			},
+			localId: "abogado-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "compression"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "BMP/CP",
 				class: "CpFormat",

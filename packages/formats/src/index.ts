@@ -754,6 +754,7 @@ import { rinaRadImageFormat } from "./rina/rad-image.js";
 import { yuRisYcgImageFormat } from "./yu-ris/ycg-image.js";
 import { shiinaRioChdImageFormat } from "./shiina-rio/chd-image.js";
 import { bellDaCpImageFormat } from "./bellda/cp-image.js";
+import { abogadoPakFormat } from "./abogado/pak.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1853,5 +1854,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		yuRisYcgImageFormat,
 		shiinaRioChdImageFormat,
 		bellDaCpImageFormat,
+		abogadoPakFormat,
 	]);
 }
