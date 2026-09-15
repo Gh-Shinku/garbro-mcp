@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "KGD1",
+				class: "Kgd1Format",
+				source: "Legacy/KeroQ/ImageKGD1.cs",
+			},
+			localId: "keroq-kgd1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GAM",
 				class: "GamFormat",
 				source: "Legacy/ProjectMyu/ImageGAM.cs",
