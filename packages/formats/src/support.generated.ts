@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "NCL",
+				class: "NclFormat",
+				source: "Legacy/Powerd/ImageNCL.cs",
+			},
+			localId: "powerd-ncl-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "NCL/URAN",
 				class: "NclFormat",
 				source: "Legacy/Uran/ImageNCL.cs",

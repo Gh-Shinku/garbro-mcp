@@ -1,7 +1,9 @@
 import {
+	paletteTriples,
 	readBmpImage,
 	RGB555_MASKS,
 	RGB565_MASKS,
+	toBgra32,
 	writeBmp1,
 	writeBmp4,
 	writeBmp8,
@@ -172,6 +174,59 @@ describe("bitmap reader", () => {
 		wrongSize.writeUInt32LE(0xff, 34);
 		expect(readBmpImage(wrongSize)?.pixels.equals(Buffer.alloc(6, 0x20))).toBe(
 			true,
+		);
+	});
+});
+
+describe("bitmap expansion", () => {
+	it("widens the channels of a sixteen bit bitmap by repeating their high bits", () => {
+		// The widest red a five bit channel holds, which thirty one widened by its own high bits fills out.
+		const red = readBmpImage(
+			writeBmp16(1, 1, Buffer.from([0x00, 0x7c]), false, RGB555_MASKS),
+		);
+		expect(red && toBgra32(red)?.subarray(0, 4)).toEqual(
+			Buffer.from([0x00, 0x00, 0xff, 0x00]),
+		);
+		// Twenty of thirty one is a hundred and sixty five of two hundred and fifty five.
+		const middle = readBmpImage(
+			writeBmp16(1, 1, Buffer.from([0x00, 0x50]), false, RGB555_MASKS),
+		);
+		expect(middle && toBgra32(middle)?.subarray(0, 4)).toEqual(
+			Buffer.from([0x00, 0x00, 0xa5, 0x00]),
+		);
+		// The low five bits are the blue channel, which comes first in the pixels of a bitmap.
+		const blue = readBmpImage(
+			writeBmp16(1, 1, Buffer.from([0x1f, 0x00]), false, RGB555_MASKS),
+		);
+		expect(blue && toBgra32(blue)?.subarray(0, 4)).toEqual(
+			Buffer.from([0xff, 0x00, 0x00, 0x00]),
+		);
+		// The six green bits of the other layout widen the same way.
+		const green = readBmpImage(
+			writeBmp16(1, 1, Buffer.from([0xe0, 0x07]), false, RGB565_MASKS),
+		);
+		expect(green && toBgra32(green)?.subarray(0, 4)).toEqual(
+			Buffer.from([0x00, 0xff, 0x00, 0x00]),
+		);
+	});
+
+	it("takes an indexed bitmap through its colour map", () => {
+		const entries: Buffer = Buffer.alloc(16 * 4);
+		entries[4] = 0x30;
+		entries[5] = 0x20;
+		entries[6] = 0x10;
+		const image = readBmpImage(
+			writeBmp4(2, 1, Buffer.from([0x10]), paletteTriples(entries)),
+		);
+		expect(image && toBgra32(image)?.subarray(0, 4)).toEqual(
+			Buffer.from([0x30, 0x20, 0x10, 0x00]),
+		);
+	});
+
+	it("leaves the fourth byte of a bitmap without alpha alone", () => {
+		const image = readBmpImage(writeBmp24(1, 1, Buffer.from([1, 2, 3])));
+		expect(image && toBgra32(image)?.subarray(0, 4)).toEqual(
+			Buffer.from([1, 2, 3, 0x00]),
 		);
 	});
 });

@@ -718,6 +718,7 @@ import { amaterasuGrpImageFormat } from "./amaterasu/grp-image.js";
 import { discoveryPr1ImageFormat } from "./discovery/pr1-image.js";
 import { discoveryAn1ImageFormat } from "./discovery/an1-image.js";
 import { uranNclImageFormat } from "./uran/ncl-image.js";
+import { powerdNclImageFormat } from "./powerd/ncl-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1050,6 +1051,7 @@ export * from "./risa/index.js";
 export * from "./mnoviolet/index.js";
 export * from "./mermaid/index.js";
 export * from "./tobe/index.js";
+export * from "./powerd/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1773,5 +1775,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		discoveryPr1ImageFormat,
 		discoveryAn1ImageFormat,
 		uranNclImageFormat,
+		powerdNclImageFormat,
 	]);
 }

@@ -448,3 +448,78 @@ export function writeBmpImage(image: BmpImage): Buffer {
 			return writeBmp32(width, height, pixels);
 	}
 }
+
+/**
+ * Expands a bitmap this module read into the thirty two bit blue, green, red, alpha pixels GARbro's own
+ * conversions produce: an indexed bitmap goes through its colour map, and a sixteen bit one has its five or
+ * six bit channels widened by repeating their high bits. The fourth byte of a bitmap that has no alpha
+ * channel is left at zero, which is what `PixelFormats.Bgr32` carries; a caller that goes on to write its own
+ * alpha into it overwrites it either way.
+ */
+export function toBgra32(image: BmpImage): Buffer | undefined {
+	const { width, height, bitsPerPixel, palette, pixels } = image;
+	const count = width * height;
+	const output: Buffer = Buffer.alloc(count * 4);
+	const entry = (index: number, at: number): void => {
+		output[at] = palette[index * 4] ?? 0;
+		output[at + 1] = palette[index * 4 + 1] ?? 0;
+		output[at + 2] = palette[index * 4 + 2] ?? 0;
+	};
+	switch (bitsPerPixel) {
+		case 1:
+		case 4:
+		case 8: {
+			const perByte = 8 / bitsPerPixel;
+			const mask = (1 << bitsPerPixel) - 1;
+			for (let i = 0; i < count; i += 1) {
+				const byte = pixels[Math.floor(i / perByte)] ?? 0;
+				const shift = 8 - bitsPerPixel * ((i % perByte) + 1);
+				entry((byte >> shift) & mask, i * 4);
+			}
+			return output;
+		}
+		case 16: {
+			const masks = image.masks ?? RGB555_MASKS;
+			const red = channel(masks.red);
+			const green = channel(masks.green);
+			const blue = channel(masks.blue);
+			for (let i = 0; i < count; i += 1) {
+				const value = pixels.readUInt16LE(i * 2);
+				output[i * 4] = widen((value & masks.blue) >>> blue.shift, blue.bits);
+				output[i * 4 + 1] = widen(
+					(value & masks.green) >>> green.shift,
+					green.bits,
+				);
+				output[i * 4 + 2] = widen((value & masks.red) >>> red.shift, red.bits);
+			}
+			return output;
+		}
+		case 24:
+			for (let i = 0; i < count; i += 1) {
+				output[i * 4] = pixels[i * 3] ?? 0;
+				output[i * 4 + 1] = pixels[i * 3 + 1] ?? 0;
+				output[i * 4 + 2] = pixels[i * 3 + 2] ?? 0;
+			}
+			return output;
+		case 32:
+			for (let i = 0; i < count; i += 1) {
+				output[i * 4] = pixels[i * 4] ?? 0;
+				output[i * 4 + 1] = pixels[i * 4 + 1] ?? 0;
+				output[i * 4 + 2] = pixels[i * 4 + 2] ?? 0;
+			}
+			return output;
+		default:
+			return undefined;
+	}
+}
+
+/** Where a colour mask starts and how many bits it keeps, so a value can be moved into eight bits. */
+function channel(mask: number): { shift: number; bits: number } {
+	const shift = 31 - Math.clz32(mask & -mask);
+	return { shift, bits: 32 - Math.clz32(mask) - shift };
+}
+
+/** Widens a channel value to eight bits by repeating its high bits, the way the framework's conversions do. */
+function widen(value: number, bits: number): number {
+	return (value << (8 - bits)) | (value >>> (2 * bits - 8));
+}
