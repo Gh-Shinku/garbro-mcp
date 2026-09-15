@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "K2",
+				"class": "K2Format",
+				"source": "Legacy/Gsx/ImageK2.cs"
+			},
+			"localId": "gsx-k2-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BGD",
 				"class": "BgdFormat",
 				"source": "ArcFormats/GameSystem/ImageBGD.cs"
