@@ -75,15 +75,22 @@ export function readBmpMetaData(
 export function readBmpHeaderFields(
 	bmp: Buffer,
 ): { width: number; height: number; bitsPerPixel: number } | undefined {
-	if (bmp.length < BMP_HEADER_SIZE) return undefined;
+	// The older header is short enough that a bitmap carrying it need not reach the fifty four bytes the
+	// writers here produce, and it holds its measurements as words two bytes earlier.
+	if (bmp.length < 18) return undefined;
 	if (bmp.subarray(0, 2).toString("latin1") !== "BM") return undefined;
-	if (bmp.readUInt32LE(14) < 40) return undefined;
-	const width = bmp.readInt32LE(18);
-	const signedHeight = bmp.readInt32LE(22);
-	if (width <= 0 || signedHeight === 0) return undefined;
-	const bitsPerPixel = bmp.readUInt16LE(28);
+	const dibHeaderSize = bmp.readUInt32LE(14);
+	const core = CORE_HEADER_SIZE === dibHeaderSize;
+	if (!core && dibHeaderSize < DIB_HEADER_SIZE) return undefined;
+	if (bmp.length < 14 + dibHeaderSize) return undefined;
+	const width = core ? bmp.readUInt16LE(18) : bmp.readInt32LE(18);
+	const rows = core ? bmp.readUInt16LE(20) : bmp.readInt32LE(22);
+	if (width <= 0 || rows === 0) return undefined;
+	if ((core ? bmp.readUInt16LE(22) : bmp.readUInt16LE(26)) !== 1)
+		return undefined;
+	const bitsPerPixel = core ? bmp.readUInt16LE(24) : bmp.readUInt16LE(28);
 	if (bitsPerPixel === 0) return undefined;
-	return { width, height: Math.abs(signedHeight), bitsPerPixel };
+	return { width, height: Math.abs(rows), bitsPerPixel };
 }
 
 /**

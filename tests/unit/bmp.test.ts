@@ -1,5 +1,6 @@
 import {
 	paletteTriples,
+	readBmpHeaderFields,
 	readBmpImage,
 	RGB555_MASKS,
 	RGB565_MASKS,
@@ -306,5 +307,30 @@ describe("bitmap reader with the older header", () => {
 	it("refuses an older header whose colours do not fit", () => {
 		const bmp = coreHeaderBmp(2, 1, 8, [1, 2, 3], [0, 1], false);
 		expect(readBmpImage(bmp)).toBeUndefined();
+	});
+	it("reads the measurements of the older header", () => {
+		// The same two by one picture, written with the twelve byte header whose fields are words.
+		const bmp = writeBmp24(2, 1, Buffer.from([1, 2, 3, 4, 5, 6]));
+		const core = Buffer.alloc(26, 0);
+		core.write("BM", 0, "latin1");
+		core.writeUInt32LE(core.length, 2);
+		core.writeUInt32LE(26, 10);
+		core.writeUInt32LE(12, 14);
+		core.writeUInt16LE(2, 18);
+		core.writeUInt16LE(1, 20);
+		core.writeUInt16LE(1, 22);
+		core.writeUInt16LE(24, 24);
+		expect(readBmpHeaderFields(core)).toEqual({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+		});
+		// A header of a length between the two, and one that names no plane, are not read.
+		const odd = Buffer.from(core);
+		odd.writeUInt32LE(20, 14);
+		expect(readBmpHeaderFields(odd)).toBeUndefined();
+		const planes = Buffer.from(bmp);
+		planes.writeUInt16LE(0, 26);
+		expect(readBmpHeaderFields(planes)).toBeUndefined();
 	});
 });
