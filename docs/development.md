@@ -84,6 +84,7 @@ recorded here with the reason, so that a later pass does not have to read them a
 | `PNG/ISM` | `ArcFormats/Ism/ImagePNG.cs` | needs a portable network graphic decoder, which this project does not have. |
 | `DPNG` | `ArcFormats/Qlie/ImageDPNG.cs` | the picture is a wall of portable network graphic tiles that has to be composed into one canvas, which needs a decoder this project does not have. |
 | `JBP` | `ArcFormats/Sviu/ImageJBP.cs` | a lossy transform codec, parked rather than declined. |
+| `ARGB` | `ArcFormats/Qlie/ImageARGB.cs` | the picture is a JPEG with a portable network graphic mask behind it, so it needs both of the decoders this project does not have. |
 | `AIFF` | `ArcFormats/AudioAIFF.cs` | delegates to the NAudio library's own reader. |
 | `CAB` | `Experimental/Cabinet/ArcCAB.cs` | delegates to the WiX compression library. |
 | `AI5WIN`, `ARC` | `ArcFormats/Elf/ArcAI5Win.cs` and `ArcARC.cs` | need the user's own scheme database, noted in `docs/formats/elf-ai5dat.md`. |
