@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "RAD",
+				class: "RadFormat",
+				source: "Legacy/Rina/ImageRAD.cs",
+			},
+			localId: "rina-rad-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GsPIC",
 				class: "PicFormat",
 				source: "ArcFormats/GsPack/ImageGS.cs",
