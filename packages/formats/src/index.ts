@@ -778,6 +778,7 @@ import { ivoryMoeImageFormat } from "./ivory/moe-image.js";
 import { ivoryMmdImageFormat } from "./ivory/mmd-image.js";
 import { miscLzsImageFormat } from "./misc/lzs-image.js";
 import { umesoftGrxImageFormat } from "./umesoft/grx-image.js";
+import { umesoftSgxImageFormat } from "./umesoft/sgx-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1905,5 +1906,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		ivoryMmdImageFormat,
 		miscLzsImageFormat,
 		umesoftGrxImageFormat,
+		umesoftSgxImageFormat,
 	]);
 }

@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "SGX",
+				class: "SgxFormat",
+				source: "ArcFormats/UMeSoft/ImageGRX.cs",
+			},
+			localId: "umesoft-sgx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GRX",
 				class: "GrxFormat",
 				source: "ArcFormats/UMeSoft/ImageGRX.cs",

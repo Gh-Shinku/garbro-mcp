@@ -24,7 +24,7 @@ import {
 } from "../shared/fixed-archive.js";
 
 /** The four bytes of the signature, which the reference packs into a word. */
-const SIGNATURE = Buffer.from([0x47, 0x52, 0x58, 0x1a]);
+export const GRX_SIGNATURE = Buffer.from([0x47, 0x52, 0x58, 0x1a]);
 /** Where the fields behind the signature stand, both here and in the formats that wrap this one. */
 export const GRX_INFO_OFFSET = 4;
 const HEADER_SIZE = 0x10;
@@ -56,6 +56,24 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
+/** The bitmap of a picture the reader has unpacked, at the depth the reader has settled on. */
+export function writeGrxBitmap(
+	width: number,
+	height: number,
+	pixels: Buffer,
+	outputDepth: number,
+): Buffer {
+	if (DEPTH_GREY === outputDepth)
+		return writeBmp8(width, height, pixels, false);
+	if (DEPTH_555 === outputDepth) {
+		return writeBmp16(width, height, pixels, false, RGB555_MASKS);
+	}
+	if (DEPTH_565 === outputDepth) {
+		return writeBmp16(width, height, pixels, false, RGB565_MASKS);
+	}
+	return writeBmp32(width, height, pixels, false);
+}
+
 /**
  * `GrxFormat.ReadInfo`: whether the pixels are packed, whether the picture carries a plane of alpha behind
  * them, the depth, the measurements and where that plane stands. The depth has to be one the reader knows,
@@ -85,7 +103,9 @@ export function readGrxInfo(data: Buffer, at: number): GrxLayout | undefined {
 /** `GrxFormat.ReadMetaData`: the signature and then the fields of the picture. */
 export function readGrxLayout(data: Buffer): GrxLayout | undefined {
 	if (data.length < HEADER_SIZE) return undefined;
-	if (!data.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
+	if (!data.subarray(0, GRX_SIGNATURE.length).equals(GRX_SIGNATURE)) {
+		return undefined;
+	}
 	return readGrxInfo(data, GRX_INFO_OFFSET);
 }
 
@@ -104,6 +124,21 @@ export function grxPixelSizes(layout: GrxLayout): {
 /** The depth the port writes out, which is four bytes to the pixel for a picture of three or four. */
 export function grxOutputDepth(layout: GrxLayout): number {
 	return grxPixelSizes(layout).destination * 8;
+}
+
+/**
+ * The depth a picture is written out at: a plane of alpha takes the fourth byte of a picture of three or four
+ * bytes to the pixel and widens a picture of two, while the plane of a picture of one, or of the high colour
+ * kind with a spare bit, is unpacked and then left behind, which is what the reference does as well.
+ */
+export function grxReportedDepth(layout: GrxLayout): number {
+	if (
+		layout.alpha &&
+		(DEPTH_565 === layout.bitsPerPixel || layout.bitsPerPixel >= DEPTH_24)
+	) {
+		return 32;
+	}
+	return grxOutputDepth(layout);
 }
 
 /** Where the reader stands in the stream: the reference seeks rather than walking a buffer. */
@@ -404,7 +439,7 @@ export const umesoftGrxImageDescriptor: FormatDescriptor = {
 
 export const umesoftGrxImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: umesoftGrxImageDescriptor,
-	detection: { signatures: [{ bytes: SIGNATURE }] },
+	detection: { signatures: [{ bytes: GRX_SIGNATURE }] },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEADER_SIZE)) return false;
 		return readGrxLayout(await readStored(source)) !== undefined;
@@ -414,7 +449,7 @@ export const umesoftGrxImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) {
 			throw invalidPicture("Not a U-Me Soft picture");
 		}
-		const depth = grxOutputDepth(layout);
+		const depth = grxReportedDepth(layout);
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		return {
 			entries: [
@@ -458,23 +493,8 @@ export const umesoftGrxImageFormat: ArchiveFormat = defineFixedArchive({
 			);
 		}
 		const { pixels, outputDepth } = unpackGrx(stored, layout, 0);
-		if (DEPTH_GREY === outputDepth) {
-			return Readable.from([
-				writeBmp8(layout.width, layout.height, pixels, false),
-			]);
-		}
-		if (DEPTH_555 === outputDepth) {
-			return Readable.from([
-				writeBmp16(layout.width, layout.height, pixels, false, RGB555_MASKS),
-			]);
-		}
-		if (DEPTH_565 === outputDepth) {
-			return Readable.from([
-				writeBmp16(layout.width, layout.height, pixels, false, RGB565_MASKS),
-			]);
-		}
 		return Readable.from([
-			writeBmp32(layout.width, layout.height, pixels, false),
+			writeGrxBitmap(layout.width, layout.height, pixels, outputDepth),
 		]);
 	},
 });
