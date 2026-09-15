@@ -6,6 +6,26 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PR1",
+				"class": "Pr1Format",
+				"source": "Legacy/Discovery/ImagePR1.cs"
+			},
+			"localId": "discovery-pr1-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"extension gate",
+				"two walk directions",
+				"window opcodes",
+				"four one bit planes",
+				"sixteen colour map"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GRP",
 				"class": "GrpFormat",
 				"source": "ArcFormats/Amaterasu/ImageGRP.cs"
