@@ -46,12 +46,23 @@ for (const record of status.implementations) {
 	tracked.set(referenceKey(type, tag, source, className), record);
 }
 
-const rows = inventory.formats.map((format) => {
-	const record = tracked.get(
-		referenceKey(format.type, format.tag, format.source, format.class),
-	);
-	return { ...format, localId: record?.localId, status: record?.status };
-});
+// The three Draft files are the reference's own templates for new formats rather than formats: their namespace
+// and their class name carry question marks, the tag the inventory reads out of them is `xxx`, and none of them
+// is reachable. They are left out of the report rather than counted as work that is not done.
+const TEMPLATE_SOURCES = new Set([
+	"ArcFormats/DraftArc.cs",
+	"ArcFormats/DraftAudio.cs",
+	"ArcFormats/DraftImage.cs",
+]);
+
+const rows = inventory.formats
+	.filter((format) => !TEMPLATE_SOURCES.has(format.source))
+	.map((format) => {
+		const record = tracked.get(
+			referenceKey(format.type, format.tag, format.source, format.class),
+		);
+		return { ...format, localId: record?.localId, status: record?.status };
+	});
 
 const filtered = options.type
 	? rows.filter((row) => row.type === options.type)
