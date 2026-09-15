@@ -727,6 +727,7 @@ import { tacticsTgfImageFormat } from "./tactics/tgf-image.js";
 import { riddleGcpImageFormat } from "./riddle/gcp-image.js";
 import { cswareGdtImageFormat } from "./csware/gdt-image.js";
 import { reallivePdtImageFormat } from "./reallive/pdt-image.js";
+import { eaglsGrImageFormat } from "./eagls/gr-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1062,6 +1063,7 @@ export * from "./tobe/index.js";
 export * from "./powerd/index.js";
 export * from "./gameres/index.js";
 export * from "./melody/index.js";
+export * from "./eagls/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -1794,5 +1796,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		riddleGcpImageFormat,
 		cswareGdtImageFormat,
 		reallivePdtImageFormat,
+		eaglsGrImageFormat,
 	]);
 }

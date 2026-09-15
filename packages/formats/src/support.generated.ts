@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GR",
+				class: "GrFormat",
+				source: "ArcFormats/Eagls/ImageGR.cs",
+			},
+			localId: "eagls-gr-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PDT",
 				class: "PdtFormat",
 				source: "ArcFormats/RealLive/ImagePDT.cs",
