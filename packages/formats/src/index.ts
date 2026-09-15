@@ -766,6 +766,7 @@ import { ikuraDoImageFormat } from "./ikura/do-image.js";
 import { sas5IarImageFormat } from "./sas5/iar-image.js";
 import { akatomboFbImageFormat } from "./akatombo/fb-image.js";
 import { ikuraGgsImageFormat } from "./ikura/ggs-image.js";
+import { ikuraGgpImageFormat } from "./ikura/ggp-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1880,5 +1881,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		sas5IarImageFormat,
 		akatomboFbImageFormat,
 		ikuraGgsImageFormat,
+		ikuraGgpImageFormat,
 	]);
 }

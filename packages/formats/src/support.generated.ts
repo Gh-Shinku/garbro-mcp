@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GGP",
+				class: "GgpFormat",
+				source: "ArcFormats/Ikura/ImageGGP.cs",
+			},
+			localId: "ikura-ggp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GGS",
 				class: "GgsFormat",
 				source: "ArcFormats/Ikura/ImageGGS.cs",
