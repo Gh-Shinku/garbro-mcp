@@ -740,6 +740,7 @@ import { vnEngineZawImageFormat } from "./vn-engine/zaw-image.js";
 import { propellerMgrImageFormat } from "./propeller/mgr-image.js";
 import { gameSystemBgdImageFormat } from "./gamesystem/bgd-image.js";
 import { gsxK2ImageFormat } from "./gsx/k2-image.js";
+import { projectMyuGamImageFormat } from "./project-myu/gam-image.js";
 
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
@@ -1822,5 +1823,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		propellerMgrImageFormat,
 		gameSystemBgdImageFormat,
 		gsxK2ImageFormat,
+		projectMyuGamImageFormat,
 	]);
 }

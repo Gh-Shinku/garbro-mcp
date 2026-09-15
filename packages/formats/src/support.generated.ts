@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GAM",
+				class: "GamFormat",
+				source: "Legacy/ProjectMyu/ImageGAM.cs",
+			},
+			localId: "project-myu-gam-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image writing"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "K2",
 				class: "K2Format",
 				source: "Legacy/Gsx/ImageK2.cs",
