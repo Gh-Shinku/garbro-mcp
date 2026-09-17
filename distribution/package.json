@@ -1,0 +1,24 @@
+{
+	"name": "garbro-mcp",
+	"version": "0.0.0-dev.0",
+	"private": true,
+	"description": "MCP server for ADV/Galgame resource inspection and extraction",
+	"type": "commonjs",
+	"license": "MIT",
+	"bin": {
+		"garbro-mcp-server": "./garbro-mcp.cjs"
+	},
+	"engines": {
+		"node": ">=24.0.0"
+	},
+	"files": [
+		"garbro-mcp.cjs",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.md",
+		"README.md"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Gh-Shinku/garbro-mcp.git"
+	}
+}

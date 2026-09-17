@@ -1,0 +1,99 @@
+name: Experimental release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Prerelease version without v (for example 0.1.0-experimental.1)'
+        required: true
+        type: string
+      publish:
+        description: 'Publish a GitHub prerelease after all smoke tests pass (never publish to npm)'
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: experimental-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_VERSION: ${{ inputs.version }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.26.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Build fixed-version artifacts
+        run: node scripts/build-release.mjs --version "$RELEASE_VERSION" --prerelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: experimental-release
+          path: dist/release/garbro-mcp-*
+          if-no-files-found: error
+
+  smoke:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.26.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: experimental-release
+          path: dist/release
+      - name: Verify portable and offline npm installations
+        shell: bash
+        run: node scripts/test-release.mjs --version "$RELEASE_VERSION"
+
+  publish:
+    needs: [build, smoke]
+    if: inputs.publish && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: experimental-release
+          path: dist/release
+      - name: Create a GitHub prerelease at the tested commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          tag="v$RELEASE_VERSION"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/$tag")" ]; then
+            echo "Tag $tag already exists; refusing to replace or reuse it."
+            exit 1
+          fi
+          gh release create "$tag" dist/release/garbro-mcp-* \
+            --target "$RELEASE_COMMIT" \
+            --prerelease \
+            --title "garbro-mcp $RELEASE_VERSION (experimental)" \
+            --notes "Experimental, not stable. Requires Node.js 24+. Download the portable ZIP; no pnpm, Git, or runtime dependency installation is needed. The optional tgz installs locally with npm. Verify downloads against the attached SHA256SUMS. Tested commit: $RELEASE_COMMIT."

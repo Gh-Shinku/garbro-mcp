@@ -3,19 +3,15 @@
 	"version": "0.0.0",
 	"private": true,
 	"description": "Modern TypeScript toolkit for detecting and extracting ADV/Galgame resource archives",
-	"devEngines": {
-		"packageManager": {
-			"name": "pnpm",
-			"version": "^11.6.0",
-			"onFail": "download"
-		}
-	},
+	"packageManager": "pnpm@11.26.0",
 	"type": "module",
 	"engines": {
 		"node": ">=24.0.0"
 	},
 	"scripts": {
 		"build": "tsc -b",
+		"build:release": "pnpm build && node scripts/build-release.mjs",
+		"test:release": "node scripts/test-release.mjs",
 		"clean": "tsc -b --clean",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
@@ -38,6 +34,9 @@
 		"@garbro-mcp/mcp": "workspace:*",
 		"@modelcontextprotocol/client": "^2.0.0",
 		"@types/node": "^24.13.4",
+		"cross-spawn": "7.0.6",
+		"esbuild": "0.28.2",
+		"fflate": "0.8.3",
 		"iconv-lite": "^0.7.3",
 		"typescript": "^7.0.2",
 		"vitest": "^5.0.0"

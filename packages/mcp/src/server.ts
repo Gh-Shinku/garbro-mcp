@@ -16,7 +16,9 @@ import {
 import { McpServer, type ServerContext } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 
-const VERSION = "0.0.0";
+declare const GARBRO_MCP_VERSION: string;
+export const SERVER_VERSION =
+	typeof GARBRO_MCP_VERSION === "string" ? GARBRO_MCP_VERSION : "0.0.0";
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const errorCodes = [
 	"INVALID_ARCHIVE",
@@ -227,7 +229,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			(support) => [support.localId, support],
 		),
 	);
-	const server = new McpServer({ name: "garbro-mcp", version: VERSION });
+	const server = new McpServer({ name: "garbro-mcp", version: SERVER_VERSION });
 	const readOnly = {
 		readOnlyHint: true,
 		destructiveHint: false,
@@ -272,7 +274,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				return success({
 					server: {
 						name: "garbro-mcp" as const,
-						version: VERSION,
+						version: SERVER_VERSION,
 						transport: "stdio" as const,
 					},
 					inputRoots: workspace.inputRoots.map((root) => ({ ...root })),

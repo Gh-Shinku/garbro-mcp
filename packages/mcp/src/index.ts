@@ -2,13 +2,14 @@
 
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { parseArgs } from "node:util";
-import { buildServer } from "./server.js";
+import { buildServer, SERVER_VERSION } from "./server.js";
 
 const { values } = parseArgs({
 	options: {
 		"input-root": { type: "string", multiple: true },
 		"output-root": { type: "string" },
 		help: { type: "boolean", short: "h" },
+		version: { type: "boolean", short: "v" },
 	},
 });
 
@@ -18,7 +19,13 @@ if (values.help) {
 Options:
   --input-root <id=path>  Add a named readable root (repeatable)
   --output-root <path>    Set the only writable extraction root
+  -v, --version           Show the server version
   -h, --help              Show this help`);
+	process.exit(0);
+}
+
+if (values.version) {
+	console.log(SERVER_VERSION);
 	process.exit(0);
 }
 
