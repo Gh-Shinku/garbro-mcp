@@ -785,6 +785,7 @@ import {
 } from "./umesoft/mgx.js";
 import { yukaYkgImageFormat } from "./yuka/ykg-image.js";
 import { zyxMtlImageFormat } from "./zyx/mtl-image.js";
+import { zyxSplImageFormat } from "./zyx/spl-image.js";
 import { zyxXmgImageFormat } from "./zyx/xmg-image.js";
 
 export * from "./advsys/index.js";
@@ -1918,6 +1919,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		umesoftMgxImageFormat,
 		yukaYkgImageFormat,
 		zyxMtlImageFormat,
+		zyxSplImageFormat,
 		zyxXmgImageFormat,
 	]);
 }
