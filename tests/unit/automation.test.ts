@@ -1,4 +1,8 @@
-import { ArchiveAutomationService, WorkspacePolicy } from "@garbro-mcp/core";
+import {
+	ArchiveAutomationService,
+	WorkspacePolicy,
+	writeExtractionReport,
+} from "@garbro-mcp/core";
 import { createDefaultRegistry } from "@garbro-mcp/formats";
 import {
 	copyFile,
@@ -145,5 +149,10 @@ describe("ArchiveAutomationService", () => {
 		expect(await readFile(resolve(target, "scripts/startup.tjs"))).toHaveLength(
 			26,
 		);
+		const report = await writeExtractionReport(service.workspace, result);
+		const saved = JSON.parse(await readFile(report.absolutePath, "utf8"));
+		expect(saved.bytesWritten).toBe("26");
+		expect(saved.items[0].error.code).toBe("OUTPUT_EXISTS");
+		expect(saved.items[1].artifact.sha256).toHaveLength(64);
 	});
 });

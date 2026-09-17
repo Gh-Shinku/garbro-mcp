@@ -26,7 +26,7 @@ export interface AutomationLimits {
 }
 
 export const DEFAULT_AUTOMATION_LIMITS: AutomationLimits = {
-	previewDefaultBytes: 16 * 1024,
+	previewDefaultBytes: 2 * 1024,
 	previewMaxBytes: 64 * 1024,
 	scanPageMax: 500,
 	entryPageMax: 1000,
@@ -610,7 +610,11 @@ export class ArchiveAutomationService {
 		};
 		await walk(resolved.absolutePath, "", 0);
 		files.sort((left, right) =>
-			left.rootRelative.localeCompare(right.rootRelative),
+			left.rootRelative < right.rootRelative
+				? -1
+				: left.rootRelative > right.rootRelative
+					? 1
+					: 0,
 		);
 		const cursorPath = options.cursor
 			? decodeCursor(options.cursor)
