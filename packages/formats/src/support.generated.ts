@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CGD",
+				class: "CgdFormat",
+				source: "ArcFormats/GameSystem/ImageCGD.cs",
+			},
+			localId: "game-system-cgd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PRS",
 				class: "PrsFormat",
 				source: "ArcFormats/Marble/ImagePRS.cs",

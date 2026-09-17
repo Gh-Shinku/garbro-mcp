@@ -232,6 +232,7 @@ import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { abelGpsImageFormat } from "./abel/gps-image.js";
 import { nexasGrpImageFormat } from "./nexas/grp-image.js";
 import { marblePrsImageFormat } from "./marble/prs-image.js";
+import { gameSystemCgdImageFormat } from "./gamesystem/cgd-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1373,6 +1374,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikuraTanImageFormat,
 		bananaMagImageFormat,
 		abelGpsImageFormat,
+		gameSystemCgdImageFormat,
 		marblePrsImageFormat,
 		nexasGrpImageFormat,
 		crowdGaxImageFormat,

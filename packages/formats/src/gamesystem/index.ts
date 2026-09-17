@@ -5,3 +5,4 @@ export * from "./puremail.js";
 export * from "./alp-image.js";
 export * from "./texb-image.js";
 export * from "./bgd-image.js";
+export * from "./cgd-image.js";
