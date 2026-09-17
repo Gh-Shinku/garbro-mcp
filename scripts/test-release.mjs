@@ -118,8 +118,7 @@ async function smoke(bundlePath, outputRoot) {
 			"xp3",
 		);
 		assert.equal(
-			(await call("scan_archives", { rootId: "samples" })).archives[0].format
-				.id,
+			(await call("scan_archives", { rootId: "samples" })).archives[0].formatId,
 			"xp3",
 		);
 		assert.equal(
@@ -151,7 +150,16 @@ async function smoke(bundlePath, outputRoot) {
 		assert.equal(extracted.status, "completed");
 		assert.equal(extracted.extracted, 3);
 		assert.deepEqual(progress, [1, 2, 3]);
-		for (const item of extracted.items) {
+		assert.equal(extracted.items.length, 0);
+		assert.equal(extracted.itemsOmitted, 3);
+		const reportBytes = await readFile(extracted.report.absolutePath);
+		assert.equal(
+			createHash("sha256").update(reportBytes).digest("hex"),
+			extracted.report.sha256,
+		);
+		const report = JSON.parse(reportBytes.toString());
+		assert.equal(report.items.length, 3);
+		for (const item of report.items) {
 			const bytes = await readFile(item.artifact.absolutePath);
 			assert.equal(BigInt(bytes.length).toString(), item.artifact.bytesWritten);
 			assert.equal(

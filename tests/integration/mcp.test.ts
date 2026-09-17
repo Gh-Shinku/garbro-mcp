@@ -1,6 +1,9 @@
-import { buildServer } from "@garbro-mcp/mcp/server";
+import { buildServer, type BuildServerOptions } from "@garbro-mcp/mcp/server";
+import { FormatRegistry, type ArchiveEntry } from "@garbro-mcp/core";
+import { createHash } from "node:crypto";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
-import { copyFile, mkdtemp, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
+import { Readable } from "node:stream";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -17,7 +20,7 @@ afterEach(async () => {
 	);
 });
 
-async function connect() {
+async function connect(overrides: Pick<BuildServerOptions, "registry"> = {}) {
 	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
 	const output = await mkdtemp(resolve(tmpdir(), "garbro-mcp-output-"));
 	temporaryDirectories.push(root, output);
@@ -25,6 +28,7 @@ async function connect() {
 	const [clientTransport, serverTransport] =
 		InMemoryTransport.createLinkedPair();
 	const server = buildServer({
+		...overrides,
 		inputRoots: { games: root },
 		outputRoot: output,
 	});
@@ -70,10 +74,8 @@ describe("MCP server", () => {
 			formats: [
 				{
 					id: "xp3",
-					support: {
-						reference: { type: "archive", tag: "XP3" },
-						status: "partial",
-					},
+					resourceType: "archive",
+					status: "partial",
 				},
 			],
 		});
@@ -89,7 +91,7 @@ describe("MCP server", () => {
 		});
 		expect(scanned.structuredContent).toMatchObject({
 			scanned: 1,
-			archives: [{ source, format: { id: "xp3" } }],
+			archives: [{ source, formatId: "xp3" }],
 			complete: true,
 		});
 
@@ -143,8 +145,8 @@ describe("MCP server", () => {
 			extracted: 1,
 			failed: 1,
 			bytesWritten: "10",
+			itemsOmitted: 1,
 			items: [
-				{ entryId: "0", status: "extracted" },
 				{
 					entryId: "missing",
 					status: "failed",
@@ -152,6 +154,15 @@ describe("MCP server", () => {
 				},
 			],
 		});
+		const payload = extracted.structuredContent as {
+			report: { absolutePath: string };
+		};
+		const report = JSON.parse(
+			await readFile(payload.report.absolutePath, "utf8"),
+		);
+		expect(report.items.map((item: { status: string }) => item.status)).toEqual(
+			["extracted", "failed"],
+		);
 		expect(progress).toEqual([1, 2]);
 		expect(
 			await readFile(
@@ -173,5 +184,270 @@ describe("MCP server", () => {
 			isError: true,
 			structuredContent: { error: { code: "UNSAFE_PATH" } },
 		});
+	});
+
+	it("bounds default catalog responses and retains opt-in details", async () => {
+		const { client } = await connect();
+		const result = await client.callTool({ name: "list_formats" });
+		expect(Buffer.byteLength(JSON.stringify(result))).toBeLessThanOrEqual(
+			16384,
+		);
+		const payload = result.structuredContent as {
+			formats: { details?: unknown }[];
+		};
+		expect(payload.formats.length).toBeLessThanOrEqual(20);
+		expect(payload.formats.every((item) => item.details === undefined)).toBe(
+			true,
+		);
+		const detailed = await client.callTool({
+			name: "list_formats",
+			arguments: { formatId: "xp3", detail: "full" },
+		});
+		expect(detailed.structuredContent).toMatchObject({
+			formats: [
+				{
+					details: {
+						attribution: expect.any(Array),
+						support: { reference: { tag: "XP3" } },
+					},
+				},
+			],
+		});
+	});
+
+	it("resumes catalog and scan pages without losing budget-truncated items", async () => {
+		const { client, root } = await connect();
+		const first = await client.callTool({
+			name: "list_formats",
+			arguments: { limit: 1000, maxResponseBytes: 2048 },
+		});
+		expect(Buffer.byteLength(JSON.stringify(first))).toBeLessThanOrEqual(2048);
+		const page = first.structuredContent as {
+			nextOffset: number;
+			responseTruncated: boolean;
+			formats: { id: string }[];
+		};
+		expect(page.responseTruncated).toBe(true);
+		expect(page.nextOffset).toBe(page.formats.length);
+		const second = await client.callTool({
+			name: "list_formats",
+			arguments: { offset: page.nextOffset, maxResponseBytes: 2048 },
+		});
+		const next = second.structuredContent as typeof page;
+		expect(next.formats[0]?.id).not.toBe(page.formats[0]?.id);
+
+		const names = [
+			"A.xp3",
+			"a.xp3",
+			"Z.xp3",
+			"z.xp3",
+			"あ.xp3",
+			"画像.xp3",
+			"b.xp3",
+			"c.xp3",
+		];
+		await Promise.all(
+			names.map((name) =>
+				copyFile(resolve(root, "basic.xp3"), resolve(root, name)),
+			),
+		);
+		const seen: string[] = [];
+		let cursor: string | null = null;
+		for (let iteration = 0; iteration < 20; iteration += 1) {
+			const result = await client.callTool({
+				name: "scan_archives",
+				arguments: {
+					rootId: "games",
+					limit: 500,
+					maxResponseBytes: 2048,
+					...(cursor ? { cursor } : {}),
+				},
+			});
+			expect(result.isError).not.toBe(true);
+			expect(Buffer.byteLength(JSON.stringify(result))).toBeLessThanOrEqual(
+				2048,
+			);
+			const response = result.structuredContent as {
+				archives: { source: { path: string } }[];
+				nextCursor: string | null;
+				complete: boolean;
+			};
+			seen.push(...response.archives.map((item) => item.source.path));
+			cursor = response.nextCursor;
+			if (response.complete) break;
+		}
+		expect(cursor).toBeNull();
+		expect(seen).toEqual([...names, "basic.xp3"].sort());
+	});
+
+	it("keeps large extraction results in a complete hashed report", async () => {
+		const { client } = await connect();
+		const result = await client.callTool({
+			name: "extract_entries",
+			arguments: {
+				source: { rootId: "games", path: "basic.xp3" },
+				selection: {
+					mode: "ids",
+					entryIds: [
+						"0",
+						...Array.from({ length: 300 }, (_, i) => `missing-${i}`),
+					],
+				},
+			},
+		});
+		expect(Buffer.byteLength(JSON.stringify(result))).toBeLessThanOrEqual(
+			16384,
+		);
+		const response = result.structuredContent as {
+			items: unknown[];
+			itemsOmitted: number;
+			report: {
+				absolutePath: string;
+				relativePath: string;
+				sha256: string;
+				bytesWritten: string;
+			};
+		};
+		expect(response.items).toHaveLength(10);
+		expect(response.itemsOmitted).toBe(291);
+		const bytes = await readFile(response.report.absolutePath);
+		expect(bytes.length.toString()).toBe(response.report.bytesWritten);
+		expect(createHash("sha256").update(bytes).digest("hex")).toBe(
+			response.report.sha256,
+		);
+		expect(JSON.parse(bytes.toString()).items).toHaveLength(301);
+		const collected: unknown[] = [];
+		let offset: number | null = 0;
+		while (offset !== null) {
+			const page = await client.callTool({
+				name: "extract_entries",
+				arguments: {
+					reportPath: response.report.relativePath,
+					inline: "all",
+					offset,
+					itemLimit: 40,
+					maxResponseBytes: 2048,
+				},
+			});
+			expect(page.isError).not.toBe(true);
+			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(2048);
+			const payload = page.structuredContent as {
+				items: unknown[];
+				nextOffset: number | null;
+			};
+			collected.push(...payload.items);
+			if (payload.nextOffset !== null)
+				expect(payload.nextOffset).toBeGreaterThan(offset);
+			offset = payload.nextOffset;
+		}
+		expect(collected).toEqual(JSON.parse(bytes.toString()).items);
+		expect(await readFile(response.report.absolutePath)).toEqual(bytes);
+		const invalid = await client.callTool({
+			name: "extract_entries",
+			arguments: {
+				source: { rootId: "games", path: "basic.xp3" },
+				reportPath: response.report.relativePath,
+			},
+		});
+		expect(invalid.structuredContent).toMatchObject({
+			error: { code: "INVALID_ARGUMENT" },
+		});
+	});
+
+	it("reports report-file errors without losing completed extraction counts", async () => {
+		const { client, output, root } = await connect();
+		await symlink(root, resolve(output, ".garbro-reports"));
+		const result = await client.callTool({
+			name: "extract_entries",
+			arguments: { source: { rootId: "games", path: "basic.xp3" } },
+		});
+		expect(result.structuredContent).toMatchObject({
+			status: "completed",
+			extracted: 3,
+			reportError: { code: "UNSAFE_PATH" },
+		});
+	});
+
+	it("omits metadata by default and budgets escaped text and hex previews", async () => {
+		const bytes = Buffer.alloc(65536, 0);
+		const entry: ArchiveEntry = {
+			id: "0",
+			path: "large.bin",
+			size: BigInt(bytes.length),
+			packedSize: BigInt(bytes.length),
+			compressed: false,
+			encrypted: false,
+			metadata: { large: "x".repeat(100000) },
+		};
+		const registry = new FormatRegistry([
+			{
+				descriptor: {
+					id: "xp3",
+					name: "Test",
+					extensions: ["xp3"],
+					attribution: [],
+					capabilities: {
+						detect: true,
+						list: true,
+						extract: true,
+						create: false,
+						encryption: false,
+					},
+				},
+				async detect() {
+					return true;
+				},
+				async open(source, sourcePath) {
+					return {
+						sourcePath,
+						format: this.descriptor,
+						size: source.size,
+						metadata: entry.metadata ?? {},
+						entries: [entry],
+						async openEntry() {
+							return Readable.from([bytes]);
+						},
+						async close() {
+							await source.close();
+						},
+					};
+				},
+			},
+		]);
+		const { client } = await connect({ registry });
+		const source = { rootId: "games", path: "basic.xp3" };
+		const entries = await client.callTool({
+			name: "list_entries",
+			arguments: { source },
+		});
+		expect(entries.structuredContent).toMatchObject({ entries: [{ id: "0" }] });
+		expect(JSON.stringify(entries)).not.toContain('"metadata"');
+		const full = await client.callTool({
+			name: "list_entries",
+			arguments: { source, detail: "full", maxResponseBytes: 2048 },
+		});
+		expect(full.structuredContent).toMatchObject({
+			error: { code: "LIMIT_EXCEEDED" },
+		});
+		for (const mode of ["hex", "text"]) {
+			const preview = await client.callTool({
+				name: "read_entry",
+				arguments: {
+					source,
+					entryId: "0",
+					mode,
+					maxBytes: 65536,
+					maxResponseBytes: 2048,
+				},
+			});
+			expect(preview.isError).not.toBe(true);
+			expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThanOrEqual(
+				2048,
+			);
+			expect(preview.structuredContent).toMatchObject({
+				responseTruncated: true,
+				preview: { truncated: true },
+			});
+		}
 	});
 });

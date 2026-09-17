@@ -6,6 +6,9 @@ import {
 	type ArchiveAutomationOptions,
 	type AutomationControl,
 	type FormatRegistry,
+	GarbroError,
+	readExtractionReport,
+	writeExtractionReport,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
 } from "@garbro-mcp/core";
@@ -15,6 +18,13 @@ import {
 } from "@garbro-mcp/formats";
 import { McpServer, type ServerContext } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
+import {
+	boundedPage,
+	DEFAULT_RESPONSE_BYTES,
+	fitsResponse,
+	MAX_RESPONSE_BYTES,
+	toolResult,
+} from "./context.js";
 
 declare const GARBRO_MCP_VERSION: string;
 export const SERVER_VERSION =
@@ -41,6 +51,21 @@ const failureSchema = z.object({ error: errorSchema });
 const sourceSchema = z.object({
 	rootId: z.string().min(1),
 	path: z.string().min(1),
+});
+const budgetSchema = z
+	.number()
+	.int()
+	.min(2048)
+	.max(MAX_RESPONSE_BYTES)
+	.default(DEFAULT_RESPONSE_BYTES);
+const detailSchema = z.enum(["summary", "full"]).default("summary");
+const formatSummarySchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	extensions: z.array(z.string()),
+	resourceType: z.enum(resourceTypes).optional(),
+	status: z.string().optional(),
+	verification: z.string().optional(),
 });
 const formatSchema = z.object({
 	id: z.string(),
@@ -93,10 +118,12 @@ const successOrFailure = <T extends z.ZodType>(schema: T) =>
 	z.union([schema, failureSchema]);
 
 function success<const T extends Record<string, unknown>>(payload: T) {
-	return {
-		content: [{ type: "text" as const, text: JSON.stringify(payload) }],
-		structuredContent: payload,
-	};
+	if (!fitsResponse(payload, MAX_RESPONSE_BYTES))
+		throw new GarbroError(
+			"LIMIT_EXCEEDED",
+			"Response exceeds 64 KiB. Request a smaller page or summary detail.",
+		);
+	return toolResult(payload);
 }
 
 function failure(error: unknown) {
@@ -104,12 +131,18 @@ function failure(error: unknown) {
 	const payload = {
 		error: {
 			code: garbroError.code,
-			message: garbroError.message,
-			...(garbroError.details === undefined
-				? {}
-				: { details: garbroError.details }),
+			message: garbroError.message.slice(0, 2048),
 		},
 	};
+	while (
+		Buffer.byteLength(
+			JSON.stringify({ ...toolResult(payload), isError: true }),
+		) > 2048
+	)
+		payload.error.message = payload.error.message.slice(
+			0,
+			Math.floor(payload.error.message.length / 2),
+		);
 	return {
 		content: [{ type: "text" as const, text: JSON.stringify(payload) }],
 		structuredContent: payload,
@@ -169,6 +202,36 @@ function supportToWire(support: SupportRecord) {
 	};
 }
 
+function entrySummary(entry: Parameters<typeof entryToWire>[0]) {
+	return {
+		id: entry.id,
+		path: entry.path,
+		size: entry.size.toString(),
+		packedSize: entry.packedSize.toString(),
+		compressed: entry.compressed,
+		encrypted: entry.encrypted,
+		...(entry.sizeKnown === undefined ? {} : { sizeKnown: entry.sizeKnown }),
+	};
+}
+
+function formatSummary(
+	format: Parameters<typeof formatToWire>[0],
+	support?: SupportRecord,
+) {
+	return {
+		id: format.id,
+		name: format.name,
+		extensions: [...format.extensions],
+		...(support === undefined
+			? {}
+			: {
+					resourceType: support.reference.type,
+					status: support.status,
+					verification: support.verification,
+				}),
+	};
+}
+
 type ExtractionResult = Awaited<
 	ReturnType<ArchiveAutomationService["extractEntries"]>
 >;
@@ -191,10 +254,7 @@ function batchItemToWire(item: ExtractionResult["items"][number]) {
 		status: item.status,
 		error: {
 			code: item.error.code,
-			message: item.error.message,
-			...(item.error.details === undefined
-				? {}
-				: { details: item.error.details }),
+			message: item.error.message.slice(0, 2048),
 		},
 	};
 }
@@ -251,6 +311,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					inputRoots: z.array(z.object({ id: z.string(), path: z.string() })),
 					outputRoot: z.string(),
 					limits: z.object({
+						responseDefaultBytes: z.number().int().positive(),
+						responseMaxBytes: z.number().int().positive(),
 						previewDefaultBytes: z.number().int().positive(),
 						previewMaxBytes: z.number().int().positive(),
 						scanPageMax: z.number().int().positive(),
@@ -279,7 +341,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					},
 					inputRoots: workspace.inputRoots.map((root) => ({ ...root })),
 					outputRoot: workspace.outputRoot,
-					limits: automation.limits,
+					limits: {
+						...automation.limits,
+						responseDefaultBytes: DEFAULT_RESPONSE_BYTES,
+						responseMaxBytes: MAX_RESPONSE_BYTES,
+					},
 					capabilities: {
 						resourceTypes,
 						previewModes: ["auto", "text", "hex"] as const,
@@ -300,52 +366,95 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				"List formats with implementation status, verification level, and known limitations.",
 			inputSchema: z.object({
 				resourceType: z.enum(resourceTypes).optional(),
+				formatId: z.string().optional(),
+				detail: detailSchema,
+				maxResponseBytes: budgetSchema,
 				status: z.string().optional(),
 				extension: z.string().optional(),
 				offset: z.number().int().nonnegative().default(0),
-				limit: z.number().int().positive().max(1000).default(200),
+				limit: z.number().int().positive().max(1000).default(20),
 			}),
-			outputSchema: z.object({
-				total: z.number().int().nonnegative(),
-				offset: z.number().int().nonnegative(),
-				limit: z.number().int().positive(),
-				nextOffset: z.number().int().nonnegative().nullable(),
-				formats: z.array(formatSchema.extend({ support: supportSchema })),
-			}),
+			outputSchema: successOrFailure(
+				z.object({
+					total: z.number().int().nonnegative(),
+					offset: z.number().int().nonnegative(),
+					limit: z.number().int().positive(),
+					nextOffset: z.number().int().nonnegative().nullable(),
+					responseTruncated: z.boolean(),
+					formats: z.array(
+						formatSummarySchema.extend({
+							details: formatSchema
+								.extend({ support: supportSchema })
+								.optional(),
+						}),
+					),
+				}),
+			),
 			annotations: readOnly,
 		},
-		async ({ resourceType, status, extension, offset, limit }) => {
-			const normalizedExtension = extension?.replace(/^\./, "").toLowerCase();
-			const formats = registry
-				.listFormats()
-				.map((format) => ({ format, support: supportById.get(format.id) }))
-				.filter(
-					(item): item is typeof item & { support: SupportRecord } =>
-						item.support !== undefined,
-				)
-				.filter(
-					({ format, support }) =>
-						(resourceType === undefined ||
-							support.reference.type === resourceType) &&
-						(status === undefined || support.status === status) &&
-						(normalizedExtension === undefined ||
-							format.extensions.some(
-								(candidate) => candidate.toLowerCase() === normalizedExtension,
-							)),
-				)
-				.map(({ format, support }) => ({
-					...formatToWire(format),
-					support: supportToWire(support),
-				}));
-			const page = formats.slice(offset, offset + limit);
-			return success({
-				total: formats.length,
-				offset,
-				limit,
-				nextOffset:
-					offset + page.length < formats.length ? offset + page.length : null,
-				formats: page,
-			});
+		async ({
+			resourceType,
+			formatId,
+			detail,
+			maxResponseBytes,
+			status,
+			extension,
+			offset,
+			limit,
+		}) => {
+			try {
+				const normalizedExtension = extension?.replace(/^\./, "").toLowerCase();
+				const formats = registry
+					.listFormats()
+					.map((format) => ({ format, support: supportById.get(format.id) }))
+					.filter(
+						(item): item is typeof item & { support: SupportRecord } =>
+							item.support !== undefined,
+					)
+					.filter(
+						({ format, support }) =>
+							(formatId === undefined || format.id === formatId) &&
+							(resourceType === undefined ||
+								support.reference.type === resourceType) &&
+							(status === undefined || support.status === status) &&
+							(normalizedExtension === undefined ||
+								format.extensions.some(
+									(candidate) =>
+										candidate.toLowerCase() === normalizedExtension,
+								)),
+					)
+					.map(({ format, support }) => ({
+						...formatSummary(format, support),
+						...(detail === "full"
+							? {
+									details: {
+										...formatToWire(format),
+										support: supportToWire(support),
+									},
+								}
+							: {}),
+					}));
+				const page = formats.slice(offset, offset + limit);
+				return success(
+					boundedPage(
+						page,
+						(visible) => ({
+							total: formats.length,
+							offset,
+							limit,
+							nextOffset:
+								offset + visible.length < formats.length
+									? offset + visible.length
+									: null,
+							responseTruncated: visible.length < page.length,
+							formats: visible,
+						}),
+						maxResponseBytes,
+					),
+				);
+			} catch (error) {
+				return failure(error);
+			}
 		},
 	);
 
@@ -356,13 +465,14 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				"Scan a configured input root for supported resources and return a resumable page.",
 			inputSchema: z.object({
 				rootId: z.string().min(1),
+				maxResponseBytes: budgetSchema,
 				path: z.string().min(1).default("."),
 				recursive: z.boolean().default(true),
 				includeGlobs: z.array(z.string()).max(32).optional(),
 				excludeGlobs: z.array(z.string()).max(32).optional(),
 				maxDepth: z.number().int().min(0).max(64).default(8),
 				cursor: z.string().min(1).optional(),
-				limit: z.number().int().positive().max(500).default(200),
+				limit: z.number().int().positive().max(500).default(50),
 				includeUnrecognized: z.boolean().default(false),
 			}),
 			outputSchema: successOrFailure(
@@ -372,7 +482,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						z.object({
 							source: sourceSchema,
 							size: z.string(),
-							format: formatSchema,
+							formatId: z.string(),
 						}),
 					),
 					unrecognized: z.array(sourceSchema),
@@ -382,6 +492,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					),
 					nextCursor: z.string().nullable(),
 					complete: z.boolean(),
+					responseTruncated: z.boolean(),
 				}),
 			),
 			annotations: readOnly,
@@ -394,7 +505,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					recursive: input.recursive,
 					maxDepth: input.maxDepth,
 					limit: input.limit,
-					includeUnrecognized: input.includeUnrecognized,
+					includeUnrecognized: true,
 					...(input.includeGlobs === undefined
 						? {}
 						: { includeGlobs: input.includeGlobs }),
@@ -408,24 +519,71 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					scanOptions,
 					toControl(context),
 				);
-				return success({
-					...result,
-					archives: result.archives.map((archive) => ({
-						...archive,
-						size: archive.size.toString(),
-						format: formatToWire(archive.format),
-					})),
-					failures: result.failures.map((item) => ({
+				const events = [
+					...result.archives.map((item) => ({
+						kind: "archive" as const,
 						source: item.source,
-						error: {
-							code: item.error.code,
-							message: item.error.message,
-							...(item.error.details === undefined
-								? {}
-								: { details: item.error.details }),
-						},
+						item,
 					})),
-				});
+					...result.failures.map((item) => ({
+						kind: "failure" as const,
+						source: item.source,
+						item,
+					})),
+					...result.unrecognized.map((source) => ({
+						kind: "unrecognized" as const,
+						source,
+					})),
+				].sort((a, b) =>
+					a.source.path < b.source.path
+						? -1
+						: a.source.path > b.source.path
+							? 1
+							: 0,
+				);
+				return success(
+					boundedPage(
+						events,
+						(visible) => {
+							const archives: Record<string, unknown>[] = [];
+							const failures: Record<string, unknown>[] = [];
+							const unrecognized = [];
+							for (const event of visible) {
+								if (event.kind === "archive")
+									archives.push({
+										source: event.source,
+										size: event.item.size.toString(),
+										formatId: event.item.format.id,
+									});
+								else if (event.kind === "failure")
+									failures.push({
+										source: event.source,
+										error: {
+											code: event.item.error.code,
+											message: event.item.error.message.slice(0, 2048),
+										},
+									});
+								else unrecognized.push(event.source);
+							}
+							const responseTruncated = visible.length < events.length;
+							return {
+								scanned: visible.length,
+								archives,
+								failures,
+								unrecognized: input.includeUnrecognized ? unrecognized : [],
+								unrecognizedCount: unrecognized.length,
+								responseTruncated,
+								complete: result.complete && !responseTruncated,
+								nextCursor: responseTruncated
+									? Buffer.from(visible.at(-1)?.source.path ?? "").toString(
+											"base64url",
+										)
+									: result.nextCursor,
+							};
+						},
+						input.maxResponseBytes,
+					),
+				);
 			} catch (error) {
 				return failure(error);
 			}
@@ -437,7 +595,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		{
 			description:
 				"Detect and summarize one resource without returning its full entry list.",
-			inputSchema: z.object({ source: sourceSchema }),
+			inputSchema: z.object({
+				source: sourceSchema,
+				detail: detailSchema,
+				maxResponseBytes: budgetSchema,
+			}),
 			outputSchema: successOrFailure(
 				z.union([
 					z.object({ recognized: z.literal(false), source: sourceSchema }),
@@ -445,8 +607,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						recognized: z.literal(true),
 						source: sourceSchema,
 						size: z.string(),
-						format: formatSchema,
-						metadata: z.record(z.string(), z.unknown()),
+						format: formatSummarySchema,
+						metadata: z.record(z.string(), z.unknown()).optional(),
 						summary: z.object({
 							entryCount: z.number().int().nonnegative(),
 							compressedEntries: z.number().int().nonnegative(),
@@ -458,19 +620,28 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			),
 			annotations: readOnly,
 		},
-		async ({ source }) => {
+		async ({ source, detail, maxResponseBytes }) => {
 			try {
 				await workspace.prepare({ createOutput: false });
 				const result = await automation.inspectArchive(source);
 				if (!result.recognized) return success(result);
-				return success({
+				const payload = {
 					recognized: true as const,
 					source: result.source,
 					size: result.size.toString(),
-					format: formatToWire(result.format),
-					metadata: result.metadata,
+					format: formatSummary(
+						result.format,
+						supportById.get(result.format.id),
+					),
+					...(detail === "full" ? { metadata: result.metadata } : {}),
 					summary: result.summary,
-				});
+				};
+				if (!fitsResponse(payload, maxResponseBytes))
+					throw new GarbroError(
+						"LIMIT_EXCEEDED",
+						"Inspection cannot fit the response budget. Use summary detail.",
+					);
+				return success(payload);
 			} catch (error) {
 				return failure(error);
 			}
@@ -483,13 +654,15 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			description: "List and filter a bounded page of archive entries.",
 			inputSchema: z.object({
 				source: sourceSchema,
+				detail: detailSchema,
+				maxResponseBytes: budgetSchema,
 				includeGlobs: z.array(z.string()).max(32).optional(),
 				excludeGlobs: z.array(z.string()).max(32).optional(),
 				caseSensitive: z.boolean().default(false),
 				compressed: z.boolean().optional(),
 				encrypted: z.boolean().optional(),
 				offset: z.number().int().nonnegative().default(0),
-				limit: z.number().int().positive().max(1000).default(100),
+				limit: z.number().int().positive().max(1000).default(50),
 			}),
 			outputSchema: successOrFailure(
 				z.object({
@@ -499,6 +672,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					limit: z.number().int().positive(),
 					nextOffset: z.number().int().nonnegative().nullable(),
 					entries: z.array(entrySchema),
+					responseTruncated: z.boolean(),
 				}),
 			),
 			annotations: readOnly,
@@ -523,10 +697,24 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						? {}
 						: { encrypted: options.encrypted }),
 				});
-				return success({
-					...result,
-					entries: result.entries.map(entryToWire),
-				});
+				const entries = result.entries.map(
+					options.detail === "full" ? entryToWire : entrySummary,
+				);
+				return success(
+					boundedPage(
+						entries,
+						(visible) => ({
+							...result,
+							entries: visible,
+							nextOffset:
+								result.offset + visible.length < result.matchedTotal
+									? result.offset + visible.length
+									: null,
+							responseTruncated: visible.length < entries.length,
+						}),
+						options.maxResponseBytes,
+					),
+				);
 			} catch (error) {
 				return failure(error);
 			}
@@ -541,6 +729,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			inputSchema: z.object({
 				source: sourceSchema,
 				entryId: z.string().min(1),
+				maxResponseBytes: budgetSchema,
 				mode: z.enum(["auto", "text", "hex"]).default("auto"),
 				encoding: z.enum(["auto", "utf8", "utf16le", "cp932"]).default("auto"),
 				maxBytes: z.number().int().positive().max(65536).optional(),
@@ -548,6 +737,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			outputSchema: successOrFailure(
 				z.object({
 					entry: entrySchema,
+					responseTruncated: z.boolean(),
 					preview: z.union([
 						z.object({
 							kind: z.literal("text"),
@@ -570,18 +760,30 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		async ({ source, entryId, ...options }, context) => {
 			try {
 				await workspace.prepare({ createOutput: false });
-				const result = await automation.previewEntry(source, entryId, {
-					mode: options.mode,
-					encoding: options.encoding,
-					...(options.maxBytes === undefined
-						? {}
-						: { maxBytes: options.maxBytes }),
-					signal: context.mcpReq.signal,
-				});
-				return success({
-					entry: entryToWire(result.entry),
-					preview: result.preview,
-				});
+				const requested =
+					options.maxBytes ?? automation.limits.previewDefaultBytes;
+				let maxBytes = requested;
+				for (;;) {
+					const result = await automation.previewEntry(source, entryId, {
+						mode: options.mode,
+						encoding: options.encoding,
+						maxBytes,
+						signal: context.mcpReq.signal,
+					});
+					const payload = {
+						entry: entrySummary(result.entry),
+						preview: result.preview,
+						responseTruncated: maxBytes < requested,
+					};
+					if (fitsResponse(payload, options.maxResponseBytes))
+						return success(payload);
+					if (maxBytes === 1)
+						throw new GarbroError(
+							"LIMIT_EXCEEDED",
+							"Entry header cannot fit the response budget.",
+						);
+					maxBytes = Math.max(1, Math.floor(maxBytes / 2));
+				}
 			} catch (error) {
 				return failure(error);
 			}
@@ -598,9 +800,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"extract_entries",
 		{
 			description:
-				"Extract all, explicitly selected, or glob-matched entries beneath the configured output root.",
+				"Extract entries with compact counts and a saved report. Use reportPath instead of source to page the report without extracting again.",
 			inputSchema: z.object({
-				source: sourceSchema,
+				source: sourceSchema.optional(),
+				reportPath: z.string().min(1).optional(),
+				offset: z.number().int().nonnegative().default(0),
 				selection: z
 					.discriminatedUnion("mode", [
 						z.object({
@@ -621,6 +825,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					.default({ mode: "all" }),
 				outputSubdirectory: z.string().min(1).optional(),
 				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
+				inline: z.enum(["summary", "errors", "all"]).default("errors"),
+				itemLimit: z.number().int().min(0).max(100).default(10),
+				maxResponseBytes: budgetSchema,
 			}),
 			outputSchema: successOrFailure(
 				z.object({
@@ -631,6 +838,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					skipped: z.number().int().nonnegative(),
 					failed: z.number().int().nonnegative(),
 					bytesWritten: z.string(),
+					report: artifactSchema.optional(),
+					reportError: errorSchema.optional(),
+					itemsOmitted: z.number().int().nonnegative(),
+					responseTruncated: z.boolean(),
+					offset: z.number().int().nonnegative(),
+					nextOffset: z.number().int().nonnegative().nullable(),
 					items: z.array(
 						z.union([
 							z.object({
@@ -663,6 +876,79 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		},
 		async ({ source, ...options }, context) => {
 			try {
+				if ((source === undefined) === (options.reportPath === undefined))
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						"Provide exactly one of source or reportPath",
+					);
+				if (options.reportPath !== undefined) {
+					const loaded = await readExtractionReport(
+						workspace,
+						options.reportPath,
+					);
+					const stored = z
+						.object({
+							status: z.enum(["completed", "partial", "failed"]),
+							outputDirectory: z.string(),
+							selected: z.number().int().nonnegative(),
+							extracted: z.number().int().nonnegative(),
+							skipped: z.number().int().nonnegative(),
+							failed: z.number().int().nonnegative(),
+							bytesWritten: z.string(),
+							items: z
+								.array(
+									z
+										.object({
+											status: z.enum(["extracted", "skipped", "failed"]),
+										})
+										.passthrough(),
+								)
+								.max(10000),
+						})
+						.parse(loaded.report);
+					const candidates =
+						options.inline === "summary"
+							? []
+							: stored.items.filter(
+									(item) =>
+										options.inline === "all" || item.status === "failed",
+								);
+					if (candidates.length > options.offset && options.itemLimit === 0)
+						throw new GarbroError(
+							"INVALID_ARGUMENT",
+							"Use inline summary for counts only, or a positive itemLimit to page items",
+						);
+					const page = candidates.slice(
+						options.offset,
+						options.offset + options.itemLimit,
+					);
+					return success(
+						boundedPage(
+							page,
+							(visible) => ({
+								...stored,
+								items: visible,
+								report: {
+									...loaded.artifact,
+									bytesWritten: loaded.artifact.bytesWritten.toString(),
+								},
+								offset: options.offset,
+								nextOffset:
+									options.offset + visible.length < candidates.length
+										? options.offset + visible.length
+										: null,
+								itemsOmitted: Math.max(0, stored.selected - visible.length),
+								responseTruncated: visible.length < stored.selected,
+							}),
+							options.maxResponseBytes,
+						),
+					);
+				}
+				if (source === undefined || options.offset !== 0)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						"Extraction requires source and offset 0; use reportPath to continue a report",
+					);
 				await workspace.prepare();
 				const selection =
 					options.selection.mode === "ids"
@@ -693,11 +979,56 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					},
 					toControl(context),
 				);
-				return success({
-					...result,
-					bytesWritten: result.bytesWritten.toString(),
-					items: result.items.map(batchItemToWire),
-				});
+				let report: Record<string, unknown> | undefined;
+				let reportError:
+					| { code: (typeof errorCodes)[number]; message: string }
+					| undefined;
+				try {
+					const artifact = await writeExtractionReport(workspace, result);
+					report = {
+						...artifact,
+						bytesWritten: artifact.bytesWritten.toString(),
+					};
+				} catch (error) {
+					const converted = asGarbroError(error);
+					reportError = {
+						code: converted.code,
+						message: converted.message.slice(0, 2048),
+					};
+				}
+				const candidates =
+					options.inline === "summary"
+						? []
+						: result.items.filter(
+								(item) => options.inline === "all" || item.status === "failed",
+							);
+				const inlineItems = candidates
+					.slice(0, options.itemLimit)
+					.map(batchItemToWire);
+				return success(
+					boundedPage(
+						inlineItems,
+						(visible) => ({
+							status: result.status,
+							outputDirectory: result.outputDirectory,
+							selected: result.selected,
+							extracted: result.extracted,
+							skipped: result.skipped,
+							failed: result.failed,
+							bytesWritten: result.bytesWritten.toString(),
+							...(report === undefined ? {} : { report }),
+							...(reportError === undefined ? {} : { reportError }),
+							itemsOmitted: result.selected - visible.length,
+							responseTruncated: visible.length < result.selected,
+							offset: 0,
+							nextOffset:
+								visible.length < candidates.length ? visible.length : null,
+							items: visible,
+						}),
+						options.maxResponseBytes,
+						true,
+					),
+				);
 			} catch (error) {
 				return failure(error);
 			}
