@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "SBI",
+				class: "SbiFormat",
+				source: "ArcFormats/Vitamin/ImageSBI.cs",
+			},
+			localId: "vitamin-sbi-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CGD",
 				class: "CgdFormat",
 				source: "ArcFormats/GameSystem/ImageCGD.cs",

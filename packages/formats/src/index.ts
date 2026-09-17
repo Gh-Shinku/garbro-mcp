@@ -233,6 +233,7 @@ import { abelGpsImageFormat } from "./abel/gps-image.js";
 import { nexasGrpImageFormat } from "./nexas/grp-image.js";
 import { marblePrsImageFormat } from "./marble/prs-image.js";
 import { gameSystemCgdImageFormat } from "./gamesystem/cgd-image.js";
+import { vitaminSbiImageFormat } from "./vitamin/sbi-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -945,6 +946,7 @@ export * from "./yaneurao/index.js";
 export * from "./pajamas/index.js";
 export * from "./sceneplayer/index.js";
 export * from "./umesoft/index.js";
+export * from "./vitamin/index.js";
 export * from "./electriciteit/index.js";
 export * from "./abogado/index.js";
 export * from "./paprika/index.js";
@@ -1375,6 +1377,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		bananaMagImageFormat,
 		abelGpsImageFormat,
 		gameSystemCgdImageFormat,
+		vitaminSbiImageFormat,
 		marblePrsImageFormat,
 		nexasGrpImageFormat,
 		crowdGaxImageFormat,
