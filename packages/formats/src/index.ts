@@ -239,6 +239,7 @@ import { ipacIesImageFormat, ipacIesRawImageFormat } from "./ipac/ies-image.js";
 import { bellDaPwAudioFormat } from "./bellda/pw-audio.js";
 import { wingGemImageFormat } from "./wing/gem-image.js";
 import { uranDarImageFormat } from "./uran/dar-image.js";
+import { mayBeSoftHhpImageFormat } from "./maybesoft/hhp-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -853,6 +854,7 @@ export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
 export * from "./redzone/index.js";
+export * from "./maybesoft/index.js";
 export * from "./uran/index.js";
 export * from "./triangle/index.js";
 export * from "./tail/index.js";
@@ -1385,6 +1387,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameSystemCgdImageFormat,
 		vitaminSbiImageFormat,
 		bellDaPwAudioFormat,
+		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
 		wingGemImageFormat,
 		ipacIesImageFormat,
