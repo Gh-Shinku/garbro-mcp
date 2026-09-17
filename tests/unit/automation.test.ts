@@ -2,6 +2,7 @@ import {
 	ArchiveAutomationService,
 	WorkspacePolicy,
 	writeExtractionReport,
+	readExtractionReport,
 } from "@garbro-mcp/core";
 import { createDefaultRegistry } from "@garbro-mcp/formats";
 import {
@@ -154,5 +155,14 @@ describe("ArchiveAutomationService", () => {
 		expect(saved.bytesWritten).toBe("26");
 		expect(saved.items[0].error.code).toBe("OUTPUT_EXISTS");
 		expect(saved.items[1].artifact.sha256).toHaveLength(64);
+		const loaded = await readExtractionReport(
+			service.workspace,
+			report.relativePath,
+		);
+		expect(loaded.report).toEqual(saved);
+		expect(loaded.artifact.sha256).toBe(report.sha256);
+		await expect(
+			readExtractionReport(service.workspace, "../escape.json"),
+		).rejects.toMatchObject({ code: "INVALID_ARGUMENT" });
 	});
 });

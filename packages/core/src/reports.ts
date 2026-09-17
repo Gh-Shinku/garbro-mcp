@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
-import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { constants } from "node:fs";
+import { lstat, open, realpath, writeFile } from "node:fs/promises";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 import type { BatchExtractionResult, ExtractedArtifact } from "./automation.js";
 import { GarbroError } from "./errors.js";
 import type { WorkspacePolicy } from "./workspace.js";
@@ -36,4 +37,64 @@ export async function writeExtractionReport(
 		bytesWritten: BigInt(bytes.length),
 		sha256: createHash("sha256").update(bytes).digest("hex"),
 	};
+}
+
+/** Read only generated report paths, without creating output directories. */
+export async function readExtractionReport(
+	workspace: WorkspacePolicy,
+	relativePath: string,
+): Promise<{ report: unknown; artifact: ExtractedArtifact }> {
+	if (
+		!/^\.garbro-reports\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/.test(
+			relativePath,
+		)
+	)
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			"Expected a generated .garbro-reports/<id>.json path",
+		);
+	for (const directory of [
+		workspace.outputRoot,
+		resolve(workspace.outputRoot, ".garbro-reports"),
+	]) {
+		const info = await lstat(directory);
+		if (info.isSymbolicLink() || !info.isDirectory())
+			throw new GarbroError(
+				"UNSAFE_PATH",
+				"Report directory is not a real directory",
+			);
+	}
+	const path = resolve(workspace.outputRoot, relativePath);
+	const canonicalRoot = await realpath(workspace.outputRoot);
+	const relation = relative(canonicalRoot, await realpath(path));
+	if (
+		isAbsolute(relation) ||
+		relation === ".." ||
+		relation.startsWith(`..${sep}`) ||
+		(await lstat(path)).isSymbolicLink()
+	)
+		throw new GarbroError(
+			"UNSAFE_PATH",
+			"Report path escapes the output root or is a symbolic link",
+		);
+	const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
+	try {
+		const info = await file.stat();
+		if (!info.isFile())
+			throw new GarbroError("UNSAFE_PATH", "Report is not a regular file");
+		if (info.size > 64 * 1024 * 1024)
+			throw new GarbroError("LIMIT_EXCEEDED", "Report exceeds 64 MiB");
+		const bytes = await file.readFile();
+		return {
+			report: JSON.parse(bytes.toString("utf8")) as unknown,
+			artifact: {
+				relativePath,
+				absolutePath: path,
+				bytesWritten: BigInt(bytes.length),
+				sha256: createHash("sha256").update(bytes).digest("hex"),
+			},
+		};
+	} finally {
+		await file.close();
+	}
 }
