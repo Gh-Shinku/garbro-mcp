@@ -7,3 +7,4 @@ export * from "./do-image.js";
 export * from "./ggs-image.js";
 export * from "./ggp-image.js";
 export * from "./ygp-image.js";
+export * from "./tan-image.js";

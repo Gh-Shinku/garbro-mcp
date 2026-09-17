@@ -225,6 +225,8 @@ import { arccFormat } from "./hexenhaus/arcc.js";
 import { sdaSdFormat } from "./squadrad/sda.js";
 import { sqzFormat } from "./musica/sqz.js";
 import { mpkHgFormat } from "./tako/mpk.js";
+import { favoriteHzcImageFormat } from "./favorite/hzc-image.js";
+import { ikuraTanImageFormat } from "./ikura/tan-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
@@ -1363,6 +1365,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		sdaSdFormat,
 		sqzFormat,
 		mpkHgFormat,
+		favoriteHzcImageFormat,
+		ikuraTanImageFormat,
 		bananaMagImageFormat,
 		tanFormat,
 		csPackFormat,
