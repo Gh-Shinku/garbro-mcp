@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "XMG",
+				class: "XmgFormat",
+				source: "ArcFormats/Zyx/ImageXMG.cs",
+			},
+			localId: "zyx-xmg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MGX",
 				class: "MgxFormat",
 				source: "ArcFormats/UMeSoft/ArcMGX.cs",
