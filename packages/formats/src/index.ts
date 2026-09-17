@@ -237,6 +237,7 @@ import { vitaminSbiImageFormat } from "./vitamin/sbi-image.js";
 import { vitaminMfcImageFormat } from "./vitamin/mfc-image.js";
 import { ipacIesImageFormat, ipacIesRawImageFormat } from "./ipac/ies-image.js";
 import { bellDaPwAudioFormat } from "./bellda/pw-audio.js";
+import { wingGemImageFormat } from "./wing/gem-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -950,6 +951,7 @@ export * from "./pajamas/index.js";
 export * from "./sceneplayer/index.js";
 export * from "./umesoft/index.js";
 export * from "./vitamin/index.js";
+export * from "./wing/index.js";
 export * from "./electriciteit/index.js";
 export * from "./abogado/index.js";
 export * from "./paprika/index.js";
@@ -1382,6 +1384,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameSystemCgdImageFormat,
 		vitaminSbiImageFormat,
 		bellDaPwAudioFormat,
+		wingGemImageFormat,
 		ipacIesImageFormat,
 		ipacIesRawImageFormat,
 		vitaminMfcImageFormat,

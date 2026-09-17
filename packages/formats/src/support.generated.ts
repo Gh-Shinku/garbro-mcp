@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "GEM",
+				class: "GemFormat",
+				source: "Legacy/Wing/ImageGEM.cs",
+			},
+			localId: "wing-gem-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WAV/PW",
 				class: "PwAudio",
