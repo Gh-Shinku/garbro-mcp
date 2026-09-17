@@ -230,6 +230,7 @@ import { ikuraTanImageFormat } from "./ikura/tan-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
 import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { abelGpsImageFormat } from "./abel/gps-image.js";
+import { nexasGrpImageFormat } from "./nexas/grp-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1371,6 +1372,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikuraTanImageFormat,
 		bananaMagImageFormat,
 		abelGpsImageFormat,
+		nexasGrpImageFormat,
 		crowdGaxImageFormat,
 		tanFormat,
 		csPackFormat,

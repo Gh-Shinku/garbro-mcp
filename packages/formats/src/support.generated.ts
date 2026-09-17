@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GR3",
+				class: "GrpFormat",
+				source: "ArcFormats/Nexas/ImageGRP.cs",
+			},
+			localId: "nexas-grp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GPS",
 				class: "GpsFormat",
 				source: "ArcFormats/Abel/ImageGPS.cs",
