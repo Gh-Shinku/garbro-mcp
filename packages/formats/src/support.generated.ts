@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MTL",
+				class: "MtlFormat",
+				source: "ArcFormats/Zyx/ImageMTL.cs",
+			},
+			localId: "zyx-mtl-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "XMG",
 				class: "XmgFormat",
 				source: "ArcFormats/Zyx/ImageXMG.cs",
