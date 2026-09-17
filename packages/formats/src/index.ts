@@ -236,6 +236,7 @@ import { gameSystemCgdImageFormat } from "./gamesystem/cgd-image.js";
 import { vitaminSbiImageFormat } from "./vitamin/sbi-image.js";
 import { vitaminMfcImageFormat } from "./vitamin/mfc-image.js";
 import { ipacIesImageFormat, ipacIesRawImageFormat } from "./ipac/ies-image.js";
+import { bellDaPwAudioFormat } from "./bellda/pw-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1380,6 +1381,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		abelGpsImageFormat,
 		gameSystemCgdImageFormat,
 		vitaminSbiImageFormat,
+		bellDaPwAudioFormat,
 		ipacIesImageFormat,
 		ipacIesRawImageFormat,
 		vitaminMfcImageFormat,

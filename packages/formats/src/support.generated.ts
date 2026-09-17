@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WAV/PW",
+				class: "PwAudio",
+				source: "ArcFormats/BellDa/AudioPW.cs",
+			},
+			localId: "bell-da-pw-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "IES/RAW",
 				class: "IesRawFormat",
