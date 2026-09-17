@@ -1,0 +1,229 @@
+// Format reference: GARBro "ArcFormats/UMeSoft/ArcMGX.cs", classes `MgxOpener`, `MgxFormat` and
+// `MgxMetaData`. One file is both an archive of frames and the first of those frames as a picture: the port
+// keeps a port for each, the archive taking precedence so that a file opens as the several pictures it holds.
+// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
+
+import { GarbroError } from "@garbro-mcp/core";
+import type {
+	ArchiveFormat,
+	ByteSource,
+	FormatDescriptor,
+} from "@garbro-mcp/core";
+import { Readable } from "node:stream";
+import { changeExtension } from "../shared/companion.js";
+import {
+	checkPlacement,
+	createFixedEntry,
+	defineFixedArchive,
+	isSaneCount,
+	type FixedEntry,
+} from "../shared/fixed-archive.js";
+import {
+	GRX_INFO_OFFSET,
+	GRX_SIGNATURE,
+	grxReportedDepth,
+	readGrxInfo,
+	unpackGrx,
+	writeGrxBitmap,
+	type GrxLayout,
+} from "./grx-image.js";
+
+/** The four bytes of the signature, which the reference packs into a word, shared by both ports. */
+const SIGNATURE = Buffer.from([0x4d, 0x47, 0x58, 0x1a]);
+/** The archive keeps a count and then a place for every frame. */
+const COUNT_FIELD = 4;
+const INDEX_START = 8;
+/** The picture port keeps the place of the first frame there. */
+const FIRST_FRAME_FIELD = 8;
+const FIRST_FRAME_HEADER = 12;
+/** A picture this project is willing to hold, past which the reference would run out of memory. */
+const LIMIT = 256 * 1024 * 1024;
+
+export interface MgxLayout extends GrxLayout {
+	/** Where the picture of the U-Me Soft kind stands inside the file. */
+	grxOffset: number;
+}
+
+function invalidPicture(message: string): GarbroError {
+	return new GarbroError("INVALID_ARCHIVE", message);
+}
+
+/** `MgxOpener.TryOpen`: a count of frames, then the place of every one of them. */
+export function readMgxFrames(
+	data: Buffer,
+	baseName: string,
+): FixedEntry[] | undefined {
+	if (data.length < INDEX_START) return undefined;
+	if (!data.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
+	const count = data.readInt32LE(COUNT_FIELD);
+	if (!isSaneCount(count)) return undefined;
+	if (INDEX_START + count * 4 > data.length) return undefined;
+	const offsets: number[] = [];
+	for (let index = 0; index < count; index += 1) {
+		const offset = data.readUInt32LE(INDEX_START + index * 4);
+		if (offset > data.length) return undefined;
+		offsets.push(offset);
+	}
+	const size = BigInt(data.length);
+	const entries: FixedEntry[] = [];
+	for (let index = 0; index < count; index += 1) {
+		const offset = offsets[index] ?? 0;
+		const next =
+			index + 1 < count ? (offsets[index + 1] ?? offset) : data.length;
+		if (next < offset) return undefined;
+		if (!checkPlacement(BigInt(offset), BigInt(next - offset), size)) {
+			return undefined;
+		}
+		entries.push(
+			createFixedEntry({
+				id: index,
+				path: `${baseName}#${index.toString().padStart(4, "0")}.GRX`,
+				offset: BigInt(offset),
+				size: BigInt(next - offset),
+				metadata: { type: "image" },
+			}),
+		);
+	}
+	return entries;
+}
+
+/**
+ * `MgxFormat.ReadMetaData`: the four bytes `MGX\x1A` and the place of the first frame, where the four bytes
+ * of the picture of the U-Me Soft kind and its own fields stand. A file whose first frame does not stand
+ * wholly inside it is turned away rather than throwing the way the reference's own reader would.
+ */
+export function readMgxLayout(data: Buffer): MgxLayout | undefined {
+	if (data.length < FIRST_FRAME_HEADER) return undefined;
+	if (!data.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
+	const offset = data.readUInt32LE(FIRST_FRAME_FIELD);
+	if (offset + 4 > data.length) return undefined;
+	if (!data.subarray(offset, offset + 4).equals(GRX_SIGNATURE))
+		return undefined;
+	const info = readGrxInfo(data, offset + GRX_INFO_OFFSET);
+	if (!info) return undefined;
+	return { ...info, grxOffset: offset };
+}
+
+async function readStored(source: ByteSource): Promise<Buffer> {
+	return Buffer.from(await source.readAt(0n, Number(source.size)));
+}
+
+const ATTRIBUTION = {
+	project: "GARbro",
+	source: "ArcFormats/UMeSoft/ArcMGX.cs",
+	license: "MIT",
+	commit: "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
+} as const;
+
+export const umesoftMgxArchiveDescriptor: FormatDescriptor = {
+	id: "umesoft-mgx-archive",
+	name: "U-Me Soft multi-frame image",
+	extensions: ["grx"],
+	capabilities: {
+		detect: true,
+		list: true,
+		extract: true,
+		create: false,
+		encryption: false,
+	},
+	attribution: [ATTRIBUTION],
+};
+
+export const umesoftMgxArchiveFormat: ArchiveFormat = defineFixedArchive({
+	descriptor: umesoftMgxArchiveDescriptor,
+	// The file is both an archive and a picture; the archive is the fuller reading of it, so it is tried first.
+	detection: { signatures: [{ bytes: SIGNATURE }], priority: 10 },
+	async detect(source: ByteSource): Promise<boolean> {
+		if (source.size < BigInt(INDEX_START)) return false;
+		return (
+			readMgxFrames(
+				Buffer.from(await source.readAt(0n, Number(source.size))),
+				"x",
+			) !== undefined
+		);
+	},
+	async read(source: ByteSource, sourcePath: string) {
+		const baseName = sourcePath.replace(/^.*[/\\]/, "").replace(/\.[^.]*$/, "");
+		const entries = readMgxFrames(await readStored(source), baseName);
+		if (!entries) {
+			throw invalidPicture("Not a U-Me Soft multi-frame picture");
+		}
+		return { entries, metadata: { entryCount: entries.length } };
+	},
+});
+
+export const umesoftMgxImageDescriptor: FormatDescriptor = {
+	id: "umesoft-mgx-image",
+	name: "U-Me Soft multi-frame image",
+	extensions: ["grx"],
+	capabilities: {
+		detect: true,
+		list: true,
+		extract: true,
+		create: false,
+		encryption: false,
+	},
+	attribution: [ATTRIBUTION],
+};
+
+export const umesoftMgxImageFormat: ArchiveFormat = defineFixedArchive({
+	descriptor: umesoftMgxImageDescriptor,
+	detection: { signatures: [{ bytes: SIGNATURE }] },
+	async detect(source: ByteSource): Promise<boolean> {
+		if (source.size < BigInt(FIRST_FRAME_HEADER)) return false;
+		return readMgxLayout(await readStored(source)) !== undefined;
+	},
+	async read(source: ByteSource, sourcePath: string) {
+		const layout = readMgxLayout(await readStored(source));
+		if (!layout) {
+			throw invalidPicture("Not a U-Me Soft picture");
+		}
+		const depth = grxReportedDepth(layout);
+		const fileName = sourcePath.replace(/^.*[/\\]/, "");
+		return {
+			entries: [
+				{
+					...createFixedEntry({
+						id: 0,
+						path: changeExtension(fileName, "bmp"),
+						offset: BigInt(layout.grxOffset),
+						size: source.size - BigInt(layout.grxOffset),
+						compressed: layout.packed,
+						metadata: {
+							type: "image",
+							width: layout.width,
+							height: layout.height,
+							bitsPerPixel: depth,
+						},
+					}),
+					sizeKnown: false,
+				},
+			],
+			metadata: {
+				image: "bmp",
+				compression: layout.packed ? "grx" : "none",
+				width: layout.width,
+				height: layout.height,
+				bitsPerPixel: depth,
+			},
+		};
+	},
+	async openEntry(source: ByteSource) {
+		const stored = await readStored(source);
+		const layout = readMgxLayout(stored);
+		if (!layout) {
+			throw invalidPicture("Not a U-Me Soft picture");
+		}
+		const size = layout.width * layout.height * 4;
+		if (!Number.isSafeInteger(size) || size > LIMIT) {
+			throw new GarbroError(
+				"LIMIT_EXCEEDED",
+				`U-Me Soft picture of ${size} bytes is too large`,
+			);
+		}
+		const { pixels, outputDepth } = unpackGrx(stored, layout, layout.grxOffset);
+		return Readable.from([
+			writeGrxBitmap(layout.width, layout.height, pixels, outputDepth),
+		]);
+	},
+});
