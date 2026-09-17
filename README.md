@@ -10,17 +10,14 @@ independent, streaming implementations of its core API, CLI, and MCP server.
 
 ## Install the MCP server
 
-The server is currently available only by building this repository from source. Install Node.js 24
-or newer and pnpm 11, then run:
+Install Node.js 24 or newer, then download a versioned `garbro-mcp-<version>-portable.zip` from
+[GitHub Releases](https://github.com/Gh-Shinku/garbro-mcp/releases) and extract it. The portable
+server includes its runtime dependencies: no Git, pnpm, or build step is required.
 
-```shell
-git clone https://github.com/Gh-Shinku/garbro-mcp.git
-cd garbro-mcp
-pnpm install
-pnpm build
-```
+Experimental release assets are published manually. If no portable ZIP is available yet, use the
+[source installation guide](docs/development.md#requirements-and-setup).
 
-Add the built stdio server to your MCP client configuration. Use absolute paths for the server,
+Add the extracted stdio server to your MCP client configuration. Use absolute paths for the server,
 input roots, and output root:
 
 ```json
@@ -29,7 +26,7 @@ input roots, and output root:
     "garbro": {
       "command": "node",
       "args": [
-        "C:/path/to/garbro-mcp/packages/mcp/dist/index.js",
+        "C:/Tools/garbro-mcp/garbro-mcp.cjs",
         "--input-root", "games=D:/Games",
         "--output-root", "D:/garbro-output"
       ]
@@ -41,10 +38,15 @@ input roots, and output root:
 For filesystem policy, available tools, limits, and configuration details, read the
 [MCP guide](docs/mcp.md).
 
+Choose a fixed experimental version and verify it with `node garbro-mcp.cjs --version`. To update
+or roll back, download another version, change the configured path, and restart your MCP client.
+The optional `.tgz` can be installed locally with npm; see the [distribution guide](docs/distribution.md).
+
 ## Documentation
 
 - [MCP installation, configuration, and tool contracts](docs/mcp.md)
 - [Development setup, package layout, CLI, and testing](docs/development.md)
+- [Experimental artifacts, checksums, and release workflow](docs/distribution.md)
 - [Format support status and compatibility methodology](docs/support.md)
 - [Individual format notes](docs/formats/)
 

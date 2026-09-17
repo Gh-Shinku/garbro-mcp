@@ -3,13 +3,20 @@
 ## Requirements and setup
 
 - Node.js 24 or newer
-- pnpm 11
+- pnpm 11.26.0 (pinned in `package.json`)
 
 ```shell
-pnpm install
+git clone https://github.com/Gh-Shinku/garbro-mcp.git
+cd garbro-mcp
+pnpm install --frozen-lockfile
 pnpm build
 pnpm check
 ```
+
+For source installations, configure the MCP client to run Node with the absolute path to
+`packages/mcp/dist/index.js`, followed by `--input-root id=/path/to/input` and
+`--output-root /path/to/output`. Ordinary users should prefer the prebuilt portable distribution;
+see [distribution.md](distribution.md) for local artifact builds and release verification.
 
 The repository is a private pnpm workspace:
 
