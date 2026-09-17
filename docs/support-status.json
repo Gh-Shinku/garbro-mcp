@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "NGC",
+				"class": "NgcFormat",
+				"source": "Legacy/Brownie/ImageNGC.cs"
+			},
+			"localId": "brownie-ngc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "HHP",
 				"class": "HhpFormat",
 				"source": "Legacy/MayBeSoft/ImageHHP.cs"

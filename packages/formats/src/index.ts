@@ -240,6 +240,7 @@ import { bellDaPwAudioFormat } from "./bellda/pw-audio.js";
 import { wingGemImageFormat } from "./wing/gem-image.js";
 import { uranDarImageFormat } from "./uran/dar-image.js";
 import { mayBeSoftHhpImageFormat } from "./maybesoft/hhp-image.js";
+import { brownieNgcImageFormat } from "./brownie/ngc-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1387,6 +1388,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameSystemCgdImageFormat,
 		vitaminSbiImageFormat,
 		bellDaPwAudioFormat,
+		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
 		wingGemImageFormat,
