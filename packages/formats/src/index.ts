@@ -228,6 +228,7 @@ import { mpkHgFormat } from "./tako/mpk.js";
 import { favoriteHzcImageFormat } from "./favorite/hzc-image.js";
 import { ikuraTanImageFormat } from "./ikura/tan-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
+import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1368,6 +1369,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		favoriteHzcImageFormat,
 		ikuraTanImageFormat,
 		bananaMagImageFormat,
+		crowdGaxImageFormat,
 		tanFormat,
 		csPackFormat,
 		cpcFormat,
