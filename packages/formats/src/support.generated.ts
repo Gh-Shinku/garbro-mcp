@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DAR",
+				class: "DarFormat",
+				source: "Legacy/Uran/ImageDAR.cs",
+			},
+			localId: "uran-dar-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GEM",
 				class: "GemFormat",
 				source: "Legacy/Wing/ImageGEM.cs",
