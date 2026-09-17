@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MAG",
+				class: "MagFormat",
+				source: "ArcFormats/Banana/ImageMAG.cs",
+			},
+			localId: "banana-mag-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "SPL",
 				class: "SplFormat",
 				source: "ArcFormats/Zyx/ImageSPL.cs",
