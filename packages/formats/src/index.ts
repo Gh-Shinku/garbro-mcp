@@ -275,6 +275,7 @@ import {
 	sceplayG24aImageFormat,
 } from "./sceplay/g24-image.js";
 import { creativeVocAudioFormat } from "./creative/voc-audio.js";
+import { egnImageFormat } from "./unknown/egn-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1456,6 +1457,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		sceplayG24aImageFormat,
 		sceplayG2408ImageFormat,
 		creativeVocAudioFormat,
+		egnImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
