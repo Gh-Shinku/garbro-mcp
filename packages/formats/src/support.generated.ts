@@ -9,6 +9,25 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DDS",
+				class: "DdsFormat",
+				source: "ArcFormats/DirectDraw/ImageDDS.cs",
+			},
+			localId: "directdraw-dds-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"DX10 and other compressed kinds",
+				"YUV and luminance colours",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CP2",
 				class: "Cp2Format",
 				source: "Legacy/Aquarium/ImageCP2.cs",
