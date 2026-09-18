@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "RC8",
+				class: "Rc8Format",
+				source: "ArcFormats/Majiro/ImageRC8.cs",
+			},
+			localId: "majiro-rc8-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "DTLC/SOHFU",
 				class: "DtlcFormat",
 				source: "ArcFormats/Sohfu/ImageDTL.cs",

@@ -258,6 +258,7 @@ import {
 	sohfuDtlImageFormat,
 	sohfuDtlcImageFormat,
 } from "./sohfu/dtl-image.js";
+import { majiroRc8ImageFormat } from "./majiro/rc8-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1423,6 +1424,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		technoBrainWapeAudioFormat,
 		sohfuDtlImageFormat,
 		sohfuDtlcImageFormat,
+		majiroRc8ImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
