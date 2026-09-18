@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "ADP/CROSSNET",
+				class: "AdpAudio",
+				source: "Legacy/CrossNet/AudioADP.cs",
+			},
+			localId: "crossnet-adp-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "ADP",
 				class: "AdpAudio",
 				source: "ArcFormats/Abogado/AudioADP.cs",
