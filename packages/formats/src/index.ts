@@ -269,6 +269,7 @@ import {
 	frontWingFwgiImageFormat,
 } from "./frontwing/fg-image.js";
 import { kaasAudioFormat } from "./kaas/kaas-audio.js";
+import { mebiusMcgImageFormat } from "./mebius/mcg-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1016,6 +1017,7 @@ export * from "./mugi/index.js";
 export * from "./cotton-club/index.js";
 export * from "./crowd/index.js";
 export * from "./aypio/index.js";
+export * from "./mebius/index.js";
 export * from "./melonpan/index.js";
 export * from "./scoop/index.js";
 export * from "./rain/index.js";
@@ -1444,6 +1446,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		frontWingFwgiImageFormat,
 		frontWingFweiImageFormat,
 		kaasAudioFormat,
+		mebiusMcgImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,

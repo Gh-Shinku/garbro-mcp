@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "MCG/MEBIUS",
+				class: "McgFormat",
+				source: "ArcFormats/Mebius/ImageMCG.cs",
+			},
+			localId: "mebius-mcg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "PCM/KAAS",
 				class: "KaasAudio",
