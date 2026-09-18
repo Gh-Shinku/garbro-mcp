@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GXT",
+				"class": "GxtFormat",
+				"source": "ArcFormats/Cri/ImageGXT.cs"
+			},
+			"localId": "cri-gxt-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"texture formats other than UBC3"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "DDS",
 				"class": "DdsFormat",
 				"source": "ArcFormats/DirectDraw/ImageDDS.cs"
