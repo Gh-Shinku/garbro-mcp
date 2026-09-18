@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "HG3",
+				class: "Hg3Format",
+				source: "ArcFormats/CatSystem/ImageHG3.cs",
+			},
+			localId: "cat-system-hg3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"JPEG and WebP sections",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"JPEG and WebP sections",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "HG2",
 				class: "Hg2Format",
 				source: "ArcFormats/CatSystem/ImageHG2.cs",

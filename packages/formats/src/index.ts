@@ -249,6 +249,7 @@ import { gpk2GfbImageFormat } from "./gpk2/gfb-image.js";
 import { cgdKToolImageFormat, cgdSpielImageFormat } from "./kapp/cgd-image.js";
 import { tailCfpImageFormat, tailCfp2ImageFormat } from "./tail/cfp-image.js";
 import { catSystemHg2ImageFormat } from "./cat-system/hg2-image.js";
+import { catSystemHg3ImageFormat } from "./cat-system/hg3-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1407,6 +1408,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tailCfpImageFormat,
 		tailCfp2ImageFormat,
 		catSystemHg2ImageFormat,
+		catSystemHg3ImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
