@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GRB",
+				class: "GrbFormat",
+				source: "Legacy/CrossNet/ImageGRB.cs",
+			},
+			localId: "crossnet-grb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "RSG",
 				class: "RsgFormat",
 				source: "Legacy/RSystem/ImageRSG.cs",
