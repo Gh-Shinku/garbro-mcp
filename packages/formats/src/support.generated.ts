@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "PCM/KAAS",
+				class: "KaasAudio",
+				source: "ArcFormats/Kaas/AudioKAAS.cs",
+			},
+			localId: "kaas-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "FG/FWEI",
 				class: "FweiFormat",

@@ -268,6 +268,7 @@ import {
 	frontWingFweiImageFormat,
 	frontWingFwgiImageFormat,
 } from "./frontwing/fg-image.js";
+import { kaasAudioFormat } from "./kaas/kaas-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1442,6 +1443,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameSystemChrImageFormat,
 		frontWingFwgiImageFormat,
 		frontWingFweiImageFormat,
+		kaasAudioFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
