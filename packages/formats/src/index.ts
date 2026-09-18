@@ -274,6 +274,7 @@ import {
 	sceplayG2408ImageFormat,
 	sceplayG24aImageFormat,
 } from "./sceplay/g24-image.js";
+import { creativeVocAudioFormat } from "./creative/voc-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -849,6 +850,7 @@ export * from "./black-rainbow/index.js";
 export * from "./clio/index.js";
 export * from "./circus/index.js";
 export * from "./cat-system/index.js";
+export * from "./creative/index.js";
 export * from "./cri/index.js";
 export * from "./abel/index.js";
 export * from "./antique/index.js";
@@ -1453,6 +1455,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mebiusMcgImageFormat,
 		sceplayG24aImageFormat,
 		sceplayG2408ImageFormat,
+		creativeVocAudioFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
