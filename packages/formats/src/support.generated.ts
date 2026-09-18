@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "XTX",
+				class: "XtxFormat",
+				source: "ArcFormats/Cri/ImageXTX.cs",
+			},
+			localId: "cri-xtx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the second kind of tiling",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GXT",
 				class: "GxtFormat",
 				source: "ArcFormats/Cri/ImageGXT.cs",
