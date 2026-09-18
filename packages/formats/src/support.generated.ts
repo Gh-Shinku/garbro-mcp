@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CPB/TYP1",
+				class: "Typ1Format",
+				source: "ArcFormats/AZSys/ImageTYP1.cs",
+			},
+			localId: "az-sys-typ1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "XTX",
 				class: "XtxFormat",
 				source: "ArcFormats/Cri/ImageXTX.cs",

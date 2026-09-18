@@ -286,6 +286,7 @@ import { aquariumCp2ImageFormat } from "./aquarium/cp2-image.js";
 import { directDrawDdsImageFormat } from "./directdraw/dds-image.js";
 import { criGxtImageFormat } from "./cri/gxt-image.js";
 import { criXtxImageFormat } from "./cri/xtx-image.js";
+import { azSysTyp1ImageFormat } from "./azsys/typ1-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -854,6 +855,7 @@ export * from "./active-soft/index.js";
 export * from "./ail/index.js";
 export * from "./amaterasu/index.js";
 export * from "./artemis/index.js";
+export * from "./azsys/index.js";
 export * from "./basil/index.js";
 export * from "./bishop/index.js";
 export * from "./banana/index.js";
@@ -1479,6 +1481,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		directDrawDdsImageFormat,
 		criGxtImageFormat,
 		criXtxImageFormat,
+		azSysTyp1ImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
