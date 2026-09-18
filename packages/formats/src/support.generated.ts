@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "HG2",
+				class: "Hg2Format",
+				source: "ArcFormats/CatSystem/ImageHG2.cs",
+			},
+			localId: "cat-system-hg2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CFP/REB2",
 				class: "Cfp2Format",
 				source: "ArcFormats/Tail/ImageCFP.cs",
