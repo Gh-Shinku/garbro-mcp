@@ -280,6 +280,7 @@ import { digitalMonkeyPktImageFormat } from "./digital-monkey/pkt-image.js";
 import { cadathCgfImageFormat } from "./cadath/cgf-image.js";
 import { cadathVwfAudioFormat } from "./cadath/vwf-audio.js";
 import { tanakaBcImageFormat } from "./tanaka/bc-image.js";
+import { keroqKgdImageFormat } from "./keroq/kgd-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1466,6 +1467,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cadathCgfImageFormat,
 		cadathVwfAudioFormat,
 		tanakaBcImageFormat,
+		keroqKgdImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
