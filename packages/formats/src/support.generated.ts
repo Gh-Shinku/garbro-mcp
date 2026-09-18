@@ -9,6 +9,23 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "LMG",
+				class: "LmgFormat",
+				source: "Legacy/CottonClub/ImageLMG.cs",
+			},
+			localId: "cotton-club-lmg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding", "JPEG method"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"JPEG method",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CTF",
 				class: "CtfFormat",
 				source: "Legacy/Unknown/ImageCTF.cs",
