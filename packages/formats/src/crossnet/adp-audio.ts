@@ -182,7 +182,7 @@ export function decodeCrossNetAdp(
 		if (at + 2 > output.length) {
 			throw invalidSound("CrossNet sound writes past its own end");
 		}
-		output.writeInt16LE(value & 0xffff, at);
+		output.writeInt16LE(value, at);
 	};
 	let source = layout.dataOffset;
 	const readByte = (): number => {

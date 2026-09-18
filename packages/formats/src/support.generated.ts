@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "WV1",
+				class: "Wv1Audio",
+				source: "Legacy/Aaru/AudioWV1.cs",
+			},
+			localId: "aaru-wv1-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "ADP/CROSSNET",
 				class: "AdpAudio",
 				source: "Legacy/CrossNet/AudioADP.cs",
