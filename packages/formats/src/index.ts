@@ -263,6 +263,7 @@ import { basilBcfImageFormat } from "./basil/bcf-image.js";
 import { unknownCtfImageFormat } from "./unknown/ctf-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
 import { kidPrtImageFormat } from "./kid/prt-image.js";
+import { gameSystemChrImageFormat } from "./gamesystem/chr-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1434,6 +1435,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		unknownCtfImageFormat,
 		cottonClubLmgImageFormat,
 		kidPrtImageFormat,
+		gameSystemChrImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
