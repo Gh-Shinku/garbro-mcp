@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CTF",
+				class: "CtfFormat",
+				source: "Legacy/Unknown/ImageCTF.cs",
+			},
+			localId: "unknown-ctf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BCF",
 				class: "BcfFormat",
 				source: "ArcFormats/Basil/ImageBCF.cs",
