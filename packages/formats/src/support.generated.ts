@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "EXP/CLIO",
+				class: "ExpFormat",
+				source: "Legacy/Clio/ImageEXP.cs",
+			},
+			localId: "clio-exp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MRL",
 				class: "MrlFormat",
 				source: "Legacy/Artel/ImageMRL.cs",
