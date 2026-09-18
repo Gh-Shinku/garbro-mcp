@@ -247,6 +247,7 @@ import { rsystemRsgImageFormat } from "./rsystem/rsg-image.js";
 import { crossNetGrbImageFormat } from "./crossnet/grb-image.js";
 import { gpk2GfbImageFormat } from "./gpk2/gfb-image.js";
 import { cgdKToolImageFormat, cgdSpielImageFormat } from "./kapp/cgd-image.js";
+import { tailCfpImageFormat, tailCfp2ImageFormat } from "./tail/cfp-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1402,6 +1403,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		gpk2GfbImageFormat,
 		cgdKToolImageFormat,
 		cgdSpielImageFormat,
+		tailCfpImageFormat,
+		tailCfp2ImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,

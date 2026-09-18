@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CFP/REB2",
+				class: "Cfp2Format",
+				source: "ArcFormats/Tail/ImageCFP.cs",
+			},
+			localId: "tail-cfp-reb2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "CFP",
+				class: "CfpFormat",
+				source: "ArcFormats/Tail/ImageCFP.cs",
+			},
+			localId: "tail-cfp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CGD/SPIEL",
 				class: "CgdSpielFormat",
 				source: "Legacy/KApp/ImageCGD.cs",
