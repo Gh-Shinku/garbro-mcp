@@ -250,6 +250,7 @@ import { cgdKToolImageFormat, cgdSpielImageFormat } from "./kapp/cgd-image.js";
 import { tailCfpImageFormat, tailCfp2ImageFormat } from "./tail/cfp-image.js";
 import { catSystemHg2ImageFormat } from "./cat-system/hg2-image.js";
 import { catSystemHg3ImageFormat } from "./cat-system/hg3-image.js";
+import { abogadoAdpAudioFormat } from "./abogado/adp-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1409,6 +1410,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tailCfp2ImageFormat,
 		catSystemHg2ImageFormat,
 		catSystemHg3ImageFormat,
+		abogadoAdpAudioFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
