@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "VWF",
+				class: "VwfAudio",
+				source: "ArcFormats/Cadath/AudioVWF.cs",
+			},
+			localId: "cadath-vwf-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "CGF/CADATH",
 				class: "CgfFormat",

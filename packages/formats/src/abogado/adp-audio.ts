@@ -31,7 +31,7 @@ const LIMIT = 256 * 1024 * 1024;
 /**
  * `AdpDecoder.QuantizeTable`, one step for every quantiser the walk may stand at.
  */
-const QUANTIZE_TABLE = new Uint16Array([
+export const ADP_QUANTIZE_TABLE = new Uint16Array([
 	0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x0010,
 	0x0011, 0x0013, 0x0015, 0x0017, 0x0019, 0x001c, 0x001f, 0x0022, 0x0025,
 	0x0029, 0x002d, 0x0032, 0x0037, 0x003c, 0x0042, 0x0049, 0x0050, 0x0058,
@@ -105,7 +105,7 @@ export class AbogadoAdpDecoder {
 
 	decode(code: number): number {
 		const nibble = code & 0x0f;
-		const quant = QUANTIZE_TABLE[this.#quantizer] ?? 0;
+		const quant = ADP_QUANTIZE_TABLE[this.#quantizer] ?? 0;
 		this.#quantizer += INCREMENT_TABLE[nibble] ?? 0;
 		if (this.#quantizer < 0) this.#quantizer = 0;
 		else if (this.#quantizer > MAXIMUM_QUANTIZER) {
