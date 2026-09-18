@@ -262,6 +262,7 @@ import { majiroRc8ImageFormat } from "./majiro/rc8-image.js";
 import { basilBcfImageFormat } from "./basil/bcf-image.js";
 import { unknownCtfImageFormat } from "./unknown/ctf-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
+import { kidPrtImageFormat } from "./kid/prt-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1432,6 +1433,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		basilBcfImageFormat,
 		unknownCtfImageFormat,
 		cottonClubLmgImageFormat,
+		kidPrtImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
