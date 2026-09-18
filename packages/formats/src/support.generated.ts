@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CGF/CADATH",
+				class: "CgfFormat",
+				source: "ArcFormats/Cadath/ImageCGF.cs",
+			},
+			localId: "cadath-cgf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PKT/DM",
 				class: "PktFormat",
 				source: "Legacy/DigitalMonkey/ImagePKT.cs",
