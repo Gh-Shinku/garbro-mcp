@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "G2408A",
+				class: "G2408Format",
+				source: "Legacy/Sceplay/ImageG24.cs",
+			},
+			localId: "sceplay-g2408-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "G24A",
+				class: "G24AFormat",
+				source: "Legacy/Sceplay/ImageG24.cs",
+			},
+			localId: "sceplay-g24a-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MCG/MEBIUS",
 				class: "McgFormat",
 				source: "ArcFormats/Mebius/ImageMCG.cs",

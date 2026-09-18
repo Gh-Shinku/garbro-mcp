@@ -270,6 +270,10 @@ import {
 } from "./frontwing/fg-image.js";
 import { kaasAudioFormat } from "./kaas/kaas-audio.js";
 import { mebiusMcgImageFormat } from "./mebius/mcg-image.js";
+import {
+	sceplayG2408ImageFormat,
+	sceplayG24aImageFormat,
+} from "./sceplay/g24-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1447,6 +1451,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		frontWingFweiImageFormat,
 		kaasAudioFormat,
 		mebiusMcgImageFormat,
+		sceplayG24aImageFormat,
+		sceplayG2408ImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
