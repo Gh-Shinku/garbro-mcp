@@ -5,6 +5,34 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "DTLC/SOHFU",
+				"class": "DtlcFormat",
+				"source": "ArcFormats/Sohfu/ImageDTL.cs"
+			},
+			"localId": "sohfu-dtlc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DTL/SOHFU",
+				"class": "DtlFormat",
+				"source": "ArcFormats/Sohfu/ImageDTL.cs"
+			},
+			"localId": "sohfu-dtl-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "WAPE",
 				"class": "WapeAudio",

@@ -254,6 +254,10 @@ import { abogadoAdpAudioFormat } from "./abogado/adp-audio.js";
 import { crossNetAdpAudioFormat } from "./crossnet/adp-audio.js";
 import { aaruWv1AudioFormat } from "./aaru/wv1-audio.js";
 import { technoBrainWapeAudioFormat } from "./techno-brain/wape-audio.js";
+import {
+	sohfuDtlImageFormat,
+	sohfuDtlcImageFormat,
+} from "./sohfu/dtl-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1417,6 +1421,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		crossNetAdpAudioFormat,
 		aaruWv1AudioFormat,
 		technoBrainWapeAudioFormat,
+		sohfuDtlImageFormat,
+		sohfuDtlcImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
