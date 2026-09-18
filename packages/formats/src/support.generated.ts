@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "FG/FWEI",
+				class: "FweiFormat",
+				source: "ArcFormats/FrontWing/ImageFG.cs",
+			},
+			localId: "frontwing-fwei-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "FG/FWGI",
+				class: "FwgiFormat",
+				source: "ArcFormats/FrontWing/ImageFG.cs",
+			},
+			localId: "frontwing-fwgi-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CHR",
 				class: "ChrFormat",
 				source: "ArcFormats/GameSystem/ImageCHR.cs",
