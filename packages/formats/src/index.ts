@@ -259,6 +259,7 @@ import {
 	sohfuDtlcImageFormat,
 } from "./sohfu/dtl-image.js";
 import { majiroRc8ImageFormat } from "./majiro/rc8-image.js";
+import { basilBcfImageFormat } from "./basil/bcf-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1425,6 +1426,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		sohfuDtlImageFormat,
 		sohfuDtlcImageFormat,
 		majiroRc8ImageFormat,
+		basilBcfImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,

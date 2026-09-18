@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "BCF",
+				class: "BcfFormat",
+				source: "ArcFormats/Basil/ImageBCF.cs",
+			},
+			localId: "basil-bcf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "RC8",
 				class: "Rc8Format",
 				source: "ArcFormats/Majiro/ImageRC8.cs",
