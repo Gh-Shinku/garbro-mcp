@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GFB",
+				class: "GfbFormat",
+				source: "ArcFormats/Gpk2/ImageGFB.cs",
+			},
+			localId: "gpk2-gfb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GRB",
 				class: "GrbFormat",
 				source: "Legacy/CrossNet/ImageGRB.cs",
