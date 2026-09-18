@@ -281,6 +281,7 @@ import { cadathCgfImageFormat } from "./cadath/cgf-image.js";
 import { cadathVwfAudioFormat } from "./cadath/vwf-audio.js";
 import { tanakaBcImageFormat } from "./tanaka/bc-image.js";
 import { keroqKgdImageFormat } from "./keroq/kgd-image.js";
+import { splushWaveSwgImageFormat } from "./splush-wave/swg-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1468,6 +1469,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cadathVwfAudioFormat,
 		tanakaBcImageFormat,
 		keroqKgdImageFormat,
+		splushWaveSwgImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
