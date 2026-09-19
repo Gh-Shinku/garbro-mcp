@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PIC/GROCER",
+				class: "PicFormat",
+				source: "Legacy/Grocer/ImagePIC.cs",
+			},
+			localId: "grocer-pic-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PDT/UK2",
 				class: "PdtFormat",
 				source: "Legacy/AyPio/ImagePDT.cs",

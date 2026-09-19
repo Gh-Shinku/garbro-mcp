@@ -324,6 +324,7 @@ import { dlbFormat } from "./aypio/dlb.js";
 import { dlbV0Format } from "./aypio/dlb.js";
 import { aypioVocAudioFormat } from "./aypio/voc-audio.js";
 import { aypioPdtImageFormat } from "./aypio/pdt-image.js";
+import { grocerPicImageFormat } from "./grocer/pic-image.js";
 import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
@@ -1141,6 +1142,7 @@ export * from "./ugos/index.js";
 export * from "./dai-system/index.js";
 export * from "./n-system/index.js";
 export * from "./inspire/index.js";
+export * from "./grocer/index.js";
 export * from "./groover/index.js";
 export * from "./splush-wave/index.js";
 export * from "./lazycrew/index.js";
@@ -1540,6 +1542,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		dlbV0Format,
 		aypioVocAudioFormat,
 		aypioPdtImageFormat,
+		grocerPicImageFormat,
 		morningTtdFormat,
 		studioSakuraDatFormat,
 		fwaFormat,
