@@ -649,6 +649,7 @@ import { frmImageFormat } from "./logg/frm-image.js";
 import { mbpImageFormat } from "./hmp/mbp-image.js";
 import { muwAudioFormat } from "./artel/muw-audio.js";
 import { um3AudioFormat } from "./bruns/um3-audio.js";
+import { brunsEencImageFormat } from "./bruns/eenc-image.js";
 import { dwvAudioFormat } from "./sysd/dwv-audio.js";
 import { qdoScriptFormat } from "./redzone/qdo-script.js";
 import { nsfAudioFormat } from "./pan/nsf-audio.js";
@@ -1870,6 +1871,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mbpImageFormat,
 		muwAudioFormat,
 		um3AudioFormat,
+		brunsEencImageFormat,
 		dwvAudioFormat,
 		qdoScriptFormat,
 		nsfAudioFormat,

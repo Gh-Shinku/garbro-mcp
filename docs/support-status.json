@@ -6,6 +6,24 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "EENC",
+				"class": "EencFormat",
+				"source": "ArcFormats/Bruns/ImageEENC.cs"
+			},
+			"localId": "bruns-eenc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures of kinds other than a bitmap and a portable network graphic"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "CMP/ARK",
 				"class": "CmpFormat",
 				"source": "Legacy/Ark/ImageCMP.cs"
