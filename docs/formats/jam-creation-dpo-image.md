@@ -41,8 +41,8 @@ no tile reaches standing as nought.
 - The reference reads a tile with whatever reader its own catalog knows; the port reads a bitmap and turns any
   other kind of picture away.
 - The reference hands its tiles to the platform, which keeps the shape of a place where the picture carries one
-  and stands for a whole one where it does not; the project's own walk into four byte places leaves the shape
-  of a place as nought, so the port stands it back the way the platform would.
+  and stands for a whole one where it does not; the port walks a tile into four byte places with the same shape
+  of a place, which `toBgra32` carries where its caller asks for it.
 - A file of fewer than forty eight bytes, a file whose word is not `Divided Picture`, a file whose word at
   `0x10` is not one, a file of a shape other than one or two, a table of names whose size does not stand at
   four bytes for every name, a tile naming a picture the table does not hold, and a canvas of no places or of
