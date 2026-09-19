@@ -291,6 +291,7 @@ import { csWareBpcImageFormat } from "./csware/bpc-image.js";
 import { uncannyCiiImageFormat } from "./uncanny/cii-image.js";
 import { aoiAgfImageFormat } from "./aoi/agf-image.js";
 import { blackRainbowBmdImageFormat } from "./black-rainbow/bmd-image.js";
+import { mebiusKoeAudioFormat } from "./mebius/koe-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1490,6 +1491,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		uncannyCiiImageFormat,
 		aoiAgfImageFormat,
 		blackRainbowBmdImageFormat,
+		mebiusKoeAudioFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,

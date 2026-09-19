@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "KOE/MEBIUS",
+				class: "KoeAudio",
+				source: "ArcFormats/Mebius/AudioKOE.cs",
+			},
+			localId: "mebius-koe-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "BMD",
 				class: "BmdFormat",
