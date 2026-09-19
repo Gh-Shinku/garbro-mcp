@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CMP/ARK",
+				class: "CmpFormat",
+				source: "Legacy/Ark/ImageCMP.cs",
+			},
+			localId: "ark-cmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BMP/NNNN",
 				class: "NNNNBmpFormat",
 				source: "ArcFormats/MokoPro/CompressedFile.cs",

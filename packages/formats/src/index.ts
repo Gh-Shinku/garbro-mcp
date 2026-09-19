@@ -501,6 +501,7 @@ import { yukaYkcFormat } from "./yuka/ykc.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
 import { mokoProBmpImageFormat } from "./moko-pro/bmp-image.js";
 import { mokoProOggAudioFormat } from "./moko-pro/ogg-audio.js";
+import { arkCmpImageFormat } from "./ark/cmp-image.js";
 import { eveGmFormat } from "./eve/gm.js";
 import { studioEgoPak0Format } from "./studio-ego/pak0.js";
 import { nexasPacFormat } from "./nexas/pac.js";
@@ -939,6 +940,7 @@ export * from "./sceplay/index.js";
 export * from "./tigerman/index.js";
 export * from "./iris/index.js";
 export * from "./herb/index.js";
+export * from "./ark/index.js";
 export * from "./applepie/index.js";
 export * from "./artel/index.js";
 export * from "./rsystem/index.js";
@@ -1721,6 +1723,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mokoProNnnnFormat,
 		mokoProBmpImageFormat,
 		mokoProOggAudioFormat,
+		arkCmpImageFormat,
 		eveGmFormat,
 		studioEgoPak0Format,
 		nexasPacFormat,
