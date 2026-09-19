@@ -11,12 +11,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import {
-	type BmpImage,
-	readBmpImage,
-	toBgra32,
-	writeBmp32,
-} from "../shared/bmp.js";
+import { readBmpImage, toBgra32, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -197,28 +192,6 @@ function readSlice(
 	return data.subarray(offset, end);
 }
 
-/**
- * The places of a picture beside the file, four bytes apiece. The reference hands its tiles to the reader of
- * the platform, which keeps the shape of a place where the picture carries one and stands for a whole one
- * where it does not; the project's own walk into four byte places leaves the shape of a place as nought, so
- * the port stands it back the way the platform would.
- */
-function tilePixels(image: BmpImage): Buffer | undefined {
-	const bgra = toBgra32(image);
-	if (!bgra) return undefined;
-	const count = image.width * image.height;
-	if (32 === image.bitsPerPixel) {
-		for (let index = 0; index < count; index += 1) {
-			bgra[index * 4 + 3] = image.pixels[index * 4 + 3] ?? 0;
-		}
-	} else {
-		for (let index = 0; index < count; index += 1) {
-			bgra[index * 4 + 3] = 0xff;
-		}
-	}
-	return bgra;
-}
-
 /** A picture beside the file, walked out into the places of a canvas of four bytes a place. */
 interface DpoSource {
 	width: number;
@@ -239,7 +212,8 @@ async function readDpoSources(
 				cache.set(name, undefined);
 			} else {
 				const bmp = readBmpImage(stored);
-				const bgra = bmp ? tilePixels(bmp) : undefined;
+				// The shape of a place of a tile is what stands the tiles of a canvas beside each other.
+				const bgra = bmp ? toBgra32(bmp, true) : undefined;
 				cache.set(
 					name,
 					bmp && bgra

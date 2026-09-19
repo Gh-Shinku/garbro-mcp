@@ -485,8 +485,14 @@ export function writeBmpImage(image: BmpImage): Buffer {
  * six bit channels widened by repeating their high bits. The fourth byte of a bitmap that has no alpha
  * channel is left at zero, which is what `PixelFormats.Bgr32` carries; a caller that goes on to write its own
  * alpha into it overwrites it either way.
+ *
+ * Where `keepAlpha` stands, the fourth byte of a bitmap of thirty two bits keeps its own value and the fourth
+ * byte of every other bitmap stands as a whole one, which is what the framework's own conversions carry.
  */
-export function toBgra32(image: BmpImage): Buffer | undefined {
+export function toBgra32(
+	image: BmpImage,
+	keepAlpha = false,
+): Buffer | undefined {
 	const { width, height, bitsPerPixel, palette, pixels } = image;
 	const count = width * height;
 	const output: Buffer = Buffer.alloc(count * 4);
@@ -505,6 +511,7 @@ export function toBgra32(image: BmpImage): Buffer | undefined {
 				const byte = pixels[Math.floor(i / perByte)] ?? 0;
 				const shift = 8 - bitsPerPixel * ((i % perByte) + 1);
 				entry((byte >> shift) & mask, i * 4);
+				if (keepAlpha) output[i * 4 + 3] = 0xff;
 			}
 			return output;
 		}
@@ -521,6 +528,7 @@ export function toBgra32(image: BmpImage): Buffer | undefined {
 					green.bits,
 				);
 				output[i * 4 + 2] = widen((value & masks.red) >>> red.shift, red.bits);
+				if (keepAlpha) output[i * 4 + 3] = 0xff;
 			}
 			return output;
 		}
@@ -529,6 +537,7 @@ export function toBgra32(image: BmpImage): Buffer | undefined {
 				output[i * 4] = pixels[i * 3] ?? 0;
 				output[i * 4 + 1] = pixels[i * 3 + 1] ?? 0;
 				output[i * 4 + 2] = pixels[i * 3 + 2] ?? 0;
+				if (keepAlpha) output[i * 4 + 3] = 0xff;
 			}
 			return output;
 		case 32:
@@ -536,6 +545,7 @@ export function toBgra32(image: BmpImage): Buffer | undefined {
 				output[i * 4] = pixels[i * 4] ?? 0;
 				output[i * 4 + 1] = pixels[i * 4 + 1] ?? 0;
 				output[i * 4 + 2] = pixels[i * 4 + 2] ?? 0;
+				if (keepAlpha) output[i * 4 + 3] = pixels[i * 4 + 3] ?? 0;
 			}
 			return output;
 		default:

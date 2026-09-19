@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "PDT/BMP",
+				class: "PdtBmpFormat",
+				source: "Legacy/AyPio/PdtBitmap.cs",
+			},
+			localId: "aypio-pdt-bmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "G/Leaf",
 				class: "GAudio",
