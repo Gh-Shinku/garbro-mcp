@@ -24,8 +24,6 @@ const MARK = Buffer.from([0x78, 0x74, 0x78, 0x00]);
 const HEADER_SIZE = 0x20;
 const MARK_FIELD = 0;
 const KIND_FIELD = 0x04;
-/** The two kinds of tiling the head may name, less the one the reference leaves unwritten. */
-const KINDS = [0, 1, 2];
 const ALIGNED_WIDTH_FIELD = 0x08;
 const ALIGNED_HEIGHT_FIELD = 0x0c;
 const WIDTH_FIELD = 0x10;
