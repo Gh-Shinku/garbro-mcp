@@ -654,6 +654,7 @@ import { dwvAudioFormat } from "./sysd/dwv-audio.js";
 import { qdoScriptFormat } from "./redzone/qdo-script.js";
 import { nsfAudioFormat } from "./pan/nsf-audio.js";
 import { htfImageFormat } from "./jam-creation/htf-image.js";
+import { jamCreationDpoImageFormat } from "./jam-creation/dpo-image.js";
 import { advgImageFormat } from "./advgsys/bmp-image.js";
 import { mwpImageFormat } from "./emic/mwp-image.js";
 import { leafWAudioFormat } from "./leaf/w-audio.js";
@@ -1876,6 +1877,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		qdoScriptFormat,
 		nsfAudioFormat,
 		htfImageFormat,
+		jamCreationDpoImageFormat,
 		advgImageFormat,
 		mwpImageFormat,
 		leafWAudioFormat,

@@ -9,6 +9,24 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DPO",
+				class: "DpoFormat",
+				source: "ArcFormats/JamCreation/ImageDPO.cs",
+			},
+			localId: "jam-creation-dpo-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"tiles of kinds other than a bitmap",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "EENC",
 				class: "EencFormat",
 				source: "ArcFormats/Bruns/ImageEENC.cs",
