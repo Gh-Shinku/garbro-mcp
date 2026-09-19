@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "WAY",
+				class: "WadyAudio",
+				source: "ArcFormats/Marble/AudioWADY.cs",
+			},
+			localId: "marble-way-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WA1",
 				class: "Wa1Audio",
 				source: "ArcFormats/Ffa/AudioWA1.cs",

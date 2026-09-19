@@ -232,6 +232,7 @@ import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { abelGpsImageFormat } from "./abel/gps-image.js";
 import { nexasGrpImageFormat } from "./nexas/grp-image.js";
 import { marblePrsImageFormat } from "./marble/prs-image.js";
+import { marbleWadyAudioFormat } from "./marble/way-audio.js";
 import { gameSystemCgdImageFormat } from "./gamesystem/cgd-image.js";
 import { vitaminSbiImageFormat } from "./vitamin/sbi-image.js";
 import { vitaminMfcImageFormat } from "./vitamin/mfc-image.js";
@@ -1506,6 +1507,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ipacIesRawImageFormat,
 		vitaminMfcImageFormat,
 		marblePrsImageFormat,
+		marbleWadyAudioFormat,
 		nexasGrpImageFormat,
 		crowdGaxImageFormat,
 		tanFormat,
