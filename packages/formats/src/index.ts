@@ -290,6 +290,7 @@ import { azSysTyp1ImageFormat } from "./azsys/typ1-image.js";
 import { csWareBpcImageFormat } from "./csware/bpc-image.js";
 import { uncannyCiiImageFormat } from "./uncanny/cii-image.js";
 import { aoiAgfImageFormat } from "./aoi/agf-image.js";
+import { blackRainbowBmdImageFormat } from "./black-rainbow/bmd-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1488,6 +1489,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		csWareBpcImageFormat,
 		uncannyCiiImageFormat,
 		aoiAgfImageFormat,
+		blackRainbowBmdImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
