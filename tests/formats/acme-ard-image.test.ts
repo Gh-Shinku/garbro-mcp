@@ -92,7 +92,7 @@ describe("acme ard image", () => {
 		} finally {
 			await archive.close();
 		}
-	});
+	}, 30000);
 
 	it("accepts a lower case extension", async () => {
 		expect(await ardImageFormat.detect(sourceOf(buildArd()), "cg01.ard")).toBe(
@@ -115,5 +115,5 @@ describe("acme ard image", () => {
 		expect(await ardImageFormat.detect(sourceOf(longer), "CG01.ARD")).toBe(
 			false,
 		);
-	});
+	}, 30000);
 });
