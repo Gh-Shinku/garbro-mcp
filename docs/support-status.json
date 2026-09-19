@@ -6,6 +6,20 @@
 		{
 			"reference": {
 				"type": "audio",
+				"tag": "WA1",
+				"class": "Wa1Audio",
+				"source": "ArcFormats/Ffa/AudioWA1.cs"
+			},
+			"localId": "ffa-wa1-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
 				"tag": "WA2",
 				"class": "Wa2Audio",
 				"source": "ArcFormats/Ffa/AudioWA2.cs"
