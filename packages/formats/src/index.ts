@@ -323,6 +323,7 @@ import { crowdPckFormat } from "./crowd/pck.js";
 import { dlbFormat } from "./aypio/dlb.js";
 import { dlbV0Format } from "./aypio/dlb.js";
 import { aypioVocAudioFormat } from "./aypio/voc-audio.js";
+import { aypioPdtImageFormat } from "./aypio/pdt-image.js";
 import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
@@ -1538,6 +1539,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		dlbFormat,
 		dlbV0Format,
 		aypioVocAudioFormat,
+		aypioPdtImageFormat,
 		morningTtdFormat,
 		studioSakuraDatFormat,
 		fwaFormat,

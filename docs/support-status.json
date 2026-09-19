@@ -5,6 +5,20 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "PDT/UK2",
+				"class": "PdtFormat",
+				"source": "Legacy/AyPio/ImagePDT.cs"
+			},
+			"localId": "aypio-pdt-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "VOC/UK2",
 				"class": "VocAudio",
