@@ -7,3 +7,4 @@ export * from "./texb-image.js";
 export * from "./bgd-image.js";
 export * from "./cgd-image.js";
 export * from "./chr-image.js";
+export * from "./adp4-audio.js";
