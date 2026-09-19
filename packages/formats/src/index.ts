@@ -293,6 +293,7 @@ import { aoiAgfImageFormat } from "./aoi/agf-image.js";
 import { blackRainbowBmdImageFormat } from "./black-rainbow/bmd-image.js";
 import { mebiusKoeAudioFormat } from "./mebius/koe-audio.js";
 import { gameSystemAdp4AudioFormat } from "./gamesystem/adp4-audio.js";
+import { ffaWa2AudioFormat } from "./ffa/wa2-audio.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1494,6 +1495,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		blackRainbowBmdImageFormat,
 		mebiusKoeAudioFormat,
 		gameSystemAdp4AudioFormat,
+		ffaWa2AudioFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
