@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CII",
+				class: "CiiFormat",
+				source: "Legacy/Uncanny/ImageCII.cs",
+			},
+			localId: "uncanny-cii-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "BPC",
 				class: "BpcFormat",
 				source: "ArcFormats/CsWare/ImageBPC.cs",

@@ -288,6 +288,7 @@ import { criGxtImageFormat } from "./cri/gxt-image.js";
 import { criXtxImageFormat } from "./cri/xtx-image.js";
 import { azSysTyp1ImageFormat } from "./azsys/typ1-image.js";
 import { csWareBpcImageFormat } from "./csware/bpc-image.js";
+import { uncannyCiiImageFormat } from "./uncanny/cii-image.js";
 import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
@@ -1484,6 +1485,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		criXtxImageFormat,
 		azSysTyp1ImageFormat,
 		csWareBpcImageFormat,
+		uncannyCiiImageFormat,
 		brownieNgcImageFormat,
 		mayBeSoftHhpImageFormat,
 		uranDarImageFormat,
