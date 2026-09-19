@@ -660,6 +660,7 @@ import { advgImageFormat } from "./advgsys/bmp-image.js";
 import { mwpImageFormat } from "./emic/mwp-image.js";
 import { leafWAudioFormat } from "./leaf/w-audio.js";
 import { leafGAudioFormat } from "./leaf/g-audio.js";
+import { leafLfgImageFormat } from "./leaf/lfg-image.js";
 import { texbImageFormat } from "./gamesystem/texb-image.js";
 import { wrgAudioFormat } from "./regrips/wrg-audio.js";
 import { regripsMrgAudioFormat } from "./regrips/mrg-audio.js";
@@ -1885,6 +1886,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mwpImageFormat,
 		leafWAudioFormat,
 		leafGAudioFormat,
+		leafLfgImageFormat,
 		texbImageFormat,
 		wrgAudioFormat,
 		regripsMrgAudioFormat,

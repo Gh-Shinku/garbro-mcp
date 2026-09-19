@@ -10,3 +10,4 @@ export * from "./w-audio.js";
 export * from "./lgf-image.js";
 export * from "./bjr-image.js";
 export * from "./g-audio.js";
+export * from "./lfg-image.js";

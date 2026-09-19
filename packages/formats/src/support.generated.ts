@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "LFG",
+				class: "LfgFormat",
+				source: "ArcFormats/Leaf/ImageLFG.cs",
+			},
+			localId: "leaf-lfg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PDT/BMP",
 				class: "PdtBmpFormat",
 				source: "Legacy/AyPio/PdtBitmap.cs",
