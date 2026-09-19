@@ -9,3 +9,4 @@ export * from "./p16-audio.js";
 export * from "./w-audio.js";
 export * from "./lgf-image.js";
 export * from "./bjr-image.js";
+export * from "./g-audio.js";

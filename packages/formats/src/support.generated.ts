@@ -8,6 +8,20 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "G/Leaf",
+				class: "GAudio",
+				source: "ArcFormats/Leaf/AudioG.cs",
+			},
+			localId: "leaf-g-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "DPO",
 				class: "DpoFormat",
