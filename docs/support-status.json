@@ -6,6 +6,34 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BMP/NNNN",
+				"class": "NNNNBmpFormat",
+				"source": "ArcFormats/MokoPro/CompressedFile.cs"
+			},
+			"localId": "mokopro-bmp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "audio",
+				"tag": "OGG/NNNN",
+				"class": "NNNNOggAudio",
+				"source": "ArcFormats/MokoPro/CompressedFile.cs"
+			},
+			"localId": "mokopro-ogg-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PIC/GROCER",
 				"class": "PicFormat",
 				"source": "Legacy/Grocer/ImagePIC.cs"

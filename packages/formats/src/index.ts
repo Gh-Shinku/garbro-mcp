@@ -499,6 +499,8 @@ import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { systemAquaCatfFormat } from "./system-aqua/catf.js";
 import { yukaYkcFormat } from "./yuka/ykc.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
+import { mokoProBmpImageFormat } from "./moko-pro/bmp-image.js";
+import { mokoProOggAudioFormat } from "./moko-pro/ogg-audio.js";
 import { eveGmFormat } from "./eve/gm.js";
 import { studioEgoPak0Format } from "./studio-ego/pak0.js";
 import { nexasPacFormat } from "./nexas/pac.js";
@@ -1717,6 +1719,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		systemAquaCatfFormat,
 		yukaYkcFormat,
 		mokoProNnnnFormat,
+		mokoProBmpImageFormat,
+		mokoProOggAudioFormat,
 		eveGmFormat,
 		studioEgoPak0Format,
 		nexasPacFormat,

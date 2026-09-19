@@ -6,7 +6,6 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import { inflateLzss } from "@garbro-mcp/codecs";
 import { basename } from "node:path";
 import { Readable } from "node:stream";
 import {
@@ -14,38 +13,9 @@ import {
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { MOKO_SIGNATURE, readMokoHeader, unpackMoko } from "./moko-core.js";
 
-/** 'NNNN', the signature of the compressed container. */
-const SIGNATURE = 0x4e4e4e4e;
-/** The payload starts with the signature and the unpacked size. */
-const HEADER_SIZE = 8;
-const UNPACKED_SIZE_FIELD = 4;
-/** GARbro `MokoCrypt.DefaultKey`. */
-const KEY_FIRST = 1;
-const KEY_SECOND = 0x23;
-/** GARbro `LzssStream` with a ring buffer filled with spaces. */
-const FRAME_FILL = 0x20;
-
-/**
- * GARbro `MokoCrypt.Decrypt`: a backward pass over the payload that mixes every byte with its successor
- * and with the two key bytes.
- */
-export function decryptMoko(input: Buffer): void {
-	for (let i = input.length - 2; i >= 0; i -= 1) {
-		input[i] = (input[i] ?? 0) ^ (KEY_SECOND ^ (input[i + 1] ?? 0));
-		input[i + 1] = (input[i + 1] ?? 0) ^ (KEY_FIRST ^ (input[i] ?? 0));
-	}
-}
-
-async function readHeader(source: ByteSource): Promise<number | undefined> {
-	if (source.size < BigInt(HEADER_SIZE)) return undefined;
-	const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
-	if (header.readUInt32LE(0) !== SIGNATURE) return undefined;
-	const unpackedSize = header.readInt32LE(UNPACKED_SIZE_FIELD);
-	if (unpackedSize <= 0) return undefined;
-	return unpackedSize;
-}
-
+/** The single entry of the container: the whole file, named by the name of the file itself. */
 function toFixedEntries(
 	size: number,
 	packedSize: bigint,
@@ -76,15 +46,7 @@ async function openNnnnEntry(
 	const stored = Buffer.from(
 		await source.readAt(entry.offset, Number(entry.packedSize)),
 	);
-	// The reference decrypts everything behind the header, not the header itself.
-	const payload = stored.subarray(HEADER_SIZE);
-	decryptMoko(payload);
-	return Readable.from([
-		inflateLzss(payload, {
-			outputLength: Number(entry.size),
-			frameFill: FRAME_FILL,
-		}),
-	]);
+	return Readable.from([unpackMoko(stored, Number(entry.size))]);
 }
 
 export const mokoProNnnnDescriptor: FormatDescriptor = {
@@ -110,16 +72,16 @@ export const mokoProNnnnDescriptor: FormatDescriptor = {
 
 export const mokoProNnnnFormat = defineFixedArchive({
 	descriptor: mokoProNnnnDescriptor,
-	detection: { signatures: [{ bytes: Buffer.from("NNNN", "latin1") }] },
+	detection: { signatures: [{ bytes: MOKO_SIGNATURE }] },
 	async detect(source: ByteSource): Promise<boolean> {
 		try {
-			return (await readHeader(source)) !== undefined;
+			return (await readMokoHeader(source)) !== undefined;
 		} catch {
 			return false;
 		}
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const unpackedSize = await readHeader(source);
+		const unpackedSize = await readMokoHeader(source);
 		if (unpackedSize === undefined)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Mokopro layout");
 		return {
