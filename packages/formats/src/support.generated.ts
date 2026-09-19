@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "VOC/UK2",
+				class: "VocAudio",
+				source: "Legacy/AyPio/AudioVOC.cs",
+			},
+			localId: "aypio-voc-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WAY",
 				class: "WadyAudio",
 				source: "ArcFormats/Marble/AudioWADY.cs",

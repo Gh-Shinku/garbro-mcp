@@ -322,6 +322,7 @@ import { mugiBinFormat } from "./mugi/bin.js";
 import { crowdPckFormat } from "./crowd/pck.js";
 import { dlbFormat } from "./aypio/dlb.js";
 import { dlbV0Format } from "./aypio/dlb.js";
+import { aypioVocAudioFormat } from "./aypio/voc-audio.js";
 import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
 import { dl1Format } from "./csware/dl1.js";
@@ -1536,6 +1537,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		crowdPckFormat,
 		dlbFormat,
 		dlbV0Format,
+		aypioVocAudioFormat,
 		morningTtdFormat,
 		studioSakuraDatFormat,
 		fwaFormat,
