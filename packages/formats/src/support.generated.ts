@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "AGF/AOI",
+				class: "AgfFormat",
+				source: "ArcFormats/Aoi/ImageAGF.cs",
+			},
+			localId: "aoi-agf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CII",
 				class: "CiiFormat",
 				source: "Legacy/Uncanny/ImageCII.cs",
