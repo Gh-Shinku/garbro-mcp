@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BIZ",
+				"class": "BizFormat",
+				"source": "Legacy/Adviz/ImageBIZ.cs"
+			},
+			"localId": "adviz-biz-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the walk of the places of a picture",
+				"the palette of the game a picture stands in",
+				"the place of a palette within the table of palettes",
+				"the table of the kinds of the palettes of the engine"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a picture whose palette stands in no table of palettes beside it"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BMP/uGOS",
 				"class": "DetBmpFormat",
 				"source": "ArcFormats/uGOS/ImageBMP.cs"
