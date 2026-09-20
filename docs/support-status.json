@@ -6,6 +6,25 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CBF",
+				"class": "CbfFormat",
+				"source": "ArcFormats/Abel/ImageCBF.cs"
+			},
+			"localId": "abel-cbf-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the shape of the places from a companion `.alp` file"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PDT/5",
 				"class": "Pdt5Format",
 				"source": "Legacy/AyPio/ImagePDT5.cs"

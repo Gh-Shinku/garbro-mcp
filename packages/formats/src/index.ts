@@ -230,6 +230,7 @@ import { ikuraTanImageFormat } from "./ikura/tan-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
 import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { abelGpsImageFormat } from "./abel/gps-image.js";
+import { abelCbfImageFormat } from "./abel/cbf-image.js";
 import { nexasGrpImageFormat } from "./nexas/grp-image.js";
 import { marblePrsImageFormat } from "./marble/prs-image.js";
 import { marbleWadyAudioFormat } from "./marble/way-audio.js";
@@ -1460,6 +1461,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ikuraTanImageFormat,
 		bananaMagImageFormat,
 		abelGpsImageFormat,
+		abelCbfImageFormat,
 		gameSystemCgdImageFormat,
 		vitaminSbiImageFormat,
 		bellDaPwAudioFormat,
