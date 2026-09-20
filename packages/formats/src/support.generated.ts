@@ -18404,5 +18404,32 @@ export const formatSupportCatalog = {
 				"an executable whose resource table reaches past the 64 KiB head the port reads while detecting",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "MGS",
+				class: "MgsOpener",
+				source: "ArcFormats/Masys/ArcMGS.cs",
+			},
+			localId: "masys-mgs",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the length prefixed record walk",
+				"the name key the reference shares with the MGD archive",
+				"the format driven entry extensions",
+				"the wave head of a sound entry",
+				"the packed nibble walk of a sound entry",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real packed sound, which would confirm the chunk size the reference reads from the stored bits per sample",
+				"an archive from a real game whose names are XORed",
+			],
+		},
 	],
 } as const;
