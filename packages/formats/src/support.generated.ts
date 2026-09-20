@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "IMGD/WAG",
+				class: "ImgdFormat",
+				source: "ArcFormats/Hexenhaus/ArcWAG.cs",
+			},
+			localId: "hexenhaus-imgd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of the picture handed out as they stand",
+				"the words that name where a picture stands within a picture of the game",
+			],
+			unsupported: ["archive creation", "image encoding", "picture decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PB3",
 				class: "Pb3Format",
 				source: "ArcFormats/Cmvs/ImagePB3.cs",

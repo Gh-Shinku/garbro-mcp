@@ -12,6 +12,7 @@ import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { medFormat } from "./dxlib/med.js";
+import { hexenhausImgdImageFormat } from "./hexenhaus/imgd-image.js";
 import { dpfFormat } from "./mutation/dpf.js";
 import { ccfFormat } from "./black-rainbow/ccf.js";
 import { circusPckFormat } from "./circus/pck.js";
@@ -1267,6 +1268,7 @@ export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
 		new Xp3Format(),
 		new Adpack32Format(),
+		hexenhausImgdImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
 		ugoTxtFormat,
