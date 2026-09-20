@@ -8,6 +8,46 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "RPGMVO",
+				class: "RpgmvoAudio",
+				source: "Experimental/RPGMaker/AudioRPGMV.cs",
+			},
+			localId: "rpg-maker-rpgmvo-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the places of the key the words of the engine name",
+				"the walk of the places of the key over the head of the file",
+			],
+			unsupported: ["archive creation", "audio encoding", "sound decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
+				tag: "RPGMVP",
+				class: "RpgmvpFormat",
+				source: "Experimental/RPGMaker/ImageRPGMV.cs",
+			},
+			localId: "rpg-maker-rpgmvp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the places of the key the words of the engine name",
+				"the walk of the places of the key over the head of the file",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "SPC",
 				class: "SpcFormat",

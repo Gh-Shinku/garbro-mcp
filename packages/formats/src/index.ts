@@ -41,6 +41,8 @@ import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafPakFormat } from "./leaf/pak.js";
 import { rpgMakerRgssAdFormat } from "./rpg-maker/rgss-ad.js";
+import { rpgMakerRpgmvpImageFormat } from "./rpg-maker/rpgmvp-image.js";
+import { rpgMakerRpgmvoAudioFormat } from "./rpg-maker/rpgmvo-audio.js";
 import { leafTexFormat } from "./leaf/tex.js";
 import { museDatFormat } from "./muse/dat.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
@@ -1295,6 +1297,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafPxFormat,
 		leafPakFormat,
 		rpgMakerRgssAdFormat,
+		rpgMakerRpgmvpImageFormat,
+		rpgMakerRpgmvoAudioFormat,
 		leafTexFormat,
 		oneUpArcFormat,
 		seraphimMcFormat,
