@@ -40,6 +40,7 @@ import { k5Format } from "./gsx/k5.js";
 import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafPakFormat } from "./leaf/pak.js";
+import { rpgMakerRgssAdFormat } from "./rpg-maker/rgss-ad.js";
 import { leafTexFormat } from "./leaf/tex.js";
 import { museDatFormat } from "./muse/dat.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
@@ -918,6 +919,7 @@ export * from "./ikura/index.js";
 export * from "./ivory/index.js";
 export * from "./liddell/index.js";
 export * from "./leaf/index.js";
+export * from "./rpg-maker/index.js";
 export * from "./muse/index.js";
 export * from "./myharvest/index.js";
 export * from "./mutation/index.js";
@@ -1288,6 +1290,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kpcFormat,
 		leafPxFormat,
 		leafPakFormat,
+		rpgMakerRgssAdFormat,
 		leafTexFormat,
 		oneUpArcFormat,
 		seraphimMcFormat,
