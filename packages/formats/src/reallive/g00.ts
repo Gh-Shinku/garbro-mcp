@@ -32,9 +32,10 @@ const UNPACKED_SIZE_FIELD = 4;
 /** The frame table stores an offset and a size per frame. */
 const FRAME_FIELDS_SIZE = 8;
 /** Copy lengths and distances are scaled by this factor. */
-const LZ_BYTES_PER_PIXEL = 1;
+/** The archive unpacks one byte a pixel and copies at least two of them at a time. */
+const G00_TABLE_BYTES_PER_PIXEL = 1;
 /** A copy is at least this long, plus the low four bits of its distance word. */
-const LZ_MIN_COUNT = 2;
+const G00_TABLE_MIN_COUNT = 2;
 const LZ_DISTANCE_SHIFT = 4;
 const LZ_COUNT_MASK = 0xf;
 /** The bit reader starts with this marker and refills whenever it shifts down to one. */
@@ -44,14 +45,20 @@ const LZ_CONTROL_BASE = 0x100;
 const LZ_CONTROL_MASK = 1;
 
 /**
- * GARbro `G00Reader.LzDecompress` with the parameters the archive uses. The packed stream opens with the packed
- * size including its own header and the unpacked size. A control byte is refilled whenever the one-bit marker
- * shifts down to the sentinel, a set bit copies one pixel literally, and a clear bit reads a sixteen bit word
- * whose low four bits extend the copy length and whose upper twelve bits are the distance in pixels. The
- * reference lets its array accesses throw when a copy would leave the output or reach before its start, so
- * those cases decline the archive here.
+ * GARbro `G00Reader.LzDecompress`. The packed stream opens with the packed size including its own header and
+ * the unpacked size. A control byte is refilled whenever the one-bit marker shifts down to the sentinel, a set
+ * bit copies as many bytes as this kind of stream holds a pixel of, and a clear bit reads a sixteen bit word
+ * whose low four bits extend the copy length and whose upper twelve bits are the distance. Both the length and
+ * the distance count pixels, so both are scaled by the size of one.
+ *
+ * The reference lets its array accesses throw when a copy would leave the output or reach before its start, so
+ * those cases decline the stream here.
  */
-export function unpackG00Table(data: Buffer): Buffer | undefined {
+export function unpackG00Lzss(
+	data: Buffer,
+	minCount: number,
+	bytesPerPixel: number,
+): Buffer | undefined {
 	if (data.length < PACKED_HEADER_SIZE) return undefined;
 	const packedSize = data.readInt32LE(PACKED_SIZE_FIELD) - PACKED_HEADER_SIZE;
 	const unpackedSize = data.readInt32LE(UNPACKED_SIZE_FIELD);
@@ -70,13 +77,13 @@ export function unpackG00Table(data: Buffer): Buffer | undefined {
 			remaining -= 1;
 		}
 		if ((bits & LZ_CONTROL_MASK) !== 0) {
-			if (target + LZ_BYTES_PER_PIXEL > output.length) return undefined;
+			if (target + bytesPerPixel > output.length) return undefined;
 			// A read past the end of the stream leaves zeroes behind, as the reference does.
-			for (let i = 0; i < LZ_BYTES_PER_PIXEL; i += 1)
+			for (let i = 0; i < bytesPerPixel; i += 1)
 				output[target + i] = data[source + i] ?? 0;
-			target += LZ_BYTES_PER_PIXEL;
-			source += LZ_BYTES_PER_PIXEL;
-			remaining -= LZ_BYTES_PER_PIXEL;
+			target += bytesPerPixel;
+			source += bytesPerPixel;
+			remaining -= bytesPerPixel;
 			continue;
 		}
 		if (remaining < 2) break;
@@ -84,8 +91,9 @@ export function unpackG00Table(data: Buffer): Buffer | undefined {
 		const word = data.readUInt16LE(source);
 		source += 2;
 		remaining -= 2;
-		const distance = (word >> LZ_DISTANCE_SHIFT) * LZ_BYTES_PER_PIXEL;
-		const count = (word & LZ_COUNT_MASK) * LZ_BYTES_PER_PIXEL + LZ_MIN_COUNT;
+		// The length counts pixels, so the least it can be is added before it is scaled.
+		const count = ((word & LZ_COUNT_MASK) + minCount) * bytesPerPixel;
+		const distance = (word >> LZ_DISTANCE_SHIFT) * bytesPerPixel;
 		const from = target - distance;
 		if (from < 0 || target + count > output.length) return undefined;
 		for (let i = 0; i < count; i += 1) {
@@ -94,6 +102,11 @@ export function unpackG00Table(data: Buffer): Buffer | undefined {
 		}
 	}
 	return output;
+}
+
+/** The same walk with the parameters the archive reads its frame table with. */
+export function unpackG00Table(data: Buffer): Buffer | undefined {
+	return unpackG00Lzss(data, G00_TABLE_MIN_COUNT, G00_TABLE_BYTES_PER_PIXEL);
 }
 
 interface G00Frame {
