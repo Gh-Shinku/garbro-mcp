@@ -149,3 +149,40 @@ project cannot supply. Each finding below is the reason the entry stays unread, 
   that one, not either picture. The walk of the places of a `BIZ` picture is four words of a head and a walk
   of the places of the picture the words of which stand beside them, and the walk of `GIZ/2` is four places
   of a picture walked in strips of eight places; the palettes are the whole of the difficulty.
+
+## The entries read line by line against the reference
+
+Screened by the places the reference stands in rather than by the bytes the support report names them by, these
+small entries still stand unread, every one of them for a reason that stands in the reference itself:
+
+- **GPK/STACK** (`ArcFormats/Stack/ArcGPK.cs`) — the places of the archive stand in an index of its own at the
+  end of the file, under the words `STKFile0PIDX` and `STKFile0PACKFILE`, standing as a stream of the places of
+  a picture encrypted with a walk the game names. The reference draws that walk from the words of the game: it
+  reads the resource `CIPHERCODE` of the kind `CODE` out of an `.exe` standing beside the archive or beside the
+  directory of it. No archive of this kind can be read without a game's words beside it.
+- **AF2** (`ArcFormats/CsWare/AudioAF2.cs`) — the reference stands as a head of thirty-two places and stops
+  within the walk of it: it stands the words of a picture of its own (the places of a picture each second, the
+  places of a picture, and how many places a place of a picture stands for) and stands nothing behind them, no
+  places of a picture and no return. The places of a picture of a kind stand as the place of a picture of the
+  words of the head — which the reference stands as the places of a picture each second multiplied by the
+  places of a place of a picture, a place of a picture standing as the places of a picture of every channel of
+  it, so that the words of the head stand wrong for any picture of more than one channel. There is no walk of
+  the places of a picture to port.
+- **BIN/DXLIB** (`ArcFormats/DxLib/ArcDX8.cs`) — the reference stands the words of the head of a version of
+  the archive of the kind `DXA`, stands the walk of the words of it over the index, and then stands the words
+  `// decrypt-2` and `// decompress` where the places of the kind of the archive behind the walk stand, and
+  stands `null` behind them. The walk of the places of the archive stands unwritten.
+- **DXA** (`ArcFormats/DxLib/ArcDX.cs`, the kind the entry above stands on) — the archive of the engine stands
+  as an index walked with words the game names, and the reference draws them from the place of the person
+  reading rather than from the archive: its list of the words of the kinds of the engine stands empty
+  (`DxScheme.DefaultScheme`), the person reading it is asked for a word through `WidgetSCR.xaml`, and the words
+  the person names stand held in that list for the places behind them. Five hundred and ninety places of the
+  reference stand on a word that stands nowhere in it.
+- **BYTES/UNITY** (`ArcFormats/Unity/ArcSpVM.cs`) — the archive is a picture of the places of a picture named
+  `…DAT.bytes` beside a picture of the words of its places named `…INF.bytes`, and the places of the archive
+  stand as a stream of the kind the places of the .NET kind stand in: the reference stands the stream of the
+  places of a picture through `BinaryFormatter` of the .NET kind, with a binder of its own standing the kind
+  `SpVM.Library.LinkerInfo` of the words of the game onto a kind of its own. Reading such a stream stands as
+  reading the places of the kind the .NET kind stands them in — records of the kinds of the .NET kind, of the
+  words of the kinds of them, and of the places of a picture — which stands outside the place of a picture of
+  this project.
