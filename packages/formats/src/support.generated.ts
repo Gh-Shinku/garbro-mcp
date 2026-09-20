@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "RHA",
+				class: "RhaAudio",
+				source: "ArcFormats/rUGP/AudioRHA.cs",
+			},
+			localId: "rugp-rha-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the two ways the places of a sound stand",
+				"the places of a colour that do not stand in a step of a sound, which stand at nought or as the places of the highest kind",
+				"the places of a colour of a step that stand behind the places of the step",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WAV",
 				class: "WaveAudio",
 				source: "GameRes/AudioWAV.cs",
