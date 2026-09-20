@@ -477,6 +477,7 @@ import { ankhDatFormat } from "./ankh/dat.js";
 import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
 import { ffaDatFormat } from "./ffa/dat.js";
 import { ffaJdatFormat } from "./ffa/dat.js";
+import { malieLibFormat } from "./malie/lib.js";
 import { malieLibuFormat } from "./malie/libu.js";
 import { willPnaFormat } from "./will/pna.js";
 import { yaneuraoDatDxFormat } from "./yaneurao/dat.js";
@@ -1761,6 +1762,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		shapeShifterBndFormat,
 		ffaDatFormat,
 		ffaJdatFormat,
+		malieLibFormat,
 		malieLibuFormat,
 		willPnaFormat,
 		yaneuraoDatDxFormat,
