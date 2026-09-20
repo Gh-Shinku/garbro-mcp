@@ -134,6 +134,10 @@ candidates when porting continues.
   companion lookup, which this project has, and then a way to hand the companion to another image
   format, which it does not have yet. The stored diff is two LZSS streams, one holding a pixel index and
   one the differences themselves.
+- `EPA` (`ArcFormats/Pajamas/ImageEPA.cs`, 238 lines) carries two signatures and five colour types. Its
+  reader walks a channel through a sixteen entry offset table, reads a colour map with `PaletteFormat.Bgr`
+  for the one byte kinds, reads a second channel for its alpha colour type, and lays out pixels of more
+  than one byte in separate planes. None of that is blocked; it is simply more than one sitting's work.
 
 ## Two engines can share a tag and a class name
 
