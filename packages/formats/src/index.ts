@@ -903,6 +903,7 @@ import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
 import { rinaRadImageFormat } from "./rina/rad-image.js";
 import { yuRisYcgImageFormat } from "./yu-ris/ycg-image.js";
 import { shiinaRioChdImageFormat } from "./shiina-rio/chd-image.js";
+import { shiinaRioPadAudioFormat } from "./shiina-rio/pad-audio.js";
 import { bellDaCpImageFormat } from "./bellda/cp-image.js";
 import { abogadoPakFormat } from "./abogado/pak.js";
 import { marbleYpImageFormat } from "./marble/yp-image.js";
@@ -1849,6 +1850,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cyberworksCsystemDat2Format,
 		pandoraPbxFormat,
 		nononoNpfFormat,
+		shiinaRioPadAudioFormat,
 		shiinaRioWarcFormat,
 		realliveG00Format,
 		nitroplusNitroPakFormat,

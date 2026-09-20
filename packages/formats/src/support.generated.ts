@@ -18540,5 +18540,33 @@ export const formatSupportCatalog = {
 				"a real picture whose channels are back referenced, which is where the escape byte and the delta pass are hardest to get right",
 			],
 		},
+		{
+			reference: {
+				type: "audio",
+				tag: "PAD",
+				class: "PadAudio",
+				source: "ArcFormats/ShiinaRio/AudioPAD.cs",
+			},
+			localId: "shiina-rio-pad-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the block walk and its end marker",
+				"the nibble load with its sign extension",
+				"the per channel shift",
+				"the two tap prediction out of the seeded and the loaded coefficient slots",
+				"the state that carries across blocks",
+				"the wave file the reference builds by patching the stored header",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real sound, which would show the filter indices and shifts a game actually uses",
+				"the byte the reference steps over in front of a stereo block, which a real file would confirm is filler",
+			],
+		},
 	],
 } as const;
