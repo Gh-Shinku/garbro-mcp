@@ -39,6 +39,7 @@ import { ivorySgFormat } from "./ivory/sg.js";
 import { k5Format } from "./gsx/k5.js";
 import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
+import { leafPakFormat } from "./leaf/pak.js";
 import { leafTexFormat } from "./leaf/tex.js";
 import { museDatFormat } from "./muse/dat.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
@@ -1286,6 +1287,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kaasPbFormat,
 		kpcFormat,
 		leafPxFormat,
+		leafPakFormat,
 		leafTexFormat,
 		oneUpArcFormat,
 		seraphimMcFormat,

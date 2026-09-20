@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "PAK/LEAF",
+				class: "LeafPackOpener",
+				source: "ArcFormats/Leaf/ArcLEAF.cs",
+			},
+			localId: "leaf-pak",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the walk of the names at the end of the file",
+				"the walk of places the key of a title stands as",
+			],
+			unsupported: [
+				"archive creation",
+				"archives of titles whose key the reference names in its own list of games",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "DSM/UNITY",
 				class: "DsmOpener",
 				source: "ArcFormats/Unity/ArcDSM.cs",
