@@ -18417,5 +18417,27 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of their own (the places of the picture of the walk of the places of the picture of the sound of the kind of the places of the picture of the walk of them stand beside the places of the picture of the walk of the places of the picture of the picture of the walk of the places of the picture of the sound of the engine, which stand outside the places of the picture of the walk of them of the sound), and the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of a picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of their own beyond the first",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "RPA",
+				class: "RpaOpener",
+				source: "ArcFormats/RenPy/ArcRPA.cs",
+			},
+			localId: "renpy-rpa",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"archive rebuild",
+				"the kinds of the walk of the places of the picture of the words of the walk of the picture beyond the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of two places of the picture",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the places of the picture of the engine of the kinds of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the second kind (the word of the head of the picture of the walk of the places of the picture standing of the places of the picture of the walk of the places of the picture of the third kind of the places of the picture alone), which turn a picture of this project away as well",
+				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the kinds of the places of the picture of the walk of them that stand beyond the kinds of the walk of the places of the picture of the fixtures of this project (the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them standing of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them), the reference standing the places of the picture of the walk of the places of the picture of the kinds of the places of the picture of the walk of them that stand of no places of the picture of the walk of the places of the picture of its own of no places of the picture of the walk of the places of the picture as well",
+			],
+		},
 	],
 } as const;

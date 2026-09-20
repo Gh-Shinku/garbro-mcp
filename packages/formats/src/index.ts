@@ -531,6 +531,7 @@ import { cyberworksCsystemDat2Format } from "./cyberworks/dat.js";
 import { pandoraPbxFormat } from "./pandora/pbx.js";
 import { nononoNpfFormat } from "./nonono/npf.js";
 import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
+import { renpyRpaFormat } from "./renpy/rpa.js";
 import { realliveG00Format } from "./reallive/g00.js";
 import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { systemAquaCatfFormat } from "./system-aqua/catf.js";
@@ -1051,6 +1052,7 @@ export * from "./rpm/index.js";
 export * from "./entexec/index.js";
 export * from "./advdx/index.js";
 export * from "./dmotion/index.js";
+export * from "./renpy/index.js";
 export * from "./reallive/index.js";
 export * from "./propeller/index.js";
 export * from "./topcat/index.js";
@@ -1364,6 +1366,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyScnFormat,
 		plantechPacFormat,
 		phsFormat,
+		renpyRpaFormat,
 		redzonePakFormat,
 		k5Format,
 		pkdFormat,
