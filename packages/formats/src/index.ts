@@ -240,6 +240,7 @@ import { favoriteHzcImageFormat } from "./favorite/hzc-image.js";
 import { ikuraTanImageFormat } from "./ikura/tan-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
 import { crowdGaxImageFormat } from "./crowd/gax-image.js";
+import { crowdCwpImageFormat } from "./crowd/cwp-image.js";
 import { abelGpsImageFormat } from "./abel/gps-image.js";
 import { abelCbfImageFormat } from "./abel/cbf-image.js";
 import { nexasGrpImageFormat } from "./nexas/grp-image.js";
@@ -1572,6 +1573,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		marbleWadyAudioFormat,
 		nexasGrpImageFormat,
 		crowdGaxImageFormat,
+		crowdCwpImageFormat,
 		tanFormat,
 		csPackFormat,
 		cpcFormat,

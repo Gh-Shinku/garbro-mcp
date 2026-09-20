@@ -9,6 +9,26 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CWP",
+				class: "CwpFormat",
+				source: "ArcFormats/Crowd/ImageCWP.cs",
+			},
+			localId: "crowd-cwp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the words of a portable network graphic stood around the places of a picture",
+			],
+			unsupported: ["archive creation", "image encoding", "picture decoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "IPH",
 				class: "IphFormat",
 				source: "ArcFormats/TechnoBrain/ImageIPH.cs",
