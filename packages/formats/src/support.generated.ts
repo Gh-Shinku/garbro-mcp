@@ -9,6 +9,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GR2/Pola",
+				class: "PolaFormat",
+				source: "ArcFormats/AdvSys/ImageGR2.cs",
+			},
+			localId: "advsys-pola-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of both kinds of the walk of its places",
+				"the walk of the places of a picture whose places of the walk stand for places of the picture of their own",
+				"the walk of a picture of the engine standing behind the walk of the places of a picture",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the walk of a picture that name the places behind them and the counts of them, which stand transcribed but covered by no fixture of this project",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GR2",
 				class: "Gr2Format",
 				source: "ArcFormats/AdvSys/ImageGR2.cs",

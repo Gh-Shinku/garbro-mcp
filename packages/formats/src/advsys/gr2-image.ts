@@ -27,9 +27,9 @@ const BITS_FIELD = 0xc;
 const PLACES_OF_ROW_ALIGNMENT = 4;
 /** The kinds of the places of a picture the reference stands, of sixteen, of four and twenty and of two and
  * thirty places each. A picture of a kind of its own stands away with a word of its own. */
-const BITS_PER_PLACE_16 = 16;
-const BITS_PER_PLACE_24 = 24;
-const BITS_PER_PLACE_32 = 32;
+export const BITS_PER_PLACE_16 = 16;
+export const BITS_PER_PLACE_24 = 24;
+export const BITS_PER_PLACE_32 = 32;
 const BITS_PER_PLACE_KINDS: readonly number[] = [
 	BITS_PER_PLACE_16,
 	BITS_PER_PLACE_24,
