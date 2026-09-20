@@ -2,7 +2,6 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	decodeCp932,
 	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
