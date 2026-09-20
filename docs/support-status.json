@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "ED8",
+				"class": "Ed8Format",
+				"source": "ArcFormats/ActiveSoft/ImageEDT.cs"
+			},
+			"localId": "active-soft-ed8-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the palette of a picture standing as the places of the picture of the words of a picture of the engine",
+				"the places of the picture that stand as the places of the walk of the picture of the count of them",
+				"the places of the picture that stand as the places of the picture of the walk of the picture of the places of the picture of the count of them"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the kinds of the places of the picture of the walk of a picture that stand beside the places of the picture of the places of the picture of the two places of theirs beyond the kind of the place beside the place of the walk of the picture, of which there stand one and twenty and three against the fixtures of this project"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "EDT",
 				"class": "EdtFormat",
 				"source": "ArcFormats/ActiveSoft/ImageEDT.cs"
