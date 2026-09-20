@@ -580,6 +580,7 @@ import { mngFormat } from "./mng/mng.js";
 import { tanukiTacFormat } from "./tanuki/tac.js";
 import { kidLnkFormat } from "./kid/lnk.js";
 import { leafKcapFormat } from "./leaf/kcap.js";
+import { webpImageFormat } from "./webp/webp-image.js";
 import { zyxBdfFormat } from "./zyx/bdf.js";
 import { kaasPdFormat } from "./kaas/pd.js";
 import { gamesystemPuremailFormat } from "./gamesystem/puremail.js";
@@ -1274,6 +1275,7 @@ export * from "./saiki/index.js";
 export * from "./james/index.js";
 export * from "./sas5/index.js";
 export * from "./qsoft/index.js";
+export * from "./webp/index.js";
 
 export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
@@ -2187,6 +2189,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		yukaYkgImageFormat,
 		zyxMtlImageFormat,
 		zyxSplImageFormat,
+		webpImageFormat,
 		zyxXmgImageFormat,
 	]);
 }

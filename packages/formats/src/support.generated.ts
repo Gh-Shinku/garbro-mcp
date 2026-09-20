@@ -18273,5 +18273,22 @@ export const formatSupportCatalog = {
 				"archive creation",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "WEBP",
+				class: "WebPFormat",
+				source: "ArcFormats/WebP/ImageWEBP.cs",
+			},
+			localId: "webp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["image decoding", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the kind of the places of the picture where the places of the picture of the walk of them of the picture of the places of the picture stand of the places of the picture of an odd count, the places of the picture of the walk of the places of the picture of the picture standing unaligned of the places of the picture of the word of the walk of the picture behind it",
+			],
+		},
 	],
 } as const;
