@@ -19,3 +19,4 @@ export * from "./jbp-ycc.js";
 export * from "./jbp-reader.js";
 export * from "./pb3-reader.js";
 export * from "./tz.js";
+export * from "./tlg6-golomb.js";
