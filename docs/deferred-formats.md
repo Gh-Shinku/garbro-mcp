@@ -36,6 +36,11 @@ open archives that the shipped defaults already cover.
   `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
   `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
   a `KnownKeys` table.
+- `DPK` (`ArcFormats/Dac/ArcDPK.cs`) decrypts its own index with a chained XOR seeded by the last byte
+  of the header, so its listing reads without a key, but every entry is then XORed with a pair of words
+  that comes from `Properties.Settings.Default.DPKKey1` and `DPKKey2`, and the name hash the entry
+  decryption subtracts is folded from the same pair. `KnownSchemes` ships as an empty array, so a payload
+  cannot be read without the numbers the game was built with.
 - `ASSETS/UNITY` (`ArcFormats/Unity/ArcASSET.cs`) reads a `Key` of the same kind.
 - `OGG/TINK` (`ArcFormats/Cyberworks/AudioTINK.cs`) holds `TinkAudioScheme.KnownKeys` as an empty
   dictionary in the shipped default.
