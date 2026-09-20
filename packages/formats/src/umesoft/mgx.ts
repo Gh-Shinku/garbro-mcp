@@ -12,11 +12,8 @@ import type {
 import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import {
-	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 import {
 	GRX_INFO_OFFSET,
@@ -31,8 +28,6 @@ import {
 /** The four bytes of the signature, which the reference packs into a word, shared by both ports. */
 const SIGNATURE = Buffer.from([0x4d, 0x47, 0x58, 0x1a]);
 /** The archive keeps a count and then a place for every frame. */
-const COUNT_FIELD = 4;
-const INDEX_START = 8;
 /** The picture port keeps the place of the first frame there. */
 const FIRST_FRAME_FIELD = 8;
 const FIRST_FRAME_HEADER = 12;
@@ -49,44 +44,6 @@ function invalidPicture(message: string): GarbroError {
 }
 
 /** `MgxOpener.TryOpen`: a count of frames, then the place of every one of them. */
-export function readMgxFrames(
-	data: Buffer,
-	baseName: string,
-): FixedEntry[] | undefined {
-	if (data.length < INDEX_START) return undefined;
-	if (!data.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
-	const count = data.readInt32LE(COUNT_FIELD);
-	if (!isSaneCount(count)) return undefined;
-	if (INDEX_START + count * 4 > data.length) return undefined;
-	const offsets: number[] = [];
-	for (let index = 0; index < count; index += 1) {
-		const offset = data.readUInt32LE(INDEX_START + index * 4);
-		if (offset > data.length) return undefined;
-		offsets.push(offset);
-	}
-	const size = BigInt(data.length);
-	const entries: FixedEntry[] = [];
-	for (let index = 0; index < count; index += 1) {
-		const offset = offsets[index] ?? 0;
-		const next =
-			index + 1 < count ? (offsets[index + 1] ?? offset) : data.length;
-		if (next < offset) return undefined;
-		if (!checkPlacement(BigInt(offset), BigInt(next - offset), size)) {
-			return undefined;
-		}
-		entries.push(
-			createFixedEntry({
-				id: index,
-				path: `${baseName}#${index.toString().padStart(4, "0")}.GRX`,
-				offset: BigInt(offset),
-				size: BigInt(next - offset),
-				metadata: { type: "image" },
-			}),
-		);
-	}
-	return entries;
-}
-
 /**
  * `MgxFormat.ReadMetaData`: the four bytes `MGX\x1A` and the place of the first frame, where the four bytes
  * of the picture of the U-Me Soft kind and its own fields stand. A file whose first frame does not stand
@@ -114,43 +71,6 @@ const ATTRIBUTION = {
 	license: "MIT",
 	commit: "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
 } as const;
-
-export const umesoftMgxArchiveDescriptor: FormatDescriptor = {
-	id: "umesoft-mgx-archive",
-	name: "U-Me Soft multi-frame image",
-	extensions: ["grx"],
-	capabilities: {
-		detect: true,
-		list: true,
-		extract: true,
-		create: false,
-		encryption: false,
-	},
-	attribution: [ATTRIBUTION],
-};
-
-export const umesoftMgxArchiveFormat: ArchiveFormat = defineFixedArchive({
-	descriptor: umesoftMgxArchiveDescriptor,
-	// The file is both an archive and a picture; the archive is the fuller reading of it, so it is tried first.
-	detection: { signatures: [{ bytes: SIGNATURE }], priority: 10 },
-	async detect(source: ByteSource): Promise<boolean> {
-		if (source.size < BigInt(INDEX_START)) return false;
-		return (
-			readMgxFrames(
-				Buffer.from(await source.readAt(0n, Number(source.size))),
-				"x",
-			) !== undefined
-		);
-	},
-	async read(source: ByteSource, sourcePath: string) {
-		const baseName = sourcePath.replace(/^.*[/\\]/, "").replace(/\.[^.]*$/, "");
-		const entries = readMgxFrames(await readStored(source), baseName);
-		if (!entries) {
-			throw invalidPicture("Not a U-Me Soft multi-frame picture");
-		}
-		return { entries, metadata: { entryCount: entries.length } };
-	},
-});
 
 export const umesoftMgxImageDescriptor: FormatDescriptor = {
 	id: "umesoft-mgx-image",

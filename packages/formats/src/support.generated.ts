@@ -2059,20 +2059,6 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
-				type: "archive",
-				tag: "MGX",
-				class: "MgxOpener",
-				source: "ArcFormats/UMeSoft/ArcMGX.cs",
-			},
-			localId: "umesoft-mgx-archive",
-			status: "partial",
-			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
-			unsupported: ["archive creation"],
-			remainingVerification: ["real-game GARbro differential output"],
-		},
-		{
-			reference: {
 				type: "image",
 				tag: "SGX",
 				class: "SgxFormat",

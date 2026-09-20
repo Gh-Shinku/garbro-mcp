@@ -3,10 +3,8 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	readMgxLayout,
-	umesoftMgxArchiveFormat,
 	umesoftMgxImageFormat,
 } from "../../packages/formats/src/umesoft/mgx.js";
-import { expectArchive } from "../helpers/archive.js";
 
 const GRX_HEADER_SIZE = 0x10;
 const INDEX_START = 8;
@@ -57,91 +55,6 @@ function mgxFile(frames: Buffer[], parts: { count?: number } = {}): Buffer {
 function sourceOf(data: Buffer): BufferByteSource {
 	return new BufferByteSource(data);
 }
-
-describe("U-Me Soft multi-frame archive", () => {
-	const first = grxFile({
-		width: 8,
-		height: 1,
-		bitsPerPixel: 8,
-		rows: [raw([1, 2, 3, 4, 5, 6, 7, 8])],
-	});
-	const second = grxFile({
-		width: 4,
-		height: 1,
-		bitsPerPixel: 8,
-		rows: [raw([9, 10, 11, 12])],
-	});
-
-	it("opens the file as the several pictures it holds", async () => {
-		const data = mgxFile([first, second]);
-		await expectArchive({
-			format: umesoftMgxArchiveFormat,
-			archive: data,
-			sourcePath: "dir/cg.grx",
-			entries: [
-				{ path: "cg#0000.GRX", size: first.length },
-				{ path: "cg#0001.GRX", size: second.length },
-			],
-			metadata: { entryCount: 2 },
-		});
-		const handle = await umesoftMgxArchiveFormat.open(
-			sourceOf(data),
-			"dir/cg.grx",
-		);
-		// The first frame of the file is the picture the image port reads.
-		expect(readMgxLayout(data)).toMatchObject({
-			width: 8,
-			height: 1,
-			bitsPerPixel: 8,
-			packed: true,
-			grxOffset: INDEX_START + 8,
-		});
-		expect(handle.metadata).toMatchObject({ entryCount: 2 });
-	});
-
-	it("hands the frames out as they stand", async () => {
-		const data = mgxFile([first, second]);
-		const handle = await umesoftMgxArchiveFormat.open(sourceOf(data), "cg.grx");
-		const entry = handle.entries[1];
-		if (!entry) throw new Error("no entry");
-		const chunks: Buffer[] = [];
-		for await (const chunk of await handle.openEntry(entry.id)) {
-			chunks.push(Buffer.from(chunk));
-		}
-		expect(Buffer.concat(chunks).toString("hex")).toBe(second.toString("hex"));
-	});
-
-	it("turns away a file whose index or frames do not hold", async () => {
-		expect(
-			await umesoftMgxArchiveFormat.detect(
-				sourceOf(mgxFile([first], { count: 0 })),
-				"cg.grx",
-			),
-		).toBe(false);
-		const tooMany = mgxFile([first]);
-		tooMany.writeInt32LE(0x40000, 4);
-		expect(
-			await umesoftMgxArchiveFormat.detect(sourceOf(tooMany), "cg.grx"),
-		).toBe(false);
-		const outside = mgxFile([first]);
-		outside.writeUInt32LE(0x1000, INDEX_START);
-		expect(
-			await umesoftMgxArchiveFormat.detect(sourceOf(outside), "cg.grx"),
-		).toBe(false);
-		const odd = mgxFile([first]);
-		odd.write("MGX\x1B", 0, "latin1");
-		expect(await umesoftMgxArchiveFormat.detect(sourceOf(odd), "cg.grx")).toBe(
-			false,
-		);
-	});
-
-	it("tries the archive before the picture, which reads the same file", () => {
-		expect(umesoftMgxArchiveFormat.detection?.priority).toBe(10);
-		expect(umesoftMgxImageFormat.detection?.priority).toBeUndefined();
-		expect(umesoftMgxArchiveFormat.descriptor.id).toBe("umesoft-mgx-archive");
-		expect(umesoftMgxImageFormat.descriptor.id).toBe("umesoft-mgx-image");
-	});
-});
 
 describe("U-Me Soft multi-frame picture", () => {
 	const first = grxFile({

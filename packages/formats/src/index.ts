@@ -929,10 +929,7 @@ import { ivoryMmdImageFormat } from "./ivory/mmd-image.js";
 import { miscLzsImageFormat } from "./misc/lzs-image.js";
 import { umesoftGrxImageFormat } from "./umesoft/grx-image.js";
 import { umesoftSgxImageFormat } from "./umesoft/sgx-image.js";
-import {
-	umesoftMgxArchiveFormat,
-	umesoftMgxImageFormat,
-} from "./umesoft/mgx.js";
+import { umesoftMgxImageFormat } from "./umesoft/mgx.js";
 import { yukaYkgImageFormat } from "./yuka/ykg-image.js";
 import { zyxMtlImageFormat } from "./zyx/mtl-image.js";
 import { zyxSplImageFormat } from "./zyx/spl-image.js";
@@ -2235,7 +2232,6 @@ export function createDefaultRegistry(): FormatRegistry {
 		miscLzsImageFormat,
 		umesoftGrxImageFormat,
 		umesoftSgxImageFormat,
-		umesoftMgxArchiveFormat,
 		umesoftMgxImageFormat,
 		yukaYkgImageFormat,
 		zyxMtlImageFormat,
