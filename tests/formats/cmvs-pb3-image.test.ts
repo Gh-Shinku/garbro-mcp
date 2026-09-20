@@ -17,7 +17,12 @@ function buildV1(): Buffer {
 	const width = 16;
 	const height = 16;
 	const planeSize = width * height;
-	const recordSize = 12 + 1 + 1;
+	// The places of the walk of the places of a colour stand as the places of the file of the picture itself,
+	// which stand as the places of the picture one place at a time: every place of the walk of the picture
+	// stands as one place of the file, so the places of the file that name the places of the walk of a colour
+	// stand as the places of eight places of the walk.
+	const walkPlaces = Math.ceil(planeSize / 8);
+	const recordSize = 12 + 1 + walkPlaces;
 	// The words of the head of a picture of this kind stand in the first six and thirty places of the file, and
 	// the places of the walks of its colours stand behind the words of the head and the places of the tables of
 	// the walks of the colours.
@@ -52,8 +57,12 @@ function buildV1(): Buffer {
 		// picture stand as the places of the walk that stand for them.
 		records[from + 12] = 0x00;
 		// The places of the walk of the places of a colour stand as the places of the file one place at a
-		// time, every one of them standing as it stands.
-		records[from + 13] = 0x00;
+		// time, every one of them standing as it stands: the places of the file that name them stand as no
+		// places of the walk at all, so every place of the walk of a colour stands as the place of the walk of
+		// the picture that stands beside it.
+		for (let at = 0; at < walkPlaces; at += 1) {
+			records[from + 13 + at] = 0x00;
+		}
 	}
 	// The places the walk of the places of every colour stands for itself stand in the places of the table of
 	// the walks of the colours, which stand as places of their own behind the words of the head of the picture
@@ -67,6 +76,38 @@ function buildV1(): Buffer {
 		}
 	}
 	return Buffer.concat([head, table, records, walks]);
+}
+
+/** A picture of the fifth kind of sixteen places, whose places of every colour stand as a walk of their own:
+ * every place of the walk stands beside the place before it, so the places of the picture stand as the places
+ * of the picture that stand beside the places of the file the walk stands for. */
+function buildV5(): Buffer {
+	const width = 16;
+	const height = 16;
+	const planeSize = width * height;
+	const walkPlaces = Math.ceil(planeSize / 8);
+	const walksAt = 0x54;
+	const channelSize = walkPlaces + planeSize;
+	const head = Buffer.alloc(walksAt, 0x00);
+	head.write("PB3B", 0, "latin1");
+	head.writeInt32LE(0, 4);
+	head.writeInt32LE(0x10, 0x18);
+	head.writeUInt16LE(5, 0x1c);
+	head.writeUInt16LE(width, 0x1e);
+	head.writeUInt16LE(height, 0x20);
+	head.writeUInt16LE(32, 0x22);
+	for (let channel = 0; channel < 4; channel += 1) {
+		head.writeInt32LE(channel * channelSize, 0x34 + 8 * channel);
+		head.writeInt32LE(channel * channelSize + walkPlaces, 0x38 + 8 * channel);
+	}
+	const walks = Buffer.alloc(4 * channelSize, 0x00);
+	for (let channel = 0; channel < 4; channel += 1) {
+		const from = channel * channelSize + walkPlaces;
+		for (let at = 0; at < planeSize; at += 1) {
+			walks[from + at] = at & 0xff;
+		}
+	}
+	return Buffer.concat([head, walks]);
 }
 
 /** A picture of the second kind: the places of the picture stand as the places of a picture of the Purple
@@ -145,20 +186,53 @@ describe("Purple Software image format", () => {
 		expect(wrongMark.subarray(0, 4).toString("latin1")).toBe("PB3C");
 	});
 
+	it("stands the places of a picture of the first kind as the places of the walk of its colours", async () => {
+		const out = await extract(buildV1());
+		expect(out.readUInt32LE(0x12)).toBe(16);
+		// `ImageData.Create` keeps the stored order top down, so the height of the bitmap is negative.
+		expect(out.readInt32LE(0x16)).toBe(-16);
+		expect(out.readUInt16LE(0x1c)).toBe(32);
+		const pixels = out.subarray(0x36);
+		for (let y = 0; y < 16; y += 1) {
+			for (let x = 0; x < 16; x += 1) {
+				const at = (y * 16 + x) * 4;
+				const place = y * 16 + x;
+				// The places of every colour of the picture stand as the places of the walk of their own, so
+				// every place of the picture stands as the place of the picture that stands as it stands.
+				expect([
+					pixels[at],
+					pixels[at + 1],
+					pixels[at + 2],
+					pixels[at + 3],
+				]).toEqual([place, place, place, place]);
+			}
+		}
+	});
+
+	it("stands the places of a picture of the fifth kind beside the places before them", async () => {
+		const out = await extract(buildV5());
+		expect(out.readUInt32LE(0x12)).toBe(16);
+		expect(out.readUInt16LE(0x1c)).toBe(32);
+		const pixels = out.subarray(0x36);
+		for (let place = 0; place < 256; place += 1) {
+			// Every place of the walk of the places of a colour stands beside the place before it, so the place
+			// of the picture stands as the places of the picture that stand beside the places of the file the
+			// walk stands for.
+			const expected = ((place * (place + 1)) / 2) % 256;
+			expect(pixels[place * 4]).toBe(expected);
+		}
+	});
+
 	it("turns a picture whose places stand as a walk this project does not read away", async () => {
-		// The places of a picture of the first kind stand as a walk of their own under tables of the file, which
-		// this port does not yet stand.
-		const v1 = buildV1();
-		expect(readPb3Head(v1)).toMatchObject({ kind: 1, subKind: 0x10 });
-		await expect(extract(v1)).rejects.toThrow(GarbroError);
-		await expect(extract(v1)).rejects.toThrow(
-			"Purple picture of a kind this project does not read",
-		);
-		for (const kind of [5, 6, 8]) {
+		for (const kind of [6, 8, 4, 7, 9]) {
 			const data = Buffer.from(buildKind2());
 			data.writeUInt16LE(kind, 0x1c);
 			await expect(extract(data)).rejects.toThrow(GarbroError);
 		}
+		// A picture of the first kind whose underkind names a picture of a kind this project does not read.
+		const other = Buffer.from(buildV1());
+		other.writeInt32LE(0, 0x18);
+		await expect(extract(other)).rejects.toThrow(GarbroError);
 	});
 
 	it("stands the places of a picture of the second kind as the places of the picture within it", async () => {

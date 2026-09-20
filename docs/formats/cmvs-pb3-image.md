@@ -24,9 +24,11 @@ the walks of the places of the colours of the picture stand.
 | six and eight | stand as a walk of their own behind the words of the engine and the places of the game |
 | four and seven | stand as no picture the reference reads at all |
 
-This port stands the places of a picture of the kinds two and three, which stand as the places of a picture of
-the Purple engine within them and hand their places to `jbp-reader.ts`; the words of the head of such a picture
-stand at `0x34` and the places of the transparency of the picture at the place its head names.
+This port stands the places of a picture of the kinds one, two, three and five: the places of a picture of the
+second and third kinds stand as the places of a picture of the Purple engine within them and hand their places
+to `jbp-reader.ts`, the words of the head of such a picture standing at `0x34` and the places of the
+transparency of the picture at the place its head names; the places of a picture of the first and fifth kinds
+stand as walks of their own under the tables of the picture.
 
 ## Deviations from the reference
 
@@ -41,16 +43,11 @@ stand at `0x34` and the places of the transparency of the picture at the place i
   picture names two and thirty places a place and of three colours a place where it names four and twenty, which
   is what the reference names the places of a picture of this kind as.
 
-## What this port does not yet stand
+## The walks this port does not stand
 
-- The walks of the places of the first and fifth kinds stand in `packages/codecs/src/pb3-reader.ts` as the
-  reference stands them, and this port does not yet hand a picture of either kind out: the places a picture of
-  the first kind stands as stand under tables of their own at `0x2C` and `0x30`, and the places this port reads
-  of a picture of the first kind of the test stand as the places of the picture of one colour behind the places
-  of the colour that stands before it, which stands as no picture the reference reads. Reading them stands as a
-  turn of its own.
 - The walks of the places of the kinds that stand behind the words of the engine and the places of a picture of
   the game that stand beside them stand as no part of this port.
+- The places of a picture of the kinds four and seven stand as no picture the reference reads at all.
 
 ## Tests
 

@@ -3,7 +3,13 @@
 // places, and the places of the picture stand as the places of the walk of the kind it names).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { readPb3Head, pb3UnpackJbp, type Pb3Picture } from "@garbro-mcp/codecs";
+import {
+	readPb3Head,
+	pb3UnpackJbp,
+	pb3UnpackV1,
+	pb3UnpackV5,
+	type Pb3Picture,
+} from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -87,19 +93,15 @@ function unpackPb3(data: Buffer): Pb3Picture {
 			data.readInt32LE(ALPHA_FIELD),
 		);
 	}
-	if (kind === KIND_V1 || kind === KIND_V5) {
-		// The walks of the places of these kinds stand in the codecs of this project, and this port does not
-		// yet stand a picture of either kind: the places a picture of the first kind stands as stand as the
-		// places of the file that stand behind them under tables of their own, and the places this port reads
-		// of the picture of the test stand as the places of the picture of one colour behind the places of the
-		// colour that stands before it. Reading them stands as a turn of its own.
-		if (kind === KIND_V1 && head.subKind !== V1_SUBKIND) {
+	if (kind === KIND_V1) {
+		if (head.subKind !== V1_SUBKIND) {
 			throw invalidPicture(
 				"Purple picture of a kind this project does not read",
 			);
 		}
-		throw invalidPicture("Purple picture of a kind this project does not read");
+		return pb3UnpackV1(data, head);
 	}
+	if (kind === KIND_V5) return pb3UnpackV5(data, head);
 	if (kind === KIND_V6 || kind === KIND_V6_OTHER) {
 		// The reference reads the places of a picture of these kinds through the words of the engine and the
 		// places of a picture of the game that stand beside them.

@@ -21,18 +21,15 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
+				"the walks of the places of the first and fifth kinds of picture",
 				"the places of a picture of the kinds that stand as the places of a picture of the Purple engine within them",
 			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"the walks of the places of the first and fifth kinds of picture",
 				"the walks of the places of the kinds that stand behind the words of the engine and the places of the game",
 			],
-			remainingVerification: [
-				"the walk of the places of the first kind of picture",
-				"real-game GARbro differential output",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
