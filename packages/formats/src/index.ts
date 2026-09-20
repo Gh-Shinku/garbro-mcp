@@ -245,6 +245,7 @@ import { koeiYkFormat } from "./koei/yk-archive.js";
 import { neFormat } from "./microsoft/ne-archive.js";
 import { mgsFormat } from "./masys/mgs-archive.js";
 import { eternitySgfImageFormat } from "./eternity/sgf-image.js";
+import { pajamasEpaImageFormat } from "./pajamas/epa-image.js";
 import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
@@ -1552,6 +1553,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,
+		pajamasEpaImageFormat,
 		ucgFormat,
 		voiceFormat,
 		arccFormat,

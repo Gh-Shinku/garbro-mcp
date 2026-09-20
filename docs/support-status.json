@@ -18489,6 +18489,38 @@
 				"a picture whose alpha section is of the bitmap kind",
 				"a picture of several colour blocks taken from a real game"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "EPA",
+				"class": "EpaFormat",
+				"source": "ArcFormats/Pajamas/ImageEPA.cs"
+			},
+			"localId": "pajamas-epa-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the header walk and both modes",
+				"the five colour types",
+				"the flag byte channel walk",
+				"the sixteen entry offset table",
+				"the second channel of the alpha colour type",
+				"bitmap output"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a flag that asks for an empty back reference, on which the reference would read its stream to the end instead of stopping"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture of each colour type, in particular the two byte kind whose two channels are woven by an expression of the reference's own",
+				"a channel that ends in a back reference too long for it, which the reference stops rather than completes"
+			]
 		}
 	]
 }
