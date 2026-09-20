@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "VAW",
+				class: "VawAudio",
+				source: "ArcFormats/BlackCyc/AudioVAW.cs",
+			},
+			localId: "black-cyc-vaw-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the four kinds of the places of a sound",
+				"the walk of places of a sound of its own",
+				"the wave header of a sound of its own",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WV5",
 				class: "Wv5Audio",
 				source: "ArcFormats/Maika/AudioWV5.cs",

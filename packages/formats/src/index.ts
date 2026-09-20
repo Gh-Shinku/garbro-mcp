@@ -170,6 +170,7 @@ import { cp3Format } from "./seraphim/cp3.js";
 import { crmFormat } from "./circus/crm.js";
 import { pkgFormat } from "./yatagarasu/pkg.js";
 import { gpkFormat } from "./black-cyc/gpk.js";
+import { blackCycVawAudioFormat } from "./black-cyc/vaw-audio.js";
 import { arc0Format } from "./mixwill/arc0.js";
 import { minkGrpFormat } from "./mink/grp.js";
 import { yaneDatFormat } from "./yane-sdk/dat.js";
@@ -1420,6 +1421,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		crmFormat,
 		pkgFormat,
 		gpkFormat,
+		blackCycVawAudioFormat,
 		arc0Format,
 		minkGrpFormat,
 		yaneDatFormat,
