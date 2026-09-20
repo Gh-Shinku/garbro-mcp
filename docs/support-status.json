@@ -18581,6 +18581,37 @@
 				"a real picture of each colour mode",
 				"a real picture whose channels are back referenced, which is where the escape byte and the delta pass are hardest to get right"
 			]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "GsPack",
+				"class": "PakOpener",
+				"source": "ArcFormats/GsPack/ArcGsPack.cs"
+			},
+			"localId": "gspack-pak-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the three marks",
+				"the two record sizes",
+				"the stored index",
+				"the packed index and the mixing of it",
+				"the name folded record key",
+				"the type the reference takes from the archive name"
+			],
+			"unsupported": [
+				"archive creation",
+				"the GsData and ScW formats that share this source file, which are tracked as implementations of their own"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real archive whose index is packed, which exercises the LZSS walk over a real index",
+				"a real archive of the encrypted kind, which exercises the key its record names fold into"
+			]
 		}
 	]
 }
