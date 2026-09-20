@@ -27,7 +27,7 @@ export const formatSupportCatalog = {
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: [
 				"real-game GARbro differential output",
-				"the places of the walk of a picture that name the places behind them and the counts of them, which stand transcribed but covered by no fixture of this project",
+				"the counts of the places of the walk of the count of its own of five and twenty places or more, and the places of the walk of a picture that stand further behind the place written than the places of a walk of the kind of the count of its own",
 			],
 		},
 		{

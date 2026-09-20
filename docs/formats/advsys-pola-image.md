@@ -53,16 +53,24 @@ picture of the engine and the places of it. This port stands the picture the sam
 
 ## What stands covered by a fixture and what does not
 
-The walk of the places of a picture whose places of the walk stand for places of the picture of their own stands
-covered by a fixture, of the places of the walk of a picture of a word of the walk of the picture of the test,
-standing against an account of the reference of its own (`tests/formats/advsys-pola-image.test.ts`). The places
-of the walk of a picture that name the places behind them and the counts of them stand transcribed from the
-reference and stand covered by **no** fixture of this project: a stream of this kind stands as a walk of the
-places of a picture that stands beside the places of the picture it stands for, and this project stands no
-account of the walk of the places of a picture of a kind of its own to stand against it, so the places of the
-walk of a picture that name the places behind them stand verified by no word of a picture of the game. What a
-game stands in the places of a picture of this kind therefore stands to be stood against the walks of the
-reference.
+The walk of the places of a picture stands covered by a fixture of this project: the places of the walk of a
+picture that stand for places of the picture of their own (of four places and of eight, with the words of the
+walk of the picture standing before the places of the picture of them), and the places of the walk of a picture
+that name the places behind them and the counts of them — that is, the walks whose places of the picture stand
+as the places of the picture of two places of the picture of their own standing over and over, of the counts of
+three places to sixteen. These stand against an account of the reference of its own
+(`tests/formats/advsys-pola-image.test.ts`).
+
+The places of the walk of a picture that stand **uncovered** stand as:
+
+- the counts of the places of the walk of the count of its own of five and twenty places or more, which stand as
+  the places of the count of a place of the picture of its own;
+- the places of the walk of a picture that stand further behind the place written than the places of the walk of
+  the kind of the count of its own.
+
+What a game stands in the places of a picture of this kind therefore stands to be stood against the walks of
+the reference, where a walk of the picture stands for a count of the places of a walk of five and twenty places
+or more or for the places of a picture of a walk of the kind of the count of the places behind it.
 
 ## Deviations from the reference
 

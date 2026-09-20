@@ -24,6 +24,76 @@ function buildHead(options?: {
 	return head;
 }
 
+/** The walks of the places of a picture whose places of the walk stand for the places of the picture behind
+ * them and for the counts of them, stood against an account of the reference of its own: every walk stands the
+ * places of the picture of two places of the picture of its own and then a walk of the places of the picture
+ * behind them, whose places stand beside each other, so the places of the picture stand as the places of the
+ * picture of the two places of their own standing over and over. */
+const WALKS: readonly {
+	name: string;
+	places: number;
+	stream: string;
+	walked: string;
+}[] = [
+	{
+		name: "mixed",
+		places: 8,
+		stream: "fbf84142fe43fd",
+		walked: "4142414241434241",
+	},
+	{ name: "count3", places: 5, stream: "fbff4142fe", walked: "4142414241" },
+	{ name: "count4", places: 6, stream: "bbff4142fe", walked: "414241424142" },
+	{ name: "count5", places: 7, stream: "3bff4142fe", walked: "41424142414241" },
+	{
+		name: "count6",
+		places: 8,
+		stream: "3bfe4142fe",
+		walked: "4142414241424142",
+	},
+	{
+		name: "count7",
+		places: 9,
+		stream: "3bf44142fe",
+		walked: "414241424142414241",
+	},
+	{
+		name: "count8",
+		places: 10,
+		stream: "3bfc4142fe",
+		walked: "41424142414241424142",
+	},
+	{
+		name: "count9",
+		places: 11,
+		stream: "3b804142fe",
+		walked: "4142414241424142414241",
+	},
+	{
+		name: "count10",
+		places: 12,
+		stream: "3bc04142fe",
+		walked: "414241424142414241424142",
+	},
+	{
+		name: "count12",
+		places: 14,
+		stream: "3be04142fe",
+		walked: "4142414241424142414241424142",
+	},
+	{
+		name: "count15",
+		places: 17,
+		stream: "3bb04142fe",
+		walked: "4142414241424142414241424142414241",
+	},
+	{
+		name: "count16",
+		places: 18,
+		stream: "3bf04142fe",
+		walked: "414241424142414241424142414241424142",
+	},
+];
+
 describe("AdvSys engine compressed image format", () => {
 	it("reads the head of a picture of each of the two kinds of the walk of it", () => {
 		// The places of the head of a picture of the second kind of the walk of it stand behind the words of
@@ -43,7 +113,6 @@ describe("AdvSys engine compressed image format", () => {
 	it("turns away a head that names no picture of this kind", () => {
 		expect(readPolaLayout(buildHead({ mark: "*Polb" }), 0x40)).toBeUndefined();
 		expect(readPolaLayout(Buffer.alloc(8), 8)).toBeUndefined();
-		// The words of the kind of the picture stand in the places of the kind of the picture of the engine.
 		expect(readPolaLayout(buildHead({ mark: "GR2_" }), 0x40)).toBeUndefined();
 	});
 
@@ -58,18 +127,24 @@ describe("AdvSys engine compressed image format", () => {
 		expect(unpackPolaPicture(stream, 8)).toEqual(
 			Buffer.concat([places, Buffer.alloc(2)]),
 		);
+		const short = Buffer.from([0x41, 0x42, 0x43, 0x44]);
+		expect(
+			unpackPolaPicture(Buffer.concat([Buffer.from([0xff, 0xff]), short]), 4),
+		).toEqual(Buffer.concat([short, Buffer.alloc(2)]));
 	});
 
-	it("walks a picture of four places the same way", () => {
-		const places = Buffer.from([0x41, 0x42, 0x43, 0x44]);
-		const stream = Buffer.concat([Buffer.from([0xff, 0xff]), places]);
-		expect(unpackPolaPicture(stream, 4)).toEqual(
-			Buffer.concat([places, Buffer.alloc(2)]),
-		);
+	it("walks the places of a picture whose places of the walk name the places behind them", () => {
+		for (const walk of WALKS) {
+			expect(
+				unpackPolaPicture(Buffer.from(walk.stream, "hex"), walk.places),
+				walk.name,
+			).toEqual(
+				Buffer.concat([Buffer.from(walk.walked, "hex"), Buffer.alloc(2)]),
+			);
+		}
 	});
 
 	it("turns a walk that stands short of the places of the picture away", () => {
-		// A walk that names places of the picture it stands for and stands short of them stands away.
 		const short = Buffer.from([0xff, 0xff, 0x41, 0x42]);
 		expect(() => unpackPolaPicture(short, 64)).toThrow(GarbroError);
 	});
