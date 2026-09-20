@@ -5,6 +5,27 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "WV5",
+				"class": "Wv5Audio",
+				"source": "ArcFormats/Maika/AudioWV5.cs"
+			},
+			"localId": "maika-wv5-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walk of runs a sound stands as",
+				"the places of the colours of a sound",
+				"the places a place of a sound stands beside the place before it"
+			],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "DAT/PMASTER",
 				"class": "DatOpener",

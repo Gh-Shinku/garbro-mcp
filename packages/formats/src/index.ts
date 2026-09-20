@@ -406,6 +406,7 @@ import { fwaFormat } from "./nug/fwa.js";
 import { riddlePacFormat } from "./riddle/pac.js";
 import { myAdvPacFormat } from "./myadv/pac.js";
 import { maikaMik01Format } from "./maika/mik01.js";
+import { maikaWv5AudioFormat } from "./maika/wv5-audio.js";
 import { pinpaiArcxFormat } from "./pinpai/arcx.js";
 import { gigaTpfFormat } from "./giga/tpf.js";
 import { sognaDatFormat } from "./sogna/dat.js";
@@ -1583,6 +1584,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		riddlePacFormat,
 		myAdvPacFormat,
 		maikaMik01Format,
+		maikaWv5AudioFormat,
 		gxFormat,
 		dl1Format,
 		nejiiCdtFormat,
