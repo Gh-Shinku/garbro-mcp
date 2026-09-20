@@ -9,6 +9,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "DAT/PMASTER",
+				class: "DatOpener",
+				source: "ArcFormats/Unity/PMaster/ArcDAT.cs",
+			},
+			localId: "unity-pmaster-dat",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head that counts its own places as files",
+				"the walk of the files",
+				"the walk of the names",
+				"the walk of a key of its own",
+			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "RGSSAD",
 				class: "RgssOpener",
 				source: "Experimental/RPGMaker/ArcRGSS.cs",

@@ -835,6 +835,7 @@ import { keroqKgd1ImageFormat } from "./keroq/kgd1-image.js";
 import { utageImageFormat } from "./unity/utage-image.js";
 import { unityDsmScriptFormat } from "./unity/dsm-script.js";
 import { unityDsmArchiveFormat } from "./unity/dsm-archive.js";
+import { unityPMasterDatFormat } from "./unity/pmaster-dat.js";
 import { aaruBm2ImageFormat } from "./aaru/bm2-image.js";
 import { betImageFormat } from "./system21/bet-image.js";
 import { lzBetImageFormat } from "./system21/bet-image.js";
@@ -2079,6 +2080,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		utageImageFormat,
 		unityDsmScriptFormat,
 		unityDsmArchiveFormat,
+		unityPMasterDatFormat,
 		aaruBm2ImageFormat,
 		betImageFormat,
 		lzBetImageFormat,
