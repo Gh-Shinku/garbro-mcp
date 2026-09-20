@@ -5,6 +5,32 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "GRD/SJ",
+				"class": "GrdFormat",
+				"source": "ArcFormats/StudioJikkenshitsu/ImageGRD.cs"
+			},
+			"localId": "studio-jikkenshitsu-grd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walk of the LZSS kind the places of the picture stand behind",
+				"the places of the picture under the standard cipher",
+				"the colours of a picture of eight bits",
+				"the shape of the places of a picture of eight bits"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures whose places of a colour stand beside any but eight and four and twenty"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "RHA",
 				"class": "RhaAudio",

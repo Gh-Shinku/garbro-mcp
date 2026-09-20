@@ -838,6 +838,7 @@ import { gameresJpegImageFormat } from "./gameres/jpeg-image.js";
 import { gameresMp3AudioFormat } from "./gameres/mp3-audio.js";
 import { gameresWavAudioFormat } from "./gameres/wav-audio.js";
 import { rugpRhaAudioFormat } from "./rugp/rha-audio.js";
+import { studioJikkenshitsuGrdImageFormat } from "./studio-jikkenshitsu/grd-image.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
 import { rinaRadImageFormat } from "./rina/rad-image.js";
@@ -1223,6 +1224,7 @@ export * from "./tobe/index.js";
 export * from "./powerd/index.js";
 export * from "./gameres/index.js";
 export * from "./rugp/index.js";
+export * from "./studio-jikkenshitsu/index.js";
 export * from "./melody/index.js";
 export * from "./eagls/index.js";
 export * from "./qlie/index.js";
@@ -2073,6 +2075,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gameresMp3AudioFormat,
 		gameresWavAudioFormat,
 		rugpRhaAudioFormat,
+		studioJikkenshitsuGrdImageFormat,
 		macromediaSndAudioFormat,
 		gsPackPicImageFormat,
 		rinaRadImageFormat,
