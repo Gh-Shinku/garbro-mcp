@@ -8,6 +8,32 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "IPH",
+				class: "IphFormat",
+				source: "ArcFormats/TechnoBrain/ImageIPH.cs",
+			},
+			localId: "techno-brain-iph-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of a picture that stands as they stand",
+				"the walk of the places of a picture",
+				"the places that name how much of a place of a picture stands on the places beside it",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"pictures of places of a colour this project does not read",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "WAR2/SAS5",
 				class: "War2Opener",

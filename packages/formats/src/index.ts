@@ -267,6 +267,7 @@ import { abogadoAdpAudioFormat } from "./abogado/adp-audio.js";
 import { crossNetAdpAudioFormat } from "./crossnet/adp-audio.js";
 import { aaruWv1AudioFormat } from "./aaru/wv1-audio.js";
 import { technoBrainWapeAudioFormat } from "./techno-brain/wape-audio.js";
+import { technoBrainIphImageFormat } from "./techno-brain/iph-image.js";
 import {
 	sohfuDtlImageFormat,
 	sohfuDtlcImageFormat,
@@ -1523,6 +1524,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		crossNetAdpAudioFormat,
 		aaruWv1AudioFormat,
 		technoBrainWapeAudioFormat,
+		technoBrainIphImageFormat,
 		sohfuDtlImageFormat,
 		sohfuDtlcImageFormat,
 		majiroRc8ImageFormat,
