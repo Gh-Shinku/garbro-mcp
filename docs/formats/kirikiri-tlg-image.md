@@ -1,14 +1,13 @@
 # KiriKiri game engine image format (`TLG`)
 
-Reference: GARbro `ArcFormats/KiriKiri/ImageTLG.cs`, classes `TlgFormat`, `TlgMetaData`, and the walk of the
-places of the picture of the fifth kind of the places of the picture (`ReadV5`, `TVPTLG5DecompressSlide`,
-`TVPTLG5ComposeColors3To4` and `TVPTLG5ComposeColors4To4`). GARbro commit
+Reference: GARbro `ArcFormats/KiriKiri/ImageTLG.cs`, classes `TlgFormat`, `TlgMetaData`, and the walks of the
+places of the picture of the fifth kind (`ReadV5`, `TVPTLG5DecompressSlide`, `TVPTLG5ComposeColors3To4` and
+`TVPTLG5ComposeColors4To4`) and of the sixth kind (`ReadV6`, `TVPTLG6DecodeGolombValues`,
+`TVPTLG6DecodeGolombValuesForFirst` and `TVPTLG6DecodeLineGeneric`). GARbro commit
 `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT License.
 
 A picture of the engine of the kind of KiriKiri. This project stands the places of the picture of the walk of
-the places of the picture of the fifth kind of the places of the picture alone, and stands the places of the
-picture of the walk of the places of the picture of the sixth kind of the places of the picture of the
-reference.
+the places of the picture of the fifth and of the sixth kind of the places of the picture of the reference.
 
 ## Head
 
@@ -95,13 +94,131 @@ picture of the walk of them behind them, and of no places of the picture of the 
 picture where they stand of the places of the picture of the walk of the places of the picture of the place of
 the picture of the walk of them of the first place of the picture of the walk of the places of the picture.
 
+## The places of the picture of the walk of the places of the picture of the sixth kind
+
+The places of the picture of the walk of the places of the picture of the sixth kind stand of the places of
+the picture of the walk of the places of the picture of the words of the walk of the picture of the kind of the
+places of the picture of the walk of them of the engine: the places of the picture of the walk of the places
+of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the
+places of the picture of the sound, the places of the picture of the walk of the places of the picture of the
+kind of the places of the picture of the walk of them of the places of the picture, and the places of the
+picture of the walk of the places of the picture of the sound of the places of the picture.
+
+The picture stands of the places of the picture of the walk of the places of the picture of the kind of the
+places of the picture of the walk of them of eight places of the picture of the walk of the places of the
+picture, every one of them standing of eight places of the picture of the walk of the places of the picture of
+the picture, and of the places of the picture of the walk of the places of the picture of the kind of the
+places of the picture of the walk of them of every colour of every one of them: the places of the picture of
+the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
+places of the picture of the sound standing of the places of the picture of the walk of the places of the
+picture of the place of the picture of the walk of them of the places of the picture of the walk of the places
+of the picture of the sound of the places of the picture, and of the places of the picture of the walk of the
+places of the picture of the words of the walk of the picture of the places of the picture of the walk of the
+places of the picture of their own.
+
+### The places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture
+
+Every place of the picture of the walk of the places of the picture of a colour stands of a place of the
+picture of the walk of the places of the picture of the words of the walk of the picture of the place of the
+picture of the walk of them (`i32`) whose two places of the picture of the walk of the places of the picture
+of the place of the picture of the walk of them of the sound stand of the kind of the places of the picture of
+the walk of the places of the picture of the sound of the places of the picture of the walk of the places of
+the picture of the places of the picture of the walk of them of the places of the picture of the walk of the
+places of the picture:
+
+| the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them | the places of the picture of the walk of the places of the picture of the sound |
+| --- | --- |
+| `00` | the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture, which this project stands |
+| `01` | the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the engine |
+| `10` | the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture |
+| `11` | the places of the picture of the walk of the places of the picture as they stand |
+
+The reference stands the places of the picture of the walk of the places of the picture of the sound of the
+places of the picture of the walk of the places of the picture of the places of the picture of the walk of them
+of the places of the picture of the walk of the places of the picture of their own beside the places of the
+picture of the walk of the places of the picture of the sound, so a picture of this project stands the place
+of the picture of the walk of the places of the picture of the same kind of the places of the picture of the
+walk of the places of the picture.
+
+The places of the picture of the walk of the places of the picture of the sound of the places of the picture of
+the walk of the places of the picture stand of the places of the picture of the walk of the places of the
+picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
+of the places of the picture of the walk of them, standing of the places of the picture of the walk of the
+places of the picture of the walk of them of the places of the picture of the walk of the places of the picture
+of the word of the walk of them of the engine of the places of the picture of the walk of the places of the
+picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
+of the places of the picture of the sound of the places of the picture of the walk of the places of the picture
+of their own.
+
+### The places of the picture of the walk of the places of the picture of the line
+
+Every line of the picture stands of the places of the picture of the walk of the places of the picture of the
+places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
+walk of them of the places of the picture of the walk of the places of the picture of the sound of the places
+of the picture of the walk of the places of the picture: the places of the picture of the walk of the places of
+the picture of the kind of the places of the picture of the walk of them of the places of the picture of the
+walk of the places of the picture of the place of the picture of the walk of them, and of the places of the
+picture of the walk of the places of the picture of the place of the picture of the walk of them of the kind
+of the places of the picture of the walk of the places of the picture of the sound of the places of the
+picture, standing of the places of the picture of the walk of the places of the picture of the place of the
+picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound
+of the places of the picture of the walk of the places of the picture.
+
+Every line stands of the places of the picture of the walk of the places of the picture of the kind of the
+places of the picture of the walk of them of the places of the picture of the walk of the places of the
+picture of the places of the picture of the walk of them (32 of them, standing of the places of the picture of
+the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
+places of the picture of the walk of the places of the picture of the sound of the places of the picture of
+their own and of the places of the picture of the walk of the places of the picture of the middle of the
+places of the picture of the walk of the places of the picture of the sound of the places of the picture), and
+of the places of the picture of the walk of the places of the picture of the sound of the places of the picture
+of the walk of the places of the picture of the places of the picture of the walk of them standing of the
+places of the picture of the walk of the places of the picture of the place of the picture of the walk of them
+of the places of the picture of the walk of the places of the picture where they stand. Every one of them
+stands of the places of the picture of the walk of the places of the picture of the place of the picture of the
+walk of them of the places of the picture of the walk of the places of the picture of the sound of the places
+of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
+them, standing of the places of the picture of the walk of the places of the picture of the place of the
+picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound
+of the places of the picture, and of the places of the picture of the walk of the places of the picture of the
+middle of the places of the picture of the walk of the places of the picture of the sound.
+
+### The places of the picture of the walk of the places of the picture of no places of their own
+
+The places of the picture of the walk of the places of the picture of the first line of the picture stands of
+the places of the picture of the walk of the places of the picture of the colour of no places of their own:
+`0xFF000000` where three places of the picture of a place of the picture stand beside each other, and
+`0x00000000` where four of them stand. The places of the picture of the walk of the places of the picture of
+every line behind them stand of the line of the places of the picture of the walk of the places of the picture
+before them.
+
 ## Deviations from the reference
 
-* The reference stands the places of the picture of the walk of the places of the picture of the sixth kind of
-  the places of the picture as well, standing of the places of the picture of the walk of the places of the
-  picture of the words of the walk of the picture of the kind of the places of the picture of the walk of them
-  of the engine. A picture of this project stands the words of the head of the picture of a picture of the
-  sixth kind, and turns the places of the picture of the walk of the places of their own away.
+
+* The reference stands the places of the picture of the walk of the places of the picture of the words of the
+  walk of the picture of the places of the picture of the sound of the places of the picture of the walk of the
+  places of the picture of the sixth kind of the places of the picture in a picture of the places of the picture
+  of the walk of them of 4096 places of the picture standing of the places of the picture of the walk of the
+  places of the picture of the place of the picture of the walk of them of the places of the picture of the
+  words of the walk of the picture behind them. The places of the picture of the walk of the places of the
+  picture of the words of the walk of the picture that stand beside those places of the picture of the walk of
+  them stand of the places of the picture of the walk of the places of the picture of no places of the picture
+  of the walk of them where a picture of this project stands them, so a picture of this project stands the
+  places of the picture of the walk of the places of the picture of the words of the walk of the picture of the
+  places of the picture of the walk of the places of the picture of the place of the picture of the walk of them
+  of the places of the picture of their own, standing of the places of the picture of the walk of the places of
+  the picture of the words of the walk of the picture of the places of the picture of the walk of them of the
+  places of the picture of the walk of the places of the picture of the place of the picture of the walk of them
+  behind them.
+* The reference stands the places of the picture of the walk of the places of the picture of the words of the
+  walk of the picture of the places of the picture of the sound through the places of the picture of the walk of
+  them of a picture of the places of the picture of the walk of them of the places of the picture of the walk
+  of the places of the picture (standing of the places of the picture of the walk of the places of the picture
+  of the place of the picture of the walk of them of the places of the picture of the walk of the places of the
+  picture of the kind of the places of the picture of the walk of them of the places of the picture of their
+  own), so a picture of this project stands a picture of the places of the picture of the walk of them where
+  they stand very short of the places of the picture as the places of the picture of the walk of the places of
+  the picture of no places of their own.
 * The reference stands the places of the picture of the walk of the places of the picture of a picture of this
   kind beside the places of the picture of the walk of the places of the picture of the picture of the places
   of the picture of the walk of them where the places of the picture of the walk of the places of the picture
@@ -121,7 +238,7 @@ the picture of the walk of them of the first place of the picture of the walk of
 
 ## Verification
 
-Eleven fixtures of synthetic pictures stand against the walk of the words of the head of the picture and the
+Sixteen fixtures of synthetic pictures stand against the walk of the words of the head of the picture and the
 places of the picture of the walk of the places of the picture of the fifth kind of the places of the picture:
 the words of the head of a picture of the third and of the fourth colour, of the places of the picture of the
 walk of the places of the picture of the words of the walk of the picture of the kinds of the walk of the
@@ -143,3 +260,38 @@ places of the picture of the walk of the places of the picture of the places of 
 places of the picture of their own, and of the places of the picture of the walk of the places of the picture
 of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the
 places of the picture of the walk of the places of them.
+
+Five more fixtures stand against the places of the picture of the walk of the places of the picture of the
+sixth kind of the places of the picture, standing of the places of the picture of the walk of the places of the
+picture of the words of the walk of the picture of the kind of the places of the picture of the walk of them of
+the engine: a picture of one place of the picture of the walk of the places of the picture of the sound, a
+picture of one place of the picture of the walk of the places of the picture of no places of their own (of
+three and of four colours), a picture of nine places of the picture of the walk of the places of the picture of
+the sound of the places of the picture of the walk of the places of the picture of no places of their own
+(standing of the places of the picture of the walk of the places of the picture of the places of the picture of
+the walk of them of the places of the picture of the walk of the places of the picture of the kind of the
+places of the picture of the walk of them of the places of the picture of their own and of the places of the
+picture of the walk of the places of the picture of the place of the picture of the walk of them), a picture of
+two places of the picture of the walk of the places of the picture of the sound of the places of the picture of
+the walk of the places of the picture of the places of the picture of the walk of them of the places of the
+picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
+of the places of the picture of their own, and the places of the picture of the walk of the places of the
+picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the
+places of the picture of the walk of them of the engine of the places of the picture of the walk of the places
+of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the
+places of the picture of the sixth kind of the places of the picture of the walk of the places of the picture,
+and of the places of the picture of the walk of the places of the picture of the sound of the places of the
+picture that stand of no places of the picture of the walk of the places of the picture.
+
+The places of the picture of the walk of the places of the picture of the words of the walk of the picture of
+those fixtures stand of the places of the picture of the walk of the places of the picture of the place of the
+picture of the walk of them of the places of the picture of the walk of the places of the picture behind them
+from the places of the picture of the walk of the places of the picture of the sound of the places of the
+picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the
+places of the picture of their own, and of the places of the picture of the walk of the places of the picture
+of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the
+places of the picture of the sound of the places of the picture of the walk of the places of the picture of
+their own where the places of the picture of the walk of the places of the picture of the walk of them of the
+places of the picture of the walk of the places of the picture of the sound of the places of the picture of the
+walk of the places of them stand of the places of the picture of the walk of the places of the picture of the
+words of the walk of them.

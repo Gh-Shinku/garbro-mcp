@@ -7,10 +7,81 @@ import {
 	readTlgLayout,
 	unpackTlg5,
 } from "../../packages/formats/src/kirikiri/tlg-image.js";
+import { unpackTlg6 } from "../../packages/formats/src/kirikiri/tlg6.js";
 
 const HEAD_SIZE = 0x26;
 const DATA_OFFSET_5 = 20;
 const DATA_OFFSET_6 = 23;
+const MAX_BIT_LENGTH_6 = 8;
+const GOLOMB_METHOD = 0;
+const AVERAGE_METHOD = 1;
+
+/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
+ * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
+ * the picture of the sound of the places of the picture of the walk of the places of the picture. */
+function word(value: number): Buffer {
+	const out = Buffer.alloc(4, 0x00);
+	out.writeInt32LE(value, 0);
+	return out;
+}
+
+/** The places of the picture of the walk of the places of the picture of the kind of the places of the picture
+ * of the walk of the places of the picture of the places of the picture of the walk of them of the places of
+ * the picture of the walk of the places of the picture, standing of the places of the picture of the walk of
+ * the places of the picture of the sound of the places of the picture of the walk of the places of the picture
+ * of their own beside them. */
+function filterStream(count: number): Buffer {
+	return Buffer.concat([word(count + 1), Buffer.alloc(count + 1, 0x00)]);
+}
+
+/** The places of the picture of the walk of the places of the picture of the places of the picture of the
+ * walk of them of the places of the picture of the walk of the places of the picture of the sound of the
+ * places of the picture of the walk of the places of the picture of the sixth kind of the places of the
+ * picture of the walk of the places of the picture. */
+function tlg6(
+	options: { colors: number; width: number; height: number },
+	filters: Buffer,
+	planes: { method?: number; bits: number; payload: Buffer }[],
+): Buffer {
+	const parts = [
+		head6(options.colors, options.width, options.height),
+		word(MAX_BIT_LENGTH_6),
+		filters,
+	];
+	for (const plane of planes) {
+		const method = plane.method ?? GOLOMB_METHOD;
+		parts.push(word((method << 30) | plane.bits), plane.payload);
+	}
+	return Buffer.concat(parts);
+}
+
+/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
+ * of them of the places of the picture of the walk of the places of the picture of the sound of the places of
+ * the picture of the walk of the places of the picture of no places of the picture of the walk of the places of
+ * the picture of their own. */
+function zeroRun(count: number): Buffer {
+	const bits: number[] = [];
+	const put = (value: number, width: number): void => {
+		for (let i = 0; i < width; i += 1) bits.push((value >>> i) & 1);
+	};
+	// The places of the picture of the walk of the places of the picture of the sound of the places of the
+	// picture of the walk of the places of the picture stand of the places of the picture of the walk of the
+	// places of the picture of the kind of the places of the picture of the walk of the places of the picture
+	// of the place of the picture of the walk of them: the places of the picture of the walk of the places of
+	// the picture of the place of the picture of the walk of them of the places of the picture of the walk of
+	// the places of the picture of the sound, and of the places of the picture of the walk of the places of
+	// the picture of the place of the picture of the walk of them of the places of the picture of the walk of
+	// them of the places of the picture of their own.
+	put(0, 1);
+	let first = 0;
+	while (1 << (first + 1) <= count) first += 1;
+	put(1 << first, first + 1);
+	put(count - (1 << first), first);
+	const out = Buffer.alloc(Math.ceil(bits.length / 8), 0x00);
+	for (let i = 0; i < bits.length; i += 1)
+		if (bits[i]) out[i >> 3] = (out[i >> 3] ?? 0) | (1 << (i & 7));
+	return out;
+}
 
 /** The places of the picture of the words of the head of a picture of the fifth kind of the places of the
  * picture. */
@@ -323,5 +394,109 @@ describe("KiriKiri game engine image format", () => {
 		await expect(
 			kirikiriTlgImageFormat.detect(new BufferByteSource(wrong)),
 		).resolves.toBe(false);
+	});
+
+	it("reads the places of the picture of the walk of the places of the picture of the sixth kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture", () => {
+		// The places of the picture of the walk of the places of the picture of the place of the picture of the
+		// walk of them of the places of the picture of the walk of the places of the picture of the sound stand
+		// of the places of the picture of the walk of the places of the picture of the place of the picture of
+		// the walk of them of the places of the picture of the walk of the places of the picture of the kind of
+		// the places of the picture of the walk of the places of the picture.
+		const file = tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+			{ bits: 3, payload: Buffer.from([0x07]) },
+			{ bits: 3, payload: Buffer.from([0x07]) },
+			{ bits: 3, payload: Buffer.from([0x07]) },
+		]);
+		const layout = readTlgLayout(file, file.length);
+		if (!layout) throw new Error("no layout");
+		const bits = unpackTlg6(file, layout);
+		expect(Array.from(bits.subarray(0, 4))).toEqual([0xff, 0xff, 0xff, 0xff]);
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of no places of their own of the places of the picture of the walk of the places of the picture", () => {
+		// The places of the picture of the walk of the places of the picture of the place of the picture of the
+		// walk of them of the places of the picture of the walk of the places of the picture of the sound stand
+		// of the places of the picture of the walk of the places of the picture of the place of the picture of
+		// the walk of them of the places of the picture of the walk of the places of the picture of the kind of
+		// the places of the picture of the walk of the places of the picture.
+		const three = tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+			{ bits: 2, payload: Buffer.from([0x02]) },
+			{ bits: 2, payload: Buffer.from([0x02]) },
+			{ bits: 2, payload: Buffer.from([0x02]) },
+		]);
+		const threeLayout = readTlgLayout(three, three.length);
+		if (!threeLayout) throw new Error("no layout");
+		expect(Array.from(unpackTlg6(three, threeLayout).subarray(0, 4))).toEqual([
+			0x00, 0x00, 0x00, 0xff,
+		]);
+		const four = tlg6({ colors: 4, width: 1, height: 1 }, filterStream(1), [
+			{ bits: 2, payload: Buffer.from([0x02]) },
+			{ bits: 2, payload: Buffer.from([0x02]) },
+			{ bits: 2, payload: Buffer.from([0x02]) },
+			{ bits: 2, payload: Buffer.from([0x02]) },
+		]);
+		const fourLayout = readTlgLayout(four, four.length);
+		if (!fourLayout) throw new Error("no layout");
+		expect(Array.from(unpackTlg6(four, fourLayout).subarray(0, 4))).toEqual([
+			0x00, 0x00, 0x00, 0x00,
+		]);
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sixth kind out of the places of the picture of the walk of the places of the picture of the words of the walk of the picture", () => {
+		// The places of the picture of the walk of the places of the picture of the walk of them of the places
+		// of the picture of the walk of the places of the picture stand of the places of the picture of the
+		// walk of the places of the picture of the places of the picture of the walk of them of the places of
+		// the picture of the walk of the places of the picture, and of the places of the picture of the walk of
+		// the places of the picture of the kind of the places of the picture of the walk of the places of the
+		// picture of the sound of the places of the picture of the walk of the places of the picture of their
+		// own.
+		const run = zeroRun(9);
+		const file = tlg6({ colors: 3, width: 9, height: 1 }, filterStream(2), [
+			{ bits: 8, payload: run },
+			{ bits: 8, payload: run },
+			{ bits: 8, payload: run },
+		]);
+		const layout = readTlgLayout(file, file.length);
+		if (!layout) throw new Error("no layout");
+		const bits = unpackTlg6(file, layout);
+		expect(bits.length).toBe(9 * 4);
+		for (let i = 0; i < 9; i += 1)
+			expect(Array.from(bits.subarray(i * 4, i * 4 + 4))).toEqual([
+				0x00, 0x00, 0x00, 0xff,
+			]);
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the place of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own", () => {
+		// The places of the picture of the walk of the places of the picture of the place of the picture of the
+		// walk of them of the places of the picture of the walk of the places of the picture stand of the
+		// places of the picture of the walk of the places of the picture of the kind of the places of the
+		// picture of the walk of the places of the picture of the sound of the places of the picture of the
+		// walk of the places of the picture of their own.
+		const file = tlg6({ colors: 3, width: 2, height: 1 }, filterStream(1), [
+			{ bits: 7, payload: Buffer.from([0x55]) },
+			{ bits: 7, payload: Buffer.from([0x55]) },
+			{ bits: 7, payload: Buffer.from([0x55]) },
+		]);
+		const layout = readTlgLayout(file, file.length);
+		if (!layout) throw new Error("no layout");
+		const bits = unpackTlg6(file, layout);
+		expect(Array.from(bits.subarray(0, 8))).toEqual([
+			0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff,
+		]);
+	});
+
+	it("turns away the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the sixth kind that stand of no places of the picture of the walk of the places of the picture", () => {
+		const file = tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+			{ method: AVERAGE_METHOD, bits: 2, payload: Buffer.from([0x02]) },
+		]);
+		const layout = readTlgLayout(file, file.length);
+		if (!layout) throw new Error("no layout");
+		expect(() => unpackTlg6(file, layout)).toThrow(GarbroError);
+		const short = tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+			{ bits: 2, payload: Buffer.from([0x02]) },
+		]);
+		const shortLayout = readTlgLayout(short, short.length);
+		if (!shortLayout) throw new Error("no layout");
+		expect(() => unpackTlg6(short, shortLayout)).toThrow(GarbroError);
 	});
 });

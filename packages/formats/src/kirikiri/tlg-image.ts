@@ -16,6 +16,7 @@ import {
 	createFixedEntry,
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
+import { unpackTlg6 } from "./tlg6.js";
 
 /** The places of the picture of the words of the head of a picture of this kind. */
 const HEAD_SIZE = 0x26;
@@ -66,7 +67,7 @@ export interface TlgLayout {
 	dataOffset: number;
 }
 
-function invalidPicture(message: string): GarbroError {
+export function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
@@ -146,7 +147,7 @@ export function readTlgLayout(
  * picture of the walk of the places of the picture of the word of the walk of them stand of the places of the
  * picture of the walk of the places of the picture.
  */
-function decompressSlide(
+export function decompressSlide(
 	out: Buffer,
 	input: Buffer,
 	size: number,
@@ -421,17 +422,15 @@ export const kirikiriTlgImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) throw invalidPicture("Not a picture of this kind");
 		// The reference stands the places of the picture of the walk of the places of the picture of the
 		// picture of the walk of the places of the picture of the kind of the places of the picture of the
-		// third kind of the places of the picture out of the places of the picture of the walk of the places
-		// of the picture of the words of the walk of them, so a picture of this project stands the places of
-		// the picture of the walk of the places of the picture of the fourth kind of the places of the picture
-		// of their own.
+		// fifth kind and of the places of the picture of the walk of the places of the picture of the sixth kind
+		// of the places of the picture of the walk of the places of the picture of the sound of the places of the
+		// picture of the walk of the places of the picture of their own.
+		const pixels =
+			layout.version === 6
+				? unpackTlg6(stored, layout)
+				: unpackTlg5(stored, layout);
 		return Readable.from([
-			writeBmp32(
-				layout.width,
-				layout.height,
-				unpackTlg5(stored, layout),
-				false,
-			),
+			writeBmp32(layout.width, layout.height, pixels, false),
 		]);
 	},
 });
