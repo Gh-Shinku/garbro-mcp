@@ -6,6 +6,28 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "QNT",
+				"class": "QntFormat",
+				"source": "ArcFormats/AliceSoft/ImageQNT.cs"
+			},
+			"localId": "alicesoft-qnt-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the three heads of a picture",
+				"the walked places of the colours of a picture",
+				"the walked places of the transparency of a picture",
+				"the walk of the places of a picture"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MAG/MAKI02",
 				"class": "MagFormat",
 				"source": "ArcFormats/Otemoto/ImageMAG.cs"

@@ -85,6 +85,7 @@ import { ifxFormat } from "./winters/ifx.js";
 import { pkdFormat } from "./zone/pkd.js";
 import { Xp3Format } from "./xp3/format.js";
 import { alkFormat } from "./alicesoft/alk.js";
+import { alicesoftQntImageFormat } from "./alicesoft/qnt-image.js";
 import { cdpaPackFormat } from "./cdpa/pack.js";
 import { hyperworksPakFormat } from "./hyperworks/pak.js";
 import { nafFormat } from "./brownie/naf.js";
@@ -1340,6 +1341,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		valkyriaAm2Format,
 		p8Format,
 		alkFormat,
+		alicesoftQntImageFormat,
 		cdpaPackFormat,
 		hyperworksPakFormat,
 		nafFormat,
