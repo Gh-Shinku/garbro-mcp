@@ -5,6 +5,26 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "archive",
+				"tag": "DSM/UNITY",
+				"class": "DsmOpener",
+				"source": "ArcFormats/Unity/ArcDSM.cs"
+			},
+			"localId": "unity-dsm-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the places a text of the kind the scenario stands as begins with",
+				"how many places the clear of such a file holds"
+			],
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "script",
 				"tag": "DSM/UTAGE",
 				"class": "DsmConverter",

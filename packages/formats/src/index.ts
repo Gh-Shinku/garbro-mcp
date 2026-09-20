@@ -832,6 +832,7 @@ import { projectMyuGamImageFormat } from "./project-myu/gam-image.js";
 import { keroqKgd1ImageFormat } from "./keroq/kgd1-image.js";
 import { utageImageFormat } from "./unity/utage-image.js";
 import { unityDsmScriptFormat } from "./unity/dsm-script.js";
+import { unityDsmArchiveFormat } from "./unity/dsm-archive.js";
 import { aaruBm2ImageFormat } from "./aaru/bm2-image.js";
 import { betImageFormat } from "./system21/bet-image.js";
 import { lzBetImageFormat } from "./system21/bet-image.js";
@@ -2072,6 +2073,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		keroqKgd1ImageFormat,
 		utageImageFormat,
 		unityDsmScriptFormat,
+		unityDsmArchiveFormat,
 		aaruBm2ImageFormat,
 		betImageFormat,
 		lzBetImageFormat,
