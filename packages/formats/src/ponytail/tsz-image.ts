@@ -29,9 +29,9 @@ const VERSION_FIELD = 0x04;
 const WIDTH_FIELD = 0x0c;
 const HEIGHT_FIELD = 0x0e;
 /** The colours of the picture stand behind the head: sixteen of them, three bytes apiece. */
-const PALETTE_FIELD = 0x10;
-const PALETTE_COLORS = 16;
-const PALETTE_SIZE = PALETTE_COLORS * 3;
+export const PALETTE_FIELD = 0x10;
+export const PALETTE_COLORS = 16;
+export const PALETTE_SIZE = PALETTE_COLORS * 3;
 /** How many places stand in a word of the line buffer, and how the two columns of a pair are kept. */
 const WORD_PLACES = 16;
 /** The ways a step of the walk takes, which stand in the places before the step itself. */
@@ -118,7 +118,7 @@ export function readTszPalette(data: Buffer): Buffer {
 }
 
 /** Where the walk of the picture stands: the word it holds and how many of its places are still there. */
-interface TszCursor {
+export interface TszCursor {
 	data: Buffer;
 	position: number;
 	bits: number;
@@ -148,7 +148,7 @@ function readWord(cursor: TszCursor): number {
 
 /** `TszReader.GetNextBit`: the walk takes the highest place of the word it holds and stands another word under
  * it every sixteen places. */
-function nextBit(cursor: TszCursor): boolean {
+export function nextBit(cursor: TszCursor): boolean {
 	cursor.count -= 1;
 	if (cursor.count < 0) {
 		cursor.bits = readWord(cursor);
@@ -161,7 +161,7 @@ function nextBit(cursor: TszCursor): boolean {
 
 /** `TszReader.GetBits`: as many places were asked for as stand in the word at hand; where fewer stand there,
  * the word behind the word at hand is stood under it. */
-function getBits(cursor: TszCursor, count: number): number {
+export function getBits(cursor: TszCursor, count: number): number {
 	if (count > WORD_PLACES || count < 0) {
 		throw invalidPicture("NMI picture asks for more places than a word holds");
 	}
@@ -186,7 +186,7 @@ function getBits(cursor: TszCursor, count: number): number {
 
 /** `TszReader.GetBitLength`: how many places a step of the walk names — one where the place at hand does not
  * stand, and otherwise as many as the run of places that stand before it says, less the highest of them. */
-function readBitLength(cursor: TszCursor): number {
+export function readBitLength(cursor: TszCursor): number {
 	if (!nextBit(cursor)) return 1;
 	let count = 1;
 	while (nextBit(cursor)) {

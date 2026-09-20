@@ -442,6 +442,7 @@ import { clickTeamMfsFormat } from "./clickteam/mf.js";
 import { miscBinFormat } from "./misc/bin.js";
 import { ponytailBndFormat } from "./ponytail/bnd.js";
 import { ponytailTszImageFormat } from "./ponytail/tsz-image.js";
+import { ponytailTczImageFormat } from "./ponytail/tcz-image.js";
 import { ankhGrpFormat } from "./ankh/grp.js";
 import { ankhDatFormat } from "./ankh/dat.js";
 import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
@@ -1672,6 +1673,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		miscBinFormat,
 		ponytailBndFormat,
 		ponytailTszImageFormat,
+		ponytailTczImageFormat,
 		ankhGrpFormat,
 		ankhDatFormat,
 		shapeShifterBndFormat,
