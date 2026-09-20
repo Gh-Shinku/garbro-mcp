@@ -763,6 +763,7 @@ import { grpImageFormat } from "./herb/grp-image.js";
 import { imaImageFormat } from "./hillfield/ima-image.js";
 import { mtgImageFormat } from "./asura/mtg-image.js";
 import { cswareWavAudioFormat } from "./csware/wav-audio.js";
+import { advizGiz2ImageFormat } from "./adviz/giz2-image.js";
 import { advizBizImageFormat } from "./adviz/biz-image.js";
 import { biz2ImageFormat } from "./adviz/biz2-image.js";
 import { rbpImageFormat } from "./dice/rbp-image.js";
@@ -2031,6 +2032,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		imaImageFormat,
 		mtgImageFormat,
 		cswareWavAudioFormat,
+		advizGiz2ImageFormat,
 		advizBizImageFormat,
 		biz2ImageFormat,
 		rbpImageFormat,

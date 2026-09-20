@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GIZ/2",
+				"class": "GizFormat",
+				"source": "Legacy/Adviz/ImageGIZ2.cs"
+			},
+			"localId": "adviz-giz2-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"where a picture stands within a picture of the places of a picture",
+				"the walk of the four records of the places of a picture",
+				"the strips of eight places of a picture",
+				"the palette of the game a picture stands in"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a picture whose palette stands in no table of palettes beside it"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "BIZ",
 				"class": "BizFormat",
 				"source": "Legacy/Adviz/ImageBIZ.cs"
