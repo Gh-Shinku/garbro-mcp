@@ -18373,5 +18373,36 @@ export const formatSupportCatalog = {
 				"the DATA02 pictures the reference decodes through the fixed high id geometry",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "EXE/NE",
+				class: "NeExeOpener",
+				source: "Experimental/Microsoft/ArcNE.cs",
+			},
+			localId: "microsoft-ne-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the DOS stub and NE header walk",
+				"the resource table walk with its alignment shift",
+				"the resource type names of the reference",
+				"the integer flag of resource ids",
+				"raw entry extraction",
+				"the version resource entry flag",
+			],
+			unsupported: [
+				"archive creation",
+				"the RT_VERSION text conversion, which the reference's own read cannot reach and this port therefore does not perform",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an executable whose resource table holds named rather than integer resources, which the reference reads as an id",
+				"an executable whose resource table reaches past the 64 KiB head the port reads while detecting",
+			],
+		},
 	],
 } as const;

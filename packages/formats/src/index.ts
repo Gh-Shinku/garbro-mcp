@@ -242,6 +242,7 @@ import { lb5Format } from "./jupiter/lb5.js";
 import { cgV2Format } from "./parsley/cg2.js";
 import { ykFormat } from "./rune/yk.js";
 import { koeiYkFormat } from "./koei/yk-archive.js";
+import { neFormat } from "./microsoft/ne-archive.js";
 import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
@@ -1110,6 +1111,7 @@ export * from "./foster/index.js";
 export * from "./jupiter/index.js";
 export * from "./rune/index.js";
 export * from "./koei/index.js";
+export * from "./microsoft/index.js";
 export * from "./musica/index.js";
 export * from "./tako/index.js";
 export * from "./broom/index.js";
@@ -1545,6 +1547,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cgV2Format,
 		ykFormat,
 		koeiYkFormat,
+		neFormat,
 		ucgFormat,
 		voiceFormat,
 		arccFormat,
