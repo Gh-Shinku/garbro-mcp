@@ -18650,6 +18650,35 @@
 				"real-game GARbro differential output",
 				"a real picture, which would show whether games use the difference flag with an alpha channel"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "G00",
+				"class": "G00Format",
+				"source": "ArcFormats/RealLive/ImageG00.cs"
+			},
+			"localId": "reallive-g00-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head that tells the three kinds apart",
+				"the packed stream, both as it stands and as copies of what came before",
+				"the stored kind of three bytes a pixel",
+				"the indexed kind with the palette it carries",
+				"the tiled kind and the pieces of its first tile"
+			],
+			"unsupported": [
+				"image creation",
+				"the tiles behind the first one that is not empty, which the reference never reads either"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture of each kind, which would show whether games use the tiled one at all"
+			]
 		}
 	]
 }

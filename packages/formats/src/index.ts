@@ -547,6 +547,7 @@ import { nononoNpfFormat } from "./nonono/npf.js";
 import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
 import { renpyRpaFormat } from "./renpy/rpa.js";
 import { realliveG00Format } from "./reallive/g00.js";
+import { realliveG00ImageFormat } from "./reallive/g00-image.js";
 import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { systemAquaCatfFormat } from "./system-aqua/catf.js";
 import { yukaYkcFormat } from "./yuka/ykc.js";
@@ -1855,6 +1856,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		shiinaRioPadAudioFormat,
 		shiinaRioWarcFormat,
 		realliveG00Format,
+		realliveG00ImageFormat,
 		nitroplusNitroPakFormat,
 		systemAquaCatfFormat,
 		yukaYkcFormat,
