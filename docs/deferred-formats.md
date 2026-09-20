@@ -105,3 +105,47 @@ a picture through tables it stands itself.
 `WEBP` (`ArcFormats/WebP/ImageWEBP.cs`) reads the words of every kind of its own head and hands the places of
 the picture to the reader of the kind of files of the system. Its words stand as a format of their own for a
 turn of its own.
+
+## The smallest entries, audited one by one
+
+The entries that the support report names by the fewest bytes are not the smallest jobs: the byte count is the
+size of the tag listing, not of the reader. Read against the reference, most of them stand on something this
+project cannot supply. Each finding below is the reason the entry stays unread, with the places it stands in.
+
+- **CRZ** (`ArcFormats/Crowd/ImageCRZ.cs`) — the picture is an `SZDD` stream, which this project can walk
+  (`inflateLzss` with a frame of `0x1000` filled with `0x20` from `0x1000 - 0x10`), and the head behind it is
+  a place of the words of a game encrypted with a key of thirty-six places. The reference draws that key from
+  `CrzScheme.KnownKeys`, and its `DefaultScheme` stands as an empty dictionary (`ImageCRZ.cs`, the default
+  scheme and the `KnownKeys` property), so the keys stand in the words of the game and nowhere in the
+  reference. A picture of this kind therefore stands unread until a game's keys stand to hand.
+- **MBM** (`Legacy/Logg/ArcMBM.cs`) — a place of the pictures of the engine without an index of its own: the
+  reference names the list of the places of an archive by the size of the archive, through a table of three
+  archives (`ArcSizeToFileListMap`: `0x0AB0F5F4` to `logg_pl.lst`, `0x0BFFD3DA` to `logg_ak.lst`,
+  `0x09809196` to `logg_th.lst`), and reads the list through the file lists of the reference itself. Those
+  lists stand beside the games rather than within the reference, so no archive can be read without one of
+  them.
+- **PACK/BONK** (`ArcFormats/Bonk/ArcPACK.cs`) — the same shape: the name, the size and the index of every
+  place stand in `bonk_ntr_1.lst`, read through the file lists of the reference and standing beside the game
+  rather than within the reference. The places of a picture of this kind are `SLID` streams that this project
+  can walk, so only the index of an archive stands unread.
+- **ADS** (`ArcFormats/BlackRainbow/ArcADS.cs`), **PKZ** (`ArcFormats/Sviu/ArcPKZ.cs`), **ARC/FOMA**
+  (`Legacy/StudioFoma/ArcARC.cs`), **ACV** (`ArcFormats/NonColor/ArcACV.cs`) and **DAT/MINATO**
+  (`ArcFormats/NonColor/ArcMinato.cs`) — every one of them draws its scheme from the game it stands beside:
+  a list of keys, of names, or of the places of the places of the archive, through `Scheme` or
+  `QueryScheme`, with a default that stands empty.
+- **MCP** (`Legacy/Mink/ImageMCP.cs`) — the reference does not stand as it stands: `ReadMetaData` breaks off
+  within the words of the head of the picture, and the walk of it names a kind of head, a kind of the places
+  of a picture and the places of the picture itself that stand nowhere in the file. There is no algorithm to
+  port.
+- **S5I** (`ArcFormats/rUGP/ImageS5I.cs`) — the picture of the engine stands within an archive of the kind
+  `CRioArchive` (the class `CRioArchive`, `LoadRioTypeCore`), which stands in the fifteen-hundred-line
+  `ArcFormats/rUGP/ArcRIO.cs` and is not ported. The picture is one object within it.
+- **BIZ** (`Legacy/Adviz/ImageBIZ.cs`) and **GIZ/2** (`Legacy/Adviz/ImageGIZ2.cs`) — both stand on the
+  palette of the game rather than on a palette of their own, drawn through `ReadPalette` of `ImageBIZ.cs` from
+  two companions of the engine, `GRP_TBL.SYS` and `PLT_TBL.SYS`, with a table of mappers that name the place
+  of a palette within `PLT_TBL.SYS` by the pair of the size of the two companions (`GrpMap`) and with a
+  renaming of the words of a picture of the places of a picture of a person before the naming. These two
+  stand together: the palette stands in one place of `ImageBIZ.cs` and serves both, so the place to start is
+  that one, not either picture. The walk of the places of a `BIZ` picture is four words of a head and a walk
+  of the places of the picture the words of which stand beside them, and the walk of `GIZ/2` is four places
+  of a picture walked in strips of eight places; the palettes are the whole of the difficulty.
