@@ -18462,5 +18462,25 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture behind the places of the picture of the walk of the places of the picture of the book of the places of the picture, which a picture of this project stands of the places of the picture of the walk of the places of the picture of the last 512 places of the picture of the walk of the places of the picture of the picture of the kind of the places of the picture of the walk of the places of the picture where the reference stands them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture",
 			],
 		},
+		{
+			reference: {
+				type: "script",
+				tag: "GSC",
+				class: "GscFormat",
+				source: "ArcFormats/Liar/ArcXFL.cs",
+			},
+			localId: "liar-gsc-script",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"script writing",
+				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine, which the reference stands of the places of the picture of the walk of the places of the picture of their own beside them",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine: the reference registers no places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the sound of their own, so the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine stand of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the reference of the places of the picture of the walk of the places of the picture of the picture of the kind of the places of the picture of the walk of them",
+			],
+		},
 	],
 } as const;

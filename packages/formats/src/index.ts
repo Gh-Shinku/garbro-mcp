@@ -416,6 +416,7 @@ import { wsm2Format } from "./tanaka/wsm.js";
 import { wsm4Format } from "./tanaka/wsm.js";
 import { arcgFormat } from "./tanaka/arcg.js";
 import { vcPakFormat } from "./circus/vc.js";
+import { gscFormat } from "./liar/gsc.js";
 import { xflFormat } from "./liar/xfl.js";
 import { exhGRPFormat } from "./ex-hibit/grp.js";
 import { abmpFormat } from "./q-lie/abmp.js";
@@ -1714,6 +1715,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		arcgFormat,
 		vcPakFormat,
 		xflFormat,
+		gscFormat,
 		exhGRPFormat,
 		abmpFormat,
 		abmp7Format,
