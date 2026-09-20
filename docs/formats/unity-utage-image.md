@@ -21,6 +21,7 @@ The measurements are read from the header of that picture, which is where this p
 
 Neither picture is decoded here, because the project carries no decoder for either: `openEntry` hands the
 picture out **as it stands behind the key** — the decrypted bytes — where the reference decodes it and hands
+back the pixels. That is the same deviation the other pass-through ports of this project take, and the bytes
 handed out are exactly the bytes the reference decodes.
 
 The tests cover a byte of nothing and a byte of the key staying where they are, the signature of a PNG behind

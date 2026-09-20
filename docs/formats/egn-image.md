@@ -28,6 +28,7 @@ bitmap behind the stream, this format carries no signature at all: the reference
 so does this port, after the formats that carry a signature of their own.
 
 Deviations from the reference, in the message only: a stream that ends inside the walk, and a picture whose
+unfolded bytes are not a bitmap at all, are refused with messages of this project's own. The write path of the
 reference throws `NotImplementedException`, so this is a read only format.
 
 The tests cover the head of the long form, the mode, the size and the bitmap behind the stream it is turned

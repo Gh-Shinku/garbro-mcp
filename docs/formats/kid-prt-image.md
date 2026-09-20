@@ -8,6 +8,7 @@ Implementation: `packages/formats/src/kid/prt-image.ts` (`kidPrtImageDescriptor`
 
 The file begins with the word `PRT` and a nought behind it. The version stands at four as a word — of which
 only `101` and `102` are read, the second carrying a pair of offsets behind the head — the depth at six, the
+places of the colour map and of the pixels at eight and ten, the width and the height at twelve and
 fourteen, and a word at sixteen that says whether a plane of fourth bytes stands behind the pixels. Only
 eight, twenty four and thirty two bits a pixel are read, and the row of the reader's own buffer is the width
 in bytes rounded up to four whether the depth needs the padding or not.
@@ -28,5 +29,6 @@ bits, a colour map or a plane of fourth bytes that reaches past the file, and a 
 fit are refused rather than left to the reference's own exceptions. The write path of the reference throws
 `NotImplementedException`, so this is a read only format.
 
+The tests cover the head, the word, version, depth and places it is turned away for, the walk of the fourth
 bytes with the rows turned, the twenty four and thirty two bit pictures written out, the eight bit one with
 its colour map, and a file that does not hold a picture.

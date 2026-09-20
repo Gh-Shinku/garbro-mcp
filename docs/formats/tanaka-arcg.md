@@ -27,6 +27,7 @@ verbatim; the reference's content-signature type pass is left out.
 
 An index offset of zero means the real index lives in a sibling `.bmi` file, which the reference decrypts with a
 keystream whose seed comes from a passphrase. That passphrase is either configured per volume serial number or
+read from the Windows volume itself through `GetVolumeInformation`, so an archive of this kind is bound to the
 medium it shipped on and cannot be opened elsewhere — not by this port, and not by GARbro on a different volume
 either. Only the embedded layout is handled here, and the companion case is rejected explicitly.
 

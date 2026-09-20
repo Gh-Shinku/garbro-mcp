@@ -24,6 +24,7 @@ Every measurement is hidden the same way, and the size behind the fourth word ha
 the measurements: the reference multiplies width, height and four in the arithmetic of an unsigned word and
 compares the result, so a header whose product wraps around is one whose pixels cannot be held — and this reader
 refuses it rather than trying to. The word at sixteen says the file is another format of this engine rather than a
+picture of this kind, and the reference refuses a file that carries it.
 
 ## The pixels
 

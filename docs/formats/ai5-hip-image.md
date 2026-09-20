@@ -19,6 +19,7 @@ A file that carries pictures of the plain kind inside itself:
 
 The reference looks at the word at twelve and, finding nought, at the word behind it; two words of nought are no
 index at all. The picture the index names runs to the second picture, or to the end of the file when there is no
+second one, and a second picture in front of the first is no file of this kind. The region the two offsets name
 has to hold the header of a picture of the plain kind, which is the real gate: the word at twelve only decides
 where the reference starts looking.
 

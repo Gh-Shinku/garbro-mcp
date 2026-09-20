@@ -19,8 +19,13 @@ two are told apart by the word behind the word of the format, which stands at `2
 The width of the picture stands in the word at `0x0C`, its height in the word at `0x0E`; unlike the first kind
 of its pictures the width counts places rather than fours of places, and a picture stands at most `0x190`
 places high. How far the picture stands from the corner of its own place stands in the words at `0x08` and
+`0x0A`, which the reference keeps and does not use while gathering the places of the picture. Behind the head
 stand sixteen colours, three bytes apiece, the same way as for the first kind.
 
+## The walk of the places
+
+The places of the picture stand column by column in a buffer that holds sixteen columns of the greatest height
+a picture of this kind takes. A step of the walk either copies a run of places or takes one place out of the
 place two behind:
 
 | the places in front of the step | what the step does |

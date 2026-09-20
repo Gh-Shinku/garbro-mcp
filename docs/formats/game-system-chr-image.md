@@ -32,6 +32,7 @@ The rows are handed out **bottom up**, which is what `ImageData.CreateFlipped` m
 reference throws `NotImplementedException`, so this is a read only format.
 
 Deviations from the reference, in the message only: a stream that ends inside a row, and a pixel or a frame
+that reaches past the picture, are refused with messages of this project's own, where the reference would
 read or write past its own array.
 
 The tests cover the head and the word, measurements and offsets it is turned away for, pixels that stand,

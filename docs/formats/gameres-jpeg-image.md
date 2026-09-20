@@ -19,6 +19,7 @@ body, and a walk that runs into the end of the file, or into a marker that is no
 without a picture.
 
 The picture is handed out **as it stands**, because the project carries no decoder for it — the same deviation
+the other pass-through ports of this project take, and the bytes handed out are exactly the bytes the
 reference would decode. Writing the format is not ported, though the reference can write one through the
 encoder of its framework. The entry is named after the file with a `jpg` extension.
 

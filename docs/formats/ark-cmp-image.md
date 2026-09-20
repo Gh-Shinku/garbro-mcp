@@ -20,6 +20,7 @@ closes the head. The walk has to reach from behind the head to the end of the fi
 
 ## The tree of codes
 
+The tree begins with the thirty two places of the picture, every one of them weighing what the head says, and
 behind them as many places as stand between thirty two and two hundred and fifty five, weighing nought apiece.
 The two places that weigh the least are then joined again and again — where several weigh the same, the last
 of them in the order they stand in — until one place is left, which is the root of the tree; the first of the
@@ -27,6 +28,7 @@ two places joined is its left and the second its right.
 
 ## The walk of the picture
 
+The places of the three planes of the picture stand behind each other, as many of them as the picture is wide
 and high, and a place of the picture is walked out of the tree of codes a place at a time: a place of the walk
 that stands takes the walk to the left and a place that does not takes it to the right. What a place of the
 tree gives is not the place of the picture itself but how far it stands behind the place before it, the places
@@ -51,6 +53,7 @@ whose rows run the way they are walked.
 ## Tests
 
 `tests/formats/ark-cmp-image.test.ts` covers the head, the shape of a picture behind it, a walk that does not
+reach the end of the file, the tree of codes of the weights of the head, the walk of the places of a picture of
 two places of width, a picture written out as a bitmap of sixteen bits, a file whose name is not `cmp` and a
 file whose walk does not reach the end of the file. The vectors are worked out by hand: where every place but
 the thirty first weighs nought, that place stands one bit away from the root, and a walk of six nought places

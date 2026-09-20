@@ -7,6 +7,7 @@ Implementation: `packages/formats/src/unknown/ctf-image.ts` (`unknownCtfImageDes
 `unknownCtfImageFormat`, id `unknown-ctf-image`, `readCtfLayout`, `unpackCtfRle`, `unpackCtf`).
 
 The file begins with the word `CTFF`; the width and the height stand at four and six as words, the size of
+the planes at twelve, the places of the red, the green, the blue and the alpha plane from sixteen, and the
 depth at `0x20` — which has to be twenty four bits whether or not the alpha plane stands behind it. A place
 of the alpha plane that is not nought is what makes the picture thirty two bits a pixel. The byte at `0x22`
 says whether the stream was packed, which the reference notes and then does not use: it always reads an LZSS
@@ -24,6 +25,7 @@ to four. The rows are handed out top down, which is what `ImageData.Create` mean
 
 Deviations from the reference, in the message only: a plane that stands outside the planes the head declares
 is refused rather than left to the walk, and a run that reaches past the planes or a stream that ends inside
+the walk is refused with a message of this project's own. The write path of the reference throws
 `NotImplementedException`, so this is a read only format.
 
 The tests cover the head of both depths, the fields the reader is turned away for, the walk of runs up to the

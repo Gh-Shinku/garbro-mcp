@@ -13,6 +13,7 @@ The reference registers no word of its own, only the two names `pdt` and `anm`.
 
 The first byte of the file is thirty four. The two bytes at `0x21` name the two walks of a plane, and the four
 words behind them name the left, the top, the right and the bottom edge of the picture: the width of the
+picture stands in the places of the bits between its left and its right edge — eight places for every byte —
 and its height in the pairs of rows between its top and its bottom edge. A picture of no places, of more than
 two thousand and forty eight places of width or of more than five hundred and twelve places of height is
 turned away.
@@ -20,6 +21,7 @@ turned away.
 ## The colours
 
 Sixteen colours of four bits each stand from the first byte behind the head, in a word apiece: the lowest four
+places of the word are the blue of the colour, the four behind them the red and the four behind those the
 green, every part of four places standing for thirty four places of a colour of eight bits.
 
 ## The planes
@@ -36,6 +38,7 @@ of the walk gives a *pair* of rows of that byte:
 - a byte that is the second of the two names how many pairs stand there, and the one byte behind it stands for
   both rows of every pair.
 
+The four planes are then gathered: the places of the four planes stand together in every colour of the
 picture — the byte of the first plane in the highest place of a colour, the second plane behind it and so on —
 and every byte of a plane carries the colours of eight places of a row, two colours of four places standing in
 every byte of the picture. What is handed out is a bitmap of four bits with the sixteen colours of the head.
@@ -56,6 +59,7 @@ every byte of the picture. What is handed out is a bitmap of four bits with the 
 ## Tests
 
 `tests/formats/aypio-pdt-image.test.ts` covers the head and the bounds it is turned away for, the colours of
+the head, the gathering of the places of four planes, the walk of the planes of a picture of eight places of
 width and two of height, the two walks of a plane and the bytes they share, a picture gathered into a bitmap
 with its colours, a file whose first byte is not that of the engine, and a plane that runs out of the file.
 The vectors are worked out by hand: the plane bytes `0x80`, `0x40`, `0x20` and `0x10` give the colours `0x12`

@@ -29,5 +29,6 @@ size holds them. What the blocks hold is:
 Where the sides of a picture are not whole numbers of blocks the blocks on the right and at the bottom write
 only the pixels that stand inside the picture, which is what the reference's own bounds of its loops do.
 
+The tests cover both walks of the first kind of block, the places of alpha of the third, the eight steps of
 alpha of the fifth with both orders of its two places, a picture of more than one block with the blocks on the
 right and at the bottom reaching past it, and one picture of every kind.

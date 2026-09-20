@@ -13,9 +13,13 @@ same walk of the key the reference knows.
 
 ## The front of such a file
 
+The reference reads a file as an archive of this kind only where its name stands as the name `data.dsm` and
+where the first three places of the file stand as the places a text of the kind the scenario stands as begins
 with. Where they do, the file holds one file of the name `data.txt`, which stands as a script of its own, and
 whose places stand from the front of the file to its end.
 
+How many places the clear holds stands as three places for every four places of the text, whole fours
+counting, which stands over the places of the text the scenario stands as rather than over the places of the
 clear; the reference names it the same way.
 
 ## Deviations from the reference
@@ -24,8 +28,11 @@ clear; the reference names it the same way.
   places a text of the kind stands with, are turned away; the reference leaves such a file to the kinds that
   read it otherwise.
 - How many places the file the archive holds stands in is named the way the reference names it, which stands
+  the places of the text the scenario stands as over the places of the clear; how many places it really holds
+  stands as many as the places of the scenario stand in once they stand in the clear, which the port hands out
   whole.
 - The reference stands before the kind that reads the same file as a script of its own only where the file
+  begins with the places of a text; this port stands before it wherever that holds, the two kinds telling a
   file of the same name apart by those places alone.
 
 ## Tests

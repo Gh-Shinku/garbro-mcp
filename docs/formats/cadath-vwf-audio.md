@@ -19,6 +19,7 @@ holds two nibbles a byte that step the sample up and down:
 * how far the quantiser moves comes from the Cadath table (`-1, -1, -1, 0, 2, 4, 6, 8, -1, -1, -1, 0, 2, 4,
   6, 8`), which is the Abogado table but for the fourth and twelfth steps, and the quantiser is held between
   nought and `0x58`;
+* the step of a code is a quarter of the quantiser plus, for the three lower places of the code, the whole of
   the quantiser, its half and its quarter;
 * a code below eight climbs and a code of eight and above falls.
 

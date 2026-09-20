@@ -7,17 +7,22 @@ Reference: `GARbro/ArcFormats/StudioJikkenshitsu/ImageGRD.cs`, classes `GrdForma
 Implementation: `packages/formats/src/studio-jikkenshitsu/grd-image.ts`
 (`studioJikkenshitsuGrdImageDescriptor`, `studioJikkenshitsuGrdImageFormat`, id
 `studio-jikkenshitsu-grd-image`, `readGrdLayout`, `grdKey`, `decodeGrdPixels`, `decodeGrdAlpha`,
+`applyGrdAlpha`, `decodeGrd`), with the standard cipher of `packages/codecs/src/des.ts`, the walk of the LZSS
 kind of `@garbro-mcp/codecs` and the bitmap writers of `packages/formats/src/shared/bmp.ts`.
 
 The reference registers the word `GRD ` and no name at all.
 
 ## The head
 
+The word `GRD ` stands at the beginning of the file, the places of a colour of the picture stand in the place
+at `0x04`, the highest place of the place at `0x05` names whether the places of the picture stand under the
 cipher, the width stands in the words at `0x06` and the height in the words at `0x08`. The word at `0x0C`
+names how many places the walk of the picture stands in and the word at `0x14` how many places the shape of
 those places stands as.
 
 ## The cipher
 
+The reference stands the places of a picture under the standard cipher, the tables of `SjTransform` being the
 tables of the standard, and stands every block of the stream under it on its own. The key stands as the four
 low places of every place of the key the reference names for its own pictures, which is the same expansion the
 standard cipher knows.
@@ -26,22 +31,36 @@ The key of the reference, `{ 15, 0, 1, 2, 8, 5, 10, 11, 5, 9, 14, 13, 1, 8, 0, 6
 in its second place, and the reference leaves every place behind such a place out; the key therefore stands as
 one place of four and twenty places of nought, which is what this port stands it as.
 
+## The walk of the places
+
 Behind the head stands a walk of the LZSS kind of the kind the reference's own reader knows. What it stands is
 the head of the walk, which the reader reads past, then the colours of a picture of eight bits — four places a
+colour, its blue, its green, its red and a place that counts for nothing — and then the places of the picture
 itself. The places of a picture of eight bits stand in rows that hold a whole number of four places of a
+colour, and the places of a picture of four and twenty stand in rows that hold four and twenty places for
+every three places of the picture.
 
+## The shape of the places
+
+Where a picture of eight bits carries a shape of its places, the shape stands behind the places of the picture
 under a walk of the LZSS kind of its own, which stands from behind those places to the end of the file and
 stands as many places as the head names. The shape begins with two tables: how many places of a row stand
+under a colour of their own, and where the places of that colour stand in the places of the shape. Every row of
 the picture then stands as the colours of the picture first, and a place that stands under a colour of its own
+stands as that colour, the lowest places of its place counting as many places of the shape as they name.
 
 ## Deviations from the reference
 
 - A file of fewer than four and twenty bytes, a file that does not hold the word of the format, a picture whose
   places of a colour stand beside any but eight and four and twenty, a picture of no places or of more places
   than this project will hold, and a picture whose walk does not stand whole in the file are turned away; the
+  reference would throw while reading its head or inside the walk of the LZSS kind.
 - A walk that stands fewer places than the picture holds, and a shape that stands fewer places than the words
+  it begins with name, are refused with a message, where the reference reads past the places of its own stream.
+- The places of the shape stand from behind the places of the picture to the end of the file, as the reference
   reads them, so a picture whose shape stands behind other places still reads them the same way.
 - The places of a picture stand as a bitmap of their own, the picture standing the other way up from the
+  places of the file; a picture with a shape of its own stands the right way up, the places of the shape having
   been stood in it.
 
 ## Tests

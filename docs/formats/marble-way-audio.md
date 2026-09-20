@@ -35,6 +35,7 @@ the right channel are each walked from nought and never from the other channel's
 The walk begins with a sample of its own — two bytes — and then takes an item at a time, the item being one
 byte or two. An item whose lowest place stands moves the sample along by what `SampleTable2` gives for the
 places above that one, or stands a sample of its own where those places stand at `0x40` and above. Any other
+item stands between the sample at hand and the sample its higher places name — the lowest places of the item
 standing for the number of samples that stand between them, which is what `SizeTable` gives — and the samples
 between the two are stepped evenly, the end of the run being the sample the item names. Where three hundred
 items stand behind the walk, the sample begins again at nought.

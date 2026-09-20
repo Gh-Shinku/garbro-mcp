@@ -30,6 +30,7 @@ streams and the same four planes with the step of every byte (see `cat-system-hg
 two share `hg-core.ts`. Its rows are stored **bottom up**, which is what `CreateFlipped` means.
 
 This port reads a plain picture. The two sections whose own decoder the reference keeps in other formats are
+recognised and listed, and their extraction is refused with a message of this project's own; the reference
 throws `NotImplementedException` for the WebP section and would need the JPEG decoder for the other. The
 write path throws `NotImplementedException`, so this is a read only format.
 

@@ -8,6 +8,7 @@ Implementation: `packages/formats/src/ikura/ggp-image.ts` (`ikuraGgpImageDescrip
 
 The format is a portable network graphic with a fake header in front of it, laid over with a key. The reference
 reads it by extending its portable network graphic reader; this project has no such reader, so the port passes
+the picture through instead — the way the other containers of this project that hold a picture they cannot
 decode do — and reports the measurements of the picture from the header at the front of it. The write path of
 the reference throws `NotImplementedException`, so this is a read only format.
 

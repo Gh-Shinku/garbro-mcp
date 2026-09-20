@@ -59,4 +59,6 @@ no tile reaches standing as nought.
 is not that of the engine and the four heads it is turned away for, a name table that does not stand in the
 file, the standing of the tiles of a picture on its canvas with its four byte places, what stands beyond the
 canvas, a tile that reaches beyond its own picture, a picture whose tiles are taken from beside the file, and a
+picture whose tiles do not stand beside it. The vectors are worked out by hand: the two places of the first
+picture stand at the top left of the canvas, the two places of the second at its bottom right, and the places
 no tile reaches stand as nought.

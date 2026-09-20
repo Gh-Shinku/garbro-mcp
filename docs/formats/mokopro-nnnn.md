@@ -7,6 +7,7 @@
 - GARBro baseline: `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`
 - License: MIT
 
+A file of this kind is not a container of several resources but a single compressed payload, so the archive view
 has exactly one entry that carries the name of the file itself.
 
 ## Layout

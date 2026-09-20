@@ -20,11 +20,14 @@ pages stand from the beginning of the file — and the sound is given page by pa
 ## The walk of the pages
 
 A page of an Ogg sound is twenty seven bytes, the count of its segments, its table of them and its places. The
+engine cut the word of the codec out of the first places of the sound and stood two bytes in its stead, so the
 walk of the pages puts the word back:
 
 | the byte that names the place | what the walk does with the page |
 | ----------------------------- | -------------------------------- |
 | 1, the first place | the word `vorbis` stands behind the byte, the first entry of the table grows by five and the walk moves to the second place |
+| 3, the second place | the word stands behind the byte, the rest of the first entry of the table is read out of the sound as well, the first entry grows by five and the walk moves to the third place — and where the page holds more than that one segment, the walk of the third place stands behind it in the same page |
+| 5, the third place | the word stands behind the byte, the last entry of the table grows by five and the walk moves to the places of the sound |
 | any other byte | the page stands as it was written, the two bytes behind the byte as well |
 
 Every page the walk gives stands with the word `OggS` over its first four bytes — the engine did not write it —
@@ -45,6 +48,7 @@ Ogg kind the pages make up.
 
 ## Tests
 
+`tests/formats/leaf-g-audio.test.ts` covers the head and the four files it is turned away for, the walk of the
 four pages of a sound with the words of their codecs put back, the marks of the four pages, a page whose byte
 names no place of the sound, a page that is cut short, the sound handed out as a sound of the Ogg kind, a file
 whose name is not `g` and a file that does not hold a sound. The marks of the four pages are worked out by

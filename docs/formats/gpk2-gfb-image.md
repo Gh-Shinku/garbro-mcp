@@ -25,6 +25,7 @@ are taken out into the tight rows a bitmap wants, and the picture is handed out 
 which is what `ImageData.CreateFlipped` means. The write path of the reference throws
 `NotImplementedException`, so this is a read only format.
 
+A palette of fewer than three bytes an entry is refused with a message of this project's own, where the
 reference would read past the palette it holds (a documented deviation).
 
 The tests cover the head, the signature and the head fields the reader turns away, a tight palette read and
