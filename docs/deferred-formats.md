@@ -79,7 +79,9 @@ further than the reference's own list of them.
 - `DZI` (`ArcFormats/Malie/ImageDZI.cs`) reads a directory of tiles whose data comes through `VFS`, i.e.
   through other files beside it, rather than from the picture.
 - `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
-  which would need an XML walk this project does not have.
+  which would need an XML walk this project does not have. `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`)
+  splits one such picture into its frames and layers, so it stands on the same walk and is not a
+  candidate of its own.
 
 ## The payload is a .NET object graph
 
@@ -107,26 +109,31 @@ further than the reference's own list of them.
   carry no layout of their own, because each engine subclasses them; registering them here would mean
   reading every file of those extensions as one unnamed script.
 
-## Portable, but not ported yet
+## Screened, with the reason for the delay recorded
 
-These were screened and no blocker was found: the reference is complete and carries no key, no outside
-listing and no outside reader in the places the screening looked. They are recorded here so that the
-screening is not repeated, and they are the first candidates when porting continues.
+These carry no key, no outside listing and no reader outside the reference tree in the places the
+screening looked, and the reference is complete. What delays them is the size or the shape of the port
+rather than a missing input, so each entry records what the port would have to carry. They are the first
+candidates when porting continues.
 
 - `PX` (`ArcFormats/Leaf/ImagePX.cs`, 488 lines) is a block structured picture reader with its own reader
   classes (`PxReader`, `PxBlock`).
 - `PAD` (`ArcFormats/ShiinaRio/AudioPAD.cs`) decodes through a 69 entry `double` table (`PadDecoder`),
   which JavaScript floats can hold exactly as the reference uses them.
-- `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`) splits one multi-frame picture into layers named
-  `basename#NNNN`.
 - `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
   reason that picture stands unread.
-- `EXE/NE` (`Experimental/Microsoft/ArcNE.cs`) walks the resource table of a 16 bit Windows executable
-  and hands out its entries as versions (`NeResourceEntry`, `OpenVersion`).
-- `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`) is a picture reader (`DifFormat`) with no scheme, key or
-  listed companion of its own.
+- `EXE` (`Experimental/Microsoft/ArcEXE.cs`, 259 lines) is the PE sibling of the ported NE walker and
+  would carry the resource walk of `ArcFormats/ExeFile.cs` (497 lines) with its `ResourceAccessor`, the
+  resource directory tree and the RT_BITMAP wrapper that puts a bitmap file header in front of a stored
+  bitmap. It also holds the version resource parser that works, unlike the NE one.
+- `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`, 155 lines) is a difference against a base image: its
+  header names that image without an extension and the reference finds it by globbing the directory
+  (`VFS.GetFiles (base_name+".*")`) and decodes it with whichever format reads it. A port would need the
+  companion lookup, which this project has, and then a way to hand the companion to another image
+  format, which it does not have yet. The stored diff is two LZSS streams, one holding a pixel index and
+  one the differences themselves.
 
 ## Two engines can share a tag and a class name
 
