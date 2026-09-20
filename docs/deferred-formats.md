@@ -1,144 +1,143 @@
 # Formats this project does not read, and why
 
-This file keeps the reason every GARbro engine the project does not read yet stands unread, so that the
-screening is not carried out again for every one of them. Every entry names the reference the screening stands
-on. `docs/support-status.json` keeps what every format the project *does* read stands for; this file keeps the
-other side of that line.
+This file records why each GARbro engine this project does not read stays unread, so that the screening is
+not repeated for every one of them. Every entry names the reference file and the identifier the reason
+rests on, so that the reason can be re-checked against the reference without repeating the screening.
 
-The reasons stand in groups.
+`docs/support-status.json` records what every format this project *does* read supports; this file records
+the other side of that line. All findings below were read off the GARbro baseline commit
+`b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`.
 
-## The reference stands incomplete
+## The reference does not compile, or stops before it reads anything
 
-The reference itself hands nothing over, so there is no algorithm to stand beside.
+There is no reading algorithm to port, because the reference itself never reaches one.
 
-- `MCP` (`Legacy/Mink/ImageMCP.cs`) and `LPC` (`ArcFormats/Hypatia/ArcLPC.cs`) do not compile.
-- `AF2` (`ArcFormats/CsWare/AudioAF2.cs`) ends its reader at `format.SetBPS()` without standing anything over.
-- `BIN/DXLIB` (`ArcFormats/DxLib/ArcDX8.cs`) ends its reader at `return null;` with `// decrypt-2` and
-  `// decompress` still standing as words rather than as places.
-- `EMS` (`ArcFormats/Entis/AudioEMS.cs`) calls `CreateDecoderSymbolTable` at its line 156 and
-  `DecodeSymbols` at its line 162, and stands neither of them anywhere in the tree — the file does not
+- `EMS` (`ArcFormats/Entis/AudioEMS.cs`) calls `CreateDecoderSymbolTable` at line 156 and `DecodeSymbols`
+  at line 162. Both names occur in that file and nowhere else in the tree: they are never defined, so the
+  file does not compile.
+- `MCP` (`Legacy/Mink/ImageMCP.cs`) ends its `ReadMetaData` at line 39 with an object initializer whose
+  closing `};` is missing — the file does not compile. `Read` also refers to a type names `xxxMetaData`.
+- `LPC` (`ArcFormats/Hypatia/ArcLPC.cs`) reads a count at offset 4 and then builds every entry with
+  `Create<Entry> (name)`, where `name` is not declared in the method and no offset or size is read.
+- `AF2` (`ArcFormats/CsWare/AudioAF2.cs`) ends at `format.SetBPS()` and returns no `SoundInput`.
+- `BIN/DXLIB` (`ArcFormats/DxLib/ArcDX8.cs`) reaches `return null;` with its `// decrypt-2` and
+  `// decompress` steps still standing as comments rather than as code.
 
-## The keys stand outside the reference
+## The key is not in the archive
 
-the game, which stand outside the file of the archive.
+These archives carry no usable key; the reference asks the user, and its own default scheme ships empty.
+A port cannot read such a file without a key the file does not contain, so a port would only be able to
+open archives that the shipped defaults already cover.
 
-- `ACV` (`ArcFormats/NonColor/ArcACV.cs`) and `DAT/MINATO` (`ArcFormats/NonColor/ArcMinato.cs`) read
-  `QueryScheme`, whose `KnownSchemes` stand as no keys.
+- `ACV` (`ArcFormats/NonColor/ArcACV.cs`, `QueryScheme` at line 51) and `DAT/MINATO`
+  (`ArcFormats/NonColor/ArcMinato.cs`, `QueryScheme` at line 68, with `NcSchemeCrc32` beside it).
 - `PKZ` (`ArcFormats/Sviu/ArcPKZ.cs`), `PKG/2` (`ArcFormats/Yatagarasu/ArcPKG2.cs`),
-  `ASSETS/UNITY` (`ArcFormats/Unity/ArcASSET.cs`), `CG/ACTGS` and `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`),
-  and `ADS` (`ArcFormats/BlackRainbow/ArcADS.cs`) stand the same way.
-- `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`), `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), and
-  `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) stand behind schemes of the same kind.
-- `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads its key out of a file above the archive.
-- `PAK/MORNING` (`ArcFormats/Morning/ArcPAK.cs`) reads `MorningScheme.DefaultKey`, which stands as no key at
-  all; `OGG/TINK` (`ArcFormats/Cyberworks/AudioTINK.cs`) stands the same way.
-- `MBM` (`Legacy/Logg/ArcMBM.cs`) and `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) read lists of files that
-  stand outside the project.
+  `ADS` (`ArcFormats/BlackRainbow/ArcADS.cs`), `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`),
+  `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
+  `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
+  a `KnownKeys` table.
+- `ASSETS/UNITY` (`ArcFormats/Unity/ArcASSET.cs`) reads a `Key` of the same kind.
+- `OGG/TINK` (`ArcFormats/Cyberworks/AudioTINK.cs`) holds `TinkAudioScheme.KnownKeys` as an empty
+  dictionary in the shipped default.
+- `PAK/MORNING` (`ArcFormats/Morning/ArcPAK.cs`) reads `DefaultKey`.
+- `DXA` (`ArcFormats/DxLib/ArcDX.cs`) ships both `DefaultScheme` and `KnownKeys` empty and asks for the
+  key through `WidgetSCR.xaml`, i.e. through the person reading the file.
+- `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads the resource `CIPHERCODE` out of an executable placed
+  beside the archive.
+- `PAK/EAGLS` (`ArcFormats/Eagls/ArcEAGLS.cs`) asks for its encryption through `Query<EaglsOptions>` and
+  then calls `DetectEncryptionScheme` on what the answer holds.
+- `BIN/PAC` (`ArcFormats/DigitalWorks/ArcBIN.cs`) reaches its key through a `Scheme` whose `DefaultScheme`
+  ships without one.
+- `CRZ` (`ArcFormats/Crowd/ImageCRZ.cs`) is an `SZDD` stream, which this project can already walk, behind
+  a header whose key comes from `CrzScheme.KnownKeys`, empty in the shipped `DefaultScheme`.
 
-## The places stand as another kind of file this project does not read
+## The index is not in the archive
 
-- `DPNG` (`ArcFormats/Qlie/ImageDPNG.cs`) stands as places of portable network graphics, one to a place, and
-  `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`) as places of such a picture and of a picture of the JPEG kind.
-- `BIP` (`ArcFormats/Cri/ImageBIP.cs`) stands the same way, one picture to a place of the picture.
-- `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`) reads places of such a picture, and only where the file stands
-  inside an archive of the `ISA` kind.
-  places of its own, read through tables it stands as places of its own.
-- `JBP` (`ArcFormats/Sviu/ImageJBP.cs`) hands its places to a reader of the kind of pictures of `PB3`, which
-  stands in `ArcFormats/Cmvs/ImagePB3.cs`, a file of nine hundred places that keeps two formats of its own
-  beside it. Its places stand in `PbReaderBase` (at line 88), `Pb3Reader` (193, with walks of its own at 229,
-  walk at 487, `Unpack` at 530, `Decode` at 572, `Dct` at 651 and `Ycc2Rgb` at 749). The words of a picture of
-  that kind stand as this: where its places stand at the four places behind their own head, its kind at eight,
-  how wide and how tall it stands at `0x10` and `0x12`, and how many places of two walks of the picture stand
-  standing at the eighty places behind those with one place added to every one of them, and the places that
-  reads the two walks themselves from the places behind those.
-- The walks of such a picture stand as a kind of their own: the project's `packages/codecs/src/huffman.ts`
-  stands a walk of another kind — its `decompressHuffman` reads places through a table of `HUFFMAN_TREE_SIZE`
-  places — so reading `JbpReader` stands as a turn of its own rather than as a part of this one, and the places
-  of its walks stand as the turn to begin with.
+The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
+than inside the archive, so a game file alone cannot be walked.
 
-- `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every place to a library of the kind of cabinet files.
-- `AIFF` (`ArcFormats/AudioAIFF.cs`) hands every place to the reader of the kind of sound files it stands as.
-- `OPUS` (`Experimental/Opus/AudioOPUS.cs`) stands behind a library of the kind of sound it reads.
-- `BYTES/UNITY` (`ArcFormats/Unity/ArcSpVM.cs`) stands behind a reader of the kind of files of the system and
-- `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`) reads a companion picture of the portable network graphic kind
+- `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
+  `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).
+- `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
 
-## The head stands as words of another kind
+## The payload needs a decoder this project does not have
 
-- `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`) and `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) name their
-  places through words of the kind of files that name places.
-- `SCR` and `TXT` (`GameRes/ScriptText.cs`) stand as words of no places at all, so a port of them would tell
-  every file of their kinds as a script of the engine.
+The archive side is walkable, but every entry is a picture or a sound in a format the project reads no
+further than the reference's own list of them.
 
-## The places stand as a picture of their own
+- `DPNG` (`ArcFormats/Qlie/ImageDPNG.cs`) and `BIP` (`ArcFormats/Cri/ImageBIP.cs`) hand their entries to
+  a PNG reader.
+- `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`) picks between `JpegBitmapDecoder` and `PngBitmapDecoder`, i.e.
+  the Windows imaging stack.
+- `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library.
+- `AIFF` (`ArcFormats/AudioAIFF.cs`) and `WMA` (`ArcFormats/AudioWMA.cs`) hand theirs to NAudio.
+- `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries
+  open through an `ISA` archive) depend on external readers in the same way.
+- `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`) reads a companion PNG for every entry.
+- `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`) stands on the `CRX` reader of the same engine, which this
+  project has not ported.
+- `DZI` (`ArcFormats/Malie/ImageDZI.cs`) reads a directory of tiles whose data comes through `VFS`, i.e.
+  through other files beside it, rather than from the picture.
+- `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
+  which would need an XML walk this project does not have.
 
-a picture through tables it stands itself.
+## The payload is a .NET object graph
 
-- `ImagePX.cs` (seventeen thousand places), `ImagePB3.cs` (nine hundred places), and
-  `AudioPAD.cs` (`ArcFormats/ShiinaRio/AudioPAD.cs`) stand as the largest such places.
-- `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`) stands on a reader of the kind of pictures of `CRX`, which the
-  project does not read.
-- `DZI` (`ArcFormats/Malie/ImageDZI.cs`) reads a directory of places of pictures of its own.
+- `BYTES/UNITY` (`ArcFormats/Unity/ArcSpVM.cs`) reads its entries through `BinaryFormatter` with a binder
+  that maps the game's `LinkerInfo` types onto its own. Deserializing that graph needs the game's own
+  assemblies, and the format is a serialization of them rather than a byte layout.
 
-## The head of the file stands as the words of a picture of its own, and the project reads no such places
+## The picture is a palette kept beside the game
 
-the picture to the reader of the kind of files of the system. Its words stand as a format of their own for a
-turn of its own.
+- `BIZ` (`Legacy/Adviz/ImageBIZ.cs`) and `GIZ/2` (`Legacy/Adviz/ImageGIZ2.cs`) read their palette out of
+  the companion files `GRP_TBL.SYS` and `PLT_TBL.SYS`, addressed through a `GrpMap` table. The picture
+  data itself is walkable; the palettes are the whole of the difficulty, and they are shared between the
+  two formats.
 
-## The smallest entries, audited one by one
+## The picture lives inside an archive this project does not read
 
-The entries that the support report names by the fewest bytes are not the smallest jobs: the byte count is the
-size of the tag listing, not of the reader. Read against the reference, most of them stand on something this
-project cannot supply. Each finding below is the reason the entry stays unread, with the places it stands in.
+- `S5I` (`ArcFormats/rUGP/ImageS5I.cs`) reads one object of a `CRioArchive`, whose walk lives in the
+  fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs` and `LoadRio*` helpers that this project has not
+  ported.
 
-- **CRZ** (`ArcFormats/Crowd/ImageCRZ.cs`) — the picture is an `SZDD` stream, which this project can walk
-  (`inflateLzss` with a frame of `0x1000` filled with `0x20` from `0x1000 - 0x10`), and the head behind it is
-  a place of the words of a game encrypted with a key of thirty-six places. The reference draws that key from
-  `CrzScheme.KnownKeys`, and its `DefaultScheme` stands as an empty dictionary (`ImageCRZ.cs`, the default
-  scheme and the `KnownKeys` property), so the keys stand in the words of the game and nowhere in the
-- **MBM** (`Legacy/Logg/ArcMBM.cs`) — a place of the pictures of the engine without an index of its own: the
-  archives (`ArcSizeToFileListMap`: `0x0AB0F5F4` to `logg_pl.lst`, `0x0BFFD3DA` to `logg_ak.lst`,
-  `0x09809196` to `logg_th.lst`), and reads the list through the file lists of the reference itself. Those
-  lists stand beside the games rather than within the reference, so no archive can be read without one of
-  them.
-- **PACK/BONK** (`ArcFormats/Bonk/ArcPACK.cs`) — the same shape: the name, the size and the index of every
-  place stand in `bonk_ntr_1.lst`, read through the file lists of the reference and standing beside the game
-  can walk, so only the index of an archive stands unread.
-- **ADS** (`ArcFormats/BlackRainbow/ArcADS.cs`), **PKZ** (`ArcFormats/Sviu/ArcPKZ.cs`), **ARC/FOMA**
-  (`Legacy/StudioFoma/ArcARC.cs`), **ACV** (`ArcFormats/NonColor/ArcACV.cs`) and **DAT/MINATO**
-  (`ArcFormats/NonColor/ArcMinato.cs`) — every one of them draws its scheme from the game it stands beside:
-  `QueryScheme`, with a default that stands empty.
-- **MCP** (`Legacy/Mink/ImageMCP.cs`) — the reference does not stand as it stands: `ReadMetaData` breaks off
-  port.
-- **S5I** (`ArcFormats/rUGP/ImageS5I.cs`) — the picture of the engine stands within an archive of the kind
-  `CRioArchive` (the class `CRioArchive`, `LoadRioTypeCore`), which stands in the fifteen-hundred-line
-  `ArcFormats/rUGP/ArcRIO.cs` and is not ported. The picture is one object within it.
-- **BIZ** (`Legacy/Adviz/ImageBIZ.cs`) and **GIZ/2** (`Legacy/Adviz/ImageGIZ2.cs`) — both stand on the
-  palette of the game rather than on a palette of their own, drawn through `ReadPalette` of `ImageBIZ.cs` from
-  two companions of the engine, `GRP_TBL.SYS` and `PLT_TBL.SYS`, with a table of mappers that name the place
-  of a palette within `PLT_TBL.SYS` by the pair of the size of the two companions (`GrpMap`) and with a
-  stand together: the palette stands in one place of `ImageBIZ.cs` and serves both, so the place to start is
-  of a picture walked in strips of eight places; the palettes are the whole of the difficulty.
+## The reference class is only a base for engines to build on
 
-  words of the head of the picture name the picture it stands over, and `ReadBaseImage` stands the words of it
-  the picture of a kind of its own. The words the picture names the picture it stands over with stand walked as
+- `SCR` and `TXT` (`GameRes/ScriptText.cs`) are `abstract class ScriptFormat` and
+  `abstract class GenericScriptFormat` with `TextScriptFormat` and `BinScriptFormat` beside them. They
+  carry no layout of their own, because each engine subclasses them; registering them here would mean
+  reading every file of those extensions as one unnamed script.
 
-## The entries read line by line against the reference
+## Portable, but not ported yet
 
-Screened by the places the reference stands in rather than by the bytes the support report names them by, these
-small entries still stand unread, every one of them for a reason that stands in the reference itself:
+These were screened and no blocker was found: the reference is complete and carries no key, no outside
+listing and no outside reader in the places the screening looked. They are recorded here so that the
+screening is not repeated, and they are the first candidates when porting continues.
 
-  a picture encrypted with a walk the game names. The reference draws that walk from the words of the game: it
-  reads the resource `CIPHERCODE` of the kind `CODE` out of an `.exe` standing beside the archive or beside the
-- **AF2** (`ArcFormats/CsWare/AudioAF2.cs`) — the reference stands as a head of thirty-two places and stops
-  places of a picture, and how many places a place of a picture stands for) and stands nothing behind them, no
-  places of a picture and no return. The places of a picture of a kind stand as the place of a picture of the
-  it, so that the words of the head stand wrong for any picture of more than one channel. There is no walk of
-- **BIN/DXLIB** (`ArcFormats/DxLib/ArcDX8.cs`) — the reference stands the words of the head of a version of
-- **DXA** (`ArcFormats/DxLib/ArcDX.cs`, the kind the entry above stands on) — the archive of the engine stands
-  as an index walked with words the game names, and the reference draws them from the place of the person
-  reading rather than from the archive: its list of the words of the kinds of the engine stands empty
-  (`DxScheme.DefaultScheme`), the person reading it is asked for a word through `WidgetSCR.xaml`, and the words
-  reference stand on a word that stands nowhere in it.
-  places of a picture through `BinaryFormatter` of the .NET kind, with a binder of its own standing the kind
-  `SpVM.Library.LinkerInfo` of the words of the game onto a kind of its own. Reading such a stream stands as
-  this project.
+- `PX` (`ArcFormats/Leaf/ImagePX.cs`, 488 lines) is a block structured picture reader with its own reader
+  classes (`PxReader`, `PxBlock`).
+- `PAD` (`ArcFormats/ShiinaRio/AudioPAD.cs`) decodes through a 69 entry `double` table (`PadDecoder`),
+  which JavaScript floats can hold exactly as the reference uses them.
+- `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`) splits one multi-frame picture into layers named
+  `basename#NNNN`.
+- `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
+  the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
+- `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
+  reason that picture stands unread.
+- `EXE/NE` (`Experimental/Microsoft/ArcNE.cs`) walks the resource table of a 16 bit Windows executable
+  and hands out its entries as versions (`NeResourceEntry`, `OpenVersion`).
+- `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`) is a picture reader (`DifFormat`) with no scheme, key or
+  listed companion of its own.
+
+## Two engines can share a tag and a class name
+
+The gap inventory identifies an implementation by its kind, tag, source file and class name, and two
+unrelated engines can agree on all but the file. Two such pairs exist in the baseline:
+
+- `YK`: `Legacy/Rune/ArcYK.cs` and `Legacy/Koei/ArcYK.cs` both export `YkOpener` for the tag `YK`, and the
+  formats are unrelated — Rune's index sits inside the file, Koei's comes from a table keyed on the file
+  name. Both are ported now, as `rune-yk` and `koei-yk`.
+- `WEBP`: `ArcFormats/WebP/ImageWEBP.cs` and `Experimental/WebP/ImageWEBP.cs` both export `WebPFormat`.
+  The first, ported as `webp-image`, parses the container and decodes through a managed `WebPDecoder`. The
+  experimental variant parses the same container — its reading code is the managed one's — and differs
+  only in decoding pixels through `libwebp.dll` and WPF, which has no place in a pure TypeScript port.
+  Its entries are therefore covered by the ported format, and no separate record is kept.
