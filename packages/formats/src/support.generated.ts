@@ -8,6 +8,27 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "image",
+				tag: "PMG",
+				class: "PmgFormat",
+				source: "Legacy/Acme/ImagePMG.cs",
+			},
+			localId: "acme-pmg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the three places of a colour of a picture",
+				"the walks of the places of a colour",
+				"the places of the walk of a place of a colour that stand as places of their own",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "RPGMVO",
 				class: "RpgmvoAudio",

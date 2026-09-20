@@ -651,6 +651,7 @@ import { befAlpImageFormat } from "./bef/alp-image.js";
 import { gamesystemAlpImageFormat } from "./gamesystem/alp-image.js";
 import { masysAlpImageFormat } from "./masys/alp-image.js";
 import { ardImageFormat } from "./acme/ard-image.js";
+import { acmePmgImageFormat } from "./acme/pmg-image.js";
 import { mbImageFormat } from "./mb/image.js";
 import { ngwImageFormat } from "./brownie/ngw-image.js";
 import { gdfImageFormat } from "./mink/gdf-image.js";
@@ -1901,6 +1902,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gamesystemAlpImageFormat,
 		masysAlpImageFormat,
 		ardImageFormat,
+		acmePmgImageFormat,
 		mbImageFormat,
 		ngwImageFormat,
 		gdfImageFormat,
