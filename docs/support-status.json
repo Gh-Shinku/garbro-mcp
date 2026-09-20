@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "BMP/uGOS",
+				"class": "DetBmpFormat",
+				"source": "ArcFormats/uGOS/ImageBMP.cs"
+			},
+			"localId": "ugos-bmp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the walk of the places of a picture through its instructions",
+				"the predictors of an instruction",
+				"the runs and the copies of places",
+				"the stream of the places behind the places of a picture",
+				"a picture of eight places walked as one place for every place of it"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "IMGD/WAG",
 				"class": "ImgdFormat",
 				"source": "ArcFormats/Hexenhaus/ArcWAG.cs"
