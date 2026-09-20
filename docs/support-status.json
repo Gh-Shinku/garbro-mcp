@@ -6,6 +6,31 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GWD",
+				"class": "GwdFormat",
+				"source": "ArcFormats/AdvSys/ImageGWD.cs"
+			},
+			"localId": "advsys-gwd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walk of a picture of eight bits",
+				"the walk of a picture of twenty four bits, one line each for the blue places of a colour, the green and the red",
+				"the shape of the places of a picture, which stands beside it as a picture of eight bits"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures whose places of a colour stand beside any but eight and twenty four"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "MG2",
 				"class": "Mg2Format",
 				"source": "ArcFormats/Valkyria/ImageMG2.cs"

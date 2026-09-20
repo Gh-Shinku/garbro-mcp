@@ -1,6 +1,7 @@
 import { FormatRegistry } from "@garbro-mcp/core";
 export { formatSupportCatalog } from "./support.generated.js";
 import { advSysFpkFormat } from "./advsys/fpk.js";
+import { advSysGwdImageFormat } from "./advsys/gwd-image.js";
 import { Adpack32Format } from "./active-soft/adpack32.js";
 import { bananaPkFormat } from "./banana/pk.js";
 import { ailDatFormat, lnk2Format } from "./ail/dat.js";
@@ -1238,6 +1239,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		spcFormat,
 		ailDatFormat,
 		advSysFpkFormat,
+		advSysGwdImageFormat,
 		bishopBscFormat,
 		ccfFormat,
 		circusPckFormat,
