@@ -6,6 +6,32 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MG2",
+				"class": "Mg2Format",
+				"source": "ArcFormats/Valkyria/ImageMG2.cs"
+			},
+			"localId": "valkyria-mg2-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the two ways the places of a picture stand under their mask",
+				"places that stand as a portable network graphic and places that stand as a JPEG",
+				"the head of a picture of either kind"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"the shape of the places, which stands as a picture of its own",
+				"the bottom-up standing of the second way, which the reference works on its own frame"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TCZ",
 				"class": "TczFormat",
 				"source": "Legacy/Ponytail/ImageTCZ.cs"

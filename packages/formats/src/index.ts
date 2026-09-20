@@ -706,6 +706,7 @@ import { picImageFormat } from "./misc/pic-image.js";
 import { lgfImageFormat } from "./leaf/lgf-image.js";
 import { wm2ImageFormat } from "./fc01/wm2-image.js";
 import { malImageFormat } from "./valkyria/mal-image.js";
+import { valkyriaMg2ImageFormat } from "./valkyria/mg2-image.js";
 import { texImageFormat } from "./system21/tex-image.js";
 import { ggaImageFormat } from "./ikura/gga-image.js";
 import { thpImageFormat } from "./primesoft/thp-image.js";
@@ -1936,6 +1937,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		lgfImageFormat,
 		wm2ImageFormat,
 		malImageFormat,
+		valkyriaMg2ImageFormat,
 		texImageFormat,
 		ggaImageFormat,
 		thpImageFormat,
