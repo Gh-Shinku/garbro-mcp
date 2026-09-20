@@ -12,3 +12,4 @@ export * from "./riddle-cmp.js";
 export * from "./zlib.js";
 export * from "./msvc-random.js";
 export * from "./rc4.js";
+export * from "./jbp-huffman.js";
