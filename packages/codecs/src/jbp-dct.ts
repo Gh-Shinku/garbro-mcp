@@ -61,27 +61,27 @@ export function inverseJbpDct(
 			// A place of the walk of the picture that stands for the places of the picture every one of which
 			// stands as the same place of the picture stands as the places of the walk of the picture that stand
 			// for it, and no other place of the picture stands behind it.
-			const value = (table[at(p)] ?? 0) * (quant[at(q)] ?? 0);
+			const value = (table[at(p)] ?? 0) * (quant[q] ?? 0);
 			for (let place2 = 0; place2 < PLACES_PER_SIDE; place2 += 1) {
 				table[at(p + place2 * SIDE_STRIDE)] = value;
 			}
 			continue;
 		}
-		let c = (quant[at(q + 0x10)] ?? 0) * (table[at(p + 0x10)] ?? 0);
-		let d = (quant[at(q + 0x30)] ?? 0) * (table[at(p + 0x30)] ?? 0);
+		let c = (quant[q + 0x10] ?? 0) * (table[at(p + 0x10)] ?? 0);
+		let d = (quant[q + 0x30] ?? 0) * (table[at(p + 0x30)] ?? 0);
 		let x = Math.imul(c + d, ROTATE) >> PLACES_BEHIND;
 		c = (Math.imul(c, COS_1) >> PLACES_BEHIND) + x;
 		d = (Math.imul(d, COS_3) >> PLACES_BEHIND) + x;
-		const a = (table[at(p + 0x00)] ?? 0) * (quant[at(q + 0x00)] ?? 0);
-		const b = (table[at(p + 0x20)] ?? 0) * (quant[at(q + 0x20)] ?? 0);
+		const a = (table[at(p + 0x00)] ?? 0) * (quant[q + 0x00] ?? 0);
+		const b = (table[at(p + 0x20)] ?? 0) * (quant[q + 0x20] ?? 0);
 		const w = (a + b + c) | 0;
 		x = (a + b - c) | 0;
 		const y = (a - b + d) | 0;
 		const z = (a - b - d) | 0;
-		const cc = (table[at(p + 0x38)] ?? 0) * (quant[at(q + 0x38)] ?? 0);
-		const dd = (table[at(p + 0x28)] ?? 0) * (quant[at(q + 0x28)] ?? 0);
-		const aa = (table[at(p + 0x18)] ?? 0) * (quant[at(q + 0x18)] ?? 0);
-		const bb = (table[at(p + 0x08)] ?? 0) * (quant[at(q + 0x08)] ?? 0);
+		const cc = (table[at(p + 0x38)] ?? 0) * (quant[q + 0x38] ?? 0);
+		const dd = (table[at(p + 0x28)] ?? 0) * (quant[q + 0x28] ?? 0);
+		const aa = (table[at(p + 0x18)] ?? 0) * (quant[q + 0x18] ?? 0);
+		const bb = (table[at(p + 0x08)] ?? 0) * (quant[q + 0x08] ?? 0);
 		const n = Math.imul(aa + bb + cc + dd, COS_SUM) >> PLACES_BEHIND;
 		const u =
 			(n +

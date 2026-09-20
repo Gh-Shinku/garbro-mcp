@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "JBP",
+				"class": "JbpFormat",
+				"source": "ArcFormats/Sviu/ImageJBP.cs"
+			},
+			"localId": "sviu-jbp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walk of the places of a picture of the Purple engine",
+				"the places of the colours of a picture"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures of the kinds of the engine that stand as companions of the places of the game"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TXT/uGOS",
 				"class": "TxtFormat",
 				"source": "ArcFormats/uGOS/ImageTXT.cs"
