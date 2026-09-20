@@ -5,6 +5,26 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "script",
+				"tag": "DSM/UTAGE",
+				"class": "DsmConverter",
+				"source": "ArcFormats/Unity/ScriptDSM.cs"
+			},
+			"localId": "unity-dsm-script",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the key and the places of a ciphered block the reference stands from its own words",
+				"the places of a text of the kind the script stands as"
+			],
+			"unsupported": ["archive creation", "script re-encoding"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "GRC",
 				"class": "GrcFormat",
