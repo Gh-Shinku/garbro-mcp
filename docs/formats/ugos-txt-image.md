@@ -1,7 +1,9 @@
 # μ-GameOperationSystem tiled bitmap
 
-Reference: `GARbro/ArcFormats/uGOS/ImageTXT.cs`, classes `TxtFormat`, `TxtMetaData` and `Tile`, with the
-pictures of its places read by `ArcFormats/uGOS/ImageDET.cs`. GARbro commit
+Reference: `GARbro/ArcFormats/uGOS/ImageTXT.cs`, classes `TxtFormat`, `TxtMetaData` and `Tile`. The pictures of
+the places of such a picture are read by `ArcFormats/uGOS/ImageBMP.cs`, classes `DetBmpFormat` and its `Reader`,
+which the project does not read; the reference names the kind of those pictures `BMP/uGOS`, and the archive of
+the engine stands in `ArcFormats/uGOS/ArcDET.cs`. GARbro commit
 `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT License.
 
 Implementation: `packages/formats/src/ugos/txt-image.ts` (`ugoTxtDescriptor`, `ugoTxtFormat`, id
@@ -27,7 +29,11 @@ places of a tile.
   into one picture; this project reads no places of such pictures, so this port names the places of a tile of a
   picture and hands them out as they stand, and reads no picture of its own.
 - The reference reads the places of a tile of a picture out of a picture of the kind that stands as the places
-  of a picture of the engine; this port reads no such picture and reads no places of a tile at all.
+  of a picture of the engine; this port reads no such picture and reads no places of a tile at all. That kind
+  stands as a walk of the places of a picture, standing its places beside the places that stand before them
+  along forty places of the pictures of a place of it, and the reference reads the places it stands by through
+  tables it stands as places of its own; reading it stands as a picture of its own rather than as a part of
+  this one.
 - The reference reads the words of a file of this kind as the words of the engine stand, which this kind of
   file system reads as the words of the kind of file systems that name them; this port keeps the places of the
   words as they stand.
