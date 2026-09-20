@@ -18494,5 +18494,37 @@ export const formatSupportCatalog = {
 				"a channel that ends in a back reference too long for it, which the reference stops rather than completes",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "MGD/NSystem",
+				class: "MgdFormat",
+				source: "ArcFormats/NSystem/ImageMGD.cs",
+			},
+			localId: "nsystem-mgd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the header walk",
+				"the stored pixel mode",
+				"the packed mode, both of its channels",
+				"the alpha channel run and list forms",
+				"the three colour group kinds",
+				"bitmap output at the depth the alpha channel asks for",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"mode two, whose payload is a whole portable network graphic that the reference hands to an image library this project does not carry",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture of the packed mode, whose two channels are stored with lengths the reference does not check against each other",
+				"a picture whose difference group leaves a channel short of zero, which wraps the stored byte as the reference's cast does",
+			],
+		},
 	],
 } as const;

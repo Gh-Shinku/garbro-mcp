@@ -246,6 +246,7 @@ import { neFormat } from "./microsoft/ne-archive.js";
 import { mgsFormat } from "./masys/mgs-archive.js";
 import { eternitySgfImageFormat } from "./eternity/sgf-image.js";
 import { pajamasEpaImageFormat } from "./pajamas/epa-image.js";
+import { nsystemMgdImageFormat } from "./nsystem/mgd-image.js";
 import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
@@ -1094,6 +1095,7 @@ export * from "./masys/index.js";
 export * from "./nejii/index.js";
 export * from "./yaneurao/index.js";
 export * from "./pajamas/index.js";
+export * from "./nsystem/index.js";
 export * from "./sceneplayer/index.js";
 export * from "./umesoft/index.js";
 export * from "./vitamin/index.js";
@@ -1554,6 +1556,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mgsFormat,
 		eternitySgfImageFormat,
 		pajamasEpaImageFormat,
+		nsystemMgdImageFormat,
 		ucgFormat,
 		voiceFormat,
 		arccFormat,
