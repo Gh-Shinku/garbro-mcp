@@ -61,6 +61,7 @@ import { mpkFormat } from "./nitroplus/mpk.js";
 import { nppFormat } from "./nitroplus/npp.js";
 import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
+import { sas5War2Format, sas5WarFormat } from "./sas5/war.js";
 import { phsFormat } from "./uran/phs.js";
 import { redzonePakFormat } from "./redzone/pak.js";
 import { pinesoftVoiceFormat } from "./pinesoft/voice.js";
@@ -946,6 +947,7 @@ export * from "./nitroplus/index.js";
 export * from "./plantech/index.js";
 export * from "./pinesoft/index.js";
 export * from "./parsley/index.js";
+
 export * from "./seraphim/index.js";
 export * from "./succubus/index.js";
 export * from "./selene/index.js";
@@ -1260,6 +1262,8 @@ export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
 		new Xp3Format(),
 		new Adpack32Format(),
+		sas5WarFormat,
+		sas5War2Format,
 		medFormat,
 		bananaPkFormat,
 		otemotoMagImageFormat,

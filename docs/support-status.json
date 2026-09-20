@@ -6,6 +6,56 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "WAR2/SAS5",
+				"class": "War2Opener",
+				"source": "ArcFormats/Sas5/ArcWAR.cs"
+			},
+			"localId": "sas5-war2",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the index of an archive",
+				"the words of a wave around the places of a sound of the first kind",
+				"the places of a sound of the Ogg kind"
+			],
+			"unsupported": [
+				"archive creation",
+				"audio encoding",
+				"the names of the files of the engine"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "WAR/SAS5",
+				"class": "WarOpener",
+				"source": "ArcFormats/Sas5/ArcWAR.cs"
+			},
+			"localId": "sas5-war",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the index of an archive",
+				"the words of a wave around the places of a sound of the first kind",
+				"the places of a sound of the Ogg kind"
+			],
+			"unsupported": [
+				"archive creation",
+				"audio encoding",
+				"the names of the files of the engine"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "MED",
 				"class": "MedOpener",
 				"source": "ArcFormats/DxLib/ArcMED.cs"
