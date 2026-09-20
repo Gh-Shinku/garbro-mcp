@@ -18439,5 +18439,28 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the kinds of the places of the picture of the walk of them that stand beyond the kinds of the walk of the places of the picture of the fixtures of this project (the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them standing of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them), the reference standing the places of the picture of the walk of the places of the picture of the kinds of the places of the picture of the walk of them that stand of no places of the picture of the walk of the places of the picture of its own of no places of the picture of the walk of the places of the picture as well",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "TLG",
+				class: "TlgFormat",
+				source: "ArcFormats/KiriKiri/ImageTLG.cs",
+			},
+			localId: "kirikiri-tlg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture of the walk of the places of the picture of the sixth kind of the places of the picture",
+				"the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them that stand beside the places of the picture of the walk of the places of the picture of the picture of the places of the picture of the walk of them",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the sixth kind of the places of the picture (the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine of the kind of the places of the picture of the pictures), which stand of the places of the picture of the walk of the places of the picture of the reference, and of no places of the picture of the walk of the places of the picture of this project",
+				"the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them that stand beside the places of the picture of the walk of the places of the picture of the picture of the walk of them of the places of the picture of the walk of the places of the picture (the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the place of the picture of the walk of the places of the picture standing beside the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them, which stand of the places of the picture of the walk of the places of the picture of a picture of the kind of the places of the picture beside the places of the picture of the walk of the places of the picture)",
+			],
+		},
 	],
 } as const;

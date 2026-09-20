@@ -176,6 +176,7 @@ import { propellerMpkFormat } from "./propeller/mpk.js";
 import { tcd1Format } from "./topcat/tcd1.js";
 import { odioFormat } from "./hexenhaus/odio.js";
 import { nfsFormat } from "./nags/nfs.js";
+import { kirikiriTlgImageFormat } from "./kirikiri/tlg-image.js";
 import { xpkFormat } from "./kirikiri/xpk.js";
 import { xuseBinFormat } from "./xuse/bin.js";
 import { mbfFormat } from "./tanaka/mbf.js";
@@ -1469,6 +1470,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tcd1Format,
 		odioFormat,
 		nfsFormat,
+		kirikiriTlgImageFormat,
 		xpkFormat,
 		xuseBinFormat,
 		mbfFormat,
