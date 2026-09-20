@@ -4,7 +4,7 @@ Reference: `GARbro/ArcFormats/uGOS/ImageTXT.cs`, classes `TxtFormat`, `TxtMetaDa
 pictures of its places read by `ArcFormats/uGOS/ImageDET.cs`. GARbro commit
 `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT License.
 
-Implementation: `packages/formats/src/ugos/txt-image.ts` (`ugo\\TxtDescriptor`, `ugo\\TxtFormat`, id
+Implementation: `packages/formats/src/ugos/txt-image.ts` (`ugoTxtDescriptor`, `ugoTxtFormat`, id
 `ugos-txt-image`, `readUgoTxtLayout`).
 
 This picture of the engine stands as words rather than as places of a picture: a file of the kind of files that
