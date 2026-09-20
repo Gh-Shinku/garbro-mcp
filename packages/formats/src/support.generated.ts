@@ -8,6 +8,31 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "WAV",
+				class: "WaveAudio",
+				source: "GameRes/AudioWAV.cs",
+			},
+			localId: "gameres-wav-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a wave",
+				"the walk of the chunks of a wave, with the place that stands behind a chunk of an odd length",
+				"the places of a sound that stand as a sound of the Ogg kind or as the places of an MPEG Layer 3 sound",
+			],
+			unsupported: [
+				"archive creation",
+				"audio encoding",
+				"the places of a sound of the kinds that need turning, which the reference turns into places of a sound of the plain kind",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GWD",
 				class: "GwdFormat",
