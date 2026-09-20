@@ -18458,6 +18458,37 @@
 				"a real packed sound, which would confirm the chunk size the reference reads from the stored bits per sample",
 				"an archive from a real game whose names are XORed"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "SGF",
+				"class": "SgfFormat",
+				"source": "ArcFormats/Eternity/ImageSGF.cs"
+			},
+			"localId": "eternity-sgf-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the header walk",
+				"the five mask difference walk",
+				"the block restart and the row restart",
+				"the alpha section",
+				"bitmap output"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"the bitmap kind of alpha section, whose reader the reference leaves empty and which therefore yields no alpha channel"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture whose alpha section is of the bitmap kind",
+				"a picture of several colour blocks taken from a real game"
+			]
 		}
 	]
 }
