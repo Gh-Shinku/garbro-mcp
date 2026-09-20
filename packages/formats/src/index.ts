@@ -65,6 +65,7 @@ import { mpkFormat } from "./nitroplus/mpk.js";
 import { nppFormat } from "./nitroplus/npp.js";
 import { parsleyScnFormat } from "./parsley/scn.js";
 import { plantechPacFormat } from "./plantech/pac.js";
+import { sas5Sec5Format } from "./sas5/sec5.js";
 import { sas5War2Format, sas5WarFormat } from "./sas5/war.js";
 import { sviuJbpImageFormat } from "./sviu/jbp-image.js";
 import { ugosDetBmpImageFormat } from "./ugos/det-image.js";
@@ -1289,6 +1290,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		sviuJbpImageFormat,
 		ugosDetBmpImageFormat,
 		ugoTxtFormat,
+		sas5Sec5Format,
 		sas5WarFormat,
 		sas5War2Format,
 		medFormat,

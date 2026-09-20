@@ -18344,5 +18344,22 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of a sound of more than two places of the picture of a place of the picture of the walk of the places of the picture",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "SEC5",
+				class: "Sec5Opener",
+				source: "ArcFormats/Sas5/ArcSec5.cs",
+			},
+			localId: "sas5-sec5",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "archive rebuild"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the walk of the names of the places of the picture of the walk of the places of the picture (Sec5Opener.LookupIndex, FindSec5Resr, ReadResrSection and ReadRes2Section), which stands the places of the picture of the walk of the places of the picture of the archives of the kinds file-war and file-iar beside the places of the picture of the walk of the places of the picture of their own. Those places of the picture stand for the consumer of the places of the picture of the walk of the places of the picture of the archives of the engine of the SAS5 kind, and stand of no places of the picture of the walk of the places of the picture of the places of the picture of the walk of them.",
+			],
+		},
 	],
 } as const;
