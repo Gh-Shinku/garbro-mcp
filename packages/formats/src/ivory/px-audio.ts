@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Ivory/AudioCTRK.cs", classes `PxAudio` and `TrkDecoder` (a sound of the
-// Ivory engine: a head of six and thirty places that names the kind of the places behind it, the places
-// standing as places of a sound of the plain kind, as places walked of their own, or as a sound of the Ogg
-// kind). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { MsbBitReader } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
@@ -18,8 +13,6 @@ import {
 } from "../shared/fixed-archive.js";
 import { writeWave } from "../shared/wav.js";
 
-/** The words a sound of this kind stands behind, and the words the head of the sound stands behind where it
- * stands behind words of its own. */
 const MARK = Buffer.from("cTRK", "latin1");
 const OUTER_MARK = Buffer.from("fPX ", "latin1");
 const HEAD_SIZE = 0x24;
@@ -33,13 +26,9 @@ const CHANNELS_FIELD = 0x1a;
 const BITS_FIELD = 0x1c;
 const KIND_FIELD = 0x1e;
 const MINIMUM_HEAD_LENGTH = 0x20;
-/** The kinds of the places of a sound: the places of a sound of the plain kind, the places of a sound walked
- * of their own, and a sound of the Ogg kind. */
 const PLAIN_KIND = 0;
 const WALKED_KIND = 2;
 const OGG_KIND = 3;
-/** Every step of the walk of a sound stands as many places of the sound as this, and a block of the walk stands
- * as this many places of a colour. */
 const BLOCK_PLACES = 28;
 const PLACE_BITS = 4;
 const FIRST_BITS = 8;
@@ -64,13 +53,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PxAudio.TryOpen`: the words of the head stand behind the words of the sound where it stands behind words of
- * its own, and behind nought of them where it does not; the words beside them name how long the places behind
- * the head stand, how long the head stands, and how many places of a colour the places of the sound stand for,
- * and the words beside those name how many places of a colour stand in a step of the sound, how many of them
- * stand in a place of a colour, and which kind of places stands behind the head.
- */
 export function readPxLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -119,12 +101,6 @@ export function readPxLayout(
 	};
 }
 
-/**
- * `TrkDecoder.Decode`: the places of a sound stand as blocks of eight and twenty places of a colour, every
- * block beginning with the places of the first place of a colour of the sound and the places of how far the
- * places of the block stand from it, and every step of the block then naming how far the place it stands for
- * stands from the place before it.
- */
 export function decodePx(data: Buffer, layout: PxLayout): Buffer {
 	const channels = layout.channels;
 	const step = 2 * channels;

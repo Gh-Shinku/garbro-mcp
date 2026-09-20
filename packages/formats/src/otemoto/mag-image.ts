@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Otemoto/ImageMAG.cs", classes `MagFormat` and `MakiReader` (a picture
-// of the Otemoto engine: a head of sixty four places that names the places of the picture, and behind it the
-// places of a palette of the places of the picture, the words that name the places of the walk of its places,
-// the places that walk reads, and the places the walk stands for itself). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,16 +12,11 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The head of a picture of this kind stands in sixty four places, and the words it stands behind stand in the
- * first eight of them. */
 const HEAD_SIZE = 0x40;
 const MARK = "MAKI02  ";
 /** The words of the head stand behind a place of their own, which stands as this place. */
 const MARK_END = 0x1a;
 const MARK_SCAN_FROM = 8;
-/** Every word of the head stands in four places, and the words of the head stand in thirty two places behind
- * the place their own words end at: the four places of the picture the words stand for stand four places into
- * them, and the places of the palette stand behind them. */
 const HEAD_WORDS_SIZE = 0x20;
 const X_FIELD = 0x04;
 const Y_FIELD = 0x06;
@@ -68,13 +57,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `MagFormat.ReadMetaData`: the words of the head stand in the first eight places of the file, and the words
- * of the picture stand behind a place of their own which stands as this place; the words at that place name the
- * place of the picture along its row and along its column and the place the picture ends at, which stand as the
- * width and the height of the picture the head stands for. Every other place of the head names where a place of
- * the walk of the picture, the places the walk reads, and the places the walk stands for itself stand.
- */
 export function readOtemotoMagLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -130,8 +112,6 @@ export function readOtemotoMagLayout(
 	};
 }
 
-/** `MakiReader.ReadPalette`: every place of the palette stands in three places, the places of the red and the
- * blue of it standing the other way round. */
 export function readOtemotoMagPalette(
 	data: Buffer,
 	layout: OtemotoMagLayout,
@@ -147,12 +127,6 @@ export function readOtemotoMagPalette(
 	return palette;
 }
 
-/**
- * `MakiReader.Unpack`: the places of the picture stand as places of a walk of their own, every step of it
- * naming a place by how far above it stands and how far beside it stands, or standing as a place the walk reads
- * for itself where it names none; the words that name the places of the walk stand in the places behind the
- * head, every place of them naming eight steps of the walk.
- */
 export function unpackOtemotoMag(
 	data: Buffer,
 	layout: OtemotoMagLayout,
@@ -213,9 +187,6 @@ export function unpackOtemotoMag(
 	return output;
 }
 
-/** The places of the walk stand as places of two places, which a bitmap of four or eight places a place holds
- * as the places of the picture itself, a row of it standing in as many places as the head of the picture says
- * rather than in the places of a row of the picture. */
 export function otemotoMagIndexBytes(
 	places: Uint16Array,
 	layout: OtemotoMagLayout,

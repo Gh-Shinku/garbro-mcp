@@ -11,10 +11,6 @@ import {
 const HEAD_SIZE = 0x0c;
 const RECORD_SIZE = 0x0c;
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of a script of this kind, standing of the places of the
- * picture of the walk of the places of the picture of the words of the walk of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of their own. */
 function script(
 	type: number,
 	lines: { id: number; text: Buffer; offset?: number; size?: number }[],
@@ -64,15 +60,6 @@ describe("Amaterasu game engine script format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine behind the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the place of the picture of the walk of them of the places of the picture of the walk of the places of
-		// the picture of the text of a script of this kind stand of no places of the picture of the walk of the
-		// places of the picture of the kind of the places of the picture of the walk of them of the places of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-		// of the places of the picture of the words of the walk of the places of the picture of the walk of them
-		// of the places of the picture of the walk of the places of the picture of the places of the picture of
-		// the walk of the places of the picture of their own.
 		const file = script(0, [
 			{ id: 7, text: Buffer.from("late", "latin1"), offset: 0x40 },
 		]);
@@ -88,45 +75,19 @@ describe("Amaterasu game engine script format", () => {
 
 	it("turns away the places of the picture of the walk of the places of the picture of the words of the walk of the place of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind", () => {
 		const good = script(1, [{ id: 1, text: Buffer.from("hi", "latin1") }]);
-		// The places of the picture of the walk of the places of the picture of the words of the walk of them of
-		// the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of their own.
 		const wrong = Buffer.from(good);
 		wrong.write("XXX\0", 0, "latin1");
 		expect(readScrLayout(wrong)).toBeUndefined();
-		// A picture of the places of the picture of the walk of them of the places of the picture that stands
-		// very short stands of the places of the picture of the walk of the places of the picture of the kind of
-		// the places of the picture of the walk of the places of the picture of their own.
 		expect(readScrLayout(Buffer.alloc(8, 0x00))).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of the place of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the text stand past the places of the picture of the walk of the places of the picture of the picture
-		// of this kind.
 		const far = Buffer.from(good);
 		far.writeUInt32LE(0x1000, HEAD_SIZE);
 		expect(readScrLayout(far)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of the text stand
-		// over the places of the picture of the walk of the places of the picture of the kind of the places of
-		// the picture of the walk of them of the places of the picture of the walk of the places of the picture
-		// of the places of the picture of their own.
 		const long = Buffer.from(good);
 		long.writeInt32LE(0x100, HEAD_SIZE + 4);
 		expect(readScrLayout(long)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of their own.
 		const many = Buffer.from(good);
 		many.writeUInt32LE(0x1000, 8);
 		expect(readScrLayout(many)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound stand of the places of the picture of the walk of the places of the picture of no places of
-		// the picture of the walk of the places of the picture of their own.
 		const empty = script(3, []);
 		const emptyLayout = readScrLayout(empty);
 		if (!emptyLayout) throw new Error("no empty layout");

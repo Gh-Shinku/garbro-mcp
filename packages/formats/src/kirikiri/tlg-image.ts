@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/KiriKiri/ImageTLG.cs", classes `TlgFormat`, `TlgMetaData` and the
-// walk of the places of the picture of the fifth kind of the places of the picture (`ReadV5`,
-// `TVPTLG5DecompressSlide`, `TVPTLG5ComposeColors3To4` and `TVPTLG5ComposeColors4To4`). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,7 +14,6 @@ import {
 import { unpackTlg6 } from "./tlg6.js";
 import { blendTlgImage, readTailTags } from "./tlg-tags.js";
 
-/** The places of the picture of the words of the head of a picture of this kind. */
 const HEAD_SIZE = 0x26;
 const PREFIX_SIZE = 0x0f;
 const PREFIX = Buffer.from("TLG0.0\0sds\x1a", "latin1");
@@ -41,8 +35,6 @@ const MASKED_5_SECOND = 0xac;
 const MASKED_JKM = 0x1a;
 const MASKED_JKM_SECOND = 0x1c;
 const FIRST_PLACES = 0xab;
-/** The places of the picture of the walk of the places of the picture of the fifth kind of the places of the
- * picture. */
 const RING_SIZE = 4096;
 const RING_PLACES = RING_SIZE - 1;
 const LEAST_MATCH = 3;
@@ -50,10 +42,6 @@ const LONG_MATCH = 18;
 const FLAG_PLACES = 0x100;
 const OFFSET_PLACES = 0x0f;
 const OFFSET_SHIFT = 8;
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of the places of the picture of the picture of the walk of them: the places of the picture of the walk of
- * the places of the picture of the place of the picture of the walk of them, and of the places of the picture
- * of the walk of the places of the picture of the place of the picture of the walk of them behind it. */
 const BLOCK_HEAD = 5;
 const MOST_WORDS = 4;
 const LIMIT = 256 * 1024 * 1024;
@@ -72,15 +60,6 @@ export function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `TlgFormat.ReadMetaData`: the words of the head of a picture of this kind. The head stands of the places of
- * the picture of the kind of the walk of the places of the picture, of the places of the picture of the walk
- * of the places of the picture of the picture itself, and of how wide and how tall the picture stands, the
- * places of the picture of the walk of the places of the picture standing of the places of the picture of the
- * kind of the places of the picture of the walk of them, of how many places of the picture of a place of the
- * picture of the picture stand beside each other, and of the places of the picture of the walk of them of the
- * kinds of the walk of the places of the picture of the fifth and of the sixth kind.
- */
 export function readTlgLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -139,15 +118,6 @@ export function readTlgLayout(
 	};
 }
 
-/**
- * `TVPTLG5DecompressSlide`: the places of the picture of the walk of the places of the picture of the fifth
- * kind stand of the places of the picture of the walk of the places of the picture of the picture of the
- * walk of them, the places of the picture of the walk of the places of the picture standing of the places of
- * the picture of the walk of the places of the picture of the words of the walk of the picture, and standing
- * of the places of the picture of the walk of the places of the picture of their own where the places of the
- * picture of the walk of the places of the picture of the word of the walk of them stand of the places of the
- * picture of the walk of the places of the picture.
- */
 export function decompressSlide(
 	out: Buffer,
 	input: Buffer,
@@ -215,9 +185,6 @@ export function decompressSlide(
 	return r;
 }
 
-/** `TVPTLG5ComposeColors3To4` and `TVPTLG5ComposeColors4To4`: the places of the picture of the walk of the
- * places of the picture of the places of the picture stand beside each other of the places of the picture of
- * the walk of the places of the picture of the picture behind them. */
 function composeColors(
 	bits: Buffer,
 	at: number,
@@ -250,12 +217,6 @@ function composeColors(
 	}
 }
 
-/** `TlgFormat.ReadV5`: the places of the picture of the walk of the places of the picture of the fifth kind
- * of the places of the picture stand as the places of the picture of the walk of the places of the picture of
- * the picture of the walk of them of the places of the picture of every place of the picture of the walk of
- * the places of the picture, the places of the picture of the walk of the places of the picture of the
- * picture standing of the places of the picture of the walk of the places of the picture of the picture of
- * the walk of them of every place of the picture of the walk of the places of them. */
 export function unpackTlg5(data: Buffer, layout: TlgLayout): Buffer {
 	if (layout.version !== 5)
 		throw invalidPicture(
@@ -421,26 +382,12 @@ export const kirikiriTlgImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const layout = readTlgLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the
-		// fifth kind and of the places of the picture of the walk of the places of the picture of the sixth kind
-		// of the places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of their own.
 		let pixels =
 			layout.version === 6
 				? unpackTlg6(stored, layout)
 				: unpackTlg5(stored, layout);
 		let width = layout.width;
 		let height = layout.height;
-		// The reference stands the places of the picture of the walk of the places of the picture of the base
-		// of the places of the picture of the walk of them of the places of the picture of the walk of the
-		// places of the picture of the sound of the places of the picture of the walk of the places of the
-		// picture of the words of the walk of the picture of the places of the picture of the walk of the
-		// places of the picture of the kind of the places of the picture of the walk of the places of the
-		// picture of their own, so a picture of this project stands the places of the picture of the walk of the
-		// places of the picture of the kind of the places of the picture of the walk of them of the places of
-		// the picture of the walk of the places of the picture of the base of the places of the picture of the
-		// walk of them.
 		try {
 			const tags = readTailTags(stored);
 			const own = sourcePath.replace(/^.*[/\\]/, "");
@@ -475,14 +422,7 @@ export const kirikiriTlgImageFormat: ArchiveFormat = defineFixedArchive({
 					}
 				}
 			}
-		} catch {
-			// The reference stands the places of the picture of the walk of the places of the picture of the
-			// words of the walk of the picture of the places of the picture of the walk of the places of the
-			// picture of the base of the places of the picture of the walk of them of the places of the picture
-			// of the walk of the places of the picture of their own, standing of the places of the picture of
-			// the walk of the places of the picture of the picture of the kind of the places of the picture of
-			// the walk of the places of the picture of their own.
-		}
+		} catch {}
 		return Readable.from([writeBmp32(width, height, pixels, false)]);
 	},
 });

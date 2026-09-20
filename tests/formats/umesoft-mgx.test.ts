@@ -41,7 +41,6 @@ function grxFile(parts: PictureParts): Buffer {
 	return Buffer.concat([head, Buffer.concat(parts.rows)]);
 }
 
-/** A whole file: the count and the places of the frames, and then the frames themselves. */
 function mgxFile(frames: Buffer[], parts: { count?: number } = {}): Buffer {
 	const count = parts.count ?? frames.length;
 	const head: Buffer = Buffer.alloc(INDEX_START + count * 4, 0x00);

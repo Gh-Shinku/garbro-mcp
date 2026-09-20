@@ -139,7 +139,6 @@ describe("elf composite image format (HIP)", () => {
 				"a.hip",
 			),
 		).toBe(false);
-		// A second picture in front of the first is no file of this kind.
 		expect(
 			await ai5HipImageFormat.detect(
 				sourceOf(buildHip({ firstOffset: 0x60, secondOffset: 0x40 })),

@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/CaramelBox/ArcARC4.cs", class `TzCompression` (the compression of the
-// pictures of the engine: a header naming how many places of the picture stand behind it, and the places of the
-// picture standing as blocks of the places of the picture of their own, the places of the places of the picture
-// standing walked or as they stand, walking of the places of the picture of the words of the walk behind the
-// places of the walk of them). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 
 /** TzCompression markers, read as little endian 16 bit values. */

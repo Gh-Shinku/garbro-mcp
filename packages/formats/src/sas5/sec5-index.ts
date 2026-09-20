@@ -1,24 +1,13 @@
-// Format reference: GARbro "ArcFormats/Sas5/ArcSec5.cs", the walk of the names of the places of the picture
-// of the walk of the places of the picture of the engine of the SAS5 kind: `Sec5Opener.LookupIndex`,
-// `FindSec5Resr`, `ReadResrSection` and `ReadRes2Section` (with the places of the picture of the walk of the
-// places of the picture of the words of the walk of the picture standing of "GameRes/BinaryStream.cs",
-// `ReadCString`). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { readFile } from "node:fs/promises";
 import { findCompanionFilesByExtension } from "../shared/companion.js";
 import { readSec5Sections } from "./sec5.js";
 
-/** The places of the picture of the walk of the places of the picture of the places of the picture of the
- * sound of the walk of them that stand for the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the archives of the engine. */
 const WAR_KIND = "file-war";
 const IAR_KIND = "file-iar";
 const RESR_MARK = "RESR";
 const RES2_MARK = "RES2";
 const COUNT_SIZE = 4;
 const LENGTH_SIZE = 4;
-/** The places of the picture of the walk of the places of the picture of the picture of the walk of them of
- * the places of the picture of the walk of the places of the picture stand of eight places of the picture. */
 const BYTE_RANK = 8;
 const STRING_KIND = 0x90;
 const STRING_KIND_MASK = 0xf8;
@@ -31,23 +20,17 @@ const MOST_PLACES = 4;
 const TWO_PLACES = 3;
 const LIMIT = 1_000_000;
 
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture of the engine. */
 export interface Sec5IndexPlace {
 	name: string;
 	type: string;
 }
 
-/** The places of the picture of the walk of the places of the picture of the name of the place of the picture
- * of the walk of the places of the picture of the engine of their own. */
 const CP932 = new TextDecoder("shift_jis");
 
 function kindOf(place: string): string {
 	return place.toLowerCase();
 }
 
-/** `BinaryStream.ReadCString`: the places of the picture of the walk of the places of the picture of a word
- * that stands for the places of the picture of no places of their own. */
 function readCString(
 	data: Buffer,
 	at: number,
@@ -57,22 +40,10 @@ function readCString(
 	while (end < data.length && data[end] !== 0) end += 1;
 	return {
 		value: CP932.decode(data.subarray(at, end)),
-		// The reference stands the places of the picture of the walk of the places of the picture behind the
-		// places of the picture that stand for the places of the picture of no places of their own.
 		position: end < data.length ? end + 1 : data.length,
 	};
 }
 
-/**
- * `Sec5Opener.ReadResrSection`: the places of the picture of the walk of the places of the picture of the
- * places of the picture of the engine of the first kind. Every place of the picture of the walk of them stands
- * of the places of the picture of the walk of the places of the picture of the name of the picture of the walk
- * of it, of the places of the picture of the walk of the places of the picture of the kind of the picture of
- * the walk of it, of the places of the picture of the walk of the places of the picture of the kind of the
- * places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture of the engine, and of the places of the picture of the walk of the places of the picture of the
- * place of the picture of the walk of them.
- */
 export function readSec5ResrSection(
 	data: Buffer,
 ): Map<string, Map<number, Sec5IndexPlace>> | undefined {
@@ -110,10 +81,6 @@ export function readSec5ResrSection(
 	return map.size > 0 ? map : undefined;
 }
 
-/** `Res2Reader`: the places of the picture of the walk of the places of the picture of the places of the
- * picture of the engine of the second kind, the places of the picture of the walk of the places of the
- * picture of the words of the walk of the picture standing in the places of the picture of the walk of the
- * places of the picture of their own. */
 class Res2Reader {
 	private at = 0;
 
@@ -133,13 +100,6 @@ class Res2Reader {
 		return value;
 	}
 
-	/** `Res2Reader.ReadNumber`: the places of the picture of the walk of the places of the picture of the
-	 * sound of the places of the picture standing of the places of the picture of the walk of the places of
-	 * them, of the places of the picture of the walk of the places of the picture of the picture of the walk of
-	 * them of the places of the picture of the walk of the places of the picture of the picture of their own
-	 * where the places of the picture of the walk of the places of the picture of the word of the walk of them
-	 * stand behind the places of the picture of the walk of the places of the picture of the third place of the
-	 * picture of the walk of them. */
 	readNumber(kind: number): number | undefined {
 		const count = (kind & 7) + 1;
 		if (count > MOST_PLACES) return undefined;
@@ -158,9 +118,6 @@ class Res2Reader {
 		return value;
 	}
 
-	/** `Res2Reader.ReadString`: the places of the picture of the walk of the places of the picture of a place
-	 * of the picture of the walk of them of the places of the picture of the walk of the places of the picture
-	 * of the places of the picture of the engine. */
 	readString(): string | undefined {
 		const kind = this.readByte();
 		if (kind === undefined || (kind & STRING_KIND_MASK) !== STRING_KIND)
@@ -183,9 +140,6 @@ class Res2Reader {
 		);
 	}
 
-	/** `Res2Reader.ReadInteger`: the places of the picture of the walk of the places of the picture of the
-	 * sound of the places of the picture of the walk of the places of the picture of the word of the walk of
-	 * the places of the picture of their own. */
 	readInteger(): number | undefined {
 		const kind = this.readByte();
 		if (kind === undefined) return undefined;
@@ -196,9 +150,6 @@ class Res2Reader {
 		return (kind & LOCATED_PLACES) - (kind & LOCATED_SIGN);
 	}
 
-	/** `Res2Reader.SkipObject`: the places of the picture of the walk of the places of the picture of the
-	 * places of the picture of the walk of them that stand for the places of the picture of the walk of the
-	 * places of the picture of this kind stand of no places of the picture of the walk of them of their own. */
 	skipObject(): boolean {
 		const kind = this.readByte();
 		if (kind === undefined) return false;
@@ -207,18 +158,12 @@ class Res2Reader {
 	}
 }
 
-/** `Sec5Opener.ReadRes2Section`: the places of the picture of the walk of the places of the picture of the
- * places of the picture of the engine of the second kind. */
 export function readSec5Res2Section(
 	data: Buffer,
 ): Map<string, Map<number, Sec5IndexPlace>> | undefined {
 	if (data.length < COUNT_SIZE) return undefined;
 	const tableSize = data.readInt32LE(0);
 	if (tableSize < 0) return undefined;
-	// The reference stands the places of the picture of the walk of the places of the picture of the places of
-	// the picture of the engine of the second kind, the places of the picture of the words of the walk of the
-	// picture standing behind the places of the picture of the walk of the places of the picture of the place
-	// of the picture of the walk of them.
 	const streamAt = COUNT_SIZE + tableSize + COUNT_SIZE;
 	if (streamAt > data.length) return undefined;
 	const strings = data.subarray(COUNT_SIZE, COUNT_SIZE + tableSize);
@@ -256,11 +201,6 @@ export function readSec5Res2Section(
 	return map.size > 0 ? map : undefined;
 }
 
-/** `Sec5Opener.FindSec5Resr`: the places of the picture of the walk of the places of the picture of the
- * names of the places of the picture of the walk of them stand beside the places of the picture of the walk
- * of the places of the picture of the engine of the name that stands beside the places of the picture of the
- * walk of the places of the picture of the picture, or beside the places of the picture of the walk of the
- * places of the picture of the picture above them. */
 export async function readSec5Names(
 	sourcePath: string,
 ): Promise<Map<string, Map<number, Sec5IndexPlace>> | undefined> {
@@ -297,9 +237,6 @@ export async function readSec5Names(
 	return undefined;
 }
 
-/** `Sec5Opener.LookupIndex`: the places of the picture of the walk of the places of the picture of the names
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of an archive of the engine. */
 export function lookupSec5Names(
 	index: Map<string, Map<number, Sec5IndexPlace>> | undefined,
 	archiveName: string,
@@ -308,11 +245,6 @@ export function lookupSec5Names(
 	return index.get(kindOf(archiveName.replace(/^.*[/\\]/, "")));
 }
 
-/** The places of the picture of the walk of the places of the picture of the names of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of an
- * archive of the engine, standing of no places of the picture of the walk of the places of the picture where
- * the places of the picture of the walk of the places of the picture of the kind of the pictures of the
- * engine stand of no places of the picture of the walk of them. */
 export async function readSec5ArchiveNames(
 	sourcePath: string,
 ): Promise<Map<number, Sec5IndexPlace> | undefined> {

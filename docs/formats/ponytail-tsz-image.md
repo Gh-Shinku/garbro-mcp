@@ -17,9 +17,6 @@ fours of places in the word at `0x0C` and its height in the word at `0x0E`. Behi
 colours, three bytes apiece — the red of the colour first, then its green and its blue — and every byte of a
 colour stands for the colour of four places, being used in both halves of a byte.
 
-## The walk of the places
-
-The places of the picture stand column by column, and the two columns of a pair stand one behind the other in
 the two halves of a line buffer as long as two columns. A step of the walk gives a run of places of a column,
 how long the run stands being the run of places in front of the step:
 

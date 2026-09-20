@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Hexenhaus/ArcWAG.cs", class `ImgdFormat` (a picture of the WAG kind
-// that stands as the places of a portable network graphic behind a head of its own: the reference stands the
-// places of the picture behind the words of its head and hands them to the reader of the pictures of that
-// kind). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -17,11 +12,8 @@ import {
 } from "../shared/fixed-archive.js";
 import { readPngHeaderFields } from "../shared/png.js";
 
-/** The words a picture of this kind stands behind, and how many places of the file its head stands in. */
 const MARK = Buffer.from("IMGD", "latin1");
 const HEAD_SIZE = 0x10;
-/** The words and the places the places of the picture stand behind at the end of the file, which name where
- * the places of the picture stand within the picture of the game they stand in. */
 const TRAILER_MARK = "CNTR";
 const TRAILER_SIZE = 12;
 const TRAILER_TAIL = 14;
@@ -41,13 +33,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `ImgdFormat.ReadMetaData`: the words of the head of a picture of this kind stand in the first four places of
- * the file, and the places of a portable network graphic stand behind the head: the reference hands those
- * places to the reader of the pictures of that kind and reads the words of the head of the picture itself. The
- * places of the picture stand fourteen places behind the end of the file where they name where the picture
- * stands within the picture of the game it stands in.
- */
 export function readImgdLayout(
 	data: Buffer,
 	fileLength = data.length,

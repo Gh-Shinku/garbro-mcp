@@ -1,8 +1,3 @@
-// Format reference: GARbro "Legacy/AyPio/AudioVOC.cs", classes `VocAudio` and `VocDecoder` (a UK2 engine
-// sound: a walk of nibbles that steps a sample along by one of eighty nine steps of a table whose values are
-// worked out from the bits of a sample, each step standing for the same places of the step table and the
-// places of the sample already walked). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -30,13 +25,10 @@ const SAMPLE_COUNT_FIELD = 0x18;
 const BITS_FIELD = 0x20;
 /** The first sample of the sound, in two halves, which the head carries. */
 const FIRST_SAMPLE_FIELDS = [0x0a, 0x0b, 0x0e, 0x0f];
-/** The step the walk of the two channels stands at, one for each. */
 const PREVIOUS_FIELDS = [0x0c, 0x10];
-/** The two parts of where the walk of the sound begins, which the head adds up. */
 const DATA_FIELDS = [0x04, 0x14];
 /** The shape of the sound, which stands behind the word `fmt ` of the head. */
 const FORMAT_FIELD = 0x21;
-/** How many steps the walk of the sound knows. */
 const STEP_COUNT = 89;
 /** A sound this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
@@ -55,7 +47,6 @@ const STEP_TABLE = new Uint16Array([
 	0x41b2, 0x4844, 0x4f7e, 0x5771, 0x602f, 0x69ce, 0x7462, 0x7fff,
 ]);
 
-/** `VocDecoder.IndexTable`: how a step moves along the steps of the walk for the places of the sound. */
 const INDEX_TABLE = new Int8Array([-1, -1, -1, -1, 1, 2, 3, 4]);
 
 export interface VocLayout {
@@ -70,7 +61,6 @@ export interface VocLayout {
 	previous: [number, number];
 	/** The first sample of the sound, in two halves. */
 	first: [number, number];
-	/** Where the walk of the sound begins. */
 	dataOffset: number;
 }
 
@@ -78,13 +68,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `VocDecoder`: the head of the file is thirty six bytes wide and carries the shape of the sound behind the
- * word `fmt ` at `0x1D` — the kind of the sound, the channels, the pace, the average, the size of a block and
- * the bits of a sample — together with how many samples the sound holds, the step the walk of each channel
- * stands at, the first sample of the sound and two parts of where the walk of the sound begins. The word
- * `RIFF` stands at `0x38`.
- */
 export function readVocLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -132,12 +115,6 @@ export function readVocLayout(
 	};
 }
 
-/**
- * `VocDecoder.BuildSamples`: the steps of the walk are worked out for every place of a sample. A step stands
- * for what its own value in the step table gives, cut into as many parts as the bits of a sample name, and
- * every place of a sample takes the parts its own places name — which is the sum, over the parts of the step
- * table, of a part of it wherever the places of a sample that stand below that part say so.
- */
 export function buildVocSamples(bitsPerSample: number): Int32Array {
 	const places = 1 << (bitsPerSample - 1);
 	const samples = new Int32Array(STEP_COUNT * places);
@@ -158,7 +135,6 @@ export function buildVocSamples(bitsPerSample: number): Int32Array {
 	return samples;
 }
 
-/** Where the walk of the sound stands: the byte it is reading and the nibbles it still holds. */
 interface VocCursor {
 	data: Buffer;
 	position: number;
@@ -193,14 +169,6 @@ function clamp16(value: number): number {
 	return value;
 }
 
-/**
- * `VocDecoder.Decode`: the first sample of the sound stands in the head, and every step of the walk then
- * moves a sample along by what the steps of the walk give for the places of the nibble — the highest place of
- * the nibble saying whether the sample climbs or falls — and the sample stands at the very end of the sound
- * the walk writes, which is a step behind the one it read. The walk of a sound of two channels moves the
- * steps of the channel its place names along, and the last sample of every channel and the samples the walk
- * does not reach stand as nought.
- */
 export function decodeVoc(data: Buffer, layout: VocLayout): Buffer {
 	const output: Buffer = Buffer.alloc(layout.sampleCount * 2, 0x00);
 	// The first sample of the sound stands in the head and not in the walk. A sound of fewer than two

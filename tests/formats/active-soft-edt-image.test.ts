@@ -11,10 +11,6 @@ import {
 const MARK = ".TRUE\x8d\x5d\x8c\xcb\x00";
 const HEAD_SIZE = 0x22;
 
-/** The places of the pictures of the test, stood against an account of the reference of its own: a picture
- * whose places stand as the places of the picture of the words of the walk of them, a picture whose places of
- * a row stand as the places of the picture of the row before them, and a picture whose places stand of the
- * places of the picture beside them. */
 const PICTURES: readonly {
 	name: string;
 	width: number;
@@ -52,7 +48,6 @@ const PICTURES: readonly {
 	},
 ];
 
-/** The places of the head of a picture of this kind. */
 function buildPicture(picture: (typeof PICTURES)[number]): Buffer {
 	const packed = Buffer.from(picture.packed, "hex");
 	const extra = Buffer.from(picture.extra, "hex");
@@ -85,8 +80,6 @@ describe("Active Soft RGB image format", () => {
 		const wrongMark = buildPicture(picture);
 		wrongMark.write(".TRUF", 0, "latin1");
 		expect(readEdtLayout(wrongMark, wrongMark.length)).toBeUndefined();
-		// Every place of the picture of the places of the walk of a picture stands as the places of a picture
-		// of the three places of a place of the picture, so a picture of no places of them stands nowhere.
 		const noExtra = buildPicture(picture);
 		noExtra.writeUInt32LE(0, 0x1e);
 		expect(readEdtLayout(noExtra, noExtra.length)).toBeUndefined();
@@ -120,11 +113,7 @@ describe("Active Soft RGB image format", () => {
 			expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 			expect(bmp.readUInt16LE(0x1c)).toBe(24);
 			expect(bmp.readInt32LE(0x12)).toBe(picture.width);
-			// The places of a picture of this kind stand from the first place of it rather than from the last,
-			// so the places of the picture stand from the head of it downwards.
 			expect(bmp.readInt32LE(0x16)).toBe(-picture.height);
-			// The places of a row of a picture of this kind stand in the places of the picture of the three
-			// places of a place of the picture, which stand in the places of the picture of the walk of them.
 			const stride = (picture.width * 3 + 3) & ~3;
 			const places = Buffer.from(picture.out, "hex");
 			for (let row = 0; row < picture.height; row += 1) {
@@ -145,16 +134,11 @@ describe("Active Soft RGB image format", () => {
 	});
 
 	it("turns a picture cut short of the places of the walk of it away", () => {
-		// The words of the head of a picture of this kind name the places of the walk of the picture and the
-		// places of the picture of the walk of it, so a picture cut short of the places of the walk of it stands
-		// away where its places stand short of them.
 		const picture = PICTURES[1];
 		if (!picture) throw new Error("no picture");
 		const file = buildPicture(picture);
 		const cut = file.subarray(0, file.length - 12);
 		expect(readEdtLayout(cut, cut.length)).toBeUndefined();
-		// And the places of a picture whose places of the walk of it stand past the places of the picture of
-		// the walk of the count of them stand away in the walk of the places of the picture.
 		const short = buildPicture({
 			...picture,
 			extra: picture.extra.slice(0, 6),

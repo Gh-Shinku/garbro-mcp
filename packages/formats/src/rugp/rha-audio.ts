@@ -17,7 +17,6 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** The reference registers no word of its own: a sound of this kind is told by the head of its first step. */
 const HEAD_SIZE = 2;
 /** The places of a sound of its own stand behind a head of the engine's, and how many places of a colour stand
  * in the last places of a step of it stands in the words behind such a head. */
@@ -27,7 +26,6 @@ const OWN_SCHEMA = 0x10b;
 const LAST_ZERO_ADD = 0x1000;
 const LAST_FULL_ADD = 0x2000;
 const FULL_ADD_VALUE = 0xff;
-/** The word a step of a sound of the plain kind stands as, with the places of its own head behind it. */
 const PLAIN_HEAD = 0xfffb0000;
 /** The place of a head that names whether the step behind it carries places of a colour of its own. */
 const CRC_BIT = 1 << 16;
@@ -48,10 +46,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `RhaAudio.RhaToMp3Header`: the places of a head of the engine stand as the places of a head of an MPEG
- * Layer 3 sound, every run of its places standing where the sound stands it.
- */
 export function rhaToMp3Header(header: number): number {
 	return (
 		(((header & 0x0f) << 4) |
@@ -62,11 +56,6 @@ export function rhaToMp3Header(header: number): number {
 	);
 }
 
-/**
- * `RhaAudio.GetFrameLength`: how many places of a colour a step of a sound stands as, by the places of its
- * head: how fast the sound runs, the run of places that names how many of its places stand a second, and
- * whether a place of a colour of its own stands behind them.
- */
 export function mp3FrameLength(header: number): number {
 	let lsf: number;
 	let frequency: number;
@@ -88,9 +77,6 @@ export function mp3FrameLength(header: number): number {
 	return frameLength;
 }
 
-/** `RhaAudio.TryOpen`: the head of the first step of a sound tells the way its places stand: the places of a
- * sound of its own stand behind a head of the engine's, and the places of a sound of the plain kind stand
- * behind a head whose places stand as a head of an MPEG Layer 3 sound. */
 export function readRhaSchema(
 	data: Buffer,
 	fileLength = data.length,
@@ -102,13 +88,6 @@ export function readRhaSchema(
 	return undefined;
 }
 
-/**
- * `RhaAudio.ConvertToMp3`: every step of a sound of this kind stands as a step of an MPEG Layer 3 sound: its
- * head stands as the head of such a step, and how many places of a colour of the sound do not stand in it
- * stands in the words behind the head of a sound of its own, those places standing at nought or as a place of
- * a colour of the highest kind. Where the head names places of a colour of its own, they stand behind the
- * places of the step as they stand.
- */
 export function convertRhaToMp3(
 	data: Buffer,
 	fileLength = data.length,
@@ -200,8 +179,6 @@ export const rugpRhaAudioDescriptor: FormatDescriptor = {
 	],
 };
 
-/** The places of a sound of this kind stand as the places of an MPEG Layer 3 sound, which is the sound the
- * reference reads and hands out. */
 function readConverted(data: Buffer, fileLength: number): Buffer {
 	const converted = convertRhaToMp3(data, fileLength);
 	if (!converted) throw invalidSound("Not an rUGP engine sound");
@@ -210,8 +187,6 @@ function readConverted(data: Buffer, fileLength: number): Buffer {
 
 export const rugpRhaAudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: rugpRhaAudioDescriptor,
-	// The reference registers no word of its own and is offered every file, so a sound of this kind is tried
-	// after every kind that is told by a word of its own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
@@ -239,7 +214,6 @@ export const rugpRhaAudioFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const stored = await readStored(source);
-		// The places of the sound stand as the places of an MPEG Layer 3 sound.
 		return Readable.from([readConverted(stored, Number(source.size))]);
 	},
 });

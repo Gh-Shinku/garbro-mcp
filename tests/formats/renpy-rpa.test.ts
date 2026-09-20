@@ -12,10 +12,6 @@ const INDEX_PLACES = 8;
 const KEY_PLACES = 0x19;
 const HEAD_SIZE = 0x22;
 
-/** The places of the picture of the walk of the places of the picture of the word of the walk of them of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of them, the places of the picture of the walk of the places of the picture standing of the places
- * of the picture of the walk of the places of the picture of the place of the picture of the walk of them. */
 function pickleInt(value: bigint): number[] {
 	if (value >= 0n && value < 0x100n) return [0x4b, Number(value)];
 	if (value >= 0n && value < 0x10000n) {
@@ -27,9 +23,6 @@ function pickleInt(value: bigint): number[] {
 			out.push(Number((value >> BigInt(i * 8)) & 0xffn));
 		return out;
 	}
-	// The places of the picture of the walk of the places of the picture of the walk of them stand as the
-	// places of the picture of the walk of the places of the picture of the picture of their own, of the
-	// places of the picture of the walk of the places of the picture of the walk of them behind them.
 	const bytes: number[] = [];
 	let left = value;
 	while (left > 0n) {
@@ -47,10 +40,6 @@ function pickleString(value: string): number[] {
 	return [0x55, bytes.length, ...bytes];
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the kind of the places of the picture of the walk of them, standing of the places of the picture of the
- * walk of the places of the picture of the places of the picture of the walk of the places of the picture of
- * the kind of the places of the picture of the walk of them. */
 function pickleIndex(
 	places: { name: string; offset: bigint; size: bigint; head?: Buffer }[],
 ): Buffer {
@@ -71,7 +60,6 @@ function pickleIndex(
 	return Buffer.from(out);
 }
 
-/** The places of the picture of the walk of the places of the picture of the engine of the kind of Ren'Py. */
 function archive(options: {
 	places: { name: string; offset: bigint; size: bigint; head?: Buffer }[];
 	key: number;
@@ -79,11 +67,6 @@ function archive(options: {
 	version?: number;
 	indexText?: string;
 }): Buffer {
-	// The places of the picture of the walk of the places of the picture of the place of the picture of the
-	// walk of them, and of the places of the picture of the walk of the places of the picture of the place of
-	// the picture of the walk of them, stand of the places of the picture of the walk of the places of the
-	// picture of the word of the walk of the places of the picture of the head of the picture of the walk of
-	// them.
 	const index = deflateSync(
 		pickleIndex(
 			options.places.map((place) => ({
@@ -97,9 +80,6 @@ function archive(options: {
 	const head = Buffer.alloc(HEAD_SIZE, 0x20);
 	head.write("RPA-", 0, "latin1");
 	head.writeUInt32LE(options.version ?? 0x20302e33, 4);
-	// The places of the picture of the walk of the places of the picture of the words of the walk of the
-	// picture stand behind the places of the picture of the walk of the places of the picture of the sound of
-	// the picture of the walk of the places of the picture.
 	head.write(
 		options.indexText ??
 			(HEAD_SIZE + options.data.length).toString(16).padStart(16, "0"),
@@ -125,11 +105,6 @@ describe("Ren'Py archive", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture", async () => {
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them, and of the places of the picture of the walk of the places of the picture of the place
-		// of the picture of the walk of them, stand of the places of the picture of the walk of the places of
-		// the picture of the word of the walk of the places of the picture of the head of the picture of the
-		// walk of them.
 		const key = 0x1a2b3c4d;
 		const data = Buffer.from([10, 20, 30, 40, 50, 60, 70, 80]);
 		const file = archive({
@@ -148,10 +123,6 @@ describe("Ren'Py archive", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture that stand before the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them", async () => {
-		// The places of the picture of the walk of the places of the picture that stand before the places of
-		// the picture of the walk of the places of the picture of the place of the picture of the walk of them
-		// stand beside the places of the picture of the walk of the places of the picture of the place of the
-		// picture of the walk of them of their own.
 		const head = Buffer.from([0x78, 0x9c]);
 		const data = Buffer.from([0xaa, 0xbb, 0xcc, 0xdd, 0xee]);
 		const file = archive({
@@ -202,9 +173,6 @@ describe("Ren'Py archive", () => {
 			indexText: (0x1000).toString(16).padStart(16, "0"),
 		});
 		expect(await readRpaIndex(farIndex, farIndex.length)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture stand of the kind of the places of the picture of the walk of them of no places of the
-		// picture of the walk of them.
 		const unknown = archive({
 			places: [{ name: "a.bin", offset: 0n, size: 2n }],
 			key: 0,
@@ -223,9 +191,6 @@ describe("Ren'Py archive", () => {
 
 	it("stands the places of the picture of the walk of the places of the picture out", async () => {
 		const data = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them stand at the places of the picture of the walk of them of the places of the picture of
-		// the walk of the places of the picture of the picture of their own.
 		const file = archive({
 			places: [
 				{ name: "script.rpyc", offset: BigInt(HEAD_SIZE), size: 4n },

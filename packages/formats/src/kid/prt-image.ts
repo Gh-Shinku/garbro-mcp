@@ -53,12 +53,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PrtFormat.ReadMetaData`: the word `PRT` with a nought behind it, the version at four as a word — of
- * which only `101` and `102` are read — the depth at six, the places of the palette and of the pixels at
- * eight and ten, the width and the height at twelve and fourteen, and a word at sixteen that says whether a
- * plane of fourth bytes stands behind the pixels. The second version carries a pair of offsets at `0x14`.
- */
 export function readPrtLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -228,7 +222,6 @@ export const kidPrtImageFormat: ArchiveFormat = defineFixedArchive({
 					hasAlpha: layout.hasAlpha,
 				},
 			}),
-			// The fourth bytes and the turn of the rows are taken out into a bitmap of this project's own.
 			sizeKnown: false,
 		};
 		return {

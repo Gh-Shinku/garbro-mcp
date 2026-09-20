@@ -11,9 +11,6 @@ import {
 const MARK = ".8Bit\x8d\x5d\x8c\xcb\x00";
 const HEAD_SIZE = 0x1a;
 
-/** The places of the walk of a picture stand in the places of the picture of every place of the walk of the
- * picture, the first place of the walk of a picture standing in the place behind the first place of the picture
- * of the walk of it. */
 function pack(bits: readonly number[]): Buffer {
 	const out = Buffer.alloc(Math.ceil(bits.length / 8));
 	bits.forEach((bit, at) => {
@@ -23,13 +20,10 @@ function pack(bits: readonly number[]): Buffer {
 	return out;
 }
 
-/** The places of the walk of a picture of the count of them stand as the places of the walk of the picture of
- * the count of them, the first place standing above the places of the walk of the count. */
 function placesOfWalk(value: number): number[] {
 	return Array.from({ length: 8 }, (_, i) => (value >> (7 - i)) & 1);
 }
 
-/** `BitReader.CountBits`: the count of the places of the walk of a picture of the count of them. */
 function countOfWalk(count: number): number[] {
 	let bits = 0;
 	let least = count;
@@ -65,8 +59,6 @@ function buildPicture(options: {
 	return Buffer.concat([head, palette, walk]);
 }
 
-/** The places of the picture of the test: every place of the walk of the picture stands as a place of the
- * picture of its own, so the places of the picture stand as the places of the picture of the walk of them. */
 const LITERALS = [0, 1, 2, 3, 3, 2, 1, 0];
 
 function literalBits(pixels: readonly number[]): number[] {
@@ -90,8 +82,6 @@ describe("Active Soft indexed image format", () => {
 			width: 4,
 			height: 2,
 			paletteSize: 4,
-			// The places of the walk of the picture of the test stand as the places of the picture of the
-			// places of the walk of them, of which there stand one and seventy places of the walk.
 			compSize: Math.ceil((8 + 7 * 9) / 8),
 			dataOffset: HEAD_SIZE,
 		});
@@ -107,8 +97,6 @@ describe("Active Soft indexed image format", () => {
 		const wrongMark = Buffer.from(good);
 		wrongMark.write(".8Biu", 0, "latin1");
 		expect(readEd8Layout(wrongMark, wrongMark.length)).toBeUndefined();
-		// The places of the palette of a picture of this kind stand as the places of a picture of the places of
-		// a picture of a kind of its own at the most.
 		const many = Buffer.from(good);
 		many.writeInt32LE(0x101, 0x12);
 		expect(readEd8Layout(many, many.length)).toBeUndefined();
@@ -119,7 +107,6 @@ describe("Active Soft indexed image format", () => {
 	});
 
 	it("walks the places of the pictures of the test", () => {
-		// Every place of the walk of the picture stands as a place of the picture of its own.
 		const file = buildPicture({
 			width: 4,
 			height: 2,
@@ -130,17 +117,12 @@ describe("Active Soft indexed image format", () => {
 		if (!layout) throw new Error("no layout");
 		const { pixels, palette } = unpackEd8Picture(file, layout);
 		expect(pixels).toEqual(Buffer.from(LITERALS));
-		// The places of the palette of a picture of this kind stand as the places of the picture of the words
-		// of a picture of the engine, so the places of the picture stand behind the places of the picture.
 		expect(palette).toEqual(
 			Buffer.from([1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0]),
 		);
 	});
 
 	it("walks the places of a picture whose places of the walk stand beside them", () => {
-		// A place of the walk of the picture stands for the places of the picture of the count of them, and the
-		// places of the picture of the walk of the picture stand for the places of the picture of the count of
-		// the walk of the picture of the two places of their own.
 		const bits = placesOfWalk(5);
 		bits.push(0);
 		bits.push(0, 0);
@@ -176,11 +158,8 @@ describe("Active Soft indexed image format", () => {
 		expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 		expect(bmp.readUInt16LE(0x1c)).toBe(8);
 		expect(bmp.readInt32LE(0x12)).toBe(4);
-		// The places of a picture of this kind stand from the first place of it rather than from the last.
 		expect(bmp.readInt32LE(0x16)).toBe(-2);
 		expect(bmp.readUInt32LE(0x2e)).toBe(0x100);
-		// A place of the palette of the picture stands as the places of the picture of the words of a picture
-		// of the engine, which stand as the places of the picture of the background of the places behind them.
 		expect(bmp.subarray(0x36, 0x46)).toEqual(
 			Buffer.from([1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0]),
 		);
@@ -194,8 +173,6 @@ describe("Active Soft indexed image format", () => {
 	});
 
 	it("turns a walk of the places of a picture that stands past the places of it away", () => {
-		// A walk of the places of a picture that stands for the places of the picture of the count of them and
-		// stands past the places of the picture of the walk of it stands away.
 		const bits = placesOfWalk(1);
 		bits.push(0);
 		bits.push(0, 0);

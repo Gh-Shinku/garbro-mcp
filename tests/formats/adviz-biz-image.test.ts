@@ -15,11 +15,8 @@ const WALK_START = 0x39;
 const PALETTE_SIZE = 0x300;
 const PALETTE_PLACES = 0x100;
 
-/** The places of the picture of the test, of four places by two. */
 const PLACES = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0xff, 0x7f, 0x10]);
 
-/** The places of the picture of the test as they stand in the file: every place standing beside the place of
- * the walk of the picture and the place of the walk changing as the places are walked. */
 function storePlaces(places: Buffer): Buffer {
 	const stored = Buffer.alloc(places.length);
 	let walk = WALK_START;
@@ -38,7 +35,6 @@ function buildPicture(width = 4, height = 2, places = PLACES): Buffer {
 	return Buffer.concat([head, storePlaces(places)]);
 }
 
-/** The table of the words of the places of a picture: one record of eight words and four words behind them. */
 function groupTable(nameWordField: string, extension: string): Buffer {
 	const record = Buffer.alloc(12, 0x00);
 	record.write(nameWordField, 0, "latin1");
@@ -66,8 +62,6 @@ describe("ADVIZ engine image format", () => {
 	});
 
 	it("turns away a picture whose places do not stand for it", () => {
-		// The reference stands a picture away where the places behind its head do not stand for a picture of
-		// the places of its head.
 		const short = Buffer.concat([
 			buildPicture().subarray(0, HEAD_SIZE),
 			Buffer.alloc(7),
@@ -122,12 +116,8 @@ describe("ADVIZ engine image format", () => {
 				expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 				expect(bmp.readUInt16LE(0x1c)).toBe(8);
 				expect(bmp.readInt32LE(0x12)).toBe(4);
-				// The reference stands the places of a picture of this kind from the last place of it rather
-				// than from the first, so the rows stand from the foot of the picture upwards.
 				expect(bmp.readInt32LE(0x16)).toBe(2);
 				expect(bmp.readUInt32LE(0x2e)).toBe(PALETTE_PLACES);
-				// The palette: the first place of a place of the palette stands for the places of the picture
-				// and the last one for the places behind it.
 				expect(bmp.readUInt8(0x36)).toBe(0x22);
 				expect(bmp.readUInt8(0x37)).toBe(0x11);
 				expect(bmp.readUInt8(0x38)).toBe(0x00);
@@ -135,8 +125,6 @@ describe("ADVIZ engine image format", () => {
 				expect(bmp.readUInt8(0x36 + 12)).toBe(0x22);
 				expect(bmp.readUInt8(0x36 + 13)).toBe(0x11);
 				expect(bmp.readUInt8(0x36 + 14)).toBe(0x03);
-				// The places of the picture stand in the file in the order the picture stands them, the
-				// places of the picture standing from the foot of it upwards.
 				expect(bmp.subarray(0x436)).toEqual(PLACES);
 			},
 		);

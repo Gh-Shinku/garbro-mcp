@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Sas5/ArcWAR.cs", classes `WarOpener` and `War2Opener` (a sound archive
-// of the SAS5 engine: the head names how many places the index stands in and how many places every one of them
-// stands in, every place of the index naming where the places of a file of the archive stand, how much of it
-// stands, and the kind of the sound it stands for). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveEntry,
@@ -16,22 +10,18 @@ import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import { createFixedEntry } from "../shared/fixed-archive.js";
 
-/** The words a sound of this kind stands behind, and the words beside them that name the index. */
 const MARK = Buffer.from("war ", "latin1");
 const SECOND_MARK = Buffer.from("war2", "latin1");
 const COUNT_FIELD = 0x08;
 const ENTRY_SIZE_FIELD = 0x0c;
 const INDEX_OFFSET = 0x10;
 const MINIMUM_ENTRY_SIZE = 0x18;
-/** Where the places of a place of the index stand. */
 const OFFSET_FIELD = 0x00;
 const SIZE_FIELD = 0x04;
 const FORMAT_FIELD = 0x14;
 /** The kinds of sound the head names: a sound that stands as places of a wave, and a sound of the Ogg kind. */
 const WAVE_KIND = 0;
 const OGG_KIND = 2;
-/** The words a wave stands behind, which the reference writes around the places of a sound of the first kind,
- * and the words of the places the wave stands for. */
 const RIFF = Buffer.from("RIFF", "latin1");
 const WAVE = Buffer.from("WAVE", "latin1");
 const FORMAT_WORD = Buffer.from("fmt ", "latin1");
@@ -95,11 +85,6 @@ export function warEntryName(
 	return name;
 }
 
-/**
- * `WarOpener.OpenWavEntry`: the places of a sound of the first kind stand behind the places of the wave it
- * stands for and the places that name how the places of the sound stand, and the reference writes the words of
- * a wave around them as they stand rather than reading them.
- */
 export function openWarWave(data: Buffer, entry: WarEntry): Buffer {
 	if (entry.size < WAVE_HEAD_FIELDS) {
 		throw invalidArchive("SAS5 sound is cut short of its own head");

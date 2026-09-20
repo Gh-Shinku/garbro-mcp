@@ -1,27 +1,8 @@
-// Reference: GARbro "ArcFormats/AZSys/ArcEncrypted.cs", the class `Isaac64Cipher`. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The places of the picture of the walk of the places of the picture of the sound of the places of the picture
-// of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
-// places of the picture of the walk of the places of the picture that stand of the places of the picture of the
-// walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of
-// the places of the picture of the walk of the places of the picture of the second and of the sixth places of
-// the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
-// the places of the picture, standing of the places of the picture of the walk of the places of the picture of
-// the kind of the places of the picture of the walk of the places of the picture of the kind of the places of
-// the picture of the walk of them of the places of the picture of the walk of them.
-
 const WORDS = 0x100;
 const SEED_MULTIPLIER = 0x9e370001;
 const FILL_MULTIPLIER = 0x61c88647;
 const GOLDEN = 0x9e3779b97f4a7c13n;
 
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture of the two places of the picture of the walk of them of the places
- * of the picture of the walk of the places of the picture of the places of the picture of the walk of the
- * places of the picture stand of the places of the picture of the walk of the places of the picture of the kind
- * of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of them. */
 function wrap(value: bigint): bigint {
 	return BigInt.asUintN(64, value);
 }
@@ -30,17 +11,6 @@ function shiftRight(value: bigint, count: bigint): bigint {
 	return BigInt.asUintN(64, value) >> count;
 }
 
-/**
- * `Isaac64Cipher`: the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of the places of the picture of the words of the walk of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the sixth and of the
- * fourth places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of the places of the picture of the sound, standing of the places of the picture of the
- * walk of the places of the picture of the kind of the places of the picture of the walk of the places of the
- * picture of the words of the walk of the places of the picture of the walk of them of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of the places of the picture.
- */
 export class Isaac64 {
 	readonly #entropy: bigint[] = new Array<bigint>(WORDS).fill(0n);
 	readonly #state: bigint[] = new Array<bigint>(WORDS).fill(0n);
@@ -58,12 +28,6 @@ export class Isaac64 {
 	#h = 0n;
 
 	constructor(seed: number) {
-		// The reference stands the places of the picture of the walk of the places of the picture of the sound
-		// of the places of the picture of the walk of the places of the picture through the places of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-		// of them of the places of the picture of the walk of the places of the picture of the second and of the
-		// sixth places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture.
 		const words = new Uint32Array(2 * WORDS);
 		words[0] = (seed ^ SEED_MULTIPLIER) >>> 0;
 		for (let i = 1; i < 2 * WORDS; i += 1) {
@@ -79,9 +43,6 @@ export class Isaac64 {
 		this.init();
 	}
 
-	/** The places of the picture of the walk of the places of the picture of the words of the walk of the places
-	 * of the picture of the walk of them of the places of the picture of the walk of the places of the picture
-	 * of the places of the picture of the walk of the places of the picture. */
 	#mix(): void {
 		this.#a = wrap(this.#a - this.#e);
 		this.#f ^= shiftRight(this.#h, 9n);
@@ -109,10 +70,6 @@ export class Isaac64 {
 		this.#g = wrap(this.#g + this.#h);
 	}
 
-	/** `Isaac64Cipher.Init`: the places of the picture of the walk of the places of the picture of the kind of
-	 * the places of the picture of the walk of the places of the picture of the words of the walk of the places
-	 * of the picture of the walk of them of the places of the picture of the walk of the places of the picture
-	 * of the places of the picture of the walk of the places of the picture. */
 	private init(): void {
 		this.#aa = 0n;
 		this.#bb = 0n;
@@ -213,21 +170,7 @@ export class Isaac64 {
 		}
 	}
 
-	/** `Isaac64Cipher.GetRand32`: the places of the picture of the walk of the places of the picture of the
-	 * sound of the places of the picture of the walk of the places of the picture of the fourth places of the
-	 * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
-	 * the places of the picture of the next places of the picture of the walk of the places of the picture. */
 	nextUint32(): number {
-		// The reference stands the places of the picture of the walk of the places of the picture of the sound
-		// of the places of the picture of the walk of the places of the picture of the places of the picture of
-		// the walk of them of the places of the picture of the walk of the places of the picture of the
-		// reference where the places of the picture of the walk of the places of the picture of the kind of the
-		// places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture stand of no places of the picture of the walk of the
-		// places of the picture of their own beside them, so a picture of this project stands them of the
-		// places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of the places of the picture of the walk of the
-		// places of the picture of their own.
 		const current = this.#count;
 		this.#count = current - 1;
 		if (current === 0) {

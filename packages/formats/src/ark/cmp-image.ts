@@ -1,8 +1,3 @@
-// Format reference: GARbro "Legacy/Ark/ImageCMP.cs", classes `CmpFormat`, `CmpMetaData` and `CmpReader` (an
-// Ark picture: three planes of five bits apiece, walked out of a tree of codes whose shape stands in the head
-// of the file as the weights of thirty two places, the places of a colour standing beside each other in the
-// planes). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -40,11 +35,9 @@ const LIMIT = 256 * 1024 * 1024;
 export interface CmpLayout {
 	width: number;
 	height: number;
-	/** Whether the file carries a shape of its own behind the head, which the walk of the picture does not read. */
 	hasAlpha: boolean;
 	alphaWidth: number;
 	alphaHeight: number;
-	/** The weights of the thirty two places of the tree of codes. */
 	frequencies: Uint32Array;
 	/** Where the walk of codes begins and how many bytes it stands in. */
 	dataOffset: number;
@@ -111,13 +104,6 @@ export function readCmpLayout(
 	};
 }
 
-/**
- * `CmpReader.BuildHuffmanTree`: the tree begins with the thirty two places of the picture, every one of them
- * weighing what the head says, and behind them as many places as stand between thirty two and two hundred and
- * fifty five, weighing nought apiece. The two places that weigh the least are then joined again and again —
- * where several weigh the same, the last of them in the order they stand in — until one place is left, which
- * is the root of the tree: the first of the two places joined is its left and the second its right.
- */
 export function buildCmpTree(frequencies: Uint32Array): CmpNode {
 	const tree: CmpNode[] = [];
 	for (let symbol = 0; symbol < SYMBOLS; symbol += 1) {
@@ -189,11 +175,6 @@ function unpackCmpPlanes(
 	}
 }
 
-/**
- * `CmpReader.Unpack`: the places of the three planes of the picture stand behind each other, as many of them
- * as the picture is wide and high. Every place of a colour is then taken from the three planes — five places
- * of blue, then five of green and five of red — and the rows of the picture stand from its bottom edge up.
- */
 export function decodeCmp(data: Buffer, layout: CmpLayout): Buffer {
 	const planeSize = layout.width * layout.height;
 	const planes = new Uint8Array(planeSize * 3);

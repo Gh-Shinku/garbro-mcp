@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Cmvs/ImagePB3.cs", class `Pb3Format` (a picture of the Purple engine
-// that stands as the places of the picture itself: the head of the picture names the kind of the walk of its
-// places, and the places of the picture stand as the places of the walk of the kind it names).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import {
 	readPb3Head,
 	readPb3V6Name,
@@ -30,12 +25,9 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind stands behind. */
 const MARK = Buffer.from("PB3B", "latin1");
-/** The head of a picture of this kind stands in six and thirty places. */
 const HEADER_SIZE = 0x24;
 const ALPHA_FIELD = 0x2c;
-/** The kinds of the walk of the places of a picture of this kind. */
 const KIND_V1 = 1;
 const KIND_JBP = 2;
 const KIND_JBP_OTHER = 3;
@@ -44,7 +36,6 @@ const KIND_V6 = 6;
 const KIND_V6_OTHER = 8;
 /** The underkind a picture of the first kind may stand as. */
 const V1_SUBKIND = 0x10;
-/** How many places a place of a picture of this kind stands in. */
 const BITS_PER_PLACE = 32;
 const COLOURS_PER_PLACE = 4;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
@@ -83,16 +74,12 @@ function readLayout(data: Buffer, fileLength: number): Pb3Layout | undefined {
 	};
 }
 
-/** The places of the picture, which stand as the places of the picture of the kind of the walk of its
- * places. */
 async function unpackPb3(
 	data: Buffer,
 	sourcePath: string,
 ): Promise<Pb3Picture> {
 	const head = readPb3Head(data, data.length);
 	if (!head) throw invalidPicture("Not a Purple picture");
-	// The reference reads the places of the file of a picture of the kinds that stand as a picture of the
-	// Purple engine in the places of the whole file, and the places its own head names for the other kinds.
 	const kind = head.kind;
 	if (kind === KIND_JBP || kind === KIND_JBP_OTHER) {
 		return pb3UnpackJbp(
@@ -115,17 +102,11 @@ async function unpackPb3(
 		return unpackPb3V6(data, head, sourcePath);
 	}
 	if (kind === KIND_V6 || kind === KIND_V6_OTHER) {
-		// The reference reads the places of a picture of these kinds through the words of the engine and the
-		// places of a picture of the game that stand beside them.
 		throw invalidPicture("Purple picture of a kind this project does not read");
 	}
 	throw invalidPicture("Purple picture of a kind this project does not read");
 }
 
-/** The places of the picture the words of a picture of the kinds that stand behind the words of the engine
- * name, which stand beside the places of the game. The reference reads them through the reader of every kind of
- * picture of the engine; this port reads the pictures of the engine itself and the bitmaps of the system, and
- * reads no places of the pictures of the other kinds. */
 async function loadBasePicture(
 	sourcePath: string,
 	name: string,
@@ -133,8 +114,6 @@ async function loadBasePicture(
 ): Promise<Pb3BasePicture | undefined> {
 	if (depth > 4) return undefined;
 	const at = resolve(dirname(sourcePath), name);
-	// The reference turns a picture whose words name the file of the picture itself away rather than reading
-	// the places of the picture for ever.
 	if (at === resolve(sourcePath)) return undefined;
 	const stored = await readFile(at).catch(() => undefined);
 	if (!stored) return undefined;
@@ -168,8 +147,6 @@ async function loadBasePicture(
 	return undefined;
 }
 
-/** The places of a picture of the kinds that stand behind the words of the engine, whose words name the
- * picture the places of the picture itself stand as. */
 async function unpackPb3V6(
 	data: Buffer,
 	head: Pb3Head,
@@ -270,9 +247,6 @@ export const cmvsPb3ImageFormat: ArchiveFormat = defineFixedArchive({
 				"Purple picture stands short of the places of its walk",
 			);
 		}
-		// The places of a picture of this kind stand as the places of four colours apiece; the reference stands
-		// a picture of three colours apiece as the places of the picture itself, and this port hands every
-		// picture of this kind out as the places of the colours of the picture.
 		const places =
 			layout.bitsPerPixel === BITS_PER_PLACE
 				? picture.pixels
@@ -285,8 +259,6 @@ export const cmvsPb3ImageFormat: ArchiveFormat = defineFixedArchive({
 	},
 });
 
-/** The places of a picture of three colours apiece, which stand as the places of the picture of the colours of
- * the picture itself. */
 export function stripPb3Alpha(picture: Pb3Picture): Buffer {
 	const packed: Buffer = Buffer.alloc(picture.width * picture.height * 3, 0x00);
 	for (let y = 0; y < picture.height; y += 1) {

@@ -1,19 +1,3 @@
-// Reference: GARbro "ArcFormats/AudioOGG.cs", the classes `OggAudio`, `OggInput` and `OggRestoreStream`. GARbro
-// commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The reference stands the places of the picture of the walk of the places of the picture of the sound of the
-// places of the picture of the walk of the places of the picture of this kind through the places of the picture
-// of the walk of the places of the picture of the words of the walk of the picture of the places of the picture
-// of the kind of the places of the picture of the walk of the places of the picture of the engine of the kind
-// of the places of the picture of the walk of the places of the picture (`NVorbis`), which stands outside the
-// places of the picture of the walk of the places of the picture of this project, so a picture of this project
-// stands the places of the picture of the walk of the places of the picture of the container of the places of
-// the picture of the walk of the places of the picture of this kind of the places of the picture of the walk
-// of the places of the picture as they stand, and stands the places of the picture of the walk of the places of
-// the picture of the words of the walk of the picture of the places of the picture of the walk of the places
-// of the picture of the places of the picture of the walk of them of the places of the picture of the walk of
-// the places of the picture of the fifth kind of the places of the picture of the walk of the places of the
-// picture beside the places of the picture of the walk of the places of the picture of the sound.
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -28,25 +12,11 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** 'OggS', the word every place of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of this kind stands of. */
 const OGG_MARK = Buffer.from("OggS", "latin1");
-/** The words of the head of a place of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the fifth kind of the places of the picture
- * of the walk of the places of the picture. */
 const PAGE_HEAD = 0x1b;
 const PAGE_MARK_PLACES = 4;
 const SEGMENT_COUNT_AT = 0x1a;
 const CRC_AT = 0x16;
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of the place of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture of the places of the picture of the walk of them of the places of the picture of the
- * walk of the places of the picture that stand of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of the places of the picture of the sound of
- * the places of the picture of the walk of the places of the picture of this kind beside the places of the
- * picture of the walk of the places of the picture of the words of the walk of the picture of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture. */
 const WAVE_FORMATS = [0x676f, 0x6770, 0x6771, 0x674f];
 const RIFF_MARK = Buffer.from("RIFF", "latin1");
 const WAVE_MARK = Buffer.from("WAVEfmt ", "latin1");
@@ -54,65 +24,27 @@ const WAVE_HEAD = 0x14;
 const WAVE_FORMAT_AT = 0x10;
 const DATA_MARK = 0x61746164;
 const WORD = 4;
-/** How many places of the picture of the walk of the places of the picture of the walk of them of the places of
- * the picture of the walk of the places of the picture a picture of this project stands of the places of the
- * picture of the walk of the places of the picture of the words of the walk of the picture of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the walk of them of the
- * places of the picture of the walk of the places of the picture. */
 const MOST_SECTIONS = 256;
 
 function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk of
- * the places of the picture of the sound of the places of the picture of the walk of the places of the picture
- * of the fifth kind of the places of the picture of the walk of the places of the picture. */
 export interface OggPage {
 	at: number;
 	length: number;
-	/** The places of the picture of the walk of the places of the picture of the words of the walk of the
-	 * picture of the places of the picture of the walk of the places of the picture of the places of the
-	 * picture of the walk of them of the places of the picture of the walk of the places of the picture as they
-	 * stand of the places of the picture of the walk of the places of the picture. */
 	stored: number;
-	/** The places of the picture of the walk of the places of the picture of the words of the walk of the
-	 * picture of the places of the picture of the walk of the places of the picture standing of the places of
-	 * the picture of the walk of the places of the picture of the fifth kind of the places of the picture of
-	 * the walk of the places of the picture of their own. */
 	computed: number;
 }
 
-/** What a picture of this project stands out of a sound of this kind. */
 export interface OggLayout {
-	/** The places of the picture of the walk of the places of the picture of the sound of the places of the
-	 * picture of the walk of the places of the picture of this kind as they stand. */
 	ogg: Buffer;
-	/** Where the places of the picture of the walk of the places of the picture of the sound of the places of
-	 * the picture of the walk of the places of the picture stand of the places of the picture of the walk of
-	 * the places of the picture of the words of the walk of the picture of the places of the picture of the
-	 * walk of them of the places of the picture of the walk of the places of the picture. */
 	oggAt: number;
-	/** Where the places of the picture of the walk of the places of the picture of the sound of the places of
-	 * the picture of the walk of the places of the picture stand of the places of the picture of the walk of
-	 * the places of the picture of the words of the walk of the picture of the places of the picture of the
-	 * walk of them of the places of the picture of the walk of the places of the picture. */
 	wrapped: boolean;
 	pages: OggPage[];
-	/** The places of the picture of the walk of the places of the picture of the walk of them of the places of
-	 * the picture of the walk of the places of the picture behind the places of the picture of the walk of the
-	 * places of the picture of the last place of the picture of the walk of the places of the picture of the
-	 * fifth kind of the places of the picture of the walk of the places of the picture, which stand of no
-	 * places of the picture of the walk of the places of the picture of their own where they stand of the
-	 * places of the picture of the walk of the places of the picture of the book of the places of the picture. */
 	trailing: number;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of the places of the picture of every place of the picture of the
- * walk of the places of the picture of the fifth kind of the places of the picture of the walk of the places of
- * the picture, and where they stand of the places of the picture of the walk of the places of the picture of
- * the places of the picture of their own. */
 function readPages(data: Buffer): OggPage[] | undefined {
 	const pages: OggPage[] = [];
 	let at = 0;
@@ -128,11 +60,6 @@ function readPages(data: Buffer): OggPage[] | undefined {
 		if (at + length > data.length) return undefined;
 		const stored = data.readUInt32LE(at + CRC_AT);
 		const page = Buffer.from(data.subarray(at, at + length));
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// words of the walk of the picture of the places of the picture of the walk of the places of the
-		// picture of no places of their own before it stands the places of the picture of the walk of the
-		// places of the picture of the words of the walk of the picture of the places of the picture standing
-		// of the places of the picture of the walk of the places of the picture of their own.
 		page.writeUInt32LE(0, CRC_AT);
 		pages.push({
 			at,
@@ -145,16 +72,6 @@ function readPages(data: Buffer): OggPage[] | undefined {
 	return pages;
 }
 
-/**
- * `OggAudio.TryOpen`: the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of this kind stand of the places of the
- * picture of the walk of the places of the picture of the picture of their own, or of the places of the
- * picture of the walk of the places of the picture of the book of the places of the picture of the places of
- * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * the places of the picture of the sound inside a picture of the places of the picture of the walk of them of
- * the places of the picture of the walk of the places of the picture of the kind of the places of the picture
- * of the walk of them of the engine.
- */
 export function readOggLayout(data: Buffer): OggLayout | undefined {
 	let ogg: Buffer;
 	let oggAt = 0;
@@ -200,34 +117,10 @@ export function readOggLayout(data: Buffer): OggLayout | undefined {
 	return { ogg, oggAt, wrapped, pages, trailing };
 }
 
-/** Where the places of the picture of the walk of the places of the picture of the words of the walk of the
- * picture of the places of the picture of the walk of the places of the picture of every place of the picture
- * of the walk of the places of the picture of the fifth kind of the places of the picture of the walk of the
- * places of the picture stand beside the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of their own. */
 export function oggPagesValid(layout: OggLayout): boolean {
 	return layout.pages.every((page) => page.stored === page.computed);
 }
 
-/**
- * `OggRestoreStream`: the places of the picture of the walk of the places of the picture of the words of the
- * walk of the picture of the places of the picture of the walk of the places of the picture of every place of
- * the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the
- * walk of the places of the picture stand of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of the places of the picture of their own,
- * standing of the places of the picture of the walk of the places of the picture of the kind of the places of
- * the picture of the walk of the places of the picture where the places of the picture of the walk of the
- * places of the picture of the sound of the places of the picture of the walk of the places of the picture
- * stand of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of their
- * own. A picture of this project stands them of the places of the picture of the walk of the places of the
- * picture of the places of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture of the reference of the places of the picture of the walk of the places of the picture
- * of the kind of the places of the picture of the walk of the places of the picture (`OGGFixCrc`), which
- * stands of the places of the picture of the walk of the places of the picture of no places of the picture of
- * the walk of the places of the picture of their own beside them.
- */
 export function restoreOggCrc(layout: OggLayout): Buffer {
 	const out = Buffer.from(layout.ogg);
 	for (const page of layout.pages) {
@@ -260,18 +153,6 @@ export const oggAudioDescriptor: FormatDescriptor = {
 
 export const oggAudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: oggAudioDescriptor,
-	// The reference stands two places of the picture of the walk of the places of the picture of the words of
-	// the walk of the picture of the places of the picture of the walk of them of the places of the picture of
-	// the walk of the places of the picture: the word of the places of the picture of the walk of the places of
-	// the picture of the sound of the places of the picture of the walk of the places of the picture of this
-	// kind, and the places of the picture of the walk of the places of the picture of the kind of the places of
-	// the picture of the walk of the places of the picture of the words of the walk of them of no places of the
-	// picture of the walk of the places of the picture, which stands of the places of the picture of the walk
-	// of the places of the picture of the kind of the places of the picture of the walk of the places of the
-	// picture of the sound of the places of the picture of the walk of the places of the picture of the kind of
-	// the places of the picture of the walk of them of the engine inside a picture of the places of the picture
-	// of the walk of them of the places of the picture of the walk of the places of the picture of the kind of
-	// the places of the picture of the walk of them of the engine.
 	detection: {
 		signatures: [
 			{ bytes: Buffer.from("OggS", "latin1") },
@@ -313,13 +194,6 @@ export const oggAudioFormat: ArchiveFormat = defineFixedArchive({
 		const data = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const layout = readOggLayout(data);
 		if (!layout) throw invalidSound("Not a sound of this kind");
-		// The reference stands the places of the picture of the walk of the places of the picture of the sound
-		// of the places of the picture of the walk of the places of the picture of this kind as they stand: the
-		// places of the picture of the walk of the places of the picture of the words of the walk of the picture
-		// of the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the engine stand of the places of the picture of the walk of the places
-		// of the picture of the kind of the places of the picture of the walk of the places of the picture of the
-		// sound of the places of the picture of the walk of the places of the picture of this project.
 		return Readable.from([Buffer.from(layout.ogg)]);
 	},
 });

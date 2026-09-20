@@ -1,11 +1,5 @@
-// Format reference: GARbro "ArcFormats/AdvSys/ImageGR2.cs", class `PolaReader` (the walk of the places of a
-// picture of the compressed kind of the engine: the places of the walk of the picture and the places of the
-// picture they stand for stand in the same stream, the places of the walk standing as the places of the words
-// of the stream and the places of the picture standing beside them).
-
 import { GarbroError } from "@garbro-mcp/core";
 
-/** The walk of the places of a picture stands two places short of the places of the picture it stands for. */
 export const POLA_TAIL = 2;
 const LEAST_MATCH_PLACES = 3;
 const COPY_PLACES = 2;
@@ -19,12 +13,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PolaReader`: the walk of the places of a picture. The places of the walk of the picture stand in the words
- * of the stream, sixteen places of the walk to a word, and the places of the picture stand beside them: a place
- * of the walk that stands names a place of the picture that stands for itself, and a place of the walk that
- * stands clear names a place of the picture that stands for the places behind it.
- */
 class PolaReader {
 	private readonly data: Buffer;
 	private position = 0;
@@ -37,12 +25,9 @@ class PolaReader {
 		this.data = data;
 	}
 
-	/** `PolaReader.NextBit`: the place of the walk behind the places of the walk read of it. */
 	private nextBit(): number {
 		const bit = this.bits & 1;
 		this.bits >>= 1;
-		// A word of the walk of a picture stands for sixteen places of the walk, so the word behind it stands
-		// in the stream where the places of the walk of it have been read.
 		if (this.bits === 1) this.bits = this.readWord() | 0x10000;
 		return bit;
 	}
@@ -67,12 +52,6 @@ class PolaReader {
 		return byte;
 	}
 
-	/**
-	 * The count of the places of a walk of a picture that stands for the places behind it: the places of the
-	 * count stand as the places of the walk of the count of them, the shortest counts of three places standing
-	 * as the first places of the walk of the count and the longest ones standing as the places of the picture of
-	 * the count of its own.
-	 */
 	private readMatchCount(): number {
 		if (this.nextBit() !== 0) return LEAST_MATCH_PLACES;
 		if (this.nextBit() !== 0) return 4;
@@ -137,13 +116,7 @@ class PolaReader {
 						}
 					}
 				}
-				// The places of the walk of a picture stand for the places of the picture standing behind the
-				// place of the walk that stands for itself, which the places of the walk of a picture stand for
-				// as well.
 				offset -= count;
-				// The words of the count of the places of a walk of a picture stand beside each other in the
-				// stream, so the words of the walk of a picture stand alike and stand apart by the places of the
-				// walk they stand for.
 				count = this.readMatchCount();
 				if (dst + count > size) count = size - dst;
 				this.copyOverlapped(dst + offset, dst, count);
@@ -168,7 +141,6 @@ class PolaReader {
 	}
 }
 
-/** `PolaReader`: the places of a picture of the compressed kind of the engine, walked. */
 export function unpackPolaPicture(data: Buffer, unpackedSize: number): Buffer {
 	if (unpackedSize < 0)
 		throw invalidPicture("The places of a picture of this kind stand nowhere");

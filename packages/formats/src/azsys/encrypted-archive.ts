@@ -1,7 +1,3 @@
-// Reference: GARbro "ArcFormats/AZSys/ArcEncrypted.cs", the classes `ArcEncryptedOpener`, `EncryptionScheme`,
-// `AzArchive` and the walks of the places of the picture of the walk of the places of the picture of the words of
-// the walk of the places of the picture of the walk of them shared by both kinds (`ArcEncryptedBase`). GARbro
-// commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -28,10 +24,6 @@ import {
 	type AzIsaacEntry,
 } from "./isaac-archive.js";
 
-/** The words of the head of a picture of this kind and the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
- * of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture of the places of the picture of the walk of the places of the picture. */
 const HEAD_SIZE = 0x30;
 const ARC_MARK = "ARC\0";
 const ASB_MARK = "ASB\0";
@@ -44,11 +36,6 @@ const CHECKSUM_HEAD = 4;
 const ASB_HEAD = 0x10;
 const ADLER_HEAD = 4;
 const WORD = 4;
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
- * walk of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture of their own. */
 export const AZ_DEFAULT_SEED = [0x2f4d7dfe, 0x47345292, 0x1ba5fe82, 0x7bc04525];
 const SEED_WORDS = 4;
 const SEED_BYTES = 0x10;
@@ -63,21 +50,11 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `Binary.RotL (ulong, int)`: the places of the picture of the walk of the places of the picture of the sound of
- * the places of the picture of the walk of the places of the picture of the places of the picture of the walk of
- * the places of the picture of the sixth and of the fourth places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of the places of the picture of their own. */
 function rotateLeft64(value: bigint, count: number): bigint {
 	const at = BigInt(count & ROTATE_MASK);
 	return BigInt.asUintN(64, (value << at) | (value >> (64n - at)));
 }
 
-/** `EncryptionScheme.GenerateKey`: the places of the picture of the walk of the places of the picture of the
- * sound of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the walk of the places of the
- * picture of the words of the walk of the places of the picture of the walk of them of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of
- * the picture of the sound of the places of the picture of the walk of the places of the picture. */
 export function generateAzIndexKey(seed: number[]): number {
 	const bytes = Buffer.alloc(SEED_BYTES, 0x00);
 	for (let i = 0; i < SEED_WORDS; i += 1)
@@ -92,12 +69,6 @@ export function generateAzIndexKey(seed: number[]): number {
 	return (first ^ (~combined >>> 0)) >>> 0;
 }
 
-/** `EncryptionScheme.GenerateContentKey`: the places of the picture of the walk of the places of the picture of
- * the sound of the places of the picture of the walk of the places of the picture of the kind of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of the places of the picture of the fourth and of the sixth places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the
- * places of the picture of the sound of the places of the picture of the walk of the places of the picture. */
 export function generateAzContentKey(environment: Buffer): number {
 	const seed = new Array<number>(SEED_WORDS).fill(0);
 	const twister = new FastMersenneTwister(
@@ -110,24 +81,6 @@ export function generateAzContentKey(environment: Buffer): number {
 	return generateAzIndexKey(seed);
 }
 
-/** `ArcEncryptedBase.Decrypt` for the first kind: the places of the picture of the walk of the places of the
- * picture of the words of the walk of the places of the picture of the walk of the places of the picture stand
- * where the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
- * of the places of the picture of the walk of the places of the picture of the places of the picture of the walk
- * of the places of the picture stand of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the places of the picture of the
- * walk of the places of the picture of their own. The places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture stand of the places of the picture of the walk
- * of the places of the picture of the kind of the places of the picture of the walk of the places of the picture
- * of the words of the walk of the places of the picture of the walk of them of the places of the picture of the
- * walk of the places of the picture of the sixth and of the fourth places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of the places of the picture of
- * their own, so a picture of this project stands of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of the places of the picture of the last places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture. */
 export function decryptAz(data: Buffer, offset: number, key: number): void {
 	let hash = (BigInt(key >>> 0) * BigInt(ASB_KEY)) & MASK64;
 	if ((offset & ROTATE_MASK) !== 0) hash = rotateLeft64(hash, offset);
@@ -140,22 +93,6 @@ export function decryptAz(data: Buffer, offset: number, key: number): void {
 		data[i] = (data[i] ?? 0) ^ (cycle[(offset + i) % ROTATE_BITS] ?? 0);
 }
 
-/** `ArcEncryptedBase.UnpackData`: the places of the picture of the walk of the places of the picture of the
- * words of the walk of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture stand of the places of the picture of the walk
- * of the places of the picture of the kind of the places of the picture of the walk of the places of the picture
- * of the words of the walk of the places of the picture of the walk of them of the places of the picture of the
- * walk of the places of the picture of the kind of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of the places of the picture where they stand of
- * the places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of the places of the picture of the sound of the places of the picture of the walk of the places of
- * the picture of the places of the picture of the walk of the places of the picture, and of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of the places of the picture of
- * their own where they stand of no places of the picture of the walk of the places of the picture of the kind of
- * the places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture.
- */
 async function unpackAzData(data: Buffer, at: number): Promise<Buffer> {
 	const length = data.length - at;
 	if (length <= ADLER_HEAD) return Buffer.from(data.subarray(at));
@@ -166,33 +103,16 @@ async function unpackAzData(data: Buffer, at: number): Promise<Buffer> {
 	return Buffer.from(await inflateZlibBuffer(data.subarray(at + ADLER_HEAD)));
 }
 
-/** What a picture of this project stands out of a picture of this kind. */
 export interface AzEncryptedLayout {
 	entries: AzIsaacEntry[];
 	indexKey: number;
 	contentKey: number;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * picture of this kind. */
 export interface AzEncryptedEntry extends AzIsaacEntry {
-	/** Where the places of the picture of the walk of the places of the picture of the words of the walk of the
-	 * places of the picture of the walk of them of the places of the picture of the walk of the places of the
-	 * picture of the fifth kind of the places of the picture of the walk of the places of the picture stand of
-	 * the places of the picture of the walk of the places of the picture of the kind of the places of the
-	 * picture of the walk of the places of the picture of the words of the walk of the places of the picture of
-	 * the walk of them of the places of the picture of the walk of the places of the picture. */
 	sysenv: boolean;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture stand of
- * the places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of the places of the picture of the sound of the places of the picture of the walk of the places of
- * the picture behind the places of the picture of the walk of the places of the pictures of the head of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
- * walk of the places of the picture of the places of the picture of the walk of the places of the picture. */
 async function readIndex(
 	data: Buffer,
 	head: Buffer,
@@ -228,13 +148,6 @@ async function readIndex(
 	return parseAzIndex(index, count, HEAD_SIZE + indexLength, data.length);
 }
 
-/** `ArcEncryptedOpener.ReadSysenvSeed`: the places of the picture of the walk of the places of the picture of
- * the sound of the places of the picture of the walk of the places of the picture of the kind of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of the places of the picture stand of the places of the picture of the walk
- * of the places of the picture of the places of the picture of the walk of the places of the picture of the kind
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture. */
 async function readSysenvSeed(
 	data: Buffer,
 	entries: AzIsaacEntry[],
@@ -258,20 +171,6 @@ async function readSysenvSeed(
 	return generateAzContentKey(seed.subarray(0, SEED_BYTES));
 }
 
-/**
- * `ArcEncryptedOpener.TryOpen`: the reference stands the places of the picture of the walk of the places of the
- * picture of the words of the walk of the places of the picture of the walk of them of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of
- * the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of
- * the places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture (`53EA06EB` and `74F98F2F`), and stands the words of the head of the places of the picture of the
- * walk of the places of the picture of the kind of the places of the picture of the walk of the places of the
- * picture of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * sound, standing of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the first kind of the places of the picture
- * of the walk of the places of the picture of the places of the picture of the walk of the places of the picture.
- */
 export async function readAzEncryptedLayout(
 	data: Buffer,
 	sourcePath?: string,
@@ -311,17 +210,6 @@ export async function readAzEncryptedLayout(
 	return { entries, indexKey, contentKey };
 }
 
-/** `ArcEncryptedOpener.OpenEntry`: the places of the picture of the walk of the places of the picture of the
- * walk of the places of the picture of every place of the picture of the walk of the places of the picture of
- * the fifth kind of the places of the picture of the walk of the places of the picture stand of the places of
- * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * places of the picture of the places of the picture of the walk of the places of the picture of the kind of the
- * places of the picture of the walk of the places of the picture of the sound of the places of the picture of
- * the walk of the places of the picture of the words of the walk of the places of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture.
- */
 export async function unpackAzEncryptedEntry(
 	data: Buffer,
 	layout: AzEncryptedLayout,
@@ -368,15 +256,6 @@ export const azEncryptedArchiveDescriptor: FormatDescriptor = {
 
 export const azEncryptedArchiveFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: azEncryptedArchiveDescriptor,
-	// The reference stands two places of the picture of the walk of the places of the picture of the words of the
-	// walk of the places of the picture of the walk of them of the places of the picture of the walk of the
-	// places of the picture of the kind of the places of the picture of the walk of the places of the picture of
-	// the sound of the places of the picture of the walk of the places of the picture of the kind of the places of
-	// the picture of the walk of them, which stand of the places of the picture of the walk of the places of the
-	// picture of the kind of the places of the picture of the walk of the places of the picture of the head of
-	// the places of the picture of the walk of the places of the picture of the places of the picture of the walk
-	// of the places of the picture of the kind of the places of the picture of the walk of them of the places of
-	// the picture of the walk of the places of the picture of the sound.
 	detection: {
 		signatures: [
 			{ bytes: Buffer.from([0xeb, 0x06, 0xea, 0x53]) },

@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Cadath/ImageKGF.cs", classes `KgfFormat`, `KgfMetaData`,
-// `KgfDecoder` and `KgfDecoder.InputBuffer` (a picture of the Cadath engine whose places stand in one of six
-// kinds of the walk of the places of a picture, the places of the picture of the kinds of the walk of the
-// pictures of the engine standing as the places of the picture of the compression of them). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,29 +12,22 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file. */
 const MARK = Buffer.from("KGF", "latin1");
 const HEAD_SIZE = 0x1c;
 const WIDTH_FIELD = 4;
 const HEIGHT_FIELD = 8;
 const BPP_FIELD = 0xc;
 const MODE_FIELD = 0x10;
-/** The places of the walk of the places of a picture of the kinds of the walk of the places of the pictures of
- * the engine stand in the places of the picture of the words of the places of the picture of the walk of
- * them. */
 const PACKED_SIZE_FIELD = 0x24;
 const BITS_PER_PLACE = 8;
 const BITS_PER_PLACE_24 = 24;
 const BITS_PER_PLACE_32 = 32;
-/** The kinds of the walk of the places of a picture of this kind. */
 const MODE_RAW = 0;
 const MODE_CHANNELS = 1;
 const MODE_BITS = 2;
 const MODE_PACKED = 3;
 const MODE_PACKED_CHANNELS = 4;
 const MODE_PACKED_XOR = 5;
-/** The places of a picture of the kinds of the walk of the places of the picture of the compression of the
- * pictures of the engine of the places of the picture of the kinds of the walk of them. */
 const PACKED_BUFFER = 0x100;
 const PACKED_BUFFER_LONG = 0x200;
 const LEAST_RUN = 3;
@@ -58,10 +45,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `KgfFormat.ReadMetaData`: the words of the head of a picture of this kind name how wide and how tall it
- * stands, how many places a place of it stands in, and the kind of the walk of the places of it.
- */
 export function readKgfLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -79,12 +62,6 @@ export function readKgfLayout(
 	return { width, height, bitsPerPixel, mode, dataOffset: HEAD_SIZE };
 }
 
-/**
- * `KgfDecoder.InputBuffer`: the places of the walk of a picture of the places of the picture of the walk of
- * the places of the picture of the engine. The places of the picture of the walk of them stand as the places
- * of the picture of the places of the picture behind them, the places of the picture standing within the
- * places of a picture of every place of the picture of the walk of them.
- */
 class KgfInputBuffer {
 	private readonly ctlBits: Buffer;
 	private readonly data: Buffer;
@@ -99,8 +76,6 @@ class KgfInputBuffer {
 		return this.length >> 3;
 	}
 
-	/** `InputBuffer.ReadFrom`: the words of the walk of the places of a picture stand in the places of the
-	 * picture of the walk of them. */
 	readFromStream(input: Buffer, position: number): number {
 		const from = position;
 		if (from + this.byteLength > input.length)
@@ -111,21 +86,10 @@ class KgfInputBuffer {
 		return from + this.byteLength;
 	}
 
-	/** `InputBuffer.ReadFrom`: the words of the walk of the places of a picture stand as the places of the
-	 * picture of the places of the walk of the picture of the kind of the walk of the places of the picture of
-	 * the engine. */
 	readFromBuffer(input: Buffer): void {
 		input.copy(this.ctlBits, 0, 0, this.byteLength);
 	}
 
-	/**
-	 * `InputBuffer.Decode`: the places of the walk of a picture stand as the places of the picture of the
-	 * places of the walk of them where the places of the walk of the picture stand for the places of the
-	 * picture of no places of their own, and as the places of the picture of the words of the walk of the
-	 * picture behind them where they stand for the places of the picture of their own — the places of the
-	 * picture standing beside the places of the picture behind them of the places of the walk of the picture
-	 * before them.
-	 */
 	decode(
 		output: Buffer,
 		dstPos: number,
@@ -154,13 +118,6 @@ class KgfInputBuffer {
 	}
 }
 
-/**
- * `KgfDecoder.Decompress`: the places of the picture stand as the places of a picture of the walk of the
- * places of the picture of the kind of the walk of a picture of the engine of the places of the picture of the
- * picture, the places of the walk of the places of the picture of the kind of the walk of them standing as the
- * places of the picture of the words of the walk of the picture of the kind of the walk of the places of the
- * picture behind them.
- */
 function decompressKgf(
 	input: Buffer,
 	position: number,
@@ -189,8 +146,6 @@ function decompressKgf(
 	return output;
 }
 
-/** `KgfDecoder.CopyChannels`: the places of the picture of the walk of the places of a picture stand beside
- * each other, of the places of the picture of a place of the picture of their own. */
 function copyChannels(output: Buffer, data: Buffer, pixelSize: number): void {
 	let src = 0;
 	for (let i = 0; i < pixelSize; i += 1) {
@@ -201,8 +156,6 @@ function copyChannels(output: Buffer, data: Buffer, pixelSize: number): void {
 	}
 }
 
-/** `KgfDecoder.Unpack`: the places of the picture, walked of the kind of the walk of the places of a picture
- * of the words of the head of it. */
 export function unpackKgfPicture(data: Buffer, layout: KgfLayout): Buffer {
 	const pixelSize = layout.bitsPerPixel / BITS_PER_PLACE;
 	const output = Buffer.alloc(layout.width * layout.height * pixelSize);
@@ -246,11 +199,6 @@ export function unpackKgfPicture(data: Buffer, layout: KgfLayout): Buffer {
 		Buffer.alloc(output.length),
 		PACKED_BUFFER_LONG,
 	);
-	// The places of the picture of a kind of the walk of the places of the picture of the picture of the
-	// engine stand beside the places of the picture of the walk of them of the places of the picture of the
-	// picture itself, so every place of the picture stands as the places of the picture of the place of the
-	// picture of the column of the picture behind it, the places of the picture of a column of the picture
-	// standing of their own of the places of the picture of the walk of them.
 	const line = Buffer.alloc(layout.width);
 	let src = 0;
 	for (let channel = 0; channel < pixelSize; channel += 1) {
@@ -268,9 +216,6 @@ export function unpackKgfPicture(data: Buffer, layout: KgfLayout): Buffer {
 	return output;
 }
 
-/** `KgfDecoder.UnpackV2`: the places of the picture stand as the places of the picture of the words of the
- * walk of the places of the picture or as the places of the picture of the runs of the places of the picture
- * behind the places of the walk of them. */
 function unpackKgfBits(
 	data: Buffer,
 	layout: KgfLayout,
@@ -318,9 +263,6 @@ function unpackKgfBits(
 			dst += 1;
 		}
 		if (dst >= places.length) break;
-		// The places of the walk of the picture stand in the places of a picture of every place of the walk of
-		// them, the first place of the walk of a picture standing in the place behind the first place of the
-		// picture of the walk of it.
 		bits[i >> 3] = (bits[i >> 3] ?? 0) >> 1;
 	}
 	copyChannels(output, places, pixelSize);
@@ -395,10 +337,6 @@ export const cadathKgfImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readKgfLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
 		const places = unpackKgfPicture(stored, layout);
-		// The reference hands the places of a picture of this kind out in the places of the picture of the
-		// four places of a place of the picture where the places of a picture of the kind of the places of a
-		// picture of four and twenty places stand, and in the places of the picture of their own where they
-		// stand of their own.
 		if (layout.bitsPerPixel === BITS_PER_PLACE_24)
 			return Readable.from([
 				writeBmp24(layout.width, layout.height, places, false),

@@ -12,7 +12,6 @@ import {
 import { withCompanionFiles } from "../helpers/companion.js";
 import { literalLzssStream } from "../helpers/lzss.js";
 
-/** An Abel picture: the head, and the places of the picture behind whichever walk the head names. */
 function cbfFile(input: {
 	compression: number;
 	width: number;
@@ -31,7 +30,6 @@ function cbfFile(input: {
 	return Buffer.concat([head, input.body]);
 }
 
-/** The places of a picture of the first way: the places of every block of eight by eight in the zigzag order. */
 const ZIGZAG_ORDER = [
 	0x00, 0x01, 0x08, 0x10, 0x09, 0x02, 0x03, 0x0a, 0x11, 0x18, 0x20, 0x19, 0x12,
 	0x0b, 0x04, 0x05, 0x0c, 0x13, 0x1a, 0x21, 0x28, 0x30, 0x29, 0x22, 0x1b, 0x14,
@@ -52,7 +50,6 @@ function pattern(): Buffer {
 	return Buffer.from(places);
 }
 
-/** The walk of the places of the first way, which stands the places of every block in the zigzag order. */
 function zigzagWalk(pixels: Buffer): Buffer {
 	const stride = 24;
 	const walked: number[] = [];
@@ -64,9 +61,6 @@ function zigzagWalk(pixels: Buffer): Buffer {
 	return Buffer.from(walked);
 }
 
-/** The places the walk of the first way stands over: every place behind the place three before it. The walk
- * from the end towards the beginning keeps every place it stands behind the one it has not touched yet, which
- * is the place the walk of the picture stands over. */
 function addUp(walked: Buffer): Buffer {
 	const stored = Buffer.from(walked);
 	for (let at = stored.length - 1; at >= 3; at -= 1) {
@@ -210,7 +204,6 @@ describe("Abel image format", () => {
 		expect(bmp.readUInt32LE(0x12)).toBe(2);
 		expect(bmp.readInt32LE(0x16)).toBe(-1);
 		expect(bmp.readUInt16LE(0x1c)).toBe(24);
-		// The size of the places of a bitmap stands at `0x22`.
 		expect(bmp.readUInt32LE(0x22)).toBe(8);
 		expect(bmp.subarray(0x36, 0x3e).toString("hex")).toBe(
 			hex([1, 2, 3, 4, 5, 6, 0, 0]),

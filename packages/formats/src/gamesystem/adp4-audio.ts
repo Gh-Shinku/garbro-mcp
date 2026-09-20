@@ -31,7 +31,6 @@ const HEADER_SIZE = 4;
 /** A sound this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
 
-/** `AdpDecoder.AdpSamples`, one step for every place the walk of the samples may stand at. */
 const ADP_SAMPLES = new Int32Array([
 	0, 2, 4, 6, 7, 9, 11, 13, 0, -2, -4, -6, -7, -9, -11, -13, 1, 3, 5, 7, 9, 11,
 	13, 15, -1, -3, -5, -7, -9, -11, -13, -15, 1, 3, 5, 7, 10, 12, 14, 16, -1, -3,
@@ -137,7 +136,6 @@ const ADP_SAMPLES = new Int32Array([
 	3724, 11172, 18621, 26069, 33518, 40966, 48415, 55863, -3724, -11172, -18621,
 	-26069, -33518, -40966, -48415, -55863,
 ]);
-/** `AdpDecoder.AdpAdjust`, where the walk of the samples stands next after every place. */
 const ADP_ADJUST = new Uint16Array([
 	0, 0, 0, 0, 32, 64, 96, 128, 0, 0, 0, 0, 32, 64, 96, 128, 0, 0, 0, 0, 48, 80,
 	112, 144, 0, 0, 0, 0, 48, 80, 112, 144, 16, 16, 16, 16, 64, 96, 128, 160, 16,
@@ -243,7 +241,6 @@ export interface Adp4Layout {
 	kind: string;
 	/** How many steps of samples the file says it holds. */
 	sampleCount: number;
-	/** Where the walk of the samples begins. */
 	dataOffset: number;
 }
 
@@ -418,10 +415,6 @@ export function decodeAdp4Adps(
 	}
 }
 
-/**
- * `AdpDecoder.Decode`: the sound stands the number of steps the head gives wide, every step two channels of
- * sixteen bits, and the walk of the kind at hand writes it out.
- */
 export function decodeAdp4(stored: Buffer, layout: Adp4Layout): Buffer {
 	const output: Buffer = Buffer.alloc(layout.sampleCount * 8, 0x00);
 	if ("adps" === layout.kind) {

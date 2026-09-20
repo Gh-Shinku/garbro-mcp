@@ -12,8 +12,6 @@ import { withCompanionFiles } from "../helpers/companion.js";
 
 const HEADER_SIZE = 0x10;
 
-/** The places of the picture of the walk of the places of the picture of the places of the picture of the
- * engine of the first kind. */
 function resr(
 	records: {
 		name: string;
@@ -47,8 +45,6 @@ function resr(
 	return Buffer.concat(parts);
 }
 
-/** The places of the picture of the walk of the places of the picture of the picture of the walk of the
- * places of the picture of the places of the picture of the engine of the second kind. */
 class Res2Builder {
 	readonly #table: Buffer[] = [];
 	readonly #offsets = new Map<string, number>();
@@ -73,10 +69,6 @@ class Res2Builder {
 	}
 
 	integer(value: number): void {
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the picture of their own where the places
-		// of the picture of the walk of the places of the picture stand within the places of the picture of
-		// the walk of the places of the picture of the walk of them of their own.
 		if (value >= 0 && value < 0x10) this.#stream.push(value & 0x0f);
 		else {
 			const bytes = Buffer.alloc(4);
@@ -99,8 +91,6 @@ class Res2Builder {
 	}
 }
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of the places of the picture of the engine of the name `SEC5`. */
 function sec5(sectionName: string, payload: Buffer): Buffer {
 	const out = Buffer.alloc(HEADER_SIZE + 8 + payload.length + 4, 0x00);
 	out.write("SEC5", 0, "latin1");
@@ -129,10 +119,6 @@ describe("SAS5 engine resource names", () => {
 					archive: "bg.war",
 					id: 0,
 				},
-				// The places of the picture of the walk of the places of the picture of the places of the
-				// picture of the engine of another kind stand of the places of the picture of the walk of the
-				// places of the picture of the place of the picture of the walk of them of no places of the
-				// picture of the walk of them.
 				{ name: "x", type: "y", kind: "file-other", archive: "z.iar", id: 1 },
 			]),
 		);

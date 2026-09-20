@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/AdvSys/ImageGR2.cs", class `PolaFormat` (the compressed kind of the
-// pictures of the AdvSys engine: the places of a picture of this kind stand walked, and the places the walk
-// stands for stand as a picture of the kind of the places of a picture of the engine itself, so the walk is
-// walked twice, once to stand the words of the head of that picture and once to stand the places of it).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -26,11 +20,8 @@ import {
 } from "./gr2-image.js";
 import { unpackPolaPicture } from "./pola-reader.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file. */
 const MARK = Buffer.from("*Pola", "latin1");
 const HEAD_SIZE = 0x14;
-/** The places of the head of a picture of the second kind of the walk of it stand behind the words of the kind
- * of the picture, and the places of the pictures of the two kinds stand in kinds of their own. */
 const KIND_FIELD = 5;
 const KIND_WORDS = "*  ";
 const OLD_HEAD_SIZE = 0xd;
@@ -40,9 +31,7 @@ const UNPACKED_SIZE_FIELD = 8;
 const PROBE_SIZE = 64;
 
 export interface PolaLayout {
-	/** Where the walk of the places of the picture stands in the file. */
 	dataOffset: number;
-	/** How many places the walk of the picture stands for. */
 	unpackedSize: number;
 	newVersion: boolean;
 }
@@ -51,11 +40,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PolaFormat.ReadMetaData`: the words of the head of a picture of this kind name the kind of the walk of the
- * places of it and how many places the walk of it stands for, and the places of the walk stand behind them.
- * The kind of the walk of the picture stands as the words `*  ` behind the words of the kind of the picture.
- */
 export function readPolaLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -74,8 +58,6 @@ export function readPolaLayout(
 	};
 }
 
-/** The places of the picture of the engine a walk of this kind stands for, with the words of the head of that
- * picture standing within them. */
 function unpackPolaGr2(
 	data: Buffer,
 	layout: PolaLayout,
@@ -86,9 +68,6 @@ function unpackPolaGr2(
 	height: number;
 	bitsPerPixel: number;
 } {
-	// The words of the head of the picture of the engine stand within the places of the walk of the picture of
-	// this kind, and a picture of the first kind of the walk does not name how many places the walk of it stands
-	// for, so the reference stands the walk of the picture short and reads the places of the head of it.
 	const probe = unpackPolaPicture(
 		data.subarray(layout.dataOffset),
 		Math.max(PROBE_SIZE, layout.unpackedSize),
@@ -98,8 +77,6 @@ function unpackPolaGr2(
 		throw invalidPicture(
 			"The walk of a picture of this kind stands for no picture of the engine",
 		);
-	// A picture of the first kind of the walk names no places of the walk of it, so the places the walk of the
-	// picture stands for stand as the places of the head of the picture of the engine and the places of it.
 	const unpackedSize = layout.newVersion
 		? layout.unpackedSize
 		: 0x10 + head.stride * head.height;

@@ -55,7 +55,6 @@ function bmpPixels(bmp: Buffer): string {
 
 describe("UK2 engine image format", () => {
 	it("reads the head of a picture", () => {
-		// The width stands in the places of the bits between the edges: one byte for every eight of them.
 		const data = pdtFile({
 			left: 2,
 			top: 3,

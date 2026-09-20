@@ -18,21 +18,12 @@ const PCM32 = 4;
 const PCM_FLOAT = 5;
 const VORBIS = 15;
 
-/** The places of the picture of the walk of the places of the picture of a sound of this kind, standing of no
- * places of the picture of the walk of the places of the picture where the places of the picture of the walk
- * of the places of the picture of the head of the picture of the walk of them stand of no places of the
- * picture of the walk of them of their own. */
 function mustLayout(file: Buffer): Fsb5Layout {
 	const layout = readFsb5Layout(file, file.length);
 	if (!layout) throw new Error("no layout");
 	return layout;
 }
 
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of them: the places of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture of the word of the walk of the places of the picture of the place of the picture of
- * the walk of them, and of the places of the picture of the walk of the places of the picture of the walk of
- * them. */
 function sampleWord(options: {
 	nextChunk?: boolean;
 	rateIndex?: number;
@@ -51,8 +42,6 @@ function sampleWord(options: {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the sound. */
 function chunk(kind: number, payload: Buffer, next: boolean): Buffer {
 	const out = Buffer.alloc(4, 0x00);
 	out.writeInt32LE((next ? 1 : 0) | (payload.length << 1) | (kind << 25), 0);
@@ -106,10 +95,6 @@ describe("FMOD Sample Bank audio format", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the frequency of the places of the picture behind them", () => {
-		// The places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of them stand of the places of the picture of the walk of the places of the
-		// picture of the frequency of the places of the picture behind them that stand beside the places of
-		// the picture of the walk of the places of the picture of the sound of their own.
 		const rate = Buffer.alloc(4);
 		rate.writeInt32LE(12345, 0);
 		const table = Buffer.concat([
@@ -127,10 +112,6 @@ describe("FMOD Sample Bank audio format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the walk of them over where they stand of no places of the picture of the walk of the places of the picture of the sound", () => {
-		// The places of the picture of the walk of the places of the picture of the walk of them that stand for
-		// the places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the sound of the places of the picture of
-		// the walk of them of their own.
 		const table = Buffer.concat([
 			sampleWord({ nextChunk: true, rateIndex: 9, channels: 1, count: 2 }),
 			chunk(1, Buffer.from([2]), false),
@@ -165,12 +146,6 @@ describe("FMOD Sample Bank audio format", () => {
 			format: PCM8,
 			table: Buffer.concat([
 				sampleWord({ rateIndex: 3, count: 4 }),
-				// The places of the picture of the walk of the places of the picture of the picture of the
-				// walk of them stand of the places of the picture of the walk of the places of the picture of
-				// the kinds of the walk of the places of the picture of the sound of their own, so the places
-				// of the picture of the walk of the places of the picture of the word of the walk of the
-				// places of the picture of the sound stand of the places of the picture of the walk of the
-				// places of the picture of the picture behind them.
 				Buffer.alloc(4, 0x00),
 			]),
 			data,

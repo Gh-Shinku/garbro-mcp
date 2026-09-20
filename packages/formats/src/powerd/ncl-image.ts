@@ -51,11 +51,6 @@ async function readNclLayout(
 	};
 }
 
-/**
- * The picture behind the header, with the second bitmap behind it, when there is one, laid over the first as
- * its alpha channel. Both of them are bitmaps of this project's own making, and the one that carries the alpha
- * has to be an eight bit grey one.
- */
 async function renderNclImage(source: ByteSource): Promise<Buffer> {
 	const layout = await readNclLayout(source);
 	if (!layout) {

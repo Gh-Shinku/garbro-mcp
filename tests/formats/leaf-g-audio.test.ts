@@ -44,7 +44,6 @@ function mark(page: Buffer): number {
 	return crc32Normal(copy);
 }
 
-/** What the walk of the pages of the engine is to give for one page. */
 function rebuilt(
 	header: Buffer,
 	codec: boolean,
@@ -194,10 +193,6 @@ describe("Leaf audio format (Ogg/Vorbis)", () => {
 		const data = gFile([page(1, HEADER_CONTENT)]);
 		const short = data.subarray(0, data.length - 3);
 		const out = decodeG(short);
-		// What stands at hand of the places of the page is given as it stands, with the word of the page and
-		// the word of its codec written into it, and the page the walk was to give is never reached.
-		// The page stands as far as the walk came: its head, its table of one segment, the byte that names
-		// the place of the sound and the word of the codec, with no place of the sound behind them at all.
 		expect(out.length).toBe(PAGE_HEADER_SIZE + 2 + CODEC_WORD.length);
 		expect(out.subarray(0, 4).toString("latin1")).toBe("OggS");
 		expect(out.subarray(-6).toString("latin1")).toBe("vorbis");

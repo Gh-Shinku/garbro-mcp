@@ -2,17 +2,9 @@
 // `BlendImage` of `TlgFormat`. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 import { Buffer } from "node:buffer";
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture of the kind of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture. */
 const TAG_MARK = Buffer.from("tags", "latin1");
 const MARK_PLACES = 4;
 const FIELD_WIDTH = 4;
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture of the words of the walk of the
- * picture: the places of the picture of the walk of the places of the picture of the word of the walk of them
- * and of the places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the sound. */
 const SEPARATOR_PLACES = 1;
 const BASE_NAME_KEY = 1;
 const OFFSET_X_KEY = 2;
@@ -22,14 +14,8 @@ const NORMAL_METHOD = 1;
 const EXCLUSIVE_METHOD = 2;
 const OPAQUE = 0xff;
 const BYTES_PER_PLACE = 4;
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of the places of the picture of the picture of the kind of the
- * places of the picture of the walk of them. */
 const MOST_TAIL = 512;
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture. */
 export interface TlgTags {
 	baseName: string | undefined;
 	offsetX: number;
@@ -37,19 +23,8 @@ export interface TlgTags {
 	method: number;
 }
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture that stand of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * picture, standing of the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of their
- * own. */
 const DECODER = new TextDecoder("shift_jis");
 
-/** `TagsParser.ParseInt`: the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture that stand
- * of the places of the picture of the walk of the places of the picture of the words of the walk of them of the
- * places of the picture of the walk of the places of the picture of the place of the picture of the walk of them
- * and of the places of the picture of the walk of the places of the picture of the picture of the walk of them. */
 function parseLength(
 	tags: Buffer,
 	at: number,
@@ -63,10 +38,6 @@ function parseLength(
 	return { value, at: colon + 1 };
 }
 
-/** `TagsParser.Parse`: the places of the picture of the walk of the places of the picture of the walk of them
- * of the places of the picture of the walk of the places of the picture of the places of the picture of the
- * walk of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture. */
 function parseTags(
 	tags: Buffer,
 	at: number,
@@ -101,9 +72,6 @@ function parseTags(
 	return fields;
 }
 
-/** `TagsParser.GetInt`: the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of the places of the picture. */
 function tagInt(
 	tags: Buffer,
 	field: { at: number; length: number } | undefined,
@@ -117,15 +85,6 @@ function tagInt(
 	return undefined;
 }
 
-/**
- * `TlgFormat.ApplyTags` up to the places of the picture of the walk of the places of the picture of the
- * picture: the places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture stand of the places of the
- * picture of the walk of the places of the picture of the words of the walk of the picture of the places of the
- * picture of the walk of the places of the picture, and of the places of the picture of the walk of the places
- * of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture of the sound.
- */
 export function readTlgTags(tail: Buffer): TlgTags | undefined {
 	let at = tail.length - MARK_PLACES - FIELD_WIDTH;
 	while (at >= 0) {
@@ -152,28 +111,11 @@ export function readTlgTags(tail: Buffer): TlgTags | undefined {
 	};
 }
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them where the places of the picture of the walk of the places of the picture of the sound of the places of
- * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * the places of the picture of their own of the places of the picture of the walk of the places of the picture
- * of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture. */
 export function readTailTags(file: Buffer): TlgTags | undefined {
 	const start = Math.max(0, file.length - MOST_TAIL);
 	return readTlgTags(file.subarray(start));
 }
 
-/**
- * `TlgFormat.BlendImage`: the places of the picture of the walk of the places of the picture of the overlay of
- * the places of the picture of the walk of them of the places of the picture of the base of the places of the
- * picture of the walk of them. The base picture stands of the places of the picture of the walk of the places of
- * the picture of the places of the picture of the walk of the places of the picture of their own, standing of
- * the places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of them of the places of the picture of the walk of the places of the picture where the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of them stand of the places of the
- * picture of the walk of the places of the picture.
- */
 export function blendTlgImage(
 	base: Buffer,
 	baseWidth: number,
@@ -186,15 +128,6 @@ export function blendTlgImage(
 	method: number,
 ): Buffer | undefined {
 	const dstStride = baseWidth * BYTES_PER_PLACE;
-	// The reference stands the places of the picture of the walk of the places of the picture of the place of
-	// the picture of the walk of them of the places of the picture of the walk of the places of the picture past
-	// the places of the picture of the walk of the places of the picture of the base of the places of the
-	// picture of the walk of them, standing of the places of the picture of the walk of the places of the
-	// picture of the kind of the places of the picture of the walk of them of the places of the picture of the
-	// walk of the places of the picture, so a picture of this project stands of the places of the picture of the
-	// walk of the places of the picture of the place of the picture of the walk of them of the places of the
-	// picture of their own where they stand past the places of the picture of the walk of the places of the
-	// picture of the base of the places of the picture of the walk of them.
 	if (
 		offsetX + overlayWidth > baseWidth ||
 		offsetY + overlayHeight > baseHeight

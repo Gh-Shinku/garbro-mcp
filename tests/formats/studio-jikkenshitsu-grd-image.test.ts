@@ -10,8 +10,6 @@ import {
 	studioJikkenshitsuGrdImageFormat,
 } from "../../packages/formats/src/studio-jikkenshitsu/grd-image.js";
 
-/** A Studio Jikkenshitsu picture: the head, the places of the picture under a walk of the LZSS kind, and the
- * shape of those places behind them. */
 function grdFile(input: {
 	bitsPerPixel?: number;
 	width?: number;
@@ -131,8 +129,6 @@ const GREY = Buffer.from(
 	"hex",
 );
 
-/** The same kind of picture with a shape of its places behind the places of the picture, the shape naming one
- * place of a colour of its own for every row. */
 const SHAPED = Buffer.from(
 	"475244200800020002000000b6040000" +
 		"0000000014000000ff00010203040506" +
@@ -267,7 +263,6 @@ describe("Studio Jikkenshitsu image format", () => {
 		if (!layout) throw new Error("the picture stands in the file");
 		const bmp = decodeGrd(ENCRYPTED, layout);
 		expect(bmp.readUInt16LE(0x1c)).toBe(24);
-		// The places of the file stand the other way up, so the bitmap stands bottom up.
 		expect(bmp.readInt32LE(0x16)).toBe(1);
 		expect(bmp.subarray(0x36, 0x3c)).toEqual(
 			Buffer.from("112233445566", "hex"),
@@ -295,8 +290,6 @@ describe("Studio Jikkenshitsu image format", () => {
 		if (!layout) throw new Error("the picture stands in the file");
 		const bmp = decodeGrd(SHAPED, layout);
 		expect(bmp.readUInt16LE(0x1c)).toBe(32);
-		// The places of the shape stand the picture the right way up, its places counting places of a colour
-		// of the shape as many places as they name.
 		expect(bmp.readInt32LE(0x16)).toBe(-2);
 		expect(bmp.subarray(0x36, 0x46)).toEqual(
 			Buffer.from("132333ff15253533112131ff12223200", "hex"),

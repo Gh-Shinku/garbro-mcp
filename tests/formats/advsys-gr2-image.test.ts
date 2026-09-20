@@ -10,7 +10,6 @@ import {
 
 const HEAD_SIZE = 0x10;
 
-/** The places of a row of a picture stand padded to the places of four. */
 function strideOf(width: number, bitsPerPixel: number): number {
 	return (width * (bitsPerPixel / 8) + 3) & ~3;
 }
@@ -32,8 +31,6 @@ function buildPicture(options?: {
 	const size = strideOf(width, bitsPerWord * 8) * height;
 	const pixels = Buffer.alloc(size, 0x00);
 	for (let at = 0; at < size; at += 1) pixels[at] = (at * 7 + 3) & 0xff;
-	// The places behind the places of a row of the picture stand for no place of the picture, so they stand
-	// as the places of the picture stand of the picture of this project -- clear.
 	const rowStride = strideOf(width, bitsPerWord * 8);
 	const used = (width * (bitsPerWord * 8)) / 8;
 	for (let row = 0; row < height; row += 1) {
@@ -60,7 +57,6 @@ describe("AdvSys engine image format", () => {
 			bitsPerPixel: 32,
 			stride: 8,
 		});
-		// The places of a row of a picture stand padded to the places of four.
 		expect(
 			readGr2Layout(buildPicture({ width: 3, height: 1 }), 0x20),
 		).toMatchObject({ bitsPerPixel: 32, stride: 12 });
@@ -82,7 +78,6 @@ describe("AdvSys engine image format", () => {
 		const wrongMark = Buffer.from(buildPicture());
 		wrongMark.write("GR3_", 0, "latin1");
 		expect(readGr2Layout(wrongMark, 0x20)).toBeUndefined();
-		// The reference stands a picture of a kind of the places of a picture it stands no places for away.
 		expect(
 			readGr2Layout(buildPicture({ bitsPerWord: 1 }), 0x20),
 		).toBeUndefined();
@@ -101,8 +96,6 @@ describe("AdvSys engine image format", () => {
 		expect(places.length).toBe(16);
 		expect(places[0]).toBe(0x03);
 		expect(places[15]).toBe((15 * 7 + 3) & 0xff);
-		// The reference stands the places of a picture of the places behind the words of the head of it as
-		// they stand, so a file that stands with places behind them stands with them unread.
 		const longer = buildPicture({ width: 2, height: 2, extra: 5 });
 		const longerLayout = readGr2Layout(longer, longer.length);
 		if (!longerLayout) throw new Error("no layout");
@@ -122,8 +115,6 @@ describe("AdvSys engine image format", () => {
 		expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 		expect(bmp.readUInt16LE(0x1c)).toBe(32);
 		expect(bmp.readInt32LE(0x12)).toBe(2);
-		// The reference stands the places of a picture of this kind from the first place of it rather than
-		// from the last, so the places of the picture stand from the head of it downwards.
 		expect(bmp.readInt32LE(0x16)).toBe(-2);
 		expect(bmp.subarray(0x36)).toEqual(
 			data.subarray(HEAD_SIZE, HEAD_SIZE + 16),
@@ -134,9 +125,6 @@ describe("AdvSys engine image format", () => {
 		const data = buildPicture({ width: 3, height: 2, bitsPerWord: 3 });
 		const bmp = await extract(data);
 		expect(bmp.readUInt16LE(0x1c)).toBe(24);
-		// The places of a row of the picture and of the picture of this project stand in the places of four,
-		// so the places of a row of the picture stand as they stand within the picture of this project, one
-		// row behind the other. The places behind the places of a row stand for no place of the picture.
 		const first = data.subarray(HEAD_SIZE, HEAD_SIZE + 9);
 		const second = data.subarray(HEAD_SIZE + 12, HEAD_SIZE + 21);
 		const at = bmp.indexOf(first);
@@ -148,8 +136,6 @@ describe("AdvSys engine image format", () => {
 		const data = buildPicture({ width: 3, height: 1, bitsPerWord: 2 });
 		const bmp = await extract(data);
 		expect(bmp.readUInt16LE(0x1c)).toBe(16);
-		// The places of the picture of this project hold the places of the picture of this kind as they
-		// stand, the picture of this project standing the places stands of the places of the picture itself.
 		const pixels = data.subarray(HEAD_SIZE, HEAD_SIZE + 8);
 		expect(bmp.includes(pixels)).toBe(true);
 	});

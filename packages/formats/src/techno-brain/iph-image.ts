@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/TechnoBrain/ImageIPH.cs", classes `IphFormat` and `IphReader` (a
-// picture of the TechnoBrain kind that stands as places of the RIFF kind: the words of the head name where the
-// places of the picture stand and how they stand, and every row of them stands as it stands, as a walk of
-// places of its own, and as places of how much of a place of the picture stands on the places beside it).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,9 +12,7 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind stands behind and the words of its head. */
 const RIFF = "RIFF";
-/** The places of the pictures stand behind the words of the head of the kind of files this one stands as. */
 const HEADER_SIZE_FIELD = 0x04;
 const HEADER_SIZE = 0x38;
 const MARK_FIELD = 0x08;
@@ -31,13 +23,10 @@ const WIDTH_FIELD = 0x40;
 const HEIGHT_FIELD = 0x42;
 const BITS_FIELD = 0x50;
 const COMPRESSED_FIELD = 0x52;
-/** Every place of a picture of this kind stands in two places, and the places of its pictures stand behind
- * the words of its head. */
 const PLACES_PER_PIXEL = 2;
 const PICTURE_OFFSET = 0x58;
 /** The one number of places a place of a picture this project reads stands in. */
 const BITS_PER_PIXEL = 16;
-/** The words of a walk of the places of a row of a picture. */
 const END_WORD = 0xff;
 const RUN_WORD = 0xfe;
 const LITERAL_LIMIT = 0x80;
@@ -66,13 +55,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `IphFormat.ReadMetaData`: the words of the file stand as the words of the kind of files that hold the places
- * of a picture, the size of the head of which stands at `0x38`; the words of the head name the places of the
- * picture behind the words of the head of that kind of file, and the words of those places name how much of
- * the picture stands, how wide and how tall it stands, how many places a place of it stands in, and whether it
- * stands walked of its own.
- */
 export function readIphLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -116,14 +98,6 @@ export function readIphLayout(
 	};
 }
 
-/**
- * `IphReader.Unpack`: every row of a walked picture stands as places of its own, one place of the picture
- * standing as a place of the walk that stands as it stands, as a place that stands as many places of the
- * picture beside it, or as a place that stands beside the place before it by how much its places of a colour
- * stand beside those of the place before it; behind every row stand the places that name how much of a place
- * of the picture stands on the places beside it, and a row that stands as no places of a walk at all stands as
- * it stands.
- */
 export function unpackIph(data: Buffer, layout: IphLayout): Buffer {
 	const width = layout.width;
 	const height = layout.height;
@@ -261,9 +235,6 @@ export const technoBrainIphImageDescriptor: FormatDescriptor = {
 
 export const technoBrainIphImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: technoBrainIphImageDescriptor,
-	// The reference stands the words `RIFF` before the words of a picture of this kind without standing them
-	// as a word of its own, so that a sound of the kind that stands as the words of the RIFF kind stands as no
-	// picture; a picture of this kind is told by the words of its head.
 	detection: { signatures: [] },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEADER_SIZE)) return false;

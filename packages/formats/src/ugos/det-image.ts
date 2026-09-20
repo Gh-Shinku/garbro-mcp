@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/uGOS/ImageBMP.cs", classes `DetBmpFormat` and `DetBmpMetaData` (a
-// picture of the μ-GameOperationSystem engine whose places stand walked rather than as they stand in the
-// picture: the words of the head name how wide and how tall the picture stands and how many places a place of
-// the picture stands in, and the places of it are walked from the places of the picture through the words
-// behind the head). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,13 +13,9 @@ import {
 } from "../shared/fixed-archive.js";
 import { unpackDetPicture } from "./det-bmp-reader.js";
 
-/** The words of the head of a picture of this kind stand in the first places of the file. */
 const HEAD_SIZE = 0x10;
 const MARK = 0x46;
 const KIND_MASK = 0x5f;
-/** The kind of a picture of this kind, which the reference reads with the places of the words behind the word
- * of a head dropped, so that a head that names the kind in the places of the head that stand beneath it stands
- * as one that names the kind in the places of the head that stand above it. */
 const KIND = 0x45;
 const BITS_PER_PICTURE_PLACE_8 = 8;
 const BITS_PER_PICTURE_PLACE_24 = 0x18;
@@ -50,10 +40,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `DetBmpFormat.ReadMetaData`: the words of the head of a picture of this kind name the kind of the picture,
- * how many places a place of it stands in, and how wide and how tall it stands.
- */
 export function readDetLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -76,15 +62,6 @@ async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
 
-/**
- * The places of a picture of this kind stand walked, and the reference hands them out in the places of a
- * picture of the kind it stands walked in: the places of a picture of thirty-two places and of one of four and
- * twenty stand beside the places of their own, the places behind the places of a picture of four and twenty
- * standing as the picture stands them rather than being walked from a stream of their own, and a picture of
- * eight places stands walked as one place for every place of it. The reference names the kind of a picture of
- * four and twenty places as a picture of thirty-two places when it hands it out, so the places behind the
- * places of such a picture stand within the picture it hands out as well.
- */
 export function decodeDetPicture(data: Buffer, layout: DetLayout): Buffer {
 	if (layout.width <= 0 || layout.height <= 0)
 		throw invalidPicture("A picture of no places stands nowhere");
@@ -122,8 +99,6 @@ export const ugosDetBmpImageDescriptor: FormatDescriptor = {
 
 export const ugosDetBmpImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: ugosDetBmpImageDescriptor,
-	// The reference names the places a picture of this kind stands with, which stand in the head of the
-	// picture, and reads the head of it again when it is held.
 	detection: {
 		signatures: BITS_PER_PICTURE_PLACE_KINDS.map((bits) => ({
 			bytes: Buffer.from([MARK, KIND, bits]),

@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/ActiveSoft/ImageEDT.cs", classes `Ed8Format`, `Ed8MetaData` and
-// `Ed8Format.Reader` (a picture of the Active Soft engine of the places of a picture of a palette of its own:
-// the places of the picture stand as the places of the picture of the words of the walk of them, and the places
-// of the picture of the walk of the picture stand beside the places of the picture of the walk of the picture of
-// the count of them). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,32 +13,19 @@ import {
 } from "../shared/fixed-archive.js";
 import { EdBitReader } from "./ed-common.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file, and the places of
- * the head of it stand behind them. */
 const MARK = Buffer.from(".8Bit\x8d\x5d\x8c\xcb\x00", "latin1");
 const HEAD_SIZE = 0x1a;
 const WIDTH_FIELD = 0xe;
 const HEIGHT_FIELD = 0x10;
 const PALETTE_SIZE_FIELD = 0x12;
 const COMP_SIZE_FIELD = 0x16;
-/** The places of a palette of a picture of this kind stand as the places of a picture of the three places of a
- * place of the picture, and stand as the places of the picture of a picture of the places of a picture of the
- * engine of the places of a picture of a picture of two hundred and fifty-six places of it at the most. */
 const PALETTE_PLACES = 0x100;
 const PALETTE_PLACE_SIZE = 3;
 const PLACES_PER_WALK = 8;
-/** The places of the picture of the walk of a picture that stand beside the places of the picture of the places
- * behind the places of the walk of them stand as the places of the picture of the places of the picture of the
- * two places of their own, of the kinds of the places of the picture of the count of them: a place of the
- * picture of the places behind the places of the walk of the picture of its own and of the places of the
- * picture of the count of the places of the walk of the picture of the places of the picture of the kinds of
- * the places of the picture of the engine. */
 const SHIFT_SIGNS: readonly number[] = [
 	-0x10, 0x01, -0x20, -0x0f, 0x11, 0x02, -0x1f, 0x21, -0x1e, -0x0e, 0x12, 0x22,
 	0x03, -0x0d,
 ];
-/** The places of a walk of a picture of a count of two places of the picture stand for the places of the
- * picture of the count of them, so the count stands within the places of a picture of the count. */
 const LEAST_COUNT = 2;
 
 export interface Ed8Layout {
@@ -59,11 +40,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Ed8Format.ReadMetaData`: the words of the head of a picture of this kind name the words of the kind of the
- * picture, how wide and how tall the picture stands, how many places the palette of the picture stands for, and
- * how many places the walk of the places of the picture stands for.
- */
 export function readEd8Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -76,8 +52,6 @@ export function readEd8Layout(
 	const compSize = data.readUInt32LE(COMP_SIZE_FIELD);
 	if (width <= 0 || height <= 0) return undefined;
 	if (paletteSize <= 0 || paletteSize > PALETTE_PLACES) return undefined;
-	// The places of the palette and the places of the walk of the picture stand behind the words of the head of
-	// the picture, the places of the palette standing before the places of the walk of it.
 	if (HEAD_SIZE + paletteSize * PALETTE_PLACE_SIZE > fileLength)
 		return undefined;
 	return {
@@ -89,20 +63,12 @@ export function readEd8Layout(
 	};
 }
 
-/**
- * `Ed8Format.Read`: the places of the picture, walked. Every place of the picture stands as the places of the
- * walk of the picture of the count of them, of the places of the picture of its own, or as the places of the
- * picture of the walk of the places of the picture behind it — the places of the picture of the walk of the
- * picture of the count of them standing beside the places of the picture of the count of the walk of them.
- */
 export function unpackEd8Picture(
 	data: Buffer,
 	layout: Ed8Layout,
 ): { pixels: Buffer; palette: Buffer } {
 	const paletteAt = layout.dataOffset;
 	const palette = Buffer.alloc(layout.paletteSize * 4);
-	// The places of the palette of a picture of this kind stand as the places of the picture of the words of a
-	// picture of the engine, so the places of the picture stand behind the places of the picture of theirs.
 	for (let at = 0; at < layout.paletteSize; at += 1) {
 		const b = data[paletteAt + at * PALETTE_PLACE_SIZE] ?? 0;
 		const g = data[paletteAt + at * PALETTE_PLACE_SIZE + 1] ?? 0;
@@ -132,9 +98,6 @@ export function unpackEd8Picture(
 				code = (code << 1) + reader.nextBit() + 1;
 			}
 			code = (code << 1) + reader.nextBit();
-			// The place of the walk of the picture that stands for the places of the picture of the walk of the
-			// count of them stands as the place of the walk of the picture of the count of the places of the
-			// picture of the walk of the picture behind it.
 			if (code === previous) break;
 			previous = code;
 			let count = reader.countBits();

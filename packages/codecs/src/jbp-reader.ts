@@ -1,14 +1,8 @@
-// Format reference: GARbro "ArcFormats/Cmvs/ImagePB3.cs", class `JbpReader` — the walk of the places of a
-// picture of the Purple engine, which `ArcFormats/Sviu/ImageJBP.cs` stands as a picture of its own. GARbro
-// commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { decodeJbpCoefficients } from "./jbp-coefficients.js";
 import { inverseJbpDct } from "./jbp-dct.js";
 import { JbpBitStream, JbpHuffmanTree } from "./jbp-huffman.js";
 import { standJbpColours } from "./jbp-ycc.js";
 
-/** Where the words of the walk of the places of a picture stand, and how many places every one of them stands
- * in. */
 const HEADER_SIZE = 0x24;
 const DATA_FIELD = 0x04;
 const KIND_FIELD = 0x08;
@@ -16,20 +10,14 @@ const WIDTH_FIELD = 0x10;
 const HEIGHT_FIELD = 0x12;
 const PLACES_FIELD = 0x1c;
 const OTHER_PLACES_FIELD = 0x20;
-/** The walk of the places of the picture stands the words of its walks behind the places its own words name,
- * every place of those words naming one place of the walk of the picture. */
 const WALK_FIELD = 0x80;
 const WALK_PLACES = 0x10;
 const FREQUENCY_SIZE = 0x40;
 const QUANT_SIZE = 0x40;
 const QUANT_FIELD = 0x80;
-/** How many places of the picture stand in every side of a place of a colour, and how many places of a colour
- * stand in every place of a picture of this kind. */
 const PLACES_PER_SIDE = 16;
 const SIDE_PLACES = 4;
 const BLOCKS_PER_PLACE = 6;
-/** The places of the picture stand behind the places of the walk of the places of the picture, so that every
- * place of the picture stands as the places of the walk of the places of the picture that stand for it. */
 const PLACES_PER_BLOCK = 64;
 const COLOURS_PER_PLACE = 4;
 
@@ -37,19 +25,12 @@ export interface JbpPicture {
 	/** How wide and how tall the picture stands, as the words of its head name it. */
 	width: number;
 	height: number;
-	/** How wide and how tall the places of the picture stand, which stand as the places of the picture of the
-	 * places of the walk of its colours behind them. */
 	alignedWidth: number;
 	alignedHeight: number;
-	/** How many places of the picture stand in a row of them. */
 	stride: number;
-	/** The places of the picture, which stand as the places of four colours apiece. */
 	pixels: Buffer;
 }
 
-/** `JbpReader..ctor`: the words of the head of a picture of this kind name where the places of the walk of the
- * places of the picture stand, the kind of the picture, how wide and how tall it stands, and how many places
- * of the two walks of the places of the picture stand. */
 export function readJbpHead(
 	data: Buffer,
 	offset = 0,
@@ -70,8 +51,6 @@ export function readJbpHead(
 	return { dataPos, kind, width, height, places, otherPlaces };
 }
 
-/** The places of the walk of a picture stand as the places of the picture of the kind of the file: the places
- * of the picture stand as the places of eight, sixteen, or two and thirty and sixteen places of the picture. */
 export function alignedJbpPlaces(
 	width: number,
 	height: number,
@@ -99,12 +78,6 @@ function readFrequencies(data: Buffer, at: number): number[] {
 	return frequencies;
 }
 
-/**
- * `JbpReader.Unpack`: the places of the walk of the places of a picture stand behind the words the head of the
- * picture names, and behind those stand the places that name how many places of the walk stand for the places
- * of the picture, the places the walk stands for itself, and then the two walks of the places of the picture
- * themselves.
- */
 export function decodeJbpPicture(data: Buffer, offset = 0): JbpPicture {
 	const head = readJbpHead(data, offset);
 	const aligned = alignedJbpPlaces(head.width, head.height, head.kind);
@@ -216,9 +189,6 @@ export function decodeJbpPicture(data: Buffer, offset = 0): JbpPicture {
 	};
 }
 
-/** `JbpReader.Stride` and the places of the picture itself: the places of a picture of this kind stand as the
- * places of four colours apiece, so a picture of this kind stands as the places of the picture of three
- * colours apiece behind them. */
 export function jbpToBgr(picture: JbpPicture): Buffer {
 	const packed: Buffer = Buffer.alloc(picture.width * picture.height * 3, 0x00);
 	for (let y = 0; y < picture.height; y += 1) {
@@ -233,5 +203,4 @@ export function jbpToBgr(picture: JbpPicture): Buffer {
 	return packed;
 }
 
-/** How many places of the file the head of a picture of this kind stands in. */
 export const JBP_HEADER_SIZE = HEADER_SIZE;

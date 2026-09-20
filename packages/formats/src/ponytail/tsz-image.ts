@@ -46,19 +46,16 @@ const BIT_MASK = new Uint16Array([
 	0x0000, 0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
 	0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff,
 ]);
-/** `TszReader.s_pattern1`, which stands for the places of a word that keep their colour. */
 const PATTERN_1 = new Uint16Array([
 	0xffff, 0xeeee, 0xdddd, 0xcccc, 0xbbbb, 0xaaaa, 0x9999, 0x8888, 0x7777,
 	0x6666, 0x5555, 0x4444, 0x3333, 0x2222, 0x1111, 0x0000,
 ]);
-/** `TszReader.s_pattern2`, which stands for the places of a word that take one. */
 const PATTERN_2 = new Uint16Array([
 	0x0000, 0x0001, 0x0010, 0x0011, 0x0100, 0x0101, 0x0110, 0x0111, 0x1000,
 	0x1001, 0x1010, 0x1011, 0x1100, 0x1101, 0x1110, 0x1111,
 ]);
 
 export interface TszLayout {
-	/** The places of the picture, in four places of a byte. */
 	width: number;
 	height: number;
 	/** How many bytes stand in a row of the picture. */
@@ -117,7 +114,6 @@ export function readTszPalette(data: Buffer): Buffer {
 	return palette;
 }
 
-/** Where the walk of the picture stands: the word it holds and how many of its places are still there. */
 export interface TszCursor {
 	data: Buffer;
 	position: number;
@@ -198,8 +194,6 @@ export function readBitLength(cursor: TszCursor): number {
 	return (getBits(cursor, count) | (1 << count)) & 0xffff;
 }
 
-/** `TszReader.CopyOverlapped` over the places of the line buffer, which the reference copies two bytes at a
- * time; a run whose places stand before the place at hand stands over and over. */
 function copyOverlappedPlaces(
 	line: Uint16Array,
 	source: number,
@@ -233,19 +227,6 @@ function copyOverlappedPlaces(
 	}
 }
 
-/**
- * `TszReader.Unpack`: the places of the picture stand column by column, the two columns of a pair standing one
- * behind the other in the two halves of a line buffer. Every step of the walk gives a run of places of the
- * column at hand, and the way the run stands is named by the run of places in front of the step:
- *
- * | the places in front of the step | what the step does |
- * | ------------------------------- | ------------------ |
- * | none | places of the column before the one at hand, standing a whole line behind it, taken from four places the step names |
- * | one | the same, taken from a byte the step names |
- * | two | one place of the line buffer, taken from the file as it stands |
- * | three | places of the column at hand, taken from four places the step names |
- * | four | one place of the column before the one at hand, which the byte the step gives keeps in part and stands in part |
- */
 export function decodeTsz(data: Buffer, layout: TszLayout): Buffer {
 	const palette = readTszPalette(data);
 	const pixels: Buffer = Buffer.alloc(layout.stride * layout.height, 0x00);

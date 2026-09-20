@@ -15,31 +15,18 @@ import { readPb3Head } from "../../packages/codecs/src/pb3-reader.js";
 const DATA1_FIELD = 0x2c;
 const DATA2_FIELD = 0x30;
 
-/** The words the places of the file of a picture of the sixth kind stand behind, every one of which stands as
- * the places of the file itself. */
 const NAME_KEY_V6 = [
 	0xa6, 0x75, 0xf3, 0x9c, 0xc5, 0x69, 0x78, 0xa3, 0x3e, 0xa5, 0x4f, 0x79, 0x59,
 	0xfe, 0x3a, 0xc7,
 ];
 
-/** A picture of the first kind of sixteen places, whose places of every colour stand as a walk of their own
- * and whose places of the picture stand as the places of that walk: every place of a colour stands as the
- * place of the picture that stands as it stands, so the places of the picture stand as the places of the
- * colours of the picture themselves. */
 function buildV1(): Buffer {
 	const channels = 4;
 	const width = 16;
 	const height = 16;
 	const planeSize = width * height;
-	// The places of the walk of the places of a colour stand as the places of the file of the picture itself,
-	// which stand as the places of the picture one place at a time: every place of the walk of the picture
-	// stands as one place of the file, so the places of the file that name the places of the walk of a colour
-	// stand as the places of eight places of the walk.
 	const walkPlaces = Math.ceil(planeSize / 8);
 	const recordSize = 12 + 1 + walkPlaces;
-	// The words of the head of a picture of this kind stand in the first six and thirty places of the file, and
-	// the places of the walks of its colours stand behind the words of the head and the places of the tables of
-	// the walks of the colours.
 	const head = Buffer.alloc(0x34, 0x00);
 	const data1 = 0x34;
 	const tableSize = 4 * channels;
@@ -61,26 +48,14 @@ function buildV1(): Buffer {
 	const records = Buffer.alloc(channels * recordSize, 0x00);
 	for (let at = 0; at < channels; at += 1) {
 		const from = at * recordSize;
-		// The places of the walk of the places of a colour: one place of the walk of the picture, which stands
-		// for no places of the picture beside it, and one place of the file, which stands as the places of the
-		// picture of the walk of its places.
 		records.writeInt32LE(1, from);
 		records.writeInt32LE(0, from + 4);
 		records.writeInt32LE(planeSize, from + 8);
-		// The places 0 stand for the places of the picture of the walk of their places, so the places of the
-		// picture stand as the places of the walk that stand for them.
 		records[from + 12] = 0x00;
-		// The places of the walk of the places of a colour stand as the places of the file one place at a
-		// time, every one of them standing as it stands: the places of the file that name them stand as no
-		// places of the walk at all, so every place of the walk of a colour stands as the place of the walk of
-		// the picture that stands beside it.
 		for (let at = 0; at < walkPlaces; at += 1) {
 			records[from + 13 + at] = 0x00;
 		}
 	}
-	// The places the walk of the places of every colour stands for itself stand in the places of the table of
-	// the walks of the colours, which stand as places of their own behind the words of the head of the picture
-	// and every one of which names how many places of the walk of a colour the places of its colour stand for.
 	const walks = Buffer.alloc(tableSize + channels * planeSize, 0x00);
 	for (let channel = 0; channel < channels; channel += 1) {
 		walks.writeInt32LE(planeSize, channel * 4);
@@ -92,9 +67,6 @@ function buildV1(): Buffer {
 	return Buffer.concat([head, table, records, walks]);
 }
 
-/** A picture of the fifth kind of sixteen places, whose places of every colour stand as a walk of their own:
- * every place of the walk stands beside the place before it, so the places of the picture stand as the places
- * of the picture that stand beside the places of the file the walk stands for. */
 function buildV5(): Buffer {
 	const width = 16;
 	const height = 16;
@@ -124,8 +96,6 @@ function buildV5(): Buffer {
 	return Buffer.concat([head, walks]);
 }
 
-/** Writes a picture and the places of a picture of the engine beside it into a temporary directory and runs
- * the callback with the place of the words of the picture. */
 async function withCompanions(
 	main: string,
 	companions: Record<string, Buffer>,
@@ -144,22 +114,11 @@ async function withCompanions(
 	}
 }
 
-/** A picture of the sixth kind of sixteen places, whose words name a picture of the engine that stands beside
- * it and whose places of the picture itself stand as the places of a walk of their own that stands over it. */
 function buildV6(): Buffer {
 	const width = 16;
 	const height = 16;
-	// Every place of the picture stands as the places of a walk of the picture itself: the places of the walk
-	// stand as the places of the file of the picture one place at a time, and the walk names the picture of the
-	// engine the places of the picture stand as through the words of its head.
 	const overlay = Buffer.alloc(8 + 1 + 3 * 8 * 32, 0x00);
-	// The places of the walk of the places of the picture stand as places of their own within the places of
-	// the picture itself, the places of the walk of the picture standing at the places the places of the
-	// picture name.
 	overlay.writeInt32LE(1, 0);
-	// The places of the walk of the places of the picture: the places of the second place of a picture of the
-	// picture itself stand as no places of the walk at all, so the places of the picture the words name stand
-	// as the places of the picture that stand there.
 	overlay[8] = 0x40;
 	let at = 9;
 	for (const place of [0xaa, 0xbb, 0xcc]) {
@@ -168,9 +127,6 @@ function buildV6(): Buffer {
 	}
 	const walkPlaces = Math.ceil(overlay.length / 8);
 	const bitsAt = 0x54;
-	// The words of the head of the picture stand in the first two and fifty places of the file, the words that
-	// name the picture of the engine standing in the places behind them and the places of the walk of the
-	// places of the picture behind those.
 	const head = Buffer.alloc(0x34, 0x00);
 	head.write("PB3B", 0, "latin1");
 	head.writeInt32LE(0, 4);
@@ -191,8 +147,6 @@ function buildV6(): Buffer {
 	return Buffer.concat([head, name, Buffer.alloc(walkPlaces, 0x00), overlay]);
 }
 
-/** A picture of the second kind: the places of the picture stand as the places of a picture of the Purple
- * engine that stands within it at the places the words of its head name. */
 function buildKind2(): Buffer {
 	const jbp = buildJbp();
 	const head = Buffer.alloc(0x34, 0x00);
@@ -257,8 +211,6 @@ describe("Purple Software image format", () => {
 	});
 
 	it("turns away a head that names no picture", () => {
-		// The words of the walk of the places of a picture stand behind the words of the picture itself, and the
-		// reference reads them as the places of the walk of the kind of pictures the words of the head name.
 		expect(cmvsPb3ImageFormat.detection).toEqual({
 			signatures: [{ bytes: Buffer.from("PB3B", "latin1") }],
 		});
@@ -278,8 +230,6 @@ describe("Purple Software image format", () => {
 			for (let x = 0; x < 16; x += 1) {
 				const at = (y * 16 + x) * 4;
 				const place = y * 16 + x;
-				// The places of every colour of the picture stand as the places of the walk of their own, so
-				// every place of the picture stands as the place of the picture that stands as it stands.
 				expect([
 					pixels[at],
 					pixels[at + 1],
@@ -296,17 +246,12 @@ describe("Purple Software image format", () => {
 		expect(out.readUInt16LE(0x1c)).toBe(32);
 		const pixels = out.subarray(0x36);
 		for (let place = 0; place < 256; place += 1) {
-			// Every place of the walk of the places of a colour stands beside the place before it, so the place
-			// of the picture stands as the places of the picture that stand beside the places of the file the
-			// walk stands for.
 			const expected = ((place * (place + 1)) / 2) % 256;
 			expect(pixels[place * 4]).toBe(expected);
 		}
 	});
 
 	it("stands the places of a picture of the sixth kind as the places of the picture its words name", async () => {
-		// The words of the picture of the engine the words of the head name stand as places of their own, and
-		// the places of the picture seen through them stand as the places of the picture that stand there.
 		const base = buildV1();
 		await withCompanions(
 			"picture.pb3",
@@ -320,9 +265,6 @@ describe("Purple Software image format", () => {
 				const out = await consumeBuffer(await archive.openEntry(entry.id));
 				await archive.close();
 				const pixels = out.subarray(0x36);
-				// The places of the picture stand as the places of the walk of the picture itself, so the places of
-				// the picture that stand as no places of the walk at all stand as the places of the picture the
-				// words of the head name.
 				const at = (x: number, y: number): number => (y * 16 + x) * 4;
 				expect([...pixels.subarray(at(0, 0), at(0, 0) + 4)]).toEqual([
 					0xaa, 0xaa, 0xaa, 0xaa,
@@ -336,8 +278,6 @@ describe("Purple Software image format", () => {
 				expect([...pixels.subarray(at(8, 8), at(8, 8) + 4)]).toEqual([
 					0xcc, 0xcc, 0xcc, 0xcc,
 				]);
-				// The places of the picture the words name stand as the places of the picture of the walk of the
-				// places of its own, so the places of the picture stand as the places of that picture behind them.
 				expect([...pixels.subarray(at(15, 7), at(15, 7) + 4)]).toEqual([
 					127, 127, 127, 127,
 				]);

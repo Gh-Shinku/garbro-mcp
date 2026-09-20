@@ -25,7 +25,6 @@ const WIDTH_FIELD = 0x04;
 const HEIGHT_FIELD = 0x08;
 const DEPTH_FIELD = 0x0c;
 const FLAGS_FIELD = 0x14;
-/** The two places of the flags that say how the pixels stand. */
 const COMPRESSED_MASK = 0x0f;
 const ALPHA_MASK = 0x20;
 /** The depths the reference reads. */

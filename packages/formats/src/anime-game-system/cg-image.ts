@@ -1,11 +1,3 @@
-// Format reference: GARbro "ArcFormats/AnimeGameSystem/ImageAinos.cs", classes `CgFormat`, `CgMetaData` and
-// `CgFormat.Reader` (a picture of the Anime Game System engine that stands as a part of a picture rather than
-// as the whole of one: the words of the head of it name the place of the picture that stands and the places of
-// the picture of the part that stand, and the places of the picture stand as runs of the places beside them or
-// as places of the picture of their own, the places of the picture of the picture standing green where the
-// places of a part stand for no place of the picture). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -20,47 +12,29 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words of the head of a picture of this kind stand in the first places of the file, and the words of the
- * part of the picture stand behind them. */
 const HEAD_SIZE = 5;
 const PART_HEAD_SIZE = 0xd;
-/** The places of the head of a picture of this kind stand as the places of the picture of the kind of the
- * picture, which stand as one place, and as the places of the picture of the width and of the height of the
- * picture, which stand as the places of a picture of two places each. */
 const KIND_FIELD = 0;
 const WIDTH_FIELD = 1;
 const HEIGHT_FIELD = 3;
-/** The kind of a picture of this kind stands beneath the places of a picture of the kind of the places of a
- * picture of the engine. */
 const KIND_LIMIT = 0x20;
 const PLACES_LIMIT = 4096;
-/** The places of a picture of the kind the places of a picture stand of their own. */
 const KIND_RGB = 0x10;
 const KIND_PART = 7;
 const PLACES_PER_PLACE = 3;
-/** The places of a picture of a kind of the places of a picture of its own stand as the places of a palette of
- * a picture of the places of a picture of the engine. */
 const PALETTE_PLACES = 0x80;
 const PALETTE_SIZE = PALETTE_PLACES * PLACES_PER_PLACE;
-/** The places of a picture a picture of this kind stands for no place of stand as the places of the
- * picture of the background of it, which stand green: the places of the green of a place of a picture. */
 const BACKGROUND_PLACE = 0xff;
-/** Every place of a picture of this kind stands for the places of a picture of the three places of a place of
- * the picture. */
 const LONG_RUN = 15;
 const LONGEST_RUN = 270;
 const RUN_TOO_LONG = 0xff;
-/** Where the places of a picture that stand beside the places of the picture stand, of the places of the walk
- * of the places of the picture of the engine. */
 const SHIFT_X: readonly number[] = [0, -1, -3, -2, -1, 0, 1, 2];
 const SHIFT_Y: readonly number[] = [0, 0, -1, -1, -1, -1, -1, -1];
 
 export interface CgLayout {
-	/** The kind of the picture, which names the kind of the walk of the places of it. */
 	type: number;
 	width: number;
 	height: number;
-	/** The places of the picture of the part of the picture that stands. */
 	left: number;
 	top: number;
 	right: number;
@@ -72,11 +46,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `CgFormat.ReadMetaData`: the place of the head of a picture of this kind names the kind of it and how wide
- * and how tall it stands, and, where the kind names a part of a picture, the places of the picture of the part
- * of the picture that stands within it.
- */
 export function readCgLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -126,7 +95,6 @@ export function readCgLayout(
 	};
 }
 
-/** `CgFormat.Reader`: the places of the picture of the part of the picture that stands. */
 class CgReader {
 	private position: number;
 	private readonly out: Buffer;
@@ -138,8 +106,6 @@ class CgReader {
 	) {
 		this.position = layout.dataOffset;
 		this.out = Buffer.alloc(layout.width * layout.height * PLACES_PER_PLACE);
-		// The reference stands the places of the picture behind the places of a picture of the engine green,
-		// so the places of the picture a part of the picture stands for no place of stand green as well.
 		for (let at = 1; at < this.out.length; at += PLACES_PER_PLACE)
 			this.out[at] = BACKGROUND_PLACE;
 		this.table = new Int32Array(8);
@@ -160,7 +126,6 @@ class CgReader {
 		return byte;
 	}
 
-	/** `Binary.CopyOverlapped`: a walk of the places of a picture that stands within the places it stands for. */
 	private copy(src: number, dst: number, count: number): void {
 		if (
 			src < 0 ||
@@ -174,15 +139,11 @@ class CgReader {
 			this.out[dst + at] = this.out[src + at] ?? 0;
 	}
 
-	/** The count of the places of a walk of a picture, which stands as the places of the count behind the
-	 * places of the walk where the places of the walk stand for no place of the picture of their own. */
 	private readCount(code: number): { shift: number; count: number } {
 		const shift = code >> 4;
 		let count = code & 0xf;
 		if (count === 0) {
 			count = this.readByte() + LONG_RUN;
-			// The longest counts of the places of a walk stand as the places of the picture of the walk of the
-			// count of its own, standing as the whole places of a picture of the walk of the count.
 			if (count === LONGEST_RUN) {
 				let byte: number;
 				do {
@@ -194,8 +155,6 @@ class CgReader {
 		return { shift, count };
 	}
 
-	/** `CgFormat.Reader.UnpackIndexed`: the places of a picture of a kind of the places of a picture of a
-	 * palette of its own. */
 	unpackIndexed(): void {
 		const palette = this.data.subarray(
 			this.position,
@@ -214,9 +173,6 @@ class CgReader {
 		});
 	}
 
-	/** `CgFormat.Reader.UnpackRGB`: the places of a picture of a kind of the places of a picture of its own,
-	 * which stand as the places of the picture of the places behind them where the places of the walk name
-	 * them. */
 	unpackRGB(): void {
 		this.walk((dst, code) => {
 			if ((code & 0x40) !== 0) {
@@ -235,8 +191,6 @@ class CgReader {
 		});
 	}
 
-	/** The walk of the places of the part of the picture that stands, the places of the picture of it standing
-	 * as the places of the picture of the kind of the walk of the picture. */
 	private walk(placeOfPicture: (dst: number, code: number) => void): void {
 		const { width, top, bottom, left, right } = this.layout;
 		const row = width * PLACES_PER_PLACE;
@@ -252,8 +206,6 @@ class CgReader {
 					continue;
 				}
 				const { shift, count } = this.readCount(code);
-				// A walk of the places of the picture of no places stands for the places of the picture of the
-				// walk of the kind of the count of the walk of the places of the picture of the picture itself.
 				if (shift !== 0)
 					this.copy(
 						dst + (this.table[shift] ?? 0),
@@ -279,7 +231,6 @@ class CgReader {
 	}
 }
 
-/** `CgFormat.Read`: the places of the picture of the part of the picture that stands. */
 export function unpackCgPicture(data: Buffer, layout: CgLayout): Buffer {
 	return new CgReader(data, layout).unpack();
 }
@@ -307,10 +258,6 @@ export const animeGameSystemCgImageDescriptor: FormatDescriptor = {
 
 export const animeGameSystemCgImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: animeGameSystemCgImageDescriptor,
-	// A picture of this kind names itself with no words of its own: the reference stands the kind of the
-	// picture in the first place of the file and stands the pictures of the kinds it names no places of the
-	// head for away. The reference stands a picture of this kind behind the pictures of the kinds of the
-	// places of a picture of the engine, so this port stands it there as well.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
@@ -355,8 +302,6 @@ export const animeGameSystemCgImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const layout = readCgLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
-		// The reference stands the places of a picture of this kind beside the places of a picture of its own,
-		// which stand the places of a picture of the three places of a place of the picture.
 		return Readable.from([
 			writeBmp24(
 				layout.width,

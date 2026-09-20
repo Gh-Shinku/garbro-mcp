@@ -14,7 +14,6 @@ The reference registers the word `PDT\0` and no name at all.
 
 The file begins with that word and a word behind it that stands at `0x118`. A picture of the container stands at
 the beginning of the file, and where the word stands again behind the whole of a picture the second picture —
-the shape of the places — stands there as well.
 
 Every picture carries its own head: the size its walk gives, the size the picture stands in, where its places
 and the walk of bits stand, and a name of up to two hundred and fifty six bytes. Every place of the head is
@@ -36,10 +35,6 @@ many ones stand there says which way the step takes:
 An integer of the walk stands in as many places as the ones in front of it say, with the value itself behind
 them: the places in front of it are its highest place, so the integer `n + 2^ones` stands there.
 
-## The places of the picture
-
-What the walk gives is a bitmap as it stands. The picture of the places stands for the places of the canvas,
-and where the file carries the shape of the places, that picture stands for the shape of every place — as many
 places of it as the two pictures share. What is handed out is a bitmap of four byte places, the shape of a
 place standing from the picture of the shapes.
 
@@ -51,10 +46,8 @@ place standing from the picture of the shapes.
 - A file of fewer than eight bytes, a file whose word is not `PDT\0`, a file whose word behind it does not
   stand at `0x118`, a picture whose head does not stand in the file, whose walk or places stand outside it, or
   whose walk gives no bitmap at all are turned away; the reference would throw while reading its head.
-- A walk that reaches beyond the words it stands in, a copy that reaches beyond the places of the picture and a
   byte the walk reads that does not stand in the file are refused with a message, where the reference reaches
   beyond its own arrays or throws.
-- The picture the reference hands to its platform is read here by the bitmap reader of this project, so a
   picture that is not a bitmap of a kind it reads is refused; a picture of fewer than thirty two bits a place
   stands with a whole shape, which is what the framework's own conversions carry.
 
@@ -62,7 +55,6 @@ place standing from the picture of the shapes.
 
 `tests/formats/aypio-pdt-bmp-image.test.ts` covers the four ways of the walk of bits — a byte of its own, a
 copy behind the place at hand, a run of copies and the byte before the place at hand — the head of a picture,
-the word of the container and its own word, the shape of the places behind a picture and what it makes of the
 shape of a place, a picture handed out as a bitmap of four byte places, a file that does not hold a bitmap, and
 a walk that runs out of its words and of its places. The vectors are worked out by hand: the walk `0010100100`
 gives `ABAB` and the walk `001100100` gives `ABBB`.

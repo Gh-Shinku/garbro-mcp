@@ -25,8 +25,6 @@ function png(width: number, height: number, depth = 8, colour = 2): Buffer {
 	return header;
 }
 
-/** A JPEG of the shape the reference's own reader takes: the start of the picture, a table behind it, and a
- * frame naming the width, the height and the places of a colour. */
 function jpeg(width: number, height: number, components = 1): Buffer {
 	const app0 = Buffer.alloc(18, 0x00);
 	app0[0] = 0xff;
@@ -44,9 +42,6 @@ function jpeg(width: number, height: number, components = 1): Buffer {
 	return Buffer.concat([Buffer.from([0xff, 0xd8]), app0, frame]);
 }
 
-/** The mask the reference stands the first places of a region under: the places of the first way stand under a
- * mask as long as a fifth of the region, the places of the second way under one as long as the region names, up
- * to twenty five places. */
 function mask(input: Buffer, scheme: string): Buffer {
 	const places =
 		scheme === "v1" ? Math.floor(input.length / 5) : Math.min(25, input.length);
@@ -58,7 +53,6 @@ function mask(input: Buffer, scheme: string): Buffer {
 	return out;
 }
 
-/** A Valkyria picture: the head, the places of the picture under their mask, and the shape of them behind. */
 function mg2File(input: {
 	image: Buffer;
 	scheme?: string;

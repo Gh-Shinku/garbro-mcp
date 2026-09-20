@@ -7,11 +7,7 @@ import {
 	readMedIndex,
 } from "../../packages/formats/src/dxlib/med.js";
 
-/** An archive of two files: the head, the index of two places, and the places of the files. The head names
- * every place of the index as twenty places, twelve of them naming a file of the archive. */
-/** Where the places of the first file of the archive stand. */
 const FIRST_OFFSET = 0x38;
-/** Where the places of the second file of the archive stand. */
 const SECOND_OFFSET = 0x3c;
 const ARCHIVE = buildArchive();
 

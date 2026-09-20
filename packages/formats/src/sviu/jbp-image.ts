@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Sviu/ImageJBP.cs", class `JbpFormat`, which stands the places of a
-// picture of the Purple engine as a picture of its own; the walk of those places stands in
-// `ArcFormats/Cmvs/ImagePB3.cs`, class `JbpReader`, which `@garbro-mcp/codecs` stands.
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import {
 	JBP_HEADER_SIZE,
 	decodeJbpPicture,
@@ -23,9 +18,7 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind stands behind. */
 const MARK = Buffer.from("JBP1", "latin1");
-/** How many places a place of a picture of this kind stands in, as the reference names it. */
 const BITS_PER_PLACE = 24;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
@@ -40,12 +33,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `JbpFormat.ReadMetaData`: the words of the head of a picture of this kind name how wide and how tall the
- * picture stands. The reference reads those words and no others and stands every picture of this kind as the
- * places of four and twenty places a place; this port reads the words of the walk of the places of the picture
- * as well, so that a file whose head names no walk at all stands as no picture of this kind.
- */
 export function readJbpLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -57,8 +44,6 @@ export function readJbpLayout(
 	const head = readJbpHead(data, 0);
 	if (head.width === 0 || head.height === 0) return undefined;
 	if (head.width * head.height > LIMIT) return undefined;
-	// The places of the walk of the places of the picture stand behind the words of the head of the picture,
-	// and the places the walk reads stand behind those.
 	if (head.dataPos < 0 || head.dataPos > fileLength) return undefined;
 	if (head.places < 0 || head.otherPlaces < 0) return undefined;
 	return {
@@ -141,9 +126,6 @@ export const sviuJbpImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = await readStored(source);
 		const layout = readJbpLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a Purple picture");
-		// The reference reads the places of the walk of the places of the picture and throws where the places
-		// of the file stand short of them; this port stands those places as no places of a picture of this kind
-		// at all rather than as an error of the walk of the places of the picture itself.
 		let picture: ReturnType<typeof decodeJbpPicture>;
 		try {
 			picture = decodeJbpPicture(stored, 0);

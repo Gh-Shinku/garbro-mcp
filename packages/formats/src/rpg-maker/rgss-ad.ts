@@ -1,8 +1,3 @@
-// Format reference: GARbro "Experimental/RPGMaker/ArcRGSS.cs", classes `RgssOpener`, `RgssEntry` and
-// `KeyGenerator` (an RPG Maker engine archive: the walk of the files stands at the front of the file, every
-// place of it and of the files standing under a walk of keys of its own). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -21,22 +16,15 @@ const AD_WORD = "AD\0";
 const AD_WORD_FIELD = 0x04;
 const VERSION_FIELD = 0x07;
 const HEADER_SIZE = 0x08;
-/** The keys of the walks this port reads: the walk of the first kind, which walks the whole file, and the
- * walk of the third kind, which stands as a walk of its own. */
 const VERSION_V1 = 1;
 const VERSION_V3 = 3;
-/** The key the walk of the first kind stands from, and the walk of a key of its own. */
 const V1_SEED = 0xdeadcafe;
 const KEY_MULTIPLIER = 7;
 const KEY_ADDEND = 3;
-/** The key the walk of the third kind stands from, which stands as the word at the front of the walk. */
 const V3_KEY_MULTIPLIER = 9;
 const V3_KEY_ADDEND = 3;
 const V3_KEY_FIELD = 0x08;
-/** A name of a file of the walk of the names, which stands in the places of a text of the kind the engine
- * stands its scripts in. */
 const NAME_ENCODING = "utf8";
-/** How many files an archive of this kind may hold, past which this project stands the walk as mad. */
 const MAXIMUM_COUNT = 0x10000;
 /** A name that stands as the name of a file: the places a text of the kind the engine stands its names in
  * stands in, without the place the walk of a file begins with. */
@@ -46,7 +34,6 @@ export interface RgssEntryLayout {
 	name: string;
 	offset: number;
 	size: number;
-	/** The key the places of the file stand under. */
 	key: number;
 }
 
@@ -59,8 +46,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `KeyGenerator`: every key of a walk stands as the key before it stood, seven times over, three places
- * standing beside it, the places of the key standing in four and thirty places of their own. */
 export class RgssKeyGenerator {
 	#seed: number;
 
@@ -88,8 +73,6 @@ function keyByte(key: number, at: number): number {
 	return (key >>> ((at << 3) & 31)) & 0xff;
 }
 
-/** `RgssOpener.OpenEntry`: every four places of a file stand under the four places of one key, and the key
- * behind them stands as the next key of the walk of the file. */
 export function decryptRgssPlaces(data: Buffer, seed: number): Buffer {
 	const out: Buffer = Buffer.from(data);
 	const keys = new RgssKeyGenerator(seed);
@@ -101,13 +84,10 @@ export function decryptRgssPlaces(data: Buffer, seed: number): Buffer {
 	return out;
 }
 
-/** The other way of the same walk, which stands the places of a file as the archive stands them. */
 export function encryptRgssPlaces(data: Buffer, seed: number): Buffer {
 	return decryptRgssPlaces(data, seed);
 }
 
-/** `RgssOpener.DecryptName` of the walk of the first kind: every place of a name stands under the lowest place
- * of one key of the walk. */
 function decryptNameV1(name: Buffer, keys: RgssKeyGenerator): string {
 	const out: Buffer = Buffer.from(name);
 	for (let at = 0; at < out.length; at += 1) {
@@ -116,8 +96,6 @@ function decryptNameV1(name: Buffer, keys: RgssKeyGenerator): string {
 	return out.toString(NAME_ENCODING);
 }
 
-/** `RgssOpener.DecryptName` of the walk of the third kind: every place of a name stands under one place of the
- * key of the walk, the four places of the key standing over and over. */
 function decryptNameV3(name: Buffer, key: number): string {
 	const out: Buffer = Buffer.from(name);
 	for (let at = 0; at < out.length; at += 1) {
@@ -126,7 +104,6 @@ function decryptNameV3(name: Buffer, key: number): string {
 	return out.toString(NAME_ENCODING);
 }
 
-/** A name of the walk of the names, which stands as the name of a file of the archive. */
 function readName(name: string): string | undefined {
 	if (0 === name.length || !NAME_BYTES.test(name)) return undefined;
 	if (name.includes("\0") || name.includes("\\")) return undefined;
@@ -134,8 +111,6 @@ function readName(name: string): string | undefined {
 	return 0 === trimmed.length ? undefined : trimmed;
 }
 
-/** The walk of the first kind: every file of the walk stands behind the places of the file before it, so the
- * walk and the places of the files stand one behind the other in the file. */
 function readIndexV1(
 	data: Buffer,
 	fileLength: number,
@@ -202,10 +177,6 @@ function readIndexV3(
 	return entries;
 }
 
-/**
- * `RgssOpener.TryOpen`: the word `RGSS` stands at the beginning of the file with the word `AD` and a place of
- * nothing behind it, and the place behind those names the kind of the walk of the files.
- */
 export function readRgssLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -300,7 +271,6 @@ export const rpgMakerRgssAdFormat: ArchiveFormat = defineFixedArchive({
 				"RPG Maker archive entry stands outside the archive",
 			);
 		}
-		// The places of a file stand under the walk of the key the walk of the files named for it.
 		return Readable.from([
 			decryptRgssPlaces(stored.subarray(start, end), at.key),
 		]);

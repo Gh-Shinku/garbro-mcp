@@ -189,7 +189,6 @@ class StreamCursor {
 		return value;
 	}
 
-	/** Nothing where the stream ends, which is how the walk of the Huffman tree stops. */
 	tryReadUInt8(): number | undefined {
 		if (this.#position >= this.#data.length) return undefined;
 		const value = this.#data[this.#position] ?? 0;

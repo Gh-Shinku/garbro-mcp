@@ -9,7 +9,6 @@ import {
 	readWv5Layout,
 } from "../../packages/formats/src/maika/wv5-audio.js";
 
-/** A Maika sound: the head, and the walk of runs that stands the places of the sound. */
 function wv5File(input: {
 	channels?: number;
 	sampleRate?: number;
@@ -50,8 +49,6 @@ describe("Maika sound format", () => {
 
 	it("turns away a sound of no places of its own", () => {
 		expect(readWv5Layout(wv5File({ channels: 0 }), 0x12)).toBeUndefined();
-		// The places of the sound stand beside each other, so how many of them stand beside each other
-		// stands as a whole number of twos.
 		expect(readWv5Layout(wv5File({ channels: 3 }), 0x12)).toBeUndefined();
 		expect(readWv5Layout(wv5File({ sampleCount: 0 }), 0x12)).toBeUndefined();
 		expect(readWv5Layout(wv5File({ chunkCount: 0 }), 0x12)).toBeUndefined();
@@ -72,13 +69,9 @@ describe("Maika sound format", () => {
 	});
 
 	it("stands the places of the colours of a sound one after the other", () => {
-		// Every place of the sound stands beside the place before it of the places that stand beside each
-		// other, so the two colours of a sound stand one after the other.
 		const walk = Buffer.from([0x00, 0x04, 0x01, 0x01, 0x02, 0x01]);
 		const file = wv5File({
 			channels: 2,
-			// How many places of the sound stand stands for every place of a colour, so four places of the
-			// walk stand two of them beside each other.
 			sampleCount: 2,
 			chunkCount: 1,
 			walk,

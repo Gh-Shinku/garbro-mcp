@@ -23,15 +23,11 @@ const STREAM = Buffer.from(
 	"hex",
 );
 
-/** The places of the picture of the test, of four places by four, as the walk of the reference stands them
- * with the places behind them standing walked as well. */
 const WALKED = Buffer.from(
 	"3e1c160000000000000000000000000000000000000000000000000000000000000000000000000000000000fffffcff00000000000000000000000000000000",
 	"hex",
 );
 
-/** The places of the picture of the test, of four places by four, with the places behind them standing walked
- * from the stream of their own. */
 const WALKED_WITH_ALPHA = Buffer.from(
 	"3e1c16bc000000bc000000bc000000bc000000f9000000f9000000a9000000a9000000cd0000003100000031fffffc3100000031000000f5000000f5000000f5",
 	"hex",
@@ -57,7 +53,6 @@ async function extract(data: Buffer): Promise<Buffer> {
 	return consumeBuffer(await handle.openEntry(entry.id));
 }
 
-/** The places of a picture stand behind the places of its head. */
 function pixelsOf(bmp: Buffer, from = 0x36): Buffer {
 	return bmp.subarray(from);
 }
@@ -70,8 +65,6 @@ describe("μ-GameOperationSystem compressed bitmap", () => {
 			bitsPerPixel: BPP_32,
 			method: KIND,
 		});
-		// The reference reads the kind of the picture with the places of the words behind the word of its head
-		// dropped, so a head that names the kind in the places beneath it stands as one that names it above.
 		const lower = buildPicture();
 		lower[1] = 0x65;
 		expect(readDetLayout(lower, HEAD_SIZE + STREAM.length)?.method).toBe(KIND);
@@ -101,18 +94,12 @@ describe("μ-GameOperationSystem compressed bitmap", () => {
 		expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 		expect(bmp.readUInt16LE(0x1c)).toBe(32);
 		expect(bmp.readInt32LE(0x12)).toBe(4);
-		// A picture of this kind stands from its top rather than from its bottom, which a picture of this
-		// project names by standing its rows from the height of it downwards.
 		expect(bmp.readInt32LE(0x16)).toBe(-4);
 		expect(bmp.readUInt32LE(0x22)).toBe(64);
-		// The places behind the places of the picture stand in a stream of their own.
 		expect(pixelsOf(bmp)).toEqual(WALKED_WITH_ALPHA);
 	});
 
 	it("stands a picture of four and twenty places with the place behind it clear of its stream", async () => {
-		// The reference walks the places behind the places of a picture of four and twenty places from the
-		// stream of the picture itself, so those places stand as the picture stands them, and it names the kind
-		// of such a picture as a picture of thirty-two places when it hands it out.
 		const bmp = await extract(buildPicture(BPP_24));
 		expect(bmp.readUInt16LE(0x1c)).toBe(32);
 		expect(pixelsOf(bmp)).toEqual(WALKED);

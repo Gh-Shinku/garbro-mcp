@@ -24,12 +24,10 @@ import { readPdtPalette } from "./pdt-image.js";
 const EXTENSIONS = ["pdt", "anm"];
 /** The byte the reference tells a picture of this engine by. */
 const SIGNATURE_BYTE = 0x35;
-/** The places of the picture, in eight places of a byte for every place between its edges. */
 const LEFT_FIELD = 0x21;
 const TOP_FIELD = 0x23;
 const RIGHT_FIELD = 0x25;
 const BOTTOM_FIELD = 0x27;
-/** Where the walk of the picture begins. */
 const WALK_FIELD = 0x29;
 /** The window the walk writes its places into: three rows of six hundred and forty four places, the row at
  * hand standing at the third of them, two places in. */
@@ -40,11 +38,9 @@ const SLIDE_SIZE = 1288;
 /** The bound the reference holds a picture of this engine to. */
 const MAXIMUM_WIDTH = 640;
 const MAXIMUM_HEIGHT = 1024;
-/** The table of the places that stand further back still, and the places of it. */
 const FRAME_SIZE = 0x110;
 const FRAME_STEP = 0x10;
 const FRAME_PLACES = 0x10;
-/** How many places of the picture this project is willing to hold. */
 const LIMIT = 256 * 1024 * 1024;
 
 export interface Pdt5Layout {
@@ -84,9 +80,6 @@ export function readPdt5Layout(
 	return { width, height, offsetX: left << 3, offsetY: top };
 }
 
-/** Where the walk of the picture stands: the byte it holds and how many of its places are still there. The
- * walk takes the lowest place of a byte first, so the places of a byte stand the other way round from the way
- * a picture of this engine reads its own. */
 interface Pdt5Cursor {
 	data: Buffer;
 	position: number;
@@ -152,20 +145,6 @@ function readPdt5Pixel(window: Buffer, at: number): number {
 	return pixel;
 }
 
-/**
- * `Pdt5Reader.Unpack`: the walk of the picture stands in a window of three rows of six hundred and forty four
- * places, the row at hand standing at the third of them, two places in, and every step of the walk stands for
- * places of that row:
- *
- * | the places in front of the step | what the step does |
- * | ------------------------------- | ------------------ |
- * | `1 1 1` | a run of the place at hand, one place more than the count names, two places at the least |
- * | `1 1 0` | a run of the places that stand beside the place at hand, twice the count, one place more than the count names |
- * | `1 0` | the place that stands from the places around the place at hand |
- * | `0` | a place that stands further back still: the place the count names of the table of the place at hand, which then moves to the front of the table |
- *
- * The row at hand is then taken into the picture and the window slides along by a row.
- */
 export function decodePdt5(data: Buffer, layout: Pdt5Layout): Buffer {
 	const pixels: Buffer = Buffer.alloc(layout.width * layout.height, 0x00);
 	const window: Buffer = Buffer.alloc(WINDOW_SIZE, 0x00);

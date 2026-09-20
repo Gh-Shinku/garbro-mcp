@@ -10,15 +10,9 @@ export const RPGMV_SIGNATURE: Buffer = Buffer.from("RPGMV", "latin1");
 /** The word stands in the first five places, and the head of the file stands in the twenty places behind
  * them. */
 export const RPGMV_HEADER_SIZE = 0x14;
-/** The places of the key stand behind the head of the file, and every one of them stands in sixteen places. */
 export const RPGMV_KEY_FIELD = 0x10;
 export const RPGMV_KEY_SIZE = 16;
-/** The places of the key stand in the place of the words of the file where the places of the file that the
- * key stands beside begin, so a file of these kinds stands as the words behind its own head. */
 export const RPGMV_PLAIN_OFFSET = 0x20;
-/** The places the words of the engine stand at, which the reference asks for in the order they stand here.
- * The reference asks for the same places with the words of the kind of file systems that name them, which
- * stand as the places of this kind where the places of a file system stand as the places of this one. */
 export const RPGMV_SYSTEM_PATHS = [
 	"../../data/System.json",
 	"../../../www/data/System.json",
@@ -28,11 +22,6 @@ export const RPGMV_SYSTEM_PATHS = [
 	"data/System.json",
 ];
 
-/**
- * `RpgmvDecryptor.GetKeyFromString`: the places of the key the words of the engine name, which stand as the
- * places of the key written one place of a byte in two places. A word of an odd number of places, and a word
- * that stands as no place of a byte, name no key.
- */
 export function parseRpgmvKey(hex: string): Buffer | undefined {
 	if ((hex.length & 1) !== 0) return undefined;
 	const key: Buffer = Buffer.alloc(hex.length / 2, 0x00);
@@ -52,8 +41,6 @@ function hexToPlace(word: string): number {
 	return -1;
 }
 
-/** `RpgmvDecryptor.ParseSystemJson`: the key the words of the engine name, where the words stand as the words
- * of a file of places of the engine at all. */
 export function parseRpgmvSystem(system: string): Buffer | undefined {
 	let parsed: unknown;
 	try {
@@ -67,10 +54,6 @@ export function parseRpgmvSystem(system: string): Buffer | undefined {
 	return parseRpgmvKey(key);
 }
 
-/**
- * `RpgmvDecryptor.FindKeyFor`: the words of the engine stand beside the places of the file, two and three and
- * four places above it and beside it, and the key stands as the words of the first of them that stands at all.
- */
 export async function findRpgmvKey(
 	sourcePath: string,
 ): Promise<Buffer | undefined> {
@@ -88,10 +71,6 @@ export async function findRpgmvKey(
 	return undefined;
 }
 
-/**
- * `RpgmvDecryptor.DecryptStream`: what stands behind the head of the file, the first sixteen places of it
- * standing beside the places of the key and the rest of the file standing as it stands.
- */
 export function decryptRpgmvStream(stored: Buffer, key: Buffer): Buffer {
 	const head = Buffer.from(
 		stored.subarray(RPGMV_KEY_FIELD, RPGMV_KEY_FIELD + key.length),
@@ -102,8 +81,6 @@ export function decryptRpgmvStream(stored: Buffer, key: Buffer): Buffer {
 	return Buffer.concat([head, stored.subarray(RPGMV_PLAIN_OFFSET)]);
 }
 
-/** The places of the head of the file beside the places of the key, as the reference reads them to tell
- * whether the words it is told by stand behind them. */
 export function decryptRpgmvHead(
 	stored: Buffer,
 	key: Buffer,
@@ -118,8 +95,6 @@ export function decryptRpgmvHead(
 	return head;
 }
 
-/** `RpgmvpFormat.ReadMetaData` and `RpgmvoAudio.TryOpen`: the file stands behind the word of the engine, and
- * the words the places of its head stand for stand where the places of the key say they do. */
 export async function readRpgmvFile(
 	stored: Buffer,
 	sourcePath: string,

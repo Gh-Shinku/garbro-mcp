@@ -1,22 +1,11 @@
-// Format reference: GARbro "Legacy/Adviz/ImageBIZ.cs", the palette of the engine (`ReadPalette`) together with
-// the table of mappers of the places of a palette (`GrpMap`) and the three kinds of mapper. This project
-// implements the palette of a picture of a BIZ or a GIZ/2 picture.
-
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
-/** The words of the two companions of the engine that stand beside a picture of its kind rather than within
- * it: the table of the words of the places of a picture and the table of the palettes of them. */
 const GROUP_TABLE_NAME = "GRP_TBL.SYS";
 const PALETTE_TABLE_NAME = "PLT_TBL.SYS";
-/** Every record of the table of the words of the places of a picture stands in twelve places: eight places of
- * words and four of the words behind them. */
 const GROUP_RECORD_SIZE = 12;
 const GROUP_NAME_SIZE = 8;
-/** The words of a picture of the places of a picture of a person stand as the words of the first place of the
- * picture of that person, so that the words of the kind of the picture stand behind them. */
 const TACHIE_WORDS = /^(T[^._]+_)[2-9][^.]*\.GIZ$/;
-/** The shortest words the places of a picture of a person stand in, which stand padded to them with places. */
 const SHORTEST_NAME = 8;
 
 export interface PaletteMapper {
@@ -190,8 +179,6 @@ const PALETTE_MAPPERS: readonly PaletteMapper[] = [
 	},
 ];
 
-/** Every kind of the places of the palettes of the engine, told by the sizes of the two companions it stands
- * with. A picture stands with a place of its own where the table names no kind. */
 const MAPPER_BY_TABLE_SIZES = new Map<string, PaletteMapper>(
 	PALETTE_MAPPERS.map((mapper) => [
 		`${mapper.grpSize}:${mapper.pltSize}`,
@@ -200,11 +187,9 @@ const MAPPER_BY_TABLE_SIZES = new Map<string, PaletteMapper>(
 );
 
 export interface AdvizPalette {
-	/** The places of the palette, as the places of a picture of the kind the reference stands them in. */
 	colors: Buffer;
 	/** The place of the palette within the table of palettes. */
 	index: number;
-	/** The kind of the places of the palettes the two companions stood in, where the table names one. */
 	mapper: PaletteMapper | undefined;
 }
 
@@ -212,11 +197,6 @@ function invalidPalette(message: string): never {
 	throw new Error(message);
 }
 
-/**
- * `BizFormat.ReadPalette`: the palette of a picture of the engine stands in the table of palettes of the
- * engine, at the place the table of the words of the places of a picture names for the words of the picture,
- * told by the sizes of the two companions where the pair names a kind of its own.
- */
 export async function readAdvizPalette(
 	sourcePath: string,
 	paletteSize: number,
@@ -249,8 +229,6 @@ export async function readAdvizPalette(
 		: dot < 0
 			? fileName
 			: fileName.slice(0, dot);
-	// The reference stands the shortest words of a picture padded to the words of the places of a picture with
-	// a single place, whatever the places the words stand short of them.
 	if (name.length < SHORTEST_NAME) name += " ";
 
 	let index = 0;
@@ -273,9 +251,6 @@ export async function readAdvizPalette(
 	}
 	if (!found || at >= grpSize) return undefined;
 
-	// The reference reads the words of the picture as they stand rather than as the filled words the table of
-	// the words of the places of a picture stands them in, so the kind of the places of the palettes is told
-	// by the words of the picture itself.
 	const mapper = MAPPER_BY_TABLE_SIZES.get(`${grpSize}:${pltSize}`);
 	const named = mapper?.names?.[fileName];
 	const placed = named ?? index + (mapper?.shift ?? 0);

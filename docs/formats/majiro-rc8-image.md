@@ -25,7 +25,6 @@ Every run of the second kind therefore has to reach back, and may not reach befo
 the reference refuses a place at or after the picture and one before its start alike.
 
 Deviations from the reference, in the message only: a run that says more bytes than the picture still holds,
-a run that reaches outside it, and a stream that is cut short are refused with messages of this project's
 own, where the reference throws format exceptions of its own. The write path of the reference throws
 `NotImplementedException`, so this is a read only format.
 

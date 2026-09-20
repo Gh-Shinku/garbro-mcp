@@ -18,10 +18,6 @@ const HEAD_SIZE = 0x5c;
 const HEAD_KEY = 0x8465b49b;
 const SIGNATURE = Buffer.from([0x10, 0x33, 0xd3, 0x47]);
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture. */
 function invertAction(action: number, at: number, value: number): number {
 	if (action === 0) return rotByteRight(value, (8 - (at & 7)) & 7);
 	if (action === 1) return value ^ at;
@@ -31,12 +27,6 @@ function invertAction(action: number, at: number, value: number): number {
 	return rotByteRight(value, 4);
 }
 
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture of the places of the picture of the walk of the places of the
- * picture: the places of the picture of the walk of the places of the picture of the places of the picture of
- * the walk of them of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of the places of the picture of their own. */
 function encryptG2(scheme: G2Scheme, input: Buffer, length: number): Buffer {
 	const out = Buffer.alloc(length);
 	const whole = length & ~3;
@@ -55,29 +45,9 @@ function encryptG2(scheme: G2Scheme, input: Buffer, length: number): Buffer {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture of the places of the picture of the walk of the places of the
- * picture: the places of the picture of the walk of the places of the picture of the words of the walk of the
- * places of the picture of the walk of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the
- * places of the picture of the picture of the walk of the places of the picture of the sound of the places of
- * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of their own. */
 function encryptIndex(plain: Buffer, keys: number[]): Buffer {
 	const buffers: Buffer[] = [Buffer.from(plain), Buffer.alloc(plain.length)];
 	let slot = 0;
-	// The places of the picture of the walk of the places of the picture of the words of the walk of the places
-	// of the picture of the walk of the places of the picture of the walk of them of the places of the picture
-	// of the walk of the places of the picture of the kind of the places of the picture of the walk of the
-	// places of the picture of the reference stand of the places of the picture of the walk of the places of the
-	// picture of the sound of the places of the picture of the walk of the places of the picture of every place
-	// of the picture of the walk of the places of the picture of the fifth kind of the places of the picture of
-	// the walk of the places of the picture one behind the other, so the places of the picture of the walk of
-	// the places of the picture of the sound of the places of the picture of this project stand of the places
-	// of the picture of the walk of the places of the picture of the kind of the places of the picture of the
-	// walk of them of the places of the picture of the walk of the places of the picture of the places of the
-	// picture of the walk of the places of the picture of the same kind of the places of the picture of their
-	// own.
 	for (const key of keys) {
 		const scheme = createG2Scheme(key);
 		if (!scheme) throw new Error("bad key");
@@ -91,10 +61,6 @@ function encryptIndex(plain: Buffer, keys: number[]): Buffer {
 	return buffers[slot] ?? Buffer.alloc(0);
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of a book of the places of the picture of the walk of the
- * places of the picture of the words of the walk of them of the places of the picture of the walk of the places
- * of the picture of the kind of the places of the picture of the walk of the places of the picture. */
 function buildIndex(options: {
 	names: string[];
 	parent?: number;
@@ -143,12 +109,6 @@ function buildIndex(options: {
 
 describe("Glib2 game engine resource archive", () => {
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them of the places of the picture of the walk of the places of the picture of the sound stand
-		// of the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture of the places of the picture of the walk of them of
-		// the places of the picture of the walk of the places of the picture of the book of the places of the
-		// picture.
 		const cases = [
 			{
 				key: 0x9f020000,
@@ -205,22 +165,10 @@ describe("Glib2 game engine resource archive", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture", () => {
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them stand of the places of the picture of the walk of the places of the picture of the sound
-		// of the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture of the places of the picture of the walk of them of
-		// the places of the picture of the walk of the places of the picture of the book of the places of the
-		// picture of the places of the picture of the walk of the places of the picture of the sound of the
-		// places of the picture of the walk of the places of the picture.
 		const scheme = createG2Scheme(0x9f020000);
 		if (!scheme) throw new Error("no scheme");
 		const out = decryptG2(scheme, Buffer.from([0x11, 0x22, 0x33, 0x44]), 4);
 		expect(Array.from(out)).toEqual([0x44, 0x08, 0x19, 0x42]);
-		// The places of the picture of the walk of the places of the picture of the places of the picture of the
-		// walk of the places of the picture of the kind of the places of the picture of the walk of the places
-		// of the picture of the sound of the places of the picture of the walk of the places of the picture of
-		// the places of the picture of the walk of them of the places of the picture of the walk of the places
-		// of the picture.
 		const round = Buffer.from([0x00, 0x7f, 0x80, 0xff, 0x12, 0x34, 0x56]);
 		expect(
 			Array.from(
@@ -231,18 +179,6 @@ describe("Glib2 game engine resource archive", () => {
 
 	it("reads the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture", () => {
 		const data = Buffer.from("hello there", "latin1");
-		// The places of the picture of the walk of the places of the picture of the words of the walk of the
-		// places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-		// of them of the places of the picture of the walk of the places of the picture of the places of the
-		// picture of the walk of the places of the picture stand of the places of the picture of the walk of the
-		// places of the picture of the kind of the places of the picture of the walk of the places of the
-		// picture of the sound of the places of the picture of the walk of them of the places of the picture of
-		// the walk of the places of the picture of their own, so a picture of this project stands one of the
-		// places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture of the sound of the places of the picture of the
-		// walk of the places of the picture behind the places of the picture of the walk of the places of the
-		// picture of the fourth kind of the places of the picture of the walk of the places of the picture.
 		const keys = [0x9f020000, 0x9f020000, 0x9f020000, 0x9f020000];
 		const index = buildIndex({
 			names: ["file.txt"],
@@ -289,9 +225,6 @@ describe("Glib2 game engine resource archive", () => {
 		expect(readG2Layout(Buffer.alloc(8, 0x00))).toBeUndefined();
 		const wrong = Buffer.concat([SIGNATURE, Buffer.alloc(HEAD_SIZE, 0x00)]);
 		expect(readG2Layout(wrong)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of their own.
 		const badVersion = Buffer.alloc(HEAD_SIZE, 0x00);
 		badVersion[0x11] = 0x39;
 		const headScheme = createG2Scheme(HEAD_KEY);
@@ -308,18 +241,6 @@ describe("Glib2 game engine resource archive", () => {
 
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the fourth kind out of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the sound", async () => {
 		expect(g2ArchiveFormat.descriptor.id).toBe("g2-archive");
-		// The places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-		// of them of the places of the picture of the walk of the places of the picture of the kind of the
-		// places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of their own stand of the places of the picture of
-		// the walk of the places of the picture of the kind of the places of the picture of the walk of the
-		// places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture of the sound of the places of the picture of the
-		// walk of the places of the picture where the places of the picture of the walk of the places of the
-		// picture of the kind of the places of the picture of the walk of them of the places of the picture of
-		// the walk of the places of the picture of the places of the picture of the walk of the places of the
-		// picture stand of no places of the picture of the walk of the places of the picture of their own.
 		const plain = Buffer.alloc(0x1000, 0x5a);
 		const indexKeys = [0x9f020000, 0x9f020000, 0x9f020000, 0x9f020000];
 		const entryKeys = [0, 0, 0, 0];
@@ -337,14 +258,6 @@ describe("Glib2 game engine resource archive", () => {
 		head.writeUInt32LE(0x100, 0x54);
 		head.writeUInt32LE(stored.length, 0x58);
 		const encryptedHead = encryptG2(headSchemeFor(), head, HEAD_SIZE);
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of the kind of the
-		// places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of their own stand of no places of the picture of the
-		// walk of the places of the picture of their own, so the places of the picture of the walk of the places
-		// of the picture of the sound of the places of the picture of the walk of the places of the picture of
-		// the kind of the places of the picture of the walk of them stand where they stand.
 		const data = Buffer.concat([
 			encryptedHead,
 			Buffer.alloc(0x100 - HEAD_SIZE, 0x00),
@@ -378,8 +291,6 @@ describe("Glib2 game engine resource archive", () => {
 	});
 });
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture. */
 function headSchemeFor(): G2Scheme {
 	const scheme = createG2Scheme(HEAD_KEY);
 	if (!scheme) throw new Error("no head scheme");

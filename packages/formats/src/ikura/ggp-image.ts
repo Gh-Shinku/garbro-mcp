@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Ikura/ImageGGP.cs", classes `GgpFormat`, `GgpMetaData` and
-// `EncryptedStream`. The reference reads the picture through the portable network graphic format it extends;
-// this project has no such reader, so the port passes the decrypted picture through instead, the way the other
-// containers of this project that hold a picture they cannot decode do.
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,

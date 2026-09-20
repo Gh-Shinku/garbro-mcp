@@ -12,8 +12,6 @@ import {
 
 const INDEX_OFFSET = 0x40;
 const SECOND_OFFSET = 0x58;
-/** The places of the wave of the first file of the archive: how long the places that name how the places of
- * the wave stand, and how much of the wave stands. */
 const FORMAT_SIZE = 12;
 const DATA_SIZE = 4;
 
@@ -28,8 +26,6 @@ function buildArchive(mark = "war "): Buffer {
 	const index = Buffer.alloc(entrySize * 2, 0x00);
 	index.writeUInt32LE(INDEX_OFFSET, 0);
 	index.writeUInt32LE(8 + FORMAT_SIZE + DATA_SIZE, 4);
-	// The first file of the archive stands as the places of a wave, which stands as no kind of sound of its
-	// own in the words of the head.
 	index.writeUInt8(0, 0x14);
 	index.writeUInt32LE(SECOND_OFFSET, entrySize);
 	index.writeUInt32LE(4, entrySize + 4);

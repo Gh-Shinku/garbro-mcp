@@ -11,9 +11,6 @@ import {
 const HEAD_SIZE = 5;
 const PART_HEAD_SIZE = 0xd;
 
-/** The places of the picture of the pictures of the test, stood against an account of the reference of its
- * own: a picture of the whole of a picture, a picture of a part of a picture standing within it, and a picture
- * of a kind of the places of a picture of its own. */
 const PICTURES: readonly {
 	name: string;
 	width: number;
@@ -57,8 +54,6 @@ describe("Anime Game System image format", () => {
 			bottom: 2,
 			dataOffset: HEAD_SIZE,
 		});
-		// The places of the head of a picture of a part of a picture stand behind the places of the head of the
-		// picture of the kind of the places of a picture of it.
 		const part = Buffer.from(PICTURES[1]?.file ?? "", "hex");
 		expect(readCgLayout(part, part.length)).toMatchObject({
 			type: 1,
@@ -73,13 +68,10 @@ describe("Anime Game System image format", () => {
 	});
 
 	it("turns away a head that names no picture of this kind", () => {
-		// The kind of a picture of this kind stands beneath the places of a picture of the kind of the places
-		// of a picture of the engine.
 		expect(readCgLayout(Buffer.from([0x20, 4, 0, 2, 0]), 5)).toBeUndefined();
 		expect(readCgLayout(Buffer.from([0x00, 0, 0, 2, 0]), 5)).toBeUndefined();
 		expect(readCgLayout(Buffer.from([0x00, 4, 0, 0, 0]), 5)).toBeUndefined();
 		expect(readCgLayout(Buffer.alloc(4), 4)).toBeUndefined();
-		// The places of a part of a picture stand within the places of the picture and stand beside each other.
 		const bad = Buffer.alloc(PART_HEAD_SIZE, 0x00);
 		bad[0] = 0x01;
 		bad.writeInt16LE(4, 1);
@@ -116,8 +108,6 @@ describe("Anime Game System image format", () => {
 			expect(bmp.readUInt16LE(0x1c)).toBe(24);
 			expect(bmp.readInt32LE(0x12)).toBe(picture.width);
 			expect(bmp.readInt32LE(0x16)).toBe(-picture.height);
-			// The places of a picture of this project stand in the places of a row of the picture of the
-			// places of a picture of the BMP, which stand padded to the places of four.
 			const places = Buffer.from(picture.out, "hex");
 			const stride = (picture.width * 3 + 3) & ~3;
 			for (let row = 0; row < picture.height; row += 1) {
@@ -138,9 +128,6 @@ describe("Anime Game System image format", () => {
 	});
 
 	it("turns a picture whose places stand short of the walk of them away", () => {
-		// The places of the walk of a picture stand behind the places of the palette of a picture of a kind of
-		// the places of a picture of a palette, so a picture cut short of the places of the walk of it stands
-		// away.
 		const file = Buffer.from(PICTURES[0]?.file ?? "", "hex");
 		const cut = file.subarray(0, file.length - 3);
 		const layout = readCgLayout(cut, cut.length);

@@ -10,8 +10,6 @@ import { unpackPolaPicture } from "../../packages/formats/src/advsys/pola-reader
 const HEAD_SIZE = 0x14;
 const OLD_HEAD_SIZE = 0xd;
 
-/** A head of a picture of this kind: the words of the kind of the picture, the kind of the walk of the places
- * of it, and how many places the walk of it stands for. */
 function buildHead(options?: {
 	newVersion?: boolean;
 	unpackedSize?: number;
@@ -24,11 +22,6 @@ function buildHead(options?: {
 	return head;
 }
 
-/** The walks of the places of a picture whose places of the walk stand for the places of the picture behind
- * them and for the counts of them, stood against an account of the reference of its own: every walk stands the
- * places of the picture of two places of the picture of its own and then a walk of the places of the picture
- * behind them, whose places stand beside each other, so the places of the picture stand as the places of the
- * picture of the two places of their own standing over and over. */
 const WALKS: readonly {
 	name: string;
 	places: number;
@@ -96,8 +89,6 @@ const WALKS: readonly {
 
 describe("AdvSys engine compressed image format", () => {
 	it("reads the head of a picture of each of the two kinds of the walk of it", () => {
-		// The places of the head of a picture of the second kind of the walk of it stand behind the words of
-		// the kind of the walk of a picture, and the places of the pictures of the two kinds stand apart.
 		expect(readPolaLayout(buildHead({ newVersion: true }), 0x40)).toEqual({
 			dataOffset: HEAD_SIZE,
 			unpackedSize: 0x40,
@@ -117,13 +108,10 @@ describe("AdvSys engine compressed image format", () => {
 	});
 
 	it("walks the places of a picture whose places of the walk all stand for themselves", () => {
-		// A word of the walk of a picture whose places of the walk all stand for themselves stands before the
-		// places of the picture it stands for, and the places of the picture stand behind it.
 		const places = Buffer.from([
 			0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
 		]);
 		const stream = Buffer.concat([Buffer.from([0xff, 0xff]), places]);
-		// The places of the picture stand two places short of the places of the walk of it.
 		expect(unpackPolaPicture(stream, 8)).toEqual(
 			Buffer.concat([places, Buffer.alloc(2)]),
 		);

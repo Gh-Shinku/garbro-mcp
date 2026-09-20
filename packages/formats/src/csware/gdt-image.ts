@@ -477,7 +477,6 @@ function unpackDouble(
 		} else if (0xd2 === control) {
 			at += op;
 		} else if (control < 0xf3) {
-			// A run repeating what the two rows already hold, at one of the places the reference lists.
 			const back = doubleBack(control, height);
 			writer.copyBack(at, at - back, op);
 			writer.copyBack(at + height, at + height - back, op);

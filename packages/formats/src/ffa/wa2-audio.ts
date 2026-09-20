@@ -47,7 +47,6 @@ export interface Wa2Layout {
 	averageBytesPerSecond: number;
 	blockAlign: number;
 	bitsPerSample: number;
-	/** Where the walk of the sound begins, behind the head. */
 	dataOffset: number;
 }
 
@@ -55,13 +54,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Wa2Input`: the file begins with the word `APCM` — the word the reference registers — and then the shape of
- * a wave file whose format chunk stands from eight: the kind of the sound at `0x14`, the channels at `0x16`,
- * the pace at `0x18`, the average at `0x1C`, the size of a block at `0x20` and the bits of a sample at
- * `0x22`. The head closes with the size of the sound at `0x28`, and the walk of the sound stands behind the
- * forty four bytes of the head.
- */
 export function readWa2Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -92,14 +84,6 @@ export function readWa2Layout(
 	};
 }
 
-/**
- * `Wa2Input.Decode`: the walk takes the high four places of a byte first and the four lower places of it
- * behind them. What a place gives is the step the walk stands at times the odd number its three lowest places
- * name, less three places of the same, and the sample climbs by that step or falls by it where the highest
- * place of the place stands. The walk then moves along: the step it stands at times what the table of the two
- * walks gives for the place, less six places, and where that stands above a hundred and twenty seven the walk
- * stands there — up to the greatest step — and where it does not the walk stands where it began.
- */
 export function decodeWa2(stored: Buffer, layout: Wa2Layout): Buffer {
 	const output: Buffer = Buffer.alloc(layout.pcmSize, 0x00);
 	let sample = 0;

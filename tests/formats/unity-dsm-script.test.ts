@@ -10,10 +10,6 @@ import {
 	unityDsmScriptFormat,
 } from "../../packages/formats/src/unity/dsm-script.js";
 
-/** A UTAGE scenario of the Unity engine: the places of the script stand as the places of a ciphered block,
- * which stand as a text of the kind that stands in four places of six and sixty four. The places stand under
- * the walk of the key the reference knows, which stands worked out with another walk of the standard kind and
- * the cipher of the command line, so the script does not stand under a key this port worked out itself. */
 const SCRIPT = Buffer.from(
 	"C3SuDvv/PREsvHysfP3RfIG/pJZyrgz4ZT1CBXUrV22bgelM+fnEGpNUFsoC2YIoG1zOhwa9/NLrpKK6rnk4/w==",
 	"latin1",
@@ -33,14 +29,10 @@ describe("UTAGE Unity engine script file", () => {
 	});
 
 	it("stands the places of a script in the clear under the key of the reference", () => {
-		// The text stands behind a cipher the command line of the standard cipher worked out, so a walk other
-		// than the one of this port stands the places of the script in the clear.
 		expect(decryptDsm(SCRIPT)).toEqual(PLAIN);
 	});
 
 	it("reads the places of a script that stand as a text of the kind it stands as", () => {
-		// The reference reads the places of a text with the places of the kind that stand in four places of
-		// six and sixty four, so the places of the script may stand with the places of a line between them.
 		const broken = Buffer.from(
 			`${SCRIPT.subarray(0, 40).toString("latin1")}\n${SCRIPT.subarray(40).toString("latin1")}`,
 			"latin1",

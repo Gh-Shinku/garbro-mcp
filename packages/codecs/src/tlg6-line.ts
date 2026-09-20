@@ -1,32 +1,3 @@
-// Reference: GARbro "ArcFormats/KiriKiri/ImageTLG.cs", the places of the picture of the walk of the places of
-// the picture of the line of the places of the picture of the sixth kind of the places of the picture:
-// `tvp_make_gt_mask`, `tvp_med2`, `tvp_packed_bytes_add`, `tvp_med`, `tvp_avg` and the walk
-// `TVPTLG6DecodeLineGeneric` with its switch of the places of the picture of the walk of the places of the
-// picture of the places of the picture of the walk of them of the places of the picture of the walk of the
-// places of the picture. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
-/**
- * The places of the picture of the walk of the places of the picture of the line of the places of the picture
- * of the sixth kind of the places of the picture, standing of the places of the picture of the walk of the
- * places of the picture of the places of the picture of the walk of them of the places of the picture of the
- * walk of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of them of every place of the picture of the
- * walk of them, of the places of the picture of the walk of the places of the picture of the walk of them of
- * the places of the picture of the walk of the places of the picture of the three places of the picture of the
- * walk of the places of the picture of the sound of their own beside them. Every place of the picture of the
- * walk of them stands of the places of the picture of the walk of the places of the picture of the place of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * sound of the places of the picture: the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * them, then of the places of the picture of the walk of the places of the picture of the sound of the places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture.
- *
- * The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them were taken out of the places of the picture of the walk of the places of the picture of the words of
- * the walk of the picture of the places of the picture of the walk of them of the places of the picture of the
- * reference, and of the places of the picture of the walk of the places of the picture of the places of the
- * picture of the walk of them of the places of the picture of their own.
- */
 export const TLG6_LINE_FILTERS: readonly [
 	boolean,
 	readonly [number, number, number],
@@ -67,21 +38,12 @@ export const TLG6_LINE_FILTERS: readonly [
 	[true, [1, 0, 2], [0, 1, 2], [0, 0, 1]],
 ];
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture, standing of the places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of their own beside
- * them. */
 export function tlg6MakeGtMask(a: number, b: number): number {
 	const notB = ~b;
 	const tmp = ((a & notB) + (((a ^ notB) >>> 1) & 0x7f7f7f7f)) & 0x80808080;
 	return (((tmp >>> 7) + 0x7f7f7f7f) ^ 0x7f7f7f7f) >>> 0;
 }
 
-/** The places of the picture of the walk of the places of the picture of the middle of the places of the
- * picture of the walk of the places of the picture of the sound, standing of the places of the picture of the
- * walk of the places of the picture of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the sound of their own. */
 export function tlg6Med2(a: number, b: number, c: number): number {
 	const aGtB = tlg6MakeGtMask(a, b);
 	const mixed = (a ^ b) & aGtB;
@@ -93,40 +55,21 @@ export function tlg6Med2(a: number, b: number, c: number): number {
 	return ((n & aa) | (nn & bb) | (((bb & m) - (c & m) + (aa & m)) >>> 0)) >>> 0;
 }
 
-/** The places of the picture of the walk of the places of the picture of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the eight places of the picture of their
- * own beside them. */
 export function tlg6PackedBytesAdd(a: number, b: number): number {
 	const tmp = ((((a & b) << 1) + ((a ^ b) & 0xfefefefe)) & 0x01010100) >>> 0;
 	return (a + b - tmp) >>> 0;
 }
 
-/** The places of the picture of the walk of the places of the picture of the middle of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of
- * the places of the picture of the kind of the places of the picture of the walk of the places of the picture
- * of their own. */
 export function tlg6Med(a: number, b: number, c: number, v: number): number {
 	return tlg6PackedBytesAdd(tlg6Med2(a, b, c), v);
 }
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of
- * the walk of the places of the picture of their own. */
 export function tlg6Avg(a: number, b: number, _c: number, v: number): number {
 	const mean =
 		((a & b) + (((a ^ b) & 0xfefefefe) >>> 1) + ((a ^ b) & 0x01010101)) >>> 0;
 	return tlg6PackedBytesAdd(mean, v);
 }
 
-/** The places of the picture of the walk of the places of the picture of the line of the places of the picture
- * of the sixth kind of the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of their own: the places of the picture of the walk of the places of the picture
- * of the sound of the places of the picture stand of the places of the picture of the walk of the places of
- * the picture of the sound of the places of the picture of the walk of them, then of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of the places
- * of the picture of their own beside them. */
 export function applyTlg6Filter(
 	filterType: number,
 	a: number,
@@ -152,10 +95,6 @@ export function applyTlg6Filter(
 	return usesAverage ? tlg6Avg(a, b, c, placed) : tlg6Med(a, b, c, placed);
 }
 
-/** The places of the picture of the walk of the places of the picture of the line of the places of the picture
- * stand of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * sound of the places of the picture of the walk of the places of the picture of their own. */
 export function applyTlg6Line(
 	prevLine: Uint32Array,
 	prevAt: number,

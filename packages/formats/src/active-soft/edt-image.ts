@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/ActiveSoft/ImageEDT.cs", classes `EdtFormat`, `EdtMetaData` and
-// `EdtFormat.Reader` (a picture of the Active Soft engine of the three places of a place of the picture: the
-// places of the picture stand as the places of the picture of the words of the walk of them or as the places of
-// the picture of the places of the picture that stand behind them, in the kinds of the walk of the places of
-// the picture). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,34 +13,20 @@ import {
 } from "../shared/fixed-archive.js";
 import { EdBitReader } from "./ed-common.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file, and the places of
- * the head of it stand behind them. */
 const MARK = Buffer.from(".TRUE\x8d\x5d\x8c\xcb\x00", "latin1");
 const HEAD_SIZE = 0x22;
 const WIDTH_FIELD = 0xe;
 const HEIGHT_FIELD = 0x10;
 const PACKED_SIZE_FIELD = 0x1a;
 const EXTRA_SIZE_FIELD = 0x1e;
-/** The places of a picture of this kind stand in the places of a picture of the three places of a place of the
- * picture. */
 const PLACES_PER_PLACE = 3;
-/** The places of the picture of the walk of the count of the places of a walk of a picture stand within the
- * places of a picture of the count of its own. */
 const COUNT_PLACES = 5;
-/** The places of the picture of the places of a walk of a picture that stand behind it stand as the places of
- * the walk of the places of a picture of the count of the kinds of their places, of which the reference names
- * four, standing as the places of the picture of the words behind them. */
 const SHIFT_SELECT = 0x11191718;
 const SHIFT_SELECT_PLACES = 2;
-/** The places of a picture of a kind stand as the places of the picture of the places of the walk of the
- * picture of the two places of theirs, the first of them standing for the places of the picture of their own
- * and the last one for no place of the picture at all. */
 const PLACES_PER_ROW_BEHIND = 4;
 const PLACES_PER_ROW_BEHIND_KINDS = 7;
 const PLACES_OF_LAST_ROW = 4;
 const LAST_ROW_LEAST = 12;
-/** The places of the picture of a walk of the picture that stand behind the places of the walk of them stand
- * for the places of the picture of the kind of the places of the picture of the count of them. */
 const LEAST_PLACE = 2;
 const MOST_PLACE = 0xfd;
 
@@ -62,11 +42,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `EdtFormat.ReadMetaData`: the words of the head of a picture of this kind name the words of the kind of the
- * picture, how wide and how tall the picture stands, how many places the walk of the places of the picture
- * stands for, and how many places the picture of the places of the walk of the picture of its own stands for.
- */
 export function readEdtLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -78,13 +53,7 @@ export function readEdtLayout(
 	const compSize = data.readUInt32LE(PACKED_SIZE_FIELD);
 	const extraSize = data.readUInt32LE(EXTRA_SIZE_FIELD);
 	if (width <= 0 || height <= 0) return undefined;
-	// Every place of the picture of the places of the walk of the picture of its own stands as the places of a
-	// picture of the three places of a place of the picture, so a picture of no places of them stands nowhere.
 	if (extraSize === 0 || extraSize % PLACES_PER_PLACE !== 0) return undefined;
-	// The places of the walk of a picture and the places of the picture of the walk of it stand within the
-	// places of the picture, which the reference reads without standing them against the places of the file.
-	// This port stands the words of the head against the places of the file, so a picture cut short of the
-	// places of its own stands away.
 	if (HEAD_SIZE + compSize + extraSize > fileLength) return undefined;
 	return {
 		width,
@@ -95,8 +64,6 @@ export function readEdtLayout(
 	};
 }
 
-/** Where the places of the picture that stand beside the places of the walk of a picture stand, of the places
- * of the picture of the walk of it. */
 function createShiftTable(width: number): Int32Array {
 	const stride = width * PLACES_PER_PLACE;
 	const table = new Int32Array(
@@ -122,13 +89,6 @@ function createShiftTable(width: number): Int32Array {
 	return table;
 }
 
-/**
- * `EdtFormat.Read`: the places of the picture, walked. Every place of the walk of the picture names one of the
- * kinds of the walk of the places of the picture: a place of the picture that stands as a place of the picture
- * of the places behind the places of the walk of the picture of its own, a place of the picture that stands as
- * the places of the picture of the place beside it, and a place of the picture that stands from the places of
- * the picture of the kinds of the walk of the places of the picture of the count of them.
- */
 export function unpackEdtPicture(data: Buffer, layout: EdtLayout): Buffer {
 	const packed = data.subarray(
 		layout.dataOffset,
@@ -158,8 +118,6 @@ export function unpackEdtPicture(data: Buffer, layout: EdtLayout): Buffer {
 		if (reader.nextBit() === 1) {
 			if (reader.nextBit() === 0) {
 				const offset = table[reader.readBits(0, COUNT_PLACES)] ?? 0;
-				// The reference stands the walk of the places of the picture away where the places of the
-				// picture of the walk of it stand before the places of the picture itself.
 				if (dst < -offset) return out;
 				const count = reader.countBits() * PLACES_PER_PLACE;
 				for (let at = 0; at < count; at += 1) {

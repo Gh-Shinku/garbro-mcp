@@ -65,7 +65,6 @@ function channelFile(input: {
 	head.writeUInt8(input.hasPalette ? 1 : 0, 5);
 	head.writeUInt16LE(input.width, 6);
 	head.writeUInt16LE(input.height, 8);
-	// What the walk of the four streams counts is the size of every stream, in the order of the head.
 	input.streams.forEach((stream, index) => {
 		head.writeUInt32LE(stream.length, 0x0e + index * 4);
 	});

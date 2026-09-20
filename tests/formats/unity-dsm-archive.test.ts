@@ -10,11 +10,6 @@ import {
 } from "../../packages/formats/src/unity/dsm-archive.js";
 import { unityDsmScriptFormat } from "../../packages/formats/src/unity/dsm-script.js";
 
-/** A UTAGE scenario of the Unity engine: the places of the script stand as a text of the kind that stands in
- * four places of six and sixty four, behind the places a text of that kind begins with, which stand at the
- * front of the file the archive holds. The places stand under the walk of the key the reference knows, which
- * stands worked out with another walk of the standard kind, so the script of the test does not stand under a
- * key this port worked out itself. */
 const SCRIPT = Buffer.concat([
 	Buffer.from([0xef, 0xbb, 0xbf]),
 	Buffer.from(
@@ -35,8 +30,6 @@ describe("Unity engine scenario archive", () => {
 	});
 
 	it("stands how many places the clear of a file of its own kind holds", () => {
-		// The reference stands three places of the clear for every four places of the text, whole fours
-		// counting.
 		expect(dsmClearSize(92)).toBe(69);
 		expect(dsmClearSize(95)).toBe(69);
 		expect(dsmClearSize(0)).toBe(0);

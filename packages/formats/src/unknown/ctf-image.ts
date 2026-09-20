@@ -56,14 +56,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `CtfFormat.ReadMetaData`: the word `CTFF`, the width and the height at four and six as words, the size of
- * the planes at twelve, the places of the red, the green, the blue and the alpha plane from sixteen, and the
- * depth at `0x20` — which has to be twenty four bits, whether the alpha plane stands behind it or not. A
- * place of the alpha plane that is not nought is what makes the picture thirty two bits a pixel, and the
- * byte at `0x22` says whether the stream was packed, which the reference notes and then does not use: it
- * always reads an LZSS stream.
- */
 export function readCtfLayout(
 	data: Buffer,
 	fileLength = data.length,

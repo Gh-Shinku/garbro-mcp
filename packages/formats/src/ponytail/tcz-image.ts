@@ -38,9 +38,6 @@ const SIGNATURE = Buffer.from("NMI ", "latin1");
 const VERSION = "2.5\0";
 const VERSION_FIELD = 0x04;
 const HEADER_SIZE = 0x10;
-/** The width of the picture stands in the word at `0x0C` and its height in the word behind it, the places of
- * the picture standing beside each other rather than in fours, and how far the picture stands from the corner
- * of its own place in the first two words behind the width of the format. */
 const WIDTH_FIELD = 0x0c;
 const HEIGHT_FIELD = 0x0e;
 /** `TczReader.MaxHeight` and the buffer it walks over: sixteen columns of that height. */
@@ -58,13 +55,10 @@ const OFFSET_TABLE_1 = [
 const LIMIT = 256 * 1024 * 1024;
 
 export interface TczLayout {
-	/** The places of the picture, two of them standing in every byte of a row. */
 	width: number;
 	height: number;
 	/** How many bytes stand in a row of the picture. */
 	stride: number;
-	/** How far the picture stands from the corner of its own place, which the reference keeps and does not use
-	 * while gathering the places of the picture. */
 	originX: number;
 	originY: number;
 }
@@ -104,24 +98,6 @@ export function readTczLayout(
 	};
 }
 
-/**
- * `TczReader.Unpack`: the places of the picture stand column by column in a buffer that holds sixteen columns
- * of the greatest height a picture of this kind takes. Every column holds as many places as the picture is
- * high, and a step of the walk either copies a run of places or takes one place out of the place two behind.
- *
- * | the places in front of the step | what the step does |
- * | ------------------------------- | ------------------ |
- * | `0` then none, one, or two words of four places | one place gathered out of the place two behind, the places of the step naming the two ends of it |
- * | `1 0` and four places | a run whose places stand as many lines behind the column at hand as the four places name |
- * | `1 1 0` and two places | a run whose places stand four, three or two places behind the column at hand each way |
- * | `1 1 1 0` and three places | a run whose places stand two whole columns behind the column at hand, and as many places as the three name |
- * | `1 1 1 1 0` | the same, four columns behind |
- * | `1 1 1 1 1` | the same, eight columns behind |
- *
- * Every four columns the picture holds are gathered into the four bytes of a row, and the column the walk
- * stands over next stands sixteen columns further on, so that the four columns of a group are gathered as soon
- * as they all stand in the buffer.
- */
 export function decodeTcz(data: Buffer, layout: TczLayout): Buffer {
 	const palette = readTszPalette(data);
 	const pixels: Buffer = Buffer.alloc(layout.stride * layout.height, 0x00);

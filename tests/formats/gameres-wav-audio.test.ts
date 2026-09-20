@@ -10,7 +10,6 @@ import {
 	readWavLayout,
 } from "../../packages/formats/src/gameres/wav-audio.js";
 
-/** A wave of the RIFF kind: the head, the chunks behind it and the places of the sound. */
 function wavFile(input: {
 	tag?: number;
 	channels?: number;
@@ -56,7 +55,6 @@ function chunkLength(size: number): Buffer {
 	return out;
 }
 
-/** A sound of the Ogg kind, and the places of an MPEG Layer 3 sound. */
 const OGG = Buffer.concat([
 	Buffer.from("OggS", "latin1"),
 	Buffer.alloc(0x20, 0x5a),

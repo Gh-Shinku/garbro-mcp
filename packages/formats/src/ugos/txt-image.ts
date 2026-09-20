@@ -17,8 +17,6 @@ import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { createFixedEntry } from "../shared/fixed-archive.js";
 
-/** The words of a picture of this kind stand as the words of the engine, which stand in a file of this kind
- * rather than in the places of a picture, and the file stands at `0x1000` places or fewer. */
 const PLACES_WORD = ".txt";
 const MAXIMUM_SIZE = 0x1000;
 /** The first words of the file name how wide and how tall the picture stands and how many places of a picture a
@@ -33,7 +31,6 @@ const LIMIT = 256 * 1024 * 1024;
 export interface UgoTile {
 	/** The words the file names the place of the picture with, as they stand in the file. */
 	fileName: string;
-	/** Where the place of the picture stands along its row and along its column, in places of the picture. */
 	x: number;
 	y: number;
 }
@@ -49,13 +46,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `TxtFormat.ReadMetaData`: the first words of a file of this kind stand as the words of a file of the kind of
- * files that name the places of a picture, and name how wide and how tall the picture stands and how many
- * places of a picture a place of a tile of it stands in; every words behind those name a place of a picture of
- * its own and where it stands in the picture, the places of which stand behind the place the words name rather
- * than beside it.
- */
 export function readUgoTxtLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -77,9 +67,6 @@ export function readUgoTxtLayout(
 	const tiles: UgoTile[] = [];
 	for (let at = 1; at < words.length; at += 1) {
 		const line = words[at] ?? "";
-		// The reference reads every words behind the first as the words of a place of a picture and stops at
-		// the first words that stand as none of them; a file of this kind ends with a place of no words, so the
-		// words of no places at all stand as the end of it.
 		if (line.length === 0) break;
 		const tile = TILE_WORDS.exec(line);
 		if (!tile) return undefined;
@@ -90,8 +77,6 @@ export function readUgoTxtLayout(
 		}
 		tiles.push({
 			fileName: line,
-			// The reference stands the places of a picture of its own beside the place the words name rather
-			// than behind it.
 			x: second * tileSize,
 			y: first * tileSize,
 		});
@@ -126,7 +111,6 @@ class UgoTxtHandle implements ArchiveHandle {
 				id: at,
 				path: tile.fileName,
 				offset: 0n,
-				// The places of a place of a picture of this kind stand beside the file rather than in it.
 				size: 0n,
 				compressed: false,
 				metadata: { type: "image", x: tile.x, y: tile.y },
@@ -144,8 +128,6 @@ class UgoTxtHandle implements ArchiveHandle {
 		const at = this.entries.findIndex((entry) => entry.id === id);
 		const tile = at < 0 ? undefined : this.#layout.tiles[at];
 		if (!tile) throw invalidPicture("No such place in the picture");
-		// `VFS.CombinePath`: the reference reads the places of a place of a picture beside the words that name
-		// them.
 		const at_path = resolve(dirname(this.sourcePath), tile.fileName);
 		try {
 			return Readable.from([await readFile(at_path)]);
@@ -182,8 +164,6 @@ export const ugoTxtDescriptor: FormatDescriptor = {
 
 export const ugoTxtFormat: ArchiveFormat = {
 	descriptor: ugoTxtDescriptor,
-	// The reference registers no word of its own and tells a picture of this kind by the words of the kind of
-	// files it stands as, which every file of that kind stands as.
 	detection: { signatures: [], extensionFallback: true },
 	async detect(source: ByteSource, sourcePath?: string): Promise<boolean> {
 		if (!hasTxtWord(sourcePath)) return false;

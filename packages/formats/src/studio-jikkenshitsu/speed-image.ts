@@ -1,13 +1,3 @@
-// Format reference: GARbro "ArcFormats/StudioJikkenshitsu/ImageDAT.cs", classes `SpDatFormat` and `SpReader`
-// (a Studio Jikkenshitsu picture of the kind its own files stand as: the places of the picture stand behind a
-// walk of runs, and the shape of them behind a walk of runs of its own). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// A picture of this kind may stand under the standard cipher; the key of such a picture stands in the
-// reference's own settings, which name a key for every title it knows, and this project has no such settings.
-// A picture whose places stand under the cipher is therefore refused with a message, and a picture whose
-// places stand as they stand is read the same way the reference reads it.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -23,7 +13,6 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** The reference registers no word of its own: a picture of this kind is told by the head of its own. */
 const HEADER_SIZE = 0x22;
 const FLAGS_FIELD = 0x00;
 const SIGNATURE_PLACE = 0x02;
@@ -32,8 +21,6 @@ const ZERO_FIELD = 0x04;
 const WIDTH_FIELD = 0x16;
 const HEIGHT_FIELD = 0x18;
 const COLORS_FIELD = 0x1e;
-/** The place that counts the places of a picture the colours stand beside, and the places of a colour of a
- * picture that holds its own shape. */
 const ENCRYPTED_FLAG = 0x08;
 const SHAPE_FLAGS = 0xf4;
 const SHAPE_VALUE = 0x04;
@@ -41,7 +28,6 @@ const SHAPE_VALUE = 0x04;
  * picture may name. */
 const PALETTE_SIZE = 4;
 const MAXIMUM_COLORS = 0x100;
-/** The places of a picture stand beside the head, the places of its shape beside those. */
 const MAXIMUM_SIZE = 0x2000;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
@@ -67,12 +53,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `SpDatFormat.ReadMetaData`: the word behind the head of a picture stands at nought, the places of a colour
- * of the picture stand in the places at `0x00`, the place at `0x02` stands at one, the width of the picture
- * stands in the words at `0x16`, its height in the words at `0x18` and how many colours stand beside it in the
- * words at `0x1E`.
- */
 export function readSpeedLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -158,12 +138,6 @@ function unpackSpeedStream(
 	return { pixels: unpackSpeedRuns(walk, size), next: at + packedSize };
 }
 
-/**
- * `SpReader.Unpack`: the places of a picture of this kind stand in one walk and the places of its shape in
- * another, the two walks standing one behind the other. Every place of the shape stands two to a byte, the
- * highest places of a byte standing for the place of the picture that stands first, and a place of the shape
- * stands as many places of a colour of the shape as name it.
- */
 export function decodeSpeed(data: Buffer, layout: SpeedLayout): SpeedPicture {
 	let at = HEADER_SIZE;
 	if (at + 4 > data.length) {
@@ -207,8 +181,6 @@ export function decodeSpeed(data: Buffer, layout: SpeedLayout): SpeedPicture {
 	return { pixels: picture.pixels, alpha, palette };
 }
 
-/** `SpReader.ConvertToRgbA`: a place of a picture stands as its colour with the places of its shape stood in
- * it, the highest places of a byte of the shape standing for the place that stands first. */
 export function composeSpeed(
 	picture: SpeedPicture,
 	layout: SpeedLayout,
@@ -278,8 +250,6 @@ export const studioJikkenshitsuSpeedImageDescriptor: FormatDescriptor = {
 export const studioJikkenshitsuSpeedImageFormat: ArchiveFormat =
 	defineFixedArchive({
 		descriptor: studioJikkenshitsuSpeedImageDescriptor,
-		// The reference registers no word of its own, so a picture of this kind is tried after every kind that
-		// is told by a word of its own.
 		detection: { signatures: [], priority: -1 },
 		async detect(source: ByteSource): Promise<boolean> {
 			if (source.size < BigInt(HEADER_SIZE)) return false;
@@ -315,7 +285,6 @@ export const studioJikkenshitsuSpeedImageFormat: ArchiveFormat =
 		},
 		async openEntry(source: ByteSource) {
 			const { stored, layout } = await readSpeed(source);
-			// The places of the picture stand as a bitmap of its own.
 			return Readable.from([composeSpeed(decodeSpeed(stored, layout), layout)]);
 		},
 	});

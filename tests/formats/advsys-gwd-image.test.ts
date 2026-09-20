@@ -11,8 +11,6 @@ import {
 	readGwdShapeLayout,
 } from "../../packages/formats/src/advsys/gwd-image.js";
 
-/** The head of a picture: how many bytes its places stand in, the word of the format, the width and the height
- * the other way round from the rest of the file, and the places of a colour. */
 function gwdHead(
 	dataSize: number,
 	width: number,
@@ -28,8 +26,6 @@ function gwdHead(
 	return head;
 }
 
-/** A picture of eight places by two, whose walk stands the places of a line and then the places that do not
- * stand, worked out with an independent transcription of the reference's own walk. */
 const GREY = Buffer.from("0800000047574400080002086a792a15af853050", "hex");
 const GREY_PLACES = Buffer.from("030c1114141414140f0f0a0707070707", "hex");
 

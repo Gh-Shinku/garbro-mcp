@@ -16,7 +16,6 @@ The four bytes at the beginning of the file are the word of the format; where th
 picture behind the walk of bytes is packed by a walk of the zlib kind. The word behind the word of the format
 stands over a key of the reference (`0xDEADBEEF`), which is the key the walk of bytes stands over: every byte
 behind the head stands over a byte of the key, the four bytes of the key standing over and over from the
-lowest of them, and where the head says so the walk of the zlib kind then gives the picture.
 
 What is handed out is the picture as it stands — a bitmap or a portable network graphic — with the name of the
 file changed to the kind of the picture behind.

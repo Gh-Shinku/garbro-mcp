@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/StudioJikkenshitsu/ImageGRD.cs", classes `GrdFormat` and `GrdReader`
-// (a Studio Jikkenshitsu picture: the places of a picture stand under a walk of the LZSS kind, which may stand
-// under the standard cipher first, and a shape of the places may stand behind them). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -38,16 +33,13 @@ const FLAGS_FIELD = 0x05;
 const ENCRYPTED_FLAG = 0x80;
 const WIDTH_FIELD = 0x06;
 const HEIGHT_FIELD = 0x08;
-/** How many places the walk of the picture stands in, and how many the shape of those places stands in. */
 const PACKED_LENGTH_FIELD = 0x0c;
 const ALPHA_LENGTH_FIELD = 0x14;
-/** The places of the picture stand behind the head, the shape of them behind those places. */
 const PIXEL_OFFSET = HEADER_SIZE;
 /** The places of a color the walk stands for every picture of eight bits, every color standing in four
  * places: its blue, its green, its red and a place that counts for nothing. */
 const PALETTE_COLORS = 0x100;
 const PALETTE_SIZE = PALETTE_COLORS * 4;
-/** The head of the walk of the LZSS kind, which the reader reads past. */
 const WALK_HEAD_SIZE = 0x28;
 /** The places of a colour the reference knows, which stand as a picture of eight or four and twenty bits. */
 const BITS_8 = 8;
@@ -74,17 +66,10 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The key the reference stands the pictures of its own under: the four low places of every place of the key
- * stand as the places of a key of the standard cipher. */
 export function grdKey(): Buffer {
 	return expandNibbleKey(Buffer.from(DEFAULT_KEY));
 }
 
-/**
- * `GrdFormat.ReadMetaData`: the word `GRD ` stands at the beginning of the file, the places of a colour of
- * the picture in the place at `0x04`, whether they stand under the cipher in the highest place of the place
- * behind it, the width of the picture in the words at `0x06` and its height in the words at `0x08`.
- */
 export function readGrdLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -114,18 +99,11 @@ export function readGrdLayout(
 	};
 }
 
-/** How many places the walk of the LZSS kind stands as: the head it stands behind, the colours of a picture of
- * eight bits and the places of the picture itself. */
 function walkLength(layout: GrdLayout): number {
 	const palette = BITS_8 === layout.bitsPerPixel ? PALETTE_SIZE : 0;
 	return WALK_HEAD_SIZE + palette + layout.stride * layout.height;
 }
 
-/**
- * `GrdReader.Unpack`: the places of the picture stand behind a walk of the LZSS kind, which stands under the
- * standard cipher where the head names it; behind those places and the colours of a picture of eight bits
- * stand the places of the picture itself.
- */
 export function decodeGrdPixels(
 	data: Buffer,
 	layout: GrdLayout,
@@ -154,14 +132,6 @@ export function decodeGrdPixels(
 	return { pixels, palette };
 }
 
-/**
- * `GrdReader.ApplyAlpha`: the shape of the places of a picture of eight bits names, for every row of the
- * picture, how many places of the row stand under a colour of their own and where the places of that colour
- * stand, which are the places of the shape that stand behind the words of the two tables the shape begins
- * with. Every place of the row stands as the colour of the picture first, and a place that stands under a
- * colour of its own stands as that colour, its lowest places counting as many places of the shape as they
- * name.
- */
 export function applyGrdAlpha(
 	pixels: Buffer,
 	palette: Buffer,
@@ -219,22 +189,11 @@ export function applyGrdAlpha(
 	return out;
 }
 
-/**
- * The shape of the places of a picture, which stands behind the places of the picture and stands under a walk
- * of the LZSS kind of its own. The walk stands from behind the places of the picture to the end of the file
- * and stands as many places as the head names, which the reference reads the same way.
- */
 export function decodeGrdAlpha(data: Buffer, layout: GrdLayout): Buffer {
 	const walk = data.subarray(PIXEL_OFFSET + layout.packedLength);
 	return inflateLzss(walk, { outputLength: layout.alphaLength });
 }
 
-/**
- * `GrdReader.Unpack`: the places of a picture stand as a bitmap of eight or four and twenty bits, the picture
- * standing the other way up from the places of the file; where a shape of the places stands in a picture of
- * eight bits, the picture stands as a bitmap of thirty two bits the right way up, the places of the shape
- * having been stood in it.
- */
 export function decodeGrd(data: Buffer, layout: GrdLayout): Buffer {
 	const { pixels, palette } = decodeGrdPixels(data, layout);
 	if (0 !== layout.alphaLength && BITS_8 === layout.bitsPerPixel) {
@@ -339,8 +298,6 @@ export const studioJikkenshitsuGrdImageFormat: ArchiveFormat =
 		},
 		async openEntry(source: ByteSource) {
 			const { stored, layout } = await readGrd(source);
-			// The places of the picture stand as a bitmap of its own, the rows of which the writer stands the
-			// way the file stands them.
 			return Readable.from([decodeGrd(stored, layout)]);
 		},
 	});

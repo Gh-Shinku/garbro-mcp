@@ -11,9 +11,6 @@ import {
 const HEAD_SIZE = 0x14;
 const MOST_HEAD = 0x24;
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of the kind of the places of the picture of the walk of them of the engine. */
 function script(options: {
 	header?: Buffer;
 	code?: Buffer;
@@ -59,8 +56,6 @@ function script(options: {
 	return body;
 }
 
-/** The places of the picture of the walk of the places of the picture of the text of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of them. */
 function cstring(text: string): Buffer {
 	return Buffer.concat([Buffer.from(text, "latin1"), Buffer.alloc(1, 0x00)]);
 }
@@ -79,13 +74,6 @@ describe("Liar game engine script format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them stand of the places of the picture of the walk of the places of the
-		// picture of the place of the picture of the walk of them of the places of the picture of the walk of
-		// the places of the picture of the sound of the places of the picture of the walk of the places of the
-		// picture beside the places of the picture of the walk of the places of the picture of the text, and the
-		// places of the picture of the walk of the places of the picture of the book of the places of the
-		// picture stand behind the places of the picture of the walk of the places of the picture of the text.
 		const file = script({
 			header: Buffer.from([0x01, 0x02, 0x03, 0x04]),
 			code: Buffer.from([0xaa, 0xbb]),
@@ -114,34 +102,14 @@ describe("Liar game engine script format", () => {
 	});
 
 	it("turns away the places of the picture of the walk of the places of the picture of the words of the walk of the picture that stand of no places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine", () => {
-		// The places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture of the kind of the places of the picture of the walk of them of the engine stand beside the
-		// places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture of the places of the picture of how long the places of the picture of the walk of the places
-		// of the picture of the picture of this kind stand.
 		expect(readGscLayout(script({ texts: [], length: 0x40 }))).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture of the places of the picture of the walk of them of the places of the picture of the walk of
-		// the places of the picture of the words of the walk of the picture of the places of the picture of the
-		// walk of them stand of the places of the picture of the walk of the places of the picture of the kind
-		// of the places of the picture of the walk of them of the places of the picture of the walk of the
-		// places of the picture of the sound of the places of the picture of the walk of the places of the
-		// picture.
 		expect(readGscLayout(script({ texts: [], head: 0x13 }))).toBeUndefined();
 		expect(
 			readGscLayout(script({ texts: [], head: MOST_HEAD + 1 })),
 		).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them of the places of the picture of the walk of the places of the picture of the text stand
-		// of the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// the sound of the places of the picture of the walk of the places of the picture of their own.
 		expect(
 			readGscLayout(script({ texts: [cstring("ab")], index: [0x40] })),
 		).toBeUndefined();
-		// A picture of the picture of the walk of the places of the picture that stands very short stands of the
-		// places of the picture of the walk of the places of the picture of no places of the picture of the
-		// walk of the places of the picture of their own.
 		expect(readGscLayout(Buffer.alloc(8, 0x00))).toBeUndefined();
 		const long = script({ texts: [cstring("ab")] });
 		expect(readGscLayout(long.subarray(0, long.length - 3))).toBeUndefined();

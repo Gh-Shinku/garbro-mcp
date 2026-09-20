@@ -1,13 +1,3 @@
-// Reference: GARbro "ArcFormats/AZSys/FastMersenneTwister.cs", the class `FastMersenneTwister`. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The places of the picture of the walk of the places of the picture of the sound of the places of the picture
-// of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
-// places of the picture of the walk of the places of the picture of the places of the picture of the walk of the
-// places of the picture of the kind of the places of the picture of the walk of the places of the picture of the
-// sound of the places of the picture of the walk of the places of the picture of the fourth and of the sixth
-// places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
-// walk of the places of the picture of the sound.
 const N = 156;
 const N32 = N * 4;
 const POS1 = 122;
@@ -22,11 +12,6 @@ const WORD_BITS = 32;
 const SHIFT_BITS = 8;
 const CHANNELS = 4;
 
-/** `FastMersenneTwister`: the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of the places of the picture of the words of the walk of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the fourth and of the
- * sixth places of the picture of the walk of the places of the picture of the kind of the places of the picture
- * of the walk of the places of the picture of the sound. */
 export class FastMersenneTwister {
 	readonly #state = new Uint32Array(N32);
 	#index = 0;
@@ -45,14 +30,6 @@ export class FastMersenneTwister {
 		this.certifyPeriod();
 	}
 
-	/** `FastMersenneTwister.period_certification`: the places of the picture of the walk of the places of the
-	 * picture of the sound of the places of the picture of the walk of the places of the picture of the places of
-	 * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-	 * of them of the places of the picture of the walk of the places of the picture of the places of the picture
-	 * of the walk of the places of the picture of the words of the walk of the places of the picture of the walk
-	 * of them of the places of the picture of the walk of the places of the picture of the kind of the places of
-	 * the picture of the walk of the places of the picture of the sound of the places of the picture of the walk
-	 * of the places of the picture. */
 	private certifyPeriod(): void {
 		let inner = 0;
 		for (let i = 0; i < CHANNELS; i += 1)
@@ -71,11 +48,6 @@ export class FastMersenneTwister {
 		}
 	}
 
-	/** The places of the picture of the walk of the places of the picture of the sound of the places of the
-	 * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
-	 * the places of the picture of the places of the picture of the walk of the places of the picture of the
-	 * fourth and of the sixth places of the picture of the walk of the places of the picture of the kind of the
-	 * places of the picture of the walk of the places of the picture of the sound. */
 	#shift(result: Uint32Array, at: number, shift: number, left: boolean): void {
 		const high =
 			(BigInt(this.#state[at * CHANNELS + 3] ?? 0) << 32n) |
@@ -98,9 +70,6 @@ export class FastMersenneTwister {
 		result[3] = Number(BigInt.asUintN(32, wrappedHigh >> 32n));
 	}
 
-	/** `FastMersenneTwister.do_recursion`: the places of the picture of the walk of the places of the picture of
-	 * the words of the walk of the places of the picture of the walk of them of the places of the picture of the
-	 * walk of the places of the picture of the kind of the places of the picture of the walk of them. */
 	#recursion(r: number, a: number, b: number, c: number, d: number): void {
 		const x = new Uint32Array(CHANNELS);
 		const y = new Uint32Array(CHANNELS);
@@ -117,10 +86,6 @@ export class FastMersenneTwister {
 		}
 	}
 
-	/** `FastMersenneTwister.sfmt_gen_rand_all` and `GetRand32`: the places of the picture of the walk of the
-	 * places of the picture of the sound of the places of the picture of the walk of the places of the picture of
-	 * the kind of the places of the picture of the walk of the places of the picture of the next places of the
-	 * picture of the walk of the places of the picture. */
 	nextUint32(): number {
 		if (this.#index >= N32) {
 			let r1 = N - 2;

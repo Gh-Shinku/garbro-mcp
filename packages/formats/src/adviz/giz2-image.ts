@@ -1,8 +1,3 @@
-// Format reference: GARbro "Legacy/Adviz/ImageGIZ2.cs", classes `GizFormat` and `GizMetaData` (an image of the
-// ADVIZ engine of a kind of its own: the places of the picture stand walked as four records of the places of a
-// picture, and the palette of it stands beside the game rather than within the picture). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -23,42 +18,26 @@ import {
 } from "./giz2-reader.js";
 import { readAdvizPalette } from "./palette.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file. */
 const MARK = Buffer.from("GIZ2", "latin1");
-/** The words of the head of a picture of this kind: where the picture stands within a picture of the places of
- * a picture of the game, how wide and how tall it stands, the place of the walk of it, and which of the four
- * records of the places of the picture stand walked. */
 const POSITION_FIELD = 4;
 const WIDTH_FIELD = 6;
 const HEIGHT_FIELD = 8;
 const RLE_CODE_FIELD = 0xc;
 const PLANE_MAP_FIELD = 0xe;
-/** The places of a picture of this kind stand in strips of eight places, and a place of a picture of the game
- * stands in the places of the picture told by the words of the head of it. */
 const PLACES_PER_STRIP = 8;
 const PICTURE_PLACE_WIDTH = 0x50;
-/** The palette of a picture of this kind holds sixteen places of three places each. */
 const PALETTE_PLACES = 16;
 const PALETTE_PLACE_SIZE = 3;
 const PALETTE_SIZE = PALETTE_PLACES * PALETTE_PLACE_SIZE;
-/** The places of a palette of this kind stand as one of sixteen of the places of a picture, so every place of
- * a palette of a picture of this kind stands for sixteen of them. */
 const PLACE_STEP = 0x11;
 const BITS_PER_PLACE = 4;
 
-export interface Giz2PictureLayout extends Giz2Layout {
-	/** Where the picture stands within the picture of the places of a picture of the game. */
-}
+export interface Giz2PictureLayout extends Giz2Layout {}
 
 function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `GizFormat.ReadMetaData`: the words of the head of a picture of this kind name where the picture stands
- * within a picture of the places of a picture of the game, how wide and how tall it stands, which of the four
- * records of the places of it stand walked, and the place of the walk of them.
- */
 export function readGiz2Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -81,20 +60,12 @@ export function readGiz2Layout(
 	};
 }
 
-/**
- * `Giz2Reader.ReadPalette`: the places of the palette of a picture of this kind stand as one of sixteen of the
- * places of a picture, told in the order of the words of a picture: the places behind a place of a palette
- * stand for the places of the picture, and the first place of it for the places behind both.
- */
 export function readGiz2Palette(palette: Buffer, offset: number): Buffer {
 	const colors = Buffer.alloc(PALETTE_PLACES * PALETTE_PLACE_SIZE);
 	for (let at = 0; at < PALETTE_PLACES; at += 1) {
 		const b = palette[offset + at * PALETTE_PLACE_SIZE] ?? 0;
 		const r = palette[offset + at * PALETTE_PLACE_SIZE + 1] ?? 0;
 		const g = palette[offset + at * PALETTE_PLACE_SIZE + 2] ?? 0;
-		// The reference hands the places of a picture out as the places of the kind it stands them in, and
-		// this project stands them in a picture of the places of a picture of four places, which holds the
-		// places of a palette in the order of the places of a picture.
 		colors[at * 3] = (r * PLACE_STEP) & 0xff;
 		colors[at * 3 + 1] = (g * PLACE_STEP) & 0xff;
 		colors[at * 3 + 2] = (b * PLACE_STEP) & 0xff;
@@ -121,8 +92,6 @@ export async function decodeGiz2Picture(
 		throw invalidPicture(
 			"The palette of a picture of this kind stands beside the game it stands in, and no palette stands beside this picture",
 		);
-	// The reference stands the places of a picture of this kind from the first place of it rather than from
-	// the last, so the places of the picture stand from the head of it downwards.
 	return writeBmp4(
 		layout.width,
 		layout.height,

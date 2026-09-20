@@ -1,18 +1,7 @@
-// Reference: GARbro "ArcFormats/KiriKiri/ImageTLG.cs", the tables `TVP_Tables` and the walks
-// `TVPTLG6DecodeGolombValues` and `TVPTLG6DecodeGolombValuesForFirst` of the places of the picture of the
-// walk of the places of the picture of the sixth kind of the places of the picture. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the words of the walk of the picture. */
 const GOLOMB_N_COUNT = 4;
 const LEADING_ZERO_BITS = 12;
 const LEADING_ZERO_SIZE = 1 << LEADING_ZERO_BITS;
 const TABLE_ROWS = GOLOMB_N_COUNT * 2 * 128;
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the kinds of the walk of the places of the picture of
- * the engine, standing of the places of the picture of the walk of the places of the picture of the
- * reference. */
 const GOLOMB_COMPRESSED = [
 	[3, 7, 15, 27, 63, 108, 223, 448, 130],
 	[3, 5, 13, 24, 51, 95, 192, 384, 257],
@@ -20,10 +9,6 @@ const GOLOMB_COMPRESSED = [
 	[2, 3, 9, 18, 33, 61, 129, 258, 511],
 ];
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them of the places of the picture of the walk of them stand of the places of the picture of the
- * walk of the places of the picture of the first place of the picture of the walk of the places of the
- * picture of the place of the picture of the walk of them plus one. */
 export const TLG6_LEADING_ZERO_TABLE = (() => {
 	const table = new Uint8Array(LEADING_ZERO_SIZE);
 	for (let i = 0; i < LEADING_ZERO_SIZE; i += 1) {
@@ -37,10 +22,6 @@ export const TLG6_LEADING_ZERO_TABLE = (() => {
 	return table;
 })();
 
-/** The places of the picture of the walk of the places of the picture of the picture of the walk of them of
- * every place of the picture of the walk of the places of the picture of the sound, standing of the places
- * of the picture of the walk of the places of the picture of the walk of them of the places of the picture of
- * their own. */
 export const TLG6_GOLOMB_BIT_LENGTH_TABLE = (() => {
 	const table = new Int8Array(TABLE_ROWS * GOLOMB_N_COUNT);
 	for (let n = 0; n < GOLOMB_N_COUNT; n += 1) {
@@ -60,41 +41,15 @@ export const TLG6_GOLOMB_BIT_LENGTH_TABLE = (() => {
 	return table;
 })();
 
-/**
- * `TVPTLG6DecodeGolombValues`: the places of the picture of the walk of the places of the picture of the
- * sixth kind of the places of the picture stand of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the words of the walk of the picture: the places of
- * the picture of the walk of the places of the picture stand of the runs of the places of the picture of no
- * places of their own and of the runs of the places of the picture of the sound, the places of the picture of
- * the walk of the places of the picture of the sound standing of the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of them of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of the places of the picture.
- */
 export function decodeTlg6GolombValues(
 	pixels: Uint32Array,
-	/** The places of the picture of the walk of the places of the picture of the place of the picture of the
-	 * walk of them that stand of the places of the picture of the walk of the places of the picture of the
-	 * sound of the places of the picture of the walk of the places of the picture of the eight places of the
-	 * picture of their own. */
 	offset: number,
 	pixelCount: number,
 	bitPool: Uint8Array,
 	first: boolean,
 ): void {
-	// The reference stands the places of the picture of the walk of the places of the picture of the words of
-	// the walk of the picture of the places of the picture of the walk of them beyond the places of the
-	// picture of the walk of the places of the picture of the sound, so a picture of this project stands the
-	// places of the picture of the walk of the places of the picture of the last places of the picture of the
-	// walk of them of no places of the picture of their own.
 	const pool = Buffer.alloc(bitPool.length + 16);
 	Buffer.from(bitPool).copy(pool);
-	// The reference stands the places of the picture of the walk of the places of the picture of the words of
-	// the walk of the picture of the places of the picture of the walk of them of the places of the picture
-	// behind them, so a picture of this project stands the places of the picture of the walk of the places of
-	// the picture of the places of the picture of the walk of the places of the picture of the walk of them
-	// where the places of the picture of the walk of the places of the picture of the sound stand past the
-	// places of the picture of the walk of the places of the picture.
 	const readPool = (place: number): number => {
 		if (place + 4 > pool.length)
 			throw new RangeError(
@@ -164,11 +119,6 @@ export function decodeTlg6GolombValues(
 					}
 					bits -= 1;
 				} else {
-					// The reference stands the places of the picture of the walk of the places of the picture
-					// of the words of the walk of the picture of the places of the picture of the walk of them
-					// of the places of the picture behind them where the places of the picture of the walk of
-					// the places of the picture of the sound stand of no places of the picture of the walk of
-					// the places of the picture of the places of the picture of the walk of them.
 					poolPlace += 5;
 					bits = pool[poolPlace - 1] ?? 0;
 					bitPlace = 0;

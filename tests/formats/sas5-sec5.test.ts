@@ -10,8 +10,6 @@ import {
 
 const FIRST_SECTION = 8;
 
-/** The places of the picture of the word of the walk of the places of the picture of the places of the
- * picture of the engine of the SAS5 kind. */
 function head(): Buffer {
 	const out = Buffer.alloc(FIRST_SECTION, 0x00);
 	out.write("SEC5", 0, "latin1");
@@ -52,12 +50,6 @@ describe("SAS5 engine resource index file", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them where the places of the picture of the walk of the places of the picture of the engine stand not", () => {
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// places of the picture of the engine while the places of the picture of the walk of them stand within
-		// the places of the picture of the walk of the places of the picture of the picture of its own, so a
-		// picture of the places of the picture of the walk of them that names no places of the picture of the
-		// walk of the places of the picture of their own stands of the places of the picture of the walk of
-		// the places of the picture of the places of the picture of the walk of them of its own.
 		const file = Buffer.concat([
 			head(),
 			section("RES2", Buffer.from([0x01, 0x02, 0x03, 0x04])),
@@ -69,19 +61,9 @@ describe("SAS5 engine resource index file", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the places of the picture of the engine of the words of the walk of the picture of their own", () => {
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them stand beside the places of the picture of the walk of the places of the picture of the
-		// picture of the places of the picture of their own, the places of the picture of the walk of the
-		// places of the picture of the picture standing of the places of the picture of the walk of the places
-		// of the picture of the place of the picture of the walk of them of the places of the picture of the
-		// walk of the places of the picture of the picture of the walk of them.
 		expect(decryptSec5Code(Buffer.from([0x10, 0x20, 0x30]))).toEqual(
 			Buffer.from([0x10, 0x02, 0x64]),
 		);
-		// The places of the picture of the walk of the places of the picture of the place of the picture of the
-		// walk of them stand of the places of the picture of the walk of the places of the picture of the
-		// place of the picture of the walk of them of the places of the picture of the walk of the places of
-		// the picture of the picture of their own.
 		expect(decryptSec5Code(Buffer.from([0xf0, 0x00]))).toEqual(
 			Buffer.from([0xf0, 0x02]),
 		);
@@ -102,8 +84,6 @@ describe("SAS5 engine resource index file", () => {
 		expect(readSec5Sections(short, short.length)).toBeUndefined();
 		const noSections = Buffer.concat([head(), Buffer.from("ENDS", "latin1")]);
 		expect(readSec5Sections(noSections, noSections.length)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of a place of the picture of the
-		// engine stand past the places of the picture.
 		const past = Buffer.concat([head(), section("CODE", Buffer.alloc(4))]);
 		past.writeUInt32LE(0x1000, FIRST_SECTION + 4);
 		expect(() => readSec5Sections(past, past.length)).toThrow(GarbroError);

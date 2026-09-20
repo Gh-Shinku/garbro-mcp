@@ -79,9 +79,7 @@ export async function findCompanionFilesByExtension(
 				.sort();
 			if (names.length > 0)
 				return names.map((name) => resolve(directory, name));
-		} catch {
-			// The directory stands of no places of the picture of the walk of them.
-		}
+		} catch {}
 	}
 	return [];
 }

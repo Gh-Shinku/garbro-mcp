@@ -21,10 +21,8 @@ not claimed. Two things are looked at:
 
 The stream is handed out **as it stands**, because the project carries no decoder for it: the reference
 decodes it through `Mp3Input` and hands back the samples of the sound, while the port hands back the bytes
-themselves, which is the same deviation the other audio ports of this project take for the formats whose
 payload is a stream of MPEG Layer 3 — `macromedia-edim-audio`, `c4-vmd-audio` and `regrips-mrg-audio` among
 them. The entry is named after the file with an `mp3` extension, and `Macromedia SND`
-(`macromedia-snd-audio`) reads a stream of this kind out of the resources of its own format.
 
 The tests cover a stream that starts with a frame, a tag in front of one — with and without its footer — a
 tag whose length does not reach a frame, the sync word looked for a little way into the file, the two ends of

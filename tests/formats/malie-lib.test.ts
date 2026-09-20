@@ -15,17 +15,10 @@ const OFFSET_OFFSET = NAME_SIZE + 4;
 
 interface Place {
 	name: string;
-	/** The places of the picture of the walk of the places of the picture of the place of the picture of the
-	 * walk of them stand beside the places of the picture of the walk of the places of the picture of the
-	 * place of the picture of the walk of them of the places of the picture of the walk of the places of the
-	 * picture of the picture of their own. */
 	offset: number;
 	size: number;
 }
 
-/** The places of the picture of the walk of the places of the picture of the engine of the kind of Malie, the
- * places of the picture of the walk of the places of the picture standing of the places of the picture of the
- * walk of the places of the picture of the picture of the walk of them. */
 function buildLib(places: Place[], data: Buffer, base = 0): Buffer {
 	const indexSize = places.length * RECORD_SIZE;
 	const out = Buffer.alloc(HEADER_SIZE + indexSize + data.length, 0x00);
@@ -60,13 +53,6 @@ describe("Malie engine resource archive", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of a place of the picture of the walk of them that stands for the places of the picture of the walk of the places of the picture of its own", () => {
-		// The places of the picture of the walk of the places of the picture of a place of the picture of the
-		// walk of them that stands of no places of the picture of the walk of the places of the picture of the
-		// name of the picture of the walk of it stands for the places of the picture of the walk of the places
-		// of the picture of the places of the picture of the walk of them of their own, so the places of the
-		// picture of the walk of them of the places of the picture of the walk of the places of the picture of
-		// their own stand beside the places of the picture of the walk of the places of the picture of the
-		// name of the picture of the walk of it.
 		const innerData = Buffer.from([0xaa, 0xbb]);
 		const inner = buildLib(
 			[{ name: "inner.txt", offset: HEADER_SIZE + RECORD_SIZE, size: 2 }],
@@ -121,8 +107,6 @@ describe("Malie engine resource archive", () => {
 		const manyPlaces = Buffer.from(good);
 		manyPlaces.writeInt16LE(0x100, 8);
 		expect(readMalieLibIndex(manyPlaces)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of a place of the picture of the
-		// walk of them stand within the places of the picture of the walk of the places of the picture.
 		const inside = Buffer.from(good);
 		inside.writeUInt32LE(0, HEADER_SIZE + 0x28);
 		expect(readMalieLibIndex(inside)).toBeUndefined();

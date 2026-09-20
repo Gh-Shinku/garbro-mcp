@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/BlackCyc/AudioVAW.cs", class `VawAudio`, over the head of
-// "ArcFormats/BlackCyc/ImageDWQ.cs", class `ResourceHeader` (a Black Cyc sound: the head of the file names
-// the kind of the places of the sound, and a sound of the kind that stands as a walk of its own stands as the
-// places of a wave that stands under a walk of places of its own). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -17,14 +11,10 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The head of a file of this kind stands in the first four and sixty places of it, and the words that name
- * the kind of the places of the file stand in the words at `0x30`. */
 const HEADER_SIZE = 0x40;
 const PACK_TYPE_FIELD = 0x30;
 const PACK_TYPE_SIZE = 0x10;
 const PACK_TYPE = /^PACKTYPE=(\d+)(A?) +$/;
-/** The kinds of the places of a sound: a wave behind the head, a walk of places of its own, a sound of the
- * Ogg kind, and a sound of the Ogg kind behind a word of its own. */
 const PLAIN_WAVE = 0;
 const OWN_WALK = 1;
 const OGG_SOUND = 2;
@@ -42,7 +32,6 @@ const WAVE_HEAD_SIZE = 0x14;
 const WAVE_SIZE_FIELD = 0x04;
 const FORMAT_SIZE_FIELD = 0x10;
 const WAVE_SIZE_ADD = 8;
-/** The places of a colour of a sound of this kind stand in two places each. */
 const BYTES_PER_SAMPLE = 2;
 /** How many places a step of the walk of places stands, and how many of them stand behind the first. */
 const COUNT_BITS = 4;
@@ -57,7 +46,6 @@ export interface VawHeader {
 
 export interface VawSound {
 	kind: number;
-	/** Where the places of the sound stand. */
 	offset: number;
 }
 
@@ -65,8 +53,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `ResourceHeader.Read`: the head of a file of this kind names the kind of the places of the file in the
- * words at `0x30`. */
 export function readVawHeader(
 	data: Buffer,
 	fileLength = data.length,
@@ -85,8 +71,6 @@ export function readVawHeader(
 	return { packType, hasOwnPlaces: (match[2] ?? "").length > 0 };
 }
 
-/** `VawAudio.TryOpen`: the head of the file names the kind of the places of its sound, and where the sound
- * stands behind it. */
 export function readVawSound(
 	data: Buffer,
 	header: VawHeader,
@@ -124,11 +108,6 @@ export function readVawSound(
 	return undefined;
 }
 
-/**
- * `VawAudio.Unpack`: the wave header of a sound of the kind that stands as a walk of its own stands behind
- * the head, and the places of the sound stand behind those: every step of the walk names how many places of a
- * colour stand, and stands one place of the sound beside the place before it.
- */
 export function decodeVaw(
 	data: Buffer,
 	at: number,
@@ -169,8 +148,6 @@ export function decodeVaw(
 	return Buffer.concat([waveHead, pcm]);
 }
 
-/** A place of the walk of places stands in four and thirty places of its own, so the places of a count that
- * stand behind the first of them stand over the places of the count. */
 function shl(value: number, places: number): number {
 	if (places >= 32) return 0;
 	return (value << places) | 0;
@@ -258,8 +235,6 @@ export const blackCycVawAudioDescriptor: FormatDescriptor = {
 
 export const blackCycVawAudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: blackCycVawAudioDescriptor,
-	// The reference registers no word of its own, so a sound of this kind is tried after every kind that is
-	// told by a word of its own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource, sourcePath?: string): Promise<boolean> {
 		void sourcePath;

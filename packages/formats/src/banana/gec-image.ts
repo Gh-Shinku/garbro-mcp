@@ -1,12 +1,3 @@
-// Format reference: GARbro "ArcFormats/Banana/ImageGEC.cs", classes `GecFormat`, `GecMetaData` and
-// `GecReader` (a picture of the engine of the yellow pig: the places of the picture standing of the places
-// of the picture of the walk of the places of them, of the places of the picture of a picture of the words
-// of the head of the picture, of the places of the picture of the walk of the places of the picture of the
-// places of the picture of their own, of the places of the picture of the walk of the places of the picture
-// of a picture of the words of the head of the picture of the pictures of the engine, and of the places of
-// the picture of the walk of the places of the picture of the picture of the places of the picture of their
-// own). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -30,8 +21,6 @@ const DATA_OFFSET_FIELD = 0xd;
 const ALPHA_WIDTH_FIELD = 0x15;
 const ALPHA_HEIGHT_FIELD = 0x17;
 const ALPHA_DATA_OFFSET_FIELD = 0x19;
-/** The places of the picture of a place of the picture of the walk of the places of the picture of the
- * picture of the engine. */
 const PLACES_PER_WORD = 32;
 const TABLE_SIZE = 0x100;
 const FRAME_SIZE = 0x10002;
@@ -48,9 +37,6 @@ export interface GecLayout {
 	bitsPerPixel: number;
 	alphaOffset: number;
 	dataOffset: number;
-	/** The places of the picture of the walk of the places of the picture of the picture of the places of the
-	 * picture of the walk of them of the picture of the words of the head of the picture of the kind of the
-	 * walk of the places of them. */
 	alphaWidth: number;
 	alphaHeight: number;
 	alphaDataOffset: number;
@@ -60,13 +46,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `GecFormat.ReadMetaData`: the words of the head of a picture of this kind name the kind of the walk of the
- * places of the picture, the places of the picture of the walk of the places of the picture standing before
- * the picture of the walk of the places of the picture of the picture, how wide and how tall the picture
- * stands, and the places of the picture of the walk of the places of the picture of the picture of the walk
- * of them.
- */
 export function readGecLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -98,9 +77,6 @@ export function readGecLayout(
 		alphaDataOffset: 0,
 	};
 	if (type === 1) {
-		// The reference stands the words of the head of the picture of the places of the picture of the walk
-		// of the places of the picture of the picture of the places of the picture of the walk of them behind
-		// the words of the head of the picture of the kind of the walk of the places of them.
 		if (fileLength < ALPHA_HEAD_SIZE || data.length < ALPHA_HEAD_SIZE)
 			return undefined;
 		layout.alphaWidth = data.readUInt16LE(ALPHA_WIDTH_FIELD);
@@ -111,13 +87,6 @@ export function readGecLayout(
 	return layout;
 }
 
-/**
- * `GecReader.GetNextBit`: the places of the picture of the walk of the places of the picture stand as the
- * places of the picture of the words of the walk of the picture, the places of the picture of the walk of
- * the places of the picture of a picture of their own standing of the places of the picture of a word of the
- * walk of the places of them behind the places of the picture of the walk of the picture of the places of
- * the picture of the places of the picture of the word of the walk of the places of them.
- */
 class GecBitReader {
 	private bits = 0;
 	private bitsSrc: number;
@@ -130,15 +99,7 @@ class GecBitReader {
 		this.bitsSrc = bitsSrc;
 	}
 
-	/** `GecReader.GetNextBit`: the places of the picture of the walk of the places of a picture of this kind
-	 * stand of the places of the picture of the words of the walk of the picture, of the places of the
-	 * picture of the walk of the places of the picture of the place of the picture of the walk of them. */
 	nextBit(): number {
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// places of the picture of the word of the walk of them of the places of the picture of the walk of
-		// them before the places of the picture of the walk of the places of the picture of the place of the
-		// picture of the walk of them, so a word of the walk of the places of the picture stands for two and
-		// thirty places of the picture of the walk of the places of the picture.
 		const count = this.bitsCount;
 		this.bitsCount = count - 1;
 		if (count <= 0) {
@@ -155,12 +116,6 @@ class GecBitReader {
 		return this.bits & 1;
 	}
 
-	/** `GecReader.GetInt`: the places of the picture of the walk of the places of the picture stand of a
-	 * picture of the places of the picture of the walk of them of the places of the picture of the walk of
-	 * the picture of the places of the picture of their own, the places of the picture of the walk of the
-	 * places of the picture of the picture of the place of the picture of the walk of the places of them
-	 * standing behind the places of the picture of the walk of the places of the picture of the place of the
-	 * picture of the walk of them. */
 	nextValue(): number {
 		let count = 0;
 		while (this.nextBit() === 0) count += 1;
@@ -173,12 +128,6 @@ class GecBitReader {
 	}
 }
 
-/**
- * `GecReader.ReadFrame`: the places of the picture of the walk of the places of the picture stand as the
- * places of the picture of the words of the walk of the picture, and as the runs of the places of the
- * picture of no places of their own where the places of the walk of the picture stand for the places of the
- * picture of the walk of them of their own.
- */
 function readGecFrame(
 	reader: GecBitReader,
 	frame: Buffer,
@@ -190,11 +139,6 @@ function readGecFrame(
 			frame[at] = reader.nextValue() & 0xff;
 			at += 1;
 		} else {
-			// The reference stands the places of the picture of the walk of the places of the picture of the
-			// walk of them beyond the places of the picture of the walk of the places of the picture of the
-			// walk of the places of the picture of the word of the walk of the picture of the places of their
-			// own where the places of the picture of the walk of the places of the picture of the walk of them
-			// stand short of the places of the picture of the walk of them.
 			const run = reader.nextValue();
 			for (let i = 0; i < run && at < count; i += 1) {
 				frame[at] = 0;
@@ -204,14 +148,6 @@ function readGecFrame(
 	}
 }
 
-/**
- * `GecReader.UnpackFrame1`: the places of the picture of the walk of the places of the picture of the
- * picture of the words of the head of the picture of the places of the picture of the walk of them: the
- * places of the picture stand as the places of the picture of the walk of the places of the picture of a
- * picture of their own, the places of the picture of the walk of them standing before the places of the
- * picture of the walk of the places of the picture of the picture of the places of the picture of the walk
- * of them.
- */
 function unpackGecFrame1(
 	frame: Buffer,
 	dst: Buffer,
@@ -223,19 +159,11 @@ function unpackGecFrame1(
 		const code = frame[at] ?? 0;
 		const place = table[code] ?? 0;
 		if (code === 1) {
-			// The reference stands the places of the picture of the walk of the places of the picture of the
-			// place of the picture of the walk of them of the picture of the place of the picture of the walk
-			// of the places of the picture of the picture of their own where the places of the picture of the
-			// walk of the places of the picture of the place of the picture of the walk of them stand not.
 			if (previous !== 0) {
 				table[1] = table[0] ?? 0;
 				table[0] = place;
 			}
 		} else if (code > 1) {
-			// The reference stands the places of the picture of the walk of the places of the picture of the
-			// walk of them behind the places of the picture of the walk of the places of the picture of the
-			// place of the picture of the walk of them of the picture of the places of the picture of the walk
-			// of them of the picture of their own.
 			table.copyWithin(2, 1, code);
 			table[1] = place;
 		}
@@ -244,16 +172,6 @@ function unpackGecFrame1(
 	}
 }
 
-/**
- * `GecReader.UnpackFrame2`: the places of the picture standing of the places of the picture of the walk of
- * the places of the picture of a picture of the words of the head of the picture of the places of the
- * picture of the walk of the places of the picture of the pictures of the engine. The places of the picture
- * of the walk of the places of the picture stand of the places of the picture of the walk of the places of
- * the picture of the place of the picture of the walk of the places of the picture of the picture standing
- * beside the places of the picture of the walk of the places of the picture of the walk of them, the places
- * of the picture of the walk of the places of the picture standing of the places of the picture of the walk
- * of them of the picture of the walk of the places of the picture of the picture of their own.
- */
 function unpackGecFrame2(
 	frame: Buffer,
 	src: number,
@@ -290,11 +208,6 @@ function unpackGecFrame2(
 	return at;
 }
 
-/**
- * `GecReader.UnpackRLE`: the places of the picture of the walk of the places of the picture stand as the
- * places of the picture of the walk of the places of the picture of the picture of their own, and as the
- * runs of the places of the picture of the walk of the places of them.
- */
 function unpackGecRle(
 	reader: GecBitReader,
 	input: Buffer,
@@ -333,9 +246,6 @@ function unpackGecRle(
 				at += 1;
 				from += 1;
 			}
-			// The places of the picture of the walk of the places of the picture of the picture of their own
-			// stand of the places of the picture of the picture of the walk of them of the places of the
-			// picture of the walk of the places of the picture of the walk of them.
 			copyOverlapped(output, at - BYTE_COUNT, at, run - BYTE_COUNT);
 			at += run - BYTE_COUNT;
 			left -= run;
@@ -344,10 +254,6 @@ function unpackGecRle(
 	return { src: from, dst: at };
 }
 
-/** `Binary.CopyOverlapped`: the places of the picture of the walk of the places of the picture stand of the
- * places of the picture of the walk of the places of the picture behind them where the places of the picture
- * of the walk of the places of the picture of the picture of their own stand behind the places of the
- * picture of the walk of the places of the picture. */
 function copyOverlapped(
 	data: Buffer,
 	src: number,
@@ -368,22 +274,8 @@ function copyOverlapped(
 	}
 }
 
-/**
- * `GecReader.UnpackPixels`: the places of the picture of the walk of the places of the picture of a picture
- * of this kind. Every place of the walk of the places of the picture stands for the places of the picture of
- * a picture of the words of the head of the picture of the places of the picture of the walk of them of
- * their own, and for a picture of the places of the picture of the walk of the places of the picture of the
- * picture of their own.
- */
 function unpackGecPixels(data: Buffer, layout: GecLayout): Buffer {
 	const output = Buffer.alloc(layout.width * layout.height * BYTE_COUNT);
-	// The reference stands the places of the picture of the walk of the places of the picture of the picture
-	// at the words of the head of the picture of the kind of the walk of them, and the places of the picture
-	// of the walk of the places of the picture of the picture of their own behind the places of the picture
-	// of the walk of them of the places of the picture of the walk of the places of the picture of the words
-	// of the head of the picture — so the words of the walk of the places of the picture of the places of the
-	// picture of the walk of them stand of the places of the picture of the words of the head of the picture
-	// of the kind of the walk of the places of them.
 	const reader = new GecBitReader(
 		data,
 		layout.type === 0 ? HEAD_SIZE : ALPHA_HEAD_SIZE,
@@ -417,10 +309,6 @@ function unpackGecPixels(data: Buffer, layout: GecLayout): Buffer {
 	return output;
 }
 
-/**
- * `GecReader.UnpackAlpha`: the places of the picture of the walk of the places of the picture of the picture
- * of the places of the picture of the walk of them of their own.
- */
 function unpackGecAlpha(data: Buffer, layout: GecLayout): Buffer {
 	const bits = ALPHA_HEAD_SIZE + layout.alphaOffset;
 	const dataSrc = bits + layout.alphaDataOffset;
@@ -449,11 +337,6 @@ function unpackGecAlpha(data: Buffer, layout: GecLayout): Buffer {
 	return alpha;
 }
 
-/**
- * `GecReader.ApplyAlpha`: the places of the picture of the walk of the places of the picture of the picture
- * of the places of the picture of their own stand beside the places of the picture of the walk of the places
- * of the picture of the picture of the places of the picture of the walk of them.
- */
 function applyGecAlpha(
 	places: Buffer,
 	alpha: Buffer,
@@ -483,8 +366,6 @@ function applyGecAlpha(
 	return output;
 }
 
-/** `GecReader.Unpack`: the places of the picture of the walk of the places of the picture of a picture of
- * this kind. */
 export function unpackGecPicture(
 	data: Buffer,
 	layout: GecLayout,
@@ -520,11 +401,6 @@ export const bananaGecImageDescriptor: FormatDescriptor = {
 
 export const bananaGecImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: bananaGecImageDescriptor,
-	// The reference stands the words of the head of a picture of this kind of no places of the picture of the
-	// walk of them of its own, so the walk of the places of the picture of the kind of the places of the
-	// picture of the walk of them of the picture of the words of the head of the picture of the places of the
-	// picture of the walk of the places of the picture stands of the places of the picture of the walk of the
-	// places of the picture of the picture of their own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
@@ -572,12 +448,6 @@ export const bananaGecImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readGecLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
 		const { places, bitsPerPixel } = unpackGecPicture(stored, layout);
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// picture of the places of the picture of the walk of them of the picture of the places of the
-		// picture of the walk of the places of the picture of the picture of their own, so the places of the
-		// picture of the walk of the places of the picture stand of the places of the picture of the walk of
-		// the places of the picture of the picture of the walk of them of the picture of the picture of the
-		// walk of the places of the picture.
 		const bottomUp = true;
 		return Readable.from([
 			bitsPerPixel === 24

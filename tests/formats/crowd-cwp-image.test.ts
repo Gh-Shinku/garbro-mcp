@@ -13,11 +13,8 @@ import {
 } from "../../packages/formats/src/shared/png.js";
 
 const DATA_OFFSET = 0x19;
-/** The places of a picture that stand as the places of its own, which this port hands out as they stand. */
 const BODY = Buffer.from("789c6360f80a0001010100", "hex");
 
-/** A picture of two places in one row: the words of its head, the places of the head of the kind of pictures it
- * stands as, and the places of the picture. */
 function buildPicture(mark = "CWDP"): Buffer {
 	const head = Buffer.alloc(DATA_OFFSET, 0x00);
 	head.write(mark, 0, "latin1");
@@ -25,8 +22,6 @@ function buildPicture(mark = "CWDP"): Buffer {
 	head.writeUInt32BE(1, 8);
 	head.writeUInt8(8, 0x0c);
 	head.writeUInt8(6, 0x0d);
-	// The places of the head of the kind of pictures a picture of this kind stands as, which stand behind the
-	// places its own head names.
 	head.writeUInt8(0x08, 0x0e);
 	head.writeUInt8(0x00, 0x0f);
 	head.writeUInt8(0x00, 0x10);
@@ -81,8 +76,6 @@ describe("Crowd engine image format", () => {
 		expect(png.subarray(0, 8)).toEqual(PNG_SIGNATURE);
 		expect(png.readUInt32BE(8)).toBe(0x0d);
 		expect(png.subarray(12, 16).toString("latin1")).toBe("IHDR");
-		// The places of the head of the kind of pictures the file stands as stand as the places of the head of
-		// the file that stand behind the words of its own head.
 		expect(png.subarray(0x10, 0x25)).toEqual(PICTURE.subarray(4, 4 + 0x15));
 		expect(png.subarray(0x25, 0x29).toString("latin1")).toBe("IDAT");
 		expect(png.subarray(0x29, png.length - 11)).toEqual(BODY);
@@ -124,7 +117,6 @@ describe("Crowd engine image format", () => {
 	});
 
 	it("turns a picture cut short of the places of its head away", async () => {
-		// A picture whose head stands and whose places stand short of the places of its own head.
 		const cut = Buffer.from(PICTURE.subarray(0, 20));
 		const layout = readCwpLayout(cut, cut.length);
 		expect(layout).toMatchObject({ width: 2, height: 1 });

@@ -22,7 +22,6 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The container header, which holds the place of this picture over its base and the name of that base. */
 const HEADER_SIZE = 16;
 const BASE_LENGTH_OFFSET = 8;
 const BASE_LINE_OFFSET = 9;

@@ -13,15 +13,11 @@ import {
 const FIRST_TILE = Buffer.from([1, 2, 3, 4]);
 const SECOND_TILE = Buffer.from([5, 6]);
 
-/** A picture of four places in two rows whose places of a picture stand in places of eight places of the
- * picture apiece: the words of the head, and then the words that name the places of the picture. */
 const PICTURE = Buffer.from(
 	"4,2,8\r\ntile@1,2.bmp\r\nother@0,0.bmp\r\n",
 	"latin1",
 );
 
-/** Writes a picture and the places of its tiles into a temporary directory and runs the callback with the
- * place of the words of the picture. */
 async function withPicture(
 	words: Buffer,
 	run: (wordsPath: string) => Promise<void>,
@@ -126,7 +122,6 @@ describe("μ-GameOperationSystem tiled bitmap", () => {
 		});
 		await withPicture(PICTURE, async (wordsPath) => {
 			const source = await FileByteSource.open(wordsPath);
-			// A file of words of a kind of files of its own stands as no picture of this kind.
 			expect(await ugoTxtFormat.detect(source, `${wordsPath}.png`)).toBe(false);
 		});
 	});

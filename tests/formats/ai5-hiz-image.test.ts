@@ -83,7 +83,6 @@ describe("elf bitmap format (HIZ)", () => {
 				"a.hiz",
 			),
 		).toBe(false);
-		// A word that says the file is another format of this engine rather than a picture of this kind.
 		expect(
 			await ai5HizImageFormat.detect(
 				sourceOf(buildHiz({ mark: OTHER_FORMAT_WORD })),

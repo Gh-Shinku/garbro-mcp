@@ -14,7 +14,6 @@ import {
 function tszFile(input: {
 	width: number;
 	height: number;
-	/** The places of the line buffer, one word apiece, one step of the walk apiece. */
 	words: number[];
 	/** The way of a step, three places apiece: `[1, 1, 0]` stands for a word read out of the file. */
 	steps?: number[][];
@@ -57,7 +56,6 @@ const COLORS: number[][] = Array.from({ length: 16 }, (_, entry) => {
 });
 COLORS[3] = [0x0f, 0x08, 0x04];
 
-/** The picture the walk of the tests stands in: four words of the line buffer. */
 const PICTURE = {
 	width: 8,
 	height: 2,
@@ -65,9 +63,6 @@ const PICTURE = {
 	colors: COLORS,
 };
 
-/** The places the walk of the tests gathers, worked out with an independent transcription of the reference's
- * own walk: the line buffer holds the two columns of a pair half a buffer apart, and the places of a pair of
- * columns stand in the four bytes of a row. */
 const GATHERED = Buffer.from("016af16a1e6aee6a", "hex");
 
 describe("Ponytail Soft NMI picture", () => {

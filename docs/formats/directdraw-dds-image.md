@@ -10,12 +10,10 @@ with the three kinds of block in `packages/formats/src/shared/dxt.ts`.
 
 The file begins with the four letters `DDS ` — the word the reference registers — the head gives its own size
 at four and has to stand at a hundred and twenty four bytes or more, the height and the width stand at `0x0C`
-and `0x10`, the places of the colour stand at `0x50` and the four letters of a compressed kind at `0x54`, the
 depth at `0x58`, and the four masks of the colour at `0x5C`, `0x60`, `0x64` and `0x68`. The pixels stand
 behind the head, four bytes and the size the head gave itself behind the beginning of the file — so the port
 hands out a picture whose rows stand **top down**, which is what `ImageData.Create` means.
 
-A picture whose colour the head gives the places of is read a byte, a word or a word of four bytes a pixel and
 every place of it is spread out to a byte of its own by taking the place over and over up to the whole. A
 picture of thirty two bits a pixel whose places are the three of a plain colour stands as it is. Where the
 head gives a fourth place the fourth byte of a pixel is spread out from it, and where it does not it stands as
@@ -37,6 +35,5 @@ numbers of blocks the reference reads fewer bytes than its own walk needs and wo
 port asks for as many bytes as the walk reads and turns the picture away where they do not stand.
 
 The tests cover the head, the marks, the size of the head and the sizes it is turned away for, a picture of
-thirty two bits a pixel standing as it is, the places of a colour of sixteen and of eight bits spread out, the
 first, the third and the fifth kind of block, a compressed kind and a colour it does not read, a picture cut
 short of its pixels, and a file that does not hold a picture.

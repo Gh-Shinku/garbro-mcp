@@ -27,7 +27,6 @@ const PALETTE_SIZE = 0x100 * 3;
 const PIXEL_OFFSET = PALETTE_SIZE;
 /** The number of bits the two kinds of count are read with, told apart by two or three bits. */
 const LENGTH_TABLE = [4, 6, 8, 0x14];
-/** The places of the walk that stand beside a column, told apart by the three bits. */
 const SKIP_TABLE = [0, 0, 1, -1, 2, -2];
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;

@@ -78,7 +78,6 @@ export function readGAudioLayout(
 /** Where the pages of the sound stand, in which of the three places and what stands at each place of them. */
 type GState = "header" | "comment" | "setup" | "payload" | "broken";
 
-/** Where the walk of the pages stands: which place of the sound it is at. */
 interface GCursor {
 	data: Buffer;
 	position: number;
@@ -115,14 +114,6 @@ function updatePageCrc(page: Buffer, length: number): void {
 	page.writeUInt32LE(crc >>> 0, PAGE_CRC_FIELD);
 }
 
-/**
- * `GStream.EnumeratePages`: the sound stands in pages of the Ogg kind, and the walk of them puts the word of
- * every codec back where the engine cut it out: a page of the first place holds a byte that names the first of
- * the three places, a page of the second holds one that names the second and a page of the third one that
- * names the third, and the two bytes behind every such byte — of which the first stands in the place of the
- * word — give way to the word itself. Where a byte names none of the three places the page stands as it is.
- * Every page the walk gives stands with its own mark written afresh.
- */
 export function decodeG(data: Buffer): Buffer {
 	const cursor: GCursor = { data, position: 0 };
 	const page: Buffer = Buffer.alloc(PAGE_SIZE, 0x00);

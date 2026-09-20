@@ -12,11 +12,6 @@ const WALK_PLACES = 0x10;
 const FREQUENCY_SIZE = 0x40;
 const QUANT_FIELD = 0x80;
 
-/** A picture of sixteen places: the words of its head, the places that name how many places of the walk of its
- * places stand, the words of the walks themselves, the places the walks stand for themselves, and the two
- * walks of the places of its colours. Every place of the walk of its places stands as the same place of the
- * walk, so every place of the picture of every colour stands as nothing and the picture stands as the places
- * of the colours of the picture that stand as the place of the picture itself. */
 function buildPicture(): Buffer {
 	const head = Buffer.alloc(DATA_POS, 0x00);
 	head.write("JBP1", 0, "latin1");
@@ -27,19 +22,12 @@ function buildPicture(): Buffer {
 	head.writeInt32LE(3, 0x1c);
 	head.writeInt32LE(3, 0x20);
 	const frequencies = Buffer.alloc(FREQUENCY_SIZE * 2, 0x00);
-	// Every one of the sixteen places of the walk of the places that stand for the places of a colour stands
-	// for one place of the walk of the picture, so every place of the walk of the picture stands as the same
-	// place of the walk as the others.
 	for (let at = 0; at < WALK_PLACES; at += 1) {
 		frequencies.writeUInt32LE(1, at * 4);
 		frequencies.writeUInt32LE(1, FREQUENCY_SIZE + at * 4);
 	}
-	// The words of the walks of the places of the picture, every one of which names one place of the walk of
-	// the picture and stands as the place one.
 	const words = Buffer.alloc(WALK_PLACES, 0x00);
 	const quant = Buffer.alloc(QUANT_FIELD, 0x00);
-	// The walks of the places that stand for the places of a colour: the places 0000 stand for no places of
-	// the walk of the picture, and the places 1111 name the end of the places of a colour.
 	const dcWalk = Buffer.alloc(3, 0x00);
 	const acWalk = Buffer.alloc(3, 0xff);
 	return Buffer.concat([head, frequencies, words, quant, dcWalk, acWalk]);
@@ -82,8 +70,6 @@ describe("SVIU System image format", () => {
 		// `ImageData.Create` keeps the stored order top down, so the height of the bitmap is negative.
 		expect(out.readInt32LE(0x16)).toBe(-16);
 		expect(out.readUInt16LE(0x1c)).toBe(24);
-		// Every place of the picture of every colour stands as nothing, so every place of the picture stands as
-		// the places of the colours of the picture that stand as the place of the picture itself.
 		const pixels = out.subarray(0x36);
 		expect(pixels.length).toBe(16 * 16 * 3);
 		for (let at = 0; at < pixels.length; at += 3) {

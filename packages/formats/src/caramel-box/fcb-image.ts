@@ -1,10 +1,3 @@
-// Format reference: GARbro "ArcFormats/CaramelBox/ImageFCB.cs", classes `FcbFormat`, `FcbMetaData` and the
-// walk of the places of a picture of `FcbFormat` (a picture of the Caramel BOX engine: the places of the
-// picture stand as the places of the picture of the differences of them from the places of the picture of the
-// row above and from the places of the picture beside them, the places of the picture of a row standing from
-// the first place of the picture of the row). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT
-// License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -20,29 +13,19 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file. */
 const MARK = Buffer.from("fcb1", "latin1");
 const HEAD_SIZE = 0x10;
 const WIDTH_FIELD = 4;
 const HEIGHT_FIELD = 8;
 const METHOD_FIELD = 0xc;
-/** The places of the picture of a picture of the kind of the places of a picture of the compression of the
- * pictures of the engine stand behind the words of the head of the picture, the places of the picture of the
- * places of the picture of the walk of them standing as the places of the picture of the two words of the
- * places of the picture of the engine. */
 const PACKED_HEAD_SIZE = 0x14;
 const PACKED_SIZES_SIZE = 8;
 const PACKED_WIDTH_FIELD = 0x14;
-/** The kinds of the walk of the places of a picture of this kind. */
 const METHOD_TZ = 0;
 const METHOD_ZLIB = 1;
-/** The places of a picture of this kind stand in the places of a picture of the four places of a place of the
- * picture, the places of the picture of the background of it standing grey. */
 const PLACES_PER_PLACE = 4;
 const BACKGROUND_PLACE = 0x80;
 const BACKGROUND_ALPHA = 0xff;
-/** The places of the picture of the differences of a place of the picture of the walk of the places of a
- * picture of the count of them. */
 const DELTA_PLACES = 4;
 const WIDE_DELTA = 0x40;
 const WIDER_DELTA = 0x20;
@@ -61,10 +44,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `FcbFormat.ReadMetaData`: the words of the head of a picture of this kind name how wide and how tall the
- * picture stands and the kind of the walk of the places of the picture behind the words of the kind of it.
- */
 export function readFcbLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -78,9 +57,6 @@ export function readFcbLayout(
 	return { width, height, method, dataOffset: HEAD_SIZE };
 }
 
-/** `FcbFormat.Read`: the places of the picture of the walk of the places of a picture of the kind the words of
- * the head of it name, of the places of the picture of the kind of the compression of the pictures of the
- * engine. */
 export async function readFcbPlaces(
 	data: Buffer,
 	layout: FcbLayout,
@@ -93,9 +69,6 @@ export async function readFcbPlaces(
 		const unpackedSize = data.readInt32BE(PACKED_WIDTH_FIELD);
 		if (unpackedSize <= 0)
 			throw invalidPicture("The places of the walk of a picture stand nowhere");
-		// The words of the walk of the places of a picture of the kind of the places of a picture of the
-		// compression of the pictures of the engine stand behind the places of the picture of the two words of
-		// the places of the picture of the walk of them.
 		const from = PACKED_HEAD_SIZE + PACKED_SIZES_SIZE;
 		const places = await inflateZlibBufferCapped(
 			data.subarray(from),
@@ -115,12 +88,6 @@ export async function readFcbPlaces(
 	);
 }
 
-/**
- * The walk of the places of a picture of `FcbFormat`: the places of the picture stand as the places of the
- * picture of the differences of them from the places of the picture of the row above and of the places of the
- * picture beside them, the places of the picture of a row standing from the places of the picture of the first
- * place of the row.
- */
 export function unpackFcbPicture(input: Buffer, layout: FcbLayout): Buffer {
 	const { width, height } = layout;
 	const output = Buffer.alloc(width * height * PLACES_PER_PLACE);
@@ -149,11 +116,6 @@ export function unpackFcbPicture(input: Buffer, layout: FcbLayout): Buffer {
 					if ((code & WIDER_DELTA) !== 0) {
 						if ((code & WIDEST_DELTA) !== 0) {
 							if ((code & 0x08) !== 0) {
-								// The places of the picture of the differences of a place of the picture of the
-								// walk of the places of the picture of the kind of the places of the picture of
-								// the four places of the picture of the walk of them, of the places of the
-								// picture of the walk of the places of the picture of the kind of the words of
-								// the places of the picture behind them.
 								const long = code === WIDEST_DELTA_BYTE ? 3 : 4;
 								for (let at = 0; at < long; at += 1) {
 									delta[at] = (input[src] ?? 0) - 128;
@@ -206,10 +168,6 @@ export function unpackFcbPicture(input: Buffer, layout: FcbLayout): Buffer {
 				delta[2] = (code & 3) - 2;
 				delta[3] = 0;
 			}
-			// The places of the picture stand as the places of the picture of the differences of them from the
-			// places of the picture of the row above and of the places of the picture beside them within the
-			// places of a picture of every place of the picture, so the places of the picture stand within the
-			// places of a picture of a place of the picture of its own.
 			pixel[0] = ((pixel[0] ?? 0) + ((delta[0] ?? 0) + (delta[1] ?? 0))) & 0xff;
 			pixel[1] = ((pixel[1] ?? 0) + (delta[0] ?? 0)) & 0xff;
 			pixel[2] = ((pixel[2] ?? 0) + ((delta[0] ?? 0) + (delta[2] ?? 0))) & 0xff;
@@ -218,8 +176,6 @@ export function unpackFcbPicture(input: Buffer, layout: FcbLayout): Buffer {
 				output[dst] = pixel[at] ?? 0;
 				dst += 1;
 			}
-			// The places of the picture of a row stand from the places of the picture of the first place of the
-			// row, which the places of the picture of the row behind it stand from as well.
 			if (x === 0) {
 				for (let at = 0; at < PLACES_PER_PLACE; at += 1)
 					reference[at] = pixel[at] ?? 0;

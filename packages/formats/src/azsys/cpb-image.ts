@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/AZSys/ImageCPB.cs", classes `CpbFormat`, `CpbMetaData` and
-// `CpbFormat.Reader` (an image of the AZ system engine: four records of the places of a picture, every record
-// standing as a stream of the places of a picture of its own, and the places of the four records standing
-// beside each other in the places of the picture behind them). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,7 +13,6 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind names itself with, standing in the first places of the file. */
 const MARK = Buffer.from("CPB\x1a", "latin1");
 const HEAD_SIZE = 0x20;
 const TYPE_FIELD = 4;
@@ -30,7 +23,6 @@ const BITS_PER_PLACE_24 = 24;
 const BITS_PER_PLACE_32 = 32;
 const PLACES_PER_PLACE = 4;
 const RECORDS = 4;
-/** The words of the walk of a record of the third kind stand in the first twenty places of the record. */
 const WALK_HEAD_SIZE = 0x14;
 const WALK_COUNT_FIELD = 4;
 const WALK_PLACES_FIELD = 8;
@@ -38,8 +30,6 @@ const WALK_UNPACKED_FIELD = 0x10;
 const WALK_START_MASK = 0x80;
 const WALK_MATCH_BITS = 13;
 const WALK_MATCH_LEAST = 3;
-/** Every record of a picture of the second kind stands behind the places of the words of a picture whose
- * places stand for the places of a picture itself. */
 const RECORD_CRC_SIZE = 4;
 const LIMIT = 256 * 1024 * 1024;
 
@@ -49,7 +39,6 @@ export interface CpbLayout {
 	bitsPerPixel: number;
 	width: number;
 	height: number;
-	/** How many places every record of the places of the picture stands for, it standing for no places. */
 	channels: readonly number[];
 	dataOffset: number;
 }
@@ -58,13 +47,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `CpbFormat.ReadMetaData`: the words of the head of a picture of this kind name the kind of the picture, how
- * many places a place of it stands in, the kind of the walk of the places of it, how wide and how tall it
- * stands, and how many places every record of the places of it stands for. The kinds of the walk of the places
- * of a picture name the words behind the words of the walk in a kind of their own, so the places of the
- * pictures of the two kinds stand in the places of the file in kinds of their own.
- */
 export function readCpbLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -73,8 +55,6 @@ export function readCpbLayout(
 	if (!data.subarray(0, MARK.length).equals(MARK)) return undefined;
 	const type = data[TYPE_FIELD] ?? 0;
 	const bitsPerPixel = data[BPP_FIELD] ?? 0;
-	// The reference reads no picture of a kind of its own behind the two kinds of the places of a picture it
-	// stands in.
 	if (bitsPerPixel !== BITS_PER_PLACE_24 && bitsPerPixel !== BITS_PER_PLACE_32)
 		return undefined;
 	const version = data.readInt16LE(VERSION_FIELD);
@@ -105,13 +85,6 @@ export function readCpbLayout(
 	};
 }
 
-/**
- * `Reader.Decompress`: the walk of a record of a picture of the third kind. The words of the head of the walk
- * name how many places stand within the record and where the places of the walk and the places that stand for
- * themselves stand; the words of the walk stand for the places of the picture one after another, a word of a
- * place of the walk naming a place of the picture that stands behind it where the place of the walk stands, and
- * the places that stand for themselves standing behind the places of the walk.
- */
 export function decompressCpbChannel(
 	input: Buffer,
 	outputLength: number,
@@ -145,8 +118,6 @@ export function decompressCpbChannel(
 				throw invalidPicture(
 					"A place of the walk of a picture stands before it",
 				);
-			// The places of the picture of a walk of this kind stand beside one another, so a walk of places
-			// that stands within the places it stands for stands as a walk of the places written a moment ago.
 			for (let at = 0; at < count; at += 1) {
 				if (dst + at >= outputLength)
 					throw invalidPicture("The places of a picture stand past a record");
@@ -174,14 +145,10 @@ export function decompressCpbChannel(
 	return output;
 }
 
-/** `Reader.Unpack`: the records of the places of a picture, one after another. */
 export async function unpackCpbPicture(
 	data: Buffer,
 	layout: CpbLayout,
 ): Promise<Buffer> {
-	// The reference stands the records of the walk of the places of a picture of the first kind behind the
-	// places of a picture of their own kind, so the places of the four records of a picture of that kind stand
-	// in kinds of their own.
 	const streamMap = layout.version === 1 ? [0, 3, 1, 2] : [0, 1, 2, 3];
 	const channelMap = layout.version === 1 ? [3, 0, 1, 2] : [2, 1, 0, 3];
 	const places = layout.width * layout.height;
@@ -202,9 +169,6 @@ export async function unpackCpbPicture(
 				places,
 			);
 		} else {
-			// A record of a picture of this kind stands as a stream of a picture of the kind a picture of the
-			// words of the file stands in, and the first four places of it stand for the places of a picture
-			// rather than for the places of the picture.
 			const from = start + RECORD_CRC_SIZE;
 			if (from >= data.length)
 				throw invalidPicture(
@@ -300,9 +264,6 @@ export const azsysCpbImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = await readStored(source);
 		const layout = readCpbLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
-		// The reference hands the places of a picture of this kind out in four places for every place of a
-		// picture of the kind it stands them in, the places of a picture of four and twenty places standing
-		// with the places behind them standing clear.
 		return Readable.from([
 			writeBmp32(
 				layout.width,

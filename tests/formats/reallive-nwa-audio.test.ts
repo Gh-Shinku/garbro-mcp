@@ -13,10 +13,6 @@ const HEAD_SIZE = 0x28;
 const DATA_OFFSET = 0x2c;
 const PLACES_PER_WORD = 8;
 
-/** The places of the picture of the walk of the places of the picture of a sound of this kind stand of the
- * places of the picture of the walk of the places of the picture of the picture of the word of the walk of
- * them behind the places of the picture of the walk of the places of the picture of the place of the picture
- * of the walk of them. */
 function packLsb(bits: number[]): Buffer {
 	const out = Buffer.alloc(Math.ceil(bits.length / PLACES_PER_WORD));
 	for (let at = 0; at < bits.length; at += 1) {
@@ -28,10 +24,6 @@ function packLsb(bits: number[]): Buffer {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of a picture of the places of the
- * picture of their own stand of the places of the picture of the walk of the places of the picture of the
- * place of the picture of the walk of them, the places of the picture of the walk of them standing of the
- * places of the picture of the walk of the places of the picture of the picture of the walk of them. */
 function valueBits(value: number, count: number): number[] {
 	const out: number[] = [];
 	for (let i = 0; i < count; i += 1) out.push((value >> i) & 1);
@@ -65,8 +57,6 @@ function head(options: {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of a sound of this kind of a place of
- * the picture of the walk of them. */
 function oneBlock(options: {
 	channels: number;
 	bps: number;
@@ -81,9 +71,6 @@ function oneBlock(options: {
 	const pcmSize = Math.floor(
 		(options.blockSize * options.bps) / PLACES_PER_WORD,
 	);
-	// The places of the picture of the walk of the places of the picture of the sound stand of the places of
-	// the picture of the walk of the places of the picture of the words of the head of the picture of the
-	// walk of the places of the picture of the picture of the walk of them.
 	const sampleCount = Math.floor((pcmSize * PLACES_PER_WORD) / options.bps);
 	const offsets = Buffer.alloc(4);
 	offsets.writeUInt32LE(DATA_OFFSET + 4, 0);
@@ -155,8 +142,6 @@ describe("RealLive engine audio format", () => {
 		const farKind = Buffer.from(good);
 		farKind.writeInt32LE(6, 8);
 		expect(readNwaLayout(farKind, farKind.length)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the sound stand as the places
-		// of the picture of the walk of the places of the picture of the sound of their own.
 		const wrongCount = Buffer.from(good);
 		wrongCount.writeInt32LE(4, 0x1c);
 		expect(readNwaLayout(wrongCount, wrongCount.length)).toBeUndefined();
@@ -179,11 +164,6 @@ describe("RealLive engine audio format", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of a picture of the walk of the
-		// places of the picture of the words of the walk of the picture stand of the places of the picture of
-		// the walk of the places of the picture of the picture of the walk of them, the places of the picture
-		// of the walk of the places of the picture of the picture of the place of the picture of the walk of
-		// them standing of the places of the picture of the walk of the places of the picture of their own.
 		const bits: number[] = [
 			...valueBits(1, 3),
 			...valueBits(2, 5),
@@ -213,20 +193,12 @@ describe("RealLive engine audio format", () => {
 		});
 		const layout = readNwaLayout(file, file.length);
 		if (!layout) throw new Error("no layout");
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the place of the picture of the walk of
-		// them, so the places of the picture of the walk of the places of the picture of the sound of the
-		// picture of the walk of them stand of the places of the picture of the walk of the places of them.
 		expect(unpackNwaPcm(file, layout)).toEqual(
 			Buffer.from([0x20, 0x18, 0x00, 0x00, 0x00]),
 		);
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the runs of them", () => {
-		// The places of the picture of the walk of the places of the picture of the picture of the walk of the
-		// places of the picture of the sound stand of the places of the picture of the walk of the places of
-		// the picture of the place of the picture of the walk of them where the places of the picture of the
-		// walk of the places of the picture stand for the places of the picture of the walk of them.
 		const bits: number[] = [
 			...valueBits(1, 3),
 			...valueBits(2, 5),
@@ -249,10 +221,6 @@ describe("RealLive engine audio format", () => {
 		});
 		const layout = readNwaLayout(file, file.length);
 		if (!layout) throw new Error("no layout");
-		// The place of the walk of the places of the picture that stands for the places of the picture of the
-		// places of the picture of the walk of them stands of the places of the picture of the walk of the
-		// places of the picture of the picture itself, so the places of the picture of the walk of the places
-		// of the picture of the sound stand of the places of the picture of the walk of them.
 		expect(unpackNwaPcm(file, layout)).toEqual(
 			Buffer.from([0x20, 0x20, 0x20, 0x20, 0x18]),
 		);
@@ -285,10 +253,6 @@ describe("RealLive engine audio format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the picture of the walk of the places of them beside each other", () => {
-		// The places of the picture of the walk of the places of the picture of the pictures of the walk of
-		// the places of the picture stand beside each other, the places of the picture of the walk of the
-		// places of the picture standing of the places of the picture of the walk of the places of the
-		// picture of the place of the picture of the walk of them.
 		const bits: number[] = [
 			...valueBits(7, 3),
 			1,
@@ -325,9 +289,6 @@ describe("RealLive engine audio format", () => {
 				sampleCount: 3,
 				blockSize: 3,
 			}),
-			// The places of the picture of the walk of the places of the picture of the sound stand behind the
-			// places of the picture of the walk of the places of the picture of the words of the head of the
-			// picture of the walk of the places of them.
 			Buffer.alloc(4),
 			Buffer.from([0x11, 0x22, 0x33]),
 		]);

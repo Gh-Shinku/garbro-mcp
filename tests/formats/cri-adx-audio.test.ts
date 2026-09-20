@@ -15,9 +15,6 @@ const DATA_OFFSET = SIGNATURE_SIZE + HEADER_SIZE;
 const FRAME_SIZE = 0x12;
 const SAMPLES_PER_FRAME = 32;
 
-/** The places of the picture of the words of the head of the picture of the walk of the places of the picture
- * of a sound of this kind, the places of the picture of the walk of the places of the picture of the sound
- * standing of the places of the picture of the head of the picture of the walk of the places of them. */
 function header(options: {
 	channels: number;
 	sampleCount: number;
@@ -46,8 +43,6 @@ function header(options: {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of the places of the picture of a sound of this kind. */
 function frame(scale: number, nibbles: number[]): Buffer {
 	const out = Buffer.alloc(FRAME_SIZE, 0x00);
 	out.writeInt16BE(scale, 0);
@@ -77,11 +72,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 		expect(layout?.samplesPerFrame).toBe(SAMPLES_PER_FRAME);
 		expect(layout?.frameSize).toBe(FRAME_SIZE);
 		expect(layout?.dataOffset).toBe(DATA_OFFSET);
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of them of the places of the picture of the frequency of the places of
-		// the picture behind it: where the places of the picture of the walk of them stand of no places of the
-		// picture of the walk of them, the places of the picture of the walk of the places of the picture of
-		// the sound stand of the places of the picture of the walk of the places of the picture of their own.
 		expect(layout?.scale).toBe(8192);
 		expect(layout?.secondScale).toBe(-4096);
 	});
@@ -131,12 +121,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the sound", () => {
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the place of the picture of the walk of
-		// them of the places of the picture of the walk of the places of the picture standing before them, so
-		// the places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the places of the picture of their own
-		// where the places of the picture of the walk of them stand of no places of the picture of their own.
 		const file = Buffer.concat([
 			header({ channels: 1, sampleCount: SAMPLES_PER_FRAME }),
 			frame(0, place([1, 2, 3])),
@@ -153,10 +137,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of them of their own", () => {
-		// The places of the picture of the walk of the places of the picture of the sound stand as the places
-		// of the picture of the walk of the places of the picture of the place of the picture of the walk of
-		// them of the places of the picture of the walk of the places of the picture of the place of the
-		// picture of the walk of them where the places of the picture of the walk of them stand.
 		const file = Buffer.concat([
 			header({ channels: 1, sampleCount: SAMPLES_PER_FRAME }),
 			frame(0, place([8])),
@@ -189,11 +169,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the sound of more than one place of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the picture of the walk of them, so the
-		// places of the picture of the walk of the places of the picture of the place behind the first place
-		// of the picture of the walk of the places of the picture stand of the places of the picture of the
-		// walk of them.
 		const count = SAMPLES_PER_FRAME * 2;
 		const file = Buffer.concat([
 			header({ channels: 1, sampleCount: count }),
@@ -226,10 +201,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of them of the places of the picture of their own", () => {
-		// The places of the picture of the walk of the places of the picture of the sound stand as the places
-		// of the picture of the walk of the places of the picture of the place of the picture of the walk of
-		// them of the places of the picture of the walk of the places of the picture of the place of the
-		// picture of the walk of them.
 		const file = Buffer.concat([
 			header({ channels: 1, sampleCount: SAMPLES_PER_FRAME }),
 			frame(1, place([1])),
@@ -237,17 +208,8 @@ describe("CRI MiddleWare ADPCM audio", () => {
 		const layout = readAdxLayout(file, file.length);
 		if (!layout) throw new Error("no layout");
 		const pcm = unpackAdxPcm(file, layout);
-		// The places of the picture of the walk of the places of the picture of the sound stand of the places
-		// of the picture of the walk of the places of the picture of the sound of the places of the picture of
-		// the walk of the places of the picture of the place of the picture of the walk of them, the places
-		// of the picture of the walk of the places of the picture of the sound standing of the places of the
-		// picture of the walk of them of the places of the picture of their own.
 		const expectPcm = Buffer.alloc(SAMPLES_PER_FRAME * 2);
 		for (let i = 0; i < SAMPLES_PER_FRAME; i += 1)
-			// The places of the picture of the walk of the places of the picture of the sound stand of the
-			// places of the picture of the walk of the places of the picture of the highest places of the
-			// picture of the walk of the places of the picture of the sound of the places of the picture of
-			// the walk of them.
 			expectPcm.writeInt16LE(2 * (i + 1), i * 2);
 		expect(pcm).toEqual(expectPcm);
 	});
@@ -293,9 +255,6 @@ describe("CRI MiddleWare ADPCM audio", () => {
 	});
 
 	it("turns a sound of the places of the picture of no places of the walk of them away", async () => {
-		// The places of the picture of the walk of the places of the picture of the sound stand short of the
-		// places of the picture of the walk of the places of the picture where the places of the picture of
-		// the walk of them stand.
 		const short = Buffer.concat([
 			header({ channels: 1, sampleCount: SAMPLES_PER_FRAME * 4 }),
 			frame(0, place([1])),

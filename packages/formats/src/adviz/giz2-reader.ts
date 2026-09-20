@@ -1,13 +1,5 @@
-// Format reference: GARbro "Legacy/Adviz/ImageGIZ2.cs", class `Giz2Reader`. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License. A picture of this kind stands walked as four places
-// of a picture, every strip of eight places of the picture standing walked as four records of the places of a
-// picture: every record holds one place of every place of the picture, and the places of the picture stand
-// beside each other in strips.
-
 import { GarbroError } from "@garbro-mcp/core";
 
-/** The words of the head of a picture of this kind stand in the first sixteen places of the file, and the
- * places of the picture stand behind them. */
 export const GIZ2_HEADER_SIZE = 0x10;
 const PLACE_HEAD_SIZE = 4;
 const PLACES_PER_RECORD = 4;
@@ -18,9 +10,7 @@ export interface Giz2Layout {
 	height: number;
 	offsetX: number;
 	offsetY: number;
-	/** The place of a word of the walk of the places of a picture. */
 	rleCode: number;
-	/** Which of the four records of the places of a picture stand walked. */
 	planeMap: number;
 }
 
@@ -39,7 +29,6 @@ function rotateRight(value: number, count: number): number {
 	return ((value >>> by) | (value << (8 - by))) & 0xff;
 }
 
-/** The walk of the places of a picture of the places of a picture, one place of a picture after another. */
 class Giz2Reader {
 	private readonly data: Buffer;
 	private readonly layout: Giz2Layout;
@@ -67,11 +56,6 @@ class Giz2Reader {
 		return byte;
 	}
 
-	/**
-	 * `Giz2Reader.UnpackPlane`: the places of one record of the places of a picture, walked: a place that
-	 * stands as it is written, a run of places of one value, a run of places of two values that stand beside
-	 * each other, and a place of the walk that stands as it stands.
-	 */
 	unpackPlane(plane: Buffer): void {
 		const { height, rleCode } = this.layout;
 		let dst = 0;
@@ -130,11 +114,6 @@ class Giz2Reader {
 		}
 	}
 
-	/**
-	 * `Giz2Reader.CopyPlanes`: the places of eight places of a strip of the picture stand beside the places of
-	 * the four records of the places of a picture, the first place of a record standing in the places of the
-	 * picture that stand in the places above the places behind it.
-	 */
 	copyPlanes(output: Buffer, stride: number, dst: number): void {
 		const [p0, p1, p2, p3] = this.planes;
 		for (let y = 0; y < this.layout.height; y += 1) {
@@ -166,7 +145,6 @@ class Giz2Reader {
 		}
 	}
 
-	/** `Giz2Reader.Unpack`: the strips of eight places of the picture, one after another. */
 	unpack(): Buffer {
 		const strips = this.layout.width >> 3;
 		const stride = this.layout.width >> 1;
@@ -175,9 +153,6 @@ class Giz2Reader {
 		for (let x = 0; x < strips; x += 1) {
 			let mask = 1;
 			for (let i = 0; i < PLACES_PER_RECORD; i += 1) {
-				// The records of the places of a picture stand walked for every strip of the picture, and the
-				// places of a record stand as the places of the strip before it stand them where the places of
-				// the record stand unwalked for this strip.
 				if ((this.layout.planeMap & mask) === 0) {
 					const plane = this.planes[i];
 					if (!plane)
@@ -195,7 +170,6 @@ class Giz2Reader {
 	}
 }
 
-/** `Giz2Format.Read`: the places of a picture of this kind, walked into places of a picture of four places. */
 export function unpackGiz2Picture(data: Buffer, layout: Giz2Layout): Buffer {
 	return new Giz2Reader(data, layout).unpack();
 }

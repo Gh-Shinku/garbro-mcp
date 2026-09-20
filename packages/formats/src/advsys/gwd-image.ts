@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/AdvSys/ImageGWD.cs", classes `GwdFormat` and `GwdReader` (an AdvSys3
-// engine picture: a head naming the places of a picture, then a walk of the places of a line at a time, the
-// places of a line standing behind the place before them). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -23,13 +18,10 @@ import {
 const FORMAT_WORD = "GWD";
 const FORMAT_WORD_FIELD = 0x04;
 const HEADER_SIZE = 0x0c;
-/** How many bytes the places of the picture stand in, and where the head names the picture. */
 const DATA_SIZE_FIELD = 0x00;
 const WIDTH_FIELD = 0x07;
 const HEIGHT_FIELD = 0x09;
 const BITS_FIELD = 0x0b;
-/** The walk of the places stands behind the head, and a byte behind the places names whether a shape of them
- * stands behind those. */
 const PIXEL_OFFSET = HEADER_SIZE;
 const SHAPE_FIELD = 0x04;
 const SHAPE_STANDS = 1;
@@ -44,7 +36,6 @@ const MAXIMUM_COUNT_BITS = 31;
 const LIMIT = 256 * 1024 * 1024;
 
 export interface GwdLayout {
-	/** How many bytes the places of the picture stand in, which names where a shape of those places begins. */
 	dataSize: number;
 	width: number;
 	height: number;
@@ -60,12 +51,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `GwdFormat.ReadMetaData`: the word `GWD` stands at `0x04`, the width of the picture in the two words at
- * `0x07` standing the other way round from the rest of the file, its height in the words at `0x09` and the
- * places of a colour in the place at `0x0B`. The word at the front of the file names how many bytes the
- * places of the picture stand in.
- */
 export function readGwdLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -88,11 +73,6 @@ export function readGwdLayout(
 	return { dataSize, width, height, bitsPerPixel };
 }
 
-/**
- * `GwdFormat.Read`: where the places of a picture of twenty four bits stand, the place behind them names
- * whether the shape of those places stands behind it, and the shape stands as a picture of its own of eight
- * bits, as wide and as high as the picture whose places it stands beside.
- */
 export function readGwdShapeLayout(
 	data: Buffer,
 	layout: GwdLayout,
@@ -151,11 +131,6 @@ function readGwdCount(reader: MsbBitReader): number {
 	return (reader.readBits(count) + (1 << count) - 2) & 0xffff;
 }
 
-/**
- * `GwdReader.FillLine`: a step of the walk names a run of places of a line and, where the places of a colour
- * that stand behind the step name any, as many places of a colour as those places name plus one. Every place
- * of a line then stands behind the place before it.
- */
 export function fillGwdLine(
 	reader: MsbBitReader,
 	line: Buffer,
@@ -219,11 +194,6 @@ export function decodeGwd(
 	return pixels;
 }
 
-/**
- * `GwdFormat.Read`: the places of the picture stand as a bitmap of eight or twenty four bits, and where the
- * shape of those places stands beside them, every place of the shape stands for the place of the colour of the
- * picture it stands before, standing the other way round from it.
- */
 export function composeGwd(
 	data: Buffer,
 	layout: GwdLayout,
@@ -285,8 +255,6 @@ async function readGwd(source: ByteSource) {
 
 export const advSysGwdImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: advSysGwdImageDescriptor,
-	// The reference registers no word at all, so a picture of this kind is tried after every kind that is told
-	// by a word of its own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEADER_SIZE)) return false;

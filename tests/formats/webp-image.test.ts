@@ -23,12 +23,7 @@ function riff(chunks: Buffer[]): Buffer {
 	return Buffer.concat([head, body]);
 }
 
-/** The places of the picture of the words of the head of the picture of the walk of the places of the picture
- * of the kind of the places of the picture of the picture of the engine. */
 function features(flags: number, width: number, height: number): Buffer {
-	// The words of the head of a picture of the kind of the places of the picture stand of the places of the
-	// picture of four places, the places of the picture of the walk of the places of the picture standing
-	// behind them of the places of the picture of three places each.
 	const out = Buffer.alloc(10);
 	out.writeUInt32LE(flags, 0);
 	out.writeUIntLE(width - 1, 4, 3);
@@ -36,20 +31,12 @@ function features(flags: number, width: number, height: number): Buffer {
 	return out;
 }
 
-/** The places of the picture of the words of the head of a picture of the kind of the walk of the places of
- * the picture of their own. */
 function losslessHead(
 	width: number,
 	height: number,
 	version = 0,
 	alpha = false,
 ): Buffer {
-	// The reference stands the places of the picture of the walk of the places of a picture of their own of a
-	// picture of the words of the head of the picture of the walk of the places of the picture of the kind of
-	// the walk of them, the places of the picture of the walk of the places of the picture standing of the
-	// places of the picture of the picture of their own — so the places of the picture of the words of the
-	// head of the picture stand of the places of the picture of a word of the walk of the places of the
-	// picture of the places of the picture of the walk of them of a picture of their own.
 	const head = Buffer.alloc(10);
 	head[0] = 0x2f;
 	const places =
@@ -110,9 +97,6 @@ describe("Google WebP image format", () => {
 		expect(layout?.width).toBe(0x140);
 		expect(layout?.height).toBe(0xc8);
 		expect(layout?.isLossless).toBe(false);
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of their own stand of the places of the picture of the picture of the kind of the walk of
-		// them of the places of the picture of the walk of them.
 		expect(layout?.dataOffset).toBe(20);
 	});
 
@@ -125,10 +109,6 @@ describe("Google WebP image format", () => {
 		expect(layout?.flags).toBe(0x10);
 		expect(layout?.width).toBe(0x200);
 		expect(layout?.height).toBe(0x100);
-		// The reference stands no places of the picture of the walk of the places of the picture of the
-		// picture of the places of the picture of the walk of them of the words of the head of the picture,
-		// so a picture of the kind of the places of the picture of the walk of them stands it of the places of
-		// the picture of the walk of the places of the picture of the places of its own.
 		expect(layout?.hasAlpha).toBe(false);
 		expect(layout?.isLossless).toBe(true);
 	});
@@ -144,9 +124,6 @@ describe("Google WebP image format", () => {
 		expect(layout?.height).toBe(4);
 		expect(layout?.alphaSize).toBe(6);
 		expect(layout?.alphaOffset).toBe(38);
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them stand of the places of the picture of the walk of the places of the
-		// picture of the walk of the places of the picture of the words of the head of the picture.
 		expect(layout?.isLossless).toBe(false);
 	});
 
@@ -158,10 +135,6 @@ describe("Google WebP image format", () => {
 		]);
 		const layout = readWebpLayout(odd, odd.length);
 		expect(layout?.alphaSize).toBe(5);
-		// The places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of them of the picture of the walk of the places of the picture stand of the
-		// places of the picture of the walk of the places of the picture of the picture of the word of the
-		// picture standing behind it.
 		expect(layout?.width).toBe(16);
 		expect(layout?.height).toBe(16);
 		expect(layout?.isLossless).toBe(true);
@@ -225,12 +198,6 @@ describe("Google WebP image format", () => {
 	});
 
 	it("reads the places of the picture of the words of the head of the picture of the places of the picture of the walk of the places of them of the picture of the walk of the places of the picture of their own", () => {
-		// The reference stands the places of the picture of the walk of the places of the picture of a picture
-		// of the kind of the walk of them where the places of the picture of the words of the head of the
-		// picture of the kind of the places of the picture of the walk of them stand, so the places of the
-		// picture of the walk of the places of the picture of the kind of the walk of them stand of the places
-		// of the picture of the walk of them of the words of the head of the picture of the kind of the places
-		// of the picture of the walk of them of the picture of the walk of the places of them.
 		const file = riff([
 			chunk("VP8X", features(0, 4, 4)),
 			chunk("VP8 ", Buffer.alloc(4), 4),
@@ -255,8 +222,6 @@ describe("Google WebP image format", () => {
 		expect(entry.path).toBe("orig.webp");
 		expect(Number(entry.size)).toBe(file.length);
 		const out = await consumeBuffer(await handle.openEntry(entry.id));
-		// The places of the picture of the kind of the walk of the places of the pictures of the engine stand
-		// as they stand.
 		expect(out).toEqual(file);
 	});
 

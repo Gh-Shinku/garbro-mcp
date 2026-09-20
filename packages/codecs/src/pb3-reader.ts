@@ -1,10 +1,5 @@
-// Format reference: GARbro "ArcFormats/Cmvs/ImagePB3.cs", classes `Pb3Format`, `PbReaderBase` and `Pb3Reader`
-// — the walk of the places of a picture of the Purple engine that stands as the places of the picture itself.
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { decodeJbpPicture } from "./jbp-reader.js";
 
-/** Where the words of the head of a picture of this kind stand. */
 const HEADER_SIZE = 0x24;
 const INPUT_SIZE_FIELD = 0x04;
 const SUB_KIND_FIELD = 0x18;
@@ -12,33 +7,22 @@ const KIND_FIELD = 0x1c;
 const WIDTH_FIELD = 0x1e;
 const HEIGHT_FIELD = 0x20;
 const BITS_FIELD = 0x22;
-/** Where the places of the walks of the places of a picture stand, and how many places of a picture stand in
- * every place of the walk of its places. */
 const WALKS_FIELD = 0x2c;
 const SECOND_WALKS_FIELD = 0x30;
 const JBP_FIELD = 0x34;
 const WALK_PLACES = 0x54;
-/** The places of the walk of the places of a picture of this kind stand in a frame of places of their own,
- * the places of the walk standing behind the places of the picture that stand before them. */
 const FRAME_SIZE = 0x800;
 const FRAME_MASK = 0x7ff;
 const FRAME_START = 0x7de;
-/** How many places of the picture the places of the walk of the places of a colour stand in. */
 const SIDE_PLACES = 16;
 const PLACES_PER_ROW = 4;
 
-/** `Pb3Reader.NameKeyV6`: the words the places of the file of a picture of the kinds that stand behind the
- * words of the engine stand behind, which stand as the places of the file itself. */
 const NAME_KEY_V6 = [
 	0xa6, 0x75, 0xf3, 0x9c, 0xc5, 0x69, 0x78, 0xa3, 0x3e, 0xa5, 0x4f, 0x79, 0x59,
 	0xfe, 0x3a, 0xc7,
 ];
-/** Where the words that name the picture of a picture of the kinds that stand behind the words of the engine
- * stand, and how many places of the file they stand in. */
 const NAME_FIELD = 0x34;
 const NAME_SIZE = 0x20;
-/** Where the places of the walk of the places of the picture stand in a picture of the kinds that stand behind
- * the words of the engine, and how many places of the picture stand in every side of a place of its walk. */
 const OVERLAY_BITS_FIELD = 0x0c;
 const OVERLAY_SIZE_FIELD = 0x18;
 const OVERLAY_DATA_FIELD = 0x2c;
@@ -46,9 +30,6 @@ const OVERLAY_HEAD_SIZE = 8;
 const SIDE_OF_OVERLAY = 8;
 const PLACES_PER_OVERLAY_ROW = 4;
 
-/** `Pb3Reader.UnpackV6`: the words of the head of a picture of the kinds that stand behind the words of the
- * engine name a picture of the engine that stands beside it, which the places of the picture itself stand as
- * behind them. */
 export function readPb3V6Name(
 	input: Buffer,
 	fileLength = input.length,
@@ -63,8 +44,6 @@ export function readPb3V6Name(
 	return Buffer.from(name).toString("latin1");
 }
 
-/** The places of a picture that stand beside a picture of the kinds that stand behind the words of the
- * engine, which the places of the picture itself stand as behind them. */
 export interface Pb3BasePicture {
 	stride: number;
 	pixels: Buffer;
@@ -79,8 +58,6 @@ export function pb3UnpackV6(
 	if (undefined === name) {
 		throw new RangeError("Purple picture names no picture of its own");
 	}
-	// The reference reads the places of the picture the words name through the reader of every kind of picture
-	// of the engine; the words of the picture itself stand beside the places of the picture of the game.
 	const base = loadBase(`${name}.pb3`);
 	if (!base) {
 		throw new RangeError(
@@ -89,8 +66,6 @@ export function pb3UnpackV6(
 	}
 	const pixels = Buffer.from(base.pixels);
 	const stride = PLACES_PER_ROW * head.width;
-	// The places of the picture the words name stand as the places of the picture itself, and the places of the
-	// walk of the places of the picture stand as the places of a walk of their own within them.
 	const bitsAt = 0x20 + input.readInt32LE(OVERLAY_BITS_FIELD);
 	const dataAt = bitsAt + input.readInt32LE(OVERLAY_DATA_FIELD);
 	const overlaySize = input.readInt32LE(OVERLAY_SIZE_FIELD);
@@ -133,8 +108,6 @@ export function pb3UnpackV6(
 				bitMask = 0x80;
 			}
 			if (0 === (bitMask & (overlay[bitSrc] ?? 0))) {
-				// The places of a place of the picture stand as the places of the picture the words name, and
-				// the places of the walk of the places of the picture stand as no places of the picture at all.
 				let dst = SIDE_OF_OVERLAY * (origin + PLACES_PER_OVERLAY_ROW * x);
 				const xCount = Math.min(SIDE_OF_OVERLAY, head.width - columnDone);
 				const yCount = Math.min(SIDE_OF_OVERLAY, head.height - rowDone);
@@ -181,13 +154,9 @@ export interface Pb3Picture {
 	height: number;
 	bitsPerPixel: number;
 	stride: number;
-	/** The places of the picture, which stand as the places of four colours apiece. */
 	pixels: Buffer;
 }
 
-/** `Pb3Format.ReadMetaData`: the words of the head of a picture of this kind name how many places of the file
- * the picture stands in, the kind and the underkind of the picture, how wide and how tall it stands, and how
- * many places a place of it stands in. */
 export function readPb3Head(
 	data: Buffer,
 	fileLength = data.length,
@@ -203,9 +172,6 @@ export function readPb3Head(
 	};
 }
 
-/** `PbReaderBase.LzssUnpack`: the places of a picture of this kind stand as a walk of their own, every step of
- * it standing as a place of the picture that stands as it stands, or as a place that stands as many places of
- * the picture beside the places that stand behind it. */
 export function pb3LzssUnpack(options: {
 	input: Buffer;
 	bitSrc: number;
@@ -249,14 +215,10 @@ export function pb3LzssUnpack(options: {
 	}
 }
 
-/** `PbReaderBase.LzssResetFrame`: the places of the walk of the places of a colour stand as nothing before
- * every walk of the places of a colour of its own. */
 export function pb3LzssResetFrame(frame: Uint8Array): void {
 	for (let at = 0; at < FRAME_START; at += 1) frame[at] = 0;
 }
 
-/** `PbReaderBase.UnpackJbp`: the places of a picture of this kind stand as the places of a picture of the
- * Purple engine that stands within them, whose places stand as the places of the picture itself. */
 export function pb3UnpackJbp(
 	input: Buffer,
 	head: Pb3Head,
@@ -267,9 +229,6 @@ export function pb3UnpackJbp(
 	const stride = PLACES_PER_ROW * head.width;
 	const pixels = Buffer.from(jbp.pixels);
 	if (stride !== jbp.stride) {
-		// The places of the walk of the places of the picture stand as the places of the picture that stand
-		// beside the places of the walk of its places, so the places of the picture stand as the places of the
-		// walk of its places that stand for them.
 		for (let y = 1; y < head.height; y += 1) {
 			const from = y * jbp.stride;
 			const to = y * stride;
@@ -307,9 +266,6 @@ export function pb3UnpackJbp(
 	};
 }
 
-/** `Pb3Reader.UnpackV1`: the places of a colour of a picture of this kind stand as a walk of their own, and
- * the places of the picture stand as the places of the walk that stand for them, every place of the walk of
- * the places of the picture standing as the places of the picture of a place of the walk of its places. */
 export function pb3UnpackV1(input: Buffer, head: Pb3Head): Pb3Picture {
 	const width = head.width;
 	const height = head.height;
@@ -405,8 +361,6 @@ export function pb3UnpackV1(input: Buffer, head: Pb3Head): Pb3Picture {
 	};
 }
 
-/** `Pb3Reader.UnpackV5`: the places of every colour of a picture of this kind stand as a walk of their own,
- * every place of the walk standing for the place of the picture that stands beside the place before it. */
 export function pb3UnpackV5(input: Buffer, head: Pb3Head): Pb3Picture {
 	const stride = PLACES_PER_ROW * head.width;
 	const pixels = Buffer.alloc(stride * head.height, 0x00);

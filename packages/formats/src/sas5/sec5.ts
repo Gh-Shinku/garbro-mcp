@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Sas5/ArcSec5.cs", classes `Sec5Opener` (and the walk of the places of
-// the picture of the places of the picture of the engine of the SAS5 kind, which stands of the places of the
-// picture of the words of the head of the picture of the places of the picture of the walk of them). GARbro
-// commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -15,16 +10,12 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The places of the picture of the words of the head of the picture of the walk of the places of the picture
- * of the places of the picture of the engine of the SAS5 kind. */
 const SEC5_MARK = Buffer.from("SEC5", "latin1");
 const SECTION_HEAD_SIZE = 8;
 const FIRST_SECTION = 8;
 const PLACES_OF_THE_NAME = 4;
 const END_MARK = "ENDS";
 const CODE_NAME = "CODE";
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the engine. */
 const KEY_ADDITION = 18;
 const BYTE_SIZE = 0x100;
 
@@ -39,14 +30,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Sec5Opener.TryOpen`: the places of the picture of the walk of the places of the picture of the places of
- * the picture of the engine of the SAS5 kind. Every place of the picture of the walk of them stands of the
- * places of the picture of the walk of the places of the picture of the four places of the picture of the
- * name of it and of the places of the picture of the walk of them, the places of the picture of the walk of
- * the places of the picture of the places of the picture of the walk of them standing behind the places of
- * the picture of the name of the picture of the walk of them.
- */
 export function readSec5Sections(
 	data: Buffer,
 	fileLength = data.length,
@@ -57,11 +40,6 @@ export function readSec5Sections(
 	const sections: Sec5Section[] = [];
 	let at = FIRST_SECTION;
 	while (at < fileLength) {
-		// The reference stands the places of the picture of the name of the place of the picture of the walk
-		// of the places of the picture before the places of the picture of the walk of the places of the
-		// picture of it, so a place of the picture of the walk of them that stands for the places of the
-		// picture of the walk of the places of the picture of the place of the picture of the walk of them
-		// stands of the places of the picture of the name of the picture of the walk of it of its own.
 		if (at + PLACES_OF_THE_NAME > data.length)
 			throw invalidArchive(
 				"The places of the picture of the walk of the places of the picture of the places of the picture of the engine stand short of the places of the picture",
@@ -90,20 +68,10 @@ export function readSec5Sections(
 	return sections;
 }
 
-/**
- * `Sec5Opener.DecryptCodeSection`: the places of the picture of the walk of the places of the picture of the
- * places of the picture of the engine stand as the places of the picture of the walk of the places of the
- * picture of the picture behind them, the places of the picture of the walk of them standing beside the places
- * of the picture of the walk of the places of the picture of the place of the picture of the walk of them of
- * the places of the picture of their own.
- */
 export function decryptSec5Code(code: Buffer): Buffer {
 	const out = Buffer.from(code);
 	let key = 0;
 	for (let at = 0; at < out.length; at += 1) {
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// picture of the places of the picture of their own before the places of the picture of the walk of
-		// the places of the picture of the picture stand as the places of the picture of the walk of them.
 		const place = (out[at] ?? 0) + KEY_ADDITION;
 		out[at] = (out[at] ?? 0) ^ key;
 		key = (key + place) & (BYTE_SIZE - 1);
@@ -178,9 +146,6 @@ export const sas5Sec5Format: ArchiveFormat = defineFixedArchive({
 				"No places of the picture of the walk of the places of the picture",
 			);
 		const data = stored.subarray(section.offset, section.offset + section.size);
-		// The reference stands the places of the picture of the walk of the places of the picture of the place
-		// of the picture of the walk of the places of the picture of the engine of the words of the walk of
-		// the picture of their own, and hands every other place of the picture over as it stands.
 		return Readable.from([
 			section.encrypted ? decryptSec5Code(data) : Buffer.from(data),
 		]);

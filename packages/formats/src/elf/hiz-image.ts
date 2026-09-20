@@ -37,7 +37,6 @@ const COUNT = 100;
 const WIDTH_XOR = 0xaa5a5a5a;
 const HEIGHT_XOR = 0xac9326af;
 const SIZE_XOR = 0x19739d6a;
-/** A word that says the file is something else of this engine rather than a picture of this kind. */
 const OTHER_FORMAT_WORD = 0x375a8436;
 const BITS_PER_PIXEL = 32;
 const BYTES_PER_PIXEL = 4;
@@ -55,11 +54,6 @@ export interface HizLayout {
 	height: number;
 }
 
-/**
- * The header of the picture, read the way the reference's metadata reader reads it: a count that has to be a
- * hundred, two measurements behind an exclusive or, a word that says the file is another format rather than a
- * picture of this kind, and the size of the picture — which has to be exactly its pixels and no more.
- */
 export function readHizHeader(header: Buffer): HizLayout | undefined {
 	if (header.length < HEADER_SIZE) return undefined;
 	if (header.readInt32LE(COUNT_FIELD) !== COUNT) return undefined;

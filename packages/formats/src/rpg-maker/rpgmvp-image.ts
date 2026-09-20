@@ -1,8 +1,3 @@
-// Format reference: GARbro "Experimental/RPGMaker/ImageRPGMV.cs", class `RpgmvpFormat` (a picture of the RPG
-// Maker engine of the kind that stands behind the words of the engine and the places of a key, which stand as
-// the words of a portable network graphic). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,7 +13,6 @@ import {
 import { readPngHeaderFields } from "../shared/png.js";
 import { RPGMV_SIGNATURE, readRpgmvFile } from "./rpgmv-core.js";
 
-/** The words a picture of this kind stands for. */
 const PNG_WORD = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
 
 function invalidPicture(message: string): GarbroError {

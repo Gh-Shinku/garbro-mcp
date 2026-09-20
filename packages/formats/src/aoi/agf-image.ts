@@ -128,21 +128,6 @@ function copyOverlapped(
 	}
 }
 
-/**
- * `AgfFormat.Read`: the pixels stand behind the place the head gives, written by steps of five kinds. Every
- * step begins with a word whose lowest byte says its kind and whose places above it say how much it writes,
- * counted in pixels:
- *
- * * the first kind is that many pixels that stand as they are;
- * * the second is one pixel that stands as it is and is then written again and again until the step is
- *   whole;
- * * the third is a run of pixels that stands as it is and is then written again as many times as the lowest
- *   byte of the word says, over and over until the step is whole;
- * * the fourth is a run of pixels copied from behind the one being written, as far behind as the three
- *   lowest places of the word say and as long as the places above them say;
- * * the fifth is nothing at all: as many pixels of the file are passed over as the word says, less a quarter
- *   of them, and the step is as long as the word says.
- */
 export function unpackAgf(stored: Buffer, layout: AgfLayout): Buffer {
 	const pixels: Buffer = Buffer.alloc(layout.width * layout.height * 4, 0x00);
 	let position = layout.dataOffset;

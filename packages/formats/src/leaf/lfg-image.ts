@@ -21,7 +21,6 @@ import {
 /** 'LEAFCODE', the word the reference registers. */
 const SIGNATURE = Buffer.from("LEAFCODE", "latin1");
 const HEADER_SIZE = 0x30;
-/** The places of the picture and the byte that says which way its places are written. */
 const OFFSET_X_FIELD = 0x20;
 const OFFSET_Y_FIELD = 0x22;
 const RIGHT_FIELD = 0x24;
@@ -29,21 +28,16 @@ const BOTTOM_FIELD = 0x26;
 const MODE_FIELD = 0x28;
 const KEY_COLOR_FIELD = 0x29;
 const IMAGE_SIZE_FIELD = 0x2c;
-/** The colours of the picture: sixteen of them, three parts apiece, every part of four places standing in the
- * places of the bytes behind the word. */
 const PALETTE_FIELD = 0x08;
 const PALETTE_COLORS = 16;
 const PALETTE_BYTES = PALETTE_COLORS * 3;
-/** Where the walk of the picture begins and how wide its frame is. */
 const WALK_FIELD = 0x30;
 const FRAME_SIZE = 0x1000;
 const FRAME_INIT = 0xfee;
-/** The two ways the places of the picture are written: along a row, or down a column. */
 const ROW_MODE = 1;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
 
-/** `LfgReader.ColorMap`: what a pair of places of the walk stands for. */
 const COLOR_MAP = new Uint8Array([
 	0x00, 0x01, 0x10, 0x11, 0x02, 0x03, 0x12, 0x13, 0x20, 0x21, 0x30, 0x31, 0x22,
 	0x23, 0x32, 0x33, 0x04, 0x05, 0x14, 0x15, 0x06, 0x07, 0x16, 0x17, 0x24, 0x25,
@@ -68,14 +62,11 @@ const COLOR_MAP = new Uint8Array([
 ]);
 
 export interface LfgLayout {
-	/** The places of the picture, in eight places of a byte. */
 	width: number;
 	height: number;
 	/** How many bytes stand in a row of the picture. */
 	stride: number;
-	/** How many bytes the walk of the picture gives. */
 	imageSize: number;
-	/** Which way the places of the picture are written. */
 	mode: number;
 	/** The colour the picture stands for as its shape. */
 	keyColor: number;
@@ -85,13 +76,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `LfgFormat.ReadMetaData`: the word `LEAFCODE` stands at the beginning of the file, the places of the picture
- * stand at four words behind it — how far its left and its top edge stand from nought and how far its right and
- * its bottom edge do, the width of the picture standing in eight places of a byte — and the byte behind those
- * says which way the places are written, the byte behind that the colour that stands for the shape of the
- * picture and the word behind those how many bytes its walk gives.
- */
 export function readLfgLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -119,12 +103,6 @@ export function readLfgLayout(
 	};
 }
 
-/**
- * `LfgReader.ReadPalette`: the colours of the picture stand in the twenty four bytes behind the word of the
- * file, every byte of them standing for two parts of a colour of four places, the higher four places of the
- * byte first; every part of four places stands for thirty four places of a colour of eight bits, and the red,
- * the green and the blue of a colour stand one behind the other.
- */
 export function readLfgPalette(data: Buffer): Buffer {
 	const parts = Buffer.alloc(PALETTE_COLORS * 3, 0x00);
 	for (let at = 0; at < PALETTE_BYTES; at += 1) {
@@ -135,14 +113,6 @@ export function readLfgPalette(data: Buffer): Buffer {
 	return parts;
 }
 
-/**
- * `LfgReader.Unpack`: the walk of the picture takes pairs of places at a time. A step whose place of the byte
- * at hand stands takes a byte of the walk, which the table of the picture stands for a pair of places; any
- * other step takes two bytes, whose four lowest places are how many pairs stand there, less three, and whose
- * twelve places above them name where in the frame the pairs stand — the frame being walked round as it is
- * written. The places of the picture stand along the rows of a picture of the first way and down its columns of
- * the second.
- */
 export function unpackLfg(data: Buffer, layout: LfgLayout): Buffer {
 	const frame: Buffer = Buffer.alloc(FRAME_SIZE, 0x00);
 	const output: Buffer = Buffer.alloc(layout.stride * layout.height, 0x00);

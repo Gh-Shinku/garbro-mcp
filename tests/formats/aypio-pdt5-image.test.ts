@@ -31,10 +31,6 @@ function pdt5File(input: {
 	return Buffer.concat([head, input.body]);
 }
 
-/**
- * The places of the walk in the order it reads them: the lowest place of a byte first, so `bits("101")` stands
- * in the first byte as `0b101`.
- */
 function bits(spec: string): Buffer {
 	const out = Buffer.alloc(Math.ceil(spec.length / 8), 0x00);
 	for (let at = 0; at < spec.length; at += 1) {
@@ -76,9 +72,6 @@ describe("UK2 engine image format of the second kind", () => {
 	});
 
 	it("walks the places of a picture out of its table", () => {
-		// The first place stands from the table of the places that stand further back — the second place of
-		// its first row, which is one — and the place behind it names the third place of that row, which is
-		// two. The six places behind those all lean on the place at hand, two of them at a time.
 		const data = pdt5File({
 			right: 0,
 			bottom: 0,
@@ -97,9 +90,6 @@ describe("UK2 engine image format of the second kind", () => {
 	});
 
 	it("walks the places of a picture that stand beside it", () => {
-		// The first two places stand from the table of the places that stand further back, the pair behind
-		// them leans on the pair that stands before it and the places behind those stand from the places
-		// around them, which stand as nought on the first row.
 		const data = pdt5File({
 			right: 0,
 			bottom: 0,

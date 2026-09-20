@@ -10,8 +10,6 @@ import {
 
 const PICTURE_OFFSET = 0x58;
 
-/** The head of a picture of two places in one row: the words of the head of the kind of files it stands as, the
- * words of its own head, and the words of the places of the picture. */
 function buildPicture(
 	picture: Buffer,
 	packedSize: number,
@@ -31,10 +29,6 @@ function buildPicture(
 	return Buffer.concat([head, picture]);
 }
 
-/** The walked places of a picture: a place that stands as it stands, a place that stands beside the place
- * before it by how its places of a colour stand beside those of the place before it, and the words of the end
- * of the walk of the row. The places of the walk stand worked out with a walk of the places of the reference's
- * own, so the places of the test stand under a walk this port did not work out. */
 const WALKED = Buffer.concat([
 	Buffer.from([1]),
 	Buffer.from([0x10, 0x21]),
@@ -102,8 +96,6 @@ describe("TechnoBrain Inteligent Picture Format", () => {
 		expect(out.readUInt32LE(0x12)).toBe(2);
 		expect(out.readInt32LE(0x16)).toBe(-1);
 		expect(out.readUInt16LE(0x1c)).toBe(16);
-		// A bitmap of a picture of this kind names how the places of every colour of a place of it stand, so the
-		// places of the picture stand behind those words.
 		const pictureAt = out.readUInt32LE(0x0a);
 		expect(out.subarray(pictureAt, pictureAt + 4)).toEqual(WALKED_PLACES);
 	});
@@ -128,7 +120,6 @@ describe("TechnoBrain Inteligent Picture Format", () => {
 		await expect(
 			technoBrainIphImageFormat.detect(new BufferByteSource(WALKED_PICTURE)),
 		).resolves.toBe(true);
-		// A sound of the kind that stands as the words of the RIFF kind stands as no picture of this kind.
 		const wave = Buffer.alloc(0x58, 0x00);
 		wave.write("RIFF", 0, "latin1");
 		wave.write("WAVE", 8, "latin1");
@@ -139,7 +130,6 @@ describe("TechnoBrain Inteligent Picture Format", () => {
 	});
 });
 
-/** The words of a picture of this kind whose places of a picture stand as nothing at all. */
 function HEADLESS(): Buffer {
 	return buildPicture(Buffer.alloc(0, 0x00), 0, true);
 }

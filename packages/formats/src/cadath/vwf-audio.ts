@@ -83,12 +83,6 @@ export function readVwfLayout(
 	};
 }
 
-/**
- * `VwfAudio.DecodeAdp`: every nibble of the stream is one step, the higher one of a byte first — how far the
- * quantiser moves comes from the table above, the step is a quarter of the quantiser plus the whole of it,
- * its half and its quarter for the three lower places of the code, and the sample climbs by the step for a
- * code below eight and falls by it for one of eight and above.
- */
 export function decodeVwfAdp(
 	input: Buffer,
 	samples: number,

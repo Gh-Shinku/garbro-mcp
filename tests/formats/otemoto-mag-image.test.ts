@@ -10,21 +10,13 @@ import {
 	unpackOtemotoMag,
 } from "../../packages/formats/src/otemoto/mag-image.js";
 
-/** A picture of eight places in one row: the words of the head stand in the first eight places, the words of
- * the picture stand behind the place they end at, and the places of the walk of the picture stand behind the
- * palette. The places of the picture stand worked out with a walk of the places of the reference's own, so the
- * places of the test stand under a walk this port did not work out. */
 const PICTURE = Buffer.from(
 	"4d414b49303220201a0000000000000000070000005000000051000000f8ffffff520000" +
 		"000000000000010204050608090a0c0d0e10111214151618191a1c1d1e20212224252628" +
 		"292a2c2d2e30313234353638393a3c3d3ec0011032",
 	"hex",
 );
-/** The places of the walk of the picture: the places the walk stands for itself and the place it stands beside
- * the place before it. */
 const PLACES = [0x3210, 0x3210];
-/** The places of the walk stood as places of a bitmap of four places a place, a row of it standing in as many
- * places as the head of the picture says. */
 const ROW = Buffer.from("10321032", "hex");
 
 async function extract(data: Buffer): Promise<Buffer> {
@@ -75,8 +67,6 @@ describe("Otemoto image format", () => {
 		if (!layout) throw new Error("the head stands in the picture");
 		const palette = readOtemotoMagPalette(PICTURE, layout);
 		expect(palette.length).toBe(16 * 3);
-		// Every place of the palette stands in three places, the places of the green and the red of it standing
-		// the other way round from the places of a bitmap of this kind.
 		expect([...palette.subarray(0, 6)]).toEqual([
 			0x01, 0x00, 0x02, 0x05, 0x04, 0x06,
 		]);

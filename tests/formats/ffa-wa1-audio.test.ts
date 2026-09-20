@@ -121,9 +121,6 @@ describe("FFA System wave audio", () => {
 	});
 
 	it("walks the samples of the second kind a code at a time", () => {
-		// A code stands in two to eight places, the lowest place of the walk first. The three bytes `0xF2`,
-		// `0xFD` and `0x00` hold the same four codes as the walk of the first kind: the places `10`, `00`,
-		// `1011111` and `0011111`.
 		const data = wa1File({
 			kind: 4,
 			dataSize: 8,

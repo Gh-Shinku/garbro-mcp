@@ -17,9 +17,6 @@ const FILE_1 = Buffer.from("202122232425262728292a2b2c2d2e2f", "hex");
 const NAMES = ["Scripts/Start.txt", "data/Icon.png"];
 const KEYS = [0x42424242, 0x0badf00d];
 
-/** The places of the walk of the files, of the walk of the names and of the files themselves, every one of
- * them stood under the walk of its own key. The archive stands worked out with a walk of the key of its own,
- * so its places stand under walks this port did not work out. */
 const INDEX = Buffer.from(
 	"796f1fe52fa79da9bae52f195b676b4bbb09e91fea21797fafe97baf5edf3a84",
 	"hex",
@@ -38,14 +35,10 @@ const INDEX_PLAIN = Buffer.from(
 	"000000004004000011000000424242421200000051040000100000000df0ad0b",
 	"hex",
 );
-/** Where the walk of the names stands from, and where the walk of the files does. */
 const NAMES_SEED = 7;
 const INDEX_SEED = 9;
-/** Where the places of the first file stand. */
 const FIRST_OFFSET = 0x440;
 
-/** The head of such an archive: how many files it holds stands as the places of the head counted as four and
- * thirty places of their own apiece, and the two places the walks stand from stand in it. */
 function pmasterHead(count: number): Buffer {
 	const head = Buffer.alloc(0x400, 0x00);
 	head.writeInt32LE(count, 0);
@@ -74,8 +67,6 @@ describe("Unity PMaster engine resource archive", () => {
 				decryptPMasterPlaces(encryptPMasterPlaces(places, seed), seed),
 			).toEqual(places);
 		}
-		// Every place of a walk stands under the place of the key that stands at the same place of the key,
-		// four and forty places of the key standing beside it.
 		expect(decryptPMasterPlaces(Buffer.alloc(4, 0), 9).toString("hex")).toBe(
 			"df2535a3",
 		);
@@ -105,7 +96,6 @@ describe("Unity PMaster engine resource archive", () => {
 
 	it("turns away a file whose head names no file at all", () => {
 		expect(readPMasterLayout(Buffer.alloc(0x400), 0x400)).toBeUndefined();
-		// The places of the head count as files, so a head that counts more than it holds is turned away.
 		const head = Buffer.alloc(0x400, 0x00);
 		head.writeInt32LE(0x20000, 0);
 		expect(readPMasterLayout(head, 0x400)).toBeUndefined();

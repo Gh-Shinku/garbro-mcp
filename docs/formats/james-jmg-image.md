@@ -14,7 +14,6 @@ the second — so the picture behind either is a bitmap, which the port reads an
 shared reader and writer, at the depth the bitmap itself holds.
 
 `RotateWords` turns every word of the picture left by four bits, and `ReverseBits` turns the sixteen bits of
-every word around; the walk of the port goes the direction the reference reads in. A word of the first kind
 comes round after four turns rather than two, so the port has no encoder for either and the tests do the
 turning round themselves. The reference deobfuscates only the first `0x40` bytes to take the measurements
 from the bitmap header and the whole file when the picture itself is asked for, which means a file too short

@@ -7,8 +7,6 @@ import {
 
 describe("Purple places of the colours of a picture", () => {
 	it("stands the places of a colour of a picture behind the places of the colour of the file", () => {
-		// The places of the file stand for the places of the colours of the picture as the places of one place
-		// of a byte behind the places of a colour.
 		expect(clampJbpColour(0x180)).toBe(0x80);
 		expect(clampJbpColour(0)).toBe(0);
 		expect(clampJbpColour(0xff)).toBe(0);
@@ -19,9 +17,6 @@ describe("Purple places of the colours of a picture", () => {
 	});
 
 	it("stands the places of the picture itself as the places of the colours of the picture", () => {
-		// A picture whose places of the colours stand as nothing and whose places of the picture stand as
-		// nothing stands as the places of the colours of the picture that stand as the places of the picture
-		// themselves: the places of the colours stand as the places of the picture 0x180 places behind them.
 		const output: Buffer = Buffer.alloc(64 * 16, 0x00);
 		const places = new Int16Array(64);
 		standJbpColours({
@@ -41,18 +36,12 @@ describe("Purple places of the colours of a picture", () => {
 			expect(output[from]).toBe(0x80);
 			expect(output[from + 1]).toBe(0x80);
 			expect(output[from + 2]).toBe(0x80);
-			// The places of the picture stand as the places of three colours apiece, the places of the kind of
-			// the picture itself standing as nothing.
 			expect(output[from + 3]).toBe(0);
 			expect(output[from + 4]).toBe(0x80);
 		}
 	});
 
 	it("stands the places of the picture as the places of the colours the walk of its places names", () => {
-		// The places of a colour of a picture stand as the places of the colours of the picture themselves, and
-		// the places of the picture stand as the places of the colours of the picture the walk of its places
-		// names: the places of a colour of the picture four places along stand as the places of the colours
-		// below, and the places of the picture of the picture stand as nothing.
 		const output: Buffer = Buffer.alloc(64 * 16, 0x00);
 		const y = new Int16Array(64);
 		const cb = new Int16Array(64).fill(4);
@@ -67,10 +56,6 @@ describe("Purple places of the colours of a picture", () => {
 			cr,
 			cbcrSrc: 0,
 		});
-		// The places of the colours of the picture stand as the places of one place of a byte of the picture:
-		// the places of the blue stand as the places of the file 0x1C590 places behind them, the places of the
-		// green as the places of the blue 0x5810 places behind them and the places of the red 0xB6C0 behind
-		// them, and the places of the red as the places of the file 0x166F0 places behind them.
 		expect(Math.imul(4, 0x1c590) >> 16).toBe(7);
 		expect((Math.imul(4, 0x5810) >> 16) + (Math.imul(4, 0xb6c0) >> 16)).toBe(3);
 		expect(Math.imul(4, 0x166f0) >> 16).toBe(5);

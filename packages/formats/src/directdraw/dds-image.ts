@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/DirectDraw/ImageDDS.cs", classes `DdsFormat`, `DdsMetaData` and the
-// walk inside the format (a texture of the Direct Draw Surface kind: a head of a hundred and twenty four
-// bytes, a colour of a few bits a pixel the head gives the places of, or a picture of the compressed kinds of
-// DirectDraw behind a mark of four letters). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT
-// License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -42,7 +36,6 @@ const RED_MASK_FIELD = 0x5c;
 const GREEN_MASK_FIELD = 0x60;
 const BLUE_MASK_FIELD = 0x64;
 const ALPHA_MASK_FIELD = 0x68;
-/** The places of the flags that say how the pixels stand. */
 const ALPHA_PIXELS = 0x01;
 const FOUR_CC = 0x04;
 const REFUSED = 0x200 | 0x20000;
@@ -72,13 +65,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `DdsFormat.ReadMetaData`: the file begins with the four letters `DDS `, the head gives its own size at four
- * and has to stand at a hundred and twenty four bytes or more, the height and the width stand at `0x0C` and
- * `0x10`, the places of the colour stand at `0x50` and the four letters of a compressed kind at `0x54`, the
- * depth at `0x58`, and the four masks of the colour at `0x5C`, `0x60`, `0x64` and `0x68`. The pixels stand
- * behind the head, four bytes and the size the head gave itself behind the beginning of the file.
- */
 export function readDdsLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -116,13 +102,6 @@ export function readDdsLayout(
 	};
 }
 
-/**
- * `DdsFormat.ReadPixelData`: every pixel of a picture whose colour the head gives the places of is read as a
- * byte, a word or a word of four bytes, and every place of it is spread out to a byte of its own by taking
- * the place over and over up to the whole. A picture of thirty two bits a pixel whose places are the three of
- * a plain colour stands as it is. Where the head gives a fourth place the fourth byte of a pixel is spread
- * out from it, and where it does not the fourth byte stands as nought.
- */
 export function readDdsPixels(stored: Buffer, layout: DdsLayout): Buffer {
 	const sourceSize = (layout.bitsPerPixel + 7) >> 3;
 	const pixels = layout.width * layout.height;

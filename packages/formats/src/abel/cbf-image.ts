@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Abel/ImageCBF.cs", classes `CbfFormat`, `CbfMetaData` and `CbfReader`
-// (an Abel picture of three byte places: it stands as it is, behind a walk of runs, behind a walk of runs of
-// the LZSS kind, or behind a walk of the places of every block of eight places by eight that stands in a
-// zigzag, every place of which stands over the places that stand before it). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -21,7 +15,6 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** The four words the reference registers, one for every way the places of a picture stand. */
 const SIGNATURES = [
 	Buffer.from("CBF0", "latin1"),
 	Buffer.from("CBF1", "latin1"),
@@ -41,7 +34,6 @@ const WALK_BEHIND_FIELD = 0x1c;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
 
-/** `CbfReader.ZigzagOrder`: which place of a block every place of the walk of the first way stands for. */
 const ZIGZAG_ORDER = new Uint8Array([
 	0x00, 0x01, 0x08, 0x10, 0x09, 0x02, 0x03, 0x0a, 0x11, 0x18, 0x20, 0x19, 0x12,
 	0x0b, 0x04, 0x05, 0x0c, 0x13, 0x1a, 0x21, 0x28, 0x30, 0x29, 0x22, 0x1b, 0x14,
@@ -54,7 +46,6 @@ export interface CbfLayout {
 	width: number;
 	height: number;
 	bitsPerPixel: number;
-	/** Which of the four ways the places of the picture stand. */
 	compression: number;
 	/** How many bytes stand in a row of the picture. */
 	stride: number;
@@ -64,11 +55,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `CbfFormat.ReadMetaData`: the first four bytes of the file are one of the four words of the format — `CBF0`
- * to `CBF3`, the byte at three saying which way the places of the picture stand — the word at `0x10` stands at
- * one, and the words behind the word of the format are the width, the height and the places of a colour.
- */
 export function readCbfLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -94,12 +80,6 @@ export function readCbfLayout(
 	};
 }
 
-/**
- * `CbfReader.UnpackV1`: the places of the picture stand behind a walk of the LZSS kind, every place of which
- * stands over the place three behind it — so a row of a picture stands over the row before it — and every
- * place of the picture is then taken out of the walk in the order of the zigzag of a block of eight places by
- * eight.
- */
 function unpackCbfLzss(input: Buffer, layout: CbfLayout): Buffer {
 	const size = layout.stride * layout.height;
 	const places = inflateLzss(input, { outputLength: size });
@@ -127,11 +107,6 @@ function unpackCbfLzss(input: Buffer, layout: CbfLayout): Buffer {
 	return pixels;
 }
 
-/**
- * `CbfReader.ReadRle`: the picture stands in three byte places at a time, and a byte behind every place of a
- * colour says how many places of the colour stand there: nought means the one place at hand, and anything else
- * means that many places, which are the place at hand over and over.
- */
 function unpackCbfRle(input: Buffer, size: number): Buffer {
 	const pixels: Buffer = Buffer.alloc(size, 0x00);
 	let dst = 0;
@@ -157,7 +132,6 @@ function unpackCbfRle(input: Buffer, size: number): Buffer {
 	return pixels;
 }
 
-/** The places of the picture, three byte places apiece, behind whichever walk the head names. */
 export function decodeCbf(data: Buffer, layout: CbfLayout): Buffer {
 	const size = layout.stride * layout.height;
 	if (0 === layout.compression) {
@@ -181,20 +155,12 @@ export function decodeCbf(data: Buffer, layout: CbfLayout): Buffer {
 	if (WALK_BEHIND_FIELD >= data.length) {
 		throw invalidPicture("Abel picture is cut short of its walk");
 	}
-	// The walk of runs behind the walk of the LZSS kind reads four bytes of it for every place of a colour
-	// and gives three at the least, so the walk of the LZSS kind never has to give more than the picture is
-	// wide and high.
 	const unpacked = inflateLzss(data.subarray(WALK_BEHIND_FIELD), {
 		outputLength: size,
 	});
 	return unpackCbfRle(unpacked, size);
 }
 
-/**
- * `CbfFormat.ReadAlpha`: the shape of the places of a picture stands beside it in a file of its own whose name
- * is the name of the picture with the name `alp`: the word `ALP1`, how many places the shape stands in and
- * then a byte and a count at a time — the byte standing for as many places as the count names.
- */
 export function readCbfAlpha(data: Buffer): Buffer | undefined {
 	if (data.length < 0x10) return undefined;
 	if (!data.subarray(0, 4).equals(Buffer.from("ALP1", "latin1")))
@@ -217,7 +183,6 @@ export function readCbfAlpha(data: Buffer): Buffer | undefined {
 	return alpha;
 }
 
-/** The places of the picture with the shape of every place standing behind them, four byte places apiece. */
 export function mergeCbfAlpha(
 	pixels: Buffer,
 	layout: CbfLayout,
@@ -239,7 +204,6 @@ async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
 
-/** The shape of the places of a picture, where it stands beside the picture. */
 async function readCompanionAlpha(
 	sourcePath: string,
 ): Promise<Buffer | undefined> {
@@ -325,8 +289,6 @@ export const abelCbfImageFormat: ArchiveFormat = defineFixedArchive({
 					bitsPerPixel: 24,
 				},
 			}),
-			// The places of the picture are gathered into a bitmap of twenty four bits, or of thirty two
-			// where the shape of the places stands beside it.
 		};
 		return {
 			entries: [entry],

@@ -1,16 +1,9 @@
-// Format reference: GARbro "ArcFormats/Cmvs/ImagePB3.cs", the walk of the places of a picture inside
-// `JbpReader.Dct` (a picture of the Purple engine that stands as the places of the walk of its colours, every
-// place of a colour standing as the places of the picture itself once the walk of the places of the walk that
-// stands for them has stood them). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 /** How many places of a picture a place of a colour of it stands in, and how many places stand in every side
  * of that place. */
 const PLACES_PER_BLOCK = 64;
 const PLACES_PER_SIDE = 8;
 const SIDE_STRIDE = 8;
 const SIDE_LAST = 7;
-/** The places the walk stands the places of a picture with, which stand as the places of the walk of the kind
- * of pictures this one stands as rather than as places of the file. */
 const ROTATE = 35467;
 const COS_1 = 50159;
 const COS_3 = -121094;
@@ -23,29 +16,15 @@ const SIN_COS_4 = -25570;
 const SIN_COS_5 = -167963;
 const SIN_COS_6 = 98390;
 const SIN_COS_7 = 201373;
-/** Every place of the walk stands at the places of the file that stand behind the places of the walk of the
- * picture itself, so every place of the picture stands as the places of the walk of the picture that stand
- * for it once the places of the walk of the picture have stood for them. */
 const PLACES_BEHIND = 16;
 const PLACES_OF_OUTPUT = 3;
 
-/**
- * `Dct`: the places of a colour of a picture stand as the places of the walk of its colours, and the places of
- * the picture itself stand as those places once the walk that stands for the places of the picture has stood
- * for them: every place of the walk of the picture stands for the places of the picture beside it that stand
- * before and behind it by how many places of the walk stand for them, and the places of the walk of the picture
- * stand as the places of the picture in the two walks of the places of the picture — one along the places of
- * the walk and one beside them — the second of which stands the places of the picture behind the places of the
- * walk that stood before them.
- */
 export function inverseJbpDct(
 	table: Int16Array,
 	quant: Int16Array,
 	offset = 0,
 ): void {
 	const at = (index: number): number => offset + index;
-	// The walk of the places of the picture along the places of the walk: every place of the walk of the
-	// picture stands for the places of the picture that stand beside the places of the file that name them.
 	for (let place = 0; place < PLACES_PER_SIDE; place += 1) {
 		const p = place;
 		const q = place;
@@ -58,9 +37,6 @@ export function inverseJbpDct(
 			(table[at(p + 0x30)] ?? 0) === 0 &&
 			(table[at(p + 0x38)] ?? 0) === 0
 		) {
-			// A place of the walk of the picture that stands for the places of the picture every one of which
-			// stands as the same place of the picture stands as the places of the walk of the picture that stand
-			// for it, and no other place of the picture stands behind it.
 			const value = (table[at(p)] ?? 0) * (quant[q] ?? 0);
 			for (let place2 = 0; place2 < PLACES_PER_SIDE; place2 += 1) {
 				table[at(p + place2 * SIDE_STRIDE)] = value;
@@ -116,8 +92,6 @@ export function inverseJbpDct(
 		table[at(p + 0x18)] = x + u;
 		table[at(p + 0x20)] = x - u;
 	}
-	// The walk of the places of the picture beside the places of the walk, which stands the places of the
-	// picture behind the places of the walk of the picture that stood before them.
 	let p = 0;
 	for (let place = 0; place < PLACES_PER_SIDE; place += 1) {
 		const a = table[at(p)] ?? 0;
@@ -172,5 +146,4 @@ export function inverseJbpDct(
 	}
 }
 
-/** How many places of a walk of the places of a picture this walk stands for. */
 export const JBP_PLACES_PER_BLOCK = PLACES_PER_BLOCK;

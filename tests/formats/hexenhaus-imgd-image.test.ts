@@ -27,8 +27,6 @@ function png(): Buffer {
 	return body;
 }
 
-/** A picture of this kind: the words of its own head, the places of the picture, and the words that name where
- * the picture stands within the picture of the game it stands in. */
 function buildPicture(withTrailer = true): Buffer {
 	const head = Buffer.alloc(HEAD_SIZE, 0x00);
 	head.write("IMGD", 0, "latin1");
@@ -37,8 +35,6 @@ function buildPicture(withTrailer = true): Buffer {
 	trailer.write("CNTR", 0, "latin1");
 	trailer.writeInt32LE(7, 4);
 	trailer.writeInt32LE(9, 8);
-	// The places of the picture stand fourteen places behind the end of the file, so the words that name where
-	// the picture stands within a picture of the game stand two places before those.
 	return Buffer.concat([head, png(), trailer, Buffer.alloc(2, 0x00)]);
 }
 
@@ -65,9 +61,6 @@ describe("WAG archive PNG image", () => {
 	});
 
 	it("reads a picture whose places name no place within a picture of the game", () => {
-		// The words of the places of the picture stand fourteen places behind the end of the file where they
-		// stand at all, so a picture whose places stand short of them stands as no places within a picture of
-		// the game at all.
 		const data = buildPicture(false);
 		expect(readImgdLayout(data, data.length)).toMatchObject({
 			offsetX: 0,

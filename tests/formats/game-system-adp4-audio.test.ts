@@ -28,7 +28,6 @@ function adp4File(input: {
 /** A sound of the second kind: the place of its second word, that word, and then the walk of its samples. */
 function adpsFile(input: { sampleCount: number; body: Buffer }): Buffer {
 	const head = Buffer.alloc(8, 0x00);
-	// The first word is where the second one stands, which is what the walk of this kind begins behind.
 	head.writeInt32LE(0, 0);
 	const count = Buffer.alloc(4, 0x00);
 	count.writeInt32LE(input.sampleCount, 0);

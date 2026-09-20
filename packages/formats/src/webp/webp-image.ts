@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/WebP/ImageWEBP.cs", classes `WebPFormat`, `WebPMetaData` and
-// `WebPFeature` (a picture of the WebP kind: the walk of the runs of the places of the picture of the words
-// of the head of a picture of the kind of the walk of the places of the picture of the pictures of the
-// engine). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -16,15 +11,10 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The places of the picture of the words of the head of a picture of the kind of the walk of the places of
- * the pictures of the engine. */
 const RIFF_MARK = Buffer.from("RIFF", "latin1");
 const WEBP_MARK = Buffer.from("WEBP", "latin1");
 const HEAD_SIZE = 12;
 const CHUNK_HEAD_SIZE = 8;
-/** The places of the picture of the words of the head of a picture of the kind of the walk of the places of
- * the pictures of the engine that stand for the places of the picture of the places of a place of the picture.
- */
 const VP8X_MARK = Buffer.from("VP8X", "latin1");
 const VP8_MARK = Buffer.from("VP8 ", "latin1");
 const VP8L_MARK = Buffer.from("VP8L", "latin1");
@@ -38,29 +28,17 @@ const ALPHA_BIT = 0x10;
 const PLACES_OF_THE_PICTURE = 2 ** 32;
 
 export interface WebpLayout {
-	/** The places of the picture of the words of the head of the picture of the kind of the walk of the places
-	 * of the pictures of the engine. */
 	flags: number;
 	isLossless: boolean;
-	/** The reference stands this word of the picture of the walk of the places of the picture of the kind of
-	 * the walk of the places of them of the picture of the places of the picture of the picture of the
-	 * engine, so a picture of the places of the picture of the places of its own stands it of the places of
-	 * the picture of the places of a place of a picture of the kind of the walk of the places of the picture. */
 	hasAlpha: boolean;
 	width: number;
 	height: number;
-	/** The places of the picture of the walk of the places of the picture of the picture itself. */
 	dataOffset: number;
 	dataSize: number;
 	alphaOffset: number;
 	alphaSize: number;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the head of a picture
- * of the kind of the walk of the places of the pictures of the engine that stand for the places of the
- * picture of three places of the picture, the places of the picture standing before the places of the picture
- * of the picture where the places of the picture of the walk of them stand as the places of the picture of a
- * picture of their own. */
 function readInt24(data: Buffer, at: number): number {
 	return (
 		((data[at] ?? 0) |
@@ -70,23 +48,10 @@ function readInt24(data: Buffer, at: number): number {
 	);
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the head of a picture of
- * the kind of the walk of the places of the pictures of the engine stood as the reference stands them: the
- * places of the picture of the walk of them stand as the places of the picture of a word of their own, and
- * the places of the picture of the walk of them of a picture of the places of the picture of their own stand
- * of the places of the picture of the walk of them of the picture of the words of the head of the picture. */
 function readSigned24AsUint(data: Buffer, at: number): number {
 	return ((readInt24(data, at) << 8) >> 8) >>> 0;
 }
 
-/**
- * `WebPFormat.ReadMetaData`: the walk of the runs of the places of the picture of the words of the head of a
- * picture of the kind of the walk of the places of the pictures of the engine. Every run of the walk of the
- * places of the picture stands of the places of the picture of a word of the walk of the places of the
- * picture of the words of the head of it and of the places of the picture of the walk of them, and the
- * places of the picture of the word of the walk of the picture stand of the places of the picture of the
- * walk of them of a picture of the words of the head of its own.
- */
 export function readWebpLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -119,20 +84,10 @@ export function readWebpLayout(
 			if (at + CHUNK_HEAD_SIZE + chunkSize > data.length) return undefined;
 			const body = data.subarray(at + CHUNK_HEAD_SIZE);
 			layout.flags = body.readUInt32LE(0);
-			// The reference reads the places of the picture of the words of the head of the picture of the
-			// places of the picture of the walk of the places of them as a word of the places of the picture
-			// of three places, the places of the picture standing before the places of the picture of the
-			// picture of the engine standing 0 where they stand as the places of the picture of no places of
-			// their own.
 			layout.width = 1 + readSigned24AsUint(body, 4);
 			layout.height = 1 + readSigned24AsUint(body, 7);
 			if (layout.width * layout.height >= PLACES_OF_THE_PICTURE)
 				return undefined;
-			// The reference walks the places of the picture of the walk of the places of them from the places
-			// of the picture of the walk of them it stands read, so the places of the picture of the words of
-			// the head of the picture of the places of the picture of the walk of the places of them of the
-			// walk of the places of the picture stand of the places of the picture of their own of the places
-			// of the picture of the walk of them where the places of the picture of the walk of them stand.
 			at += CHUNK_HEAD_SIZE + chunkSize;
 			continue;
 		}
@@ -155,9 +110,6 @@ export function readWebpLayout(
 					for (const [index, place] of LOSSY_HEAD.entries()) {
 						if ((head[3 + index] ?? 0) !== place) return undefined;
 					}
-					// A picture of the places of the picture of the walk of the places of the picture of the
-					// kind of the words of the head of its own stands of the places of the picture of the
-					// places of the picture of the walk of them.
 					if (((head[0] ?? 0) & 1) !== 0) return undefined;
 					layout.width = head.readUInt16LE(6) & LOCATED_PLACES;
 					layout.height = head.readUInt16LE(8) & LOCATED_PLACES;
@@ -198,10 +150,6 @@ export const webpImageDescriptor: FormatDescriptor = {
 
 export const webpImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: webpImageDescriptor,
-	// The reference stands the words of the head of a picture of the kind of the walk of the places of the
-	// pictures of the engine of no places of the picture of the walk of them of its own, the places of the
-	// picture of the words of the head of the picture standing of the places of the picture of the walk of
-	// the places of them of the picture of the walk of the places of the picture of the kind of them.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
@@ -250,9 +198,6 @@ export const webpImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		// The places of the picture of the kind of the walk of the places of the picture of the pictures of the
-		// engine stand as the places of the picture of their own, so a picture of this kind hands out the
-		// places of the picture of the walk of them as they stand.
 		return Readable.from([
 			Buffer.from(await source.readAt(0n, Number(source.size))),
 		]);

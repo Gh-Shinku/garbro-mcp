@@ -122,10 +122,6 @@ describe("Black Rainbow bitmap", () => {
 	});
 
 	it("unwraps a walk of runs that point behind the byte being written", async () => {
-		// Two pixels that stand, then a run of eight bytes taken from where they were written — the window
-		// stands at 0xFEE before its first byte is written, so that is where the run points. The pair holds
-		// the two lower places of the distance in its first byte and the four places above them in the
-		// second, with the length above those, three bytes short.
 		const first = Buffer.from([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
 		const packed = Buffer.concat([
 			literals(first),

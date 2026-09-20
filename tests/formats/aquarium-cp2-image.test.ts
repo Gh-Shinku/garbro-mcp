@@ -85,7 +85,6 @@ describe("Aquarium image", () => {
 			hasAlpha: false,
 			stride: strideOf(2, 24),
 		});
-		// The four lower places of the flags mean a walk of its own, the place 0x20 a plane of fourth bytes.
 		const flagged = readCp2Layout(
 			cp2File({
 				width: 2,

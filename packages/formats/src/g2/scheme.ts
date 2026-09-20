@@ -1,23 +1,3 @@
-// Reference: GARbro "ArcFormats/Glib2/ArcG2.cs", the classes `G2Scheme` and `G2MetaScheme`. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The places of the picture of the walk of the places of the picture of the words of the walk of the picture of
-// the places of the picture of the walk of the places of the picture of the places of the picture of the walk of
-// them of the places of the picture of the walk of the places of the picture stand of the places of the picture
-// of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of
-// them of the places of the picture of the walk of the places of the picture of the kind of the places of the
-// picture of the walk of the places of the picture, which stands of the places of the picture of the walk of the
-// places of the picture of the kind of the places of the picture of the walk of them of the places of the
-// picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
-// places of the picture, so a picture of this project stands of the places of the picture of the walk of the
-// places of the picture of the last places of the picture of the walk of the places of the picture of the kind
-// of the places of the picture of the walk of them of the places of the picture of the walk of them.
-
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture. */
 const MUTATION_ORDER: readonly (readonly number[])[] = [
 	[3, 2, 1, 0],
 	[0, 2, 1, 3],
@@ -27,18 +7,9 @@ const MUTATION_ORDER: readonly (readonly number[])[] = [
 	[3, 2, 1, 0],
 ];
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of the sound the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture of the places of the picture of the walk of the places of the picture. */
 type Permutation = (at: number, value: number) => number;
 
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture. */
 const PERMUTATIONS: readonly Permutation[] = [
-	// The places of the picture of the walk of the places of the picture of the word of the walk of the places of
-	// the picture of the walk of them of the places of the picture of the walk of the places of the picture.
 	(at, value) => rotByteRight(value, at),
 	(at, value) => value ^ at,
 	(_at, value) => ~value,
@@ -47,13 +18,6 @@ const PERMUTATIONS: readonly Permutation[] = [
 	(_at, value) => rotByteLeft(value, 4),
 ];
 
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the walk of them of the places
- * of the picture of the walk of the places of the picture, standing of the places of the picture of the walk of
- * the places of the picture of the kind of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the words of the walk of the places of the picture of the
- * walk of them. */
 const PERMUTATION_HASHES: readonly number[] = [
 	0x0df0, 0xb0b7, 0x45b8, 0xc9b4, 0xcfb3, 0xf0b0, 0xa85f, 0x2c0b, 0x648d,
 	0xd4e1, 0x11ea, 0xdaa7, 0xfb5f, 0xe83a, 0x82a4, 0x0f5d, 0xae64, 0x6f6f,
@@ -157,49 +121,25 @@ const PERMUTATION_HASHES: readonly number[] = [
 	0x7a4f, 0x47de, 0xe478, 0xd9ff, 0xe62c, 0x9453, 0x6d0c, 0x2fc2, 0x7444,
 ];
 
-/** `Binary.RotByteR`: the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the places of the picture of the walk of
- * the places of the picture. */
 export function rotByteRight(value: number, count: number): number {
 	const at = count & 7;
 	return ((value >> at) | (value << (8 - at))) & 0xff;
 }
 
-/** `Binary.RotByteL`: the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the places of the picture of the walk of
- * the places of the picture of the other kind. */
 export function rotByteLeft(value: number, count: number): number {
 	const at = count & 7;
 	return ((value << at) | (value >> (8 - at))) & 0xff;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of the places of the picture of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture. */
 export interface G2Scheme {
 	srcOrder: readonly number[];
 	dstOrder: readonly number[];
 	first: Permutation;
 	second: Permutation;
-	/** Where the places of the picture of the walk of the places of the picture of the sound of the places of
-	 * the picture of the walk of the places of the picture of the two places of the picture of the walk of them
-	 * from the places of the picture of the walk of the places of the picture of the words of the walk of the
-	 * places of the picture of the walk of them of the places of the picture of the walk of the places of the
-	 * picture stand of the places of the picture of the walk of the places of the picture of the book of the
-	 * places of the picture. */
 	firstAction: number;
 	secondAction: number;
 }
 
-/** `G2MetaScheme.CreateInstance`: the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of them of the places of the picture of the walk of the places
- * of the picture of the places of the picture of the walk of them of the places of the picture of the walk of
- * the places of the picture of the kind of the places of the picture of the walk of them of the places of the
- * picture of the walk of them, and turns the places of the picture of the walk of the places of the picture of
- * their own away where the places of the picture of the walk of the places of the picture of the words of the
- * walk of the places of the picture of the walk of them of the places of the picture of the walk of the places
- * of the picture stand of the places of the picture of the walk of the places of the picture of the book of the
- * places of the picture. */
 export function createG2Scheme(key: number): G2Scheme | undefined {
 	const hash = ((Math.imul(key, 0x5f) >>> 0) >>> 13) & 0xffff;
 	const at = PERMUTATION_HASHES.indexOf(hash);
@@ -218,24 +158,6 @@ export function createG2Scheme(key: number): G2Scheme | undefined {
 	return { srcOrder, dstOrder, first, second, firstAction, secondAction };
 }
 
-/** `G2Scheme.Decrypt`: the places of the picture of the walk of the places of the picture of the words of the
- * walk of the picture of the places of the picture of the walk of the places of the picture of the places of
- * the picture of the walk of the places of the picture stand where the places of the picture of the walk of the
- * places of the picture of the sound of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the last places of the picture of the walk of the places
- * of the picture of the picture of the kind of the places of the picture of the walk of them stand, of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the last places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
- * of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of them. The places of the picture of the walk of the places of the picture of the place
- * of the picture of the walk of them of the places of the picture of the walk of the places of the picture that
- * stand of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * places of the picture behind the places of the picture of the walk of the places of the picture of the last
- * places of the picture of the walk of the places of the picture of the last of them stand of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * places of the picture of the places of the picture. */
 export function decryptG2(
 	scheme: G2Scheme,
 	input: Buffer,

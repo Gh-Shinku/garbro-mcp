@@ -56,8 +56,6 @@ async function extract(data: Buffer): Promise<Buffer> {
 
 describe("UK2 engine compressed audio", () => {
 	it("works the steps of the walk out for every place of a sample", () => {
-		// The step table begins at seven and eight, so the places of a sample of four bits, which are eight,
-		// give the values 0, 2, 4, 6, 7, 9, 11 and 13 for the first step and 1, 3 and so on for the second.
 		const samples = buildVocSamples(4);
 		expect(
 			Array.from(samples.slice(0, 89 * 8)).filter((_, at) => at % 89 === 0),

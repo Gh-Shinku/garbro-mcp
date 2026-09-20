@@ -126,9 +126,6 @@ describe("Creative Voice File", () => {
 	});
 
 	it("takes the rate of the eighth kind but no samples with it", () => {
-		// The reference reads the frequency, the codec and the channel count of this kind and then copies
-		// nothing at all: the block's own samples are never read, and the walk goes on with whatever stands
-		// behind the four bytes it took. A block of the first kind behind it shows both halves of that.
 		const sound = convertVoc(
 			Buffer.concat([
 				head(),

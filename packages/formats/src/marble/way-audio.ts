@@ -78,7 +78,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The places of the file the walk stands at. */
 interface WadyCursor {
 	data: Buffer;
 	position: number;
@@ -141,7 +140,6 @@ export function readWadyLayout(
 	};
 }
 
-/** Where the walk of the sound writes its samples: the reference writes into a stream that grows. */
 interface WadyWriter {
 	data: Buffer;
 	/** How many bytes of the sound stand there, which is what the reference calls the size of its stream. */

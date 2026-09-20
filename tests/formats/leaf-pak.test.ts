@@ -18,9 +18,6 @@ const KEY = Buffer.from([
 const FILE_0 = Buffer.from("000102030405060708090a0b0c0d0e0f10111213", "hex");
 const FILE_1 = Buffer.from("LEAFSCRIPT", "latin1");
 
-/** A Leaf resource archive of two files, whose places and whose walk of names stand under the walk of the key
- * of the reference. The archive stands worked out with a walk of the key of its own, so the places of the test
- * stand under a walk this port did not work out. */
 const ARCHIVE = Buffer.from(
 	"4c4541465041434b020071496c58a3185efed985487c547763ae236909e4bd8d" +
 		"ab9bf256aa4021d0c48bbc9eef67781725d49271526a559f2758f7d17c3e7148" +
@@ -29,8 +26,6 @@ const ARCHIVE = Buffer.from(
 );
 const INDEX_OFFSET = 40;
 
-/** One file of the walk of the names: eight places of a name, three of an extension, a place that counts for
- * nothing, the place of the file, how many places it holds, and four places that count for nothing. */
 function record(
 	name: string,
 	extension: string,
@@ -45,7 +40,6 @@ function record(
 	return out;
 }
 
-/** An archive of the files of a walk of names, whose places stand under the walk of the key. */
 function leafFile(input: {
 	records?: Buffer;
 	files?: Buffer;
@@ -70,7 +64,6 @@ describe("Leaf resource archive", () => {
 	it("stands the places of a walk under the walk of its key and stands them back", () => {
 		const places = Buffer.from("00112233445566778899aabbccddeeff", "hex");
 		expect(decryptLeafPlaces(encryptLeafPlaces(places))).toEqual(places);
-		// The walk of the key stands over where the walk of the places is longer than it.
 		expect(
 			decryptLeafPlaces(encryptLeafPlaces(Buffer.alloc(0x40, 0x5a))),
 		).toEqual(Buffer.alloc(0x40, 0x5a));

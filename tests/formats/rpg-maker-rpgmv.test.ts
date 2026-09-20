@@ -19,7 +19,6 @@ import { rpgMakerRpgmvoAudioFormat } from "../../packages/formats/src/rpg-maker/
 const KEY_HEX = "774e4645fc432f714795a243e51013d8";
 const KEY = Buffer.from(KEY_HEX, "hex");
 
-/** The words of the engine of the tests, as a file of the places of the engine stands. */
 const SYSTEM_JSON = JSON.stringify({ encryptionKey: KEY_HEX });
 
 /** Writes a game into a temporary directory and runs the callback with the place of the file of the test. */
@@ -40,8 +39,6 @@ async function withGame(
 	}
 }
 
-/** A picture of the engine: the signature, the places beside it, the first sixteen places of the picture stood
- * beside the places of the key, and the rest of the picture as it stands. */
 function encryptedFile(body: Buffer, key: Buffer = KEY): Buffer {
 	const head = Buffer.alloc(0x20, 0x00);
 	RPGMV_SIGNATURE.copy(head, 0);

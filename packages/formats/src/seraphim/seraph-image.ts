@@ -626,11 +626,6 @@ const ctImage = defineSeraphImage({
 
 export const seraphimCtImageDescriptor: FormatDescriptor = ctImage.descriptor;
 
-/**
- * The three byte picture with a transparency plane behind it. The reference registers it under the words of
- * `CF`, which is why a file of this kind is found by that format first; the port keeps the same order, and this
- * one is reached by asking for it.
- */
 export const seraphimCtImageFormat: ArchiveFormat = ctImage.format;
 
 const cbImage = defineSeraphImage({

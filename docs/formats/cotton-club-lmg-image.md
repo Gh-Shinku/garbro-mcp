@@ -23,7 +23,6 @@ is exclusive ored with the byte before it, the key for the first one being the n
   reference's own rule: every byte of nothing before a length adds two hundred and fifty five to it, of two
   bytes for a word adding sixty five thousand five hundred and thirty five;
 * method **three** is a JPEG, whose decoder this project does not carry: such a picture is recognised and
-  listed, and its extraction is refused with a message of this project's own.
 
 The rows are handed out top down, which is what `ImageData.Create` means. The write path of the reference
 throws `NotImplementedException`, so this is a read only format.

@@ -192,7 +192,6 @@ function readSlice(
 	return data.subarray(offset, end);
 }
 
-/** A picture beside the file, walked out into the places of a canvas of four bytes a place. */
 interface DpoSource {
 	width: number;
 	height: number;

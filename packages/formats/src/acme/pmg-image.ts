@@ -25,9 +25,6 @@ const HEIGHT_FIELD = 0x04;
 const BITS_SIZE_FIELD = 0x08;
 const CODE_SIZE_FIELD = 0x0c;
 const DATA_SIZE_FIELD = 0x10;
-/** The word the reference registers stands as the first of the four places of the first word of the file, which
- * names how many blocks of four places a row of the picture stands in; a picture of more than this many blocks
- * stands as no picture at all. */
 const MAXIMUM_BLOCKS = 0x800;
 /** Four places of a picture stand in every block the head of the picture names. */
 const PLACES_PER_BLOCK = 4;
@@ -56,14 +53,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PmgFormat.ReadMetaData`: the head of the file names how many blocks of four places a row of the picture
- * stands in, and a picture of more than `0x800` blocks or of no blocks at all stands as no picture; the head
- * then names the height of the picture and the three sizes of the walk of the first place of a colour, of which
- * the size of the words that name the places of the walk stands above the size of the whole walk and the size of
- * the places the walk reads stands above nought. The word the head of the picture names stands again behind the
- * walk of the first place of a colour.
- */
 export function readPmgLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -91,9 +80,6 @@ export function readPmgLayout(
 	return { blocks, width, height, bitsSize, codeSize, dataSize };
 }
 
-/** A place of a colour of the walk: the places of the walk stand one place of a byte in two places, so every
- * place of a colour stands as a place of two places, the first of the two standing as the place of the colour
- * of the first of two places of the picture. */
 function decodePmgPlace(
 	command: number,
 	places: Uint16Array,
@@ -108,13 +94,6 @@ function decodePmgPlace(
 	return -1;
 }
 
-/**
- * `PmgReader.Unpack`: the three places of a colour of the picture stand beside each other, every one of them
- * standing under a head of its own and walked of its own: a step of the walk names a place of the picture by
- * how far behind the place that stands before it and how far beside it stands, or stands as a place of its own
- * where it names none. What stands at the place of the walk stands beside the place of the colour before it,
- * and the places of the three colours are read one beside the other.
- */
 export function unpackPmg(
 	stored: Buffer,
 	layout: PmgLayout,
@@ -126,8 +105,6 @@ export function unpackPmg(
 	const planes = new Uint16Array(3 * (planeSize >> 1));
 	const starts = [0, planeSize >> 1, planeSize];
 	let at = 0;
-	// The reference stands the place of the mask of the walk of the first place of a colour as a place of the
-	// whole picture rather than of the place of the colour, so the mask carries from place to place.
 	let mask = 0x80;
 	for (const start of starts) {
 		if (at + HEAD_SIZE > stored.length) {
@@ -218,9 +195,6 @@ export const acmePmgImageDescriptor: FormatDescriptor = {
 
 export const acmePmgImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: acmePmgImageDescriptor,
-	// The reference registers the place `0xA0` — the first of the four places of the first word of the file,
-	// which names how many blocks a row of the picture stands in — and, behind it, a word of no places at all,
-	// so a picture of this kind is told by its head rather than by a word of its own.
 	detection: { signatures: [] },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE + 4)) return false;

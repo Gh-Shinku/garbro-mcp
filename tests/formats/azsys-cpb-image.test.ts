@@ -12,11 +12,6 @@ import {
 
 const HEAD_SIZE = 0x20;
 
-/** A record of the walk of the third kind: the words of the walk of a picture stand behind the head of the
- * record, which names how many places the record stands for and where the words of the walk of a picture, the
- * words that stand for the places of the picture behind them, and the places that stand for themselves stand.
- * The words of the walk stand one after another and name a place of the picture by their places above the
- * places behind them. */
 function walkRecord(options: {
 	control: Buffer;
 	words?: Buffer;
@@ -33,9 +28,6 @@ function walkRecord(options: {
 
 /** A record of four places of a picture, every place of it standing for itself. */
 function recordOf(places: readonly number[]): Buffer {
-	// A word of the walk of a record stands for eight places of the walk of it, and a word of the walk that
-	// stands clear stands for a run of places that stand for themselves, whose places of the walk stand in the
-	// places behind the word.
 	return walkRecord({
 		control: Buffer.from([0x00]),
 		literals: Buffer.from([places.length - 1, ...places]),
@@ -103,7 +95,6 @@ describe("AZ system image format", () => {
 		const wrongMark = Buffer.from(buildPicture());
 		wrongMark.write("CPB\x1b", 0, "latin1");
 		expect(readCpbLayout(wrongMark, HEAD_SIZE)).toBeUndefined();
-		// The reference stands no picture of a kind of the places of a picture it names no walk for.
 		expect(readCpbLayout(buildPicture({ bpp: 8 }), HEAD_SIZE)).toBeUndefined();
 		expect(readCpbLayout(buildPicture({ bpp: 16 }), HEAD_SIZE)).toBeUndefined();
 		expect(
@@ -136,9 +127,6 @@ describe("AZ system image format", () => {
 	});
 
 	it("stands the places of the four records of a picture beside each other", async () => {
-		// The records of the places of a picture stand in kinds of their own, the first record of a picture of
-		// the second kind standing for the places of the picture of four and twenty places behind the places of
-		// the picture rather than for the places of the picture.
 		const data = buildPicture({
 			type: 3,
 			channels: [
@@ -177,8 +165,6 @@ describe("AZ system image format", () => {
 		const bmp = await consumeBuffer(await handle.openEntry(entry.id));
 		expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 		expect(bmp.readInt32LE(0x12)).toBe(2);
-		// The reference stands the places of a picture of this kind out in four places for every place of a
-		// picture, so a picture of four and twenty places stands with the places behind them standing clear.
 		expect(bmp.readUInt16LE(0x1c)).toBe(32);
 		expect(bmp.subarray(0x36)).toEqual(
 			Buffer.from([
@@ -189,8 +175,6 @@ describe("AZ system image format", () => {
 	});
 
 	it("stands a record of the second kind out of a stream of the places of a picture", async () => {
-		// A record of a picture of the second kind stands as a stream of the places of a picture of the kind a
-		// picture of the words of the file stands in, behind four places that stand for the places of a picture.
 		const places = Buffer.from([0x31, 0x32, 0x33, 0x34]);
 		const channel = Buffer.concat([Buffer.alloc(4, 0x00), deflateSync(places)]);
 		const data = buildPicture({ version: 0, channels: [0, 0, channel, 0] });

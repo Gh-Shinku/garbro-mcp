@@ -1,7 +1,3 @@
-// Reference: GARbro "ArcFormats/Glib2/ArcG2.cs", the classes `G2Opener`, `G2Entry` and the places of the
-// picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
-// places of the picture of the places of the picture of the walk of them (`G2Scheme` and `G2MetaScheme`).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,15 +14,6 @@ import {
 } from "../shared/fixed-archive.js";
 import { createG2Scheme, decryptG2, type G2Scheme } from "./scheme.js";
 
-/** The words of the head of a picture of this kind, which stand of the places of the picture of the walk of the
- * places of the picture of the words of the walk of the places of the picture of the walk of them of the places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture, so the places of the picture
- * of the walk of the places of the picture of the sound of the places of the picture of the walk of the places
- * of the picture of the picture of this kind stand of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the
- * places of the picture of the walk of the places of the picture of the words of the walk of the places of the
- * picture of the walk of them behind them. */
 const SIGNATURE = 0x47d33310;
 const HEAD_SIZE = 0x5c;
 const HEAD_KEY = 0x8465b49b;
@@ -35,10 +22,6 @@ const VERSION_AT = 0x11;
 const CLEAR_AT = 0x12;
 const INDEX_OFFSET_AT = 0x54;
 const INDEX_SIZE_AT = 0x58;
-/** The places of the picture of the walk of the places of the picture of the kind of the places of the picture
- * of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture from the words of the head of a picture of this
- * kind. */
 const KEY_AT = [0x44, 0x34, 0x24, 0x14];
 const INDEX_MARK = "CDBD";
 const INDEX_HEAD = 0x10;
@@ -52,27 +35,15 @@ const INFO_SIZE_AT = 0x08;
 const INFO_OFFSET_AT = 0x0c;
 const INFO_KEYS = 4;
 const INFO_KEY_SIZE = 0x10;
-/** The places of the picture of the walk of the places of the picture of the kind of the places of the picture
- * of the walk of them of the places of the picture of the walk of the places of the picture of every place of
- * the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the
- * walk of the places of the picture. */
 const ENTRY_CHUNK = 0x20000;
 const WORD = 4;
 const BASE = 0x30;
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of every
- * place of the picture of the walk of the places of the picture of the fifth kind of the places of the picture
- * of the walk of the places of the picture stand as a text of the places of the picture of the walk of the
- * places of the picture of the place of the picture of the walk of them of the engine. */
 const CP932 = new TextDecoder("shift_jis");
 
 function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of a picture of this kind. */
 export interface G2IndexEntry {
 	path: string;
 	offset: number;
@@ -80,20 +51,11 @@ export interface G2IndexEntry {
 	keys: number[];
 }
 
-/** What a picture of this project stands out of the book of the places of the picture of the walk of the places
- * of the picture of the words of the walk of them of a picture of this kind. */
 export interface G2Layout {
 	version: number;
 	entries: G2IndexEntry[];
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture, which stand of a text of the places of the picture of the
- * walk of the places of the picture of the place of the picture of the walk of them of the engine of no places
- * of the picture of the walk of the places of the picture of the walk of the places of the picture of the
- * place of the picture of the walk of them. */
 function readName(
 	index: Buffer,
 	at: number,
@@ -106,29 +68,6 @@ function readName(
 	return CP932.decode(index.subarray(at, end));
 }
 
-/**
- * `G2Opener.TryOpen`: the words of the head of a picture of this kind stand of the places of the picture of the
- * walk of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
- * of the places of the picture behind the places of the picture of the walk of the places of the picture of the
- * sound of the places of the picture of the walk of the places of the picture of their own, of the places of
- * the picture of the walk of the places of the picture of the words of the walk of the picture of the places of
- * the picture of how long the picture stands, of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
- * of the places of the picture of the book of the places of the picture of the walk of the places of the
- * picture of the words of the walk of them, and of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk
- * of the places of the picture of the book of the places of the picture of the walk of the places of the
- * picture of the words of the walk of them. The book of the places of the picture of the walk of the places of
- * the picture of the words of the walk of them stands of the places of the picture of the walk of the places of
- * the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of
- * the places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of them of the places of the picture of the walk of the places
- * of the picture of the words of the walk of them of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of the places of the picture of the sound, one
- * behind the other.
- */
 export function readG2Layout(data: Buffer): G2Layout | undefined {
 	if (data.length < HEAD_SIZE) return undefined;
 	if (data.readUInt32LE(0) !== SIGNATURE) return undefined;
@@ -147,24 +86,6 @@ export function readG2Layout(data: Buffer): G2Layout | undefined {
 	if (indexSize === 0 || indexOffset + indexSize > data.length)
 		return undefined;
 	const keys = KEY_AT.map((at) => header.readUInt32LE(at));
-	// The reference stands the places of the picture of the walk of the places of the picture of the words of
-	// the walk of the places of the picture of the walk of the places of the picture of the book of the places
-	// of the picture of the walk of the places of the picture of the words of the walk of them of the places of
-	// the picture of the walk of the places of the picture of the sound of the places of the picture of the walk
-	// of the places of the picture of the kind of the places of the picture of the walk of the places of the
-	// picture of the words of the walk of the places of the picture of the walk of them of the places of the
-	// picture of the walk of the places of the picture, every one of them standing of the places of the picture
-	// of the walk of the places of the picture of the words of the walk of the places of the picture of the walk
-	// of them of the places of the picture of the walk of the places of the picture of the place of the picture
-	// of the walk of them of the places of the picture of the walk of the places of the picture, and stands of
-	// the places of the picture of the walk of the places of the picture of the sound of the places of the
-	// picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
-	// the places of the picture of the words of the walk of the places of the picture of the walk of them of the
-	// places of the picture of the walk of the places of the picture of their own where the places of the
-	// picture of the walk of the places of the picture of the words of the walk of the places of the picture of
-	// the walk of them of the places of the picture of the walk of the places of the picture stand of the
-	// places of the picture of the walk of the places of the picture of the book of the places of the picture of
-	// the walk of the places of the picture of the kind of the places of the picture of the walk of them.
 	const buffers: Buffer[] = [
 		Buffer.from(data.subarray(indexOffset, indexOffset + indexSize)),
 		Buffer.alloc(indexSize),
@@ -224,25 +145,6 @@ export function readG2Layout(data: Buffer): G2Layout | undefined {
 	return { version, entries };
 }
 
-/** `G2Opener.OpenEntry`: the places of the picture of the walk of the places of the picture of every place of
- * the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the
- * walk of the places of the picture stand of the places of the picture of the walk of the places of the picture
- * of the sound of the places of the picture of the walk of the places of the picture of the kind of the places
- * of the picture of the walk of them of the places of the picture of the walk of the places of the picture of
- * the book of the places of the picture of the walk of the places of the picture of the words of the walk of
- * them of the places of the picture of the walk of the places of the picture, standing of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the
- * places of the picture of the words of the walk of the places of the picture of the walk of them of the places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk
- * of the places of the picture of the sound of the places of the picture of the walk of the places of the
- * picture of the place of the picture of the walk of them of the places of the picture of the walk of the places
- * of the picture of the words of the walk of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture, and turns to the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of the places of the picture of
- * the fourth kind of the places of the picture of the walk of them of the places of the picture of the walk of
- * the places of the picture of the sound of the places of the picture of the walk of the places of the picture
- * of the places of the picture of the walk of the places of the picture.
- */
 export function unpackG2Entry(data: Buffer, entry: G2IndexEntry): Buffer {
 	const decoders: (G2Scheme | undefined)[] = [];
 	let counted = 0;

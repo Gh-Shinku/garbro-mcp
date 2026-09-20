@@ -11,8 +11,6 @@ import {
 	unpackSpeedRuns,
 } from "../../packages/formats/src/studio-jikkenshitsu/speed-image.js";
 
-/** A Studio Jikkenshitsu picture of the kind its own files stand as: the head, then the places of the picture
- * behind the walk the head names, with the places of its shape behind those. */
 function speedFile(input: {
 	flags?: number;
 	width?: number;
@@ -161,8 +159,6 @@ describe("Studio Jikkenshitsu picture of the kind its own files stand as", () =>
 		);
 		expect(bmp.readUInt16LE(0x1c)).toBe(8);
 		expect(bmp.readInt32LE(0x16)).toBe(2);
-		// A bitmap holds whole rows, so every row of the places of the picture stands on the places of a
-		// colour of the row.
 		expect(bmp.subarray(0x436, 0x43e)).toEqual(
 			Buffer.from([1, 2, 0, 0, 3, 4, 0, 0]),
 		);

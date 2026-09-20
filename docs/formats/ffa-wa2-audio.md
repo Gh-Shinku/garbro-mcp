@@ -11,7 +11,6 @@ Implementation: `packages/formats/src/ffa/wa2-audio.ts` (`ffaWa2AudioDescriptor`
 The file begins with the word `APCM` — the word the reference registers — and then the shape of a wave file
 whose format chunk stands from eight: the kind of the sound at `0x14`, the channels at `0x16`, the pace at
 `0x18`, the average at `0x1C`, the size of a block at `0x20` and the bits of a sample at `0x22`. The head
-closes with the size of the sound at `0x28`, and the walk of the sound stands behind the forty four bytes of
 the head. What is handed out is a wave file that carries the very kind, pace and size the head names, which is
 what the reference's own reader does even where the kind of the head is not plain samples.
 
@@ -23,7 +22,6 @@ times what `Wa1Reader.SampleTable` gives for the place, less six places, and whe
 and twenty seven the walk stands there, up to the greatest step of `0x6000`, and where it does not the walk
 stands where it began, at `0x7F`.
 
-What the head says about the size of the sound is what the port writes out; where the walk of the file gives
 less than that, the sound behind it stands as nought, which is what the reference's own read of the file does.
 
 Deviations from the reference, in the message only: a file whose head does not carry the shape of a wave file,

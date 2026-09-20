@@ -17,25 +17,11 @@ const KEY_WORDS = 0x100;
 const KEY_XOR = 0x1000193;
 const ARC_MARK = "ARC\0";
 
-/** The places of the picture of the walk of the places of the picture of the sound of the places of the picture
- * of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the
- * places of the picture of the walk of the places of the picture of the sound of the places of the picture of
- * the walk of the places of the picture of the places of the picture of the walk of the places of the picture of
- * the kind of the places of the picture of the walk of the places of the picture of the sixth places of the
- * picture of the walk of the places of the picture of the words of the walk of the places of the picture. */
 function rotateLeft(value: number, count: number): number {
 	const at = count & 0x1f;
 	return ((value << at) | (value >>> (32 - at))) >>> 0;
 }
 
-/** `AzIsaacEncryption`: the places of the picture of the walk of the places of the picture of the sound of the
- * places of the picture of the walk of the places of the picture of the kind of the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the places of the
- * picture of the walk of the places of the picture of their own, which the places of the picture of the walk of
- * the places of the picture of the kind of the places of the picture of the walk of the places of the picture
- * stand beside the places of the picture of the walk of the places of the picture of the sound of the places of
- * the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture. */
 function applyCipher(data: Buffer, seed: number, offset: number): Buffer {
 	const isaac = new Isaac64(seed);
 	const key = new Uint32Array(KEY_WORDS);
@@ -49,18 +35,6 @@ function applyCipher(data: Buffer, seed: number, offset: number): Buffer {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture, standing of the places of the picture of the walk of the
- * places of the picture of the words of the walk of the places of the picture of the walk of them of the places
- * of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk
- * of the places of the picture of their own: the places of the picture of the walk of the places of the picture
- * of the kind of the places of the picture of the walk of the places of the picture of the sound of the places
- * of the picture of the walk of the places of the picture stand of the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the
- * places of the picture of the sound of the places of the picture of the walk of the places of the picture. */
 function buildArchive(entries: { name: string; body: Buffer }[]): Buffer {
 	let relative = 0;
 	const index = Buffer.alloc(entries.length * 0x30, 0x00);
@@ -98,8 +72,6 @@ describe("AZ system encrypted resource archive (ISAAC)", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture", () => {
-		// key = 0x01020304 ^ 0x9E370001, and every word stands of the places of the picture of the walk of the
-		// places of the picture of the places of the picture of the walk of the places of the picture.
 		const key = (0x01020304 ^ 0x9e370001) >>> 0;
 		const word = (0x55555555 + key) >>> 0;
 		const copy = Buffer.alloc(0x20, 0x00);
@@ -109,9 +81,6 @@ describe("AZ system encrypted resource archive (ISAAC)", () => {
 		expect(decryptAsb(copy)).toBe(true);
 		for (let at = 0x10; at < 0x20; at += 4)
 			expect(copy.readUInt32LE(at)).toBe(0x55555555);
-		// A picture of the places of the picture of the walk of them that stands very short stands of the places
-		// of the picture of the walk of the places of the picture of no places of the picture of the walk of the
-		// places of the picture of their own.
 		expect(decryptAsb(Buffer.alloc(8, 0x00))).toBe(false);
 		expect(decryptAsb(Buffer.alloc(0x20, 0x00))).toBe(false);
 	});

@@ -8,13 +8,6 @@ for (let index = 0; index < CRC32_TABLE.length; index += 1) {
 	CRC32_TABLE[index] = value >>> 0;
 }
 
-/** The raw reflected form, which stands of the places of the picture of the walk of the places of the picture
- * of the words of the walk of the places of the picture of the walk of them of the places of the picture of the
- * walk of the places of the picture of the kind of the places of the picture of the walk of them of the places
- * of the picture of their own where the places of the picture of the walk of the places of the picture of the
- * sound of the places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the walk of the places of the
- * picture. */
 export function crc32Update(input: Uint8Array, init = 0): number {
 	let value = init >>> 0;
 	for (const byte of input) {

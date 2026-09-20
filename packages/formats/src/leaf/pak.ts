@@ -1,13 +1,3 @@
-// Format reference: GARbro "ArcFormats/Leaf/ArcLEAF.cs", classes `LeafPackOpener`, `LeafArchive` and
-// `LeafPackScheme` (a Leaf resource archive: the places of the files stand at the front of the file, the walk
-// of the names at its end, and every place of both stands under a walk of places the key of the title names).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The key of an archive of this kind stands in the reference's own list of games, which names a key for every
-// title it knows, and in the settings of the reference where it knows no title. This project carries no such
-// list, so the key of the titles the reference names first stands as the key of its own; an archive of another
-// title is read with the wrong key, which its own walk of names and the places of its files tell apart.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -24,8 +14,6 @@ import {
 const SIGNATURE = Buffer.from("LEAF", "latin1");
 const PACK_WORD = "PACK";
 const PACK_WORD_FIELD = 0x04;
-/** How many files the archive holds stands in the word at `0x08`, and the walk of their names stands at the
- * end of the file, four and twenty places a file. */
 const COUNT_FIELD = 0x08;
 const RECORD_SIZE = 0x18;
 const NAME_SIZE = 0x08;
@@ -38,10 +26,7 @@ const HEADER_SIZE = 0x0a;
 const DEFAULT_KEY = Buffer.from([
 	0x71, 0x48, 0x6a, 0x55, 0x9f, 0x13, 0x58, 0xf7, 0xd1, 0x7c, 0x3e,
 ]);
-/** How many files an archive of this kind may hold, past which the reference stands the count as mad. */
 const MAXIMUM_COUNT = 0x10000;
-/** A name that stands as the name of a file of this kind: the places the reference reads a name and the places
- * of an extension out of. */
 const NAME_BYTES = /^[\x20-\x7e]*$/;
 
 export interface LeafPackEntry {
@@ -61,9 +46,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `LeafPackOpener.DecryptData`: every place of a walk stands under the place of the key that stands at the
- * same place of the key's own walk, the walk of the key standing over and over where the walk of the places is
- * longer than it. */
 export function decryptLeafPlaces(
 	data: Buffer,
 	key: Buffer = DEFAULT_KEY,
@@ -75,7 +57,6 @@ export function decryptLeafPlaces(
 	return out;
 }
 
-/** The other way of the same walk, which stands the places of a file as the archive stands them. */
 export function encryptLeafPlaces(
 	data: Buffer,
 	key: Buffer = DEFAULT_KEY,
@@ -87,8 +68,6 @@ export function encryptLeafPlaces(
 	return out;
 }
 
-/** A name of the walk of names: eight places of the name and three of the extension, the places behind the
- * name standing as nothing. */
 function readName(index: Buffer, at: number): string | undefined {
 	const nameField = index.subarray(at, at + NAME_SIZE);
 	const extensionField = index.subarray(
@@ -112,10 +91,6 @@ function readName(index: Buffer, at: number): string | undefined {
 	return 0 === extension.length ? name : `${name}.${extension}`;
 }
 
-/**
- * `LeafPackOpener.TryOpen`: the word `LEAF` stands at the beginning of the file with the word `PACK` behind it,
- * how many files the archive holds in the word at `0x08`, and the walk of their names at the end of the file.
- */
 export function readLeafPackLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -223,8 +198,6 @@ export const leafPakFormat: ArchiveFormat = defineFixedArchive({
 		if (start < 0 || end > stored.length) {
 			throw invalidArchive("Leaf archive entry stands outside the archive");
 		}
-		// Every place of a file stands under the walk of the key of the title, which stands over from the front
-		// of the file.
 		return Readable.from([decryptLeafPlaces(stored.subarray(start, end))]);
 	},
 });

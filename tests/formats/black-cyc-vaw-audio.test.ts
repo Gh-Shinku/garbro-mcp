@@ -10,8 +10,6 @@ import {
 	readVawSound,
 } from "../../packages/formats/src/black-cyc/vaw-audio.js";
 
-/** The head of a Black Cyc file: the kind of the places of the file stands in the words at `0x30`, the
- * words beside it standing as nothing. */
 function vawHead(input: { kind?: string }): Buffer {
 	const head = Buffer.alloc(0x40, 0x00);
 	head.write(
@@ -22,9 +20,6 @@ function vawHead(input: { kind?: string }): Buffer {
 	return head;
 }
 
-/** A sound of the kind that stands as a walk of its own: the head, the wave header of the sound and the walk
- * of its places. The places stand worked out with a walk of the places of the reference's own, so the places
- * of the test stand under a walk this port did not work out. */
 const OWN = Buffer.from(
 	"0000000000000000000000000000000000000000000000000000000000000000" +
 		"000000000000000000000000000000005041434b545950453d31202020202020" +
@@ -32,7 +27,6 @@ const OWN = Buffer.from(
 		"02001000646174610c00000040432f61e010",
 	"hex",
 );
-/** The places the walk of the sound stands, as they stand in the clear. */
 const PCM = Buffer.from("00000b000300060008ff01ff", "hex");
 
 describe("Black Cyc audio format", () => {
@@ -88,8 +82,6 @@ describe("Black Cyc audio format", () => {
 	});
 
 	it("stands the places of a sound beside the places before them", () => {
-		// The walk of the places stands one place of a byte at a time, so a step that names four places of a
-		// colour stands the places behind the first of them beside the place before it.
 		expect(decodeVaw(OWN, 0x40, OWN.length).subarray(0x2c)).toEqual(PCM);
 	});
 
@@ -98,8 +90,6 @@ describe("Black Cyc audio format", () => {
 		// that names none, so a walk that stops behind the sound stands a sound of its own.
 		const short = Buffer.from(OWN.subarray(0, 0x40 + 0x2c + 2));
 		const pcm = decodeVaw(short, 0x40, short.length);
-		// The places of the sound stand as the places before them once the walk stops, so the last place of
-		// the sound stands as the places behind it.
 		expect([...pcm.subarray(0x2c)]).toEqual([
 			0x00, 0x00, 0x0b, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00,
 		]);

@@ -120,8 +120,6 @@ describe("DXT block decoder", () => {
 			4,
 			4,
 		);
-		// White and black with the places of alpha nought and the whole, then the two places of
-		// interpolation with the same places of alpha again.
 		expect(firstRow(output)).toBe(
 			hex([255, 255, 255, 0, 0, 0, 0, 255, 170, 170, 170, 0, 85, 85, 85, 255]),
 		);
@@ -148,7 +146,6 @@ describe("DXT block decoder", () => {
 			4,
 			4,
 		);
-		// Every place stands at the first of the two, and the colours take the four places of the word.
 		expect(firstRow(output)).toBe(
 			hex([0, 0, 255, 200, 255, 0, 0, 200, 85, 0, 170, 200, 170, 0, 85, 200]),
 		);

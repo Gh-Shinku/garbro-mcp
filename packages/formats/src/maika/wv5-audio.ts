@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Maika/AudioWV5.cs", classes `Wv5Audio` and `Wv5Decoder` (a Maika sound:
-// the places of the sound stand as the places of a walk of runs, every step of the walk naming how many places
-// stand the same way and standing the places of a colour of its own beside the place before it). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -19,16 +14,11 @@ import { writeWave } from "../shared/wav.js";
 
 /** 'WV5A', the word the reference registers. */
 const SIGNATURE = Buffer.from("WV5A", "latin1");
-/** The head of a sound of this kind: how many places of the sound stand beside each other, how fast it runs,
- * how many places of it stand, and how many steps the walk of its places stands in. */
 const CHANNELS_FIELD = 0x04;
 const SAMPLE_RATE_FIELD = 0x06;
 const SAMPLE_COUNT_FIELD = 0x0a;
 const CHUNK_COUNT_FIELD = 0x0e;
-/** The walk of the places of the sound begins behind those words. */
 const WALK_OFFSET = 0x12;
-/** The places of a colour of a sound of this kind stand in two places each, and its runs name whole places of
- * a colour, so that a step of the walk that names no places stands two hundred and fifty six of them. */
 const BITS_PER_SAMPLE = 16;
 const BYTES_PER_SAMPLE = 2;
 const FULL_RUN = 256;
@@ -83,11 +73,6 @@ export interface Wv5Layout {
 	chunkCount: number;
 }
 
-/**
- * `Wv5Decoder`: the head of a sound of this kind names how many places of the sound stand beside each other,
- * how fast it runs, how many places of it stand and how many steps the walk of its places stands in. The
- * reference stands its places in two places of a colour each.
- */
 export function readWv5Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -105,15 +90,6 @@ export function readWv5Layout(
 	return { channels, sampleRate, sampleCount, chunkCount };
 }
 
-/**
- * `Wv5Decoder.Unpack`: every step of the walk of runs names how many places of the sound stand the same way,
- * and stands one place of a colour beside the places beside it. A step that names no places of its own stands
- * one place at a time, a step that names a whole run stands two hundred and fifty six of them, a step that
- * names a run of two places stands as many as it names, and a step that names the run of places behind it
- * stands those places in two places of a colour each. Every place of the sound stands beside the place before
- * it of the places of the sound that stand beside each other, the places of a colour standing one after the
- * other.
- */
 export function decodeWv5(data: Buffer, layout: Wv5Layout): Buffer {
 	const channels = layout.channels;
 	const mask = channels - 1;
@@ -240,7 +216,6 @@ export const maikaWv5AudioFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const { stored, layout } = await readWv5(source);
-		// The places of the sound stand as a wave of the plain kind.
 		return Readable.from([
 			writeWave(
 				{

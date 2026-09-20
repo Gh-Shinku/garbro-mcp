@@ -43,7 +43,6 @@ describe("codecs", () => {
 		const cipher = Buffer.from("3fa40e8a984d4815", "hex");
 		expect(desEncryptBlock(block, key)).toEqual(cipher);
 		expect(desDecryptBlock(cipher, key)).toEqual(block);
-		// The two vectors of the walk of the standard that are quoted everywhere.
 		expect(
 			desEncryptBlock(
 				Buffer.from("0123456789abcdef", "hex"),

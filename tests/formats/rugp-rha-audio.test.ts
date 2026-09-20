@@ -11,8 +11,6 @@ import {
 	rugpRhaAudioFormat,
 } from "../../packages/formats/src/rugp/rha-audio.js";
 
-/** An rUGP engine sound of the plain kind: two steps whose heads name the places of a colour of a step of an
- * MPEG Layer 3 sound, worked out with an independent transcription of the reference's own walk. */
 const PLAIN = Buffer.from(
 	"100400070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9e0" +
 		"e7eef5fc030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ce" +
@@ -34,8 +32,6 @@ const PLAIN_MP3 = Buffer.from(
 	"hex",
 );
 
-/** An rUGP engine sound whose steps stand behind heads of the engine's own: the places of a colour of the
- * first step stand at nought, and those of the second stand as the places of the highest kind. */
 const OWN = Buffer.from(
 	"010b12100800000306090c0f1215181b1e2124272a2d303336393c3f4245484b4e5154" +
 		"575a5d606366696c6f7275787b7e8184878a8d909396999c9fa2a5a8abaeb1b4b7ba" +

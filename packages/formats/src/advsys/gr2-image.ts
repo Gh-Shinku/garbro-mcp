@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/AdvSys/ImageGR2.cs", class `Gr2Format` (an image of the AdvSys engine
-// that stands as the places of a picture as they stand, behind a head of its own: the places of the picture of
-// every row stand as many places as the places of a picture of a row stand for, standing padded to the places
-// of four). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -17,16 +12,12 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The words a picture of this kind names itself with stand in the first places of the file. */
 const MARK = Buffer.from("GR2_", "latin1");
 const HEAD_SIZE = 0x10;
 const WIDTH_FIELD = 4;
 const HEIGHT_FIELD = 6;
 const BITS_FIELD = 0xc;
-/** The places of a picture of a kind stand in the places of a picture of a row, padded to the places of four. */
 const PLACES_OF_ROW_ALIGNMENT = 4;
-/** The kinds of the places of a picture the reference stands, of sixteen, of four and twenty and of two and
- * thirty places each. A picture of a kind of its own stands away with a word of its own. */
 export const BITS_PER_PLACE_16 = 16;
 export const BITS_PER_PLACE_24 = 24;
 export const BITS_PER_PLACE_32 = 32;
@@ -41,7 +32,6 @@ export interface Gr2Layout {
 	width: number;
 	height: number;
 	bitsPerPixel: number;
-	/** How many places the places of a row of the picture stand in. */
 	stride: number;
 }
 
@@ -49,11 +39,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Gr2Format.ReadMetaData` and `Gr2Format.GetStride`: the words of the head of a picture of this kind name how
- * wide and how tall it stands and how many places a place of it stands in, which the reference stands as the
- * places of a picture of a byte each.
- */
 export function readGr2Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -73,10 +58,6 @@ export function readGr2Layout(
 	return { width, height, bitsPerPixel, stride };
 }
 
-/**
- * `Gr2Format.Read`: the places of the picture stand as they stand behind the words of the head of it, every
- * row standing as many places as the places of a row of the picture stand in.
- */
 export function unpackGr2Picture(data: Buffer, layout: Gr2Layout): Buffer {
 	const size = layout.stride * layout.height;
 	if (HEAD_SIZE + size > data.length)
@@ -86,11 +67,6 @@ export function unpackGr2Picture(data: Buffer, layout: Gr2Layout): Buffer {
 	return Buffer.from(data.subarray(HEAD_SIZE, HEAD_SIZE + size));
 }
 
-/**
- * The places of a row of a picture of this kind stand padded to the places of four, and a picture of this
- * project stands the places of a row with no places behind them, so the places behind the places of a row
- * stand away.
- */
 export function packGr2Rows(pixels: Buffer, layout: Gr2Layout): Buffer {
 	const rowBytes = layout.width * (layout.bitsPerPixel / 8);
 	if (layout.stride === rowBytes) return pixels;
@@ -174,8 +150,6 @@ export const advsysGr2ImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readGr2Layout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
 		const pixels = packGr2Rows(unpackGr2Picture(stored, layout), layout);
-		// The reference hands the places of a picture of this kind out in the kind of the places of a picture
-		// the words of the head of it name, and this project stands them in a picture of its own.
 		if (layout.bitsPerPixel === BITS_PER_PLACE_16)
 			return Readable.from([
 				writeBmp16(layout.width, layout.height, pixels, false),

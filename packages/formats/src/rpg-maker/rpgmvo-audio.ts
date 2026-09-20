@@ -1,8 +1,3 @@
-// Format reference: GARbro "Experimental/RPGMaker/AudioRPGMV.cs", class `RpgmvoAudio` (a sound of the RPG
-// Maker engine of the kind that stands behind the words of the engine and the places of a key, which stand as
-// the words of a sound of the Ogg kind). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -17,7 +12,6 @@ import {
 } from "../shared/fixed-archive.js";
 import { RPGMV_SIGNATURE, readRpgmvFile } from "./rpgmv-core.js";
 
-/** The words a sound of this kind stands for. */
 const OGG_WORD = Buffer.from("OggS", "latin1");
 
 function invalidSound(message: string): GarbroError {
@@ -94,8 +88,6 @@ export const rpgMakerRpgmvoAudioFormat: ArchiveFormat = defineFixedArchive({
 			OGG_WORD,
 		);
 		if (!file) throw invalidSound("Not an RPG Maker sound");
-		// What stands behind the head of the file stands as the words of a sound of the Ogg kind, which are
-		// handed out as they stand rather than read into the places of a sound.
 		return Readable.from([file.body]);
 	},
 });

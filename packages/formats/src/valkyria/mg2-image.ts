@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Valkyria/ImageMG2.cs", classes `Mg2Format` and `Mg2EncryptedStream`
-// (a Valkyria picture: a head naming a portable network graphic or a JPEG whose first places stand under a
-// mask, and, behind it, a shape of the places that stands under the same mask). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -25,7 +20,6 @@ const SIGNATURE = Buffer.from("MICO", "latin1");
 const FORMAT_WORD = "CG01";
 const FORMAT_WORD_FIELD = 0x04;
 const HEADER_SIZE = 0x10;
-/** The places of the picture stand behind the head, and the shape of them behind those places. */
 const IMAGE_LENGTH_FIELD = 0x08;
 const ALPHA_LENGTH_FIELD = 0x0c;
 const PAYLOAD_OFFSET = 0x10;
@@ -41,16 +35,12 @@ const V2_MASKED_PLACES = 25;
 const LIMIT = 256 * 1024 * 1024;
 
 export interface Mg2Layout {
-	/** How many bytes the places of the picture stand in. */
 	imageLength: number;
-	/** How many bytes the shape of the places stands in, which is nought where the picture has no shape. */
 	alphaLength: number;
 }
 
 export interface Mg2Payload {
-	/** Which way the places of the picture stand under the mask. */
 	scheme: string;
-	/** Whether the places of the picture stand as a portable network graphic or as a JPEG. */
 	kind: "png" | "jpeg";
 	width: number;
 	height: number;
@@ -61,11 +51,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Mg2Format.ReadMetaData`: the word `MICO` stands at the beginning of the file with the word `CG01` behind
- * it, the word at `0x08` names how many bytes the places of the picture stand in and the word at `0x0C` how
- * many the shape of those places stands in.
- */
 export function readMg2Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -98,11 +83,6 @@ function maskKey(scheme: string, length: number): number {
 	return scheme === MASKED_V1 ? 0 : length & 0xff;
 }
 
-/**
- * `Mg2EncryptedStream.Read`: the places of a region stand under a mask that walks one place at a time from the
- * mask of the region, and every place of a region behind the last place that stands under the mask stands as
- * it is.
- */
 export function unmaskMg2(
 	data: Buffer,
 	offset: number,
@@ -121,12 +101,6 @@ export function unmaskMg2(
 	return unmasked;
 }
 
-/**
- * `Mg2Format.ReadMetaData`: the places of a picture stand as a portable network graphic or as a JPEG, and which
- * of the two ways they stand under the mask is told by the first of the two the words of the file agree with.
- * The reference tells the two kinds of a picture by the word at the front of them and reads the width, the
- * height and the places of a colour out of the header behind it.
- */
 export function readMg2Payload(
 	data: Buffer,
 	layout: Mg2Layout,
@@ -151,11 +125,6 @@ export function readMg2Payload(
 	return undefined;
 }
 
-/**
- * `Mg2Format.Read`: the places of the picture stand as they are behind the head; the shape of those places
- * stands behind them, and the reference gathers it out of a picture of its own and stands it in the fourth
- * place of every colour, which this project does not read.
- */
 export function extractMg2(
 	data: Buffer,
 	layout: Mg2Layout,
@@ -215,7 +184,6 @@ export const valkyriaMg2ImageFormat: ArchiveFormat = defineFixedArchive({
 			const header = Buffer.from(await source.readAt(0n, HEADER_SIZE));
 			const layout = readMg2Layout(header, Number(source.size));
 			if (!layout) return false;
-			// The head alone does not name the places of the picture, which stand under a mask.
 			const stored = await readStored(source);
 			return readMg2Payload(stored, layout) !== undefined;
 		} catch {
@@ -247,8 +215,6 @@ export const valkyriaMg2ImageFormat: ArchiveFormat = defineFixedArchive({
 	async openEntry(source: ByteSource, _entry, sourcePath) {
 		void sourcePath;
 		const { stored, layout, payload } = await readMg2(source);
-		// The places of the picture stand as a portable network graphic or as a JPEG, which this project hands
-		// out as they stand.
 		return Readable.from([extractMg2(stored, layout, payload)]);
 	},
 });

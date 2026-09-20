@@ -1,10 +1,3 @@
-// Format reference: GARbro "ArcFormats/Unity/ArcDSM.cs", class `DsmOpener` (the archive the UTAGE scenario of
-// the Unity engine stands as: one file of the name `data.dsm`, whose places stand as the places of a ciphered
-// block). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The reference names the same file twice, once as an archive and once as a script; both hand out the same
-// places, so this port stands over the same walk as the script of this engine.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -22,7 +15,6 @@ import { decryptDsm, hasDsmName } from "./dsm-script.js";
 /** The places a text of the kind the scenario stands as begin with, which the head of the file holds where
  * the file stands as an archive. */
 const BYTE_ORDER_MARK = Buffer.from([0xef, 0xbb, 0xbf]);
-/** How many places of the clear stand for every four places of the text the scenario stands as. */
 const CLEAR_PER_TEXT = 3;
 const TEXT_PER_CLEAR = 4;
 /** The name of the file the reference hands out of such an archive. */
@@ -32,15 +24,11 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `DsmOpener.TryOpen`: the reference reads a file of this kind only where its name stands as the name of such
- * a file and where the places of the file begin with the places a text of the kind stands with. */
 export function hasDsmByteOrderMark(data: Buffer): boolean {
 	if (data.length < BYTE_ORDER_MARK.length) return false;
 	return data.subarray(0, BYTE_ORDER_MARK.length).equals(BYTE_ORDER_MARK);
 }
 
-/** How many places the reference stands for a file of this kind: how many places the text stands in, three to
- * every four of them, which stands over the places of the clear. */
 export function dsmClearSize(fileLength: number): number {
 	return Math.floor(fileLength / TEXT_PER_CLEAR) * CLEAR_PER_TEXT;
 }
@@ -72,9 +60,6 @@ export const unityDsmArchiveDescriptor: FormatDescriptor = {
 
 export const unityDsmArchiveFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: unityDsmArchiveDescriptor,
-	// The reference registers no word of its own, so an archive of this kind is tried after every kind that is
-	// told by a word of its own; where its places stand as a text of the kind the name stands for, it is tried
-	// before the kind that reads the same file as a script of its own.
 	detection: { signatures: [], priority: 10, extensionFallback: true },
 	async detect(source: ByteSource, sourcePath?: string) {
 		if (!sourcePath || !hasDsmName(sourcePath)) return false;
@@ -100,8 +85,6 @@ export const unityDsmArchiveFormat: ArchiveFormat = defineFixedArchive({
 				encrypted: true,
 				metadata: { type: "script" } as Record<string, unknown>,
 			}),
-			// The reference stands how many places the file holds over the places of the text the scenario
-			// stands as, so how many places the clear holds may stand a little short of what it names.
 			sizeKnown: false,
 		};
 		return {
@@ -111,7 +94,6 @@ export const unityDsmArchiveFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const stored = await readStored(source);
-		// The places of the scenario stand as the places of the text it holds once they stand in the clear.
 		return Readable.from([decryptDsm(stored)]);
 	},
 });

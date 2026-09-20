@@ -1,56 +1,40 @@
-// The data encryption standard, the way GARbro stands it: "ArcFormats/StudioJikkenshitsu/SjTransform.cs" is
-// the standard cipher, its tables being the tables of the standard, and the two ways the tables of its own
-// shuffle the places of a block being the ways the standard shuffles them. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The reference stands the cipher over a stream as the .NET `CryptoStream` does: every whole block of the
-// stream stands under the cipher, and the places of a block that do not stand whole stand as they stand.
-
 /** How many bytes stand in a block of the cipher, and how many places of a colour its key holds. */
 export const DES_BLOCK_SIZE = 8;
 const DES_KEY_SIZE = 8;
 const HALF_BITS = 28;
 const SIDE_BITS = 32;
 
-/** The order the places of a block stand in first. */
 const IP = [
 	58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38,
 	30, 22, 14, 6, 64, 56, 48, 40, 32, 24, 16, 8, 57, 49, 41, 33, 25, 17, 9, 1,
 	59, 51, 43, 35, 27, 19, 11, 3, 61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39,
 	31, 23, 15, 7,
 ];
-/** The order they stand in last, which stands the places of the first order back where they stood. */
 const FP = [
 	40, 8, 48, 16, 56, 24, 64, 32, 39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14,
 	54, 22, 62, 30, 37, 5, 45, 13, 53, 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28,
 	35, 3, 43, 11, 51, 19, 59, 27, 34, 2, 42, 10, 50, 18, 58, 26, 33, 1, 41, 9,
 	49, 17, 57, 25,
 ];
-/** The order the places of the side of a block stand in where a step of the walk takes them up. */
 const E = [
 	32, 1, 2, 3, 4, 5, 4, 5, 6, 7, 8, 9, 8, 9, 10, 11, 12, 13, 12, 13, 14, 15, 16,
 	17, 16, 17, 18, 19, 20, 21, 20, 21, 22, 23, 24, 25, 24, 25, 26, 27, 28, 29,
 	28, 29, 30, 31, 32, 1,
 ];
-/** The order the places of the side of a block stand in behind a step of the walk. */
 const P = [
 	16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18, 31, 10, 2, 8, 24, 14, 32,
 	27, 3, 9, 19, 13, 30, 6, 22, 11, 4, 25,
 ];
-/** The order the places of a key stand in where the key stands as two halves, the places of a colour that
- * stand in every byte of the key being left out. */
 const PC1 = [
 	57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35,
 	27, 19, 11, 3, 60, 52, 44, 36, 63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38,
 	30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4,
 ];
-/** The order the places of those halves stand in where a step of the walk takes its own key. */
 const PC2 = [
 	14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27,
 	20, 13, 2, 41, 52, 31, 37, 47, 55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34,
 	53, 46, 42, 50, 36, 29, 32,
 ];
-/** How many places of the halves of a key stand before a step of the walk takes up its own key. */
 const SHIFTS = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1];
 
 /** The tables a step of the walk stands six places of a block as four places by. */
@@ -183,7 +167,6 @@ function subkeysFor(key: Uint8Array): bigint[] {
 	return expandKey(key);
 }
 
-/** The places of a block stand as the places of the block under the key. */
 export function desEncryptBlock(block: Uint8Array, key: Uint8Array): Buffer {
 	return cryptBlock(block, subkeysFor(key));
 }
@@ -194,10 +177,6 @@ export function desDecryptBlock(block: Uint8Array, key: Uint8Array): Buffer {
 	return cryptBlock(block, subkeysFor(key).reverse());
 }
 
-/**
- * Every whole block of a stream stands under the cipher, and the places of a block that do not stand whole
- * stand as they stand, which is what the reference's stream does with the last places of a stream.
- */
 export function desEcbDecrypt(data: Uint8Array, key: Uint8Array): Buffer {
 	const subkeys = subkeysFor(key).reverse();
 	const whole = data.length - (data.length % DES_BLOCK_SIZE);
@@ -210,7 +189,6 @@ export function desEcbDecrypt(data: Uint8Array, key: Uint8Array): Buffer {
 	return out;
 }
 
-/** The same, standing the places of a stream under the cipher the other way. */
 export function desEcbEncrypt(data: Uint8Array, key: Uint8Array): Buffer {
 	const subkeys = subkeysFor(key);
 	const whole = data.length - (data.length % DES_BLOCK_SIZE);
@@ -223,8 +201,6 @@ export function desEcbEncrypt(data: Uint8Array, key: Uint8Array): Buffer {
 	return out;
 }
 
-/** The places of a key the reference stands a key of its own as, every place of a colour of the key standing
- * as the four low places of it, the places of a key that hold nought and every place behind them left out. */
 export function expandNibbleKey(
 	key: Uint8Array,
 	keySize = DES_KEY_SIZE,

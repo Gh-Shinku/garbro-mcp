@@ -34,7 +34,6 @@ function xtxFile(input: {
 	return Buffer.concat([size, padding, head, input.body]);
 }
 
-/** A file of the kind this format reads: the places of the head and then the walked texture. */
 function spcFile(texture: Buffer, size?: number): Buffer {
 	const head = Buffer.alloc(4, 0x00);
 	head.writeUInt32LE(size ?? texture.length, 0);

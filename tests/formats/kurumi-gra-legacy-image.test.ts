@@ -73,7 +73,6 @@ describe("Kurumi encrypted image", () => {
 		expect(
 			await kurumiGraLegacyImageFormat.detect(sourceOf(file), "a.gra"),
 		).toBe(true);
-		// A word the reader does not find behind the cipher is no picture of this kind.
 		const other = encrypt(Buffer.alloc(HEADER_SIZE, 0x00));
 		expect(
 			await kurumiGraLegacyImageFormat.detect(sourceOf(other), "a.gra"),
@@ -120,7 +119,6 @@ describe("Kurumi encrypted image", () => {
 		const bmp = await render(file);
 		expect(bmp.readInt32LE(22)).toBe(-1);
 		expect(bmp.readUInt16LE(28)).toBe(16);
-		// A sixteen bit bitmap of this kind names its masks, being of the bit field kind.
 		expect(bmp.readUInt32LE(30)).toBe(3);
 		expect(bmp.readUInt32LE(54)).toBe(0x7c00);
 		expect(bmp.readUInt32LE(58)).toBe(0x03e0);

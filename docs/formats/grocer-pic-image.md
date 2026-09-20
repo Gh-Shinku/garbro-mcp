@@ -12,7 +12,6 @@ The reference registers the word one — a single byte — and no name.
 ## The head
 
 The first byte of the file is that word, and the word `Actor98` stands at `0x10`. The width of the picture
-stands in the places of the bits at `0x53` — eight places for every byte — and its height stands at `0x55`; a
 picture of more than six hundred and forty places of width is turned away. Sixteen colours stand from `0x21`,
 three bytes apiece: the green of the colour first, then its red and its blue, every byte standing for a colour
 of four places, which is thirty four places of a colour of eight bits.
@@ -35,9 +34,7 @@ its bytes from elsewhere in that buffer:
 | 6 | stands in front of the single byte it gives |
 | any other byte | stands for a single byte of the plane |
 
-The places of the four planes of a row then stand together in every colour of the picture — the first plane in
 the lowest place of a colour and the fourth in the highest — and the bytes from `0x140` to the end of the
-buffer shift down to its beginning, so that the walk of the next row finds the rows behind it there. What is
 handed out is a bitmap of eight bits with the sixteen colours of the head.
 
 ## Deviations from the reference
@@ -55,7 +52,6 @@ handed out is a bitmap of eight bits with the sixteen colours of the head.
 ## Tests
 
 `tests/formats/grocer-pic-image.test.ts` covers the head and the marks and bounds it is turned away for, the
-colours of the head, the gathering of the places of four planes, the steps of the walk that take their bytes
 from the plane in front, from the first plane of the row at hand, from the row two rows behind and from a run
 of one byte, a picture gathered into a bitmap, a file whose first byte is not that of the engine, and a walk
 that runs out of the file. The vectors are worked out by hand: the plane bytes `0x80`, `0x40`, `0x20` and

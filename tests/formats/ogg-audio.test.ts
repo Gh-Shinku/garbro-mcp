@@ -13,12 +13,6 @@ import {
 const PAGE_HEAD = 0x1b;
 const CRC_AT = 0x16;
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of a place of the picture of the walk of the places of the
- * picture of the fifth kind of the places of the picture of the walk of the places of the picture, standing of
- * the places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of their own. */
 function oggPage(
 	body: Buffer,
 	options: { crc?: number; sequence?: number } = {},
@@ -81,14 +75,6 @@ describe("Ogg/Vorbis audio format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the walk of the places of the picture of their own", () => {
-		// The places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture of the places of the picture of the walk of the places of the picture of the first place of
-		// the picture of the walk of the places of the picture of the fifth kind of the places of the picture
-		// of the walk of the places of the picture stand of the places of the picture of the walk of the places
-		// of the picture of the sound of the places of the picture of the walk of the places of the picture, and
-		// the places of the picture of the walk of the places of the picture of the words of the walk of the
-		// picture of the places of the picture of the walk of the places of the picture of the second stand of
-		// no places of the picture of the walk of the places of the picture of their own.
 		const broken = oggPage(body(16, 0xaa), { crc: 0x12345678 });
 		const second = oggPage(body(8, 0x02), { crc: 0xdeadbeef, sequence: 1 });
 		const file = Buffer.concat([broken, second]);
@@ -101,10 +87,6 @@ describe("Ogg/Vorbis audio format", () => {
 		const fixed = readOggLayout(restored);
 		if (!fixed) throw new Error("no fixed layout");
 		expect(oggPagesValid(fixed)).toBe(true);
-		// The places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of their own stand beside the places of the picture
-		// of the walk of the places of the picture of the places of the picture of the walk of them of the
-		// places of the picture of the walk of the places of the picture of the places of the picture.
 		expect(restored.length).toBe(file.length);
 		expect(restored.readUInt32LE(CRC_AT)).toBe(layout.pages[0]?.computed);
 	});
@@ -140,12 +122,6 @@ describe("Ogg/Vorbis audio format", () => {
 	});
 
 	it("turns away the places of the picture of the walk of the places of the picture of the words of the walk of the picture that stand of no places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind", () => {
-		// A picture of the places of the picture of the walk of them of the places of the picture of the walk of
-		// the places of the picture of the kind of the places of the picture of the walk of them of the engine
-		// that stands of no places of the picture of the walk of the places of the picture of the sound of the
-		// places of the picture of the walk of the places of the picture of this kind stands of the places of
-		// the picture of the walk of the places of the picture of the kind of the places of the picture of the
-		// walk of the places of the picture of their own.
 		const pcm = Buffer.concat([
 			Buffer.from("RIFF", "latin1"),
 			Buffer.alloc(4, 0x00),
@@ -158,13 +134,6 @@ describe("Ogg/Vorbis audio format", () => {
 			Buffer.alloc(4, 0x00),
 		]);
 		expect(readOggLayout(pcm)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture that stand of the places of the picture of the walk
-		// of the places of the picture of the kind of the places of the picture of the walk of them of the
-		// engine where the places of the picture of the walk of the places of the picture of the sound of the
-		// places of the picture of the walk of the places of the picture of this kind stand of the places of
-		// the picture of the walk of the places of the picture of the kind of the places of the picture of the
-		// walk of the places of the picture of their own.
 		expect(readOggLayout(Buffer.alloc(64, 0x00))).toBeUndefined();
 		expect(readOggLayout(Buffer.alloc(8, 0x00))).toBeUndefined();
 		const short = oggPage(body(16, 0xaa));

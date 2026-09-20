@@ -1,8 +1,3 @@
-// Format reference: GARbro "Legacy/AyPio/PdtBitmap.cs", classes `PdtBmpFormat`, `PdtBmpDecoder` (a UK2 engine
-// bitmap: a container of two pictures, the first standing for the places of the picture and the second, where
-// the word `PDT` stands behind the first, for their shape; every picture stands as a walk of bits over a bitmap
-// the engine packed). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -36,7 +31,6 @@ const NAME_LIMIT = 0x100;
 const LIMIT = 256 * 1024 * 1024;
 
 export interface PdtBmpPicture {
-	/** What the walk of the picture gives: a bitmap as it stands. */
 	bmp: Buffer;
 	/** How many bytes of the file the picture stands in. */
 	packedSize: number;
@@ -45,9 +39,7 @@ export interface PdtBmpPicture {
 }
 
 export interface PdtBmpLayout {
-	/** The picture of the places of the canvas. */
 	colour: PdtBmpPicture;
-	/** The picture of the shape of the places, where the file carries one. */
 	alpha?: PdtBmpPicture;
 }
 
@@ -62,12 +54,6 @@ function readName(data: Buffer, at: number): string {
 	return data.toString("latin1", at, end);
 }
 
-/**
- * `PdtBmpDecoder.GetNextBit` and `GetInteger`: what stands in the walk of a picture is a place of a word of
- * the file at a time, its highest place first, and an integer of the walk stands in as many places as the ones
- * that stand in front of it say, the value itself standing behind them — so the number of the places in front
- * of the integer is its highest place, which is what every integer the walk reads stands at.
- */
 interface PdtBitReader {
 	data: Buffer;
 	position: number;
@@ -193,12 +179,6 @@ function readPdtBmpPicture(
 	};
 }
 
-/**
- * `PdtBmpFormat.ReadMetaData` and `PdtBmpDecoder.Unpack`: the file begins with the word `PDT` and a nought and
- * the word behind it is the shape of this container. The picture of the places stands at the beginning of the
- * file, and where the word `PDT` stands again behind the whole of it the picture of the shape of the places
- * stands there.
- */
 export function readPdtBmpLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -217,12 +197,6 @@ export function readPdtBmpLayout(
 	return layout;
 }
 
-/**
- * `PdtBmpDecoder.Unpack`, the places of the picture: the walk of the places gives a bitmap as it stands, and
- * where the file carries the shape of the places as well, that walk gives another bitmap which stands for the
- * shape of every place of the picture — as many places of it as the two pictures share, one of the parts of a
- * colour of the picture of the shape standing for the shape of a place.
- */
 export function decodePdtBmp(layout: PdtBmpLayout): Buffer {
 	const colour = readBmpImage(layout.colour.bmp);
 	const places = colour ? toBgra32(colour, true) : undefined;
@@ -244,8 +218,6 @@ export function decodePdtBmp(layout: PdtBmpLayout): Buffer {
 			const at = (row * colour.width + column) * 4;
 			let value = 0;
 			if (row < height && column < width) {
-				// The reference asks the framework for a grey picture of the shape of the places, which stands
-				// for the same value where the three parts of a colour of it stand together.
 				value = shape[(row * alphaImage.width + column) * 4] ?? 0;
 			}
 			places[at + 3] = value;
@@ -317,7 +289,6 @@ export const aypioPdtBmpImageFormat: ArchiveFormat = defineFixedArchive({
 					hasAlpha: layout.alpha !== undefined,
 				},
 			}),
-			// The walk of the places gives the picture and, where it stands there, the shape of them.
 		};
 		return {
 			entries: [entry],

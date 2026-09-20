@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/RealLive/AudioNWA.cs", classes `NwaAudio`, `NwaMetaData` and
-// `NwaDecoder`, with the walk of the places of the picture of the words of the walk of the places of the
-// picture standing of "ArcFormats/BitStream.cs", class `LsbBitStream` (a sound of the RealLive engine whose
-// places stand of the places of the picture of the walk of the places of the picture of the sounds of their
-// own). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -31,8 +25,6 @@ const DATA_OFFSET = 0x2c;
 const CHANNELS_FIELD = 0;
 const BITS_FIELD = 2;
 const RATE_FIELD = 4;
-/** The kinds of the walk of the places of the picture of a sound of this kind stand of the places of the
- * picture of the walk of the places of the picture of their own. */
 const RAW_COMPRESSION = -1;
 const MOST_COMPRESSION = 5;
 const LEAST_COMPRESSION = 3;
@@ -60,13 +52,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `NwaAudio.TryOpen`: the words of the head of a sound of this kind name how many places of the picture of a
- * place of the picture of the sound stand beside each other, how many places of the picture of a place of the
- * picture stand, how many places of the picture of the sound stand within a place of the picture, the kind of
- * the walk of the places of the picture of the sound, and the places of the picture of the walk of the places
- * of the picture of the picture of the places of the picture of the walk of them.
- */
 export function readNwaLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -93,10 +78,6 @@ export function readNwaLayout(
 	if (layout.pcmSize <= 0) return undefined;
 	if (layout.pcmSize > LIMIT) return undefined;
 	if (layout.compression === RAW_COMPRESSION) {
-		// The reference stands the places of the picture of the walk of the places of the picture of a sound
-		// of this kind as they stand where the kind of the walk of the places of the picture of the sound
-		// stands for the places of the picture of the walk of them of the places of the picture of the sound
-		// of their own.
 		if (layout.pcmSize > fileLength - DATA_OFFSET) return undefined;
 		return layout;
 	}
@@ -111,9 +92,6 @@ export function readNwaLayout(
 	return layout;
 }
 
-/** `LsbBitStream`: the places of the picture of the walk of the places of the picture of a sound of this
- * kind, the places of the picture of the walk of the places of the picture of the word of the walk of them
- * standing of the places of the picture of the walk of the places of the picture of the picture of their own. */
 class NwaBitReader {
 	private bits = 0;
 	private cachedBits = 0;
@@ -126,17 +104,10 @@ class NwaBitReader {
 		this.position = position;
 	}
 
-	/** `BitStream.Reset`: the places of the picture of the walk of the places of the picture of the words of
-	 * the walk of them stand of the places of the picture of the walk of the places of the picture of the
-	 * picture of the walk of the places of them, the places of the picture of the walk of the places of the
-	 * picture of the picture of the places of the picture of the walk of them standing where they stand. */
 	reset(): void {
 		this.cachedBits = 0;
 	}
 
-	/** `LsbBitStream.GetBits`: the places of the picture of the walk of the places of the picture stand of the
-	 * places of the picture of the walk of the places of the picture of the picture of the word behind the
-	 * places of the picture of the walk of the places of the picture. */
 	getBits(count: number): number {
 		if (this.cachedBits >= count) {
 			const mask = (1 << count) - 1;
@@ -172,13 +143,6 @@ class NwaBitReader {
 	}
 }
 
-/** The places of the picture of the walk of the places of the picture of a sound of this kind stand of the
- * places of the picture of the walk of the places of the picture of a picture of the words of the walk of
- * them: the places of the picture of the walk of them stand of the places of the picture of the picture of
- * the walk of the places of the picture of the places of the picture of their own, the places of the picture
- * of the walk of the places of the picture of the picture of the places of the picture of the walk of them
- * standing of the places of the picture of the walk of the places of the picture of the picture of the walk of
- * the places of them. */
 function readNwaPlaces(
 	reader: NwaBitReader,
 	sample: number[],
@@ -190,13 +154,6 @@ function readNwaPlaces(
 	const mask = signBit - 1;
 	const value = reader.getBits(bits);
 	if (value < 0) return false;
-	// The reference stands the places of the picture of the walk of the places of the picture of the places
-	// of the picture of the walk of them of the places of the picture of a word of their own, the places of
-	// the picture of the walk of the picture of the walk of the places of the picture of the walk of them
-	// standing of the places of the picture of the walk of the places of the picture of the place of the
-	// picture of the walk of them, so the places of the picture of the walk of them stand of the places of
-	// the picture of the walk of the places of the picture of the picture of the walk of the places of the
-	// picture of the walk of them.
 	const magnitude = (((value & mask) << shift) << 16) >> 16;
 	const current = sample[channel] ?? 0;
 	sample[channel] =
@@ -206,14 +163,6 @@ function readNwaPlaces(
 	return true;
 }
 
-/**
- * `NwaDecoder.DecodeBlock`: the places of the picture of the walk of the places of the picture of a place of
- * the picture of a sound of this kind. The places of the picture of the walk of the places of the picture of
- * every place of the picture of the sound stand beside each other, the places of the picture of the walk of
- * the places of the picture of the picture of the walk of them of the places of the picture of the walk of
- * the places of the picture standing before the places of the picture of the walk of them of the picture of
- * the walk of the places of the picture of the picture of the words of the walk of them.
- */
 function decodeNwaBlock(
 	data: Buffer,
 	reader: NwaBitReader,
@@ -312,8 +261,6 @@ function decodeNwaBlock(
 	return at;
 }
 
-/** `NwaDecoder.Decode`: the places of the picture of the walk of the places of the picture of a sound of this
- * kind. */
 export function unpackNwaPcm(data: Buffer, layout: NwaLayout): Buffer {
 	const pcm = Buffer.alloc(layout.pcmSize);
 	if (layout.compression === RAW_COMPRESSION) {
@@ -360,8 +307,6 @@ export function unpackNwaPcm(data: Buffer, layout: NwaLayout): Buffer {
 	return pcm;
 }
 
-/** `NwaAudio.TryOpen`: the places of the picture of the walk of the places of the picture of a sound of this
- * kind stand as the places of the picture of the walk of the places of the picture of the sound of its own. */
 export function readNwaWave(data: Buffer, layout: NwaLayout): Buffer {
 	return writeWave(
 		{
@@ -401,10 +346,6 @@ export const realliveNwaAudioDescriptor: FormatDescriptor = {
 
 export const realliveNwaAudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: realliveNwaAudioDescriptor,
-	// The reference stands the words of the head of a sound of this kind of no places of the picture of the
-	// walk of them of its own, so a sound of this kind stands of the places of the picture of the walk of the
-	// places of the picture of the words of the head of the picture of the places of the picture of the walk
-	// of the places of the picture of the sound of its own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;

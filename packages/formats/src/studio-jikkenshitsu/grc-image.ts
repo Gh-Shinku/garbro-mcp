@@ -1,12 +1,3 @@
-// Format reference: GARbro "ArcFormats/StudioJikkenshitsu/ImageGRC.cs", classes `GrcFormat` and `GrcReader`
-// (a Studio Jikkenshitsu picture of eight bits: every step of four places of a row stands behind the places of
-// the row and of the row before it, the places of the step naming which of them every place stands behind).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// A picture of this kind may stand under the standard cipher; the key of such a picture stands in the settings
-// of the reference, which names a key for every title it knows, and this project carries no such settings. A
-// picture whose places stand under the cipher is therefore refused with a message.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -32,7 +23,6 @@ const FLAGS_FIELD = 0x01;
 const ENCRYPTED_FLAG = 0x80;
 const WIDTH_FIELD = 0x04;
 const HEIGHT_FIELD = 0x06;
-/** Where the places the walk names stand, and where the places of the picture that stand as they stand do. */
 const BITS_OFFSET_FIELD = 0x08;
 const BITS_LENGTH_FIELD = 0x0c;
 const DATA_OFFSET_FIELD = 0x10;
@@ -40,7 +30,6 @@ const DATA_LENGTH_FIELD = 0x14;
 /** The places of a shape of the picture, which the reference keeps and does not read. */
 const ALPHA_OFFSET_FIELD = 0x18;
 const ALPHA_LENGTH_FIELD = 0x1c;
-/** The places of a colour stand behind the head, the places of a row of the walk behind them. */
 const PALETTE_OFFSET = 0x20;
 const PALETTE_COLORS = 0x100;
 const PALETTE_SIZE = PALETTE_COLORS * 4;
@@ -70,14 +59,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `GrcFormat.ReadMetaData`: the places of a colour of the picture stand in the place at the front of the head,
- * the highest place of the place behind it names whether the places of the picture stand under the cipher, the
- * width of the picture stands in the words at `0x04` and its height in the words at `0x06`. Where the places
- * the walk names stand, where the places of the picture that stand as they stand do, and where the places of a
- * shape of the picture stand all stand in the words behind those. The reference reads a picture of eight bits
- * and no other.
- */
 export function readGrcLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -117,22 +98,6 @@ export function readGrcLayout(
 	};
 }
 
-/**
- * `GrcReader.Unpack`: a row of the picture stands behind one place of the walk of rows, which names which of
- * four ways the steps of the row stand:
- *
- * | the place of the row | the places a step of the row stands behind |
- * | -------------------- | ------------------------------------------ |
- * | nought | the place before the step, the places of the row before at the place of the step and before it, in that order |
- * | one | the three places before the step, in that order |
- * | two | the places of the row before, three rows at the place of the step |
- * | three | the places of the row before at the place of the step, before it and behind it |
- *
- * Every step of four places stands behind one place of the walk of the steps, the four places of a step
- * standing four pairs of places of it, the highest pair first: a pair that stands at nought names a place of
- * the picture as it stands, which stands behind the places of the picture that stand as they stand, and every
- * other pair names which of the places above the place stands in it.
- */
 export function decodeGrc(data: Buffer, layout: GrcLayout): Buffer {
 	const pixels: Buffer = Buffer.alloc(layout.stride * layout.height, 0x00);
 	const palette = paletteTriples(
@@ -225,7 +190,6 @@ export const studioJikkenshitsuGrcImageDescriptor: FormatDescriptor = {
 	],
 };
 
-/** The reference reads a picture of this kind only where its name stands as the name of such a picture. */
 function hasGrcName(sourcePath: string): boolean {
 	return /\.grc$/i.test(sourcePath);
 }
@@ -269,7 +233,6 @@ export const studioJikkenshitsuGrcImageFormat: ArchiveFormat =
 		},
 		async openEntry(source: ByteSource) {
 			const { stored, layout } = await readGrc(source);
-			// The places of the picture stand as a bitmap of eight bits.
 			return Readable.from([decodeGrc(stored, layout)]);
 		},
 	});

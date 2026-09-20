@@ -199,8 +199,6 @@ describe("D.O. picture format of the GGS kind", () => {
 			]),
 		);
 		expect(pixelBytes(stepped, 3, 1)).toBe("010000000000020000");
-		// The odd step belongs to the walk of the red channel, which goes last, so the byte it lands on the blue
-		// channel of the second pixel stands in the picture rather than being written over by a channel behind it.
 		const odd = await extract(
 			ggsFile(3, 1, [
 				fill(3, 1),

@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/Unity/AudioFSB5.cs", classes `Fsb5Audio`, `Fsb5Decoder`, `Sample`
-// and the kinds of the walk of the places of the picture of the sound `SoundFormat` and `ChunkType` (the
-// places of the picture of the sound of the engine of the places of the picture of the sound of the kind of
-// FMOD). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -17,7 +12,6 @@ import {
 } from "../shared/fixed-archive.js";
 import { writeWave } from "../shared/wav.js";
 
-/** 'FSB5' — the four places of the picture of the head of a sound of this kind. */
 const FSB5_MARK = Buffer.from("FSB5", "latin1");
 const HEAD_SIZE = 0x3c;
 const VERSION_FIELD = 4;
@@ -30,22 +24,14 @@ const BUTTON_SIZE = 8;
 const FOUR_PLACES = 4;
 const CHUNK_FIELDS = 4;
 
-/** The kinds of the walk of the places of the picture of the sound. */
 const PCM8 = 1;
 const PCM16 = 2;
 const PCM32 = 4;
 const PCM_FLOAT = 5;
 const VORBIS = 15;
-/** The places of the picture of the walk of the places of the picture of the picture of the walk of them of
- * the places of the picture of the walk of the places of the picture of a place of the picture of the walk of
- * them. */
 const CHANNELS_CHUNK = 1;
 const RATE_CHUNK = 2;
 const LOOP_CHUNK = 3;
-/** The places of the picture of the walk of the places of the picture of the sound stand of the places of the
- * picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * picture of the walk of them before the places of the picture of the walk of them of the places of the
- * picture of the walk of the places of the picture of the sound. */
 const RATE_PLACES = 0xf;
 const RATE_SHIFT = 1;
 const CHANNEL_SHIFT = 5;
@@ -77,9 +63,6 @@ const RATE_TABLE = new Map<number, number>([
 export interface Fsb5Sample {
 	sampleRate: number;
 	channels: number;
-	/** The places of the picture of the walk of the places of the picture of the sound, beside the places of
-	 * the picture of the walk of the places of the picture of the walk of them of the places of the picture
-	 * of the walk of the places of the picture of the sound of the picture of their own. */
 	dataOffset: number;
 	sampleCount: number;
 }
@@ -100,16 +83,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Fsb5Decoder.ReadSamples`: the walk of the words of the head of a sound of this kind. The words of the head
- * name the kind of the walk of the places of the picture of the sound, how many places of the picture of the
- * walk of the places of the picture stand, and how wide the places of the picture of the walk of the places of
- * the picture of the head and of the places of the picture of the walk of the places of the picture of the
- * names stand. Every place of the picture of the walk of the places of the picture of the sound stands then of
- * a word of the walk of the places of the picture of their own, and of the places of the picture of the walk of
- * the places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture behind them.
- */
 export function readFsb5Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -128,14 +101,6 @@ export function readFsb5Layout(
 		format !== PCM32 &&
 		format !== PCM_FLOAT
 	) {
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// sound of the kind of the places of the picture of the walk of them of the places of the picture of
-		// the walk of the places of the picture of the sound of the places of the picture of their own out of
-		// the places of the picture of the walk of the places of the picture of the kinds of the walk of the
-		// places of the picture of the engine of the places of the picture of the sound of the kind of FMOD
-		// that stand for the places of the picture of the walk of the places of the picture of the sound of
-		// the places of the picture of the walk of them of the places of the picture of the head of the
-		// picture of the walk of the places of the picture.
 		if (format === VORBIS)
 			throw invalidSound(
 				"The places of the picture of the walk of the places of the picture of the sound of the kind of the places of the picture of the walk of them stand beside the places of the picture of the walk of the places of the picture of the picture of the walk of the places of the picture of the sound of the engine, which stand outside the places of the picture of the walk of them of the sound",
@@ -183,12 +148,6 @@ export function readFsb5Layout(
 			} else if (chunkKind === LOOP_CHUNK) at += LOOP_PLACES;
 			else at += chunkSize;
 		}
-		// The reference stands the places of the picture of the walk of the places of the picture of the sound
-		// of the places of the picture of the walk of them where the places of the picture of the walk of the
-		// places of the picture of the head of the picture of the walk of them stand, and of the places of the
-		// picture of the walk of the places of the picture of the sound of the places of the picture of the
-		// walk of the places of the picture of the frequency of the places of the picture behind them where
-		// they stand not.
 		let sampleRate = chunkRate;
 		if (sampleRate === undefined) sampleRate = RATE_TABLE.get(rateIndex);
 		if (sampleRate === undefined)
@@ -215,9 +174,6 @@ export function readFsb5Layout(
 	};
 }
 
-/** `Fsb5Decoder.RebuildPcm`: the places of the picture of the walk of the places of the picture of the sound
- * of this kind stand as the places of the picture of the walk of the places of the picture of a sound of the
- * kind of the places of the picture of the sound of their own. */
 export function unpackFsb5Pcm(
 	data: Buffer,
 	layout: Fsb5Layout,
@@ -237,19 +193,10 @@ export function unpackFsb5Pcm(
 			data.subarray(layout.dataStart, layout.dataStart + length),
 		),
 		bitsPerSample,
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// sound of the kind of the places of the picture of the walk of them of the places of the picture of
-		// the walk of the places of the picture of the sound of the places of the picture of their own where
-		// the places of the picture of the walk of them stand of the places of the picture of the walk of the
-		// places of the picture of the sound of the places of the picture of the walk of the places of the
-		// picture of four places of the picture of their own.
 		formatTag: layout.format === PCM_FLOAT ? 3 : 1,
 	};
 }
 
-/** `Fsb5Decoder.Convert`: the places of the picture of the walk of the places of the picture of a sound of
- * this kind stood out as the places of the picture of a sound of the kind of the places of the picture of the
- * walk of the places of the picture of the sound of their own. */
 export function readFsb5Wave(data: Buffer, layout: Fsb5Layout): Buffer {
 	const places = unpackFsb5Pcm(data, layout);
 	if (!places)

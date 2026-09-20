@@ -9,9 +9,6 @@ import {
 	studioJikkenshitsuGrcImageFormat,
 } from "../../packages/formats/src/studio-jikkenshitsu/grc-image.js";
 
-/** A Studio Jikkenshitsu picture of the kind its own places stand as: the head, the colours of the picture,
- * the places that name how the steps of every row stand, the places the walk names, and the places of the
- * picture that stand as they stand. */
 function grcFile(input: {
 	width?: number;
 	height?: number;
@@ -92,9 +89,6 @@ describe("Studio Jikkenshitsu picture of the kind its own places stand as", () =
 	});
 
 	it("stands the places of every step of a row behind the places the row names", () => {
-		// The steps of the four rows stand the four ways of the walk in turn: every step of four places stands
-		// behind one place of its row, the four places of the step standing four pairs of places of it, the
-		// highest pair first.
 		const layout = readGrcLayout(grcFile({}), 0x430);
 		if (!layout) throw new Error("the picture stands in the file");
 		const bmp = decodeGrc(grcFile({}), layout);

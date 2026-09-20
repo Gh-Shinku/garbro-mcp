@@ -10,9 +10,6 @@ import {
 
 const FIRST_OFFSET = 0x20;
 
-/** The places of the picture of the walk of the places of the picture of the engine of the SAS5 kind, the
- * places of the picture of the walk of the places of the picture standing of the places of the picture of the
- * walk of the places of the picture of the places of the picture of the walk of them. */
 function buildIar(options: {
 	version: number;
 	fileCount: number;
@@ -60,9 +57,6 @@ describe("SAS5 engine images archive", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the third kind of the walk of the places of the picture", () => {
-		// The places of the picture of the walk of the places of the picture of the place of the picture of
-		// the walk of them stand of eight places of the picture behind the places of the picture of the walk
-		// of them of the third kind of the walk of the places of the picture.
 		const file = buildIar({
 			version: 3,
 			fileCount: 1,
@@ -109,9 +103,6 @@ describe("SAS5 engine images archive", () => {
 		const noPlaces = Buffer.from(good);
 		noPlaces.writeInt32LE(0, 0x1c);
 		expect(readIarIndex(noPlaces, noPlaces.length)).toBeUndefined();
-		// The places of the picture of the walk of the places of the picture of a place of the picture of the
-		// walk of them stand behind the places of the picture of the walk of them of the place of the picture
-		// of the walk of them behind it.
 		const backwards = Buffer.from(good);
 		backwards.writeUInt32LE(0x30, FIRST_OFFSET);
 		expect(readIarIndex(backwards, backwards.length)).toBeUndefined();

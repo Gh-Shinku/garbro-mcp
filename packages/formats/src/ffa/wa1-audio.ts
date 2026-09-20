@@ -90,9 +90,6 @@ export function readWa1Layout(
 	}
 	const dataSize = data.readInt32LE(DATA_SIZE_FIELD);
 	if (dataSize < 0 || dataSize > LIMIT) return undefined;
-	// Only the head of the wave file has to stand in the file: the walk of the samples reads as many bytes
-	// of them as its codes need and the samples behind that stand as nought, which is what the reference's own
-	// arrays leave there. A file that does not hold the head is turned away.
 	if (WAVE_HEADER_FIELD + WAVE_HEADER_SIZE > fileLength) return undefined;
 	return { kind, dataSize };
 }
@@ -115,25 +112,16 @@ export function readWa1ContainerLayout(
 	return { packedSize, unpackedSize };
 }
 
-/** Where the walk of a sound stands: the byte it is reading and the two places of the byte it holds. */
 interface Wa1Cursor {
 	data: Buffer;
 	position: number;
 }
 
-/** The whole place the walk of the samples stands at: the sample it last gave and the step it stands at. */
 interface Wa1Walk {
 	sample: number;
 	step: number;
 }
 
-/**
- * One step of the walk of the samples, which every kind of sound shares: the step the walk stands at times
- * the odd number the three lowest places of a code name, less three places of the same; the sample climbs by
- * that or — where the highest place of the code stands — falls by it, held between the least and the greatest
- * of sixteen bit samples; and the walk then moves to what the table of the two walks gives for the code, less
- * six places of the same, held between a hundred and twenty seven and the greatest step.
- */
 function walkStep(walk: Wa1Walk, code: number): number {
 	const difference = (walk.step * (((code & 7) << 1) + 1)) >> 3;
 	if (0 !== (code & 8)) {
@@ -163,7 +151,6 @@ interface Wa1NibbleState {
 }
 
 interface Wa1BitState {
-	/** The places of the walk of the second and the fourth kind at hand, its lowest place first. */
 	places: number;
 	/** How many places stand there. */
 	count: number;
@@ -183,11 +170,6 @@ function readNibble(cursor: Wa1Cursor, state: Wa1NibbleState): number {
 	return byte & 0x0f;
 }
 
-/**
- * The walk of a sound of the second and the fourth kind takes a code of two to eight places out of the places
- * it holds, the lowest place of the walk first. Where fewer than eight places stand there, a byte of the walk
- * stands above the places at hand.
- */
 function readCode(cursor: Wa1Cursor, state: Wa1BitState): number {
 	if (state.count < 8) {
 		if (cursor.position >= cursor.data.length) {

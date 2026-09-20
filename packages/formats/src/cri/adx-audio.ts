@@ -1,11 +1,3 @@
-// Format reference: GARbro "ArcFormats/Cri/AudioADX.cs", classes `AdxAudio`, `AdxInput` and `AdxReader`
-// (a sound of the kind of the places of the picture of the pictures of the engine of CRI: the places of the
-// picture of the walk of the places of the picture of a place of the picture standing of the places of the
-// picture of the walk of the places of the picture of the sound, of the places of the picture of the walk of
-// them of the places of the picture of the sound behind it, and of the places of the picture of the walk of
-// the places of the picture of the words of the walk of the places of the picture of the sound of their own).
-// GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import { MsbBitReader } from "@garbro-mcp/codecs";
 import type {
@@ -21,9 +13,6 @@ import {
 } from "../shared/fixed-archive.js";
 import { writeWave } from "../shared/wav.js";
 
-/** The places of the picture of the words of the head of a picture of the kind of the walk of the places of
- * the pictures of the engine stand of the places of the picture of four places, the places of the picture of
- * the walk of the places of the picture of the sound standing behind them. */
 const SIGNATURE_SIZE = 4;
 const LEAST_HEADER = 0x10;
 const WORDS_OF_THE_HEAD = 0x80;
@@ -69,14 +58,6 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `AdxReader`: the places of the picture of the walk of the places of the picture of a sound of this kind.
- * The words of the head of the picture of the walk of the places of the picture of the sound stand of the
- * places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them, of the places of the picture of the walk of them of the places of the picture of the sound behind it,
- * and of the places of the picture of the walk of the places of the picture of the words of the walk of the
- * places of the picture of the sound of their own.
- */
 export function readAdxLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -112,9 +93,6 @@ export function readAdxLayout(
 	const samplesPerFrame = ((frameSize - 2) * PLACES_PER_WORD) / ADX_BITS;
 	if (samplesPerFrame <= 0) return undefined;
 	const lowestFreq = data.readUInt16BE(head + LOWEST_FIELD);
-	// The reference stands the places of the picture of the walk of the places of the picture of the sound of
-	// the places of the picture of the walk of them of the places of the picture of the walk of the places of
-	// the picture of the sound of the frequencies of the places of the picture behind it.
 	const root = Math.sqrt(2.0);
 	const x = root - Math.cos((2 * Math.PI * lowestFreq) / samplesPerSecond);
 	const y = root - 1;
@@ -132,9 +110,6 @@ export function readAdxLayout(
 	};
 }
 
-/** `AdxReader.NibbleToSigned`: the places of the picture of the walk of the places of the picture of the
- * sound stand as the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of the places of the picture of four places of the picture. */
 function nibbleToSigned(place: number): number {
 	return (place & WORTH_PLACES) - (place & SIGN_PLACE);
 }
@@ -145,14 +120,6 @@ function clamp16(sample: number): number {
 	return sample;
 }
 
-/**
- * `AdxReader.DecodeFrame`: the places of the picture of the walk of the places of the picture of a place of
- * the picture of the walk of the places of the picture of a sound of this kind. The places of the picture of
- * the walk of the places of the picture of the sound stand as the places of the picture of the walk of the
- * places of the picture of the places of the picture of their own, and as the places of the picture of the
- * walk of them of the places of the picture of the walk of the places of the picture of the places of the
- * picture of the walk of the places of the picture of the sound of their own.
- */
 function decodeAdxFrame(
 	reader: MsbBitReader,
 	layout: AdxLayout,
@@ -184,10 +151,6 @@ function decodeAdxFrame(
 	}
 }
 
-/** `AdxInput`: the places of the picture of the walk of the places of the picture of a sound of this kind,
- * the places of the picture of the walk of the places of the picture of the sound standing one after another
- * of the places of the picture of the walk of the places of the picture of the places of the picture of the
- * walk of the places of them. */
 export function unpackAdxPcm(data: Buffer, layout: AdxLayout): Buffer {
 	const pcm = Buffer.alloc(layout.sampleCount * layout.channels * 2);
 	const reader = new MsbBitReader(data, layout.dataOffset);
@@ -204,8 +167,6 @@ export function unpackAdxPcm(data: Buffer, layout: AdxLayout): Buffer {
 	return pcm;
 }
 
-/** `AdxInput`: the places of the picture of the walk of the places of the picture of a sound of this kind
- * stand as the places of the picture of the walk of the places of the picture of a sound of their own. */
 export function readAdxWave(data: Buffer, layout: AdxLayout): Buffer {
 	const blockAlign = (OUTPUT_BITS * layout.channels) / PLACES_PER_WORD;
 	return writeWave(
@@ -244,11 +205,6 @@ export const criAdxAudioDescriptor: FormatDescriptor = {
 
 export const criAdxAudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: criAdxAudioDescriptor,
-	// The reference stands the places of the picture of the walk of the places of the picture of a sound of
-	// this kind of no places of the picture of the walk of them of its own, the places of the picture of the
-	// walk of the places of the picture of the place of the picture of the walk of them standing of the
-	// places of the picture of the walk of the places of the picture of the picture of the words of the head
-	// of the picture of the places of the picture of the walk of them.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(SIGNATURE_SIZE)) return false;

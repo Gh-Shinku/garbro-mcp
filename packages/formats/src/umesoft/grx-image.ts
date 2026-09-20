@@ -387,11 +387,6 @@ function applyGrxAlpha16(
 	return { pixels: packGrx(out, layout, 4, alignedWidth * 4), outputDepth: 32 };
 }
 
-/**
- * The reference hands its rows to the bitmap reader with the length they were unpacked with, which is the
- * width of the picture rounded up to a whole four bytes; the writers of this project take a row of exactly
- * the width of the picture, so the end of a longer row is left behind.
- */
 function packGrx(
 	pixels: Buffer,
 	layout: GrxLayout,

@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/AliceSoft/ImageQNT.cs", classes `QntFormat` and `Reader` (a picture of
-// the AliceSoft system: a head of three and forty places, three places of a colour that stand walked beside
-// each other, a place of the transparency of the picture where it stands at all, and a walk of the places of
-// the picture that stands their places beside the places that stand before them). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
@@ -58,8 +52,6 @@ export interface QntLayout {
 	headerSize: number;
 	rgbSize: number;
 	alphaSize: number;
-	/** The width and the height of the places of a colour, which stand as the places of the picture read as
-	 * pairs of rows. */
 	alignedWidth: number;
 	alignedHeight: number;
 }
@@ -68,20 +60,11 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `QntFormat.ReadMetaData`: the head of the file names the kind of the picture, which stands at two or less,
- * and the places of the picture: where it stands along its row and along its column, how wide and how tall it
- * stands, how many places a place of it stands in, and how many places the walked places of its colours and of
- * its transparency stand for.
- */
 export function readQntLayout(
 	data: Buffer,
 	fileLength = data.length,
 ): QntLayout | undefined {
 	if (fileLength < HEAD_SIZE || data.length < HEAD_SIZE) return undefined;
-	// The reference reads a picture of this kind only where the words it registers stand at the head of the
-	// file; this port reads the same words here so that a file the words do not stand at is turned away rather
-	// than read as a picture of this kind by whatever asks for one.
 	if (data.toString("latin1", 0, 3) !== "QNT") return undefined;
 	const version = data.readInt32LE(VERSION_FIELD);
 	if (version < 0 || version > MAXIMUM_VERSION) return undefined;
@@ -125,15 +108,6 @@ export function readQntLayout(
 	};
 }
 
-/**
- * `Reader..ctor` and `Reader.Unpack`: the places of a colour of the picture stand walked beside each other,
- * every place of a colour standing as the places of two rows of the picture — the place of the row that stands
- * before the other standing first — and the walked places of the transparency of the picture standing beside
- * them where the head of the picture names one. Every place the picture was walked from then stands beside the
- * places that stand before it: along the row that stands first it stands as the place before it beside the
- * place it stands at, and along every other row as the places above and before it beside the place it stands
- * at, and the first place of every row as the place above it beside the place it stands at.
- */
 export function unpackQnt(
 	first: Buffer,
 	second: Buffer | undefined,
@@ -205,8 +179,6 @@ export function unpackQnt(
 	return output;
 }
 
-/** The walk of the places of a picture, which turns away a walked part that stands as no part of a picture at
- * all rather than standing the words of the kind of file it stands in as an error of its own. */
 async function inflatePlaces(part: Buffer): Promise<Buffer> {
 	try {
 		return await inflateZlibBuffer(part);

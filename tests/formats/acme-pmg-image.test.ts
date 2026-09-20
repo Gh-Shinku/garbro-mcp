@@ -8,19 +8,12 @@ import {
 	unpackPmg,
 } from "../../packages/formats/src/acme/pmg-image.js";
 
-/** A picture of four places in one row: every one of the three places of a colour stands under a head of its
- * own, the first two of them naming a place of the walk of their own and the third naming a place of the walk
- * that stands before it, and the mask of the walk of a place of a colour carries from that place to the next.
- * The places of the picture stand worked out with a walk of the places of the reference's own, so the places of
- * the test stand under a walk this port did not work out. */
 const PICTURE = Buffer.from(
 	"0100000001000000010000000200000002000000c0011122" +
 		"0100000001000000010000000200000002000000c0013344" +
 		"0100000001000000010000000200000004000000c00155667788",
 	"hex",
 );
-/** What stands at the places of the picture: the three places of a colour stood one beside the other, the
- * places of the first place of a colour standing before those of the second and those before the third. */
 const PIXELS = Buffer.from("113355224466113377224488", "hex");
 
 async function extract(data: Buffer): Promise<Buffer> {

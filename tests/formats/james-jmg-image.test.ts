@@ -13,7 +13,6 @@ const HEADER_PASS_SIZE = 0x40;
 const PIXELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const BMP = writeBmp24(2, 2, Buffer.from(PIXELS));
 
-/** The obfuscation the reference reads back, which is the walk of the port turned around. */
 function obfuscate(bitmap: Buffer, method: JmgObfuscation): Buffer {
 	const out = Buffer.from(bitmap);
 	for (let position = 0; position + 1 < out.length; position += 2) {
@@ -58,8 +57,6 @@ describe("JAMES obfuscated bitmap", () => {
 		expect(obfuscate(BMP, "reverseBits").subarray(0, 2).toString("hex")).toBe(
 			"b242",
 		);
-		// Both words stand for the letters of a bitmap, and the walk of the port takes a picture back where
-		// the obfuscation of the reference left it.
 		expect(
 			deobfuscateJmg(Buffer.from([0xd4, 0x24]), "rotateWords").toString("hex"),
 		).toBe("424d");

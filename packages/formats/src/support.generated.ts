@@ -16,20 +16,9 @@ export const formatSupportCatalog = {
 			localId: "caramel-box-fcb-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the head of a picture",
-				"the places of the walk of a picture of the kind of the compression of the pictures of the engine",
-				"the places of the walk of a picture of the kind of the places of a picture of a picture of the engine",
-				"the places of the picture that stand as the places of the picture of the differences of them from the places of the picture beside them and of the places of the picture of the row above them",
-			],
+			supported: ["detect", "list", "extract", "the head of a picture"],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the words of the walk of the places of a picture that stand as the places of the picture of the differences of them of the kinds of the places of the picture of the count of them beyond the kind of the places of the picture of the three places of the picture",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -41,20 +30,9 @@ export const formatSupportCatalog = {
 			localId: "active-soft-ed8-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the head of a picture",
-				"the palette of a picture standing as the places of the picture of the words of a picture of the engine",
-				"the places of the picture that stand as the places of the walk of the picture of the count of them",
-				"the places of the picture that stand as the places of the picture of the walk of the picture of the places of the picture of the count of them",
-			],
+			supported: ["detect", "list", "extract", "the head of a picture"],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the kinds of the places of the picture of the walk of a picture that stand beside the places of the picture of the places of the picture of the two places of theirs beyond the kind of the place beside the place of the walk of the picture, of which there stand one and twenty and three against the fixtures of this project",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -66,20 +44,8 @@ export const formatSupportCatalog = {
 			localId: "active-soft-edt-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the head of a picture",
-				"the places of the picture that stand as the places of the picture of the words of the walk of them",
-				"the places of the picture that stand as the places of the picture of the places behind them",
-				"the places of the picture that stand from the places of the picture beside them",
-			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the indexed pictures of the same engine (the kind `ED8` of the class `Ed8Format`), which stand as the places of a picture of a palette of their own",
-			],
+			supported: ["detect", "list", "extract", "the head of a picture"],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -97,9 +63,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture of both kinds of the walk of its places",
-				"the places of a picture of a kind of the places of a palette of its own",
-				"the places of a picture of a kind of the places of a picture of its own",
-				"the runs of the places of a picture standing beside the places of the picture",
 				"a picture of a part of a picture standing within the picture",
 			],
 			unsupported: ["archive creation", "image encoding"],
@@ -120,14 +83,9 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture of both kinds of the walk of its places",
-				"the walk of the places of a picture whose places of the walk stand for places of the picture of their own",
-				"the walk of a picture of the engine standing behind the walk of the places of a picture",
 			],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the counts of the places of the walk of the count of its own of five and twenty places or more, and the places of the walk of a picture that stand further behind the place written than the places of a walk of the kind of the count of its own",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -144,15 +102,9 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the places of a picture as they stand",
-				"the places of a row standing padded to the places of four",
 				"pictures of sixteen, of four and twenty and of two and thirty places",
 			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the compressed pictures of the same engine (the kind `GR2/Pola` of the class `PolaFormat`), which stand walked rather than as the places of a picture stand",
-			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -170,10 +122,7 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture of both kinds of the walk of its places",
-				"the records of the places of a picture",
 				"the walk of a record of the third kind",
-				"the records of a picture of the second kind standing as streams of the places of a picture",
-				"the places of the four records standing beside each other",
 			],
 			unsupported: [
 				"archive creation",
@@ -197,8 +146,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"where a picture stands within a picture of the places of a picture",
-				"the walk of the four records of the places of a picture",
 				"the strips of eight places of a picture",
 				"the palette of the game a picture stands in",
 			],
@@ -224,7 +171,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the walk of the places of a picture",
 				"the palette of the game a picture stands in",
 				"the place of a palette within the table of palettes",
 				"the table of the kinds of the palettes of the engine",
@@ -251,10 +197,8 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the walk of the places of a picture through its instructions",
 				"the predictors of an instruction",
 				"the runs and the copies of places",
-				"the stream of the places behind the places of a picture",
 				"a picture of eight places walked as one place for every place of it",
 			],
 			unsupported: ["archive creation", "image encoding"],
@@ -275,7 +219,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the places of the picture handed out as they stand",
 				"the words that name where a picture stands within a picture of the game",
 			],
 			unsupported: ["archive creation", "image encoding", "picture decoding"],
@@ -296,8 +239,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the walks of the places of the first and fifth kinds of picture",
-				"the places of a picture of the kinds that stand as the places of a picture of the Purple engine within them",
 				"the words that name the picture a picture of the kinds that stand behind the words of the engine stands as",
 				"the picture the words of such a picture name, where it stands as a picture of the engine or a bitmap of the system",
 			],
@@ -319,18 +260,8 @@ export const formatSupportCatalog = {
 			localId: "sviu-jbp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the walk of the places of a picture of the Purple engine",
-				"the places of the colours of a picture",
-			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"pictures of the kinds of the engine that stand as companions of the places of the game",
-			],
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -343,17 +274,8 @@ export const formatSupportCatalog = {
 			localId: "ugos-txt-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"the words that name the places of a picture",
-				"the places of the tiles of a picture handed out as they stand",
-			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of a picture of the engine stood into a picture",
-			],
+			supported: ["detect", "list"],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -366,13 +288,7 @@ export const formatSupportCatalog = {
 			localId: "crowd-cwp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the head of a picture",
-				"the words of a portable network graphic stood around the places of a picture",
-			],
+			supported: ["detect", "list", "extract", "the head of a picture"],
 			unsupported: ["archive creation", "image encoding", "picture decoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -391,8 +307,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head of a picture",
-				"the places of a picture that stands as they stand",
-				"the walk of the places of a picture",
 				"the places that name how much of a place of a picture stands on the places beside it",
 			],
 			unsupported: [
@@ -412,14 +326,7 @@ export const formatSupportCatalog = {
 			localId: "sas5-war2",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the index of an archive",
-				"the words of a wave around the places of a sound of the first kind",
-				"the places of a sound of the Ogg kind",
-			],
+			supported: ["detect", "list", "extract", "the index of an archive"],
 			unsupported: [
 				"archive creation",
 				"audio encoding",
@@ -437,14 +344,7 @@ export const formatSupportCatalog = {
 			localId: "sas5-war",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the index of an archive",
-				"the words of a wave around the places of a sound of the first kind",
-				"the places of a sound of the Ogg kind",
-			],
+			supported: ["detect", "list", "extract", "the index of an archive"],
 			unsupported: [
 				"archive creation",
 				"audio encoding",
@@ -490,10 +390,7 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the three kinds of the places of a sound",
 				"a head that stands behind words of its own",
-				"the walk of the places of a sound",
-				"the places of a sound of the Ogg kind",
 			],
 			unsupported: ["archive creation", "audio encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
@@ -508,15 +405,7 @@ export const formatSupportCatalog = {
 			localId: "alicesoft-qnt-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the three heads of a picture",
-				"the walked places of the colours of a picture",
-				"the walked places of the transparency of a picture",
-				"the walk of the places of a picture",
-			],
+			supported: ["detect", "list", "extract", "the three heads of a picture"],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -535,7 +424,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the palette of a picture",
-				"the walk of the places of a picture",
 				"pictures of four and eight places a place",
 			],
 			unsupported: ["archive creation", "image encoding"],
@@ -556,8 +444,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the three places of a colour of a picture",
-				"the walks of the places of a colour",
-				"the places of the walk of a place of a colour that stand as places of their own",
 			],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
@@ -572,13 +458,7 @@ export const formatSupportCatalog = {
 			localId: "rpg-maker-rpgmvo-audio",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the places of the key the words of the engine name",
-				"the walk of the places of the key over the head of the file",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "audio encoding", "sound decoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -592,13 +472,7 @@ export const formatSupportCatalog = {
 			localId: "rpg-maker-rpgmvp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the places of the key the words of the engine name",
-				"the walk of the places of the key over the head of the file",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -641,7 +515,6 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the four kinds of the places of a sound",
 				"the walk of places of a sound of its own",
 				"the wave header of a sound of its own",
 			],
@@ -663,7 +536,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the walk of runs a sound stands as",
-				"the places of the colours of a sound",
 				"the places a place of a sound stands beside the place before it",
 			],
 			unsupported: ["archive creation", "audio encoding"],
@@ -684,8 +556,6 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the head that counts its own places as files",
-				"the walk of the files",
-				"the walk of the names",
 				"the walk of a key of its own",
 			],
 			unsupported: ["archive creation"],
@@ -701,14 +571,7 @@ export const formatSupportCatalog = {
 			localId: "rpg-maker-rgss-ad",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the walk of the files of the first kind",
-				"the walk of the files of the third kind",
-				"the walk of the keys of a file",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: [
 				"archive creation",
 				"archives of the kinds the reference does not read",
@@ -729,7 +592,6 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the walk of the names at the end of the file",
 				"the walk of places the key of a title stands as",
 			],
 			unsupported: [
@@ -768,13 +630,7 @@ export const formatSupportCatalog = {
 			localId: "unity-dsm-script",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the key and the places of a ciphered block the reference stands from its own words",
-				"the places of a text of the kind the script stands as",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "script re-encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -792,7 +648,6 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the four ways the steps of a row of a picture stand behind the places of the rows before it",
 				"the colours of a picture of eight bits",
 			],
 			unsupported: [
@@ -816,10 +671,7 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the walk of runs the places of a picture stand behind",
-				"the places of a picture that stand as they stand",
 				"the colours of a picture of eight bits",
-				"the shape of the places of a picture",
 			],
 			unsupported: [
 				"archive creation",
@@ -843,10 +695,7 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the walk of the LZSS kind the places of the picture stand behind",
-				"the places of the picture under the standard cipher",
 				"the colours of a picture of eight bits",
-				"the shape of the places of a picture of eight bits",
 			],
 			unsupported: [
 				"archive creation",
@@ -865,14 +714,7 @@ export const formatSupportCatalog = {
 			localId: "rugp-rha-audio",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the two ways the places of a sound stand",
-				"the places of a colour that do not stand in a step of a sound, which stand at nought or as the places of the highest kind",
-				"the places of a colour of a step that stand behind the places of the step",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "audio encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -886,19 +728,8 @@ export const formatSupportCatalog = {
 			localId: "gameres-wav-audio",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the head of a wave",
-				"the walk of the chunks of a wave, with the place that stands behind a chunk of an odd length",
-				"the places of a sound that stand as a sound of the Ogg kind or as the places of an MPEG Layer 3 sound",
-			],
-			unsupported: [
-				"archive creation",
-				"audio encoding",
-				"the places of a sound of the kinds that need turning, which the reference turns into places of a sound of the plain kind",
-			],
+			supported: ["detect", "list", "extract", "the head of a wave"],
+			unsupported: ["archive creation", "audio encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -917,7 +748,6 @@ export const formatSupportCatalog = {
 				"extract",
 				"the walk of a picture of eight bits",
 				"the walk of a picture of twenty four bits, one line each for the blue places of a colour, the green and the red",
-				"the shape of the places of a picture, which stands beside it as a picture of eight bits",
 			],
 			unsupported: [
 				"archive creation",
@@ -940,14 +770,12 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the two ways the places of a picture stand under their mask",
 				"places that stand as a portable network graphic and places that stand as a JPEG",
 				"the head of a picture of either kind",
 			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"the shape of the places, which stands as a picture of its own",
 				"the bottom-up standing of the second way, which the reference works on its own frame",
 			],
 			remainingVerification: ["real-game GARbro differential output"],
@@ -990,12 +818,7 @@ export const formatSupportCatalog = {
 			localId: "abel-cbf-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: [
-				"detect",
-				"list",
-				"extract",
-				"the shape of the places from a companion `.alp` file",
-			],
+			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -1466,10 +1289,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the walk of the places of the picture of the kind of the compression of the pictures of the engine of the places of the picture of the walk of them of a picture of more than one place of the picture, the places of the picture of the word of the walk of the picture standing across the places of the picture of the chunks of them",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18285,10 +18105,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["image decoding", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the kind of the places of the picture where the places of the picture of the walk of them of the picture of the places of the picture stand of the places of the picture of an odd count, the places of the picture of the walk of the places of the picture of the picture standing unaligned of the places of the picture of the word of the walk of the picture behind it",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18302,11 +18119,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of a picture that stands for more than one place of the picture of the walk of them of the picture of the places of the picture of the walk of them, the places of the picture of the word of the walk of the picture of the tables of the walk of the places of the picture standing across the places of the picture of the chunks of them",
-				"the places of the picture of the walk of the places of the picture of the runs of them that stand short of the places of the picture of the walk of them, the reference standing the places of the picture of the walk of the places of the picture beyond the places of the picture of the walk of them of the places of the picture of the walk of the picture of the places of the picture of their own, where a picture of this project turns the picture of the walk of the places of them away",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18320,11 +18133,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "audio encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of a sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the kinds of the walk of the places of the picture of the fixtures of this project (the kinds of the walk of the places of the picture of the places of the picture of the walk of them of the sound standing of the places of the picture of the walk of the places of the picture of the sound of their own)",
-				"the places of the picture of the walk of the places of the picture of a sound of more than one place of the picture of the walk of them, the places of the picture of the walk of the places of the picture of the picture of the walk of them standing across the places of the picture of the places of the picture of the walk of them",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18338,11 +18147,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "audio encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the kind of the walk of the places of the picture of the fixtures of this project (the places of the picture of the walk of them standing for the places of the picture of the walk of the places of the picture of the frequencies of the places of the picture behind them other than the places of the picture of the walk of the places of the picture of a picture of no places of the picture of the walk of them)",
-				"the places of the picture of the walk of the places of the picture of a sound of more than two places of the picture of a place of the picture of the walk of the places of the picture",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18356,10 +18161,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "archive rebuild"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the names of the places of the picture of the walk of them stand of the places of the picture of the walk of the places of the picture of the two kinds of the walk of the places of the picture of the places of the picture of the engine (the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of their own and of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture) stand of the places of the picture of the walk of the places of the picture of the fixtures of this project; and the places of the picture of the walk of the places of the picture of the names of the picture of the walk of them of the picture of the places of the picture of the walk of them of the engine of the kind of the pictures of the engine of Japan stand of no places of the picture of the walk of the places of the picture of the fixtures of this project",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18373,11 +18175,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "archive rebuild"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the sound of the walk of them of the places of the picture of the walk of the places of the picture of the engine of the kind of Malie of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the name `LIBP` (DatOpener), which stands the places of the picture of the walk of the places of the picture of the picture of the walk of them of its own of the places of the picture of the walk of the places of the picture of the kinds of the walk of the places of the picture of the engine, and stands of no places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of this kind",
-				"the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them that stand of the places of the picture of the walk of the places of the picture of their own of more than four and sixty places of the picture, the reference standing the places of the picture of the walk of them of no places of the picture of the walk of them",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18391,10 +18189,7 @@ export const formatSupportCatalog = {
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
 			unsupported: ["archive creation", "archive rebuild"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of a place of the picture of the walk of them stood out of the places of the picture of the walk of the places of the picture of the picture of the walk of them (IarImage), the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of their own standing beside the places of the picture of the walk of the places of the picture of the picture of the walk of them where the places of the picture of the walk of the places of the picture of the picture of the walk of them of the places of the picture of the walk of the places of them stand of the places of the picture of the walk of the places of the picture of the picture of the walk of them of their own (the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the picture of the walk of them standing of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them) — the places of the picture of the walk of the places of the picture of this project standing as they stand",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18407,15 +18202,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"audio encoding",
-				"the places of the picture of the walk of the places of the picture of the sound of the kind of the places of the picture of the walk of them",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of their own (the places of the picture of the walk of the places of the picture of the sound of the kind of the places of the picture of the walk of them stand beside the places of the picture of the walk of the places of the picture of the picture of the walk of the places of the picture of the sound of the engine, which stand outside the places of the picture of the walk of them of the sound), and the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of a picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of their own beyond the first",
-			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18428,16 +18216,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"archive rebuild",
-				"the kinds of the walk of the places of the picture of the words of the walk of the picture beyond the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of two places of the picture",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the places of the picture of the engine of the kinds of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the second kind (the word of the head of the picture of the walk of the places of the picture standing of the places of the picture of the walk of the places of the picture of the third kind of the places of the picture alone), which turn a picture of this project away as well",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the kinds of the places of the picture of the walk of them that stand beyond the kinds of the walk of the places of the picture of the fixtures of this project (the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them standing of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them), the reference standing the places of the picture of the walk of the places of the picture of the kinds of the places of the picture of the walk of them that stand of no places of the picture of the walk of the places of the picture of its own of no places of the picture of the walk of the places of the picture as well",
-			],
+			unsupported: ["archive creation", "archive rebuild"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18455,12 +18235,7 @@ export const formatSupportCatalog = {
 				"image encoding",
 				'the entropy methods other than Golomb (01 Gamma, 10 modified LZSS, 11 raw), which the reference itself refuses with "Unsupported entropy coding method"',
 			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a group of more than one line (a height over eight places of the picture) and a picture of more than one group, where the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of their own",
-				"the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture (the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the place of the picture of the walk of the places of the picture standing beside the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them, which stand of the places of the picture of the walk of the places of the picture of a picture of the kind of the places of the picture beside the places of the picture of the walk of the places of the picture)",
-				"the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture behind the places of the picture of the walk of the places of the picture of the book of the places of the picture, which a picture of this project stands of the places of the picture of the walk of the places of the picture of the last 512 places of the picture of the walk of the places of the picture of the picture of the kind of the places of the picture of the walk of the places of the picture where the reference stands them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18473,14 +18248,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"script writing",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine, which the reference stands of the places of the picture of the walk of the places of the picture of their own beside them",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine: the reference registers no places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the sound of their own, so the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine stand of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the reference of the places of the picture of the walk of the places of the picture of the picture of the kind of the places of the picture of the walk of them",
-			],
+			unsupported: ["script writing"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18493,14 +18262,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"sound writing",
-				"the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the engine, which stand outside the places of the picture of the walk of the places of the picture of this project",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the fifth kind stand behind the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture (`OGGFixCrc`) of the reference, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and stands the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound in the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them",
-			],
+			unsupported: ["sound writing"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18513,14 +18276,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"script writing",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture of the script, which the reference stands of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture beside the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the words of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture of the script, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine inside the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them",
-			],
+			unsupported: ["script writing"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18533,14 +18290,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"the places of the picture of the walk of the places of the picture of the walk of the places of the picture of the kinds of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own, which stand of the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture outside the places of the picture of the walk of the places of the picture of this project",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the reference of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own behind the places of the picture of the walk of the places of the picture of the fourth kind, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of every place of the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the sound stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture",
-			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18553,15 +18304,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture, which the reference stands of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the place of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture stand of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sixth and of the fourth places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture, which stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture outside the places of the picture of the walk of the places of the picture of this project, so the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind stand of the places of the picture of the walk of the places of the picture of the same kind of the places of the picture of the walk of the places of the picture of their own alone",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture inside the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture (the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture) stand of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of their own only",
-			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -18574,15 +18318,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the second kind of the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them, which stands of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of their own",
-			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the fourth and of the sixth places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture, which stands of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture",
-				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture inside the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture, standing of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture, of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of their own",
-			],
+			unsupported: ["archive creation"],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {

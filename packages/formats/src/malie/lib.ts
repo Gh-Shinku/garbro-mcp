@@ -14,26 +14,13 @@ import {
 	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
 
-/** 'LIB\0' — the word every picture of the places of the picture of the engine of the kind of Malie stands
- * of. */
 const LIB_SIGNATURE = 0x0042494c;
 const HEADER_SIZE = 0x10;
 const COUNT_OFFSET = 8;
-/** The places of the picture of every place of the picture of the walk of the places of the picture stand of
- * two and forty places of the picture. */
 const RECORD_SIZE = 0x30;
-/** The places of the picture of the name of the place of the picture of the walk of them stand of six and
- * thirty places of the picture. */
 const NAME_SIZE = 0x24;
 const SIZE_OFFSET = 0x24;
 const OFFSET_OFFSET = 0x28;
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of them stand beside the places of the picture of the walk of the places of the picture of the name of the
- * picture of the walk of it of their own. The reference stands the places of the picture of the walk of the
- * places of the picture of the places of the picture of their own of no places of the picture of the walk of
- * them, so a picture of the places of the picture of the walk of them that stands for its own places of the
- * picture stands of the places of the picture of the walk of the places of the picture of the walk of them of
- * its own of the places of the picture of their own. */
 const MAX_DEPTH = 64;
 const LIMIT = 1_000_000;
 
@@ -47,18 +34,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `Reader.ReadIndex`: the places of the picture of the walk of the places of the picture of the engine of
- * the kind of Malie. The places of the picture of the walk of them of a place of the picture of the walk of
- * the places of the picture stand of the places of the picture of the name of the picture of the walk of it,
- * of the places of the picture of the walk of the places of the picture of the place of the picture of the
- * walk of them, and of the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them — and a place of the picture of the walk of the places of the picture that
- * stands of no places of the picture of the walk of the places of the picture of the name of the picture of
- * the walk of it stands for the places of the picture of the walk of the places of the picture of the places
- * of the picture of the walk of them where it stands for the places of the picture of the walk of the places
- * of the picture of its own.
- */
 function readIndexOfPlaces(
 	data: Buffer,
 	baseOffset: number,
@@ -89,12 +64,6 @@ function readIndexOfPlaces(
 		const path = normalizeEntryPath(
 			root.length > 0 ? `${root}/${name}` : name,
 		).path;
-		// The reference stands the places of the picture of the walk of the places of the picture of a place
-		// of the picture of the walk of them that stands of no places of the picture of the walk of the places
-		// of the picture of the name of its own beside the places of the picture of the walk of the places of
-		// the picture of the name of the picture of the walk of it, so the places of the picture of the walk
-		// of them of the places of the picture of the walk of the places of the picture of their own stand
-		// beside them.
 		if (
 			!hasExtension &&
 			readIndexOfPlaces(data, offset, entrySize, path, dir, depth + 1)
@@ -109,8 +78,6 @@ function readIndexOfPlaces(
 	return true;
 }
 
-/** `LibOpener.TryOpen`: the places of the picture of the walk of the places of the picture of the engine of
- * the kind of Malie. */
 export function readMalieLibIndex(data: Buffer): MalieLibEntry[] | undefined {
 	const dir: MalieLibEntry[] = [];
 	if (!readIndexOfPlaces(data, 0, data.length, "", dir, 0)) return undefined;

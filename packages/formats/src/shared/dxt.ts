@@ -34,12 +34,6 @@ function readDxt1Color(
 	colour[idx + 3] = 0xff;
 }
 
-/**
- * `DecompressDXT1Block`: the two colours of the block and then, where the second of them stands above the
- * first, two places of interpolation between them, or, where it does not, one place of interpolation and a
- * fourth colour of nought that lets the pixels see through — the walk of the kind of picture that carries
- * alpha in the first kind of block. Every pixel takes one of the four by two places of the word behind them.
- */
 export function decompressDxt1Block(
 	input: Buffer,
 	src: number,
@@ -87,10 +81,6 @@ function interpolate(colour: Uint8Array, hasAlpha: boolean): void {
 	}
 }
 
-/**
- * The pixels of a block: two places of the word every one of them takes, and, where the block carries a walk
- * of alpha of its own, the alpha that walk gives the pixel.
- */
 function drawBlock(
 	input: Buffer,
 	mapAt: number,

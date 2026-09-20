@@ -1,9 +1,3 @@
-// Format reference: GARbro "Legacy/Grocer/ImagePIC.cs", classes `PicFormat` and `PicReader` (a Grocer
-// picture: four planes walked a row at a time into a buffer that also holds the rows behind, where a step of
-// the walk may take its bytes from the row at hand or from the rows behind, and the places of the four planes
-// then stand together in every colour of the picture). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -55,11 +49,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PicFormat.ReadMetaData`: the word `Actor98` stands at `0x10` of the head, the width of the picture stands
- * in the places of the bits at `0x53` — eight places for every byte — and its height stands at `0x55`. A
- * picture of more than six hundred and forty places of width is turned away.
- */
 export function readGrocerPicLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -121,16 +110,6 @@ function copyWithinBuffer(
 	buffer.copyWithin(target, source, source + count);
 }
 
-/**
- * `PicReader.Unpack`: a row of the picture is walked four planes at a time, and every step of the walk gives a
- * byte, or a count of bytes, of a plane of that row. A byte above nought and below six names a step that
- * takes its bytes from elsewhere: one byte to stand for all of them, the plane of the rows behind, the first
- * plane of the row at hand, or the plane behind or the one behind that of the row at hand. A byte of six
- * stands in front of the byte it gives, and any other byte stands for itself. The places of the four planes
- * of a row then stand together in every colour of the picture — the first plane in the lowest place of a
- * colour and the fourth in the highest — and the rows behind shift along so that the walk of the next row
- * finds them.
- */
 export function decodePic(data: Buffer, layout: GrocerPicLayout): Buffer {
 	const pixels: Buffer = Buffer.alloc(layout.width * layout.height, 0x00);
 	const buffer = new Uint8Array(BUFFER_SIZE);

@@ -5,7 +5,6 @@ Reference: `GARbro/Legacy/AyPio/AudioVOC.cs`, classes `VocAudio` and `VocDecoder
 
 Implementation: `packages/formats/src/aypio/voc-audio.ts` (`aypioVocAudioDescriptor`,
 `aypioVocAudioFormat`, id `aypio-voc-audio`, `readVocLayout`, `buildVocSamples`, `decodeVoc`), with the steps
-of the walk of the reference (`StepTable`, `IndexTable`) and the wave writer of
 `packages/formats/src/shared/wav.ts`.
 
 The reference registers the word `WAV\x81` and no name at all.
@@ -26,8 +25,6 @@ What is handed out is a wave file: the shape of the head written around the samp
 
 The steps of the walk are worked out for every place of a sample. There are eighty nine steps, the values of
 `StepTable`, and a sample of `b` places of a step gives `b` values: the value of a place is the sum, over the
-parts of the step table — the places of a sample halved again and again, down to one — of the part of the step
-which stands wherever the places of the sample that stand below that part say so. The values of a step are
 held together, one step after another.
 
 ## The walk of the sound
@@ -55,7 +52,6 @@ nibble, held between the first and the eighty ninth step.
   throws. A sound of fewer than two samples cannot hold the first sample the head names; the port leaves it
   out, where the reference writes beyond its own array.
 - The reference reads the shape of the sound and the wave writer writes the very shape the head carries,
-  including the bits of a sample the head names behind the word `fmt `, which is not the byte the walk of the
   sound is worked out with.
 
 ## Tests

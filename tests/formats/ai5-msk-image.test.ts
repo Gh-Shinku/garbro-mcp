@@ -154,8 +154,6 @@ describe("Ai5 engine image mask (MSK/AI5)", () => {
 		expect(bmp.readUInt16LE(28)).toBe(8);
 		expect(bmp.readUInt32LE(46)).toBe(0x100);
 		expect(bmp.readInt32LE(22)).toBe(1);
-		// A bitmap of this kind carries a palette of two hundred and fifty six levels of grey, so the fifth
-		// entry of it is the fifth level.
 		expect(
 			bmp.subarray(BMP_HEADER_SIZE + 5 * 4, BMP_HEADER_SIZE + 5 * 4 + 4),
 		).toEqual(Buffer.from([5, 5, 5, 0x00]));

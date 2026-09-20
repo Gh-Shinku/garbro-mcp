@@ -1,11 +1,3 @@
-// Format reference: GARbro "ArcFormats/RenPy/ArcRPA.cs", classes `RpaOpener`, `RpaEntry`, `RpaOptions` and
-// `Pickle` (the places of the picture of the walk of the places of the picture of the engine of the kind of
-// Ren'Py, whose places of the picture of the walk of the places of the picture stand of the places of the
-// picture of the walk of the places of the picture of a picture of the words of the walk of the places of the
-// picture of the kind of the places of the picture of the walk of them of the places of the picture of the
-// walk of the places of the picture of its own). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import type {
@@ -20,9 +12,6 @@ import {
 	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
 
-/** The places of the picture of the word of the walk of the places of the picture of the head of a picture of
- * the places of the picture of the engine of the kind of Ren'Py, and the places of the picture of its own
- * behind them. */
 const RPA_MARK = Buffer.from("RPA-", "latin1");
 const VERSION_WORD = 0x20302e33;
 const INDEX_PLACES = 8;
@@ -32,12 +21,6 @@ const KEY_SIZE = 8;
 const MOST_PROTOCOL = 2;
 const LONG_PLACES = 8;
 const LEAST_TUPLE = 2;
-/** The places of the picture of the walk of the places of the picture of a place of the picture of the walk
- * of them that stand of the places of the picture of the walk of the places of the picture of the place of
- * the picture of the walk of them and of the places of the picture of the walk of the places of the picture
- * of the place of the picture of the walk of them of their own stand of the places of the picture of the walk
- * of the places of the picture of the place of the picture of the walk of them that stand before the places
- * of the picture of the walk of the places of the picture of the place of the picture of the walk of them. */
 const PLAIN_TUPLE = 2;
 const OFFSET_IN_TUPLE = 0;
 const SIZE_IN_TUPLE = 1;
@@ -45,8 +28,6 @@ const HEAD_IN_TUPLE = 2;
 const LIMIT = 1_000_000;
 const BYTE_LIMIT = 4 * 1024 * 1024 * 1024;
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the
- * picture of the kind of the places of the picture of the walk of them. */
 const PROTO = 0x80;
 const TUPLE2 = 0x86;
 const TUPLE3 = 0x87;
@@ -76,8 +57,6 @@ export interface RpaPlace {
 	path: string;
 	offset: number;
 	size: number;
-	/** The places of the picture of the walk of the places of the picture that stand before the places of the
-	 * picture of the walk of the places of the picture of the place of the picture of the walk of them. */
 	head: Buffer;
 }
 
@@ -85,12 +64,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The places of the picture of the walk of the places of the picture of the walk of them of the places of
- * the picture of the words of the walk of the picture: the places of the picture of the walk of the places of
- * the picture stand of the places of the picture of the walk of the places of the picture of the word of the
- * walk of them, the places of the picture of the walk of the places of the picture of the places of the
- * picture standing of the places of the picture of the walk of them of the places of the picture of their own
- * where they stand of the places of the picture of the walk of the places of the picture of its own. */
 class PickleReader {
 	private readonly stack: unknown[] = [];
 	private readonly marks: number[] = [];
@@ -115,9 +88,6 @@ class PickleReader {
 		return value;
 	}
 
-	/** The places of the picture of the walk of the places of the picture of the sound of the places of the
-	 * picture of the walk of them that stand as the places of the picture of a word of the walk of the places
-	 * of the picture of their own. */
 	private readLong(count: number): bigint {
 		if (count <= 0) return 0n;
 		if (count > LONG_PLACES)
@@ -141,10 +111,6 @@ class PickleReader {
 		this.stack.push(value);
 	}
 
-	/** The places of the picture of the walk of the places of the picture of the places of the picture of the
-	 * walk of them, of the places of the picture of the walk of the places of the picture of the place of the
-	 * picture of the walk of them, of the places of the picture of the walk of the places of the picture of
-	 * the walk of them. */
 	private popToPlaces(mark: number): unknown[] {
 		const slice = this.stack.slice(mark);
 		this.stack.length = mark;
@@ -176,8 +142,6 @@ class PickleReader {
 		this.push(tuple);
 	}
 
-	/** `Pickle.Load`: the places of the picture of the walk of the places of the picture of the picture of the
-	 * words of the walk of the places of the picture. */
 	load(): unknown {
 		for (;;) {
 			const symbol = this.readByte();
@@ -293,10 +257,6 @@ class PickleReader {
 				continue;
 			}
 			if (symbol === APPEND) {
-				// The reference stands the places of the picture of the walk of the places of the picture of
-				// the places of the picture of the walk of them that stand beside the places of the picture of
-				// the walk of the places of the picture of the walk of them of the places of the picture of
-				// the walk of the places of the picture of their own.
 				const start = this.stack.length - 1;
 				if (start <= 0)
 					throw invalidArchive(
@@ -336,15 +296,6 @@ class PickleReader {
 	}
 }
 
-/**
- * `RpaOpener.TryOpen`: the places of the picture of the walk of the places of the picture of the engine of the
- * kind of Ren'Py. The words of the head of the picture of the walk of the places of the picture stand of the
- * places of the picture of the walk of the places of the picture of the places of the picture of the walk of
- * them of their own, the places of the picture of the walk of the places of the picture of the walk of them
- * standing of the places of the picture of the walk of the places of the picture of the places of the picture
- * of the walk of the places of the picture of the words of the walk of the picture of the kind of the places
- * of the picture of the walk of them.
- */
 export async function readRpaIndex(
 	data: Buffer,
 	fileLength = data.length,
@@ -369,10 +320,6 @@ export async function readRpaIndex(
 	)
 		return undefined;
 	const key = Number.parseInt(keyText, 16);
-	// The reference stands the places of the picture of the walk of the places of the picture of the words of
-	// the walk of the picture out of the places of the picture of the walk of the places of the picture of the
-	// picture of the walk of them that stand of the kind of the places of the picture of the walk of the place
-	// of the picture of the walk of them.
 	let packed: Uint8Array;
 	try {
 		packed = await inflateZlibBuffer(data.subarray(indexOffset));
@@ -475,10 +422,6 @@ export const renpyRpaFormat: ArchiveFormat = defineFixedArchive({
 			throw invalidArchive(
 				"No places of the picture of the walk of the places of the picture",
 			);
-		// The reference stands the places of the picture of the walk of the places of the picture that stand
-		// before the places of the picture of the walk of the places of the picture of the place of the picture
-		// of the walk of them beside the places of the picture of the walk of the places of the picture of the
-		// place of the picture of the walk of them of their own.
 		return Readable.from([
 			Buffer.concat([
 				place.head,

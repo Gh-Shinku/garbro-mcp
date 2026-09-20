@@ -1,16 +1,3 @@
-// Reference: GARbro "ArcFormats/Liar/ArcXFL.cs", the class `GscFormat` and the places of the picture of the
-// walk of the places of the picture of the script of the places of the picture of the walk of the places of the
-// picture of the sound (`GscScriptData`). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-//
-// The reference stands the places of the picture of the walk of the places of the picture of the sound of the
-// places of the picture of the walk of the places of the picture of this kind under the places of the picture
-// of the walk of the places of the picture of the places of the picture of the walk of the places of the
-// picture (`//[Export(typeof(ScriptFormat))]`), so the engine of the reference never stands them of the places
-// of the picture of the walk of the places of the picture of their own; the walk of the places of the picture
-// of the words of the walk of the picture stands of the places of the picture of the walk of the places of the
-// picture of the sound of the places of the picture of the walk of the places of the picture, and a picture of
-// this project stands them of the places of the picture of the walk of the places of the picture of the places
-// of the picture of their own.
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -25,30 +12,18 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of the head of a script of this kind: of the places of the picture of the walk of the places of
- * the picture of the kind of the places of the picture of the walk of them, and of the places of the picture
- * of the walk of the places of the picture of the place of the picture of the walk of them. */
 const HEAD_SIZE = 0x14;
 const MOST_HEAD = 0x24;
 const CODE_SIZE_AT = 0x08;
 const TEXT_INDEX_SIZE_AT = 0x0c;
 const TEXT_SIZE_AT = 0x10;
 const WORD = 4;
-/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
- * of them of the places of the picture of the walk of the places of the picture of the script of this kind
- * stand as a text of the places of the picture of the walk of the places of the picture of the place of the
- * picture of the walk of them of the engine. */
 const CP932 = new TextDecoder("shift_jis");
 
 function invalidScript(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of a script of this kind. */
 export interface GscLayout {
 	headerSize: number;
 	codeSize: number;
@@ -61,20 +36,8 @@ export interface GscLayout {
 	code: Buffer;
 }
 
-/**
- * `GscFormat.Read` up to the places of the picture of the walk of the places of the picture of the text: the
- * reference stands the places of the picture of the walk of the places of the picture of the kind of the places
- * of the picture of the walk of them of the places of the picture of the walk of the places of the picture of
- * the picture of this kind from the words of the head, and turns the places of the picture of the walk of the
- * places of the picture of their own away where they stand of the places of the picture of the walk of the
- * places of the picture of the kind of the places of the picture of the walk of them of the places of the
- * picture of their own.
- */
 export function readGscLayout(data: Buffer): GscLayout | undefined {
 	if (data.length < HEAD_SIZE) return undefined;
-	// The reference stands the first word of a script of this kind beside the words of how long the places of
-	// the picture of the walk of the places of the picture of the picture of this kind stand, so a script of
-	// another kind stands of the places of the picture of the walk of the places of the picture of their own.
 	if (data.readUInt32LE(0) !== data.length) return undefined;
 	const headerSize = data.readUInt32LE(4);
 	if (headerSize > MOST_HEAD || headerSize < HEAD_SIZE) return undefined;
@@ -86,14 +49,6 @@ export function readGscLayout(data: Buffer): GscLayout | undefined {
 	if (codeAt + codeSize > data.length) return undefined;
 	const indexAt = codeAt + codeSize;
 	if (indexAt + textIndexSize > data.length) return undefined;
-	// The reference stands the places of the picture of the walk of the places of the picture of the kind of
-	// the places of the picture of the walk of them of the places of the picture of the walk of the places of
-	// the picture of the text in four places of the picture of the walk of the places of the picture of the
-	// words of the walk of the picture of the places of the picture of the walk of them, so the places of the
-	// picture of the walk of the places of the picture of the place of the picture of the walk of them that
-	// stand behind the places of the picture of the walk of the places of the picture of the kind of the places
-	// of the picture of the walk of them of the places of the picture of the walk of the places of the picture
-	// of the sound stand of no places of the picture of the walk of the places of the picture of their own.
 	const count = Math.floor(textIndexSize / WORD);
 	const index: number[] = [];
 	for (let i = 0; i < count; i += 1) {
@@ -116,18 +71,6 @@ export function readGscLayout(data: Buffer): GscLayout | undefined {
 	};
 }
 
-/**
- * The places of the picture of the walk of the places of the picture of the text of a script of this kind: the
- * reference stands a text of the places of the picture of the walk of the places of the picture of the place of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of them of the engine at the places of the picture of the walk
- * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
- * the picture of the places of the picture of the walk of them of the places of the picture of the walk of the
- * places of the picture of the text, and stands them of the places of the picture of the walk of the places of
- * the picture of the sound of the places of the picture of the walk of the places of the picture of the place
- * of the picture of the walk of them of the places of the picture of the walk of the places of the picture of
- * no places of their own.
- */
 export function readGscLines(data: Buffer, layout: GscLayout): string[] {
 	const lines: string[] = [];
 	for (const start of layout.index) {
@@ -139,11 +82,6 @@ export function readGscLines(data: Buffer, layout: GscLayout): string[] {
 	return lines;
 }
 
-/** The places of the picture of the walk of the places of the picture of the text of a script of this kind
- * stand of the places of the picture of the walk of the places of the picture of the place of the picture of
- * the walk of them of the places of the picture of the walk of the places of the picture of the kind of the
- * places of the picture of the walk of them of the places of the picture of the walk of the places of the
- * picture of the sound of the places of the picture of the walk of the places of the picture of their own. */
 export function unpackGscScript(data: Buffer): string {
 	const layout = readGscLayout(data);
 	if (!layout) throw invalidScript("Not a script of this kind");
@@ -173,12 +111,6 @@ export const gscDescriptor: FormatDescriptor = {
 
 export const gscFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: gscDescriptor,
-	// The reference registers no word of its own for a script of this kind, and stands no places of the picture
-	// of the walk of the places of the picture of the kind of the places of the picture of the walk of them of
-	// the places of the picture of the walk of the places of the picture of the picture of their own, so a
-	// picture of this project stands them of the places of the picture of the walk of the places of the picture
-	// of the last places of the picture of the walk of the places of the picture of the picture of the kind of
-	// the places of the picture of the walk of them.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
@@ -202,12 +134,6 @@ export const gscFormat: ArchiveFormat = defineFixedArchive({
 				compressed: true,
 				metadata: { type: "script" } as Record<string, unknown>,
 			}),
-			// The places of the picture of the walk of the places of the picture of the text of a script of this
-			// kind stand of the places of the picture of the walk of the places of the picture of the kind of the
-			// places of the picture of the walk of them of the places of the picture of the walk of the places of
-			// the picture of the sound of the places of the picture of the walk of the places of the picture of
-			// their own, so how many of them stand there is not known before they stand of the places of the
-			// picture of the walk of the places of the picture of the place of the picture of the walk of them.
 			sizeKnown: false,
 		};
 		return {

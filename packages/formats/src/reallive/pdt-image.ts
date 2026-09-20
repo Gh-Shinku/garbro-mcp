@@ -168,11 +168,6 @@ function unpackBytes(stream: PdtStream, output: Buffer): void {
 	}
 }
 
-/**
- * The reference's `PdtReader.LzUnpack`: the stream a version one picture stores its pixels in. The places
- * its runs count back from are not distances but places of their own, out of the table in the header, and a
- * run that names a place the picture has not reached yet leaves the bytes between them at zero.
- */
 function unpackLz(stream: PdtStream, output: Buffer, offsets: number[]): void {
 	let at = 0;
 	let bits = 0;

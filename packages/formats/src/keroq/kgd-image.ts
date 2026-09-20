@@ -92,11 +92,6 @@ export function readKgdLayout(
 	};
 }
 
-/**
- * `Adler32.Compute`, the checksum the reference stands behind the chunks it puts back together — the
- * checksum of the compressed stream of a picture of this kind rather than the one the kind itself asks for,
- * which is what the reference writes and what a decoder of the kind that does not look at it accepts.
- */
 export function adler32(
 	data: Buffer,
 	offset = 0,

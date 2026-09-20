@@ -8,15 +8,11 @@ import {
 	unpackQnt,
 } from "../../packages/formats/src/alicesoft/qnt-image.js";
 
-/** A picture of four places in two rows and three places of a colour a place. The walked places of the picture
- * stand worked out with a walk of the places of the reference's own, so the places of the test stand under a
- * walk this port did not work out. */
 const THREE = Buffer.from(
 	"514e5400000000000100000002000000020000000200000018000000000000001100000000000000000000" +
 		"0000000000789ce33af2e8b20810cb0131002df107a8",
 	"hex",
 );
-/** What stands at the places of that picture. */
 const THREE_PIXELS = Buffer.from([
 	10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,
 ]);
@@ -26,7 +22,6 @@ const FOUR = Buffer.from(
 		"0000000000789ce33af2e8b20810cb0131002df107a8789c3bf1edcd470008cf039c",
 	"hex",
 );
-/** What stands at the places of that picture. */
 const FOUR_PIXELS = Buffer.from([
 	10, 20, 30, 200, 40, 50, 60, 210, 70, 80, 90, 220, 100, 110, 120, 230,
 ]);
@@ -37,7 +32,6 @@ const ODD = Buffer.from(
 		"0000000000789c6364f80b840c0c4c509a194a03004d7e05f5",
 	"hex",
 );
-/** What stands at the places of that picture. */
 const ODD_PIXELS = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 /** The places of a bitmap of the picture, every row of it standing in as many places as a bitmap of its kind
@@ -129,8 +123,6 @@ describe("AliceSoft System image format", () => {
 	});
 
 	it("reads the head of a picture of the other kinds", async () => {
-		// The kinds of the head that stand behind the first one name the words of the head behind a size of
-		// their own; the places of the picture of the test stand where the first kind names them.
 		const data = Buffer.from(THREE);
 		data.writeInt32LE(2, 4);
 		data.writeInt32LE(0x30, 8);

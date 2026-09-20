@@ -1,8 +1,3 @@
-// Format reference: GARbro "Legacy/AyPio/ImagePDT.cs", classes `PdtFormat`, `PdtMetaData` and `Pdt4Reader`
-// (a UK2 engine picture of four bits: its colours stand in sixteen words of the head, its four planes stand
-// one behind the other and are walked in pairs of rows, and the places of the four planes stand together in
-// every byte of the picture). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -25,7 +20,6 @@ const SIGNATURE_BYTE = 0x34;
 /** The bytes that name the two walks of a plane. */
 const RLE_1_FIELD = 0x21;
 const RLE_2_FIELD = 0x22;
-/** The places of the picture: how far its left edge and its top edge stand from nought. */
 const LEFT_FIELD = 0x23;
 const TOP_FIELD = 0x25;
 const RIGHT_FIELD = 0x27;
@@ -53,12 +47,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `PdtFormat.ReadMetaData`: the first byte of the file is thirty four; the two bytes at `0x21` name the walks
- * of a plane and the four words behind them name the left, the top, the right and the bottom of the picture.
- * The width of the picture stands in the places of the bits between its left and its right edge — eight
- * places for every byte — and the height in the pairs of rows between its top and its bottom edge.
- */
 export function readPdt4Layout(
 	data: Buffer,
 	fileLength = data.length,
@@ -159,12 +147,6 @@ function readPdtByte(data: Buffer, cursor: { position: number }): number {
 	return value;
 }
 
-/**
- * `Pdt4Reader.FlattenPlanes`: the places of the four planes stand together in every byte of the picture — the
- * byte of the first plane in the highest place of a colour, the second plane behind it and so on — and every
- * byte of a plane carries the colours of eight places of a row, two colours of four places standing in every
- * byte of the picture.
- */
 export function flattenPdtPlanes(planes: Buffer[]): Buffer {
 	const size = planes[0]?.length ?? 0;
 	const output = Buffer.alloc(size * 4, 0x00);

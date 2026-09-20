@@ -16,9 +16,6 @@ const FILE_0 = Buffer.from("000102030405060708090a0b0c0d0e0f10", "hex");
 const FILE_1 = Buffer.from("202122232425262728292a2b2c2d2e2f", "hex");
 const NAMES = ["Scripts/Map001.rvdata2", "Graphics/Icon.png"];
 
-/** An RPG Maker engine archive of the first kind: the walk of the files stands between the places of the
- * files, every place of the walk and of the files standing under a walk of keys of its own. The archive stands
- * worked out with a walk of the key of its own, so its places stand under a walk this port did not work out. */
 const V1 = Buffer.from(
 	"5247535341440001e8caaddea6d58f87f5d2fef158f76dfe95b783cc43125cdaa454dc61" +
 		"cd689ead9fde51bd49085e03246051454ce19e8fac9ddd12243cfe8d2f8e0d5a7f1e01" +
@@ -58,7 +55,6 @@ describe("RPG Maker engine resource archive", () => {
 		expect(decryptRgssPlaces(encryptRgssPlaces(places, seed), seed)).toEqual(
 			places,
 		);
-		// Every four places of a file stand under one key, the places of the key standing one by one.
 		expect([...decryptRgssPlaces(Buffer.alloc(4, 0x00), seed)]).toEqual([
 			0x78, 0x56, 0x34, 0x12,
 		]);

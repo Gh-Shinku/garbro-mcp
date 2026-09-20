@@ -19,9 +19,7 @@ word whose lowest byte says its kind and whose places above it say how much it w
 * the third is a run of pixels that stands as it is and is then written again as many times as the lowest byte
   of the count says — the count holding the length of the run above it — until the step is whole;
 * the fourth is a run of pixels copied from behind the one being written, as far behind as the three lowest
-  places of the count say and as long as the places above them say;
 * the fifth is nothing at all: as many pixels of the file are passed over as the count says, less a quarter of
-  them, and the step is as long as the count says. The count of this kind stands in the **second** byte of the
   places above the kind, which is what the reference's own double shift reads.
 
 A copy reads forward byte by byte, so a run may read the pixels it has just written.

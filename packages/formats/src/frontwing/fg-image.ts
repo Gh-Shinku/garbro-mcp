@@ -288,8 +288,6 @@ export const frontWingFweiImageFormat: ArchiveFormat = defineFixedArchive({
 			if (!header.subarray(0, FWEI_SIGNATURE.length).equals(FWEI_SIGNATURE)) {
 				return false;
 			}
-			// The reference refuses a picture of this kind without the companion it names, and so does this
-			// port: there is nothing to read without it.
 			const fge = await readFge(sourcePath);
 			return fge !== undefined && fge.length === FGE_SIZE;
 		} catch {

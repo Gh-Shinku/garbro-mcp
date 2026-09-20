@@ -8,14 +8,10 @@ import {
 	readPxLayout,
 } from "../../packages/formats/src/ivory/px-audio.js";
 
-/** A sound of the plain kind: the head and then the places of the sound as they stand. */
 const PLAIN = Buffer.from(
 	"6354524b280000000000000024000000000000002256000000000100080000000000000001020304",
 	"hex",
 );
-/** A sound walked of its own: the head and then the places of the walk, which stand five places of a colour.
- * The places of the walk stand worked out with a walk of the places of the reference's own, so the places of
- * the test stand under a walk this port did not work out. */
 const WALKED = Buffer.from(
 	"6354524b29000000000000002400000005000000225600000000010010000200000000004020192f00",
 	"hex",

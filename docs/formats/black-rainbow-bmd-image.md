@@ -13,7 +13,6 @@ pixel whatever that word says; the reference hands out a picture of `Bgra32` or 
 writes both of them as a bitmap of thirty two bits, so the difference is only what the fourth byte means.
 
 The pixels stand behind the head as the walk of `LzssReader` gives them, and that is the walk the shared codec
-of this project already carries: a window of four thousand and ninety six bytes standing at `0xFEE`, every
 control byte holding eight steps, its **lowest place first** — a step whose place stands is a byte of the
 picture, and a step whose place does not is a pair of bytes: the two lower places of how far behind the byte
 being written the run begins stand in the first of them and the four places above them in the second, with the
@@ -24,7 +23,6 @@ What the walk does not give stands as nought, which is what the reference's own 
 where the bytes it was told about run out and the picture behind them is left as it was allocated.
 
 The picture is handed out **top down**, which is what `ImageData.Create` means. The reference can also write
-this kind of picture; the port reads it only, since archive and picture creation is out of this project's
 scope.
 
 Deviations from the reference, in the message only: a picture with nothing for a width or a height and a walk

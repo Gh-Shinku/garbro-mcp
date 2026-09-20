@@ -11,11 +11,6 @@ import {
 const HEAD_SIZE = 0x11;
 const ALPHA_HEAD_SIZE = 0x1d;
 
-/** The places of the picture of the walk of the places of the picture: the places of the picture of the
- * walk of them stand of the places of the picture of a word of the walk of the places of the picture, the
- * places of the picture of the walk of the places of the picture standing of the places of the picture of
- * the walk of the places of the picture of the place of the picture of the walk of them behind the places of
- * the picture of the walk of the places of the picture of the place of the picture of the walk of them. */
 function packBits(bits: number[]): Buffer {
 	const words = Math.ceil(bits.length / 32);
 	const out = Buffer.alloc(words * 4);
@@ -28,11 +23,6 @@ function packBits(bits: number[]): Buffer {
 	return out;
 }
 
-/** The places of the picture of the words of the walk of the places of the picture of the walk of the places
- * of the picture of a picture of their own: the places of the picture of the walk of them stand of the
- * places of the picture of the walk of the places of the picture of the place of the picture of the walk of
- * them of the places of the picture of their own, and the places of the picture of the walk of the places of
- * the picture behind them of their own. */
 function valueBits(value: number): number[] {
 	let count = 0;
 	while (1 << (count + 1) <= value) count += 1;
@@ -154,13 +144,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("reads the places of a picture of the walk of the places of the picture of the pictures of the engine", () => {
-		// The places of the walk of the places of the picture of a picture of the run stand of the places of
-		// the picture of no places of their own, so a picture of the places of the picture of the walk of the
-		// places of the picture of a picture of their own stands of the places of the picture of no places of
-		// the picture of the walk of them.
-		// The places of the walk of the places of the picture: the places of the picture of the walk of the
-		// places of the picture of the picture of their own, and the places of the picture of the walk of the
-		// places of the picture of the runs of them.
 		const bits = [1, 0, ...valueBits(8)];
 		const file = Buffer.concat([
 			head({ type: 0, width: 2, height: 1, dataOffset: 0 }),
@@ -174,11 +157,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of a picture of its own", () => {
-		// The places of the picture of the walk of the places of the picture stand of the places of the
-		// picture of the walk of the places of the picture of the place of the picture of the walk of them,
-		// the places of the picture of the walk of the places of the picture of a picture of their own
-		// standing before the places of the picture of the walk of the places of the picture of the picture
-		// of the places of the picture of the walk of them.
 		const codes = [1, 1, 1, 1, 1, 1, 1, 1];
 		const bits = [1];
 		for (const code of codes) bits.push(1, ...valueBits(code));
@@ -209,10 +187,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("reads the places of a picture of the walk of the places of the picture of a picture of the walk of the places of them", () => {
-		// The places of the picture of the walk of the places of the picture stand of the places of the
-		// picture of the walk of the places of the picture of the picture of their own, and of the places of
-		// the picture of the walk of the places of the picture of the words of the walk of the picture of the
-		// places of the picture of the walk of them.
 		const bits = [0, 0, 0];
 		const body = Buffer.concat([
 			packBits(bits),
@@ -230,14 +204,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("reads the places of the picture of the walk of the places of the picture of the runs of them", () => {
-		// The places of the picture of the walk of the places of the picture of the picture of their own
-		// stand of the places of the picture of the walk of the places of the picture of the walk of them, so
-		// a place of the picture stands of the places of the picture of the walk of them of the places of the
-		// picture of the picture.
-		// The places of the walk of the places of the picture: the places of the picture of the walk of the
-		// places of the picture of the pictures of the engine, the places of the picture of the walk of the
-		// places of the picture of a picture of the walk of them, and the places of the picture of the walk
-		// of the places of the picture of the runs of them.
 		const bits = [0, 0, 1, ...valueBits(3)];
 		const body = Buffer.concat([
 			packBits(bits),
@@ -257,9 +223,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("stands the places of the picture of the walk of the places of the picture of the picture of the places of the picture beside the places of the picture of the walk of them", () => {
-		// The places of the picture of the walk of the places of the picture of the picture of the walk of
-		// them stand beside the places of the picture of the walk of the places of the picture of the
-		// picture of their own.
 		const bits = [0, 0];
 		const body = Buffer.concat([
 			packBits(bits),
@@ -306,10 +269,6 @@ describe("Yellow Pig image format", () => {
 		const bmp = await consumeBuffer(await handle.openEntry(entry.id));
 		expect(bmp.subarray(0, 2).toString("latin1")).toBe("BM");
 		expect(bmp.readInt32LE(0x12)).toBe(2);
-		// The reference stands the places of the picture of the walk of the places of the picture of the
-		// picture of the places of the picture of the walk of them of the picture of the places of the
-		// picture of the picture of its own, so the places of the picture of the walk of them stand of the
-		// places of the picture of the walk of the places of the picture of the picture.
 		expect(bmp.readInt32LE(0x16)).toBe(1);
 		expect(bmp.subarray(0x36, 0x3c)).toEqual(Buffer.from([0, 1, 0, 0, 1, 0]));
 	});
@@ -331,10 +290,6 @@ describe("Yellow Pig image format", () => {
 	});
 
 	it("turns a picture of the walk of the places of the picture of no places of the picture of the walk of them away", async () => {
-		// The places of the picture of the walk of the places of the picture of the picture of the walk of
-		// them stand short of the places of the picture of the walk of the places of the picture of the
-		// picture of their own where the places of the picture of the walk of them stand as the places of the
-		// picture of the words of the walk of the picture.
 		const bits = [0, 0, 0];
 		const file = Buffer.concat([
 			head({ type: 0, width: 2, height: 2, dataOffset: 4 }),

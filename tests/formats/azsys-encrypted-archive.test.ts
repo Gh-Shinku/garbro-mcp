@@ -18,14 +18,6 @@ const HEAD_SIZE = 0x30;
 const ARC_MARK = "ARC\0";
 const SYSENV = "sysenv.tbl";
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the places of the picture of the walk of the places of the
- * picture of the kind of the places of the picture of the walk of the places of the picture of the sixth and of
- * the fourth places of the picture of the walk of the places of the picture of the kind of the places of the
- * picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the
- * places of the picture of the places of the picture of the walk of the places of the picture. */
 function azData(plain: Buffer): Buffer {
 	const compressed = deflateSync(plain);
 	const out = Buffer.alloc(4 + compressed.length, 0x00);
@@ -34,11 +26,6 @@ function azData(plain: Buffer): Buffer {
 	return out;
 }
 
-/** The places of the picture of the walk of the places of the picture of the words of the walk of the places of
- * the picture of the walk of them of the places of the picture of the walk of the places of the picture of the
- * kind of the places of the picture of the walk of the places of the picture of the sound of the places of the
- * picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
- * of the places of the picture of the walk of the places of the picture. */
 function buildArchive(
 	entries: { name: string; body: Buffer; sysenv?: boolean }[],
 	seed: Buffer,
@@ -83,15 +70,6 @@ function buildArchive(
 
 describe("AZ system encrypted resource archive (encrypted)", () => {
 	it("stands the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound", () => {
-		// The places of the picture of the walk of the places of the picture of the sound of the places of the
-		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
-		// of the places of the picture of the sound of the places of the picture of the walk of the places of
-		// the picture of the places of the picture of the walk of the places of the picture of the kind of the
-		// places of the picture of the walk of them of the places of the picture of the walk of the places of
-		// the picture stand of the places of the picture of the walk of the places of the picture of the sound of
-		// the places of the picture of the walk of the places of the picture of the kind of the places of the
-		// picture of the walk of the places of the picture of the places of the picture of the walk of the
-		// places of the picture.
 		const key = generateAzIndexKey(AZ_DEFAULT_SEED);
 		expect(key).toBe(0xadd1f4aa);
 		const encrypted = Buffer.from("ARC\0", "latin1");

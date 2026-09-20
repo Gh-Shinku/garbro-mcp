@@ -39,6 +39,5 @@ to more than 256 megabytes is refused.
 The tests cover the four bytes of the signature, the declines of a rate below the band or above it, of a
 channel count other than one or two, of a count of no samples or fewer than none and of a header that is not
 all there, the format reported for the sound and the count of the samples of a sound of two channels, the wave
-file it is written as, the walk of the quantiser along the four bits with a sound of one channel and of two,
 the samples held inside what sixteen bits carry, the rest of a sound the stream is short of left at nothing,
 a sound too large to hold, and the nibbles of a sound read on their own.

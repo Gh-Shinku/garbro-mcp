@@ -94,7 +94,6 @@ export function readIarLayout(data: Buffer): IarLayout | undefined {
 	};
 }
 
-/** How many bytes a pixel of a picture of this kind takes, which is also the depth the port writes out. */
 export function iarBytesPerPixel(layout: IarLayout): number {
 	if ("bgra32" === layout.kind) return 4;
 	if ("bgr24" === layout.kind) return 3;
@@ -130,12 +129,6 @@ export function readIarPalette(data: Buffer, paletteSize: number): Buffer {
 	return entries;
 }
 
-/**
- * The pixels of the file stand with the length of a row the header declares, which the reference hands to its
- * bitmap reader as it is; the writers of this project take a row of exactly the width of the picture, so a
- * row that is longer has its end left behind. The pixels have to be at least as long as the rows say, which
- * the reference's bitmap reader insists on as well; one that is longer has its end left behind too.
- */
 export function packIarRows(
 	data: Buffer,
 	layout: IarLayout,

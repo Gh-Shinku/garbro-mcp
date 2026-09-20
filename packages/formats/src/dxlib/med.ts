@@ -14,15 +14,11 @@ import type {
 import { Readable } from "node:stream";
 import { createFixedEntry } from "../shared/fixed-archive.js";
 
-/** The words every archive of this kind stands behind, and the head the index stands behind. */
 const MARK = "MD";
 const HEAD_SIZE = 0x10;
 const ENTRY_LENGTH_FIELD = 0x04;
 const COUNT_FIELD = 0x06;
-/** Every place of the index stands as the places of the name of a file of the archive and the places of where
- * it stands and how much of it stands. */
 const NAME_FIELDS = 8;
-/** The place of a file of the archive stands in the four places behind the places of how much of it stands. */
 const OFFSET_FIELD = 4;
 /** A count of the files of an archive past which an index can stand in no file this project reads. */
 const MAXIMUM_COUNT = 0x10000;
@@ -43,9 +39,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `MedOpener.TryOpen`: the words of the head name the places of every place of the index and how many of them
- * stand, every place of the index naming a file of the archive, where its places stand, and how much of it
- * stands. */
 export function readMedIndex(
 	data: Buffer,
 	fileLength = data.length,
@@ -100,8 +93,6 @@ class MedArchiveHandle implements ArchiveHandle {
 				path: entryName(entry, at),
 				offset: BigInt(entry.offset),
 				size: BigInt(entry.size),
-				// The reference hands the places of a file of this kind out as they stand, and names the kind
-				// of file behind them for the reader of the places of the archive to read.
 				compressed: false,
 				metadata: { type: "file" },
 			}),
@@ -149,8 +140,6 @@ export const medDescriptor: FormatDescriptor = {
 
 export const medFormat: ArchiveFormat = {
 	descriptor: medDescriptor,
-	// The reference registers no word of its own and tells an archive of this kind by the words of its head,
-	// which every file of the plainest kind stands in front of.
 	detection: { signatures: [] },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;

@@ -33,7 +33,6 @@ stands. Both are handed out **bottom up**, which is what `ImageData.CreateFlippe
 
 Deviations from the reference, in the message only: a stream that ends inside its own head, a walk other than
 the two the reference knows, a size that does not agree with the picture's own measurements, and a run that
-reaches past it are refused with messages of this project's own. The write paths of both formats throw
 `NotImplementedException`, so this is a read only pair.
 
 The tests cover both heads and the letters of the eight bit one, the marks, letter and measurements they are

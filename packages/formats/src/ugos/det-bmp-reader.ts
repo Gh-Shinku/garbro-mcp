@@ -1,8 +1,3 @@
-// Format reference: GARbro "ArcFormats/uGOS/ImageBMP.cs", class `DetBmpFormat.Reader`. GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License. The places of the picture are walked as one stream of
-// instructions: every instruction names one of a hundred and sixty-three predictors through a list whose order
-// changes as the picture is walked, the instructions used drawn forward. Places stand in four places.
-
 import { GarbroError } from "@garbro-mcp/core";
 
 /** Where the predictors of the instructions stand, relative to the place being written. */
@@ -74,8 +69,6 @@ export function createDetTables(): DetTables {
 			second = (second << 1) & 0xff;
 		}
 		secondShifts[i] = secondShiftCount & 0xff;
-		// The reference adds the place behind the second word to a word the places of which were shifted into
-		// the places above the byte, so the adding stands within a byte as well.
 		secondWords[i] = (signedByte(second) + (1 << secondShiftCount)) & 0xff;
 
 		let length = 0;
@@ -186,7 +179,6 @@ class DetReader {
 			}
 
 			if (predictor >= 43) {
-				// A place named by three words that stand for the places of its difference from a predictor.
 				let value: number;
 				if (predictor >= 123) {
 					const known = this.offsets[predictor - 123] ?? 0;
@@ -208,8 +200,6 @@ class DetReader {
 						dst + PLACES_PER_PLACE * (this.offsets[predictor - 43] ?? 0),
 					);
 				}
-				// The words stand for the places of the difference, the first of them above the place behind
-				// the word and the last one in the place behind it.
 				let word2 = this.readNext();
 				let difference = (word2 - 2) ^ -(word2 & 1);
 				value += difference << 15;
@@ -225,7 +215,6 @@ class DetReader {
 			}
 
 			if (predictor === 0) {
-				// A place that stands as it is written, the places of it standing in the words behind it.
 				const placeBits = this.bits & 0xff;
 				let value =
 					((this.readByte() << 16) |
@@ -293,7 +282,6 @@ class DetReader {
 		}
 
 		if (this.bpp === 32) {
-			// The places that stand behind the places of the picture stand in a stream of their own.
 			let alphaAt = 3;
 			while (alphaAt < this.output.length) {
 				const alpha = this.readBits(BITS_PER_BYTE);
@@ -304,7 +292,6 @@ class DetReader {
 				}
 			}
 		} else if (this.bpp === 8) {
-			// A picture walked in the places of four stands as one place for every place of it.
 			const pixels = Buffer.alloc(this.width * this.height);
 			let at = 0;
 			for (let src = 0; src < this.output.length; src += PLACES_PER_PLACE)
@@ -403,7 +390,6 @@ class DetReader {
 		return this.bits >>> 8;
 	}
 
-	/** `Reader.ReadBits`: how many places of the stream stand behind the places being read. */
 	private readBits(count: number): number {
 		this.bits &= 0xff;
 		const standing = this.tables.wordLengths[this.bits] ?? 0;
@@ -462,7 +448,6 @@ class DetReader {
 	}
 }
 
-/** `DetBmpFormat.Read`: the places of the picture, walked. */
 export function unpackDetPicture(
 	data: Buffer,
 	width: number,

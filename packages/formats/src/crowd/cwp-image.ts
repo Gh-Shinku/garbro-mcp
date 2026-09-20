@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Crowd/ImageCWP.cs", class `CwpFormat` (a picture of the Crowd engine
-// that stands as places of a portable network graphic whose head is stood as the words of the head of the
-// file: the reference stands the words of such a picture around the places of the file and hands them to the
-// reader of the pictures of that kind). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -18,15 +12,12 @@ import {
 } from "../shared/fixed-archive.js";
 import { PNG_SIGNATURE, readPngHeaderFields } from "../shared/png.js";
 
-/** The words a picture of this kind stands behind, and the words of its head. */
 const MARKS = [Buffer.from("CWDP", "latin1"), Buffer.from("AMNP", "latin1")];
 const HEAD_SIZE = 0x11;
 const WIDTH_FIELD = 0x04;
 const HEIGHT_FIELD = 0x08;
 const BITS_FIELD = 0x0c;
 const COLOUR_TYPE_FIELD = 0x0d;
-/** How many places the words of the head of a portable network graphic stand in, where they stand in the head
- * the reference stands, and how many places of the file they stand as. */
 const PNG_HEAD_SIZE = 0x29;
 const HEADER_LENGTH_FIELD = 0x0b;
 const HEADER_LENGTH = 0x0d;
@@ -39,8 +30,6 @@ const DATA_OFFSET = 0x19;
 const PNG_FOOTER: Buffer = Buffer.from([
 	0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ]);
-/** How many places a place of a picture of this kind stands in, which the reference stands as this many places
- * of a colour for every picture of its kind. */
 const OUTPUT_PLACES = 32;
 const HIGHEST_BITS = 16;
 
@@ -57,11 +46,6 @@ function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `CwpFormat.ReadMetaData`: the words of the head name how wide and how tall the picture stands, read the long
- * way round, how many places a place of a colour of it stands in, and the kind of the places of a colour of the
- * picture, which stands as one of five kinds.
- */
 export function readCwpLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -83,9 +67,6 @@ export function readCwpLayout(
 		return undefined;
 	}
 	const colourType = data.readUInt8(COLOUR_TYPE_FIELD);
-	// The kind of the places of a colour of a picture stands as one of five kinds, and the reference reads no
-	// picture of any other kind; it stands every picture it reads as a picture of two and thirty places a place,
-	// so the number of places a place of a colour of the picture stands in stands as that number.
 	if (colourType > 6 || 1 === colourType || 5 === colourType) return undefined;
 	return {
 		width,
@@ -97,12 +78,6 @@ export function readCwpLayout(
 	};
 }
 
-/**
- * `CwpFormat.OpenAsPng`: the reference stands the words of a portable network graphic around the places of the
- * file — the words of such a graphic, the words and the places of the head of the file, the words of its own
- * places, the places of the file, and the words of the end of such a graphic — and hands them to the reader of
- * such pictures. This port stands the same words and the same places the same way and hands them out.
- */
 export function standCwpAsPng(data: Buffer, layout: CwpLayout): Buffer {
 	if (WIDTH_FIELD + PLACES_SIZE > data.length) {
 		throw invalidPicture(
@@ -154,8 +129,6 @@ export const crowdCwpImageFormat: ArchiveFormat = defineFixedArchive({
 			const stored = await readStored(source);
 			const layout = readCwpLayout(stored, Number(source.size));
 			if (!layout) return false;
-			// The words of a picture of this kind stand as the words of the kind of pictures it stands as, so a
-			// picture is told by the words of its head standing at all.
 			return readPngHeaderFields(standCwpAsPng(stored, layout)) !== undefined;
 		} catch {
 			return false;

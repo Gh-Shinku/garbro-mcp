@@ -9,7 +9,6 @@ Implementation: `packages/formats/src/aquarium/cp2-image.ts` (`aquariumCp2ImageD
 
 The file begins with the word `CP2` — the word the reference registers — the width and the height stand at
 four and eight as words, the depth at `0x0C` and the flags at `0x14` as words of their own. The four lower
-places of the flags being anything but nought mean the pixels stand behind a walk of their own, and the place
 `0x20` means a plane of fourth bytes stands behind them. Only the depths of eight, twenty four and thirty two
 bits are read. A row of the picture stands on the next thirty two byte line, whatever is left of it standing
 as it is, which is not the size a bitmap lays its own rows out with — so the port gathers the rows of every

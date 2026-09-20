@@ -10,20 +10,11 @@ import {
 } from "../../packages/formats/src/caramel-box/fcb-image.js";
 
 const HEAD_SIZE = 0x10;
-/** The places of the picture of the differences of a place of the picture of the walk of the places of a
- * picture of the kinds of the words of the places of the picture of the count of them. */
 const KEY_FACTOR = 0x1465d9;
 const KEY_ADDEND = 0x0fb5;
 
-/** The places of the walk of the picture of the test, of four places by two: the places of the picture of the
- * first row stand as the places of the picture of the first place of the row, and the places of the picture of
- * the second row stand of the places of the picture beside them, one of them standing from every place of the
- * picture of the differences of the places of the picture of the five places of the picture of the walk of
- * them. */
 const PLACES = Buffer.from([0x4a, 0x4a, 0x4a, 0x4a, 0x5a, 0x6a, 0x7a, 0x4a]);
 
-/** The places of the picture of the test: the places of the picture of the first row stand grey, and the
- * places of the picture of the second row stand from the places of the picture of the first place of the row. */
 const EXPECT = Buffer.from([
 	0x80, 0x80, 0x80, 0xff, 0x80, 0x80, 0x80, 0xff, 0x80, 0x80, 0x80, 0xff, 0x80,
 	0x80, 0x80, 0xff, 0x81, 0x81, 0x81, 0xff, 0x83, 0x83, 0x83, 0xff, 0x86, 0x86,
@@ -39,9 +30,6 @@ function head(method: number, extra: Buffer): Buffer {
 	return Buffer.concat([out, extra]);
 }
 
-/** A picture of the kind of the places of a picture of the compression of the pictures of the engine: the
- * places of the walk of the picture of the test stand as the places of the picture of the block of the places
- * of the picture of their own, the places of the picture of the walk of them standing walked by a key. */
 function tzPicture(): Buffer {
 	const payload = Buffer.from(PLACES);
 	const block = Buffer.from(payload);
@@ -53,21 +41,17 @@ function tzPicture(): Buffer {
 	const header = Buffer.alloc(6, 0x00);
 	header.writeUInt32LE(payload.length, 2);
 	const blockHeader = Buffer.alloc(8, 0x00);
-	blockHeader.writeUInt16LE(0x7453, 0); // 'St': the places of the picture stand as they stand
+	blockHeader.writeUInt16LE(0x7453, 0);
 	blockHeader.writeUInt16LE(block.length, 2);
 	blockHeader.writeUInt16LE(payload.length, 4);
 	blockHeader.writeUInt16LE(0, 6);
 	return head(0, Buffer.concat([header, blockHeader, block]));
 }
 
-/** A picture of the kind of the places of a picture of the places of the picture of the engine. */
 function zlibPicture(): Buffer {
 	const sizes = Buffer.alloc(8, 0x00);
 	sizes.writeInt32BE(PLACES.length, 0);
 	sizes.writeInt32BE(deflateSync(PLACES).length, 4);
-	// The words of the head of the picture that name the places of the walk of the places of the picture stand
-	// four places behind the words of the head of the picture, and the places of the walk of them stand behind
-	// the places of the picture of the two words of the places of the picture.
 	return head(
 		1,
 		Buffer.concat([Buffer.alloc(4, 0x00), sizes, deflateSync(PLACES)]),
@@ -104,8 +88,6 @@ describe("Caramel BOX image format", () => {
 	});
 
 	it("stands the places of a picture out of the places of the walk of the kind of the compression of the pictures of the engine", async () => {
-		// The places of the walk of the picture of the test stand as the places of the picture of the block of
-		// the places of the picture of their own of the compression of the pictures of the engine.
 		const file = tzPicture();
 		const layout = readFcbLayout(file, file.length);
 		if (!layout) throw new Error("no layout");

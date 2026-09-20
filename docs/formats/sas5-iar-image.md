@@ -38,7 +38,6 @@ third byte of an entry are its blue, its green and its red — the order a bitma
 passes them through.
 
 The rows of the stored pixels stand with the length the header declares, which the reference hands to its
-bitmap reader as it is; the writers of this project take a row of exactly the width of the picture, so a
 longer row has its end left behind and the rows are packed together. The pixels have to be at least as long
 as the rows say, which the reference's bitmap reader insists on too; anything past that is left behind.
 

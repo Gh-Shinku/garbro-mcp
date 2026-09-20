@@ -1,9 +1,3 @@
-// Format reference: GARbro "ArcFormats/Unity/PMaster/ArcDAT.cs", classes `DatOpener` and `PMasterEntry` (a
-// Unity PMaster engine resource archive: the walk of the files stands behind the head of the file, the name of
-// every file behind that walk, and every place of the walk, of a name and of a file stands under a walk of its
-// own that stands from one place of the head). GARbro commit
-// b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
-
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -16,20 +10,14 @@ import {
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 
-/** The head of a file of this kind holds four hundred places of its own, every place of them counting as a
- * file. */
 const HEADER_SIZE = 0x400;
-/** Where the walk of the files stands, and how many places of it a file holds. */
 const RECORD_SIZE = 0x10;
 const NAME_POSITION_FIELD = 0x00;
 const OFFSET_FIELD = 0x04;
 const SIZE_FIELD = 0x08;
 const KEY_FIELD = 0x0c;
-/** Where the place the walk of the names stands from stands in the head, and where the place the walk of the
- * files stands from does. */
 const NAMES_SEED_FIELD = 0x5c;
 const INDEX_SEED_FIELD = 0xd4;
-/** How many files an archive of this kind may hold, past which this project stands the head as mad. */
 const MAXIMUM_COUNT = 0x100000;
 /** The walk of a key of its own: how many places it holds, and the words it stands from. */
 const KEY_SIZE = 0x100;
@@ -61,9 +49,6 @@ function invalidArchive(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/** `DatOpener.GenerateKey`: the walk of a key of its own, whose places stand one behind the other from the
- * place the head names, every step of the walk standing the places of the key in four and thirty places of
- * their own. */
 export function generatePMasterKey(seed: number): Buffer {
 	const key: Buffer = Buffer.alloc(KEY_SIZE, 0x00);
 	let n = (Math.imul(seed, KEY_FIRST) + KEY_FIRST_ADD) >>> 0;
@@ -82,11 +67,6 @@ export function generatePMasterKey(seed: number): Buffer {
 	return key;
 }
 
-/**
- * `DatOpener.DecryptData`: every place of a walk stands under the place of the key of its own that stands at
- * the same place of the key, four and forty places of the key standing beside it, and under the place the
- * reference names for every place of the walk.
- */
 export function decryptPMasterPlaces(data: Buffer, seed: number): Buffer {
 	const out: Buffer = Buffer.from(data);
 	const key = generatePMasterKey(seed);
@@ -102,7 +82,6 @@ export function decryptPMasterPlaces(data: Buffer, seed: number): Buffer {
 	return out;
 }
 
-/** The other way of the same walk, which stands the places of a walk as the archive stands them. */
 export function encryptPMasterPlaces(data: Buffer, seed: number): Buffer {
 	const out: Buffer = Buffer.from(data);
 	const key = generatePMasterKey(seed);
@@ -118,8 +97,6 @@ export function encryptPMasterPlaces(data: Buffer, seed: number): Buffer {
 	return out;
 }
 
-/** A name of the walk of the names, which stands as the name of a file of the archive: the places a name
- * stands in, the name standing as the places of the file between them. */
 function readName(names: Buffer, at: number): string | undefined {
 	if (at < 0 || at >= names.length) return undefined;
 	let end = at;
@@ -127,19 +104,12 @@ function readName(names: Buffer, at: number): string | undefined {
 	const places = names.subarray(at, end);
 	if (0 === places.length) return undefined;
 	for (const place of places) {
-		// A name stands as the places of a text, so the places that stand beside them leave it to the kinds
-		// that read the file otherwise.
 		if (place < 0x20 || 0x7f === place) return undefined;
 	}
 	const name = places.toString("latin1");
 	return name.includes("\\") ? undefined : name;
 }
 
-/**
- * `DatOpener.TryOpen`: how many files the archive holds stands as the places of the head of the file counted
- * as four and thirty places of their own apiece, the walk of the files stands behind the head, and the walk of
- * their names stands behind that walk.
- */
 export function readPMasterLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -226,8 +196,6 @@ export const unityPMasterDatDescriptor: FormatDescriptor = {
 
 export const unityPMasterDatFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: unityPMasterDatDescriptor,
-	// The reference registers no word of its own, so an archive of this kind is tried after every kind that is
-	// told by a word of its own.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEADER_SIZE)) return false;
@@ -270,7 +238,6 @@ export const unityPMasterDatFormat: ArchiveFormat = defineFixedArchive({
 		if (end > stored.length) {
 			throw invalidArchive("PMaster archive entry stands outside the archive");
 		}
-		// Every place of a file stands under the walk of the key the walk of the files named for it.
 		return Readable.from([
 			decryptPMasterPlaces(stored.subarray(at.offset, end), at.key),
 		]);

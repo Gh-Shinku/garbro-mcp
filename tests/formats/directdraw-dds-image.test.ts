@@ -13,7 +13,6 @@ function hex(bytes: number[]): string {
 	return Buffer.from(bytes).toString("hex");
 }
 
-/** The places of the flags the reference knows. */
 const ALPHA_PIXELS = 0x01;
 const FOUR_CC = 0x04;
 const RGB = 0x40;
