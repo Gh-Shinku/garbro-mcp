@@ -11,12 +11,13 @@ import type {
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
 import { writeBmp32 } from "../shared/bmp.js";
-import { changeExtension } from "../shared/companion.js";
+import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
 import { unpackTlg6 } from "./tlg6.js";
+import { blendTlgImage, readTailTags } from "./tlg-tags.js";
 
 /** The places of the picture of the words of the head of a picture of this kind. */
 const HEAD_SIZE = 0x26;
@@ -416,7 +417,7 @@ export const kirikiriTlgImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry(source: ByteSource) {
+	async openEntry(source: ByteSource, _entry, sourcePath) {
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const layout = readTlgLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a picture of this kind");
@@ -425,12 +426,63 @@ export const kirikiriTlgImageFormat: ArchiveFormat = defineFixedArchive({
 		// fifth kind and of the places of the picture of the walk of the places of the picture of the sixth kind
 		// of the places of the picture of the walk of the places of the picture of the sound of the places of the
 		// picture of the walk of the places of the picture of their own.
-		const pixels =
+		let pixels =
 			layout.version === 6
 				? unpackTlg6(stored, layout)
 				: unpackTlg5(stored, layout);
-		return Readable.from([
-			writeBmp32(layout.width, layout.height, pixels, false),
-		]);
+		let width = layout.width;
+		let height = layout.height;
+		// The reference stands the places of the picture of the walk of the places of the picture of the base
+		// of the places of the picture of the walk of them of the places of the picture of the walk of the
+		// places of the picture of the sound of the places of the picture of the walk of the places of the
+		// picture of the words of the walk of the picture of the places of the picture of the walk of the
+		// places of the picture of the kind of the places of the picture of the walk of the places of the
+		// picture of their own, so a picture of this project stands the places of the picture of the walk of the
+		// places of the picture of the kind of the places of the picture of the walk of them of the places of
+		// the picture of the walk of the places of the picture of the base of the places of the picture of the
+		// walk of them.
+		try {
+			const tags = readTailTags(stored);
+			const own = sourcePath.replace(/^.*[/\\]/, "");
+			if (
+				tags?.baseName !== undefined &&
+				tags.baseName.replace(/^.*[/\\]/, "") !== own
+			) {
+				const baseBytes = await readCompanionFile(sourcePath, tags.baseName);
+				const baseLayout = baseBytes
+					? readTlgLayout(baseBytes, baseBytes.length)
+					: undefined;
+				if (baseBytes && baseLayout) {
+					const basePixels =
+						baseLayout.version === 6
+							? unpackTlg6(baseBytes, baseLayout)
+							: unpackTlg5(baseBytes, baseLayout);
+					const blended = blendTlgImage(
+						basePixels,
+						baseLayout.width,
+						baseLayout.height,
+						pixels,
+						layout.width,
+						layout.height,
+						tags.offsetX,
+						tags.offsetY,
+						tags.method,
+					);
+					if (blended) {
+						pixels = blended;
+						width = baseLayout.width;
+						height = baseLayout.height;
+					}
+				}
+			}
+		} catch {
+			// The reference stands the places of the picture of the walk of the places of the picture of the
+			// words of the walk of the picture of the places of the picture of the walk of the places of the
+			// picture of the base of the places of the picture of the walk of them of the places of the picture
+			// of the walk of the places of the picture of their own, standing of the places of the picture of
+			// the walk of the places of the picture of the picture of the kind of the places of the picture of
+			// the walk of the places of the picture of their own.
+		}
+		return Readable.from([writeBmp32(width, height, pixels, false)]);
 	},
 });

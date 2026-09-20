@@ -1,12 +1,22 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { writeFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
+import { withCompanionFiles } from "../helpers/companion.js";
 import {
 	kirikiriTlgImageFormat,
 	readTlgLayout,
 	unpackTlg5,
 } from "../../packages/formats/src/kirikiri/tlg-image.js";
+import {
+	blendTlgImage,
+	readTlgTags,
+} from "../../packages/formats/src/kirikiri/tlg-tags.js";
 import { unpackTlg6 } from "../../packages/formats/src/kirikiri/tlg6.js";
 
 const HEAD_SIZE = 0x26;
@@ -15,6 +25,60 @@ const DATA_OFFSET_6 = 23;
 const MAX_BIT_LENGTH_6 = 8;
 const GOLOMB_METHOD = 0;
 const AVERAGE_METHOD = 1;
+
+/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
+ * of them of the places of the picture of the walk of the places of the picture of the sound of the places of
+ * the picture of the walk of the places of the picture of the words of the walk of the picture of the places of
+ * the picture of the walk of them. */
+function tagField(keyLength: number, key: number, value: Buffer): Buffer {
+	const keyBytes = Buffer.alloc(keyLength, 0x00);
+	if (keyLength === 1) keyBytes[0] = key;
+	else if (keyLength === 2) keyBytes.writeUInt16LE(key, 0);
+	else keyBytes.writeInt32LE(key, 0);
+	return Buffer.concat([
+		Buffer.from(`${keyLength}:`, "latin1"),
+		keyBytes,
+		Buffer.alloc(1, 0x00),
+		Buffer.from(`${value.length}:`, "latin1"),
+		value,
+		Buffer.alloc(1, 0x00),
+	]);
+}
+
+/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
+ * of them of the places of the picture of the walk of the places of the picture of the words of the walk of
+ * them of the places of the picture of the walk of the places of the picture. */
+function tagTail(fields: Buffer[]): Buffer {
+	const body = Buffer.concat(fields);
+	return Buffer.concat([
+		Buffer.from("tags", "latin1"),
+		word(body.length),
+		body,
+	]);
+}
+
+/** The places of the picture of the walk of the places of the picture of the place of the picture of the walk
+ * of them of the places of the picture of the walk of the places of the picture of the kind of the places of
+ * the picture of the walk of them of the places of the picture of the walk of the places of the picture. */
+function overlayTags(
+	baseName: string,
+	offsetX: number,
+	offsetY: number,
+): Buffer {
+	return tagTail([
+		tagField(1, 1, Buffer.from(baseName, "latin1")),
+		tagField(1, 2, Buffer.from([offsetX])),
+		tagField(
+			2,
+			3,
+			(() => {
+				const out = Buffer.alloc(2, 0x00);
+				out.writeUInt16LE(offsetY, 0);
+				return out;
+			})(),
+		),
+	]);
+}
 
 /** The places of the picture of the walk of the places of the picture of the words of the walk of the picture
  * of the places of the picture of the walk of them of the places of the picture of the walk of the places of
@@ -498,5 +562,192 @@ describe("KiriKiri game engine image format", () => {
 		const shortLayout = readTlgLayout(short, short.length);
 		if (!shortLayout) throw new Error("no layout");
 		expect(() => unpackTlg6(short, shortLayout)).toThrow(GarbroError);
+	});
+
+	it("reads the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture", () => {
+		const tail = tagTail([
+			tagField(1, 1, Buffer.from("base.tlg", "latin1")),
+			tagField(1, 2, Buffer.from([0x10])),
+			tagField(2, 3, Buffer.from([0x20, 0x00])),
+			tagField(1, 4, Buffer.from([0x02])),
+		]);
+		const tags = readTlgTags(tail);
+		if (!tags) throw new Error("no tags");
+		expect(tags.baseName).toBe("base.tlg");
+		expect(tags.offsetX).toBe(0x10);
+		expect(tags.offsetY).toBe(0x20);
+		expect(tags.method).toBe(2);
+		// The places of the picture of the walk of the places of the picture of the place of the picture of the
+		// walk of them stand of the places of the picture of the walk of the places of the picture of the sound
+		// of the places of the picture of the walk of the places of the picture of the kind of the places of the
+		// picture of the walk of them of the places of the picture of the walk of the places of the picture.
+		expect(readTlgTags(Buffer.alloc(64, 0x00))).toBeUndefined();
+		expect(readTlgTags(Buffer.from("tags", "latin1"))).toBeUndefined();
+		// The reference stands the places of the picture of the walk of the places of the picture of the place
+		// of the picture of the walk of them of the places of the picture of the walk of the places of the
+		// picture of the sound where they stand of the places of the picture of the walk of the places of the
+		// picture of the kind of the places of the picture of the walk of them of the places of the picture of
+		// the walk of the places of the picture.
+		const doubled = Buffer.concat([tail, Buffer.alloc(16, 0x00), tail]);
+		expect(readTlgTags(doubled)?.baseName).toBe("base.tlg");
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the overlay of the places of the picture of the walk of them of the places of the picture of the base of the places of the picture of the walk of them", () => {
+		// The places of the picture of the walk of the places of the picture of the sound of the places of the
+		// picture of the walk of the places of the picture of the kind of the places of the picture of the walk
+		// of them of the places of the picture of the walk of the places of the picture of the places of the
+		// picture of the walk of the places of the picture of the sound of the places of the picture.
+		const base = Buffer.from([0x00, 0x00, 0x00, 0xff, 0x11, 0x22, 0x33, 0xff]);
+		const opaque = Buffer.from([0x44, 0x55, 0x66, 0xff]);
+		const blended = blendTlgImage(base, 2, 1, opaque, 1, 1, 1, 0, 1);
+		expect(Array.from(blended ?? [])).toEqual([
+			0x00, 0x00, 0x00, 0xff, 0x44, 0x55, 0x66, 0xff,
+		]);
+		// The places of the picture of the walk of the places of the picture of the place of the picture of the
+		// walk of them of the places of the picture of the walk of the places of the picture of the sound of the
+		// places of the picture of the walk of the places of the picture of the kind of the places of the
+		// picture of the walk of them of the places of the picture of the walk of the places of the picture.
+		const half = Buffer.from([0xff, 0xff, 0xff, 0x80]);
+		const mixed = blendTlgImage(
+			Buffer.from([0x00, 0x00, 0x00, 0xff]),
+			1,
+			1,
+			half,
+			1,
+			1,
+			0,
+			0,
+			1,
+		);
+		// floor((0xff * 0x80 + 0x00 * 0x7f) / 0xff) = 0x80, and the places of the picture of the walk of the
+		// places of the picture of the sound of the places of the picture of the walk of the places of the
+		// picture of the base of the places of the picture of the walk of them stand of the places of the
+		// picture of the walk of the places of the picture of the sound of the places of the picture of the
+		// walk of the places of the picture of the kind of the places of the picture of the walk of them.
+		expect(Array.from(mixed ?? [])).toEqual([0x80, 0x80, 0x80, 0xff]);
+		// The places of the picture of the walk of the places of the picture of the words of the walk of the
+		// picture of the places of the picture of the walk of them of the places of the picture of the walk of
+		// the places of the picture of the sound of the places of the picture of the walk of the places of the
+		// picture of the kind of the places of the picture of the walk of them of the places of the picture of
+		// their own of the places of the picture of the walk of the places of the picture.
+		const clear = blendTlgImage(
+			Buffer.from([0x01, 0x02, 0x03, 0xff]),
+			1,
+			1,
+			Buffer.from([0xff, 0xff, 0xff, 0x00]),
+			1,
+			1,
+			0,
+			0,
+			1,
+		);
+		expect(Array.from(clear ?? [])).toEqual([0x01, 0x02, 0x03, 0xff]);
+		// The places of the picture of the walk of the places of the picture of the places of the picture of
+		// the walk of the places of the picture stand of the places of the picture of the walk of the places of
+		// the picture of the kind of the places of the picture of the walk of them of the places of the picture
+		// of the walk of the places of the picture of the sound of the places of the picture of the walk of the
+		// places of the picture of the kind of the places of the picture of the walk of the places of the
+		// picture of their own.
+		const exclusive = blendTlgImage(
+			Buffer.from([0xff, 0x00, 0x0f, 0xff]),
+			1,
+			1,
+			Buffer.from([0x0f, 0xff, 0xf0, 0x0f]),
+			1,
+			1,
+			0,
+			0,
+			2,
+		);
+		expect(Array.from(exclusive ?? [])).toEqual([0xf0, 0xff, 0xff, 0xf0]);
+		// The places of the picture of the walk of the places of the picture of the overlay of the places of the
+		// picture of the walk of them that stand past the places of the picture of the walk of the places of the
+		// picture of the base of the places of the picture of the walk of them stand of the places of the
+		// picture of the walk of the places of the picture of no places of the picture of the walk of the places
+		// of the picture.
+		expect(
+			blendTlgImage(
+				Buffer.alloc(8, 0x00),
+				2,
+				1,
+				Buffer.alloc(4, 0xff),
+				1,
+				1,
+				2,
+				0,
+				1,
+			),
+		).toBeUndefined();
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sixth kind which the places of the picture of the walk of the places of the picture of the base of the places of the picture of the walk of them stand beside", async () => {
+		// The places of the picture of the walk of the places of the picture of the base of the places of the
+		// picture of the walk of them stand of the places of the picture of the walk of the places of the
+		// picture of no places of their own of the places of the picture of the walk of the places of the
+		// picture, and the places of the picture of the walk of the places of the picture of the overlay stand
+		// of the places of the picture of the walk of the places of the picture of the sound of the places of
+		// the picture of the walk of the places of the picture of the kind of the places of the picture of the
+		// walk of them.
+		const black = tlg6({ colors: 3, width: 2, height: 1 }, filterStream(1), [
+			{ bits: 4, payload: Buffer.from([0x04]) },
+			{ bits: 4, payload: Buffer.from([0x04]) },
+			{ bits: 4, payload: Buffer.from([0x04]) },
+		]);
+		const white = Buffer.concat([
+			tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+				{ bits: 3, payload: Buffer.from([0x07]) },
+				{ bits: 3, payload: Buffer.from([0x07]) },
+				{ bits: 3, payload: Buffer.from([0x07]) },
+			]),
+			overlayTags("base.tlg", 1, 0),
+		]);
+		await withCompanionFiles(
+			"overlay.tlg",
+			{ "base.tlg": black },
+			async (mainPath) => {
+				await writeFile(mainPath, white);
+				const source = await FileByteSource.open(mainPath);
+				const archive = await kirikiriTlgImageFormat.open(source, mainPath);
+				const entry = archive.entries[0];
+				if (!entry) throw new Error("no entry");
+				const bmp = await consumeBuffer(await archive.openEntry(entry.id));
+				// The places of the picture of the walk of the places of the pictures of the base of the places
+				// of the picture of the walk of them stand of the places of the picture of the walk of the
+				// places of the picture of the picture, and of the places of the picture of the walk of the
+				// places of the picture of the place of the picture of the walk of them of the places of the
+				// picture of the walk of the places of the picture of the overlay stand of the places of the
+				// picture of the walk of the places of the picture of the sound of the places of the picture of
+				// the walk of the places of the picture of the kind of the places of the picture of the walk of
+				// them of the places of the picture of the walk of the places of the picture.
+				expect(bmp.readInt32LE(0x12)).toBe(2);
+				expect(bmp.readInt32LE(0x16)).toBe(-1);
+				expect(Array.from(bmp.subarray(0x36, 0x3e))).toEqual([
+					0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
+				]);
+			},
+		);
+	});
+
+	it("stands the places of the picture of the walk of the places of the picture of the overlays of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the base of the places of the picture of the walk of them where the places of the picture of the walk of the places of the picture of the base stand of no places of the picture of the walk of the places of the picture", async () => {
+		const white = Buffer.concat([
+			tlg6({ colors: 3, width: 1, height: 1 }, filterStream(1), [
+				{ bits: 3, payload: Buffer.from([0x07]) },
+				{ bits: 3, payload: Buffer.from([0x07]) },
+				{ bits: 3, payload: Buffer.from([0x07]) },
+			]),
+			overlayTags("missing.tlg", 0, 0),
+		]);
+		await withCompanionFiles("overlay.tlg", {}, async (mainPath) => {
+			await writeFile(mainPath, white);
+			const source = await FileByteSource.open(mainPath);
+			const archive = await kirikiriTlgImageFormat.open(source, mainPath);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			const bmp = await consumeBuffer(await archive.openEntry(entry.id));
+			expect(bmp.readInt32LE(0x12)).toBe(1);
+			expect(Array.from(bmp.subarray(0x36, 0x3a))).toEqual([
+				0xff, 0xff, 0xff, 0xff,
+			]);
+		});
 	});
 });
