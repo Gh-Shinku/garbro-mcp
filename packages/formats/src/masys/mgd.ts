@@ -24,7 +24,7 @@ const NAME_ENTRY_SIZE = 2;
 const ENTRY_TAIL_SIZE = 8;
 const SIZE_OFFSET = 0;
 const OFFSET_OFFSET = 4;
-/** Records whose flag is 100 store their names XORed with this key, repeated every 0xf bytes. */
+/** `MgdOpener.Key`. */
 const NAME_KEY = Buffer.from("Powerd by Masys", "ascii");
 const KEY_PERIOD = 0x0f;
 const ENCRYPTED_FLAG = 100;
@@ -50,7 +50,11 @@ export const mgdDescriptor: FormatDescriptor = {
 	],
 };
 
-function decryptName(bytes: Buffer): void {
+/**
+ * `MgdOpener.Decrypt`, which `MgsOpener` calls for its own names: every byte is XORed with a key that
+ * repeats every 0xf bytes.
+ */
+export function decryptName(bytes: Buffer): void {
 	for (let position = 0; position < bytes.length; position += 1) {
 		bytes[position] =
 			(bytes[position] ?? 0) ^ (NAME_KEY[position % KEY_PERIOD] ?? 0);

@@ -103,6 +103,15 @@ export class AbogadoAdpDecoder {
 	#previous = 0;
 	#quantizer = 0;
 
+	/**
+	 * `AdpDecoder.Reset`: a chunk of a Masys payload hands the decoder the sample and the quantiser it
+	 * starts from, where the container walk of this port keeps two decoders running instead.
+	 */
+	reset(sample: number, quantizer: number): void {
+		this.#previous = sample;
+		this.#quantizer = quantizer;
+	}
+
 	decode(code: number): number {
 		const nibble = code & 0x0f;
 		const quant = ADP_QUANTIZE_TABLE[this.#quantizer] ?? 0;
