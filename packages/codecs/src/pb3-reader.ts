@@ -27,6 +27,146 @@ const FRAME_START = 0x7de;
 const SIDE_PLACES = 16;
 const PLACES_PER_ROW = 4;
 
+/** `Pb3Reader.NameKeyV6`: the words the places of the file of a picture of the kinds that stand behind the
+ * words of the engine stand behind, which stand as the places of the file itself. */
+const NAME_KEY_V6 = [
+	0xa6, 0x75, 0xf3, 0x9c, 0xc5, 0x69, 0x78, 0xa3, 0x3e, 0xa5, 0x4f, 0x79, 0x59,
+	0xfe, 0x3a, 0xc7,
+];
+/** Where the words that name the picture of a picture of the kinds that stand behind the words of the engine
+ * stand, and how many places of the file they stand in. */
+const NAME_FIELD = 0x34;
+const NAME_SIZE = 0x20;
+/** Where the places of the walk of the places of the picture stand in a picture of the kinds that stand behind
+ * the words of the engine, and how many places of the picture stand in every side of a place of its walk. */
+const OVERLAY_BITS_FIELD = 0x0c;
+const OVERLAY_SIZE_FIELD = 0x18;
+const OVERLAY_DATA_FIELD = 0x2c;
+const OVERLAY_HEAD_SIZE = 8;
+const SIDE_OF_OVERLAY = 8;
+const PLACES_PER_OVERLAY_ROW = 4;
+
+/** `Pb3Reader.UnpackV6`: the words of the head of a picture of the kinds that stand behind the words of the
+ * engine name a picture of the engine that stands beside it, which the places of the picture itself stand as
+ * behind them. */
+export function readPb3V6Name(
+	input: Buffer,
+	fileLength = input.length,
+): string | undefined {
+	if (fileLength < NAME_FIELD + NAME_SIZE) return undefined;
+	const name: number[] = [];
+	for (let at = 0; at < NAME_SIZE; at += 1) {
+		const place = (input[NAME_FIELD + at] ?? 0) ^ (NAME_KEY_V6[at & 0xf] ?? 0);
+		if (0 === place) break;
+		name.push(place);
+	}
+	return Buffer.from(name).toString("latin1");
+}
+
+/** The places of a picture that stand beside a picture of the kinds that stand behind the words of the
+ * engine, which the places of the picture itself stand as behind them. */
+export interface Pb3BasePicture {
+	stride: number;
+	pixels: Buffer;
+}
+
+export function pb3UnpackV6(
+	input: Buffer,
+	head: Pb3Head,
+	loadBase: (name: string) => Pb3BasePicture | undefined,
+): Pb3Picture {
+	const name = readPb3V6Name(input, input.length);
+	if (undefined === name) {
+		throw new RangeError("Purple picture names no picture of its own");
+	}
+	// The reference reads the places of the picture the words name through the reader of every kind of picture
+	// of the engine; the words of the picture itself stand beside the places of the picture of the game.
+	const base = loadBase(`${name}.pb3`);
+	if (!base) {
+		throw new RangeError(
+			"Purple picture stands without the places of the picture its words name",
+		);
+	}
+	const pixels = Buffer.from(base.pixels);
+	const stride = PLACES_PER_ROW * head.width;
+	// The places of the picture the words name stand as the places of the picture itself, and the places of the
+	// walk of the places of the picture stand as the places of a walk of their own within them.
+	const bitsAt = 0x20 + input.readInt32LE(OVERLAY_BITS_FIELD);
+	const dataAt = bitsAt + input.readInt32LE(OVERLAY_DATA_FIELD);
+	const overlaySize = input.readInt32LE(OVERLAY_SIZE_FIELD);
+	if (overlaySize < 0) {
+		throw new RangeError("Purple picture names no places of its own");
+	}
+	const overlay = new Uint8Array(overlaySize);
+	const frame = new Uint8Array(FRAME_SIZE);
+	pb3LzssResetFrame(frame);
+	pb3LzssUnpack({
+		input,
+		bitSrc: bitsAt,
+		dataSrc: dataAt,
+		frame,
+		output: overlay,
+		outputSize: overlaySize,
+	});
+	let bitSrc = OVERLAY_HEAD_SIZE;
+	let dataSrc = OVERLAY_HEAD_SIZE + (overlay[0] ?? 0);
+	let bitMask = 0x80;
+	const xBlocks = Math.ceil(head.width / SIDE_OF_OVERLAY);
+	const yBlocks = Math.ceil(head.height / SIDE_OF_OVERLAY);
+	if (0 === xBlocks) {
+		return {
+			width: head.width,
+			height: head.height,
+			bitsPerPixel: head.bitsPerPixel,
+			stride,
+			pixels,
+		};
+	}
+	let rowDone = 0;
+	let origin = 0;
+	let rowsLeft = yBlocks;
+	while (rowsLeft > 0) {
+		let columnDone = 0;
+		for (let x = 0; x < xBlocks; x += 1) {
+			if (0 === bitMask) {
+				bitSrc += 1;
+				bitMask = 0x80;
+			}
+			if (0 === (bitMask & (overlay[bitSrc] ?? 0))) {
+				// The places of a place of the picture stand as the places of the picture the words name, and
+				// the places of the walk of the places of the picture stand as no places of the picture at all.
+				let dst = SIDE_OF_OVERLAY * (origin + PLACES_PER_OVERLAY_ROW * x);
+				const xCount = Math.min(SIDE_OF_OVERLAY, head.width - columnDone);
+				const yCount = Math.min(SIDE_OF_OVERLAY, head.height - rowDone);
+				for (let at = yCount; at > 0; at -= 1) {
+					const count = PLACES_PER_OVERLAY_ROW * xCount;
+					if (dst + count <= pixels.length) {
+						Buffer.from(
+							overlay.buffer,
+							overlay.byteOffset + dataSrc,
+							count,
+						).copy(pixels, dst);
+					}
+					dataSrc += count;
+					dst += stride;
+				}
+			}
+			bitMask >>= 1;
+			columnDone += SIDE_OF_OVERLAY;
+		}
+		origin += stride;
+		rowDone += SIDE_OF_OVERLAY;
+		rowsLeft -= 1;
+	}
+	return {
+		width: head.width,
+		height: head.height,
+		bitsPerPixel: head.bitsPerPixel,
+		stride,
+		pixels,
+	};
+}
+
 export interface Pb3Head {
 	inputSize: number;
 	kind: number;

@@ -5,9 +5,13 @@
 
 import {
 	readPb3Head,
+	readPb3V6Name,
 	pb3UnpackJbp,
 	pb3UnpackV1,
 	pb3UnpackV5,
+	pb3UnpackV6,
+	type Pb3BasePicture,
+	type Pb3Head,
 	type Pb3Picture,
 } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
@@ -16,8 +20,10 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
-import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readBmpImage, writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -79,7 +85,10 @@ function readLayout(data: Buffer, fileLength: number): Pb3Layout | undefined {
 
 /** The places of the picture, which stand as the places of the picture of the kind of the walk of its
  * places. */
-function unpackPb3(data: Buffer): Pb3Picture {
+async function unpackPb3(
+	data: Buffer,
+	sourcePath: string,
+): Promise<Pb3Picture> {
 	const head = readPb3Head(data, data.length);
 	if (!head) throw invalidPicture("Not a Purple picture");
 	// The reference reads the places of the file of a picture of the kinds that stand as a picture of the
@@ -103,11 +112,80 @@ function unpackPb3(data: Buffer): Pb3Picture {
 	}
 	if (kind === KIND_V5) return pb3UnpackV5(data, head);
 	if (kind === KIND_V6 || kind === KIND_V6_OTHER) {
+		return unpackPb3V6(data, head, sourcePath);
+	}
+	if (kind === KIND_V6 || kind === KIND_V6_OTHER) {
 		// The reference reads the places of a picture of these kinds through the words of the engine and the
 		// places of a picture of the game that stand beside them.
 		throw invalidPicture("Purple picture of a kind this project does not read");
 	}
 	throw invalidPicture("Purple picture of a kind this project does not read");
+}
+
+/** The places of the picture the words of a picture of the kinds that stand behind the words of the engine
+ * name, which stand beside the places of the game. The reference reads them through the reader of every kind of
+ * picture of the engine; this port reads the pictures of the engine itself and the bitmaps of the system, and
+ * reads no places of the pictures of the other kinds. */
+async function loadBasePicture(
+	sourcePath: string,
+	name: string,
+	depth = 0,
+): Promise<Pb3BasePicture | undefined> {
+	if (depth > 4) return undefined;
+	const at = resolve(dirname(sourcePath), name);
+	// The reference turns a picture whose words name the file of the picture itself away rather than reading
+	// the places of the picture for ever.
+	if (at === resolve(sourcePath)) return undefined;
+	const stored = await readFile(at).catch(() => undefined);
+	if (!stored) return undefined;
+	const head = readPb3Head(stored, stored.length);
+	if (head) {
+		const layout = readLayout(stored, stored.length);
+		if (layout && head.width > 0 && head.height > 0) {
+			if (head.kind === KIND_V1) {
+				const picture = pb3UnpackV1(stored, head);
+				return { stride: picture.stride, pixels: picture.pixels };
+			}
+			if (head.kind === KIND_V5) {
+				const picture = pb3UnpackV5(stored, head);
+				return { stride: picture.stride, pixels: picture.pixels };
+			}
+			if ((head.kind === KIND_JBP || head.kind === KIND_JBP_OTHER) && layout) {
+				const picture = pb3UnpackJbp(
+					stored,
+					head,
+					HEADER_SIZE + 0x10,
+					stored.readInt32LE(ALPHA_FIELD),
+				);
+				return { stride: picture.stride, pixels: picture.pixels };
+			}
+		}
+	}
+	const bmp = readBmpImage(stored);
+	if (bmp) {
+		return { stride: bmp.width * 4, pixels: Buffer.from(bmp.pixels) };
+	}
+	return undefined;
+}
+
+/** The places of a picture of the kinds that stand behind the words of the engine, whose words name the
+ * picture the places of the picture itself stand as. */
+async function unpackPb3V6(
+	data: Buffer,
+	head: Pb3Head,
+	sourcePath: string,
+): Promise<Pb3Picture> {
+	const name = readPb3V6Name(data, data.length);
+	if (undefined === name || 0 === name.length) {
+		throw invalidPicture("Purple picture names no picture of its own");
+	}
+	const base = await loadBasePicture(sourcePath, `${name}.pb3`);
+	if (!base) {
+		throw invalidPicture(
+			"Purple picture stands without the places of the picture its words name",
+		);
+	}
+	return pb3UnpackV6(data, head, () => base);
 }
 
 async function readStored(source: ByteSource): Promise<Buffer> {
@@ -179,13 +257,13 @@ export const cmvsPb3ImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry(source: ByteSource) {
+	async openEntry(source: ByteSource, _entry, sourcePath: string) {
 		const stored = await readStored(source);
 		const layout = readLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a Purple picture");
 		let picture: Pb3Picture;
 		try {
-			picture = unpackPb3(stored);
+			picture = await unpackPb3(stored, sourcePath);
 		} catch (error) {
 			if (error instanceof GarbroError) throw error;
 			throw invalidPicture(
