@@ -150,6 +150,18 @@ project cannot supply. Each finding below is the reason the entry stays unread, 
   of the places of the picture the words of which stand beside them, and the walk of `GIZ/2` is four places
   of a picture walked in strips of eight places; the palettes are the whole of the difficulty.
 
+- **DCF** (`ArcFormats/AliceSoft/ImageDCF.cs`, the kinds `dcf ` and `pcf `) — a picture of this kind stands as
+  the marks a picture of the engine stands *over* a picture behind it rather than as the places of a picture of
+  its own, so the reference reads a picture of the kind `QNT` standing beside it in the places of the game: the
+  words of the head of the picture name the picture it stands over, and `ReadBaseImage` stands the words of it
+  against the places of the game (`VFS.FileExists`, `VFS.CombinePath`) and reads the places of the picture of
+  the kind `QNT` where they stand, standing the places of the picture of no picture behind it as the places of
+  the picture of a kind of its own. The words the picture names the picture it stands over with stand walked as
+  the reference walks them, of the places of a picture of the names of the pictures of the engine, and stand
+  told by a place of the words of the game (`AfaEncoding`, the places of a picture of the words of the engine
+  told by the game rather than by the reference). A picture of this kind therefore stands unread without the
+  places of the game it stands beside.
+
 ## The entries read line by line against the reference
 
 Screened by the places the reference stands in rather than by the bytes the support report names them by, these

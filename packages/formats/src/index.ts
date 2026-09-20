@@ -376,6 +376,7 @@ import { amusePacFormat } from "./softpal/pac.js";
 import { scrPlayerPakFormat } from "./scrplayer/pak.js";
 import { maiFormat } from "./mai/arc.js";
 import { arFormat } from "./palm-tree/ar.js";
+import { activeSoftEdtImageFormat } from "./active-soft/edt-image.js";
 import { a98Format } from "./active-soft/a98.js";
 import { wbpFormat } from "./wild-bug/wbp.js";
 import { kaguyaPltFormat } from "./kaguya/plt.js";
@@ -1656,6 +1657,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		scrPlayerPakFormat,
 		maiFormat,
 		arFormat,
+		activeSoftEdtImageFormat,
 		a98Format,
 		wbpFormat,
 		kaguyaPltFormat,

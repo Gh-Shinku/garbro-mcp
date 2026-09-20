@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "EDT",
+				class: "EdtFormat",
+				source: "ArcFormats/ActiveSoft/ImageEDT.cs",
+			},
+			localId: "active-soft-edt-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of the picture that stand as the places of the picture of the words of the walk of them",
+				"the places of the picture that stand as the places of the picture of the places behind them",
+				"the places of the picture that stand from the places of the picture beside them",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the indexed pictures of the same engine (the kind `ED8` of the class `Ed8Format`), which stand as the places of a picture of a palette of their own",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CG",
 				class: "CgFormat",
 				source: "ArcFormats/AnimeGameSystem/ImageAinos.cs",
