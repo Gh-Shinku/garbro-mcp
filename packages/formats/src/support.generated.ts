@@ -18584,5 +18584,26 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture inside the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture, standing of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture, of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of their own",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "ARC/AZ",
+				class: "ArcOpener",
+				source: "ArcFormats/AZSys/ArcAZSys.cs",
+			},
+			localId: "azsys-arc-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"ASB script decryption without a user-supplied key: the reference looks the key up in its KnownKeys dictionary, which is empty by default, so ASB entries are exposed raw",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an ARC/AZ archive whose ASB entries are decrypted with a user-supplied key",
+				"an archive whose head declares more than one index chunk (ext_count > 1)",
+			],
+		},
 	],
 } as const;
