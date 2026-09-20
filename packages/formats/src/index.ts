@@ -40,6 +40,7 @@ import { k5Format } from "./gsx/k5.js";
 import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
 import { leafPakFormat } from "./leaf/pak.js";
+import { otemotoMagImageFormat } from "./otemoto/mag-image.js";
 import { rpgMakerRgssAdFormat } from "./rpg-maker/rgss-ad.js";
 import { rpgMakerRpgmvpImageFormat } from "./rpg-maker/rpgmvp-image.js";
 import { rpgMakerRpgmvoAudioFormat } from "./rpg-maker/rpgmvo-audio.js";
@@ -1255,6 +1256,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		bananaPkFormat,
+		otemotoMagImageFormat,
 		spcFormat,
 		ailDatFormat,
 		advSysFpkFormat,

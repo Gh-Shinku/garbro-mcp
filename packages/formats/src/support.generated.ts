@@ -9,6 +9,27 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MAG/MAKI02",
+				class: "MagFormat",
+				source: "ArcFormats/Otemoto/ImageMAG.cs",
+			},
+			localId: "otemoto-mag-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the palette of a picture",
+				"the walk of the places of a picture",
+				"pictures of four and eight places a place",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PMG",
 				class: "PmgFormat",
 				source: "Legacy/Acme/ImagePMG.cs",
