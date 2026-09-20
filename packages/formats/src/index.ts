@@ -317,6 +317,7 @@ import { criGxtImageFormat } from "./cri/gxt-image.js";
 import { criXtxImageFormat } from "./cri/xtx-image.js";
 import { criSpcImageFormat } from "./cri/spc-image.js";
 import { azsysCpbImageFormat } from "./azsys/cpb-image.js";
+import { azIsaacArchiveFormat } from "./azsys/isaac-archive.js";
 import { azSysTyp1ImageFormat } from "./azsys/typ1-image.js";
 import { csWareBpcImageFormat } from "./csware/bpc-image.js";
 import { uncannyCiiImageFormat } from "./uncanny/cii-image.js";
@@ -1600,6 +1601,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		criXtxImageFormat,
 		criSpcImageFormat,
 		azsysCpbImageFormat,
+		azIsaacArchiveFormat,
 		azSysTyp1ImageFormat,
 		csWareBpcImageFormat,
 		uncannyCiiImageFormat,
