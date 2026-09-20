@@ -9,6 +9,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "FCB",
+				class: "FcbFormat",
+				source: "ArcFormats/CaramelBox/ImageFCB.cs",
+			},
+			localId: "caramel-box-fcb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of the walk of a picture of the kind of the compression of the pictures of the engine",
+				"the places of the walk of a picture of the kind of the places of a picture of a picture of the engine",
+				"the places of the picture that stand as the places of the picture of the differences of them from the places of the picture beside them and of the places of the picture of the row above them",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the words of the walk of the places of a picture that stand as the places of the picture of the differences of them of the kinds of the places of the picture of the count of them beyond the kind of the places of the picture of the three places of the picture",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ED8",
 				class: "Ed8Format",
 				source: "ArcFormats/ActiveSoft/ImageEDT.cs",

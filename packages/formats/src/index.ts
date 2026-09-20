@@ -603,6 +603,7 @@ import { emonEmeFormat } from "./emon/eme.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
 import { circusVcPacFormat } from "./circus/vc.js";
 import { caramelBoxArc3Format } from "./caramel-box/arc3.js";
+import { caramelBoxFcbImageFormat } from "./caramel-box/fcb-image.js";
 import { caramelBoxArc4Format } from "./caramel-box/arc4.js";
 import { lunePackFormat } from "./lune/pack.js";
 import { nitroplusNpaSteinsGateFormat } from "./nitroplus/npa-sg.js";
@@ -1878,6 +1879,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		livemakerVfFormat,
 		circusVcPacFormat,
 		caramelBoxArc3Format,
+		caramelBoxFcbImageFormat,
 		caramelBoxArc4Format,
 		lunePackFormat,
 		nitroplusNpaSteinsGateFormat,
