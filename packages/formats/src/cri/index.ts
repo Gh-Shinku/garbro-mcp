@@ -4,3 +4,4 @@ export * from "./spc.js";
 export * from "./gxt-image.js";
 export * from "./xtx-image.js";
 export * from "./spc-image.js";
+export * from "./adx-audio.js";

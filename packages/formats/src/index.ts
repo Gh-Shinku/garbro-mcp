@@ -308,6 +308,7 @@ import { keroqKgdImageFormat } from "./keroq/kgd-image.js";
 import { splushWaveSwgImageFormat } from "./splush-wave/swg-image.js";
 import { aquariumCp2ImageFormat } from "./aquarium/cp2-image.js";
 import { directDrawDdsImageFormat } from "./directdraw/dds-image.js";
+import { criAdxAudioFormat } from "./cri/adx-audio.js";
 import { criGxtImageFormat } from "./cri/gxt-image.js";
 import { criXtxImageFormat } from "./cri/xtx-image.js";
 import { criSpcImageFormat } from "./cri/spc-image.js";
@@ -1578,6 +1579,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		splushWaveSwgImageFormat,
 		aquariumCp2ImageFormat,
 		directDrawDdsImageFormat,
+		criAdxAudioFormat,
 		criGxtImageFormat,
 		criXtxImageFormat,
 		criSpcImageFormat,

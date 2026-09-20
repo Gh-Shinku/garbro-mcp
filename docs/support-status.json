@@ -18348,6 +18348,24 @@
 				"the places of the picture of the walk of the places of the picture of a sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the kinds of the walk of the places of the picture of the fixtures of this project (the kinds of the walk of the places of the picture of the places of the picture of the walk of them of the sound standing of the places of the picture of the walk of the places of the picture of the sound of their own)",
 				"the places of the picture of the walk of the places of the picture of a sound of more than one place of the picture of the walk of them, the places of the picture of the walk of the places of the picture of the picture of the walk of them standing across the places of the picture of the places of the picture of the walk of them"
 			]
+		},
+		{
+			"reference": {
+				"type": "audio",
+				"tag": "ADX",
+				"class": "AdxAudio",
+				"source": "ArcFormats/Cri/AudioADX.cs"
+			},
+			"localId": "cri-adx-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": ["detect", "list", "extract"],
+			"unsupported": ["archive creation", "audio encoding"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the sound of the kinds of the walk of the places of the picture of the places of the picture of the walk of them beyond the kind of the walk of the places of the picture of the fixtures of this project (the places of the picture of the walk of them standing for the places of the picture of the walk of the places of the picture of the frequencies of the places of the picture behind them other than the places of the picture of the walk of the places of the picture of a picture of no places of the picture of the walk of them)",
+				"the places of the picture of the walk of the places of the picture of a sound of more than two places of the picture of a place of the picture of the walk of the places of the picture"
+			]
 		}
 	]
 }
