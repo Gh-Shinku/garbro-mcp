@@ -693,6 +693,7 @@ import { ggfImageFormat } from "./yellowcap/ggf-image.js";
 import { befAlpImageFormat } from "./bef/alp-image.js";
 import { gamesystemAlpImageFormat } from "./gamesystem/alp-image.js";
 import { masysAlpImageFormat } from "./masys/alp-image.js";
+import { masysAgImageFormat } from "./masys/ag-image.js";
 import { ardImageFormat } from "./acme/ard-image.js";
 import { acmePmgImageFormat } from "./acme/pmg-image.js";
 import { mbImageFormat } from "./mb/image.js";
@@ -1996,6 +1997,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ggfImageFormat,
 		befAlpImageFormat,
 		gamesystemAlpImageFormat,
+		masysAgImageFormat,
 		masysAlpImageFormat,
 		ardImageFormat,
 		acmePmgImageFormat,

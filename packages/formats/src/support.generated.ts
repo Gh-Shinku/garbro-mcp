@@ -18568,5 +18568,32 @@ export const formatSupportCatalog = {
 				"the byte the reference steps over in front of a stereo block, which a real file would confirm is filler",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "ACG",
+				class: "AgFormat",
+				source: "ArcFormats/Masys/ImageAG.cs",
+			},
+			localId: "masys-ag-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the six stored streams and the controls that pick between them",
+				"the literal byte and the repeat of the pixel before",
+				"the difference of at most sixteen with its direction, wrapping as a byte does",
+				"the first pixel of a row seeding the row after it",
+				"the run length coded alpha plane and its scaling to eight bits",
+				"the twenty four and thirty two bit bitmaps",
+			],
+			unsupported: ["image creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show which of the five streams a game actually fills",
+			],
+		},
 	],
 } as const;
