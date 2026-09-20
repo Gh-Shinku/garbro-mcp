@@ -299,6 +299,7 @@ import {
 import { creativeVocAudioFormat } from "./creative/voc-audio.js";
 import { egnImageFormat } from "./unknown/egn-image.js";
 import { digitalMonkeyPktImageFormat } from "./digital-monkey/pkt-image.js";
+import { cadathKgfImageFormat } from "./cadath/kgf-image.js";
 import { cadathCgfImageFormat } from "./cadath/cgf-image.js";
 import { cadathVwfAudioFormat } from "./cadath/vwf-audio.js";
 import { tanakaBcImageFormat } from "./tanaka/bc-image.js";
@@ -1564,6 +1565,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		creativeVocAudioFormat,
 		egnImageFormat,
 		digitalMonkeyPktImageFormat,
+		cadathKgfImageFormat,
 		cadathCgfImageFormat,
 		cadathVwfAudioFormat,
 		tanakaBcImageFormat,

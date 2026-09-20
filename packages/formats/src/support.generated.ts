@@ -1457,6 +1457,23 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "KGF",
+				class: "KgfFormat",
+				source: "ArcFormats/Cadath/ImageKGF.cs",
+			},
+			localId: "cadath-kgf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the walk of the places of the picture of the kind of the compression of the pictures of the engine of the places of the picture of the walk of them of a picture of more than one place of the picture, the places of the picture of the word of the walk of the picture standing across the places of the picture of the chunks of them",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PKT/DM",
 				class: "PktFormat",
 				source: "Legacy/DigitalMonkey/ImagePKT.cs",
