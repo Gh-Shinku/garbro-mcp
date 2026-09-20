@@ -112,14 +112,15 @@ further than the reference's own list of them.
 ## Screened, with the reason for the delay recorded
 
 These carry no key, no outside listing and no reader outside the reference tree in the places the
+The survey that fills this section reads the gap inventory through `node scripts/garbro-gap.mjs --all`:
+without `--all` the tool prints only the first forty pending rows, which is a shorter list than it looks
+like.
 screening looked, and the reference is complete. What delays them is the size or the shape of the port
 rather than a missing input, so each entry records what the port would have to carry. They are the first
 candidates when porting continues.
 
 - `PX` (`ArcFormats/Leaf/ImagePX.cs`, 488 lines) is a block structured picture reader with its own reader
   classes (`PxReader`, `PxBlock`).
-- `PAD` (`ArcFormats/ShiinaRio/AudioPAD.cs`) decodes through a 69 entry `double` table (`PadDecoder`),
-  which JavaScript floats can hold exactly as the reference uses them.
 - `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
@@ -134,6 +135,18 @@ candidates when porting continues.
   companion lookup, which this project has, and then a way to hand the companion to another image
   format, which it does not have yet. The stored diff is two LZSS streams, one holding a pixel index and
   one the differences themselves.
+
+
+- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are
+  transformed by one of two schemes the reference tries in turn. It would have to carry `Primel.SHA256`,
+  the three `Primel1/2/3Encyption` ciphers, `GameRes.Cryptography.RC6`, AES in CFB mode with zero
+  padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between. That is a
+  staged port of the kind TLG6 and JBP took, not a single one.
+- `PB2` (`ArcFormats/Cmvs/ImagePB2.cs`, 265 lines) is the CVNS picture format whose header is encrypted
+  with a twenty seven byte key stored at the end of the file, and it unpacks in four different ways: a
+  block shuffled plane, a per channel block map, the JBP form, and four XORed channels. It stands on the
+  shared `PbReaderBase` of `ImagePB.cs`, whose LZSS and JBP walks this project already carries for PB3,
+  so the remaining work is the four variants and the header.
 
 ## Two engines can share a tag and a class name
 
