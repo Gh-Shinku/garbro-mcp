@@ -1,6 +1,7 @@
 export * from "./adler32.js";
 export * from "./blowfish.js";
 export * from "./crc32.js";
+export * from "./des.js";
 export * from "./huffman.js";
 export * from "./lzss.js";
 export * from "./maika-bpr.js";
