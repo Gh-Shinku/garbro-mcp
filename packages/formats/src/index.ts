@@ -418,6 +418,7 @@ import { arcgFormat } from "./tanaka/arcg.js";
 import { vcPakFormat } from "./circus/vc.js";
 import { gscFormat } from "./liar/gsc.js";
 import { xflFormat } from "./liar/xfl.js";
+import { oggAudioFormat } from "./ogg/ogg-audio.js";
 import { exhGRPFormat } from "./ex-hibit/grp.js";
 import { abmpFormat } from "./q-lie/abmp.js";
 import { abmp7Format } from "./q-lie/abmp.js";
@@ -1049,6 +1050,7 @@ export * from "./eternity/index.js";
 export * from "./uma/index.js";
 export * from "./westgate/index.js";
 export * from "./liar/index.js";
+export * from "./ogg/index.js";
 export * from "./force/index.js";
 export * from "./rpm/index.js";
 export * from "./entexec/index.js";
@@ -1715,6 +1717,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		arcgFormat,
 		vcPakFormat,
 		xflFormat,
+		oggAudioFormat,
 		gscFormat,
 		exhGRPFormat,
 		abmpFormat,

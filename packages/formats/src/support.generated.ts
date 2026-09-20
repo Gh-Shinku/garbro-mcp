@@ -18482,5 +18482,25 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine: the reference registers no places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the sound of their own, so the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine stand of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the reference of the places of the picture of the walk of the places of the picture of the picture of the kind of the places of the picture of the walk of them",
 			],
 		},
+		{
+			reference: {
+				type: "audio",
+				tag: "OGG",
+				class: "OggAudio",
+				source: "ArcFormats/AudioOGG.cs",
+			},
+			localId: "ogg-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"sound writing",
+				"the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the engine, which stand outside the places of the picture of the walk of the places of the picture of this project",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the fifth kind stand behind the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture (`OGGFixCrc`) of the reference, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and stands the places of the picture of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound in the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them",
+			],
+		},
 	],
 } as const;
