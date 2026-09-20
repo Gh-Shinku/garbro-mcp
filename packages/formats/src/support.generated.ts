@@ -9,6 +9,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GR2",
+				class: "Gr2Format",
+				source: "ArcFormats/AdvSys/ImageGR2.cs",
+			},
+			localId: "advsys-gr2-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of a picture as they stand",
+				"the places of a row standing padded to the places of four",
+				"pictures of sixteen, of four and twenty and of two and thirty places",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the compressed pictures of the same engine (the kind `GR2/Pola` of the class `PolaFormat`), which stand walked rather than as the places of a picture stand",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "CPB",
 				class: "CpbFormat",
 				source: "ArcFormats/AZSys/ImageCPB.cs",
