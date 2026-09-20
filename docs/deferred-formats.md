@@ -32,6 +32,12 @@ the game, which stand outside the file of the archive.
 - `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`), `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), and
   `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) stand behind schemes of the same kind.
 - `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads its key out of a file above the archive.
+- `PAK/EAGLS` (`ArcFormats/Eagls/ArcEAGLS.cs`) stands the places of the picture of the walk of the
+  places of the picture of the places of the picture of the sound of the walk of them beside the places
+  of the picture of the walk of the places of the picture of the picture of the walk of them by
+  `QueryEncryption()`, which stands for `Query<EaglsOptions>` — the places of the picture of the walk
+  of the places of the picture of the sound standing of the places of the picture of the walk of the
+  places of the picture of the picture of their own of the places of the picture of the walk of them.
 - `BIN/PAC` (`ArcFormats/DigitalWorks/ArcBIN.cs`) finds its index in the places of the game's own `.exe`.
 - `PAK/MORNING` (`ArcFormats/Morning/ArcPAK.cs`) reads `MorningScheme.DefaultKey`, which stands as no key at
   all; `OGG/TINK` (`ArcFormats/Cyberworks/AudioTINK.cs`) stands the same way.
