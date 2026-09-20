@@ -18522,5 +18522,25 @@ export const formatSupportCatalog = {
 				"the words of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of this kind stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture of the script, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and the places of the picture of the walk of the places of the picture of the text of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the engine inside the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "G2",
+				class: "G2Opener",
+				source: "ArcFormats/Glib2/ArcG2.cs",
+			},
+			localId: "g2-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: [
+				"archive creation",
+				"the places of the picture of the walk of the places of the picture of the walk of the places of the picture of the kinds of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own, which stand of the places of the picture of the walk of the places of the picture of the words of the walk of the picture of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture outside the places of the picture of the walk of the places of the picture of this project",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the words of the walk of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the reference of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture of their own behind the places of the picture of the walk of the places of the picture of the fourth kind, which a picture of this project stands of the places of the picture of the walk of the places of the picture of no places of the picture of the walk of the places of the picture of their own beside them, and the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of every place of the picture of the walk of the places of the picture of the fifth kind of the places of the picture of the walk of the places of the picture of the places of the picture of the walk of the places of the picture of the sound stand of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the words of the walk of them of the places of the picture of the walk of the places of the picture of the sound of the places of the picture of the walk of the places of the picture",
+			],
+		},
 	],
 } as const;

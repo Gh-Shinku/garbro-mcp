@@ -601,6 +601,7 @@ import { strikesPckFormat } from "./strikes/pck.js";
 import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { ellefinEpkFormat } from "./ellefin/epk.js";
 import { g2PakFormat } from "./g2/pak.js";
+import { g2ArchiveFormat } from "./g2/g2-archive.js";
 import { willArc2Format } from "./will/arc2.js";
 import { pinkyA5rFormat } from "./pinky/a5r.js";
 import { piasDatFormat } from "./pias/dat.js";
@@ -1892,6 +1893,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		lucifenLpkFormat,
 		ellefinEpkFormat,
 		g2PakFormat,
+		g2ArchiveFormat,
 		willArc2Format,
 		pinkyA5rFormat,
 		piasDatFormat,
