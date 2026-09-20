@@ -245,6 +245,7 @@ import { sqzFormat } from "./musica/sqz.js";
 import { mpkHgFormat } from "./tako/mpk.js";
 import { favoriteHzcImageFormat } from "./favorite/hzc-image.js";
 import { ikuraTanImageFormat } from "./ikura/tan-image.js";
+import { bananaGecImageFormat } from "./banana/gec-image.js";
 import { bananaMagImageFormat } from "./banana/mag-image.js";
 import { crowdGaxImageFormat } from "./crowd/gax-image.js";
 import { crowdCwpImageFormat } from "./crowd/cwp-image.js";
@@ -1528,6 +1529,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mpkHgFormat,
 		favoriteHzcImageFormat,
 		ikuraTanImageFormat,
+		bananaGecImageFormat,
 		bananaMagImageFormat,
 		abelGpsImageFormat,
 		abelCbfImageFormat,

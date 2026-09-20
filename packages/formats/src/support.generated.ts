@@ -18290,5 +18290,23 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the kind of the places of the picture where the places of the picture of the walk of them of the picture of the places of the picture stand of the places of the picture of an odd count, the places of the picture of the walk of the places of the picture of the picture standing unaligned of the places of the picture of the word of the walk of the picture behind it",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GEC",
+				class: "GecFormat",
+				source: "ArcFormats/Banana/ImageGEC.cs",
+			},
+			localId: "banana-gec-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of a picture that stands for more than one place of the picture of the walk of them of the picture of the places of the picture of the walk of them, the places of the picture of the word of the walk of the picture of the tables of the walk of the places of the picture standing across the places of the picture of the chunks of them",
+				"the places of the picture of the walk of the places of the picture of the runs of them that stand short of the places of the picture of the walk of them, the reference standing the places of the picture of the walk of the places of the picture beyond the places of the picture of the walk of them of the places of the picture of the walk of the picture of the places of the picture of their own, where a picture of this project turns the picture of the walk of the places of them away",
+			],
+		},
 	],
 } as const;
