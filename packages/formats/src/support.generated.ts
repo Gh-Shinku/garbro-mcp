@@ -9,6 +9,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "CG",
+				class: "CgFormat",
+				source: "ArcFormats/AnimeGameSystem/ImageAinos.cs",
+			},
+			localId: "anime-game-system-cg",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of both kinds of the walk of its places",
+				"the places of a picture of a kind of the places of a palette of its own",
+				"the places of a picture of a kind of the places of a picture of its own",
+				"the runs of the places of a picture standing beside the places of the picture",
+				"a picture of a part of a picture standing within the picture",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GR2/Pola",
 				class: "PolaFormat",
 				source: "ArcFormats/AdvSys/ImageGR2.cs",

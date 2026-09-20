@@ -491,6 +491,7 @@ import { blackButterflyDatFormat } from "./black-butterfly/dat.js";
 import { debonosuPakFormat } from "./debonosu/pak.js";
 import { vnEngineAxrFormat } from "./vn-engine/axr.js";
 import { animeGameSystemAniFormat } from "./anime-game-system/ani.js";
+import { animeGameSystemCgImageFormat } from "./anime-game-system/cg-image.js";
 import { animeGameSystemDatFormat } from "./anime-game-system/dat.js";
 import { maikaMk2Format } from "./maika/mk2.js";
 import { astArcFormat } from "./ast/arc.js";
@@ -1763,6 +1764,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		blackButterflyDatFormat,
 		debonosuPakFormat,
 		vnEngineAxrFormat,
+		animeGameSystemCgImageFormat,
 		animeGameSystemAniFormat,
 		animeGameSystemDatFormat,
 		maikaMk2Format,
