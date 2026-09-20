@@ -15,6 +15,9 @@ The reference itself hands nothing over, so there is no algorithm to stand besid
 - `AF2` (`ArcFormats/CsWare/AudioAF2.cs`) ends its reader at `format.SetBPS()` without standing anything over.
 - `BIN/DXLIB` (`ArcFormats/DxLib/ArcDX8.cs`) ends its reader at `return null;` with `// decrypt-2` and
   `// decompress` still standing as words rather than as places.
+- `EMS` (`ArcFormats/Entis/AudioEMS.cs`) calls `CreateDecoderSymbolTable` at its line 156 and
+  `DecodeSymbols` at its line 162, and stands neither of them anywhere in the tree — the file does not
+  stand of the places of the picture of the walk of the places of the picture of the sound of its own.
 
 ## The keys stand outside the reference
 
