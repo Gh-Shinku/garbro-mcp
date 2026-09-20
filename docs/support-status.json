@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CPB",
+				"class": "CpbFormat",
+				"source": "ArcFormats/AZSys/ImageCPB.cs"
+			},
+			"localId": "azsys-cpb-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of both kinds of the walk of its places",
+				"the records of the places of a picture",
+				"the walk of a record of the third kind",
+				"the records of a picture of the second kind standing as streams of the places of a picture",
+				"the places of the four records standing beside each other"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a picture of eight places, which the reference reads no words of the head for"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GIZ/2",
 				"class": "GizFormat",
 				"source": "Legacy/Adviz/ImageGIZ2.cs"
