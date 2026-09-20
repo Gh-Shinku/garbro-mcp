@@ -47,7 +47,24 @@ Reading the places of such a format means reading a second kind of file first, a
 - `BMP/uGOS` (`ArcFormats/uGOS/ImageBMP.cs`) stands as a walk of the places of a picture of four and fifty
   places of its own, read through tables it stands as places of its own.
 - `JBP` (`ArcFormats/Sviu/ImageJBP.cs`) hands its places to a reader of the kind of pictures of `PB3`, which
-  stands in a file of nine hundred places together with places of a picture of its own.
+  stands in `ArcFormats/Cmvs/ImagePB3.cs`, a file of nine hundred places that keeps two formats of its own
+  beside it. Its places stand in `PbReaderBase` (at line 88), `Pb3Reader` (193, with walks of its own at 229,
+  323 and 376 and companions of the places of the game), and `JbpReader` (at line 470, with the places of its
+  walk at 487, `Unpack` at 530, `Decode` at 572, `Dct` at 651 and `Ycc2Rgb` at 749). The words of a picture of
+  that kind stand as this: where its places stand at the four places behind their own head, its kind at eight,
+  how wide and how tall it stands at `0x10` and `0x12`, and how many places of two walks of the picture stand
+  at `0x1C` and `0x20`; the places of a picture stand in places of eight, sixteen or two and thirty places of
+  the picture by the high places of the kind of the file. `JbpReader.Unpack` stands two Huffman walks of the
+  places of the picture, the places of both of which stand at the places the head names, the words of the walk
+  standing at the eighty places behind those with one place added to every one of them, and the places that
+  name how many places of the walk stand at the places themselves and at the sixty four places behind them; it
+  then reads the places that name how many places of the picture every place of the walk stands for at the
+  eighty places behind the words of the walks where the high places of the kind of the file name them, and
+  reads the two walks themselves from the places behind those.
+- The walks of such a picture stand as a kind of their own: the project's `packages/codecs/src/huffman.ts`
+  stands a walk of another kind — its `decompressHuffman` reads places through a table of `HUFFMAN_TREE_SIZE`
+  places — so reading `JbpReader` stands as a turn of its own rather than as a part of this one, and the places
+  of its walks stand as the turn to begin with.
 
 ## The reference hands the work to a library or to the places of the game
 
