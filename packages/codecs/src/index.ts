@@ -13,3 +13,4 @@ export * from "./zlib.js";
 export * from "./msvc-random.js";
 export * from "./rc4.js";
 export * from "./jbp-huffman.js";
+export * from "./jbp-coefficients.js";
