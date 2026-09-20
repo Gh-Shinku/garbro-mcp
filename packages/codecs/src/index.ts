@@ -17,3 +17,4 @@ export * from "./jbp-coefficients.js";
 export * from "./jbp-dct.js";
 export * from "./jbp-ycc.js";
 export * from "./jbp-reader.js";
+export * from "./pb3-reader.js";

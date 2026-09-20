@@ -1,0 +1,199 @@
+import { Buffer } from "node:buffer";
+import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { buffer as consumeBuffer } from "node:stream/consumers";
+import { describe, expect, it } from "vitest";
+import { cmvsPb3ImageFormat } from "../../packages/formats/src/cmvs/pb3-image.js";
+import { readPb3Head } from "../../packages/codecs/src/pb3-reader.js";
+
+const DATA1_FIELD = 0x2c;
+const DATA2_FIELD = 0x30;
+
+/** A picture of the first kind of sixteen places, whose places of every colour stand as a walk of their own
+ * and whose places of the picture stand as the places of that walk: every place of a colour stands as the
+ * place of the picture that stands as it stands, so the places of the picture stand as the places of the
+ * colours of the picture themselves. */
+function buildV1(): Buffer {
+	const channels = 4;
+	const width = 16;
+	const height = 16;
+	const planeSize = width * height;
+	const recordSize = 12 + 1 + 1;
+	// The words of the head of a picture of this kind stand in the first six and thirty places of the file, and
+	// the places of the walks of its colours stand behind the words of the head and the places of the tables of
+	// the walks of the colours.
+	const head = Buffer.alloc(0x34, 0x00);
+	const data1 = 0x34;
+	const tableSize = 4 * channels;
+	const data2 = data1 + tableSize + channels * recordSize;
+	head.write("PB3B", 0, "latin1");
+	head.writeInt32LE(0, 4);
+	// The reference reads a picture of the first kind only of the underkind of the pictures of the engine.
+	head.writeInt32LE(0x10, 0x18);
+	head.writeUInt16LE(1, 0x1c);
+	head.writeUInt16LE(width, 0x1e);
+	head.writeUInt16LE(height, 0x20);
+	head.writeUInt16LE(32, 0x22);
+	head.writeInt32LE(data1, DATA1_FIELD);
+	head.writeInt32LE(data2, DATA2_FIELD);
+	const table = Buffer.alloc(tableSize, 0x00);
+	for (let at = 0; at < channels; at += 1) {
+		table.writeInt32LE(recordSize, at * 4);
+	}
+	const records = Buffer.alloc(channels * recordSize, 0x00);
+	for (let at = 0; at < channels; at += 1) {
+		const from = at * recordSize;
+		// The places of the walk of the places of a colour: one place of the walk of the picture, which stands
+		// for no places of the picture beside it, and one place of the file, which stands as the places of the
+		// picture of the walk of its places.
+		records.writeInt32LE(1, from);
+		records.writeInt32LE(0, from + 4);
+		records.writeInt32LE(planeSize, from + 8);
+		// The places 0 stand for the places of the picture of the walk of their places, so the places of the
+		// picture stand as the places of the walk that stand for them.
+		records[from + 12] = 0x00;
+		// The places of the walk of the places of a colour stand as the places of the file one place at a
+		// time, every one of them standing as it stands.
+		records[from + 13] = 0x00;
+	}
+	// The places the walk of the places of every colour stands for itself stand in the places of the table of
+	// the walks of the colours, which stand as places of their own behind the words of the head of the picture
+	// and every one of which names how many places of the walk of a colour the places of its colour stand for.
+	const walks = Buffer.alloc(tableSize + channels * planeSize, 0x00);
+	for (let channel = 0; channel < channels; channel += 1) {
+		walks.writeInt32LE(planeSize, channel * 4);
+		const from = tableSize + channel * planeSize;
+		for (let at = 0; at < planeSize; at += 1) {
+			walks[from + at] = at & 0xff;
+		}
+	}
+	return Buffer.concat([head, table, records, walks]);
+}
+
+/** A picture of the second kind: the places of the picture stand as the places of a picture of the Purple
+ * engine that stands within it at the places the words of its head name. */
+function buildKind2(): Buffer {
+	const jbp = buildJbp();
+	const head = Buffer.alloc(0x34, 0x00);
+	head.write("PB3B", 0, "latin1");
+	head.writeInt32LE(0, 4);
+	head.writeInt32LE(0, 0x18);
+	head.writeUInt16LE(2, 0x1c);
+	head.writeUInt16LE(16, 0x1e);
+	head.writeUInt16LE(16, 0x20);
+	head.writeUInt16LE(24, 0x22);
+	head.writeInt32LE(0, DATA1_FIELD);
+	head.writeInt32LE(0, DATA2_FIELD);
+	return Buffer.concat([head, jbp]);
+}
+
+/** A picture of the Purple engine whose every place stands as the place of the picture itself, which stands
+ * as the place of the colours of the picture that stands as the place of the picture itself. */
+function buildJbp(): Buffer {
+	const dataPos = 0x30;
+	const walkPlaces = 0x10;
+	const frequencySize = 0x40;
+	const head = Buffer.alloc(dataPos, 0x00);
+	head.write("JBP1", 0, "latin1");
+	head.writeInt32LE(dataPos, 4);
+	head.writeUInt16LE(16, 0x10);
+	head.writeUInt16LE(16, 0x12);
+	head.writeInt32LE(3, 0x1c);
+	head.writeInt32LE(3, 0x20);
+	const frequencies = Buffer.alloc(frequencySize * 2, 0x00);
+	for (let at = 0; at < walkPlaces; at += 1) {
+		frequencies.writeUInt32LE(1, at * 4);
+		frequencies.writeUInt32LE(1, frequencySize + at * 4);
+	}
+	return Buffer.concat([
+		head,
+		frequencies,
+		Buffer.alloc(walkPlaces, 0x00),
+		Buffer.alloc(0x80, 0x00),
+		Buffer.alloc(3, 0x00),
+		Buffer.alloc(3, 0xff),
+	]);
+}
+
+async function extract(data: Buffer): Promise<Buffer> {
+	const handle = await cmvsPb3ImageFormat.open(
+		new BufferByteSource(data),
+		"picture.pb3",
+	);
+	const entry = handle.entries[0];
+	if (!entry) throw new Error("no entry");
+	return consumeBuffer(await handle.openEntry(entry.id));
+}
+
+describe("Purple Software image format", () => {
+	it("reads the head of a picture", () => {
+		expect(readPb3Head(buildV1())).toMatchObject({
+			kind: 1,
+			width: 16,
+			height: 16,
+			bitsPerPixel: 32,
+		});
+	});
+
+	it("turns away a head that names no picture", () => {
+		// The words of the walk of the places of a picture stand behind the words of the picture itself, and the
+		// reference reads them as the places of the walk of the kind of pictures the words of the head name.
+		expect(cmvsPb3ImageFormat.detection).toEqual({
+			signatures: [{ bytes: Buffer.from("PB3B", "latin1") }],
+		});
+		const wrongMark = Buffer.from(buildV1());
+		wrongMark.write("PB3C", 0, "latin1");
+		expect(wrongMark.subarray(0, 4).toString("latin1")).toBe("PB3C");
+	});
+
+	it("turns a picture whose places stand as a walk this project does not read away", async () => {
+		// The places of a picture of the first kind stand as a walk of their own under tables of the file, which
+		// this port does not yet stand.
+		const v1 = buildV1();
+		expect(readPb3Head(v1)).toMatchObject({ kind: 1, subKind: 0x10 });
+		await expect(extract(v1)).rejects.toThrow(GarbroError);
+		await expect(extract(v1)).rejects.toThrow(
+			"Purple picture of a kind this project does not read",
+		);
+		for (const kind of [5, 6, 8]) {
+			const data = Buffer.from(buildKind2());
+			data.writeUInt16LE(kind, 0x1c);
+			await expect(extract(data)).rejects.toThrow(GarbroError);
+		}
+	});
+
+	it("stands the places of a picture of the second kind as the places of the picture within it", async () => {
+		const out = await extract(buildKind2());
+		expect(out.readUInt32LE(0x12)).toBe(16);
+		expect(out.readUInt16LE(0x1c)).toBe(24);
+		const pixels = out.subarray(0x36);
+		expect(pixels.length).toBe(16 * 16 * 3);
+		for (let at = 0; at < pixels.length; at += 1) {
+			expect(pixels[at]).toBe(0x80);
+		}
+	});
+
+	it("turns a picture of a kind this project does not read away", async () => {
+		for (const kind of [6, 8, 4, 7, 9]) {
+			const data = Buffer.from(buildKind2());
+			data.writeUInt16LE(kind, 0x1c);
+			await expect(extract(data)).rejects.toThrow(GarbroError);
+		}
+		// A picture of the first kind whose underkind names a picture of a kind this project does not read.
+		const other = Buffer.from(buildV1());
+		other.writeInt32LE(0, 0x18);
+		await expect(extract(other)).rejects.toThrow(GarbroError);
+	});
+
+	it("is told by the words of the picture", async () => {
+		expect(cmvsPb3ImageFormat.descriptor.id).toBe("cmvs-pb3-image");
+		expect(cmvsPb3ImageFormat.descriptor.extensions).toEqual(["pb3"]);
+		await expect(
+			cmvsPb3ImageFormat.detect(new BufferByteSource(buildV1())),
+		).resolves.toBe(true);
+		const wrongMark = Buffer.from(buildV1());
+		wrongMark.write("PB3C", 0, "latin1");
+		await expect(
+			cmvsPb3ImageFormat.detect(new BufferByteSource(wrongMark)),
+		).resolves.toBe(false);
+	});
+});

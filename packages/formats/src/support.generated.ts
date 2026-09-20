@@ -9,6 +9,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PB3",
+				class: "Pb3Format",
+				source: "ArcFormats/Cmvs/ImagePB3.cs",
+			},
+			localId: "cmvs-pb3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the places of a picture of the kinds that stand as the places of a picture of the Purple engine within them",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the walks of the places of the first and fifth kinds of picture",
+				"the walks of the places of the kinds that stand behind the words of the engine and the places of the game",
+			],
+			remainingVerification: [
+				"the walk of the places of the first kind of picture",
+				"real-game GARbro differential output",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "JBP",
 				class: "JbpFormat",
 				source: "ArcFormats/Sviu/ImageJBP.cs",

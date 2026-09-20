@@ -10,6 +10,7 @@ import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
+import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { medFormat } from "./dxlib/med.js";
 import { dpfFormat } from "./mutation/dpf.js";
 import { ccfFormat } from "./black-rainbow/ccf.js";
@@ -1266,6 +1267,7 @@ export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
 		new Xp3Format(),
 		new Adpack32Format(),
+		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
 		ugoTxtFormat,
 		sas5WarFormat,
