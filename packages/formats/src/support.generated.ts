@@ -18526,5 +18526,33 @@ export const formatSupportCatalog = {
 				"a picture whose difference group leaves a channel short of zero, which wraps the stored byte as the reference's cast does",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "BSG",
+				class: "BsgFormat",
+				source: "ArcFormats/Bishop/ImageBSG.cs",
+			},
+			localId: "bishop-bsg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the header walk, with and without a composition in front of it",
+				"the three colour modes",
+				"stored channels, including the three byte kind",
+				"the run coded channel",
+				"the back referenced channel and its delta pass",
+				"bitmap output with the rows flipped",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture of each colour mode",
+				"a real picture whose channels are back referenced, which is where the escape byte and the delta pass are hardest to get right",
+			],
+		},
 	],
 } as const;

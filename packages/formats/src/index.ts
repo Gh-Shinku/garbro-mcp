@@ -247,6 +247,7 @@ import { mgsFormat } from "./masys/mgs-archive.js";
 import { eternitySgfImageFormat } from "./eternity/sgf-image.js";
 import { pajamasEpaImageFormat } from "./pajamas/epa-image.js";
 import { nsystemMgdImageFormat } from "./nsystem/mgd-image.js";
+import { bishopBsgImageFormat } from "./bishop/bsg-image.js";
 import { ucgFormat } from "./parsley/ucg.js";
 import { voiceFormat } from "./seraphim/voice.js";
 import { arccFormat } from "./hexenhaus/arcc.js";
@@ -1557,6 +1558,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		eternitySgfImageFormat,
 		pajamasEpaImageFormat,
 		nsystemMgdImageFormat,
+		bishopBsgImageFormat,
 		ucgFormat,
 		voiceFormat,
 		arccFormat,
