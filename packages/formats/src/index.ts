@@ -840,6 +840,7 @@ import { gameresWavAudioFormat } from "./gameres/wav-audio.js";
 import { rugpRhaAudioFormat } from "./rugp/rha-audio.js";
 import { studioJikkenshitsuGrdImageFormat } from "./studio-jikkenshitsu/grd-image.js";
 import { studioJikkenshitsuSpeedImageFormat } from "./studio-jikkenshitsu/speed-image.js";
+import { studioJikkenshitsuGrcImageFormat } from "./studio-jikkenshitsu/grc-image.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
 import { rinaRadImageFormat } from "./rina/rad-image.js";
@@ -2078,6 +2079,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		rugpRhaAudioFormat,
 		studioJikkenshitsuGrdImageFormat,
 		studioJikkenshitsuSpeedImageFormat,
+		studioJikkenshitsuGrcImageFormat,
 		macromediaSndAudioFormat,
 		gsPackPicImageFormat,
 		rinaRadImageFormat,

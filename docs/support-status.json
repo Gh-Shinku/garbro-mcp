@@ -6,6 +6,30 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "GRC",
+				"class": "GrcFormat",
+				"source": "ArcFormats/StudioJikkenshitsu/ImageGRC.cs"
+			},
+			"localId": "studio-jikkenshitsu-grc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the four ways the steps of a row of a picture stand behind the places of the rows before it",
+				"the colours of a picture of eight bits"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures whose places stand under a key of their own, which stands in the reference's own settings"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "DAT/SPEED",
 				"class": "SpDatFormat",
 				"source": "ArcFormats/StudioJikkenshitsu/ImageDAT.cs"
