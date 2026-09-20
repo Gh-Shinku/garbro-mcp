@@ -6,6 +6,33 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "DAT/SPEED",
+				"class": "SpDatFormat",
+				"source": "ArcFormats/StudioJikkenshitsu/ImageDAT.cs"
+			},
+			"localId": "studio-jikkenshitsu-speed-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walk of runs the places of a picture stand behind",
+				"the places of a picture that stand as they stand",
+				"the colours of a picture of eight bits",
+				"the shape of the places of a picture"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures whose places stand under a key of their own, which stands in the reference's own settings",
+				"pictures that name no colours of their own"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "GRD/SJ",
 				"class": "GrdFormat",
 				"source": "ArcFormats/StudioJikkenshitsu/ImageGRD.cs"
