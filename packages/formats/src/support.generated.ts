@@ -8,6 +8,28 @@ export const formatSupportCatalog = {
 	implementations: [
 		{
 			reference: {
+				type: "audio",
+				tag: "PX/cTRK",
+				class: "PxAudio",
+				source: "ArcFormats/Ivory/AudioCTRK.cs",
+			},
+			localId: "ivory-px-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the three kinds of the places of a sound",
+				"a head that stands behind words of its own",
+				"the walk of the places of a sound",
+				"the places of a sound of the Ogg kind",
+			],
+			unsupported: ["archive creation", "audio encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "QNT",
 				class: "QntFormat",

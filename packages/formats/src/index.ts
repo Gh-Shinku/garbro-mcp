@@ -36,6 +36,7 @@ import { dallPelFormat } from "./dall/pel.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { MpxFormat } from "./ikura/mpx.js";
 import { ivorySgFormat } from "./ivory/sg.js";
+import { ivoryPxAudioFormat } from "./ivory/px-audio.js";
 import { k5Format } from "./gsx/k5.js";
 import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
@@ -1329,6 +1330,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
+		ivoryPxAudioFormat,
 		ivoryPxFormat,
 		vsdFormat,
 		silkyArcFormat,
