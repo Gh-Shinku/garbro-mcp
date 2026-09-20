@@ -10,6 +10,7 @@ import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
+import { medFormat } from "./dxlib/med.js";
 import { dpfFormat } from "./mutation/dpf.js";
 import { ccfFormat } from "./black-rainbow/ccf.js";
 import { circusPckFormat } from "./circus/pck.js";
@@ -913,6 +914,8 @@ export * from "./cri/index.js";
 export * from "./abel/index.js";
 export * from "./antique/index.js";
 export * from "./dall/index.js";
+export * from "./dxlib/index.js";
+
 export * from "./ethornell/index.js";
 export * from "./escude/index.js";
 export * from "./favorite/index.js";
@@ -1257,6 +1260,7 @@ export function createDefaultRegistry(): FormatRegistry {
 	return new FormatRegistry([
 		new Xp3Format(),
 		new Adpack32Format(),
+		medFormat,
 		bananaPkFormat,
 		otemotoMagImageFormat,
 		spcFormat,

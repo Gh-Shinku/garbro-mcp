@@ -5,6 +5,30 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "archive",
+				"tag": "MED",
+				"class": "MedOpener",
+				"source": "ArcFormats/DxLib/ArcMED.cs"
+			},
+			"localId": "dxlib-med",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the index of an archive",
+				"files of an archive handed out as they stand"
+			],
+			"unsupported": [
+				"archive creation",
+				"script decryption",
+				"the kinds of file of the engine"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "PX/cTRK",
 				"class": "PxAudio",
