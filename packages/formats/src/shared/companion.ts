@@ -60,3 +60,28 @@ export async function listCompanionFiles(
 		return [];
 	}
 }
+
+/**
+ * The companions a format looks for by extension rather than by name: GARbro asks its own file system for
+ * `*.ext` beside the archive, and where it finds none, for the same pattern in the directory above it. The
+ * names are returned sorted so the order is deterministic where a file system's own is not.
+ */
+export async function findCompanionFilesByExtension(
+	sourcePath: string,
+	extension: string,
+): Promise<string[]> {
+	const suffix = `.${extension.toLowerCase()}`;
+	const directories = [dirname(sourcePath), dirname(dirname(sourcePath))];
+	for (const directory of directories) {
+		try {
+			const names = (await readdir(directory))
+				.filter((name) => name.toLowerCase().endsWith(suffix))
+				.sort();
+			if (names.length > 0)
+				return names.map((name) => resolve(directory, name));
+		} catch {
+			// The directory stands of no places of the picture of the walk of them.
+		}
+	}
+	return [];
+}

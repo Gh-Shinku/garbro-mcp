@@ -15,6 +15,7 @@ import {
 	createFixedEntry,
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
+import { readSec5ArchiveNames } from "./sec5-index.js";
 
 /** 'iar ' — the four places of the picture of the head of the places of the picture of the engine of the SAS5
  * kind. */
@@ -155,16 +156,23 @@ export const sas5IarFormat: ArchiveFormat = defineFixedArchive({
 		const baseName = sourcePath.replace(/^.*[/\\]/, "").replace(/\.[^.]*$/, "");
 		const index = readIarIndex(stored, Number(source.size), baseName);
 		if (!index) throw invalidArchive("Not an archive of this kind");
+		// The reference stands the places of the picture of the walk of the places of the picture of the names
+		// of the places of the picture of the walk of them out of the places of the picture of the walk of the
+		// places of the picture of the engine of the SAS5 kind of the name `SEC5` where those places of the
+		// picture of the walk of them stand, and out of the places of the picture of the walk of the places of
+		// the picture of the name of the picture of the walk of it of their own where they stand not.
+		const names = await readSec5ArchiveNames(sourcePath);
 		return {
-			entries: index.entries.map((place, id) =>
-				createFixedEntry({
+			entries: index.entries.map((place, id) => {
+				const named = names?.get(id);
+				return createFixedEntry({
 					id,
-					path: place.path,
+					path: named ? named.name : place.path,
 					offset: BigInt(place.offset),
 					size: BigInt(place.size),
-					metadata: { type: "image" },
-				}),
-			),
+					metadata: { type: named ? named.type : "image" },
+				});
+			}),
 			metadata: {
 				version: index.version,
 				fileCount: index.fileCount,

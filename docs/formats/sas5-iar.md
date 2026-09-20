@@ -50,17 +50,19 @@ of the picture of the walk of them of the first place of the picture of the tabl
 
 ## The names
 
-Where the reference stands the places of the picture of the walk of the places of the picture of the names of
-the places of the picture of the walk of them out of the places of the picture of the walk of the places of
-the picture of the engine of the SAS5 kind of the name `SEC5` (`Sec5Opener.LookupIndex`), it stands for the
-places of the picture of the walk of them of the engine of the kind of the archive of the places of the
-picture of the walk of them of the places of the picture of the walk of them of their own. Where no such
-places of the picture stand, the reference stands the places of the picture of the walk of the places of the
-picture of a place of the picture of the walk of them of the places of the picture of the walk of them of the
-name of the picture of the walk of the places of the picture of the picture, of the places of the picture of
-the walk of the places of the picture of the place of the picture of the walk of them, and of the places of
-the picture of the walk of the places of the picture of the number of the place of the picture of the walk of
-them of five places of the picture — `data#00000` and the like.
+Where the places of the picture of the walk of the places of the picture of the engine of the SAS5 kind of the
+name `SEC5` stand beside the places of the picture of the walk of the places of the picture of the picture of
+the walk of them, the reference stands the places of the picture of the walk of the places of the picture of the
+names of the places of the picture of the walk of them out of those places of the picture of the walk of them —
+see `docs/formats/sas5-sec5.md`. Where no such places of the picture stand, the reference stands the places of
+the picture of the walk of the places of the picture of a place of the picture of the walk of them of the name
+of the picture of the walk of the places of the picture of the picture, of the places of the picture of the
+walk of the places of the picture of the place of the picture of the walk of them, and of the places of the
+picture of the walk of the places of the picture of the number of the place of the picture of the walk of them
+of five places of the picture — `data#00000` and the like. A picture of this project stands both, looking for
+a companion of the kind `SEC5` beside the places of the picture of the walk of the places of the picture of the
+archive, and then beside the places of the picture of the walk of the places of the picture of the picture above
+them.
 
 ## Deviations from the reference
 
@@ -88,13 +90,14 @@ them of five places of the picture — `data#00000` and the like.
 
 ## What this port does not stand
 
-The reference stands the places of the picture of the walk of the places of the picture of the name `SEC5`
-beside the places of the picture of the walk of them (`Sec5Opener.LookupIndex`, `FindSec5Resr`,
-`ReadResrSection` and `ReadRes2Section`), and stands those places of the picture of the walk of the places of
-the picture beside the places of the picture of the walk of them of its own of this kind as well. Those
-places of the picture of the walk of the places of the picture stand for the consumer of the archives of the
-engine of the SAS5 kind, and stand of no places of the picture of the walk of the places of the picture of the
-places of the picture of the walk of them of this kind — see `docs/formats/sas5-sec5.md`.
+The reference stands the places of the picture of the walk of the places of the picture of the names of the
+places of the picture of the walk of them out of the places of the picture of the walk of the places of the
+picture of the name `SEC5`, which this project stands as well — see `docs/formats/sas5-sec5.md`. The places of
+the picture of the walk of the places of the picture of the names of the picture of the walk of them that stand
+of no places of the picture of the walk of the places of the picture of the places of the picture of the engine
+of the kind of the pictures of the engine of Japan stand of the places of the picture of the walk of the places
+of the picture of the reference, and of no places of the picture of the walk of the places of the picture of the
+fixtures of this project.
 
 ## Verification
 

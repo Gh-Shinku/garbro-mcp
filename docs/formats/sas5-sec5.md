@@ -75,19 +75,47 @@ stands over as it stands.
   it of their own. A picture of the places of the picture of the walk of them of this project turns such a
   picture away.
 
-## What this port does not stand
+## The names of the places of the picture of the walk of the places of the picture
 
-The reference also stands the places of the picture of the walk of the places of the picture of the names of
-the places of the picture of the walk of the places of the picture of the archives of the kinds `file-war` and
-`file-iar` (`Sec5Opener.LookupIndex`, `FindSec5Resr`, `ReadResrSection` and `ReadRes2Section`), standing them
-beside the places of the picture of the walk of the places of the picture of the archives of the engine of the
-SAS5 kind of their own. Those places of the picture of the walk of the places of the picture stand for the
-consumer of the archives of the engine of the SAS5 kind, which stands outside the walk of the places of the
-picture of a picture of the places of the picture of the walk of them of this kind, and they stand of no
-places of the picture of the walk of the places of the picture of the places of the picture of the walk of
-them of this kind. The places of the picture of the walk of the places of the picture of the place of the
-picture of the walk of them therefore stand over, and no places of the picture of the walk of the places of
-the picture of this project stands of them.
+The places of the picture of the walk of the places of the picture of the engine of the SAS5 kind of the name
+`SEC5` stand the places of the picture of the walk of the places of the picture of the names of the places of
+the picture of the walk of them of the archives of the engine of the kinds `file-war` and `file-iar` as well
+(`Sec5Opener.LookupIndex`, `FindSec5Resr`, `ReadResrSection` and `ReadRes2Section`). Those places of the
+picture of the walk of the places of the picture stand as the places of the picture of the walk of the places
+of the picture of the name of the picture of the walk of the places of the picture of the archive, and as the
+places of the picture of the walk of the places of the picture of the place of the picture of the walk of them
+of the places of the picture of the walk of the places of the picture of the archive of their own — so the
+places of the picture of the walk of the places of the picture of the sound of the walk of them stand beside
+the places of the picture of the walk of the places of the picture of the name of the picture of the walk of
+the places of the picture of the archive of the places of the picture of the walk of them of the engine of the
+kind of the pictures of the engine of Japan.
+
+* `ReadResrSection` stands every place of the picture of the walk of them of the places of the picture of the
+  walk of the places of the picture of the name of the picture of the walk of it, of the places of the picture
+  of the walk of the places of the picture of the kind of the picture of the walk of it, of the places of the
+  picture of the walk of the places of the picture of the kind of the places of the picture of the walk of them
+  of the places of the picture of the walk of the places of the picture of the engine, and of the places of the
+  picture of the walk of the places of the picture of the place of the picture of the walk of them — and
+  stands the places of the picture of the walk of the places of the picture of the name of the picture of the
+  walk of the places of the picture of the archive and of the places of the picture of the walk of the places
+  of the picture of the place of the picture of the walk of them of the places of the picture of the walk of
+  the places of the picture of the archive for the two kinds of the walk of the places of the picture of the
+  picture of the walk of them of the places of the picture of the walk of the places of the picture of the
+  engine.
+* `ReadRes2Section` stands the same places of the picture of the walk of the places of the picture out of the
+  places of the picture of the walk of the places of the picture of a picture of the walk of the places of the
+  picture of the words of the walk of the picture: a table of the places of the picture of the walk of the
+  places of the picture of the words of the walk of them standing beside the places of the picture of the walk
+  of the places of the picture of the picture, the places of the picture of the walk of the places of the
+  picture standing of the places of the picture of the walk of the places of the picture of the word of the
+  walk of them of the places of the picture of the walk of the places of the picture of the picture of their
+  own, the places of the picture of the walk of the places of the picture of the walk of them standing of the
+  places of the picture of the walk of the places of the picture of the word of the walk of them behind them.
+
+The reference stands the places of the picture of the walk of the places of the picture of a companion of the
+kind `SEC5` beside the archive of the places of the picture of the walk of the places of the picture, and then
+beside the places of the picture of the walk of the places of the picture of the picture above them; a picture
+of this project stands them the same way.
 
 ## Verification
 
