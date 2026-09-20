@@ -635,6 +635,7 @@ import { eogAudioFormat } from "./crowd/eog-audio.js";
 import { kogAudioFormat } from "./sviu/kog-audio.js";
 import { aoiAogAudioFormat } from "./aoi/aog-audio.js";
 import { softpalBgmAudioFormat } from "./softpal/bgm-audio.js";
+import { realliveNwaAudioFormat } from "./reallive/nwa-audio.js";
 import { realliveOwpAudioFormat } from "./reallive/owp-audio.js";
 import { nsOpenerFormat } from "./nscripter/script.js";
 import { esdAudioFormat } from "./tamasoft/esd-audio.js";
@@ -1914,6 +1915,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kogAudioFormat,
 		aoiAogAudioFormat,
 		softpalBgmAudioFormat,
+		realliveNwaAudioFormat,
 		realliveOwpAudioFormat,
 		nsOpenerFormat,
 		esdAudioFormat,
