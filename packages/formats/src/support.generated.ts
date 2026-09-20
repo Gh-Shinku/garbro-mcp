@@ -18379,5 +18379,23 @@ export const formatSupportCatalog = {
 				"the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them that stand of the places of the picture of the walk of the places of the picture of their own of more than four and sixty places of the picture, the reference standing the places of the picture of the walk of them of no places of the picture of the walk of them",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "IAR",
+				class: "IarOpener",
+				source: "ArcFormats/Sas5/ArcIAR.cs",
+			},
+			localId: "sas5-iar",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "archive rebuild"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of the picture of the walk of the places of the picture of the names of the places of the picture of the walk of them out of the place of the picture of the walk of the places of the picture of the engine of the SAS5 kind of the name `SEC5` (Sec5Opener.LookupIndex), the places of the picture of the walk of the places of the picture of this kind standing of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of them where those places of the picture stand",
+				"the places of the picture of the walk of the places of the picture of a place of the picture of the walk of them stood out of the places of the picture of the walk of the places of the picture of the picture of the walk of them (IarImage), the places of the picture of the walk of the places of the picture of the places of the picture of the walk of them of the places of the picture of their own standing beside the places of the picture of the walk of the places of the picture of the picture of the walk of them where the places of the picture of the walk of the places of the picture of the picture of the walk of them of the places of the picture of the walk of the places of them stand of the places of the picture of the walk of the places of the picture of the picture of the walk of them of their own (the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them of the places of the picture of the walk of the places of the picture of the picture of the walk of them standing of the places of the picture of the walk of the places of the picture of the place of the picture of the walk of them) — the places of the picture of the walk of the places of the picture of this project standing as they stand",
+			],
+		},
 	],
 } as const;
