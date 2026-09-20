@@ -8,6 +8,7 @@ import { Adpack32Format } from "./active-soft/adpack32.js";
 import { bananaPkFormat } from "./banana/pk.js";
 import { ailDatFormat, lnk2Format } from "./ail/dat.js";
 import { AmiFormat } from "./amaterasu/ami.js";
+import { scrScriptFormat } from "./amaterasu/scr-script.js";
 import { mjaFormat } from "./artemis/mja.js";
 import { mifFormat } from "./basil/mif.js";
 import { bishopBscFormat } from "./bishop/bsc.js";
@@ -2135,6 +2136,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		seraphimCbImageFormat,
 		seraphimCxImageFormat,
 		amaterasuGrpImageFormat,
+		scrScriptFormat,
 		discoveryPr1ImageFormat,
 		discoveryAn1ImageFormat,
 		uranNclImageFormat,
