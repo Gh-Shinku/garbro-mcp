@@ -31,7 +31,7 @@ const HEIGHT_FIELD = 0x14;
 const OFFSET_X_FIELD = 0x18;
 const OFFSET_Y_FIELD = 0x1c;
 /** The largest size a head may stand behind, past which a file of another kind would be read. */
-const MAXIMUM_HEADER_SIZE = 0x1000;
+export const MAXIMUM_HEADER_SIZE = 0x1000;
 /** A picture this project is willing to hold, past which the reference would run out of memory. */
 const LIMIT = 256 * 1024 * 1024;
 

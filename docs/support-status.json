@@ -5,6 +5,31 @@
 	"implementations": [
 		{
 			"reference": {
+				"type": "image",
+				"tag": "SPC",
+				"class": "SpcFormat",
+				"source": "ArcFormats/Cri/ImageSPC.cs"
+			},
+			"localId": "cri-spc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the walked places of a texture",
+				"pictures of the first and third kinds of tiling",
+				"a head that stands behind a size of its own"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"pictures of the second kind of tiling"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "VAW",
 				"class": "VawAudio",
