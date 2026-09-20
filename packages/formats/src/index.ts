@@ -441,6 +441,7 @@ import { blueGaleAmvFormat } from "./blue-gale/amv.js";
 import { clickTeamMfsFormat } from "./clickteam/mf.js";
 import { miscBinFormat } from "./misc/bin.js";
 import { ponytailBndFormat } from "./ponytail/bnd.js";
+import { ponytailTszImageFormat } from "./ponytail/tsz-image.js";
 import { ankhGrpFormat } from "./ankh/grp.js";
 import { ankhDatFormat } from "./ankh/dat.js";
 import { shapeShifterBndFormat } from "./shapeshifter/bnd.js";
@@ -1670,6 +1671,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		clickTeamMfsFormat,
 		miscBinFormat,
 		ponytailBndFormat,
+		ponytailTszImageFormat,
 		ankhGrpFormat,
 		ankhDatFormat,
 		shapeShifterBndFormat,
