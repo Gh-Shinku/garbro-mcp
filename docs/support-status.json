@@ -18369,6 +18369,37 @@
 				"an ARC/AZ archive whose ASB entries are decrypted with a user-supplied key",
 				"an archive whose head declares more than one index chunk (ext_count > 1)"
 			]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "YK",
+				"class": "YkOpener",
+				"source": "Legacy/Koei/ArcYK.cs"
+			},
+			"localId": "koei-yk",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"name gated detection",
+				"the fixed DATA01 picture blocks",
+				"the fourteen offset table archives",
+				"DATA02 picture naming and geometry",
+				"the wave head of the audio archives",
+				"DATA03 word mixing"
+			],
+			"unsupported": [
+				"archive creation",
+				"the DATA02 entry ids the reference lists without geometry, which it hands to no decoder either"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real DATA01 file, whose block count depends on the game",
+				"the DATA02 pictures the reference decodes through the fixed high id geometry"
+			]
 		}
 	]
 }
