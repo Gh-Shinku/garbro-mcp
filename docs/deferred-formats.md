@@ -138,6 +138,14 @@ candidates when porting continues.
   reader walks a channel through a sixteen entry offset table, reads a colour map with `PaletteFormat.Bgr`
   for the one byte kinds, reads a second channel for its alpha colour type, and lays out pixels of more
   than one byte in separate planes. None of that is blocked; it is simply more than one sitting's work.
+- `BSG` (`ArcFormats/Bishop/ImageBSG.cs`, 256 lines) is a picture in the shape of MGD: an optional
+  `BSS-Composition` prefix of 0x20 bytes in front of a `BSS-Graphics` header, three colour modes, and three
+  compression modes. Its colours are planes of a four byte pixel, and it reads through
+  `ImageData.CreateFlipped`, so its rows arrive bottom up. The stored mode expands three byte triplets; the
+  second is a run coder whose signed count means `count + 1` literals or, when negative, `1 - count` copies
+  of the next byte; and the third is a back referencing walk with an escape byte, followed by a pass that
+  adds each sample to the one before it in its plane. The two coders are the part worth a sitting of their
+  own.
 
 ## Two engines can share a tag and a class name
 
