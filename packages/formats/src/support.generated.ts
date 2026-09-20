@@ -18595,5 +18595,33 @@ export const formatSupportCatalog = {
 				"a real picture, which would show which of the five streams a game actually fills",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "K4",
+				class: "K4Format",
+				source: "Legacy/Gsx/ImageK4.cs",
+			},
+			localId: "gsx-k4-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head that decides the format and the second one it unpacks with",
+				"the control plane and the stream, both read from the most significant bit",
+				"the stored byte and the nine bit step against the byte a row above",
+				"both widths of run and the overlap a run can reach into",
+				"the rebuilt run of a difference picture",
+				"the bottom up rows, and the turn over the alpha channel brings",
+				"both alpha modes with their scaling and their bit order",
+			],
+			unsupported: ["image creation", "alpha modes other than 0xFF and 0xFE"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show whether games use the difference flag with an alpha channel",
+			],
+		},
 	],
 } as const;

@@ -882,6 +882,7 @@ import { vnEngineZawImageFormat } from "./vn-engine/zaw-image.js";
 import { propellerMgrImageFormat } from "./propeller/mgr-image.js";
 import { gameSystemBgdImageFormat } from "./gamesystem/bgd-image.js";
 import { gsxK2ImageFormat } from "./gsx/k2-image.js";
+import { gsxK4ImageFormat } from "./gsx/k4-image.js";
 import { projectMyuGamImageFormat } from "./project-myu/gam-image.js";
 import { keroqKgd1ImageFormat } from "./keroq/kgd1-image.js";
 import { utageImageFormat } from "./unity/utage-image.js";
@@ -2188,6 +2189,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		propellerMgrImageFormat,
 		gameSystemBgdImageFormat,
 		gsxK2ImageFormat,
+		gsxK4ImageFormat,
 		projectMyuGamImageFormat,
 		keroqKgd1ImageFormat,
 		utageImageFormat,
