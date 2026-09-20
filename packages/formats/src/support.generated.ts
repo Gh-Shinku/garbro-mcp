@@ -9,6 +9,20 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PDT/5",
+				class: "Pdt5Format",
+				source: "Legacy/AyPio/ImagePDT5.cs",
+			},
+			localId: "aypio-pdt5-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: ["detect", "list", "extract"],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "LFG",
 				class: "LfgFormat",
 				source: "ArcFormats/Leaf/ImageLFG.cs",

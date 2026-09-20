@@ -325,6 +325,7 @@ import { dlbV0Format } from "./aypio/dlb.js";
 import { aypioVocAudioFormat } from "./aypio/voc-audio.js";
 import { aypioPdtImageFormat } from "./aypio/pdt-image.js";
 import { aypioPdtBmpImageFormat } from "./aypio/pdt-bmp-image.js";
+import { aypioPdt5ImageFormat } from "./aypio/pdt5-image.js";
 import { grocerPicImageFormat } from "./grocer/pic-image.js";
 import { ttdFormat } from "./melonpan/ttd.js";
 import { gxFormat } from "./scoop/gx.js";
@@ -1552,6 +1553,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		aypioVocAudioFormat,
 		aypioPdtImageFormat,
 		aypioPdtBmpImageFormat,
+		aypioPdt5ImageFormat,
 		grocerPicImageFormat,
 		morningTtdFormat,
 		studioSakuraDatFormat,
