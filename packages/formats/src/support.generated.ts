@@ -19295,5 +19295,36 @@ export const formatSupportCatalog = {
 				"the skipped records of the index tail, which are stepped over unread",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GH",
+				class: "GhFormat",
+				source: "ArcFormats/Succubus/ImageGH.cs",
+			},
+			localId: "succubus-gh-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of both versions, whose own fields stand apart",
+				"the width an index takes from the number of colours",
+				"the bit cache, whose four bytes are gathered first to last and read from the top",
+				"the walk of the second version: its places, its chunk markers, its vertical repeats and its marking",
+				"the fill that gives every place the walk never marked the value written last",
+				"the palette of the engine, red first, written blue first",
+			],
+			unsupported: [
+				"create",
+				"the third version, whose pixels the reference itself leaves unwritten",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the third version and the row table its own reader builds before throwing",
+				"a picture whose walk steps down a column rather than naming a place, which only the fixtures that carry two chunks reach",
+			],
+		},
 	],
 } as const;
