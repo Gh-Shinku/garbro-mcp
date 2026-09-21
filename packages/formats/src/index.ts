@@ -579,6 +579,11 @@ import { pcsFormat } from "./csware/pcs.js";
 import { vavFormat } from "./frontwing/vav.js";
 import { fa2Format } from "./foster/fa2.js";
 import { cherryPakFormat } from "./cherry/pak.js";
+import {
+	cherryGrp3ImageFormat,
+	cherryGrpEncImageFormat,
+	cherryGrpImageFormat,
+} from "./cherry/grp-image.js";
 import { cherryPak2Format } from "./cherry/pak.js";
 import { grooverPcgFormat } from "./groover/pcg.js";
 import { flkDatFormat } from "./splush-wave/flk.js";
@@ -1893,6 +1898,9 @@ export function createDefaultRegistry(): FormatRegistry {
 		pcsFormat,
 		vavFormat,
 		fa2Format,
+		cherryGrpImageFormat,
+		cherryGrp3ImageFormat,
+		cherryGrpEncImageFormat,
 		cherryPakFormat,
 		cherryPak2Format,
 		grooverPcgFormat,

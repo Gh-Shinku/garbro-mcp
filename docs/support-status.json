@@ -18876,6 +18876,85 @@
 				"real-game GARbro differential output",
 				"a real picture, which would show which of the two packed ways this engine writes"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GRP/CHERRY",
+				"class": "GrpFormat",
+				"source": "ArcFormats/Cherry/ImageGRP.cs"
+			},
+			"localId": "cherry-grp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head with its two lengths and the value the reader consults",
+				"the way that keeps the picture as it stands when nothing is packed",
+				"the way that keys the bytes with their own place and unfolds them",
+				"the colours a picture of eight bits carries in front of its bytes",
+				"the rows, which are read into the last row first",
+				"the later way of unfolding, with its rows turned over or not by the head"
+			],
+			"unsupported": ["image creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the second way with a packed length, which sends the picture on to the unfolding one, and which no fixture here reaches",
+				"a real picture, which would show which of the ways and which offsets the engine actually writes"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GRP/CHERRY3",
+				"class": "Grp3Format",
+				"source": "ArcFormats/Cherry/ImageGRP.cs"
+			},
+			"localId": "cherry-grp3-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the longer head with its mark of ones and its alpha flag",
+				"thirty two bit pictures beside twenty four and eight",
+				"the shared reader, with its picture not turned over"
+			],
+			"unsupported": ["image creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the colours a picture of eight bits of this kind carries inside its unfolded stream, which no fixture here reaches",
+				"a real picture, which would show whether the alpha flag is written as often as the reference reads it"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GRP/ENC",
+				"class": "GrpEncFormat",
+				"source": "ArcFormats/Cherry/ImageGRP.cs"
+			},
+			"localId": "cherry-grp-enc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the two bytes that tell the head before it is keyed",
+				"the head keyed word by word with three constants, and the value that is read without being keyed",
+				"the picture keyed with the engine's pair swap, shared with the archive reader",
+				"the shared reader, with its rows turned over"
+			],
+			"unsupported": ["image creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real encrypted picture, since the fixture picks the head's packed length so that the file reaches the encrypted path at all",
+				"a real picture, which would show what the encrypted engine writes where the first kind writes an offset"
+			]
 		}
 	]
 }
