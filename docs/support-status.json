@@ -19037,24 +19037,14 @@
 				"the colours of an eight bit picture, turned round to the order a bitmap keeps",
 				"the alpha channel a picture of twenty four bits or more may carry, spread over the pixels",
 				"a picture of eight bits without colours, read as shades of grey",
-				"the one way of storing a section the reference also reads as it stands",
-				"the packed way 0x00: the first pixel as it stands, literal bytes, back references and counted runs, with the reference's three attempts",
-				"the packed way 0x01: literals, its four shapes of back reference, and a counted run that adds to the run itself",
-				"the packed way 0x02: the block of code lengths and the codes behind it, and literals read through that table",
-				"the packed way 0x03: the table of codes with the four shapes of back reference behind it",
-				"the packed ways 0x08 and 0x09: raw literals with a byte-away and a pixel-offset shape of back reference",
-				"the packed walk of the ways 0x0c to 0x0f: the table of codes whose symbols name a place in the prediction table, and the move of the byte taken to the front of its row",
-				"the packed walk of the ways 0x0a and 0x0b: the table of codes whose symbol is the byte written, with the byte-away and pixel-offset shapes of reference"
+				"the one way of storing a section as it stands",
+				"every one of the nine packed walks the engine's sections can ask for: the ways 0x00 to 0x0f, with the table of codes, the prediction table, the two tables of pixel offsets and the reference's own three attempts"
 			],
-			"unsupported": [
-				"image creation",
-				"the two further packed walks - the 0x04 walk of the ways 0x04 and 0x06, and the 0x05 walk of the ways 0x05 and 0x07 - which are refused by name"
-			],
+			"unsupported": ["image creation"],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"of the seven ported walks, the later attempts' shapes of back reference and the retry between attempts, which no fixture here reaches: the ones the fixtures pin are the first attempt's byte form, a counted run, and the prediction table's own walk",
-				"the two further packed walks, which no fixture here reaches because this port refuses them",
-				"a real picture, which would show which of the ways the engine writes, and whether the codes in a real one are the equal length kind the fixture uses"
+				"the later attempts of the walks that shape their references by attempt, and the retry between attempts, which no fixture here reaches: the ones the fixtures pin are the first attempt's byte form, a counted run, the table of codes and the prediction table",
+				"a real picture, which would show which of the ways the engine writes, whether the codes in a real one are the equal length kind the fixture uses, and whether it pads its rows as the head says"
 			]
 		}
 	]

@@ -157,18 +157,6 @@ like.
   one the differences themselves.
 
 
-- `WBM` (`ArcFormats/WildBug/ImageWBM.cs`, 1165 lines) is the picture beside the **ported** `WWA` sound, and
-  most of it is ported now: the shared head and record walk (`wildbug/wpx-section.ts`), the picture's own
-  head, the pixels, the colours of the eight bit kind, the alpha channel and the one way of storing a section
-  the reference also reads as it stands, and **seven of its nine packed walks** as well - every way but
-  `0x04` to `0x07`. What remains is the **two further packed walks** of the `WbmReader`, `UnpackV4` for the
-  ways `0x04` and `0x06`, and `UnpackV5` for `0x05` and `0x07`. Each builds a prediction table of
-  sixty four thousand entries (`BuildTable`, `FillRefTable`) and then walks the picture through a padded
-  table of eight pixel offsets (`GenerateOffsetTableV1` or `V2`), retrying with the other table when a walk
-  fails. All of that code is decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has
-  nothing to check its own transcription against but the reference itself; the port refuses such a section by
-  name rather than guessing. That is the first piece of staged work here, and it is one walk at a time.
-
 - `GRP/RG` (`Legacy/Bom/ImageGRP.cs`, 418 lines) is a BOM picture whose header and stored pictures are
   plain, but whose packed pictures are an LZ of its own: a sliding frame of four thousand bytes filled
   with spaces, a run length and a distance, and both of those read through two **adaptive Huffman trees**

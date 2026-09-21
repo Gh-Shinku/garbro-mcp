@@ -81,11 +81,83 @@ function invalid(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-function unsupported(way: number, walk: string): GarbroError {
-	return new GarbroError(
-		"UNSUPPORTED_FEATURE",
-		`The packed walk ${walk} of a Wild Bug picture is not ported (the section's way is 0x${way.toString(16).padStart(2, "0")})`,
-	);
+/** The walks that keep a prediction table, which the reference builds for the `0x04`, `0x05` and `0x0F` walks. */
+function keepsPrediction(walk: string): boolean {
+	return "V4" === walk || "V5" === walk || "VD" === walk;
+}
+
+/** Which walk a section's way asks for, said as a name the reader can follow. */
+type WbmWalk = "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V9" | "VB" | "VD";
+
+/** Everything a walk of this engine needs, gathered so the one that was picked can simply be called. */
+interface WbmWalkArgs {
+	reader: WbmPackedReader;
+	table: Uint8Array;
+	prediction: Uint8Array;
+	offsets: readonly number[];
+	pixelSize: number;
+	condition: number;
+	version: number;
+}
+
+/** The walk the section asked for, whichever of the nine it is. */
+function runWalk(walk: WbmWalk, args: WbmWalkArgs): Buffer | undefined {
+	const { reader, table, prediction, offsets } = args;
+	switch (walk) {
+		case "V0":
+			return unpackV0(reader, offsets, args.pixelSize, args.condition);
+		case "V1":
+			return unpackV1(
+				reader,
+				offsets,
+				args.pixelSize,
+				args.condition,
+				args.version,
+			);
+		case "V2":
+			return unpackV2(reader, table, offsets, args.pixelSize, args.condition);
+		case "V3":
+			return unpackV3(
+				reader,
+				table,
+				offsets,
+				args.pixelSize,
+				args.condition,
+				args.version,
+			);
+		case "V4":
+			return unpackV4(
+				reader,
+				table,
+				prediction,
+				offsets,
+				args.pixelSize,
+				args.condition,
+			);
+		case "V5":
+			return unpackV5(
+				reader,
+				table,
+				prediction,
+				offsets,
+				args.pixelSize,
+				args.condition,
+				args.version,
+			);
+		case "V9":
+			return unpackV9(reader, offsets, args.pixelSize, args.condition);
+		case "VB":
+			return unpackVB(reader, table, offsets, args.pixelSize, args.condition);
+		default:
+			return unpackVD(
+				reader,
+				table,
+				prediction,
+				offsets,
+				args.pixelSize,
+				args.condition,
+			);
+	}
 }
 
 /**
@@ -559,7 +631,6 @@ export function unpackV2(
 	pixelSize: number,
 	condition: number,
 ): Buffer | undefined {
-	const minCount = 1 === pixelSize ? 2 : 1;
 	const available = reader.begin();
 	if (0 === available) return undefined;
 	const step = (pixelSize + 3) & ~3;
@@ -580,12 +651,12 @@ export function unpackV2(
 			remaining -= 1;
 			if (0 === remaining) return reader.output;
 		}
-		let index = reader.nextBit() << 2;
-		index |= reader.nextBit() << 1;
-		index |= reader.nextBit();
-		const source = destination - (offsetTable[index] ?? 0);
-		const count =
-			0 !== reader.nextBit() ? minCount : minCount + reader.readCount();
+		const { count, source } = readIndexedReference(
+			reader,
+			offsetTable,
+			pixelSize,
+			destination,
+		);
 		if (remaining < count) return undefined;
 		if (!copyOverlapped(reader.output, source, destination, count)) {
 			// The reference's own copy walks off the buffer here, which its caller catches.
@@ -779,6 +850,135 @@ export function unpackVD(
 }
 
 /**
+ * The reference of the `0x00`, `0x02` and `0x06` walks: three bits name one of the eight pixel offsets, and a
+ * clear bit behind them adds a run the walk counts out for itself to the shortest one.
+ */
+function readIndexedReference(
+	reader: WbmPackedReader,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	destination: number,
+): { count: number; source: number } {
+	const minCount = 1 === pixelSize ? 2 : 1;
+	let index = reader.nextBit() << 2;
+	index |= reader.nextBit() << 1;
+	index |= reader.nextBit();
+	const source = destination - (offsetTable[index] ?? 0);
+	const count =
+		0 !== reader.nextBit() ? minCount : minCount + reader.readCount();
+	return { count, source };
+}
+
+/**
+ * `WbmReader.UnpackV4`, the `0x04` and `0x06` walk: the `0x0F` walk's prediction table with the reference of
+ * the `0x00` walk behind it. Its first pixel takes one byte more before it is padded than every other walk's.
+ */
+export function unpackV4(
+	reader: WbmPackedReader,
+	table: Uint8Array,
+	prediction: Uint8Array,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+): Buffer | undefined {
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	// The reference pads the first pixel of this walk out to the next whole four bytes from one byte on.
+	const step = (pixelSize + 4) & ~3;
+	if (available < step + CODE_BLOCK_SIZE) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	reader.seekBuffer(step + CODE_BLOCK_SIZE);
+	if (!reader.fillRefTable(table, step)) return undefined;
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			const value = readPredictedLiteral(
+				reader,
+				table,
+				prediction,
+				destination,
+				pixelSize,
+			);
+			if (undefined === value) return undefined;
+			reader.output[destination] = value;
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		const { count, source } = readIndexedReference(
+			reader,
+			offsetTable,
+			pixelSize,
+			destination,
+		);
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
+}
+
+/**
+ * `WbmReader.UnpackV5`, the `0x05` and `0x07` walk: the `0x0F` walk's prediction table with the four shapes
+ * of back reference the `0x01` and `0x03` walks read.
+ */
+export function unpackV5(
+	reader: WbmPackedReader,
+	table: Uint8Array,
+	prediction: Uint8Array,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+	version: number,
+): Buffer | undefined {
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	const step = (pixelSize + 3) & ~3;
+	if (available < step + CODE_BLOCK_SIZE) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	reader.seekBuffer(step + CODE_BLOCK_SIZE);
+	if (!reader.fillRefTable(table, step)) return undefined;
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			const value = readPredictedLiteral(
+				reader,
+				table,
+				prediction,
+				destination,
+				pixelSize,
+			);
+			if (undefined === value) return undefined;
+			reader.output[destination] = value;
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		const reference = readLaterReference(
+			reader,
+			offsetTable,
+			pixelSize,
+			destination,
+			version,
+		);
+		if (!reference) return undefined;
+		const { count, source } = reference;
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
+}
+
+/**
  * `WbmReader.UnpackV0`, the `0x00` walk: the first pixel is copied as it stands and then the picture is read
  * a bit at a time. A bit equal to the walk's own condition is a literal byte; any other bit begins a back
  * reference, whose three bits name one of the eight pixel offsets and whose following bit says whether the
@@ -794,7 +994,6 @@ export function unpackV0(
 	pixelSize: number,
 	condition: number,
 ): Buffer | undefined {
-	const minCount = 1 === pixelSize ? 2 : 1;
 	const available = reader.begin();
 	if (0 === available) return undefined;
 	const step = (pixelSize + 3) & ~3;
@@ -810,12 +1009,12 @@ export function unpackV0(
 			remaining -= 1;
 			if (0 === remaining) return reader.output;
 		}
-		let index = reader.nextBit() << 2;
-		index |= reader.nextBit() << 1;
-		index |= reader.nextBit();
-		const source = destination - (offsetTable[index] ?? 0);
-		const count =
-			0 !== reader.nextBit() ? minCount : minCount + reader.readCount();
+		const { count, source } = readIndexedReference(
+			reader,
+			offsetTable,
+			pixelSize,
+			destination,
+		);
 		if (remaining < count) return undefined;
 		if (!copyOverlapped(reader.output, source, destination, count)) {
 			// The reference's own copy walks off the buffer here, which its caller catches.
@@ -848,15 +1047,13 @@ export function unpackWbmSection(
 		const way = section.dataFormat & WALK_BITS;
 		// The reference asks for the bits of the way in turn: the first that is set names the walk, and the
 		// ones behind it say which of that walk's group it is.
-		let walk: "V0" | "V1" | "V2" | "V3" | "V9" | "VB" | "VD";
+		let walk: WbmWalk;
 		if (0 === (way & 1)) {
-			if (0 !== (way & 4)) throw unsupported(way, "V4");
-			walk = 0 !== (way & 2) ? "V2" : "V0";
+			walk = 0 !== (way & 4) ? "V4" : 0 !== (way & 2) ? "V2" : "V0";
 		} else if (0 !== (way & 8)) {
-			if (0 !== (way & 4)) walk = "VD";
-			else walk = 0 !== (way & 2) ? "VB" : "V9";
+			walk = 0 !== (way & 4) ? "VD" : 0 !== (way & 2) ? "VB" : "V9";
 		} else if (0 !== (way & 4)) {
-			throw unsupported(way, "V5");
+			walk = "V5";
 		} else {
 			walk = 0 !== (way & 2) ? "V3" : "V1";
 		}
@@ -874,42 +1071,25 @@ export function unpackWbmSection(
 			);
 			// Every attempt builds the picture's own tables afresh.
 			const table = new Uint8Array(CODE_TABLE_SIZE);
-			const prediction =
-				"VD" === walk ? buildPredictionTable() : new Uint8Array(0);
+			const prediction = keepsPrediction(walk)
+				? buildPredictionTable()
+				: new Uint8Array(0);
 			try {
 				// The reference's own three attempts: two with the later table and one bit, and one with
 				// the earlier table and a bit of nothing. The walks are told which attempt it is, because
 				// the first one shapes its references differently.
 				const condition = attempt < 2 ? 1 : 0;
 				const version = 2 - attempt;
-				const result =
-					"V0" === walk
-						? unpackV0(reader, offsets, pixelSize, condition)
-						: "V1" === walk
-							? unpackV1(reader, offsets, pixelSize, condition, version)
-							: "V2" === walk
-								? unpackV2(reader, table, offsets, pixelSize, condition)
-								: "V3" === walk
-									? unpackV3(
-											reader,
-											table,
-											offsets,
-											pixelSize,
-											condition,
-											version,
-										)
-									: "V9" === walk
-										? unpackV9(reader, offsets, pixelSize, condition)
-										: "VB" === walk
-											? unpackVB(reader, table, offsets, pixelSize, condition)
-											: unpackVD(
-													reader,
-													table,
-													prediction,
-													offsets,
-													pixelSize,
-													condition,
-												);
+				const result = runWalk(walk, {
+					reader,
+					table,
+					prediction,
+					offsets,
+					pixelSize,
+					condition,
+					version,
+				});
+
 				// A finding of the walk's own ends the unpack, as it does in the reference.
 				if (!result) throw invalid("The picture does not unpack");
 				return result;

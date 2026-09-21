@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
@@ -103,6 +103,45 @@ async function bitmapOf(file: Buffer): Promise<Buffer> {
 	} finally {
 		await archive.close();
 	}
+}
+
+/**
+ * The engine's prediction table, and one step of the walk over it, written out here to work out what a
+ * picture of the ways that keep one should hold: every row counts down from the byte before it, the row is
+ * named by the byte one pixel behind the place being written, and the byte taken out is moved to the front.
+ */
+function predictionRows(): number[][] {
+	const rows: number[][] = [];
+	for (let previous = 0; previous < 0x100; previous += 1) {
+		const row: number[] = [];
+		let value = (-1 - previous) & 0xff;
+		for (let column = 0; column < 0x100; column += 1) {
+			row.push(value);
+			value = (value - 1) & 0xff;
+		}
+		rows.push(row);
+	}
+	return rows;
+}
+
+function predictAt(
+	pixels: number[],
+	at: number,
+	symbol: number,
+	pixelSize: number,
+	rows: number[][],
+): number {
+	const previous = pixels[at - pixelSize] ?? 0;
+	const row = rows[previous] ?? [];
+	const value = row[symbol] ?? 0;
+	if (0 !== symbol) {
+		const moved = row.slice(0, symbol);
+		row[0] = value;
+		for (let index = 0; index < moved.length; index += 1) {
+			row[index + 1] = moved[index] ?? 0;
+		}
+	}
+	return value;
 }
 
 describe("Wild Bug WBM image", () => {
@@ -235,29 +274,116 @@ describe("Wild Bug WBM image", () => {
 		});
 	});
 
-	it("refuses a packed section and reads one that says it holds nothing packed", async () => {
-		const packed = pictureFile([
-			{ id: 0x10, body: pictureHead(3, 2, 24) },
-			{ id: 0x11, body: pixels24(), format: 0x04, packedSize: 8 },
-		]);
-		const layout = readWbmLayout(packed);
-		if (!layout) throw new Error("the fixture is not a WBM picture");
-		// The refusal names the walk the section's own byte asks for.
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(GarbroError);
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(/walk V4/);
-		// A section that declares no packed bytes at all is read as it stands, as the reference does.
+	it("reads a section that declares no packed bytes as it stands", async () => {
 		const plain = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
 			{ id: 0x11, body: pixels24(), format: 0x01, packedSize: 0 },
 		]);
-		const plainLayout = readWbmLayout(plain);
-		if (!plainLayout) throw new Error("the fixture is not a WBM picture");
-		expect(decodeWbmPicture(plain, plainLayout).pixels).toEqual(pixels24());
+		const layout = readWbmLayout(plain);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(decodeWbmPicture(plain, layout).pixels).toEqual(pixels24());
 		expect(readBmpImage(await bitmapOf(plain))?.pixels).toEqual(
 			Buffer.from([
 				1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
 			]),
 		);
+	});
+
+	it("reads a picture of the 0x04 way through its prediction table", () => {
+		const first = Buffer.from([0x21, 0x22, 0x23]);
+		// The first four symbols take a two bit code each, and their codes are 0, 1, 2, 3.
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		const bits = new PackedBits();
+		const literal = (value: number): void => {
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		};
+		literal(1);
+		literal(2);
+		// A clear bit ends the literals and names this walk's one shape of reference: three clear bits name
+		// the first place of the table of pixel offsets, one pixel back, and a set bit leaves the run at the
+		// shortest one.
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(1);
+		for (const value of [3, 0, 1, 2, 3, 0]) literal(value);
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		const file = packedFile(4, 1, 24, body, 0x04);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// Two literals, then one byte copied from one pixel back, then four more literals.
+		const rows = predictionRows();
+		const expected = [...first];
+		for (const symbol of [1, 2]) {
+			expected.push(predictAt(expected, expected.length, symbol, 3, rows));
+		}
+		expected.push(expected[2] ?? 0);
+		for (const value of [3, 0, 1, 2, 3, 0]) {
+			expected.push(predictAt(expected, expected.length, value, 3, rows));
+		}
+		expect([...picture.pixels.subarray(0, 12)]).toEqual(expected);
+	});
+
+	it("reads a picture of the 0x05 way through its prediction table", () => {
+		const first = Buffer.from([0x11, 0x12, 0x13]);
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		const bits = new PackedBits();
+		const literal = (value: number): void => {
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		};
+		literal(1);
+		literal(2);
+		// A clear bit ends the literals; the first attempt's byte form takes two set bits and then its
+		// distance from the stream, and a set bit behind it leaves the run at two bytes.
+		bits.bit(0);
+		bits.bit(1);
+		bits.bit(1);
+		bits.byte(0);
+		bits.bit(1);
+		for (const value of [3, 0, 1, 2, 3, 0, 1]) literal(value);
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		const file = packedFile(4, 1, 24, body, 0x05);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		const rows = predictionRows();
+		const expected = [...first];
+		for (const symbol of [1, 2]) {
+			expected.push(predictAt(expected, expected.length, symbol, 3, rows));
+		}
+		// The run takes its first byte from the byte before the place written to, which is the second
+		// literal, and then the byte it wrote, so both of its bytes are that one.
+		expected.push(expected[4] ?? 0, expected[4] ?? 0);
+		for (const value of [3, 0, 1, 2, 3]) {
+			expected.push(predictAt(expected, expected.length, value, 3, rows));
+		}
+		expect([...picture.pixels.subarray(0, 12)]).toEqual(expected);
 	});
 
 	it("refuses a picture it cannot read", () => {
