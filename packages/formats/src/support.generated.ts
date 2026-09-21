@@ -18652,5 +18652,31 @@ export const formatSupportCatalog = {
 				"a real picture of each kind, which would show whether games use the tiled one at all",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "IPF",
+				class: "IpfFormat",
+				source: "ArcFormats/TechnoBrain/ImageIPF.cs",
+			},
+			localId: "techno-brain-ipf-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the format chunk and the string that tells an IPF from a wave file",
+				"the palette presence bitmap and the colours behind it",
+				"the packed bitmap with every one of its control bytes",
+				"the unpacked bitmap",
+				"the grey ramp a picture with no palette is shown in",
+			],
+			unsupported: ["image creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show whether games use the palette and the packed bitmap together",
+			],
+		},
 	],
 } as const;
