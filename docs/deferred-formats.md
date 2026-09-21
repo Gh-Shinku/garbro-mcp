@@ -36,6 +36,12 @@ open archives that the shipped defaults already cover.
   `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
   `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
   a `KnownKeys` table.
+- `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`, the `ARC/FOMA` opener) cannot read a file on its own at all:
+  its index is not in the archive but in a **separate executable** that stands beside it, and where in that
+  executable is a number the engine keeps **per archive name per executable name**. `Is9Scheme.KnownSchemes`
+  ships as an empty dictionary, so `TryOpen` finds no scheme, and with no scheme it returns nothing for every
+  file. The archive itself is then plain: twelve bytes an entry - a place, an offset and a size - with the
+  name read from the executable at the place the entry names.
 - `AVC` (`ArcFormats/ArcAVC.cs`, the extension-gated `DatOpener` of the `.dat` files of that engine) derives
   its own eight byte key from the file, so its reader looks self-contained - but it does so only once it is
   told **where** to look: `AdvReader.GetIndex` walks `KnownSchemes` and tries a key offset and a header
@@ -150,10 +156,7 @@ like.
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
   reason that picture stands unread.
-- `EXE` (`Experimental/Microsoft/ArcEXE.cs`, 259 lines) is the PE sibling of the ported NE walker and
-  would carry the resource walk of `ArcFormats/ExeFile.cs` (497 lines) with its `ResourceAccessor`, the
-  resource directory tree and the RT_BITMAP wrapper that puts a bitmap file header in front of a stored
-  bitmap. It also holds the version resource parser that works, unlike the NE one.
+- `EXE` (`Experimental/Microsoft/ArcEXE.cs`) is **not portable**: it reads an executable's resources through the reference's `ExeFile.ResourceAccessor`, which is a set of Windows loader calls (`LoadLibraryEx`, `FreeLibrary`, `FindResource`, `LoadResource`, `SizeofResource` and the enumeration callbacks behind them) rather than anything read out of the file. The managed half of the same file - the headers, the sections, the overlay, the loaded base, addresses and a byte search - **is** portable and now stands in this project as `packages/formats/src/microsoft/exe-file.ts`, which is what the ported `BIN/PAC` archive and, later, any other reader of an executable needs.
 - `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`, 155 lines) is a difference against a base image: its
   header names that image without an extension and the reference finds it by globbing the directory
   (`VFS.GetFiles (base_name+".*")`) and decodes it with whichever format reads it. A port would need the

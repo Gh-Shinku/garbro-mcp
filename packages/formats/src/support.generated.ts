@@ -19116,5 +19116,35 @@ export const formatSupportCatalog = {
 				"the seventh way's colour map beyond the colours its own fixture names",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "BIN/PAC",
+				class: "BinOpener",
+				source: "ArcFormats/DigitalWorks/ArcBIN.cs",
+			},
+			localId: "digitalworks-bin-pac",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the index of the executable beside the archive, found by the archive's own size written twice over",
+				"the index walked backwards, twelve bytes to an entry",
+				"entry names from the archive's name and the engine's own extension table",
+				"the managed half of the reference's ExeFile: headers, sections, the overlay, the loaded base, virtual addresses and a byte search",
+			],
+			unsupported: [
+				"create",
+				"the reference's own table of ready made indexes, which ships empty",
+				"an entry's packed bytes, which the reference hands over as they stand as well",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an archive whose name the engine's extension table knows, so an entry takes a real extension",
+				"a sixteen bit executable, whose segments this port reads but no test covers",
+			],
+		},
 	],
 } as const;

@@ -247,6 +247,7 @@ import { cgV2Format } from "./parsley/cg2.js";
 import { ykFormat } from "./rune/yk.js";
 import { koeiYkFormat } from "./koei/yk-archive.js";
 import { neFormat } from "./microsoft/ne-archive.js";
+import { digitalWorksBinPacFormat } from "./digitalworks/bin-pac.js";
 import { mgsFormat } from "./masys/mgs-archive.js";
 import { eternitySgfImageFormat } from "./eternity/sgf-image.js";
 import { pajamasEpaImageFormat } from "./pajamas/epa-image.js";
@@ -1137,6 +1138,7 @@ export * from "./jupiter/index.js";
 export * from "./rune/index.js";
 export * from "./koei/index.js";
 export * from "./microsoft/index.js";
+export * from "./digitalworks/index.js";
 export * from "./musica/index.js";
 export * from "./tako/index.js";
 export * from "./broom/index.js";
@@ -1576,6 +1578,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		cgV2Format,
 		ykFormat,
 		koeiYkFormat,
+		digitalWorksBinPacFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,
