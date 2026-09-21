@@ -747,6 +747,7 @@ import { g2PgxImageFormat } from "./g2/pgx-image.js";
 import { ismIsgImageFormat } from "./ism/isg-image.js";
 import { sakanaglSxArchiveFormat } from "./sakanagl/sx-archive.js";
 import { succubusGhImageFormat } from "./succubus/gh-image.js";
+import { liddellBpaImageFormat } from "./liddell/bpa-image.js";
 import { cbfImageFormat } from "./hmp/cbf-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
@@ -1017,6 +1018,7 @@ export * from "./parsley/index.js";
 
 export * from "./seraphim/index.js";
 export * from "./succubus/index.js";
+export * from "./liddell/index.js";
 export * from "./selene/index.js";
 export * from "./silky/index.js";
 export * from "./sysd/index.js";
@@ -1594,6 +1596,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ismIsgImageFormat,
 		sakanaglSxArchiveFormat,
 		succubusGhImageFormat,
+		liddellBpaImageFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,

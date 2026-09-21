@@ -19326,5 +19326,37 @@ export const formatSupportCatalog = {
 				"a picture whose walk steps down a column rather than naming a place, which only the fixtures that carry two chunks reach",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "BPA",
+				class: "BpaFormat",
+				source: "Legacy/Liddell/ImageBPA.cs",
+			},
+			localId: "liddell-bpa-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, with and without a palette of its own",
+				"the palette of the engine, red first, written blue first",
+				"a run of a channel: places that stand as they are",
+				"a run of a channel: a value filled over as many places as its own count byte says",
+				"a run of a channel: a control word mixing one value with places that stand as they are",
+				"a run of a channel: places taken from the stack of the six values used last",
+				"a picture of one byte a pixel, whose aligned rows are drawn together for the writers of this project",
+			],
+			unsupported: [
+				"create",
+				"the way the channels of a picture of several channels are drawn together, which is carried but not pinned by a fixture",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the channels of a picture of several channels, and the rows each of them is read from",
+				"a chunk that stands for more than four places at once, which none of the fixtures reaches",
+			],
+		},
 	],
 } as const;
