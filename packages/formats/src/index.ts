@@ -655,6 +655,7 @@ import { leafP16AudioFormat } from "./leaf/p16-audio.js";
 import { ikmAudioFormat } from "./microvision/ikm-audio.js";
 import { keyOggpakAudioFormat } from "./key/oggpak-audio.js";
 import { vmdAudioFormat } from "./c4/vmd-audio.js";
+import { c4GdImageFormat, c4XexGdImageFormat } from "./c4/gd-image.js";
 import { voiAudioFormat } from "./slg/voi-audio.js";
 import { eogAudioFormat } from "./crowd/eog-audio.js";
 import { kogAudioFormat } from "./sviu/kog-audio.js";
@@ -1967,6 +1968,8 @@ export function createDefaultRegistry(): FormatRegistry {
 		leafP16AudioFormat,
 		ikmAudioFormat,
 		keyOggpakAudioFormat,
+		c4GdImageFormat,
+		c4XexGdImageFormat,
 		vmdAudioFormat,
 		voiAudioFormat,
 		eogAudioFormat,
