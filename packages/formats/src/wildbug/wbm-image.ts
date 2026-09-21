@@ -280,6 +280,77 @@ export function offsetTableV2(stride: number, pixelSize: number): number[] {
 }
 
 /**
+ * `WbmReader.UnpackV1`, the `0x01` walk: much the same shape as the `0x00` one, but its back references
+ * differ. On the reference's first attempt a reference is either a byte or a word away from the byte before
+ * the place it writes to, and stands for a run of two or three bytes; on the later attempts one of the two
+ * forms is a short run taken from the table of pixel offsets instead. A clear bit behind either form **adds**
+ * the counted run to the run itself, where the `0x00` walk let the counted run stand for the whole of it.
+ */
+export function unpackV1(
+	reader: WbmPackedReader,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+	version: number,
+): Buffer | undefined {
+	const minCount = 1 === pixelSize ? 2 : 1;
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	const step = (pixelSize + 3) & ~3;
+	if (available < step) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	reader.beginBitsAt(step);
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			reader.output[destination] = reader.readNext();
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		let count: number;
+		let source: number;
+		if (version > 1) {
+			if (0 !== reader.nextBit()) {
+				if (0 !== reader.nextBit()) {
+					source = reader.readNext();
+					count = 2;
+				} else {
+					source = reader.readNext() | (reader.readNext() << 8);
+					count = 3;
+				}
+				source = destination - 1 - source;
+			} else {
+				count = minCount;
+				let index = reader.nextBit();
+				index = index + index + reader.nextBit();
+				index = index + index + reader.nextBit();
+				source = destination - (offsetTable[index] ?? 0);
+			}
+		} else if (0 !== reader.nextBit()) {
+			count = minCount;
+			let index = reader.nextBit() << 2;
+			index |= reader.nextBit() << 1;
+			index |= reader.nextBit();
+			source = destination - (offsetTable[index] ?? 0);
+		} else {
+			count = 2;
+			source = destination - 1 - reader.readNext();
+		}
+		if (0 === reader.nextBit()) count += reader.readCount();
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			// The reference's own copy walks off the buffer here, which its caller catches.
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
+}
+
+/**
  * `WbmReader.UnpackV0`, the `0x00` walk: the first pixel is copied as it stands and then the picture is read
  * a bit at a time. A bit equal to the walk's own condition is a literal byte; any other bit begins a back
  * reference, whose three bits name one of the eight pixel offsets and whose following bit says whether the
@@ -346,7 +417,8 @@ export function unpackWbmSection(
 	what: string,
 ): Buffer {
 	if (0 === (section.dataFormat & STORED_FORMAT) && 0 !== section.packedSize) {
-		if (0 !== (section.dataFormat & WALK_BITS)) {
+		const way = section.dataFormat & WALK_BITS;
+		if (0 !== way && 1 !== way) {
 			throw unsupported(section.dataFormat);
 		}
 		const bytes = readWpxSectionData(data, section, section.packedSize);
@@ -363,8 +435,14 @@ export function unpackWbmSection(
 			);
 			try {
 				// The reference's own three attempts: two with the later table and one bit, and one with
-				// the earlier table and a bit of nothing.
-				const result = unpackV0(reader, table, pixelSize, attempt < 2 ? 1 : 0);
+				// the earlier table and a bit of nothing. The walk is told which attempt it is, because
+				// the first one shapes its references differently.
+				const condition = attempt < 2 ? 1 : 0;
+				const version = 2 - attempt;
+				const result =
+					0 === way
+						? unpackV0(reader, table, pixelSize, condition)
+						: unpackV1(reader, table, pixelSize, condition, version);
 				// A finding of the walk's own ends the unpack, as it does in the reference.
 				if (!result) throw invalid("The picture does not unpack");
 				return result;

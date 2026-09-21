@@ -39,7 +39,14 @@ stream of clear bits is read as literals by the last attempt. A finding of the w
 bytes, one shorter than the first pixel, or a run reaching past the picture - ends the unpack rather than
 asking for another attempt, which is what the reference does as well.
 
-The eight further walks, `0x01` to `0x0F`, are refused with `UNSUPPORTED_FEATURE`, and the message names the
+The `0x01` walk is ported as well, and it is much the same shape with two differences. Its references come
+in four forms rather than one: on the reference's first attempt a reference is either a byte or a word away
+from the byte before the place it writes to, and stands for a run of two or three bytes, while on the later
+attempts one of the two forms is a short run taken from the table of pixel offsets instead. And a clear bit
+behind a reference **adds** the counted run to the run itself, where the `0x00` walk let the counted run
+stand for the whole of it.
+
+The eight further walks, `0x02` to `0x0F`, are refused with `UNSUPPORTED_FEATURE`, and the message names the
 walk the section's byte asks for, so a caller learns which one is missing rather than being handed a wrong
 picture. Each of those builds a reference table of sixty four thousand entries (`BuildTable`,
 `FillRefTable`) before walking the picture through the same two tables of offsets; all of that code is
@@ -48,7 +55,7 @@ transcription against but the reference itself.
 
 ## Deviations from the reference
 
-* The eight further packed walks are refused rather than ported, as above.
+* The eight further packed walks, `0x02` to `0x0F`, are refused rather than ported, as above.
 * Every read is bounded: a picture shorter than the size its head names, and a section reaching past the end
   of the file, are refused, where the reference would throw an end of stream error or keep zeros.
 * A picture of no width or no height, and a depth the engine never writes, are refused.
@@ -58,7 +65,7 @@ transcription against but the reference itself.
 
 ## Verification
 
-Twelve tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
+Fourteen tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
 of the bitmap without padding; a picture of thirty two bits whose alpha channel is spread over it (the byte
 the picture keeps behind its colours is deliberately different, so a port that kept it would fail) and whose
 second row of alpha starts where its own four byte stride says; a picture of thirty two bits with no alpha
@@ -69,12 +76,16 @@ a packed section refused with the name of the walk it asks for, beside the same 
 packed, which is read as it stands; and the refusals - the word of a sound, no head, a head too short, a
 depth of twelve, no pixels, and pixels reaching past the file.
 
-The four further tests cover the packed walk, and the bit stream they build is the one the walk reads: a
-reader is checked on its own, handing out a byte's flags highest first and the literal bytes behind them;
-then a picture whose bytes are all literals; then one whose last byte is a back reference, which takes the
-byte its own offset names; and then a stream of clear bits, which the first two attempts read as back
-references and only the third, whose own bit is clear, reads as literals - so the retry machinery is pinned
-down as well.
+Six further tests cover the packed walks, and the bit stream they build is the one the walks read: a reader
+is checked on its own, handing out a byte's flags highest first and the literal bytes behind them; then a
+picture of the `0x00` way whose bytes are all literals; then one of that way whose last byte is a back
+reference, which takes the byte its own offset names; then a stream of clear bits, which the first two
+attempts read as back references and only the third, whose own bit is clear, reads as literals, so the retry
+machinery is pinned down as well; then a picture of the `0x01` way whose bytes are all literals, which shows
+the two ways apart; and then a reference of that way in the shape only its first attempt reads, whose
+distance of nothing copies the byte before the place it writes to - and then that byte again, twice over.
 
-What stands on the reference alone: the eight further packed walks, which this port refuses, and no fixture
-is on hand to pin them down; and no real file is on hand to compare against GARbro's output.
+What stands on the reference alone: the eight further packed walks, which this port refuses; of the two ways
+that are ported, the later attempts' shapes and the retry between them, since the fixture that reaches a
+reference pins the first attempt's byte form and the shortest run; and no real file is on hand to compare
+against GARbro's output.

@@ -238,13 +238,13 @@ describe("Wild Bug WBM image", () => {
 	it("refuses a packed section and reads one that says it holds nothing packed", async () => {
 		const packed = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
-			{ id: 0x11, body: pixels24(), format: 0x01, packedSize: 8 },
+			{ id: 0x11, body: pixels24(), format: 0x02, packedSize: 8 },
 		]);
 		const layout = readWbmLayout(packed);
 		if (!layout) throw new Error("the fixture is not a WBM picture");
 		// The refusal names the walk the section's own byte asks for.
 		expect(() => decodeWbmPicture(packed, layout)).toThrow(GarbroError);
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x01 walk/);
+		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x02 walk/);
 		// A section that declares no packed bytes at all is read as it stands, as the reference does.
 		const plain = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
@@ -313,11 +313,23 @@ describe("Wild Bug WBM image", () => {
  * and then the next byte of flags.
  */
 class PackedBits {
-	#flags: { bit: number; byte?: number }[] = [];
+	#events: { bit?: number; byte?: number }[] = [];
+
+	/** A bit whose own value the walk acts on. */
+	bit(value: number): this {
+		this.#events.push({ bit: value & 1 });
+		return this;
+	}
+
+	/** A byte the walk reads as it stands, behind whatever bit made it ask for one. */
+	byte(value: number): this {
+		this.#events.push({ byte: value });
+		return this;
+	}
 
 	/** A literal byte, flagged with the bit the walk is looking for. */
 	literal(condition: number, value: number): this {
-		this.#flags.push({ bit: condition & 1, byte: value });
+		this.#events.push({ bit: condition & 1, byte: value });
 		return this;
 	}
 
@@ -326,41 +338,53 @@ class PackedBits {
 	 * and then either the shortest run or a run whose length the walk counts out for itself.
 	 */
 	backReference(condition: number, index: number, length?: number): this {
-		this.#flags.push({ bit: 1 - (condition & 1) });
-		this.#flags.push({ bit: (index >> 2) & 1 });
-		this.#flags.push({ bit: (index >> 1) & 1 });
-		this.#flags.push({ bit: index & 1 });
+		this.#events.push({ bit: 1 - (condition & 1) });
+		this.#events.push({ bit: (index >> 2) & 1 });
+		this.#events.push({ bit: (index >> 1) & 1 });
+		this.#events.push({ bit: index & 1 });
 		if (undefined === length) {
-			this.#flags.push({ bit: 1 });
+			this.#events.push({ bit: 1 });
 			return this;
 		}
-		this.#flags.push({ bit: 0 });
+		this.#events.push({ bit: 0 });
 		// `ReadCount` counts out the run itself: a run of clear bits says how many bits follow.
 		const count = length;
 		let steps = 1;
 		while (2 ** steps <= count) steps += 1;
 		const tail = count - 2 ** steps;
-		for (let at = 0; at < steps - 1; at += 1) this.#flags.push({ bit: 0 });
-		this.#flags.push({ bit: 1 });
+		for (let at = 0; at < steps - 1; at += 1) this.#events.push({ bit: 0 });
+		this.#events.push({ bit: 1 });
 		for (let at = steps - 1; at >= 0; at -= 1) {
-			this.#flags.push({ bit: (tail >> at) & 1 });
+			this.#events.push({ bit: (tail >> at) & 1 });
 		}
 		return this;
 	}
 
+	/**
+	 * The bytes as the walk reads them: a byte of flags holds eight bits, and every byte the walk asks for
+	 * while those bits are the ones in hand stands behind that byte of flags, in the order it was asked for.
+	 */
 	toBuffer(): Buffer {
 		const out: number[] = [];
-		for (let at = 0; at < this.#flags.length; at += 8) {
-			const group = this.#flags.slice(at, at + 8);
-			let flags = 0;
-			group.forEach((entry, index) => {
-				if (entry.bit) flags |= 0x80 >> index;
-			});
-			out.push(flags);
-			for (const entry of group) {
-				if (undefined !== entry.byte) out.push(entry.byte);
+		let flags = 0;
+		let held = 0;
+		let pending: number[] = [];
+		const flush = (): void => {
+			out.push(flags, ...pending);
+			flags = 0;
+			held = 0;
+			pending = [];
+		};
+		for (const event of this.#events) {
+			// A bit is taken from the byte of flags in hand, which is written before the bytes it asks for.
+			if (undefined !== event.bit) {
+				if (8 === held) flush();
+				if (event.bit) flags |= 0x80 >> held;
+				held += 1;
 			}
+			if (undefined !== event.byte) pending.push(event.byte);
 		}
+		if (held > 0 || pending.length > 0) flush();
 		return Buffer.from(out);
 	}
 }
@@ -434,6 +458,49 @@ describe("Wild Bug WBM packed walk", () => {
 		// byte of the picture takes the byte three behind it, which is the tenth literal.
 		expect(picture.pixels[15]).toBe(0x40 + 9);
 		expect(picture.pixels[15]).toBe(picture.pixels[12]);
+	});
+
+	it("reads a picture of the 0x01 way whose bytes are all literals", () => {
+		const first = Buffer.from([7, 8, 9]);
+		// A row of four pixels is twelve bytes with nothing to pad, so nine bytes follow the first.
+		const rest = Buffer.from(
+			Array.from({ length: 9 }, (_, index) => 1 + index),
+		);
+		const bits = new PackedBits();
+		for (const value of rest) bits.literal(1, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(4, 1, 24, body, 0x01);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+		);
+	});
+
+	it("reads a back reference of the first attempt's byte form", () => {
+		const first = Buffer.from([0x11, 0x22, 0x33]);
+		const bits = new PackedBits();
+		// The bit that is not the walk's ends the literals; then the two bits that name the first attempt's
+		// byte form, the distance itself, and a set bit that leaves the run at its shortest.
+		bits.bit(0);
+		bits.bit(1);
+		bits.bit(1);
+		bits.byte(0);
+		bits.bit(1);
+		for (const value of [4, 5, 6, 7, 8, 9, 10]) bits.literal(1, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(4, 1, 24, body, 0x01);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// A distance of nothing names the byte just before the place written to, so the run copies that
+		// byte and then itself, twice over.
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x11, 0x22, 0x33, 0x33, 0x33, 4, 5, 6, 7, 8, 9, 10]),
+		);
 	});
 
 	it("tries its other tables and its other bit when a walk finds nothing", () => {

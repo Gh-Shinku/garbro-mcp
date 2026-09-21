@@ -19038,14 +19038,16 @@
 				"the alpha channel a picture of twenty four bits or more may carry, spread over the pixels",
 				"a picture of eight bits without colours, read as shades of grey",
 				"the one way of storing a section the reference also reads as it stands",
-				"the packed way 0x00: the first pixel as it stands, literal bytes, back references and counted runs, with the reference's three attempts"
+				"the packed way 0x00: the first pixel as it stands, literal bytes, back references and counted runs, with the reference's three attempts",
+				"the packed way 0x01: literals, its four shapes of back reference, and a counted run that adds to the run itself"
 			],
 			"unsupported": [
 				"image creation",
-				"the eight further packed walks (0x01 to 0x0f), which are refused by name: each builds a sixty four thousand entry reference table first, and all of that code is decompiler output with nothing but the reference to check a transcription against"
+				"the eight further packed walks (0x02 to 0x0f), which are refused by name: each builds a sixty four thousand entry reference table first, and all of that code is decompiler output with nothing but the reference to check a transcription against"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
+				"of the two ported walks, the later attempts' shapes of back reference and the retry between attempts, which no fixture here reaches: one the fixture pins is the first attempt's byte form",
 				"the eight further packed walks, which no fixture here reaches because this port refuses them",
 				"a real picture, which would show which of the ways the engine writes and whether it pads its rows as the head says"
 			]
