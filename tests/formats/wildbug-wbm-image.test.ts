@@ -689,6 +689,47 @@ describe("Wild Bug WBM packed walk", () => {
 		expect(picture.pixels.subarray(0, 12)).toEqual(Buffer.from(expected));
 	});
 
+	it("reads a picture of the 0x0b way through its table and a byte away", () => {
+		const first = Buffer.from([0x41, 0x42, 0x43]);
+		// The first four symbols take a two bit code each, and their codes are 0, 1, 2, 3.
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		const bits = new PackedBits();
+		// A literal of this way is a flag and the bits of its code; the symbol is the byte written.
+		const literal = (value: number): void => {
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		};
+		literal(1);
+		literal(2);
+		// A clear bit ends the literals; a set bit names the byte form, whose distance stands behind the
+		// bits; and a set bit behind it leaves the run at two bytes.
+		bits.bit(0);
+		bits.bit(1);
+		bits.byte(0);
+		bits.bit(1);
+		for (const value of [1, 2, 1, 2, 1]) literal(value);
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		const file = packedFile(4, 1, 24, body, 0x0b);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// The run copies the byte before the place written to - the second literal - and then itself.
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x41, 0x42, 0x43, 1, 2, 2, 2, 1, 2, 1, 2, 1]),
+		);
+	});
+
 	it("tries its other tables and its other bit when a walk finds nothing", () => {
 		// A stream of nothing but clear bits: the first two attempts read them as back references and run
 		// out of bytes, and only the third attempt, whose own bit is a clear one, reads them as literals.

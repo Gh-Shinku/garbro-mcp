@@ -445,6 +445,52 @@ export function unpackV3(
 }
 
 /**
+ * `WbmReader.UnpackVB`, the `0x0A` and `0x0B` walk: the `0x02` walk's table of codes, whose symbol is the
+ * byte written as it stands, with the two shapes of reference the `0x08` and `0x09` walk reads.
+ */
+export function unpackVB(
+	reader: WbmPackedReader,
+	table: Uint8Array,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+): Buffer | undefined {
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	const step = (pixelSize + 3) & ~3;
+	if (available < step + CODE_BLOCK_SIZE) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	reader.seekBuffer(step + CODE_BLOCK_SIZE);
+	if (!reader.fillRefTable(table, step)) return undefined;
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			const literal = readTableLiteral(reader, table);
+			if (undefined === literal) return undefined;
+			reader.output[destination] = literal;
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		const { count, source } = readByteAwayReference(
+			reader,
+			offsetTable,
+			pixelSize,
+			destination,
+		);
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			// The reference's own copy walks off the buffer here, which its caller catches.
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
+}
+
+/**
  * `WbmReader.UnpackV9`, the `0x08` and `0x09` walk: the `0x00` walk's raw literal bytes with only the two
  * shapes of back reference the later attempts of the `0x01` and `0x03` walks read - a byte away from the
  * byte before the place written to, standing for two bytes, or one of the eight pixel offsets standing for
@@ -802,14 +848,13 @@ export function unpackWbmSection(
 		const way = section.dataFormat & WALK_BITS;
 		// The reference asks for the bits of the way in turn: the first that is set names the walk, and the
 		// ones behind it say which of that walk's group it is.
-		let walk: "V0" | "V1" | "V2" | "V3" | "V9" | "VD";
+		let walk: "V0" | "V1" | "V2" | "V3" | "V9" | "VB" | "VD";
 		if (0 === (way & 1)) {
 			if (0 !== (way & 4)) throw unsupported(way, "V4");
 			walk = 0 !== (way & 2) ? "V2" : "V0";
 		} else if (0 !== (way & 8)) {
 			if (0 !== (way & 4)) walk = "VD";
-			else if (0 !== (way & 2)) throw unsupported(way, "VB");
-			else walk = "V9";
+			else walk = 0 !== (way & 2) ? "VB" : "V9";
 		} else if (0 !== (way & 4)) {
 			throw unsupported(way, "V5");
 		} else {
@@ -855,14 +900,16 @@ export function unpackWbmSection(
 										)
 									: "V9" === walk
 										? unpackV9(reader, offsets, pixelSize, condition)
-										: unpackVD(
-												reader,
-												table,
-												prediction,
-												offsets,
-												pixelSize,
-												condition,
-											);
+										: "VB" === walk
+											? unpackVB(reader, table, offsets, pixelSize, condition)
+											: unpackVD(
+													reader,
+													table,
+													prediction,
+													offsets,
+													pixelSize,
+													condition,
+												);
 				// A finding of the walk's own ends the unpack, as it does in the reference.
 				if (!result) throw invalid("The picture does not unpack");
 				return result;

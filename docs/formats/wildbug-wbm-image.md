@@ -62,6 +62,9 @@ reference, a set bit standing for a byte away from the byte before the place wri
 one of the eight pixel offsets. Those two shapes are the first attempt's of the `0x01` and `0x03` walks
 without the word form, and this walk tells its attempts apart by nothing but the bit it looks for.
 
+The `0x0B` walk is ported as well: the `0x02` walk's table of codes, whose symbol is the byte written as it
+stands, with the two shapes of reference the `0x09` walk reads.
+
 The `0x0F` walk is ported too. It is the `0x02` walk's table of codes, but the symbol a code stands for is
 not a byte: it names a place in a table of predictions, one row of two hundred and fifty six for every byte,
 in which a byte predicts itself first and then its neighbours. The row is the one the byte **one pixel**
@@ -74,20 +77,19 @@ turn. The first bit that is set names the walk, and the bits behind it say which
 the ways whose first bit is clear reach the `0x00`, `0x02` or `0x04` walk by their fourth and second bits;
 among the rest, the ways with the eighth bit set reach the `0x0F`, `0x0B` or `0x09` walk, those with the
 fourth reach the `0x05` walk, those with the second the `0x03` walk, and the rest the `0x01` walk. So the
-ways `0x00` and `0x08` reach the `0x00` walk, `0x02` and `0x0A` the `0x02` walk, `0x01` the `0x01` walk,
-`0x03` the `0x03` walk, `0x09` the `0x09` walk, and `0x0C` upwards the `0x0F` walk.
+ways `0x00` and `0x08` reach the `0x00` walk, `0x02` the `0x02` walk, `0x01` the `0x01` walk, `0x03` the
+`0x03` walk, `0x09` the `0x09` walk, `0x0A` and `0x0B` the `0x0B` walk, and `0x0C` upwards the `0x0F` walk.
 
-The walks that remain - the `0x04` walk of the ways `0x04` and `0x06`, the `0x05` walk of the ways `0x05`
-and `0x07`, and the `0x0B` walk of the ways `0x0A` and `0x0B` - are refused with `UNSUPPORTED_FEATURE`, and
-the message names the walk that is missing, so a caller learns that rather than being handed a wrong
-picture. Each of them builds the prediction table of sixty four thousand bytes first; all of that code is
+Seven of the nine walks are ported. The two that remain - the `0x04` walk of the ways `0x04` and `0x06`, and
+the `0x05` walk of the ways `0x05` and `0x07` - are refused with `UNSUPPORTED_FEATURE`, and the message names
+the walk that is missing, so a caller learns that rather than being handed a wrong picture. Each of them builds the prediction table of sixty four thousand bytes first; all of that code is
 decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has nothing to check its own
 transcription against but the reference itself.
 
 ## Deviations from the reference
 
-* The three further packed walks - the `0x04`, `0x05` and `0x0B` walks, which the ways `0x04` to `0x07`
-  and `0x0A`/`0x0B` ask for - are refused rather than ported, as above.
+* The two further packed walks - the `0x04` walk of the ways `0x04` and `0x06`, and the `0x05` walk of
+  the ways `0x05` and `0x07` - are refused rather than ported, as above.
 * Every read is bounded: a picture shorter than the size its head names, and a section reaching past the end
   of the file, are refused, where the reference would throw an end of stream error or keep zeros.
 * A picture of no width or no height, and a depth the engine never writes, are refused.
@@ -97,7 +99,7 @@ transcription against but the reference itself.
 
 ## Verification
 
-Nineteen tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
+Twenty tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
 of the bitmap without padding; a picture of thirty two bits whose alpha channel is spread over it (the byte
 the picture keeps behind its colours is deliberately different, so a port that kept it would fail) and whose
 second row of alpha starts where its own four byte stride says; a picture of thirty two bits with no alpha
@@ -108,7 +110,7 @@ a packed section refused with the name of the walk it asks for, beside the same 
 packed, which is read as it stands; and the refusals - the word of a sound, no head, a head too short, a
 depth of twelve, no pixels, and pixels reaching past the file.
 
-Eleven further tests cover the packed walks, and the bit stream they build is the one the walks read: a reader
+Twelve further tests cover the packed walks, and the bit stream they build is the one the walks read: a reader
 is checked on its own, handing out a byte's flags highest first and the literal bytes behind them; then a
 picture of the `0x00` way whose bytes are all literals; then one of that way whose last byte is a back
 reference, which takes the byte its own offset names; then a stream of clear bits, which the first two
@@ -119,10 +121,11 @@ distance of nothing copies the byte before the place it writes to - and then tha
 Then a picture of the `0x02` way whose table gives its first four symbols a code of two bits each, so the
 table's own reading is pinned as well; then one of the `0x03` way through that same table with a reference
 whose counted run is added to the run itself; then two of the `0x09` way, one for each of its two shapes of
-reference; and last one of the `0x0F` way, whose expected bytes are worked out by writing the same prediction
-table and the same walk out in the test itself.
+reference; then one of the `0x0B` way, whose table's symbols are the bytes written; and last one of the
+`0x0F` way, whose expected bytes are worked out by writing the same prediction table and the same walk out in
+the test itself.
 
-What stands on the reference alone: the three further packed walks, which this port refuses; of the six ways
+What stands on the reference alone: the two further packed walks, which this port refuses; of the seven ways
 that are ported, the later attempts' shapes and the retry between them, since the fixture that reaches a
 reference pins the first attempt's byte form and the shortest run; and no real file is on hand to compare
 against GARbro's output.
