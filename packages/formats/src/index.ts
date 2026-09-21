@@ -532,6 +532,7 @@ import { densdkDaf2Format } from "./densdk/daf.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
 import { eushullyAlfFormat } from "./eushully/alf.js";
+import { eushullyAgfImageFormat } from "./eushully/agf-image.js";
 import { gamesystemCmpFormat } from "./gamesystem/cmp.js";
 import { tamasoftEpkFormat } from "./tamasoft/epk.js";
 import { youkaiDatGrpFormat } from "./youkai/dat.js";
@@ -1845,6 +1846,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		densdkDaf2Format,
 		pfsFormat,
 		tmrHiroPacFormat,
+		eushullyAgfImageFormat,
 		eushullyAlfFormat,
 		gamesystemCmpFormat,
 		tamasoftEpkFormat,

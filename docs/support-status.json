@@ -18793,6 +18793,36 @@
 				"the row step and the wrap it takes when it runs past the picture, which no fixture here pins down: the port copies the reference's own wrap, but the bytes that land in each row of a picture whose step is not one stand on the reference alone",
 				"a real picture, which would show what step and interleave the engine actually writes"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "AGF",
+				"class": "AgfFormat",
+				"source": "ArcFormats/Eushully/ImageAGF.cs"
+			},
+			"localId": "eushully-agf-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the word, and the empty one beside it",
+				"the head that names the kind of picture and its two section sizes",
+				"the section rule: equal sizes store, different sizes unfold as LZSS",
+				"the inner head with its dimensions and stored depth",
+				"the palette a picture of eight bits or fewer carries",
+				"the picture section, with its own two size words",
+				"the alpha channel behind a thirty two bit picture, and the fall back when it is missing",
+				"the three ways of walking a row, with the rows turned over"
+			],
+			"unsupported": ["image creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a packed section carrying a back reference, which no fixture here reaches: the test streams store every byte as a literal, so that path stands on the shared LZSS codec's own tests",
+				"a real picture, which would show which stored depths and which palette the engine actually writes"
+			]
 		}
 	]
 }
