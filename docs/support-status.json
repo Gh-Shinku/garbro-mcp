@@ -19077,6 +19077,37 @@
 				"a copy of the walk, which no fixture here reaches: every byte of the fixtures built is written as it stands, so only the literal branch is pinned",
 				"a real picture, which would show both ways of packing and how the engine lays its tables out"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "PB2",
+				"class": "Pb2Format",
+				"source": "ArcFormats/Cmvs/ImagePB2.cs"
+			},
+			"localId": "cmvs-pb2-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head recovered through the key the file's own last twenty seven bytes hold",
+				"the first way: one run of blocks of eight by eight, placed channel by channel",
+				"the second way: a record of flags, bytes and a packed plane a channel",
+				"the fourth way, through the ported walk of the JBP pictures",
+				"the last way: four channels folded back one into the next, written as four bytes a pixel",
+				"the LZSS and JBP walks the base shares with the ported PB3 pictures"
+			],
+			"unsupported": [
+				"image creation",
+				"the ways three, five and seven, which the reference does not read either, refused by name"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a copy of the base's LZSS walk: every fixture writes clear control bits, so only the literal branch is reached",
+				"the fourth way's own picture bytes, which are pinned only through the degenerate JBP the PB3 tests use, and its alpha channel, which no fixture here reaches"
+			]
 		}
 	]
 }
