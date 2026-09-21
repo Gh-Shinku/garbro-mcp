@@ -127,6 +127,17 @@ further than the reference's own list of them.
 - `S5I` (`ArcFormats/rUGP/ImageS5I.cs`) reads one object of a `CRioArchive`, whose walk lives in the
   fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs` and `LoadRio*` helpers that this project has not
   ported.
+- `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
+  reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
+  stock build does open these containers - but a first port of it stands withdrawn. The container is a
+  serialised object graph: a head naming six tables, a **name trie** whose nodes reach their children by a
+  base of their own, arrays whose count field is itself an object of the file (which is what the array's own
+  header size is read from), and dictionaries whose values hold places counted from the end of their own
+  arrays. The head, the key schedule and the table checks were written and are understood; the trie walk came
+  back with an **empty name map** on a hand built container, and every dictionary lookup stands on it, so the
+  reader was withdrawn rather than landed unverified. A second pass wants a **real** container to step
+  through, or a mirror writer for the trie built alongside the reader, since the walk's own condition
+  (`i >= nm1.Count || nm2[i] != prev`) is subtle enough that a synthetic fixture alone did not pin it.
 - `DREF` (`ArcFormats/Emote/ImageDREF.cs`) is not a picture at all: it is a little endian text file of
   `psb://<archive>/<entry>` lines, and the reference composes it by opening each named archive with the
   `PSB/EMOTE` opener, finding the entry by name, and drawing the layers one over another with WPF. It
