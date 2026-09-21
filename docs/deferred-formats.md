@@ -146,8 +146,6 @@ The survey that fills this section reads the gap inventory through `node scripts
 without `--all` the tool prints only the first forty pending rows, which is a shorter list than it looks
 like.
 
-- `PX` (`ArcFormats/Leaf/ImagePX.cs`, 488 lines) is a block structured picture reader with its own reader
-  classes (`PxReader`, `PxBlock`).
 - `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the

@@ -49,6 +49,7 @@ import { ivoryPxAudioFormat } from "./ivory/px-audio.js";
 import { k5Format } from "./gsx/k5.js";
 import { flkFormat } from "./liddell/flk.js";
 import { leafPxFormat } from "./leaf/px.js";
+import { leafPxImageFormat } from "./leaf/px-image.js";
 import { leafPakFormat } from "./leaf/pak.js";
 import { otemotoMagImageFormat } from "./otemoto/mag-image.js";
 import { rpgMakerRgssAdFormat } from "./rpg-maker/rgss-ad.js";
@@ -1384,6 +1385,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		gpk2Format,
 		kaasPbFormat,
 		kpcFormat,
+		leafPxImageFormat,
 		leafPxFormat,
 		leafPakFormat,
 		rpgMakerRgssAdFormat,
