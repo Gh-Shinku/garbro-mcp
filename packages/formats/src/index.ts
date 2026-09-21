@@ -744,6 +744,7 @@ import { kurumiGraImageFormat } from "./kurumi/gra-image.js";
 import { gr1ImageFormat } from "./anotherroom/gr1-image.js";
 import { bgraImageFormat } from "./g2/bgra-image.js";
 import { g2PgxImageFormat } from "./g2/pgx-image.js";
+import { ismIsgImageFormat } from "./ism/isg-image.js";
 import { cbfImageFormat } from "./hmp/cbf-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
@@ -1269,6 +1270,7 @@ export * from "./strikes/index.js";
 export * from "./lucifen/index.js";
 export * from "./ellefin/index.js";
 export * from "./g2/index.js";
+export * from "./ism/index.js";
 export * from "./pinky/index.js";
 export * from "./pias/index.js";
 export * from "./kogado/index.js";
@@ -1585,6 +1587,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ns2ArchiveFormat,
 		alicesoftAjpImageFormat,
 		g2PgxImageFormat,
+		ismIsgImageFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,

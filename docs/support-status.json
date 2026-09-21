@@ -19262,6 +19262,35 @@
 				"the packed size the head carries, which this port does not check against the run",
 				"the sibling .stx layer offsets, which only move a picture about"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "ISG",
+				"class": "IsgFormat",
+				"source": "ArcFormats/Ism/ImageISG.cs"
+			},
+			"localId": "ism-isg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of the picture and the palette it names",
+				"the packed way: its control word read from the high bit down and its frame of two thousand and forty-eight bytes",
+				"the simple way: its control word read from the low bit up, eight decisions to a byte",
+				"a picture extracted through its own palette with its bottom-up rows kept"
+			],
+			"unsupported": [
+				"create",
+				"the overlay way (0x34), which stands over a baseline picture read from a file the overlay names beside it"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the overlay way and its baseline pictures",
+				"the frame's own wrap, which only a hand built stream reaches here"
+			]
 		}
 	]
 }
