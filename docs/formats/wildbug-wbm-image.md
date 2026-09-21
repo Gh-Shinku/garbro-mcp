@@ -42,9 +42,9 @@ asking for another attempt, which is what the reference does as well.
 The `0x01` walk is ported as well, and it is much the same shape with two differences. Its references come
 in four forms rather than one: on the reference's first attempt a reference is either a byte or a word away
 from the byte before the place it writes to, and stands for a run of two or three bytes, while on the later
-attempts one of the two forms is a short run taken from the table of pixel offsets instead. And a clear bit
-behind a reference **adds** the counted run to the run itself, where the `0x00` walk let the counted run
-stand for the whole of it.
+attempts one of the two forms is a short run taken from the table of pixel offsets instead. And in every
+walk, a clear bit behind a reference **adds** a run the walk counts out for itself to the run the reference
+named.
 
 The `0x02` walk is ported too, and it is the `0x00` walk with its literal bytes taken from a table of codes.
 Behind the picture's first pixel stand a hundred and twenty eight bytes holding a four bit length for every
@@ -54,12 +54,14 @@ A code is kept at the place its own bits name once they are shifted up to fill f
 finds a literal by collecting bits until the length the table holds for the bits collected matches how many
 of them there are. The codes are read out of the same supply of bits the picture is then read from.
 
-The six further walks, `0x03` to `0x0F`, are refused with `UNSUPPORTED_FEATURE`, and the message names the
+The `0x03` walk is ported as well, and it is the `0x02` walk's table of codes with the `0x01` walk's four
+shapes of back reference behind it.
+
+The six further walks, `0x04` to `0x0F`, are refused with `UNSUPPORTED_FEATURE`, and the message names the
 walk the section's byte asks for, so a caller learns which one is missing rather than being handed a wrong
-picture. Each of those builds a reference table of sixty four thousand entries (`BuildTable`,
-`FillRefTable`) before walking the picture through the same two tables of offsets; all of that code is
-decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has nothing to check its own
-transcription against but the reference itself.
+picture. Most of them build a further table of sixty four thousand entries (`BuildTable`) before walking the
+picture; all of that code is decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has
+nothing to check its own transcription against but the reference itself.
 
 ## Deviations from the reference
 
@@ -73,7 +75,7 @@ transcription against but the reference itself.
 
 ## Verification
 
-Fifteen tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
+Sixteen tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
 of the bitmap without padding; a picture of thirty two bits whose alpha channel is spread over it (the byte
 the picture keeps behind its colours is deliberately different, so a port that kept it would fail) and whose
 second row of alpha starts where its own four byte stride says; a picture of thirty two bits with no alpha
@@ -84,7 +86,7 @@ a packed section refused with the name of the walk it asks for, beside the same 
 packed, which is read as it stands; and the refusals - the word of a sound, no head, a head too short, a
 depth of twelve, no pixels, and pixels reaching past the file.
 
-Seven further tests cover the packed walks, and the bit stream they build is the one the walks read: a reader
+Eight further tests cover the packed walks, and the bit stream they build is the one the walks read: a reader
 is checked on its own, handing out a byte's flags highest first and the literal bytes behind them; then a
 picture of the `0x00` way whose bytes are all literals; then one of that way whose last byte is a back
 reference, which takes the byte its own offset names; then a stream of clear bits, which the first two

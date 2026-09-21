@@ -160,9 +160,9 @@ like.
 - `WBM` (`ArcFormats/WildBug/ImageWBM.cs`, 1165 lines) is the picture beside the **ported** `WWA` sound, and
   most of it is ported now: the shared head and record walk (`wildbug/wpx-section.ts`), the picture's own
   head, the pixels, the colours of the eight bit kind, the alpha channel and the one way of storing a section
-  the reference also reads as it stands, and the **`0x00`, `0x01` and `0x02` packed walks** as well. What
-  remains is the **six further packed walks** of the `WbmReader`, `UnpackV3` through `UnpackVD`, for the
-  section ways `0x03` to `0x0F`. Each builds a reference table of
+  the reference also reads as it stands, and the **`0x00` to `0x03` packed walks** as well. What remains is
+  the **six further packed walks** of the `WbmReader`, `UnpackV4` through `UnpackVD`, for the section ways
+  `0x04` to `0x0F`. Each builds a reference table of
   sixty four thousand entries (`BuildTable`, `FillRefTable`) and then walks the picture through a padded
   table of eight pixel offsets (`GenerateOffsetTableV1` or `V2`), retrying with the other table when a walk
   fails. All of that code is decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has

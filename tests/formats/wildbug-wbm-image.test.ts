@@ -238,13 +238,13 @@ describe("Wild Bug WBM image", () => {
 	it("refuses a packed section and reads one that says it holds nothing packed", async () => {
 		const packed = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
-			{ id: 0x11, body: pixels24(), format: 0x03, packedSize: 8 },
+			{ id: 0x11, body: pixels24(), format: 0x04, packedSize: 8 },
 		]);
 		const layout = readWbmLayout(packed);
 		if (!layout) throw new Error("the fixture is not a WBM picture");
 		// The refusal names the walk the section's own byte asks for.
 		expect(() => decodeWbmPicture(packed, layout)).toThrow(GarbroError);
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x03 walk/);
+		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x04 walk/);
 		// A section that declares no packed bytes at all is read as it stands, as the reference does.
 		const plain = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
@@ -535,6 +535,54 @@ describe("Wild Bug WBM packed walk", () => {
 		const picture = decodeWbmPicture(file, layout);
 		expect(picture.pixels.subarray(0, 12)).toEqual(
 			Buffer.from([0x51, 0x52, 0x53, 0, 1, 2, 3, 0, 1, 2, 3, 0]),
+		);
+	});
+
+	it("reads a picture of the 0x03 way through its table and a counted run", () => {
+		const first = Buffer.from([0x61, 0x62, 0x63]);
+		// The first four symbols take a two bit code each, and their codes are 0, 1, 2, 3.
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		const bits = new PackedBits();
+		// A literal of this way is a flag and the bits of its code, and no byte of its own: the symbol the
+		// code stands for is the byte the walk writes.
+		const literal = (value: number): void => {
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		};
+		for (const value of [0, 1, 2, 3]) literal(value);
+		// The bit that is not the walk's ends the literals; the two bits that follow name the first
+		// attempt's byte form; a distance of nothing names the byte before the place written to; a clear bit
+		// adds a counted run to the run of two that form already stands for, and the run itself is one.
+		bits.bit(0);
+		bits.bit(1);
+		bits.bit(1);
+		bits.byte(0);
+		bits.bit(0);
+		bits.bit(1);
+		bits.bit(0);
+		// The two bytes the picture still has room for.
+		literal(2);
+		literal(3);
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		const file = packedFile(4, 1, 24, body, 0x03);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// Four literals follow the first pixel, and then a run of three copies the byte before the place
+		// written to - the last literal - and then itself, twice over. Two more literals fill the row.
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x61, 0x62, 0x63, 0, 1, 2, 3, 3, 3, 3, 2, 3]),
 		);
 	});
 
