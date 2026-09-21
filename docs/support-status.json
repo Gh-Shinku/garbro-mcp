@@ -19016,6 +19016,38 @@
 				"the place the samples are read from, which the reference takes from its stream's position rather than from the record; the two agree only for files whose records stand one behind the other",
 				"a real file, which would show how the engine lays its records out"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "WBM",
+				"class": "WbmFormat",
+				"source": "ArcFormats/WildBug/ImageWBM.cs"
+			},
+			"localId": "wildbug-wbm-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head both kinds of this engine carry, with its three byte kind",
+				"the picture's own head: its size and the depth it is stored in",
+				"the pixels, padded to four bytes a row",
+				"the colours of an eight bit picture, turned round to the order a bitmap keeps",
+				"the alpha channel a picture of twenty four bits or more may carry, spread over the pixels",
+				"a picture of eight bits without colours, read as shades of grey",
+				"the one way of storing a section the reference also reads as it stands"
+			],
+			"unsupported": [
+				"image creation",
+				"the nine packed walks of the reference (UnpackV0 through UnpackVD for the section ways 0x00 to 0x0f), which are refused by name: they are decompiler output with nothing but the reference to check a transcription against"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the nine packed walks, which no fixture here reaches because this port refuses them",
+				"a real picture, which would show which of the nine ways the engine writes and whether it pads its rows as the head says"
+			]
 		}
 	]
 }

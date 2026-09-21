@@ -759,6 +759,7 @@ import { lzBmpImageFormat } from "./misc/lz-bmp-image.js";
 import { bbmImageFormat } from "./blue-gale/bbm-image.js";
 import { wpnAudioFormat } from "./wildbug/wpn-audio.js";
 import { wildbugWwaAudioFormat } from "./wildbug/wwa-audio.js";
+import { wildbugWbmImageFormat } from "./wildbug/wbm-image.js";
 import { wbmImageFormat } from "./hypatia/wbm-image.js";
 import { surImageFormat } from "./tamasoft/sur-image.js";
 import { btnImageFormat } from "./tamasoft/btn-image.js";
@@ -2077,6 +2078,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		kgrImageFormat,
 		lzBmpImageFormat,
 		bbmImageFormat,
+		wildbugWbmImageFormat,
 		wildbugWwaAudioFormat,
 		wpnAudioFormat,
 		wbmImageFormat,
