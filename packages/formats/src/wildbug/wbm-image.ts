@@ -51,6 +51,10 @@ const STORED_FORMAT = 0x80;
 const WALK_BITS = 0x0f;
 /** The bytes a walk reads at a time, and the step the first pixel of a packed picture takes. */
 const BUFFER_SIZE = 0x8000;
+/** The block of code lengths the ways that carry a table keep behind the picture's first pixel. */
+const CODE_BLOCK_SIZE = 0x80;
+/** The code table a walk that carries one builds: two bytes to each of two hundred and fifty six symbols. */
+const CODE_TABLE_SIZE = 0x10000;
 /** The colours a picture of eight bits may carry, three bytes each. */
 const PALETTE_COLORS = 0x100;
 const PALETTE_ENTRY = 3;
@@ -207,6 +211,57 @@ export class WbmPackedReader {
 		return this.#available;
 	}
 
+	/**
+	 * `WpxDecoder.FillRefTable`: the picture's own code table is read out of the section. A block of bytes
+	 * holds a four bit length for every one of the two hundred and fifty six symbols, two to a byte, the
+	 * lower nibble first; behind it stand the codes themselves, one for every symbol a length was given to,
+	 * in the order the symbols run. The codes are read out of the same supply of bits the picture is then
+	 * read from, and a supply that runs out before the table is whole leaves the table unbuilt. A code is
+	 * kept at the place its bits name once they are shifted up to fill fifteen of them, so the picture can
+	 * find a symbol by collecting bits until the length at that place matches how many it has collected.
+	 *
+	 * The table is two bytes to a symbol: the length first, and then the symbol itself.
+	 */
+	fillRefTable(table: Uint8Array, source: number): boolean {
+		this.#bits = this.#buffer[this.#current] ?? 0;
+		this.#current += 1;
+		this.#bitCount = 8;
+		let at = source;
+		let symbol = 0;
+		while (symbol < 0x100) {
+			const packed = this.#buffer[at] ?? 0;
+			at += 1;
+			for (let half = 0; half < 2; half += 1) {
+				const length = (packed >> (4 * half)) & 0x0f;
+				if (0 !== length) {
+					let code = 0;
+					for (let step = 0; step < length; step += 1) {
+						if (0 === this.#bitCount) {
+							if (this.#current >= this.#available) return false;
+							this.#bits = this.#buffer[this.#current] ?? 0;
+							this.#current += 1;
+							this.#bitCount = 8;
+						}
+						const bit = (this.#bits >> 7) & 1;
+						this.#bits = (this.#bits << 1) & 0xff;
+						this.#bitCount -= 1;
+						code = code + code + bit;
+					}
+					if (15 !== length) code <<= 15 - length;
+					table[2 * code] = length;
+					table[2 * code + 1] = symbol;
+				}
+				symbol += 1;
+			}
+		}
+		return true;
+	}
+
+	/** Where the next byte read comes from, which the walks that build a table set before they do. */
+	seekBuffer(offset: number): void {
+		this.#current = offset;
+	}
+
 	/** The first pixel of a packed picture is copied straight out of the buffer, as the reference does. */
 	copyFromBuffer(target: Buffer, offset: number, count: number): void {
 		this.#buffer.copy(target, 0, offset, offset + count);
@@ -277,6 +332,66 @@ export function offsetTableV2(stride: number, pixelSize: number): number[] {
 		table[7] = 8 * pixelSize;
 	}
 	return table;
+}
+
+/**
+ * `WbmReader.UnpackV2`, the `0x02` walk: the `0x00` walk with its literal bytes taken from a table of codes
+ * instead. The picture's first pixel is copied as it stands and padded, then a block of a hundred and twenty
+ * eight bytes holds a length for every symbol, and the codes behind it build the table. A literal is read by
+ * collecting bits until the length the table holds for the bits collected matches how many of them there
+ * are; the back references are the three bit index and the run of the `0x00` walk.
+ */
+export function unpackV2(
+	reader: WbmPackedReader,
+	table: Uint8Array,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+): Buffer | undefined {
+	const minCount = 1 === pixelSize ? 2 : 1;
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	const step = (pixelSize + 3) & ~3;
+	if (available < step + CODE_BLOCK_SIZE) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	// The table's own codes are read from the byte behind the block of lengths, and the picture's bits
+	// carry on from wherever the table left off.
+	reader.seekBuffer(step + CODE_BLOCK_SIZE);
+	if (!reader.fillRefTable(table, step)) return undefined;
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			let length = 0;
+			let code = 0;
+			let weight = 1 << 14;
+			for (;;) {
+				length += 1;
+				if (0 !== reader.nextBit()) code |= weight;
+				if (table[2 * code] === length) break;
+				weight >>= 1;
+				if (0 === weight) return undefined;
+			}
+			reader.output[destination] = table[2 * code + 1] ?? 0;
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		let index = reader.nextBit() << 2;
+		index |= reader.nextBit() << 1;
+		index |= reader.nextBit();
+		const source = destination - (offsetTable[index] ?? 0);
+		const count =
+			0 !== reader.nextBit() ? minCount : minCount + reader.readCount();
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			// The reference's own copy walks off the buffer here, which its caller catches.
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
 }
 
 /**
@@ -418,21 +533,23 @@ export function unpackWbmSection(
 ): Buffer {
 	if (0 === (section.dataFormat & STORED_FORMAT) && 0 !== section.packedSize) {
 		const way = section.dataFormat & WALK_BITS;
-		if (0 !== way && 1 !== way) {
+		if (0 !== way && 1 !== way && 2 !== way) {
 			throw unsupported(section.dataFormat);
 		}
 		const bytes = readWpxSectionData(data, section, section.packedSize);
 		if (!bytes) {
 			throw invalid(`The picture's ${what} reaches past the end of the file`);
 		}
-		let table = offsetTableV2(stride, pixelSize);
+		let offsets = offsetTableV2(stride, pixelSize);
 		for (let attempt = 0; attempt < 3; attempt += 1) {
-			if (1 === attempt) table = offsetTableV1(stride, pixelSize);
+			if (1 === attempt) offsets = offsetTableV1(stride, pixelSize);
 			const reader = new WbmPackedReader(
 				bytes,
 				bytes.length,
 				section.unpackedSize,
 			);
+			// Every attempt builds the picture's own table afresh.
+			const table = new Uint8Array(CODE_TABLE_SIZE);
 			try {
 				// The reference's own three attempts: two with the later table and one bit, and one with
 				// the earlier table and a bit of nothing. The walk is told which attempt it is, because
@@ -441,8 +558,10 @@ export function unpackWbmSection(
 				const version = 2 - attempt;
 				const result =
 					0 === way
-						? unpackV0(reader, table, pixelSize, condition)
-						: unpackV1(reader, table, pixelSize, condition, version);
+						? unpackV0(reader, offsets, pixelSize, condition)
+						: 1 === way
+							? unpackV1(reader, offsets, pixelSize, condition, version)
+							: unpackV2(reader, table, offsets, pixelSize, condition);
 				// A finding of the walk's own ends the unpack, as it does in the reference.
 				if (!result) throw invalid("The picture does not unpack");
 				return result;

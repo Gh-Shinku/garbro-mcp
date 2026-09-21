@@ -19039,17 +19039,18 @@
 				"a picture of eight bits without colours, read as shades of grey",
 				"the one way of storing a section the reference also reads as it stands",
 				"the packed way 0x00: the first pixel as it stands, literal bytes, back references and counted runs, with the reference's three attempts",
-				"the packed way 0x01: literals, its four shapes of back reference, and a counted run that adds to the run itself"
+				"the packed way 0x01: literals, its four shapes of back reference, and a counted run that adds to the run itself",
+				"the packed way 0x02: the block of code lengths and the codes behind it, and literals read through that table"
 			],
 			"unsupported": [
 				"image creation",
-				"the eight further packed walks (0x02 to 0x0f), which are refused by name: each builds a sixty four thousand entry reference table first, and all of that code is decompiler output with nothing but the reference to check a transcription against"
+				"the six further packed walks (0x03 to 0x0f), which are refused by name: most build the reference table of sixty four thousand entries first, and all of that code is decompiler output with nothing but the reference to check a transcription against"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"of the two ported walks, the later attempts' shapes of back reference and the retry between attempts, which no fixture here reaches: one the fixture pins is the first attempt's byte form",
-				"the eight further packed walks, which no fixture here reaches because this port refuses them",
-				"a real picture, which would show which of the ways the engine writes and whether it pads its rows as the head says"
+				"of the three ported walks, the later attempts' shapes of back reference and the retry between attempts, which no fixture here reaches: one the fixture pins is the first attempt's byte form",
+				"the six further packed walks, which no fixture here reaches because this port refuses them",
+				"a real picture, which would show which of the ways the engine writes, and whether the codes in a real one are the equal length kind the fixture uses"
 			]
 		}
 	]

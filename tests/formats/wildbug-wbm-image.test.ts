@@ -238,13 +238,13 @@ describe("Wild Bug WBM image", () => {
 	it("refuses a packed section and reads one that says it holds nothing packed", async () => {
 		const packed = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
-			{ id: 0x11, body: pixels24(), format: 0x02, packedSize: 8 },
+			{ id: 0x11, body: pixels24(), format: 0x03, packedSize: 8 },
 		]);
 		const layout = readWbmLayout(packed);
 		if (!layout) throw new Error("the fixture is not a WBM picture");
 		// The refusal names the walk the section's own byte asks for.
 		expect(() => decodeWbmPicture(packed, layout)).toThrow(GarbroError);
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x02 walk/);
+		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x03 walk/);
 		// A section that declares no packed bytes at all is read as it stands, as the reference does.
 		const plain = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
@@ -500,6 +500,41 @@ describe("Wild Bug WBM packed walk", () => {
 		// byte and then itself, twice over.
 		expect(picture.pixels.subarray(0, 12)).toEqual(
 			Buffer.from([0x11, 0x22, 0x33, 0x33, 0x33, 4, 5, 6, 7, 8, 9, 10]),
+		);
+	});
+
+	it("reads a picture of the 0x02 way through the table of codes it carries", () => {
+		const first = Buffer.from([0x51, 0x52, 0x53]);
+		// A row of four pixels is twelve bytes with nothing to pad, so nine bytes follow the first.
+		// The table gives the first four symbols a code of two bits each, and their codes are 0, 1, 2, 3 -
+		// one byte of bits, its lowest two bits last.
+		// Two symbols to a byte, and the lower nibble is the earlier one, so a length of two for the first
+		// four symbols is 0x22 twice over.
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		const bits = new PackedBits();
+		for (const value of [0, 1, 2, 3, 0, 1, 2, 3, 0]) {
+			// A literal is flagged, and then the two bits of its code.
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		}
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		const file = packedFile(4, 1, 24, body, 0x02);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x51, 0x52, 0x53, 0, 1, 2, 3, 0, 1, 2, 3, 0]),
 		);
 	});
 
