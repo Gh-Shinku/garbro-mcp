@@ -19046,6 +19046,37 @@
 				"the later attempts of the walks that shape their references by attempt, and the retry between attempts, which no fixture here reaches: the ones the fixtures pin are the first attempt's byte form, a counted run, the table of codes and the prediction table",
 				"a real picture, which would show which of the ways the engine writes, whether the codes in a real one are the equal length kind the fixture uses, and whether it pads its rows as the head says"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "PSB",
+				"class": "PsbFormat",
+				"source": "ArcFormats/Cmvs/ImagePSB.cs"
+			},
+			"localId": "cmvs-psb-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head recovered through the key its own tail holds",
+				"the two ways the engine packs a picture: the second and the third",
+				"the walk of this engine, with its four bits of run and its frame of four thousand and ninety-six bytes",
+				"the planes of differences of the second way, added up by channel",
+				"the blocks of eight by eight of the third way, with its flags, its filling bytes and its plane",
+				"the depth of three and four bytes a pixel, written as bitmaps"
+			],
+			"unsupported": [
+				"image creation",
+				"the ways of packing a picture the reference names but does not read either, which are refused by name"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a copy of the walk, which no fixture here reaches: every byte of the fixtures built is written as it stands, so only the literal branch is pinned",
+				"a real picture, which would show both ways of packing and how the engine lays its tables out"
+			]
 		}
 	]
 }

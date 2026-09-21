@@ -15,6 +15,7 @@ import { mifFormat } from "./basil/mif.js";
 import { bishopBscFormat } from "./bishop/bsc.js";
 import { bishopPkFormat } from "./bishop/pk.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
+import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { medFormat } from "./dxlib/med.js";
 import { hexenhausImgdImageFormat } from "./hexenhaus/imgd-image.js";
 import { dpfFormat } from "./mutation/dpf.js";
@@ -1326,6 +1327,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		new Xp3Format(),
 		new Adpack32Format(),
 		hexenhausImgdImageFormat,
+		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
 		ugosDetBmpImageFormat,
