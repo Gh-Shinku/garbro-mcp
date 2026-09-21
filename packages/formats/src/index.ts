@@ -831,6 +831,7 @@ import { interheartEpfImageFormat } from "./interheart/epf-image.js";
 import { dogenzakaRc4PngImageFormat } from "./dogenzaka/rc4-png-image.js";
 import { slgTigImageFormat } from "./slg/tig-image.js";
 import { slgTicImageFormat } from "./slg/tic-image.js";
+import { slgAlbImageFormat } from "./slg/alb-image.js";
 import { silkyIgfImageFormat } from "./silky/igf-image.js";
 import { fc01AcdImageFormat } from "./fc01/acd-image.js";
 import { silkyZitImageFormat } from "./silky/zit-image.js";
@@ -2139,6 +2140,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		dogenzakaRc4PngImageFormat,
 		slgTigImageFormat,
 		slgTicImageFormat,
+		slgAlbImageFormat,
 		silkyIgfImageFormat,
 		fc01AcdImageFormat,
 		silkyZitImageFormat,

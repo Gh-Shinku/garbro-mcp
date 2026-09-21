@@ -18678,5 +18678,34 @@ export const formatSupportCatalog = {
 				"a real picture, which would show whether games use the palette and the packed bitmap together",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "ALB",
+				class: "AlbFormat",
+				source: "ArcFormats/Slg/ImageALB.cs",
+			},
+			localId: "slg-alb-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the dictionary of a block, as it stands and run length coded",
+				"the expansion of an entry that stands for more than itself",
+				"a stream of several blocks",
+				"the three kinds of picture the stream unwraps to",
+				"the header fields read off the unwrapped picture",
+			],
+			unsupported: [
+				"image creation",
+				"decoding the picture inside, which is a PNG, a DDS or a JPEG and is handed over as it stands; the PNG and JPEG decoders are ones this project does not carry",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show whether any engine stores anything but a DDS in one of these",
+			],
+		},
 	],
 } as const;
