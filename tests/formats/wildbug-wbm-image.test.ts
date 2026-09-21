@@ -244,7 +244,7 @@ describe("Wild Bug WBM image", () => {
 		if (!layout) throw new Error("the fixture is not a WBM picture");
 		// The refusal names the walk the section's own byte asks for.
 		expect(() => decodeWbmPicture(packed, layout)).toThrow(GarbroError);
-		expect(() => decodeWbmPicture(packed, layout)).toThrow(/0x04 walk/);
+		expect(() => decodeWbmPicture(packed, layout)).toThrow(/walk V4/);
 		// A section that declares no packed bytes at all is read as it stands, as the reference does.
 		const plain = pictureFile([
 			{ id: 0x10, body: pictureHead(3, 2, 24) },
@@ -609,7 +609,7 @@ describe("Wild Bug WBM packed walk", () => {
 		);
 	});
 
-	it("reads a picture of the 0x08 way with one of the eight pixel offsets", () => {
+	it("reads a picture of the 0x09 way with one of the eight pixel offsets", () => {
 		const first = Buffer.from([0x81, 0x82, 0x83]);
 		const bits = new PackedBits();
 		// A clear bit behind the walk's own names the table of pixel offsets; three clear bits name its
@@ -622,7 +622,7 @@ describe("Wild Bug WBM packed walk", () => {
 		bits.bit(1);
 		for (const value of [1, 2, 3, 4, 5, 6, 7, 8]) bits.literal(1, value);
 		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
-		const file = packedFile(4, 1, 24, body, 0x08);
+		const file = packedFile(4, 1, 24, body, 0x09);
 		const layout = readWbmLayout(file);
 		if (!layout) throw new Error("the fixture is not a WBM picture");
 		expect(layout.stride).toBe(12);
@@ -632,6 +632,61 @@ describe("Wild Bug WBM packed walk", () => {
 		expect(picture.pixels.subarray(0, 12)).toEqual(
 			Buffer.from([0x81, 0x82, 0x83, 0x81, 1, 2, 3, 4, 5, 6, 7, 8]),
 		);
+	});
+
+	it("reads a picture of the 0x0f way through its prediction table", () => {
+		const first = Buffer.from([0x31, 0x32, 0x33]);
+		const lengths = Buffer.alloc(0x80, 0x00);
+		lengths[0] = 0x22;
+		lengths[1] = 0x22;
+		const codes = Buffer.from([0x1b]);
+		// The symbols the picture is written from, one of them twice over so the move to the front of the
+		// row shows up.
+		const symbols = [1, 1, 2, 3, 0, 1, 2, 3, 0];
+		const bits = new PackedBits();
+		for (const value of symbols) {
+			bits.bit(1);
+			bits.bit((value >> 1) & 1);
+			bits.bit(value & 1);
+		}
+		const body = Buffer.concat([
+			first,
+			Buffer.alloc(1, 0x00),
+			lengths,
+			codes,
+			bits.toBuffer(),
+		]);
+		// The same table the engine builds, and the same walk over it, written out here to work out what
+		// the picture should hold: every row counts down from the byte before it, and the byte taken out is
+		// moved to the front of its row.
+		const table = new Uint8Array(0x10000);
+		for (let row = 0; row < 0x100; row += 1) {
+			let value = (-1 - row) & 0xff;
+			for (let column = 0; column < 0x100; column += 1) {
+				table[0x100 * row + column] = value;
+				value = (value - 1) & 0xff;
+			}
+		}
+		const expected: number[] = [...first];
+		const pixelSize = 3;
+		for (const symbol of symbols) {
+			// The row is named by the byte one pixel behind the place being written, not by the byte that
+			// was written last.
+			const previous = expected[expected.length - pixelSize] ?? 0;
+			const row = (previous << 8) & 0xffff;
+			const value = table[row + symbol] ?? 0;
+			if (0 !== symbol) {
+				table.copyWithin(row + 1, row, row + symbol);
+				table[row] = value;
+			}
+			expected.push(value);
+		}
+		const file = packedFile(4, 1, 24, body, 0x0f);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		expect(picture.pixels.subarray(0, 12)).toEqual(Buffer.from(expected));
 	});
 
 	it("tries its other tables and its other bit when a walk finds nothing", () => {
