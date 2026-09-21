@@ -46,7 +46,15 @@ open archives that the shipped defaults already cover.
   dictionary in the shipped default.
 - `PAK/MORNING` (`ArcFormats/Morning/ArcPAK.cs`) reads `DefaultKey`.
 - `DXA` (`ArcFormats/DxLib/ArcDX.cs`) ships both `DefaultScheme` and `KnownKeys` empty and asks for the
-  key through `WidgetSCR.xaml`, i.e. through the person reading the file.
+  key through `WidgetSCR.xaml`, i.e. through the person reading the file. Its sibling `BIN/DXLIB`
+  (`ArcFormats/DxLib/ArcDX8.cs`) is worse off: its own `TryOpen` decrypts the index with a default key and
+  then stops on `// decrypt-2` and `// decompress` and returns nothing, so the reference reads no such file
+  at all.
+- `PP/ILLUSION` (`ArcFormats/Illusion/ArcPP.cs`) keys its index with two hard-coded eight byte keys, so a
+  listing would read without any input, but `QueryEncryptionScheme` asks the game catalogue for a title and
+  then looks that title up in `PpScheme.KnownKeys`, which ships as an empty dictionary: a stock build
+  returns nothing from `TryOpen` for every file of this engine. Its entries would need the scheme as well,
+  and the fourth method it names (`UnpackData`) is a stub that hands the bytes back as they stand.
 - `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads the resource `CIPHERCODE` out of an executable placed
   beside the archive.
 - `PAK/EAGLS` (`ArcFormats/Eagls/ArcEAGLS.cs`) asks for its encryption through `Query<EaglsOptions>` and
@@ -106,6 +114,12 @@ further than the reference's own list of them.
 - `S5I` (`ArcFormats/rUGP/ImageS5I.cs`) reads one object of a `CRioArchive`, whose walk lives in the
   fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs` and `LoadRio*` helpers that this project has not
   ported.
+- `DREF` (`ArcFormats/Emote/ImageDREF.cs`) is not a picture at all: it is a little endian text file of
+  `psb://<archive>/<entry>` lines, and the reference composes it by opening each named archive with the
+  `PSB/EMOTE` opener, finding the entry by name, and drawing the layers one over another with WPF. It
+  stands on three things this project does not have in that shape - the `PSB/EMOTE` archive, which is not
+  ported, lookups by name through the virtual file system, and WPF layer blending - so even its metadata
+  needs the archive.
 
 ## The reference class is only a base for engines to build on
 
@@ -116,13 +130,14 @@ further than the reference's own list of them.
 
 ## Screened, with the reason for the delay recorded
 
-These carry no key, no outside listing and no reader outside the reference tree in the places the
+These carry no key, no outside listing and no reader outside the reference tree: the screening looked, and
+the reference is complete. What delays them is the size or the shape of the port rather than a missing
+input, so each entry records what the port would have to carry. They are the first candidates when porting
+continues.
+
 The survey that fills this section reads the gap inventory through `node scripts/garbro-gap.mjs --all`:
 without `--all` the tool prints only the first forty pending rows, which is a shorter list than it looks
 like.
-screening looked, and the reference is complete. What delays them is the size or the shape of the port
-rather than a missing input, so each entry records what the port would have to carry. They are the first
-candidates when porting continues.
 
 - `PX` (`ArcFormats/Leaf/ImagePX.cs`, 488 lines) is a block structured picture reader with its own reader
   classes (`PxReader`, `PxBlock`).
@@ -142,7 +157,14 @@ candidates when porting continues.
   one the differences themselves.
 
 
-- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are
+- `GRP/RG` (`Legacy/Bom/ImageGRP.cs`, 418 lines) is a BOM picture whose header and stored pictures are
+  plain, but whose packed pictures are an LZ of its own: a sliding frame of four thousand bytes filled
+  with spaces, a run length and a distance, and both of those read through two **adaptive Huffman trees**
+  whose weights and links are rebuilt for every symbol. The file holds the trees as machine generated
+  code (`dword_6FF464`, `dword_703E68`, `dword_70986C`, `sub_408C80`), so a port would have to reproduce
+  the updates exactly and has nothing to check them against but the reference itself. That is a staged
+  port of the kind the TLG6 and JBP codecs took.
+- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are whose index and entries are
   transformed by one of two schemes the reference tries in turn. It would have to carry `Primel.SHA256`,
   the three `Primel1/2/3Encyption` ciphers, `GameRes.Cryptography.RC6`, AES in CFB mode with zero
   padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between. That is a
