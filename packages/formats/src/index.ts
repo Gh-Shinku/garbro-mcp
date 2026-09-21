@@ -102,6 +102,7 @@ import { ifxFormat } from "./winters/ifx.js";
 import { pkdFormat } from "./zone/pkd.js";
 import { Xp3Format } from "./xp3/format.js";
 import { alkFormat } from "./alicesoft/alk.js";
+import { alicesoftAjpImageFormat } from "./alicesoft/ajp-image.js";
 import { alicesoftQntImageFormat } from "./alicesoft/qnt-image.js";
 import { cdpaPackFormat } from "./cdpa/pack.js";
 import { hyperworksPakFormat } from "./hyperworks/pak.js";
@@ -1581,6 +1582,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		koeiYkFormat,
 		digitalWorksBinPacFormat,
 		ns2ArchiveFormat,
+		alicesoftAjpImageFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,

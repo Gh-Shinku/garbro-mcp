@@ -19175,5 +19175,35 @@ export const formatSupportCatalog = {
 				"a name whose own bytes hold the mark as the second half of a two byte character, which this port ends early",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "AJP",
+				class: "AjpFormat",
+				source: "ArcFormats/AliceSoft/ImageAJP.cs",
+			},
+			localId: "alicesoft-ajp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of the picture and the two runs it names",
+				"the key over the first sixteen bytes of either run",
+				"the alpha run: its five marks, its palette and the greys it stands for",
+				"the picture handed over as the keyed JPEG it holds",
+			],
+			unsupported: [
+				"create",
+				"decoding the JPEG run and compositing the alpha into it, which needs a JPEG decoder this project does not carry",
+				"a version above one, whose alpha packing this port does not unpack",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the composited picture the reference hands back, which needs a JPEG decoder",
+				"a picture whose alpha run is saved rather than packed, which the head's own unpacked size marks",
+			],
+		},
 	],
 } as const;
