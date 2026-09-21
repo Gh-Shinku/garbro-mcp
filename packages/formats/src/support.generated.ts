@@ -19347,15 +19347,13 @@ export const formatSupportCatalog = {
 				"a run of a channel: a control word mixing one value with places that stand as they are",
 				"a run of a channel: places taken from the stack of the six values used last",
 				"a picture of one byte a pixel, whose aligned rows are drawn together for the writers of this project",
+				"the way the channels of a picture of several channels are drawn together, from their own last rows, with the byte between two runs",
 			],
-			unsupported: [
-				"create",
-				"the way the channels of a picture of several channels are drawn together, which is carried but not pinned by a fixture",
-			],
+			unsupported: ["create"],
 			remainingVerification: [
 				"real-game GARbro differential output",
-				"the channels of a picture of several channels, and the rows each of them is read from",
 				"a chunk that stands for more than four places at once, which none of the fixtures reaches",
+				"a picture whose channels differ in length from the rows of the picture, which no fixture carries",
 			],
 		},
 	],

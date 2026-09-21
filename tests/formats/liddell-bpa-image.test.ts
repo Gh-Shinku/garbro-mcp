@@ -35,11 +35,15 @@ function bitStream(bits: number[]): Buffer {
 	return out;
 }
 
-/** A run of places that all stand as they are: one control byte of nothing, then the places. */
-function storedRun(values: number[]): Buffer {
+/**
+ * A run of places that all stand as they are: a control byte of nothing in front of every **row**, and the
+ * places behind it. A control byte stands over four chunks, and every chunk of a row takes as many places as
+ * the row has left, so a row of four uses the first chunk of its own control byte.
+ */
+function storedRun(values: number[], rowWidth: number): Buffer {
 	const out: number[] = [];
-	for (let at = 0; at < values.length; at += CHUNKS * PLACES) {
-		out.push(0x00, ...values.slice(at, at + CHUNKS * PLACES));
+	for (let at = 0; at < values.length; at += rowWidth) {
+		out.push(0x00, ...values.slice(at, Math.min(at + rowWidth, values.length)));
 	}
 	return Buffer.from(out);
 }
@@ -92,7 +96,7 @@ describe("Liddell image format", () => {
 			height: 1,
 			colours: 4,
 			withPalette: true,
-			body: storedRun([1, 2, 3, 0]),
+			body: storedRun([1, 2, 3, 0], PLACES),
 		});
 		expect(readBpaLayout(withPalette)).toMatchObject({
 			width: 4,
@@ -125,7 +129,7 @@ describe("Liddell image format", () => {
 				height: 1,
 				colours: 4,
 				withPalette: true,
-				body: storedRun([1, 2, 3, 0]),
+				body: storedRun([1, 2, 3, 0], PLACES),
 			}),
 		);
 		expect(pixels(out)).toEqual(Buffer.from([1, 2, 3, 0]));
@@ -192,13 +196,56 @@ describe("Liddell image format", () => {
 		expect(pixels(out)).toEqual(Buffer.from(values));
 	});
 
+	it("draws the channels of a picture together, from the bottom up", async () => {
+		// Every channel of the fixture stands for one value throughout, so the picture must come out as that
+		// value in every place, whatever order its rows are kept in.
+		const blue = 0x11;
+		const green = 0x22;
+		const red = 0x33;
+		const row = [blue, blue, blue, blue];
+		const other = [green, green, green, green];
+		const third = [red, red, red, red];
+		const body = Buffer.concat([
+			storedRun([...row, ...row], 4),
+			Buffer.from([0x00]),
+			storedRun([...other, ...other], 4),
+			Buffer.from([0x00]),
+			storedRun([...third, ...third], 4),
+			Buffer.from([0x00]),
+		]);
+		const out = await extract(
+			buildBpa({
+				width: 4,
+				height: 2,
+				colours: 0,
+				withPalette: false,
+				depthBytes: 3,
+				body,
+			}),
+		);
+		const placed = pixels(out);
+		expect(placed.length).toBe(4 * 2 * 3);
+		for (let at = 0; at < placed.length; at += 3) {
+			expect([placed[at], placed[at + 1], placed[at + 2]]).toEqual([
+				blue,
+				green,
+				red,
+			]);
+		}
+		expect(readBmpImage(out)).toMatchObject({
+			width: 4,
+			height: 2,
+			bitsPerPixel: 24,
+		});
+	});
+
 	it("turns away a file that is not a picture of this engine", () => {
 		const good = buildBpa({
 			width: 4,
 			height: 1,
 			colours: 4,
 			withPalette: true,
-			body: storedRun([1, 2, 3, 0]),
+			body: storedRun([1, 2, 3, 0], PLACES),
 		});
 		const wrongWord = Buffer.from(good);
 		wrongWord.write("XXXXX", 0, "latin1");
@@ -219,7 +266,7 @@ describe("Liddell image format", () => {
 			height: 1,
 			colours: 4,
 			withPalette: true,
-			body: storedRun([1, 2, 3, 0]),
+			body: storedRun([1, 2, 3, 0], PLACES),
 		});
 		expect(
 			await liddellBpaImageFormat.detect(

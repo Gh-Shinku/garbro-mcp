@@ -34,9 +34,7 @@ gathers **eight** bits into a value behind one bit the run reads first and leave
 
 * A picture of more than one channel is drawn together from the channels' own rows, as the reference does - a
   channel's rows read from its last one down - and one byte stands between two channels' runs, which the
-  reference reads and leaves aside as well. **That way of drawing the channels is carried faithfully but is
-  not yet pinned by a fixture of this project**, so a picture of several channels is read on the reference's
-  word alone; a picture of one byte a pixel, which is what a palette is for, is fully pinned.
+  reference reads and leaves aside as well.
 * The run works in rows aligned to four pixels, and this port draws them together before writing a bitmap,
   since the writers of this project take packed rows.
 * Every read is bounded to the file; a picture of no size, a palette that reaches past the file, and a depth
@@ -44,12 +42,16 @@ gathers **eight** bits into a value behind one bit the run reads first and leave
 
 ## Verification
 
-Seven tests. Two cover the head, with and without a palette of its own, and the width an index is read at.
+Eight tests. Two cover the head, with and without a palette of its own, and the width an index is read at.
 Four cover the run's own kinds of chunk, each built by hand: places that stand as they are, a value filled
 over as many places as its own count byte says, a control word that mixes one value with places that stand as
 they are (whose word stands least significant byte first and is read from its top), and places of the stack's
 kind, whose own code is pinned **bit by bit** - including the bit the run reads and leaves aside, and the
-byte that stands behind four such places. The rest cover the refusals and the word of the picture.
+byte that stands behind four such places. The last one covers a picture of **three channels**, each standing
+for one value of its own throughout, so every place of the picture must come out as that value in its own
+channel: the drawing together of the channels, the rows each of them is read from, and the byte that stands
+between two of their runs are all pinned by it - and its own control bytes were what taught this port that a
+control byte stands over **one row**, not over a whole channel.
 
-What stands on the reference alone: the way the channels of a picture of several channels are drawn together,
-the rows a channel is read from, and no real picture is on hand to compare against GARbro's output.
+What stands on the reference alone: no real picture is on hand to compare against GARbro's output, and a
+chunk that stands for more than four places at once is not reached by any fixture here.
