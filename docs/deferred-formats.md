@@ -81,6 +81,13 @@ open archives that the shipped defaults already cover.
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
 than inside the archive, so a game file alone cannot be walked.
+- `DAT/IGS` (`Experimental/CellWorks/ArcDB.cs`) keeps its index in an **SQLite database** that stands beside
+  the archive: the opener builds an `IgsDbReader` over the file and asks it for an archive id and then for the
+  index. Sqlite is not a dependency of this project, and the archive itself carries no index of its own, so
+  nothing can be read without one. (Its passwords are **not** the bar: `KnownPasswords` ships two of them.)
+- `DAT/hibiki` (`ArcFormats/YaneSDK/ArcHibiki.cs`) takes its scheme from a **data file** the reference loads
+  at run time (`DeserializeScheme`, off `FormatCatalog.Instance.DataDirectory`), not from anything in its own
+  source, so there is no scheme here to port and nothing to compare a container against.
 
 - `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
   `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).

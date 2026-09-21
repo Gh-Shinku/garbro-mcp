@@ -408,6 +408,7 @@ import { kaguyaPltFormat } from "./kaguya/plt.js";
 import { kaguyaPl10Format } from "./kaguya/pl10.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
 import { nscripterSarFormat } from "./nscripter/sar.js";
+import { ns2ArchiveFormat } from "./nscripter/ns2-archive.js";
 import { keyPakFormat } from "./key/pak.js";
 import { egoDatFormat } from "./studio-ego/ego-dat.js";
 import { egoOldDatFormat } from "./studio-ego/ego-dat.js";
@@ -1579,6 +1580,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		ykFormat,
 		koeiYkFormat,
 		digitalWorksBinPacFormat,
+		ns2ArchiveFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,

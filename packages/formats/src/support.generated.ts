@@ -19146,5 +19146,34 @@ export const formatSupportCatalog = {
 				"a sixteen bit executable, whose segments this port reads but no test covers",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "NS2",
+				class: "Ns2Opener",
+				source: "ArcFormats/NScripter/ArcNS2.cs",
+			},
+			localId: "nscripter-ns2-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the index of a plain container, between its head and the place that head names",
+				"names in the engine's own Japanese code page",
+				"entries standing one behind the other from that place",
+				"the walk ending at a record that does not open with the mark",
+			],
+			unsupported: [
+				"create",
+				"an encrypted container, whose password the reference asks the person running it for",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an encrypted container and the keyed stream behind it (`Ns2Stream`), which this port does not carry",
+				"a name whose own bytes hold the mark as the second half of a two byte character, which this port ends early",
+			],
+		},
 	],
 } as const;
