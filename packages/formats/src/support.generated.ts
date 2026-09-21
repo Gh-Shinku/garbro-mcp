@@ -19205,5 +19205,35 @@ export const formatSupportCatalog = {
 				"a picture whose alpha run is saved rather than packed, which the head's own unpacked size marks",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "PGX",
+				class: "PgxFormat",
+				source: "ArcFormats/Glib2/ImagePGX.cs",
+			},
+			localId: "g2-pgx-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of the picture and the depth its lowest bit gives",
+				"the run the Glib engine's own walk reads, with its low bit first control word and its interleaved bytes",
+				"the place and length a copy names, and the frame it reads back from including its wrap",
+				"the block of the engine's own information, stepped over where it stands in front of the picture",
+				"a picture of three and of four bytes a pixel, written as bitmaps",
+			],
+			unsupported: [
+				"create",
+				"the sibling .stx file of the engine, whose layer offsets this port leaves at nothing",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the packed size the head carries, which this port does not check against the run",
+				"the sibling .stx layer offsets, which only move a picture about",
+			],
+		},
 	],
 } as const;

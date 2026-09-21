@@ -743,6 +743,7 @@ import { ankhMskImageFormat } from "./ankh/msk-image.js";
 import { kurumiGraImageFormat } from "./kurumi/gra-image.js";
 import { gr1ImageFormat } from "./anotherroom/gr1-image.js";
 import { bgraImageFormat } from "./g2/bgra-image.js";
+import { g2PgxImageFormat } from "./g2/pgx-image.js";
 import { cbfImageFormat } from "./hmp/cbf-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
@@ -1583,6 +1584,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		digitalWorksBinPacFormat,
 		ns2ArchiveFormat,
 		alicesoftAjpImageFormat,
+		g2PgxImageFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,
