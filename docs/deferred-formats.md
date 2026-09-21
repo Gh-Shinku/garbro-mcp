@@ -36,6 +36,13 @@ open archives that the shipped defaults already cover.
   `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
   `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
   a `KnownKeys` table.
+- `AVC` (`ArcFormats/ArcAVC.cs`, the extension-gated `DatOpener` of the `.dat` files of that engine) derives
+  its own eight byte key from the file, so its reader looks self-contained - but it does so only once it is
+  told **where** to look: `AdvReader.GetIndex` walks `KnownSchemes` and tries a key offset and a header
+  offset from each, and `AdvReader.KnownSchemes` ships as `new ArchiveScheme[0]`. With no scheme it returns
+  nothing for every file, so the reference reads no archive of this engine at all until a person supplies
+  the two numbers. The eight bytes it checks are the header's own bytes exclusive-or'ed with `"ARCHIVE\0"`,
+  each of which has to come out as a printable character.
 - `DPK` (`ArcFormats/Dac/ArcDPK.cs`) decrypts its own index with a chained XOR seeded by the last byte
   of the header, so its listing reads without a key, but every entry is then XORed with a pair of words
   that comes from `Properties.Settings.Default.DPKKey1` and `DPKKey2`, and the name hash the entry
