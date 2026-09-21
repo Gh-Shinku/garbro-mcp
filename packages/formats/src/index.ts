@@ -341,6 +341,7 @@ import { tanFormat } from "./ikura/tan.js";
 import { csPackFormat } from "./cat-system/cspack.js";
 import { cpcFormat } from "./broom/cpc.js";
 import { airFormat } from "./adobe/air.js";
+import { adobePsdImageFormat } from "./adobe/psd-image.js";
 import { gafFormat } from "./origin/gaf.js";
 import { emicFormat } from "./emic/pack.js";
 import { ipqFormat } from "./techno-brain/ipq.js";
@@ -1651,6 +1652,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		tanFormat,
 		csPackFormat,
 		cpcFormat,
+		adobePsdImageFormat,
 		airFormat,
 		gafFormat,
 		emicFormat,
