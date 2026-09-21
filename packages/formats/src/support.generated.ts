@@ -18739,5 +18739,32 @@ export const formatSupportCatalog = {
 				"a real picture, which would show whether the run length coded rows are what engines actually store",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GPC/PC98",
+				class: "GpcFormat",
+				source: "Legacy/Adv98/ImageGPC.cs",
+			},
+			localId: "adv98-gpc-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the packed walk, a group of eight bytes to a control bit",
+				"the threads a row's first byte names",
+				"the accumulate of a row with the row above it",
+				"the four planes woven into four bit pixels",
+				"the palette of four bit colours",
+			],
+			unsupported: ["image creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the row step and the wrap it takes when it runs past the picture, which no fixture here pins down: the port copies the reference's own wrap, but the bytes that land in each row of a picture whose step is not one stand on the reference alone",
+				"a real picture, which would show what step and interleave the engine actually writes",
+			],
+		},
 	],
 } as const;

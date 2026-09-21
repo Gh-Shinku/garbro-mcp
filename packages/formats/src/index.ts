@@ -1,5 +1,6 @@
 import { FormatRegistry } from "@garbro-mcp/core";
 export { formatSupportCatalog } from "./support.generated.js";
+import { adv98GpcImageFormat } from "./adv98/gpc-image.js";
 import { advSysFpkFormat } from "./advsys/fpk.js";
 import { advsysPolaImageFormat } from "./advsys/pola-image.js";
 import { advsysGr2ImageFormat } from "./advsys/gr2-image.js";
@@ -942,6 +943,7 @@ import { zyxMtlImageFormat } from "./zyx/mtl-image.js";
 import { zyxSplImageFormat } from "./zyx/spl-image.js";
 import { zyxXmgImageFormat } from "./zyx/xmg-image.js";
 
+export * from "./adv98/index.js";
 export * from "./advsys/index.js";
 export * from "./active-soft/index.js";
 export * from "./ail/index.js";
@@ -1330,6 +1332,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		advsysGr2ImageFormat,
 		advsysPolaImageFormat,
 		advSysFpkFormat,
+		adv98GpcImageFormat,
 		advSysGwdImageFormat,
 		bishopBscFormat,
 		ccfFormat,
