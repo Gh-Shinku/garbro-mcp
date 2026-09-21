@@ -745,6 +745,7 @@ import { gr1ImageFormat } from "./anotherroom/gr1-image.js";
 import { bgraImageFormat } from "./g2/bgra-image.js";
 import { g2PgxImageFormat } from "./g2/pgx-image.js";
 import { ismIsgImageFormat } from "./ism/isg-image.js";
+import { sakanaglSxArchiveFormat } from "./sakanagl/sx-archive.js";
 import { cbfImageFormat } from "./hmp/cbf-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { desImageFormat } from "./desire/des-image.js";
@@ -1168,6 +1169,7 @@ export * from "./jam-creation/index.js";
 export * from "./omi/index.js";
 export * from "./system21/index.js";
 export * from "./ism/index.js";
+export * from "./sakanagl/index.js";
 export * from "./ume-soft/index.js";
 export * from "./softpal/index.js";
 export * from "./scrplayer/index.js";
@@ -1588,6 +1590,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		alicesoftAjpImageFormat,
 		g2PgxImageFormat,
 		ismIsgImageFormat,
+		sakanaglSxArchiveFormat,
 		neFormat,
 		mgsFormat,
 		eternitySgfImageFormat,

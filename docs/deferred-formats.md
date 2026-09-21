@@ -80,7 +80,15 @@ open archives that the shipped defaults already cover.
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
-than inside the archive, so a game file alone cannot be walked.
+than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`ArcFormats/Unity/ArcBIN.cs`) keys each archive with a **key and an initialisation vector of its
+  own**, looked up by the archive's name in `BinPackScheme.KnownKeys` - a dictionary that ships **empty** -
+  and its entries are keyed with the AES of that pair. With no key there is nothing to try, so a stock build
+  reads no archive of this kind.
+- `AIR` (`ArcFormats/AIRNovel/ArcAIR.cs`) reads its plain containers as **ordinary zips**, which this project
+  already reads, and its keyed ones through RC4 with a passphrase that `KnownKeys` - an **empty** dictionary
+  and a prompt - supplies at run time. A stock build therefore reads only the plain ones, which need nothing
+  of this port.
+
 - `DAT/IGS` (`Experimental/CellWorks/ArcDB.cs`) keeps its index in an **SQLite database** that stands beside
   the archive: the opener builds an `IgsDbReader` over the file and asks it for an archive id and then for the
   index. Sqlite is not a dependency of this project, and the archive itself carries no index of its own, so

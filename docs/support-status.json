@@ -19291,6 +19291,37 @@
 				"the overlay way and its baseline pictures",
 				"the frame's own wrap, which only a hand built stream reaches here"
 			]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "SXSTORAGE",
+				"class": "SxOpener",
+				"source": "Experimental/SakanaGL/ArcSX.cs"
+			},
+			"localId": "sakanagl-sx-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the index beside the container, under either of its two names",
+				"the key of the index, mixed in sixty-four bits from its own head and length",
+				"the cipher, which both keys and unkeys a run of words",
+				"the names, entries, container table and name tree of the index",
+				"the entries of the one container whose own length is this file's, when an index stands over several",
+				"a packed entry unpacked with zstd, and a keyed one unkeyed with its own place and length"
+			],
+			"unsupported": [
+				"create",
+				"an index whose alternative name (before the last dash) is the one that stands, which is read but untested"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the alternative index name, which no fixture carries",
+				"the skipped records of the index tail, which are stepped over unread"
+			]
 		}
 	]
 }
