@@ -607,6 +607,7 @@ import { parsleyYanepackFormat } from "./parsley/cg.js";
 import { parsleyCgV1Format } from "./parsley/cg.js";
 import { paletteChrFormat } from "./palette/chr.js";
 import { mngFormat } from "./mng/mng.js";
+import { mngImageFormat } from "./mng/mng-image.js";
 import { tanukiTacFormat } from "./tanuki/tac.js";
 import { kidLnkFormat } from "./kid/lnk.js";
 import { leafKcapFormat } from "./leaf/kcap.js";
@@ -1924,6 +1925,7 @@ export function createDefaultRegistry(): FormatRegistry {
 		parsleyYanepackFormat,
 		parsleyCgV1Format,
 		paletteChrFormat,
+		mngImageFormat,
 		mngFormat,
 		tanukiTacFormat,
 		kidLnkFormat,

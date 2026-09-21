@@ -18928,5 +18928,35 @@ export const formatSupportCatalog = {
 				"a real picture, which would show what the encrypted engine writes where the first kind writes an offset",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "MNG",
+				class: "MngFormat",
+				source: "ArcFormats/ImageMNG.cs",
+			},
+			localId: "mng-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the word and the four bytes a PNG carries behind its own",
+				"the canvas chunk with the size of the pictures",
+				"the walk of the chunks up to the first picture's own chunk",
+				"the chunks an engine leaves between the canvas and the pictures",
+				"the first picture handed over as the PNG it holds",
+			],
+			unsupported: [
+				"image creation",
+				"PNG decoding, which the project hands over rather than decodes",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the cut at the first end chunk rather than at the end of the file, which the reference takes and no fixture here compares",
+				"a real file, which would show how many chunks an engine leaves between the canvas and its pictures",
+			],
+		},
 	],
 } as const;
