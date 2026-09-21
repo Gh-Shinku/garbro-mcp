@@ -23,23 +23,32 @@ here, `WAV` there. The records behind the head are the same in both.
   a channel the reader cannot produce leaves the picture without one - which is what the reference's own
   catch does.
 
-## What this port does not read, and says so
+## The packed way this port reads
 
-Nine ways of storing a section are gathered in the reference's `WbmReader`, chosen by the second byte of the
-section's record: `UnpackV0` through `UnpackVD`, for the ways `0x00` to `0x0F`. Each builds a reference
-table of sixty four thousand entries (`BuildTable`, `FillRefTable`) and then walks the picture through a
-padded table of eight pixel offsets (`GenerateOffsetTableV1` or `V2`), retrying with another version of that
-table when a walk fails. All of that code is decompiler output in the reference (`sub_40919C`, `sub_46C26C`),
-so a port has nothing to check its own transcription against but the reference itself.
+A section is read as it stands when its format has the top bit set, `0x80`, or when it declares no packed
+length at all. Otherwise the second byte of its record names one of nine walks, `UnpackV0` through
+`UnpackVD`, for the ways `0x00` to `0x0F`.
 
-This port reads the one way the reference also reads as it stands: a section whose format has the top bit
-set, `0x80`, or one that declares no packed length at all. Anything else is refused with
-`UNSUPPORTED_FEATURE`, and the message names the walk the section's byte asks for, so a caller learns which
-of the nine is missing rather than being handed a wrong picture.
+The `0x00` walk is ported. It copies the picture's first pixel as it stands, padded to a whole four bytes,
+and then reads the picture a bit at a time out of the bytes that follow. A bit equal to the walk's own
+condition is a literal byte; any other bit begins a back reference, whose three further bits name one of
+eight pixel offsets and whose following bit says whether the run is the shortest one or a counted one, which
+the walk counts out for itself a bit at a time. The reference tries the walk three times: twice with one
+table of offsets and a set bit of its own, and once with the other table and a clear bit, which is how a
+stream of clear bits is read as literals by the last attempt. A finding of the walk's own - a section with no
+bytes, one shorter than the first pixel, or a run reaching past the picture - ends the unpack rather than
+asking for another attempt, which is what the reference does as well.
+
+The eight further walks, `0x01` to `0x0F`, are refused with `UNSUPPORTED_FEATURE`, and the message names the
+walk the section's byte asks for, so a caller learns which one is missing rather than being handed a wrong
+picture. Each of those builds a reference table of sixty four thousand entries (`BuildTable`,
+`FillRefTable`) before walking the picture through the same two tables of offsets; all of that code is
+decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has nothing to check its own
+transcription against but the reference itself.
 
 ## Deviations from the reference
 
-* The nine packed walks are refused rather than ported, as above.
+* The eight further packed walks are refused rather than ported, as above.
 * Every read is bounded: a picture shorter than the size its head names, and a section reaching past the end
   of the file, are refused, where the reference would throw an end of stream error or keep zeros.
 * A picture of no width or no height, and a depth the engine never writes, are refused.
@@ -49,7 +58,7 @@ of the nine is missing rather than being handed a wrong picture.
 
 ## Verification
 
-Eight tests build files with a mirror writer: a stored picture of twenty four bits whose padded rows come out
+Twelve tests build files with a mirror writer. The first eight: a stored picture of twenty four bits whose padded rows come out
 of the bitmap without padding; a picture of thirty two bits whose alpha channel is spread over it (the byte
 the picture keeps behind its colours is deliberately different, so a port that kept it would fail) and whose
 second row of alpha starts where its own four byte stride says; a picture of thirty two bits with no alpha
@@ -60,5 +69,12 @@ a packed section refused with the name of the walk it asks for, beside the same 
 packed, which is read as it stands; and the refusals - the word of a sound, no head, a head too short, a
 depth of twelve, no pixels, and pixels reaching past the file.
 
-What stands on the reference alone: the nine packed walks, which this port refuses, and no fixture is on
-hand to pin them down; and no real file is on hand to compare against GARbro's output.
+The four further tests cover the packed walk, and the bit stream they build is the one the walk reads: a
+reader is checked on its own, handing out a byte's flags highest first and the literal bytes behind them;
+then a picture whose bytes are all literals; then one whose last byte is a back reference, which takes the
+byte its own offset names; and then a stream of clear bits, which the first two attempts read as back
+references and only the third, whose own bit is clear, reads as literals - so the retry machinery is pinned
+down as well.
+
+What stands on the reference alone: the eight further packed walks, which this port refuses, and no fixture
+is on hand to pin them down; and no real file is on hand to compare against GARbro's output.

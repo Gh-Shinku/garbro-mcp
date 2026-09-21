@@ -3,6 +3,7 @@ import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
+	WbmPackedReader,
 	decodeWbmPicture,
 	mergeWbmAlpha,
 	readWbmLayout,
@@ -18,6 +19,8 @@ interface Section {
 	body: Buffer;
 	/** How the section says it is stored; the top bit is the one way this port reads. */
 	format?: number;
+	/** What the section says it unfolds to, which for a packed one is not the length of its bytes. */
+	unpackedSize?: number;
 	packedSize?: number;
 }
 
@@ -44,7 +47,7 @@ function wpxFile(
 		directory[at] = section.id;
 		directory[at + 1] = section.format ?? STORED;
 		directory.writeInt32LE(offset, at + 4);
-		directory.writeInt32LE(section.body.length, at + 8);
+		directory.writeInt32LE(section.unpackedSize ?? section.body.length, at + 8);
 		directory.writeInt32LE(section.packedSize ?? 0, at + 12);
 		bodies.push(section.body);
 		offset += section.body.length;
@@ -300,5 +303,183 @@ describe("Wild Bug WBM image", () => {
 		const layout = readWbmLayout(past);
 		if (!layout) throw new Error("the fixture still names its size");
 		expect(() => decodeWbmPicture(past, layout)).toThrow();
+	});
+});
+
+/**
+ * The bit stream a packed walk reads. The walk takes one byte at a time for a literal and bits out of a byte
+ * of flags, taking a further byte of flags only once the eight bits it holds are used up. The two are
+ * therefore interleaved the way an LZSS stream is: a byte of flags, the literal bytes whose bits it holds,
+ * and then the next byte of flags.
+ */
+class PackedBits {
+	#flags: { bit: number; byte?: number }[] = [];
+
+	/** A literal byte, flagged with the bit the walk is looking for. */
+	literal(condition: number, value: number): this {
+		this.#flags.push({ bit: condition & 1, byte: value });
+		return this;
+	}
+
+	/**
+	 * A back reference: the bit that is not the walk's, then the index of the pixel offset in three bits,
+	 * and then either the shortest run or a run whose length the walk counts out for itself.
+	 */
+	backReference(condition: number, index: number, length?: number): this {
+		this.#flags.push({ bit: 1 - (condition & 1) });
+		this.#flags.push({ bit: (index >> 2) & 1 });
+		this.#flags.push({ bit: (index >> 1) & 1 });
+		this.#flags.push({ bit: index & 1 });
+		if (undefined === length) {
+			this.#flags.push({ bit: 1 });
+			return this;
+		}
+		this.#flags.push({ bit: 0 });
+		// `ReadCount` counts out the run itself: a run of clear bits says how many bits follow.
+		const count = length;
+		let steps = 1;
+		while (2 ** steps <= count) steps += 1;
+		const tail = count - 2 ** steps;
+		for (let at = 0; at < steps - 1; at += 1) this.#flags.push({ bit: 0 });
+		this.#flags.push({ bit: 1 });
+		for (let at = steps - 1; at >= 0; at -= 1) {
+			this.#flags.push({ bit: (tail >> at) & 1 });
+		}
+		return this;
+	}
+
+	toBuffer(): Buffer {
+		const out: number[] = [];
+		for (let at = 0; at < this.#flags.length; at += 8) {
+			const group = this.#flags.slice(at, at + 8);
+			let flags = 0;
+			group.forEach((entry, index) => {
+				if (entry.bit) flags |= 0x80 >> index;
+			});
+			out.push(flags);
+			for (const entry of group) {
+				if (undefined !== entry.byte) out.push(entry.byte);
+			}
+		}
+		return Buffer.from(out);
+	}
+}
+
+/** A packed picture: the pixels' section says how its bytes are packed. */
+function packedFile(
+	width: number,
+	height: number,
+	bitsPerPixel: number,
+	body: Buffer,
+	format: number,
+): Buffer {
+	const pixelSize = bitsPerPixel >> 3;
+	const stride = (width * pixelSize + 3) & ~3;
+	return pictureFile([
+		{ id: 0x10, body: pictureHead(width, height, bitsPerPixel) },
+		// The section says how large the picture it unfolds to is, which is not the length of its bytes.
+		{
+			id: 0x11,
+			body,
+			format,
+			unpackedSize: stride * height,
+			packedSize: body.length,
+		},
+	]);
+}
+
+describe("Wild Bug WBM packed walk", () => {
+	it("reads a packed picture whose bytes are all literals", () => {
+		// Three pixels of three bytes, less the one the walk copies as it stands.
+		const first = Buffer.from([1, 2, 3]);
+		// The picture is eight bytes to a row over four rows, so twenty nine bytes follow the first pixel.
+		const rest = Buffer.from(
+			Array.from({ length: 29 }, (_, index) => 4 + index),
+		);
+		const bits = new PackedBits();
+		for (const value of rest) bits.literal(1, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		// The first pixel stands whole in the section, padded to four bytes, and the flags begin behind it.
+		expect(body.subarray(0, 4)).toEqual(Buffer.from([1, 2, 3, 0x00]));
+		expect(body[4]).toBe(0xff);
+		expect(body[5]).toBe(4);
+		const file = packedFile(2, 4, 24, body, 0x00);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(8);
+		const picture = decodeWbmPicture(file, layout);
+		// The rows are two pixels wide, so the last of the literals fills the picture and the rest is
+		// padded away.
+		expect(picture.pixels.subarray(0, 8)).toEqual(
+			Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]),
+		);
+		expect(picture.pixels.subarray(8, 16)).toEqual(
+			Buffer.from([9, 10, 11, 12, 13, 14, 15, 16]),
+		);
+	});
+
+	it("reads a packed picture with a back reference", () => {
+		const first = Buffer.from([1, 2, 3]);
+		const bits = new PackedBits();
+		// Enough literals to reach the offset the first index names, then a copy of the first byte.
+		for (let index = 0; index < 12; index += 1) bits.literal(1, 0x40 + index);
+		bits.backReference(1, 0);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(5, 1, 24, body, 0x00);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(16);
+		const picture = decodeWbmPicture(file, layout);
+		// The first index of the later table names three bytes on a row of sixteen, so the copy at the last
+		// byte of the picture takes the byte three behind it, which is the tenth literal.
+		expect(picture.pixels[15]).toBe(0x40 + 9);
+		expect(picture.pixels[15]).toBe(picture.pixels[12]);
+	});
+
+	it("tries its other tables and its other bit when a walk finds nothing", () => {
+		// A stream of nothing but clear bits: the first two attempts read them as back references and run
+		// out of bytes, and only the third attempt, whose own bit is a clear one, reads them as literals.
+		const first = Buffer.from([9, 9, 9]);
+		// Twelve bytes to a row over two rows, so twenty one bytes follow the first pixel.
+		const rest = Buffer.from(
+			Array.from({ length: 21 }, (_, index) => 1 + index),
+		);
+		const bits = new PackedBits();
+		for (const value of rest) bits.literal(0, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(3, 2, 24, body, 0x00);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		expect(picture.pixels.subarray(0, 9)).toEqual(
+			Buffer.from([9, 9, 9, 1, 2, 3, 4, 5, 6]),
+		);
+	});
+});
+
+describe("Wild Bug WBM packed reader", () => {
+	it("hands its flags and its literal bytes out the way the walk reads them", () => {
+		const bits = new PackedBits();
+		bits.literal(1, 4);
+		bits.literal(1, 5);
+		bits.literal(1, 6);
+		const body = Buffer.concat([Buffer.from([1, 2, 3, 0x00]), bits.toBuffer()]);
+		// Three set bits in one byte of flags, and then the three bytes they stand for.
+		expect(body).toEqual(Buffer.from([1, 2, 3, 0x00, 0xe0, 4, 5, 6]));
+		const reader = new WbmPackedReader(body, body.length, 32);
+		expect(reader.begin()).toBe(body.length);
+		reader.copyFromBuffer(reader.output, 0, 3);
+		expect(reader.output.subarray(0, 3)).toEqual(Buffer.from([1, 2, 3]));
+		reader.beginBitsAt(4);
+		// A set bit is a literal, and the literal byte follows behind the flags.
+		expect(reader.nextBit()).toBe(1);
+		expect(reader.readNext()).toBe(4);
+		expect(reader.nextBit()).toBe(1);
+		expect(reader.readNext()).toBe(5);
+		expect(reader.nextBit()).toBe(1);
+		expect(reader.readNext()).toBe(6);
+		// The fourth bit is clear, and the walk would read a back reference from here on.
+		expect(reader.nextBit()).toBe(0);
 	});
 });

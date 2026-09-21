@@ -19037,16 +19037,17 @@
 				"the colours of an eight bit picture, turned round to the order a bitmap keeps",
 				"the alpha channel a picture of twenty four bits or more may carry, spread over the pixels",
 				"a picture of eight bits without colours, read as shades of grey",
-				"the one way of storing a section the reference also reads as it stands"
+				"the one way of storing a section the reference also reads as it stands",
+				"the packed way 0x00: the first pixel as it stands, literal bytes, back references and counted runs, with the reference's three attempts"
 			],
 			"unsupported": [
 				"image creation",
-				"the nine packed walks of the reference (UnpackV0 through UnpackVD for the section ways 0x00 to 0x0f), which are refused by name: they are decompiler output with nothing but the reference to check a transcription against"
+				"the eight further packed walks (0x01 to 0x0f), which are refused by name: each builds a sixty four thousand entry reference table first, and all of that code is decompiler output with nothing but the reference to check a transcription against"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the nine packed walks, which no fixture here reaches because this port refuses them",
-				"a real picture, which would show which of the nine ways the engine writes and whether it pads its rows as the head says"
+				"the eight further packed walks, which no fixture here reaches because this port refuses them",
+				"a real picture, which would show which of the ways the engine writes and whether it pads its rows as the head says"
 			]
 		}
 	]
