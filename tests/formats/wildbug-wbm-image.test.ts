@@ -586,6 +586,54 @@ describe("Wild Bug WBM packed walk", () => {
 		);
 	});
 
+	it("reads a picture of the 0x09 way with a byte away from the byte before it", () => {
+		const first = Buffer.from([0x71, 0x72, 0x73]);
+		const bits = new PackedBits();
+		// The bit that is not the walk's ends the literals; a set bit names the byte form, whose distance
+		// stands in the stream behind the bits; and a set bit behind it leaves the run at two bytes.
+		bits.bit(0);
+		bits.bit(1);
+		bits.byte(0);
+		bits.bit(1);
+		for (const value of [1, 2, 3, 4, 5, 6, 7]) bits.literal(1, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(4, 1, 24, body, 0x09);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// A distance of nothing names the byte before the place written to, so the run copies that byte and
+		// then itself, and the literals fill the rest of the row.
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x71, 0x72, 0x73, 0x73, 0x73, 1, 2, 3, 4, 5, 6, 7]),
+		);
+	});
+
+	it("reads a picture of the 0x08 way with one of the eight pixel offsets", () => {
+		const first = Buffer.from([0x81, 0x82, 0x83]);
+		const bits = new PackedBits();
+		// A clear bit behind the walk's own names the table of pixel offsets; three clear bits name its
+		// first place, which is one pixel back; and a set bit leaves the run at its shortest.
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(0);
+		bits.bit(1);
+		for (const value of [1, 2, 3, 4, 5, 6, 7, 8]) bits.literal(1, value);
+		const body = Buffer.concat([first, Buffer.alloc(1, 0x00), bits.toBuffer()]);
+		const file = packedFile(4, 1, 24, body, 0x08);
+		const layout = readWbmLayout(file);
+		if (!layout) throw new Error("the fixture is not a WBM picture");
+		expect(layout.stride).toBe(12);
+		const picture = decodeWbmPicture(file, layout);
+		// The first place of the table is one pixel back from the place written to, which is the very start
+		// of the picture, so the byte written is the first of its first pixel.
+		expect(picture.pixels.subarray(0, 12)).toEqual(
+			Buffer.from([0x81, 0x82, 0x83, 0x81, 1, 2, 3, 4, 5, 6, 7, 8]),
+		);
+	});
+
 	it("tries its other tables and its other bit when a walk finds nothing", () => {
 		// A stream of nothing but clear bits: the first two attempts read them as back references and run
 		// out of bytes, and only the third attempt, whose own bit is a clear one, reads them as literals.

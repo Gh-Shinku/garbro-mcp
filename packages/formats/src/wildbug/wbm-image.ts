@@ -86,11 +86,25 @@ function unsupported(dataFormat: number): GarbroError {
 	);
 }
 
-/** Which of the nine walks of the reference a section's own byte asks for, said plainly. */
+/**
+ * Which of the nine walks of the reference a section's own byte asks for, worked out the reference's own way:
+ * the bits of the way are asked for in turn, and the first that is set picks the walk.
+ */
 function describeFormat(dataFormat: number): string {
 	const way = dataFormat & WALK_BITS;
-	if (0 === way) return "the walk this port reads";
-	return `the 0x${way.toString(16).padStart(2, "0")} walk`;
+	if (0 === (way & 1)) {
+		if (0 !== (way & 4)) return "the 0x04 walk";
+		if (0 !== (way & 2)) return "the 0x02 walk";
+		return "the 0x00 walk, which this port reads";
+	}
+	if (0 !== (way & 8)) {
+		if (0 !== (way & 4)) return "the 0x0d walk";
+		if (0 !== (way & 2)) return "the 0x0b walk";
+		return "the 0x09 walk, which this port reads";
+	}
+	if (0 !== (way & 4)) return "the 0x05 walk";
+	if (0 !== (way & 2)) return "the 0x03 walk, which this port reads";
+	return "the 0x01 walk, which this port reads";
 }
 
 /**
@@ -450,6 +464,61 @@ export function unpackV3(
 }
 
 /**
+ * `WbmReader.UnpackV9`, the `0x08` and `0x09` walk: the `0x00` walk's raw literal bytes with only the two
+ * shapes of back reference the later attempts of the `0x01` and `0x03` walks read - a byte away from the
+ * byte before the place written to, standing for two bytes, or one of the eight pixel offsets standing for
+ * the shortest run. It carries no table and tells its attempts apart by nothing but the bit it looks for.
+ */
+export function unpackV9(
+	reader: WbmPackedReader,
+	offsetTable: readonly number[],
+	pixelSize: number,
+	condition: number,
+): Buffer | undefined {
+	const available = reader.begin();
+	if (0 === available) return undefined;
+	const step = (pixelSize + 3) & ~3;
+	if (available < step) return undefined;
+	reader.copyFromBuffer(reader.output, 0, pixelSize);
+	let destination = pixelSize;
+	let remaining = reader.output.length - pixelSize;
+	reader.beginBitsAt(step);
+	while (remaining > 0) {
+		while (condition === reader.nextBit()) {
+			reader.output[destination] = reader.readNext();
+			destination += 1;
+			remaining -= 1;
+			if (0 === remaining) return reader.output;
+		}
+		// This walk reads its own two shapes: a set bit is a byte away from the byte before the place written
+		// to, standing for two bytes, and a clear bit is one of the eight pixel offsets standing for the
+		// shortest run.
+		const minCount = 1 === pixelSize ? 2 : 1;
+		let count: number;
+		let source: number;
+		if (0 !== reader.nextBit()) {
+			source = destination - 1 - reader.readNext();
+			count = 2;
+		} else {
+			count = minCount;
+			let index = reader.nextBit();
+			index = index + index + reader.nextBit();
+			index = index + index + reader.nextBit();
+			source = destination - (offsetTable[index] ?? 0);
+		}
+		if (0 === reader.nextBit()) count += reader.readCount();
+		if (remaining < count) return undefined;
+		if (!copyOverlapped(reader.output, source, destination, count)) {
+			// The reference's own copy walks off the buffer here, which its caller catches.
+			throw invalid("A run of the picture reaches outside it");
+		}
+		destination += count;
+		remaining -= count;
+	}
+	return reader.output;
+}
+
+/**
  * `WbmReader.UnpackV2`, the `0x02` walk: the `0x00` walk with its literal bytes taken from a table of codes
  * instead. The picture's first pixel is copied as it stands and padded, then a block of a hundred and twenty
  * eight bytes holds a length for every symbol, and the codes behind it build the table. A literal is read by
@@ -618,7 +687,14 @@ export function unpackWbmSection(
 ): Buffer {
 	if (0 === (section.dataFormat & STORED_FORMAT) && 0 !== section.packedSize) {
 		const way = section.dataFormat & WALK_BITS;
-		if (0 !== way && 1 !== way && 2 !== way && 3 !== way) {
+		if (
+			0 !== way &&
+			1 !== way &&
+			2 !== way &&
+			3 !== way &&
+			8 !== way &&
+			9 !== way
+		) {
 			throw unsupported(section.dataFormat);
 		}
 		const bytes = readWpxSectionData(data, section, section.packedSize);
@@ -648,14 +724,16 @@ export function unpackWbmSection(
 							? unpackV1(reader, offsets, pixelSize, condition, version)
 							: 2 === way
 								? unpackV2(reader, table, offsets, pixelSize, condition)
-								: unpackV3(
-										reader,
-										table,
-										offsets,
-										pixelSize,
-										condition,
-										version,
-									);
+								: 3 === way
+									? unpackV3(
+											reader,
+											table,
+											offsets,
+											pixelSize,
+											condition,
+											version,
+										)
+									: unpackV9(reader, offsets, pixelSize, condition);
 				// A finding of the walk's own ends the unpack, as it does in the reference.
 				if (!result) throw invalid("The picture does not unpack");
 				return result;
