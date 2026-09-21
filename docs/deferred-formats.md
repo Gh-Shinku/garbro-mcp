@@ -158,17 +158,16 @@ like.
 
 
 - `WBM` (`ArcFormats/WildBug/ImageWBM.cs`, 1165 lines) is the picture beside the **ported** `WWA` sound, and
-  the file both stand in is where the shared head, the record walk and the `WpxDecoder` base live: those are
-  now ported (`wildbug/wpx-section.ts`), and so is the base's stored path. What remains is the picture half
-  itself. Its head is a section of its own (id `0x10`), the pixels are a second section (`0x11`), a palette
-  for the eight bit kind is a third (`0x12`, unpacked at a stride of forty eight with three bytes a colour)
-  and an alpha channel is a fourth (`0x13`), which is merged into the pixels. The pixels are unpacked by one
-  of **nine** variants, chosen by the second byte of the section record: `UnpackV0` through `UnpackVD` in
-  the reference's own names, for the ways `0x00` to `0x0f`. Each walks a reference table of sixty four
-  thousand entries built by `BuildTable` and `FillRefTable` and then reads a padded offset table of its own,
-  `GenerateOffsetTableV1` or `V2`. All of the reference's code here is decompiler output (`sub_40919C`,
-  `sub_46C26C`), so a port would have to reproduce nine walks exactly with nothing but the reference to check
-  them against. That is a staged port, and the first candidate among these entries.
+  most of it is ported now: the shared head and record walk (`wildbug/wpx-section.ts`), the picture's own
+  head, the pixels, the colours of the eight bit kind, the alpha channel and the one way of storing a section
+  the reference also reads as it stands. What remains is the **nine packed walks** of the `WbmReader`,
+  `UnpackV0` through `UnpackVD`, for the section ways `0x00` to `0x0F`. Each builds a reference table of
+  sixty four thousand entries (`BuildTable`, `FillRefTable`) and then walks the picture through a padded
+  table of eight pixel offsets (`GenerateOffsetTableV1` or `V2`), retrying with the other table when a walk
+  fails. All of that code is decompiler output in the reference (`sub_40919C`, `sub_46C26C`), so a port has
+  nothing to check its own transcription against but the reference itself; the port refuses such a section by
+  name rather than guessing. That is the first piece of staged work here, and it is one walk at a time.
+
 - `GRP/RG` (`Legacy/Bom/ImageGRP.cs`, 418 lines) is a BOM picture whose header and stored pictures are
   plain, but whose packed pictures are an LZ of its own: a sliding frame of four thousand bytes filled
   with spaces, a run length and a distance, and both of those read through two **adaptive Huffman trees**
