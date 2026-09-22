@@ -1114,5 +1114,215 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		},
 	);
 
+	const batchItemSchema = z.union([
+		z.object({
+			entryId: z.string(),
+			entryPath: z.string(),
+			status: z.literal("extracted"),
+			artifact: artifactSchema,
+		}),
+		z.object({
+			entryId: z.string(),
+			entryPath: z.string().optional(),
+			status: z.literal("skipped"),
+			reason: z.string(),
+		}),
+		z.object({
+			entryId: z.string(),
+			entryPath: z.string().optional(),
+			status: z.literal("failed"),
+			formatId: z.string(),
+			decoderId: z.string(),
+			error: errorSchema,
+		}),
+	]);
+	const batchSourceSchema = z.object({
+		source: sourceSchema,
+		status: z.enum(["completed", "partial", "failed"]),
+		hasFailures: z.boolean(),
+		outputDirectory: z.string().optional(),
+		selected: z.number().int().nonnegative(),
+		extracted: z.number().int().nonnegative(),
+		skipped: z.number().int().nonnegative(),
+		failed: z.number().int().nonnegative(),
+		bytesWritten: z.string(),
+		report: artifactSchema.optional(),
+		reportError: errorSchema.optional(),
+		itemsOmitted: z.number().int().nonnegative(),
+		items: z.array(batchItemSchema),
+	});
+	server.registerTool(
+		"extract_resources",
+		{
+			description:
+				"Extract several resources in one bounded batch. Review each source result and hasFailures; every completed source gets its own hashed report.",
+			inputSchema: z.object({
+				sources: z.array(sourceSchema).min(1).max(32),
+				inline: z.enum(["summary", "errors", "all"]).default("errors"),
+				itemLimit: z.number().int().min(0).max(100).default(10),
+				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
+				offset: z.number().int().nonnegative().default(0),
+				limit: z.number().int().positive().max(32).default(8),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					totalSources: z.number().int().nonnegative(),
+					offset: z.number().int().nonnegative(),
+					nextOffset: z.number().int().nonnegative().nullable(),
+					responseTruncated: z.boolean(),
+					status: z.enum(["completed", "partial", "failed"]),
+					hasFailures: z.boolean(),
+					selected: z.number().int().nonnegative(),
+					extracted: z.number().int().nonnegative(),
+					skipped: z.number().int().nonnegative(),
+					failed: z.number().int().nonnegative(),
+					bytesWritten: z.string(),
+					sources: z.array(batchSourceSchema),
+				}),
+			),
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: false,
+			},
+		},
+		async (
+			{
+				sources,
+				inline,
+				itemLimit,
+				conflictPolicy,
+				offset,
+				limit,
+				maxResponseBytes,
+			},
+			context,
+		) => {
+			try {
+				await workspace.prepare();
+				const results: Array<Record<string, unknown>> = [];
+				for (const source of sources) {
+					try {
+						const result = await automation.extractEntries(
+							source,
+							{ conflictPolicy },
+							toControl(context),
+						);
+						let report: Record<string, unknown> | undefined;
+						let reportError:
+							| { code: (typeof errorCodes)[number]; message: string }
+							| undefined;
+						try {
+							const artifact = await writeExtractionReport(workspace, result);
+							report = {
+								...artifact,
+								bytesWritten: artifact.bytesWritten.toString(),
+							};
+						} catch (error) {
+							const converted = asGarbroError(error);
+							reportError = {
+								code: converted.code,
+								message: converted.message.slice(0, 2048),
+							};
+						}
+						const candidates =
+							inline === "summary"
+								? []
+								: result.items.filter(
+										(item) => inline === "all" || item.status === "failed",
+									);
+						const visible = candidates.slice(0, itemLimit).map(batchItemToWire);
+						results.push({
+							source,
+							status: result.status,
+							hasFailures: result.hasFailures,
+							outputDirectory: result.outputDirectory,
+							selected: result.selected,
+							extracted: result.extracted,
+							skipped: result.skipped,
+							failed: result.failed,
+							bytesWritten: result.bytesWritten.toString(),
+							...(report === undefined ? {} : { report }),
+							...(reportError === undefined ? {} : { reportError }),
+							itemsOmitted: Math.max(0, candidates.length - visible.length),
+							items: visible,
+						});
+					} catch (error) {
+						if (context.mcpReq.signal.aborted) throw error;
+						const converted = asGarbroError(error);
+						results.push({
+							source,
+							status: "failed",
+							hasFailures: true,
+							selected: 0,
+							extracted: 0,
+							skipped: 0,
+							failed: 1,
+							bytesWritten: "0",
+							itemsOmitted: 0,
+							items: [],
+							reportError: {
+								code: converted.code,
+								message: converted.message.slice(0, 2048),
+							},
+						});
+					}
+				}
+				const page = results.slice(offset, offset + limit);
+				const selected = results.reduce(
+					(total, result) => total + Number(result.selected),
+					0,
+				);
+				const extracted = results.reduce(
+					(total, result) => total + Number(result.extracted),
+					0,
+				);
+				const skipped = results.reduce(
+					(total, result) => total + Number(result.skipped),
+					0,
+				);
+				const failed = results.reduce(
+					(total, result) => total + Number(result.failed),
+					0,
+				);
+				const bytesWritten = results.reduce(
+					(total, result) => total + BigInt(String(result.bytesWritten)),
+					0n,
+				);
+				return success(
+					boundedPage(
+						page,
+						(visible) => ({
+							totalSources: results.length,
+							offset,
+							nextOffset:
+								offset + visible.length < results.length
+									? offset + visible.length
+									: null,
+							responseTruncated: visible.length < page.length,
+							status:
+								failed === 0
+									? "completed"
+									: extracted > 0 || skipped > 0
+										? "partial"
+										: "failed",
+							hasFailures: failed > 0,
+							selected,
+							extracted,
+							skipped,
+							failed,
+							bytesWritten: bytesWritten.toString(),
+							sources: visible,
+						}),
+						maxResponseBytes,
+					),
+				);
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
 	return server;
 }

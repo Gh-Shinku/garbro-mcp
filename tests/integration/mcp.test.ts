@@ -63,6 +63,7 @@ describe("MCP server", () => {
 				"list_entries",
 				"read_entry",
 				"extract_entries",
+				"extract_resources",
 			].sort(),
 		);
 
@@ -243,6 +244,36 @@ describe("MCP server", () => {
 		expect(unsafe).toMatchObject({
 			isError: true,
 			structuredContent: { error: { code: "UNSAFE_PATH" } },
+		});
+	});
+
+	it("batch extracts multiple sources with per-source failures", async () => {
+		const { client } = await connect();
+		const result = await client.callTool({
+			name: "extract_resources",
+			arguments: {
+				sources: [
+					{ rootId: "games", path: "basic.xp3" },
+					{ rootId: "games", path: "missing.xp3" },
+				],
+				inline: "all",
+			},
+		});
+		expect(result.isError).not.toBe(true);
+		expect(result.structuredContent).toMatchObject({
+			status: "partial",
+			hasFailures: true,
+			selected: 3,
+			extracted: 3,
+			failed: 1,
+			sources: [
+				{ source: { path: "basic.xp3" }, status: "completed" },
+				{
+					source: { path: "missing.xp3" },
+					status: "failed",
+					reportError: { code: "IO_ERROR" },
+				},
+			],
 		});
 	});
 
