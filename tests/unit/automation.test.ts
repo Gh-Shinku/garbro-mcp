@@ -4,6 +4,7 @@ import {
 	mkdtemp,
 	readFile,
 	rm,
+	stat,
 	writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -138,6 +139,7 @@ describe("ArchiveAutomationService", () => {
 		});
 		expect(result).toMatchObject({
 			status: "partial",
+			hasFailures: true,
 			selected: 3,
 			extracted: 1,
 			failed: 2,
@@ -157,6 +159,10 @@ describe("ArchiveAutomationService", () => {
 		const saved = JSON.parse(await readFile(report.absolutePath, "utf8"));
 		expect(saved.bytesWritten).toBe("26");
 		expect(saved.items[0].error.code).toBe("OUTPUT_EXISTS");
+		expect(saved.items[0]).toMatchObject({
+			formatId: "xp3",
+			decoderId: "xp3",
+		});
 		expect(saved.items[1].artifact.sha256).toHaveLength(64);
 		const loaded = await readExtractionReport(
 			service.workspace,
@@ -167,5 +173,14 @@ describe("ArchiveAutomationService", () => {
 		await expect(
 			readExtractionReport(service.workspace, "../escape.json"),
 		).rejects.toMatchObject({ code: "INVALID_ARGUMENT" });
+
+		const failed = await service.extractEntries(source, {
+			selection: { mode: "ids", entryIds: ["missing"] },
+			outputSubdirectory: "failed-job",
+		});
+		expect(failed).toMatchObject({ status: "failed", hasFailures: true });
+		await expect(stat(resolve(output, "failed-job"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
 	});
 });

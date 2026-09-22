@@ -1,4 +1,5 @@
-import { lstat, readdir } from "node:fs/promises";
+import type { Dirent } from "node:fs";
+import { lstat, readdir, rmdir } from "node:fs/promises";
 import { matchesGlob, relative, resolve, sep } from "node:path";
 import { decodeCp932 } from "./encoding.js";
 import { asGarbroError, GarbroError } from "./errors.js";
@@ -146,11 +147,14 @@ export type BatchExtractionItem =
 			entryId: string;
 			entryPath?: string;
 			status: "failed";
+			formatId: string;
+			decoderId: string;
 			error: GarbroError;
 	  };
 
 export interface BatchExtractionResult {
 	status: "completed" | "partial" | "failed";
+	hasFailures: boolean;
 	outputDirectory: string;
 	selected: number;
 	extracted: number;
@@ -273,6 +277,30 @@ async function pathInfo(
 		const code =
 			error instanceof Error && "code" in error ? error.code : undefined;
 		if (code === "ENOENT") return undefined;
+		throw error;
+	}
+}
+
+async function removeEmptyDirectoryTree(path: string): Promise<boolean> {
+	let children: Dirent[];
+	try {
+		children = await readdir(path, { withFileTypes: true });
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return true;
+		throw error;
+	}
+	for (const child of children) {
+		if (child.isSymbolicLink() || !child.isDirectory()) return false;
+		if (!(await removeEmptyDirectoryTree(resolve(path, child.name))))
+			return false;
+	}
+	try {
+		await rmdir(path);
+		return true;
+	} catch (error) {
+		const code = (error as NodeJS.ErrnoException).code;
+		if (code === "ENOENT") return true;
+		if (code === "ENOTEMPTY" || code === "EEXIST") return false;
 		throw error;
 	}
 }
@@ -703,6 +731,16 @@ export class ArchiveAutomationService {
 		const resolved = await this.workspace.resolveInput(source, "file");
 		const defaultOutput = `${source.rootId}/${resolved.relativePath}.extracted`;
 		const outputRelative = options.outputSubdirectory ?? defaultOutput;
+		const normalizedOutput = normalizeWorkspaceRelativePath(
+			outputRelative,
+			true,
+		);
+		const intendedOutputDirectory =
+			normalizedOutput === "."
+				? this.workspace.outputRoot
+				: resolve(this.workspace.outputRoot, ...normalizedOutput.split("/"));
+		const outputExisted =
+			(await pathInfo(intendedOutputDirectory)) !== undefined;
 		const outputDirectory =
 			await this.workspace.resolveOutputDirectory(outputRelative);
 		const conflictPolicy = options.conflictPolicy ?? "fail";
@@ -876,6 +914,11 @@ export class ArchiveAutomationService {
 						entryId: candidate.id,
 						...(entry === undefined ? {} : { entryPath: entry.path }),
 						status: "failed",
+						formatId: archive.format.id,
+						decoderId:
+							typeof entry?.metadata?.decoderId === "string"
+								? entry.metadata.decoderId
+								: archive.format.id,
 						error: asGarbroError(error),
 					});
 				} finally {
@@ -892,8 +935,11 @@ export class ArchiveAutomationService {
 					: extracted > 0 || skipped > 0
 						? "partial"
 						: "failed";
+			if (status === "failed" && !outputExisted)
+				await removeEmptyDirectoryTree(outputDirectory);
 			return {
 				status,
+				hasFailures: failed > 0,
 				outputDirectory,
 				selected: selected.length,
 				extracted,
