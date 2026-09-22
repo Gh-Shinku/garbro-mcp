@@ -3,6 +3,7 @@ import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
+	createRealliveNwaAudioFormat,
 	readNwaLayout,
 	readNwaWave,
 	realliveNwaAudioFormat,
@@ -397,6 +398,26 @@ describe("RealLive engine audio format", () => {
 			Buffer.alloc(8),
 		]);
 		expect(readNwaLayout(file, file.length)?.pcmSize).toBe(pcmSize);
+	});
+
+	it("reports a configurable decoded-byte policy limit", async () => {
+		const pcmSize = 12 * 1024 * 1024;
+		const file = Buffer.concat([
+			head({
+				channels: 2,
+				bps: 16,
+				compression: 5,
+				blockCount: 1,
+				pcmSize,
+				sampleCount: pcmSize / 2,
+				blockSize: pcmSize / 2,
+			}),
+			Buffer.alloc(8),
+		]);
+		const format = createRealliveNwaAudioFormat(8 * 1024 * 1024);
+		await expect(
+			format.detect(new BufferByteSource(file), "long.nwa"),
+		).rejects.toMatchObject({ code: "LIMIT_EXCEEDED" });
 	});
 
 	it("rejects non-increasing block offsets", () => {

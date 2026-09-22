@@ -18,6 +18,7 @@ import {
 } from "./workspace.js";
 
 export interface AutomationLimits {
+	decodedResourceMaxBytes: number;
 	previewDefaultBytes: number;
 	previewMaxBytes: number;
 	scanPageMax: number;
@@ -27,6 +28,7 @@ export interface AutomationLimits {
 }
 
 export const DEFAULT_AUTOMATION_LIMITS: AutomationLimits = {
+	decodedResourceMaxBytes: 256 * 1024 * 1024,
 	previewDefaultBytes: 2 * 1024,
 	previewMaxBytes: 64 * 1024,
 	scanPageMax: 500,
