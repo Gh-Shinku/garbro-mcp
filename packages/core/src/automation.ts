@@ -126,6 +126,7 @@ export type ExtractionSelection =
 export type ConflictPolicy = "fail" | "skip" | "overwrite";
 
 export interface ExtractedArtifact {
+	outputRootId: string;
 	relativePath: string;
 	absolutePath: string;
 	bytesWritten: bigint;
@@ -157,6 +158,7 @@ export type BatchExtractionItem =
 export interface BatchExtractionResult {
 	status: "completed" | "partial" | "failed";
 	hasFailures: boolean;
+	outputRootId: string;
 	outputDirectory: string;
 	selected: number;
 	extracted: number;
@@ -725,6 +727,7 @@ export class ArchiveAutomationService {
 		source: InputReference,
 		options: {
 			selection?: ExtractionSelection;
+			outputRootId?: string;
 			outputSubdirectory?: string;
 			conflictPolicy?: ConflictPolicy;
 		},
@@ -733,18 +736,23 @@ export class ArchiveAutomationService {
 		const resolved = await this.workspace.resolveInput(source, "file");
 		const defaultOutput = `${source.rootId}/${resolved.relativePath}.extracted`;
 		const outputRelative = options.outputSubdirectory ?? defaultOutput;
+		const outputRootId =
+			options.outputRootId ?? this.workspace.outputRoots[0]?.id ?? "default";
+		const outputRoot = this.workspace.resolveOutputRoot(outputRootId);
 		const normalizedOutput = normalizeWorkspaceRelativePath(
 			outputRelative,
 			true,
 		);
 		const intendedOutputDirectory =
 			normalizedOutput === "."
-				? this.workspace.outputRoot
-				: resolve(this.workspace.outputRoot, ...normalizedOutput.split("/"));
+				? outputRoot
+				: resolve(outputRoot, ...normalizedOutput.split("/"));
 		const outputExisted =
 			(await pathInfo(intendedOutputDirectory)) !== undefined;
-		const outputDirectory =
-			await this.workspace.resolveOutputDirectory(outputRelative);
+		const outputDirectory = await this.workspace.resolveOutputDirectory(
+			outputRelative,
+			outputRootId,
+		);
 		const conflictPolicy = options.conflictPolicy ?? "fail";
 		return await this.#withArchive(resolved.absolutePath, async (archive) => {
 			const selection = options.selection ?? { mode: "all" as const };
@@ -886,12 +894,12 @@ export class ArchiveAutomationService {
 						);
 					const result = await extractEntry(archive, entry.id, {
 						outputDirectory,
-						safetyRoot: this.workspace.outputRoot,
+						safetyRoot: outputRoot,
 						overwrite: conflictPolicy === "overwrite",
 						...(control.signal === undefined ? {} : { signal: control.signal }),
 					});
 					const artifactRelative = toPosix(
-						relative(this.workspace.outputRoot, result.outputPath),
+						relative(outputRoot, result.outputPath),
 					);
 					extracted += 1;
 					bytesWritten += result.bytesWritten;
@@ -900,6 +908,7 @@ export class ArchiveAutomationService {
 						entryPath: entry.path,
 						status: "extracted",
 						artifact: {
+							outputRootId,
 							relativePath: artifactRelative,
 							absolutePath: result.outputPath,
 							bytesWritten: result.bytesWritten,
@@ -942,6 +951,7 @@ export class ArchiveAutomationService {
 			return {
 				status,
 				hasFailures: failed > 0,
+				outputRootId,
 				outputDirectory,
 				selected: selected.length,
 				extracted,

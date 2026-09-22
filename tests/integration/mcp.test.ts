@@ -27,17 +27,29 @@ afterEach(async () => {
 	);
 });
 
-async function connect(overrides: Pick<BuildServerOptions, "registry"> = {}) {
+async function connect(
+	overrides: Pick<BuildServerOptions, "registry"> = {},
+	withMusicRoot = false,
+) {
 	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
 	const output = await mkdtemp(resolve(tmpdir(), "garbro-mcp-output-"));
-	temporaryDirectories.push(root, output);
+	const music = withMusicRoot
+		? await mkdtemp(resolve(tmpdir(), "garbro-mcp-music-"))
+		: undefined;
+	temporaryDirectories.push(
+		root,
+		output,
+		...(music === undefined ? [] : [music]),
+	);
 	await copyFile(resolve("fixtures/xp3/basic.xp3"), resolve(root, "basic.xp3"));
 	const [clientTransport, serverTransport] =
 		InMemoryTransport.createLinkedPair();
 	const server = buildServer({
 		...overrides,
 		inputRoots: { games: root },
-		outputRoot: output,
+		...(music === undefined
+			? { outputRoot: output }
+			: { outputRoots: { default: output, music } }),
 	});
 	const client = new Client({ name: "garbro-mcp-test", version: "0.0.0" });
 	closers.push(
@@ -46,7 +58,7 @@ async function connect(overrides: Pick<BuildServerOptions, "registry"> = {}) {
 	);
 	await server.connect(serverTransport);
 	await client.connect(clientTransport);
-	return { client, root, output };
+	return { client, root, output, music };
 }
 
 describe("MCP server", () => {
@@ -138,6 +150,54 @@ describe("MCP server", () => {
 			complete: true,
 			archives: [],
 			counts: { recognized: 0, byFormat: {} },
+		});
+	});
+
+	it("extracts and reads reports through an explicitly named output root", async () => {
+		const { client, music } = await connect({}, true);
+		expect(music).toBeDefined();
+		const source = { rootId: "games", path: "basic.xp3" };
+		const extracted = await client.callTool({
+			name: "extract_entries",
+			arguments: {
+				source,
+				outputRootId: "music",
+				outputSubdirectory: "Rewrite",
+				inline: "all",
+			},
+		});
+		expect(extracted.isError).not.toBe(true);
+		expect(extracted.structuredContent).toMatchObject({
+			outputRootId: "music",
+			outputDirectory: resolve(music ?? "", "Rewrite"),
+			extracted: 3,
+			report: { outputRootId: "music" },
+		});
+		const reportPath = (
+			extracted.structuredContent as {
+				report: { relativePath: string };
+			}
+		).report.relativePath;
+		const report = await client.callTool({
+			name: "extract_entries",
+			arguments: { reportPath, outputRootId: "music", inline: "summary" },
+		});
+		expect(report.isError).not.toBe(true);
+		expect(report.structuredContent).toMatchObject({
+			outputRootId: "music",
+			extracted: 3,
+		});
+
+		const rejected = await client.callTool({
+			name: "extract_entries",
+			arguments: { source, outputRootId: "missing" },
+		});
+		expect(rejected.isError).toBe(true);
+		expect(rejected.structuredContent).toMatchObject({
+			error: {
+				code: "INVALID_ARGUMENT",
+				details: { allowedRoots: ["default", "music"] },
+			},
 		});
 	});
 
@@ -428,18 +488,22 @@ describe("MCP server", () => {
 			});
 			expect(page.isError).not.toBe(true);
 			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(2048);
-			expect(page.content).toEqual([
-				{
-					type: "text",
-					text: JSON.stringify({
-						notice: "Full result is available in structuredContent.",
-					}),
-				},
-			]);
 			const payload = page.structuredContent as {
 				items: unknown[];
 				nextOffset: number | null;
 			};
+			const serialized = JSON.stringify(payload);
+			expect(page.content).toEqual([
+				{
+					type: "text",
+					text:
+						Buffer.byteLength(serialized) <= 1024
+							? serialized
+							: JSON.stringify({
+									notice: "Full result is available in structuredContent.",
+								}),
+				},
+			]);
 			collected.push(...payload.items);
 			if (payload.nextOffset !== null)
 				expect(payload.nextOffset).toBeGreaterThan(offset);

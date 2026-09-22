@@ -11,7 +11,10 @@ export async function writeExtractionReport(
 	workspace: WorkspacePolicy,
 	result: BatchExtractionResult,
 ): Promise<ExtractedArtifact> {
-	const directory = await workspace.resolveOutputDirectory(".garbro-reports");
+	const directory = await workspace.resolveOutputDirectory(
+		".garbro-reports",
+		result.outputRootId,
+	);
 	const name = `${randomUUID()}.json`;
 	const path = resolve(directory, name);
 	const bytes = Buffer.from(
@@ -32,6 +35,7 @@ export async function writeExtractionReport(
 	);
 	await writeFile(path, bytes, { flag: "wx", mode: 0o600 });
 	return {
+		outputRootId: result.outputRootId,
 		relativePath: `.garbro-reports/${name}`,
 		absolutePath: path,
 		bytesWritten: BigInt(bytes.length),
@@ -43,6 +47,7 @@ export async function writeExtractionReport(
 export async function readExtractionReport(
 	workspace: WorkspacePolicy,
 	relativePath: string,
+	outputRootId?: string,
 ): Promise<{ report: unknown; artifact: ExtractedArtifact }> {
 	if (
 		!/^\.garbro-reports\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/.test(
@@ -53,9 +58,12 @@ export async function readExtractionReport(
 			"INVALID_ARGUMENT",
 			"Expected a generated .garbro-reports/<id>.json path",
 		);
+	const outputRoot = workspace.resolveOutputRoot(outputRootId);
+	const resolvedOutputRootId =
+		outputRootId ?? workspace.outputRoots[0]?.id ?? "default";
 	for (const directory of [
-		workspace.outputRoot,
-		resolve(workspace.outputRoot, ".garbro-reports"),
+		outputRoot,
+		resolve(outputRoot, ".garbro-reports"),
 	]) {
 		const info = await lstat(directory);
 		if (info.isSymbolicLink() || !info.isDirectory())
@@ -64,8 +72,8 @@ export async function readExtractionReport(
 				"Report directory is not a real directory",
 			);
 	}
-	const path = resolve(workspace.outputRoot, relativePath);
-	const canonicalRoot = await realpath(workspace.outputRoot);
+	const path = resolve(outputRoot, relativePath);
+	const canonicalRoot = await realpath(outputRoot);
 	const relation = relative(canonicalRoot, await realpath(path));
 	if (
 		isAbsolute(relation) ||
@@ -88,6 +96,7 @@ export async function readExtractionReport(
 		return {
 			report: JSON.parse(bytes.toString("utf8")) as unknown,
 			artifact: {
+				outputRootId: resolvedOutputRootId,
 				relativePath,
 				absolutePath: path,
 				bytesWritten: BigInt(bytes.length),

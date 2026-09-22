@@ -20,6 +20,7 @@ export interface InputReference {
 export interface WorkspacePolicyOptions {
 	inputRoots?: Readonly<Record<string, string>>;
 	outputRoot?: string;
+	outputRoots?: Readonly<Record<string, string>>;
 	workingDirectory?: string;
 }
 
@@ -88,9 +89,10 @@ async function ensureDirectoryTree(path: string): Promise<void> {
 }
 
 export class WorkspacePolicy {
-	readonly outputRoot: string;
 	readonly inputRoots: readonly WorkspaceRootInfo[];
+	readonly outputRoots: readonly WorkspaceRootInfo[];
 	readonly #rootMap: ReadonlyMap<string, string>;
+	readonly #outputRootMap: ReadonlyMap<string, string>;
 
 	constructor(options: WorkspacePolicyOptions = {}) {
 		const cwd = resolve(options.workingDirectory ?? process.cwd());
@@ -119,7 +121,53 @@ export class WorkspacePolicy {
 			);
 		this.inputRoots = roots;
 		this.#rootMap = rootMap;
-		this.outputRoot = resolve(cwd, options.outputRoot ?? "garbro-output");
+		if (options.outputRoot !== undefined && options.outputRoots !== undefined)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				"Configure outputRoot or outputRoots, not both",
+			);
+		const configuredOutputs = options.outputRoots ?? {
+			default: options.outputRoot ?? "garbro-output",
+		};
+		const outputRoots: WorkspaceRootInfo[] = [];
+		const outputRootMap = new Map<string, string>();
+		for (const [id, path] of Object.entries(configuredOutputs)) {
+			if (!ROOT_ID.test(id))
+				throw new GarbroError(
+					"INVALID_ARGUMENT",
+					`Invalid output root ID: ${id}`,
+				);
+			const absolute = resolve(cwd, path);
+			outputRootMap.set(id, absolute);
+			outputRoots.push({ id, path: absolute });
+		}
+		if (outputRoots.length === 0)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				"At least one output root is required",
+			);
+		this.outputRoots = outputRoots;
+		this.#outputRootMap = outputRootMap;
+	}
+
+	/** The legacy default output root. Prefer resolveOutputRoot for new code. */
+	get outputRoot(): string {
+		return this.outputRoots[0]?.path ?? "";
+	}
+
+	resolveOutputRoot(rootId?: string): string {
+		const resolvedRootId = rootId ?? this.outputRoots[0]?.id ?? "default";
+		const configuredRoot = this.#outputRootMap.get(resolvedRootId);
+		if (configuredRoot !== undefined) return configuredRoot;
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			`Unknown output root: ${resolvedRootId}`,
+			{
+				details: {
+					allowedRoots: this.outputRoots.map((root) => root.id),
+				},
+			},
+		);
 	}
 
 	async prepare(options: { createOutput?: boolean } = {}): Promise<void> {
@@ -132,7 +180,7 @@ export class WorkspacePolicy {
 				);
 		}
 		if (options.createOutput ?? true)
-			await ensureDirectoryTree(this.outputRoot);
+			for (const root of this.outputRoots) await ensureDirectoryTree(root.path);
 	}
 
 	async resolveInput(
@@ -171,20 +219,31 @@ export class WorkspacePolicy {
 		return { absolutePath, relativePath };
 	}
 
-	async resolveOutputDirectory(path: string): Promise<string> {
+	async resolveOutputDirectory(path: string, rootId?: string): Promise<string> {
 		const relativePath = normalizeWorkspaceRelativePath(path, true);
-		await ensureDirectoryTree(this.outputRoot);
+		const outputRoot = this.resolveOutputRoot(rootId);
+		await ensureDirectoryTree(outputRoot);
 		const absolute =
 			relativePath === "."
-				? this.outputRoot
-				: resolve(this.outputRoot, ...relativePath.split("/"));
-		if (!isWithin(this.outputRoot, absolute))
-			throw new GarbroError("UNSAFE_PATH", `Output path escapes root: ${path}`);
+				? outputRoot
+				: resolve(outputRoot, ...relativePath.split("/"));
+		if (!isWithin(outputRoot, absolute))
+			throw new GarbroError(
+				"UNSAFE_PATH",
+				`Output path escapes root: ${path}`,
+				{
+					details: {
+						allowedRoots: this.outputRoots.map((root) => root.id),
+						outputRootId: rootId ?? this.outputRoots[0]?.id,
+					},
+				},
+			);
 		await ensureDirectoryTree(absolute);
 		return absolute;
 	}
 
 	isOutputPath(path: string): boolean {
-		return isWithin(this.outputRoot, resolve(path));
+		const absolute = resolve(path);
+		return this.outputRoots.some((root) => isWithin(root.path, absolute));
 	}
 }

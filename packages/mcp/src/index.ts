@@ -12,7 +12,7 @@ async function main(): Promise<void> {
 	const { values } = parseArgs({
 		options: {
 			"input-root": { type: "string", multiple: true },
-			"output-root": { type: "string" },
+			"output-root": { type: "string", multiple: true },
 			"expected-build-id": { type: "string" },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
 
 Options:
   --input-root <id=path>    Add a named readable root (repeatable)
-  --output-root <path>      Set the only writable extraction root
+  --output-root [id=]<path> Add a writable root (repeatable with IDs)
   --expected-build-id <id> Refuse to start a different build
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
@@ -55,6 +55,30 @@ Options:
 		},
 		Object.create(null) as Record<string, string>,
 	);
+	const outputDeclarations = values["output-root"];
+	let outputRoot: string | undefined;
+	let outputRoots: Record<string, string> | undefined;
+	if (outputDeclarations !== undefined) {
+		outputRoots = Object.create(null) as Record<string, string>;
+		for (const declaration of outputDeclarations) {
+			const separator = declaration.indexOf("=");
+			if (separator < 0) {
+				if (outputDeclarations.length > 1)
+					throw new Error(
+						"Repeated --output-root values must use id=path declarations",
+					);
+				outputRoot = declaration;
+				outputRoots = undefined;
+				break;
+			}
+			if (separator === 0 || separator === declaration.length - 1)
+				throw new Error(`Invalid --output-root value: ${declaration}`);
+			const id = declaration.slice(0, separator);
+			if (outputRoots[id] !== undefined)
+				throw new Error(`Duplicate --output-root ID: ${id}`);
+			outputRoots[id] = declaration.slice(separator + 1);
+		}
+	}
 
 	if (
 		values["expected-build-id"] !== undefined &&
@@ -66,19 +90,20 @@ Options:
 
 	const workspace = new WorkspacePolicy({
 		...(inputRoots === undefined ? {} : { inputRoots }),
-		...(values["output-root"] === undefined
-			? {}
-			: { outputRoot: values["output-root"] }),
+		...(outputRoot === undefined ? {} : { outputRoot }),
+		...(outputRoots === undefined ? {} : { outputRoots }),
 	});
 
 	if (values.doctor) {
 		await workspace.prepare();
-		await access(workspace.outputRoot, constants.R_OK | constants.W_OK);
+		for (const root of workspace.outputRoots)
+			await access(root.path, constants.R_OK | constants.W_OK);
 		const result = {
 			status: "ok",
 			build: BUILD_IDENTITY,
 			inputRoots: workspace.inputRoots,
 			outputRoot: workspace.outputRoot,
+			outputRoots: workspace.outputRoots,
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,

@@ -61,6 +61,32 @@ describe("WorkspacePolicy", () => {
 		await expect(access(outputRoot)).rejects.toMatchObject({ code: "ENOENT" });
 	});
 
+	it("resolves directories inside explicitly named output roots", async () => {
+		const directory = await temporaryDirectory();
+		const music = resolve(directory, "music");
+		const workspace = new WorkspacePolicy({
+			inputRoots: { games: directory },
+			outputRoots: {
+				default: resolve(directory, "results"),
+				music,
+			},
+		});
+
+		await expect(
+			workspace.resolveOutputDirectory("Rewrite", "music"),
+		).resolves.toBe(resolve(music, "Rewrite"));
+		expect(workspace.outputRoots).toEqual([
+			{ id: "default", path: resolve(directory, "results") },
+			{ id: "music", path: music },
+		]);
+		await expect(
+			workspace.resolveOutputDirectory("Rewrite", "missing"),
+		).rejects.toMatchObject({
+			code: "INVALID_ARGUMENT",
+			details: { allowedRoots: ["default", "music"] },
+		});
+	});
+
 	it.each(["../outside", "/absolute", "C:\\drive", "folder/../outside"])(
 		"rejects unsafe input path %s",
 		async (path) => {

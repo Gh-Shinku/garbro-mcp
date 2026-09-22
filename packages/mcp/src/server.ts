@@ -128,13 +128,22 @@ function success<const T extends Record<string, unknown>>(payload: T) {
 
 function failure(error: unknown) {
 	const garbroError = asGarbroError(error);
+	const errorPayload: {
+		code: (typeof errorCodes)[number];
+		message: string;
+		details?: Record<string, unknown>;
+	} = {
+		code: garbroError.code,
+		message: garbroError.message.slice(0, 2048),
+		...(garbroError.details === undefined
+			? {}
+			: { details: garbroError.details }),
+	};
 	const payload = {
-		error: {
-			code: garbroError.code,
-			message: garbroError.message.slice(0, 2048),
-		},
+		error: errorPayload,
 	};
 	while (
+		payload.error.message.length > 0 &&
 		Buffer.byteLength(
 			JSON.stringify({ ...toolResult(payload), isError: true }),
 		) > 2048
@@ -143,6 +152,12 @@ function failure(error: unknown) {
 			0,
 			Math.floor(payload.error.message.length / 2),
 		);
+	if (
+		Buffer.byteLength(
+			JSON.stringify({ ...toolResult(payload), isError: true }),
+		) > 2048
+	)
+		delete payload.error.details;
 	return {
 		content: [{ type: "text" as const, text: JSON.stringify(payload) }],
 		structuredContent: payload,
@@ -285,6 +300,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			...(options.outputRoot === undefined
 				? {}
 				: { outputRoot: options.outputRoot }),
+			...(options.outputRoots === undefined
+				? {}
+				: { outputRoots: options.outputRoots }),
 			...(options.workingDirectory === undefined
 				? {}
 				: { workingDirectory: options.workingDirectory }),
@@ -324,6 +342,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					}),
 					inputRoots: z.array(z.object({ id: z.string(), path: z.string() })),
 					outputRoot: z.string(),
+					outputRoots: z.array(z.object({ id: z.string(), path: z.string() })),
 					limits: z.object({
 						decodedResourceMaxBytes: z.number().int().positive(),
 						responseDefaultBytes: z.number().int().positive(),
@@ -356,6 +375,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					},
 					inputRoots: workspace.inputRoots.map((root) => ({ ...root })),
 					outputRoot: workspace.outputRoot,
+					outputRoots: workspace.outputRoots.map((root) => ({ ...root })),
 					limits: {
 						...automation.limits,
 						responseDefaultBytes: DEFAULT_RESPONSE_BYTES,
@@ -870,6 +890,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	);
 
 	const artifactSchema = z.object({
+		outputRootId: z.string(),
 		relativePath: z.string(),
 		absolutePath: z.string(),
 		bytesWritten: z.string(),
@@ -883,6 +904,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			inputSchema: z.object({
 				source: sourceSchema.optional(),
 				reportPath: z.string().min(1).optional(),
+				outputRootId: z.string().min(1).optional(),
 				offset: z.number().int().nonnegative().default(0),
 				selection: z
 					.discriminatedUnion("mode", [
@@ -912,6 +934,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				z.object({
 					status: z.enum(["completed", "partial", "failed"]),
 					hasFailures: z.boolean(),
+					outputRootId: z.string(),
 					outputDirectory: z.string(),
 					selected: z.number().int().nonnegative(),
 					extracted: z.number().int().nonnegative(),
@@ -967,10 +990,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					const loaded = await readExtractionReport(
 						workspace,
 						options.reportPath,
+						options.outputRootId,
 					);
 					const stored = z
 						.object({
 							status: z.enum(["completed", "partial", "failed"]),
+							outputRootId: z.string(),
 							outputDirectory: z.string(),
 							selected: z.number().int().nonnegative(),
 							extracted: z.number().int().nonnegative(),
@@ -1056,6 +1081,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					{
 						selection,
 						conflictPolicy: options.conflictPolicy,
+						...(options.outputRootId === undefined
+							? {}
+							: { outputRootId: options.outputRootId }),
 						...(options.outputSubdirectory === undefined
 							? {}
 							: { outputSubdirectory: options.outputSubdirectory }),
@@ -1094,6 +1122,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						(visible) => ({
 							status: result.status,
 							hasFailures: result.hasFailures,
+							outputRootId: result.outputRootId,
 							outputDirectory: result.outputDirectory,
 							selected: result.selected,
 							extracted: result.extracted,
@@ -1145,6 +1174,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		source: sourceSchema,
 		status: z.enum(["completed", "partial", "failed"]),
 		hasFailures: z.boolean(),
+		outputRootId: z.string().optional(),
 		outputDirectory: z.string().optional(),
 		selected: z.number().int().nonnegative(),
 		extracted: z.number().int().nonnegative(),
@@ -1163,6 +1193,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				"Extract several resources in one bounded batch. Review each source result and hasFailures; every completed source gets its own hashed report.",
 			inputSchema: z.object({
 				sources: z.array(sourceSchema).min(1).max(32),
+				outputRootId: z.string().min(1).optional(),
 				inline: z.enum(["summary", "errors", "all"]).default("errors"),
 				itemLimit: z.number().int().min(0).max(100).default(10),
 				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
@@ -1195,6 +1226,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		async (
 			{
 				sources,
+				outputRootId,
 				inline,
 				itemLimit,
 				conflictPolicy,
@@ -1211,7 +1243,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					try {
 						const result = await automation.extractEntries(
 							source,
-							{ conflictPolicy },
+							{
+								conflictPolicy,
+								...(outputRootId === undefined ? {} : { outputRootId }),
+							},
 							toControl(context),
 						);
 						let report: Record<string, unknown> | undefined;
@@ -1242,6 +1277,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							source,
 							status: result.status,
 							hasFailures: result.hasFailures,
+							outputRootId: result.outputRootId,
 							outputDirectory: result.outputDirectory,
 							selected: result.selected,
 							extracted: result.extracted,
