@@ -11,8 +11,6 @@ import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 const MARK = Buffer.from("-BPA-", "latin1");
 const HEADER_SIZE = 0x11;
 const COLOUR_BYTES = 3;
-/** One control byte stands over four chunks, and a chunk over sixteen places at the most. */
-const CHUNKS = 4;
 const PLACES = 4;
 
 function palette(colours: number): Buffer {
