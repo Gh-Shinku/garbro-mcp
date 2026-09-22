@@ -56,6 +56,11 @@ const TWO_BY_TWO = Buffer.from([
 ]);
 
 describe("Zyx tiled picture", () => {
+	it("uses its extension to guard the signatureless layout", () => {
+		expect(zyxSplImageFormat.descriptor.extensions).toEqual(["spl"]);
+		expect(zyxSplImageFormat.detection?.extensionOnly).toBe(true);
+	});
+
 	it("reads a head of tiles and measurements", () => {
 		const layout = readSplLayout(
 			splFile(4, 1, TWO_BY_TWO, [
