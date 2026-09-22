@@ -15,8 +15,9 @@ pnpm check
 
 For source installations, configure the MCP client to run Node with the absolute path to
 `packages/mcp/dist/index.js`, followed by `--input-root id=/path/to/input` and
-`--output-root /path/to/output`. Ordinary users should prefer the prebuilt portable distribution;
-see [distribution.md](distribution.md) for local artifact builds and release verification.
+`--output-root id=/path/to/output`. Repeat either option to expose additional named roots. Ordinary
+users should prefer the prebuilt portable distribution; see [distribution.md](distribution.md) for
+local artifact builds and release verification.
 
 The repository is a private pnpm workspace:
 

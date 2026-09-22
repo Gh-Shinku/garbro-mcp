@@ -5,45 +5,96 @@ selection, and extraction policy remain usable without MCP.
 
 ## Filesystem policy
 
-Start the server with one or more named input roots and one output root:
+Start the server with named input and output roots:
 
 ```text
-garbro-mcp-server --input-root games=D:/Games --input-root samples=D:/Samples --output-root D:/Extracted
+garbro-mcp-server --input-root games=D:/Games --output-root default=D:/Extracted --output-root music=C:/Users/me/Music
 ```
 
 Inputs use logical references such as `{ "rootId": "games", "path": "title/data.xp3" }`.
-Absolute paths, traversal, unknown root IDs, and symlink escapes are rejected. Extraction is limited
-to the configured output root and rejects unsafe archive names and symlinked output components.
-Without arguments, `workspace` maps to the current directory and output defaults to
-`garbro-output` below it.
+Absolute paths, traversal, unknown root IDs, and symlink escapes are rejected. Every write request
+selects an `outputRootId` plus a relative subdirectory. Rejected roots report `allowedRoots`.
+The legacy single `--output-root <path>` form remains accepted as `default`. Without arguments,
+`workspace` maps to the current directory and output defaults to `garbro-output` below it.
+
+Before connecting a client, run `--version --json` to record the immutable `buildId`, source commit,
+format-catalog hash, and protocol version. `--doctor --json` validates all configured roots. An
+optional `--expected-build-id` makes a stale or different bundle fail at startup.
 
 ## Tools
 
 | Tool | Purpose | Writes files |
 | --- | --- | --- |
 | `get_server_info` | Discover roots, output policy, limits, and capabilities | No |
+| `search_resources` | Resolve titles through an optional evidence-backed alias catalog | No |
 | `list_formats` | Query formats by resource type, status, or extension | No |
-| `scan_archives` | Detect supported files under a logical directory | No |
+| `scan_resources` | Detect supported resources under a logical directory | No |
+| `scan_archives` | Compatibility alias for `scan_resources` | No |
 | `inspect_archive` | Detect and summarize one file | No |
 | `list_entries` | Filter and page an archive's entries | No |
 | `read_entry` | Return a capped text or hexadecimal preview | No |
+| `plan_extraction` | Preflight selection, conflicts, costs, budgets, and plan digest | No |
 | `extract_entries` | Extract all, selected IDs, or glob-matched entries | Yes |
+| `extract_resources` | Extract several source resources with total budgets | Yes |
+| `verify_artifacts` | Hash and structurally verify output artifacts | No |
 
-`scan_archives` uses an opaque cursor and reports failures per file. `list_entries` uses numeric
+`scan_resources` uses an opaque cursor and reports failures per file. `list_entries` uses numeric
 offset pagination and supports include/exclude globs plus compression and encryption filters.
 `read_entry` defaults to a 2 KiB preview, detects UTF-8/UTF-16LE/CP932 text, and falls back to hex
 for binary data. Larger previews are opt-in, up to 64 KiB of source bytes, subject to the response budget.
 
-`extract_entries` first preflights every selected destination, then records each item as
+Call `plan_extraction` before a material write. It reports exact known input/output sizes, unknown
+sizes, conflicts, budget violations, and a `planDigest` without creating an output directory.
+Pass that digest to `extract_entries`; execution rejects `PLAN_CHANGED` if a source or destination
+changed after planning. Byte budgets are decimal strings. Available hard bounds are
+`maxResources`, `maxInputBytes`, `maxOutputBytes`, `maxDecodedBytesPerResource`, and `timeoutMs`.
+Strict output or decoded budgets reject formats whose cost cannot be proven.
+
+`extract_entries` then preflights every selected destination and records each item as
 `extracted`, `skipped`, or `failed`. Its conflict policy is `fail`, `skip`, or `overwrite`; overwrite
 only replaces regular files. The default destination mirrors the source as
-`<outputRoot>/<rootId>/<source path>.extracted/`. Successful artifacts include absolute and
-output-root-relative paths, byte counts, and SHA-256 hashes.
+`<outputRoot>/<input rootId>/<source path>.extracted/`. Successful artifacts include the output
+root ID, absolute and root-relative paths, byte counts, and SHA-256 hashes. `extract_resources`
+preflights all sources and enforces budgets against the aggregate batch before its first write.
+
+`verify_artifacts` reopens only files below configured output roots, computes SHA-256 incrementally,
+checks optional expected hashes/sizes, and validates WAV or Ogg structure. Its evidence level is
+`hash`, `structural`, or `manifest`; a successful write does not itself imply verified content.
+
+## Resource alias catalogs
+
+Opaque filenames do not contain soundtrack titles. Load user-supplied evidence outside the game
+directory with `--resource-catalog <json>` instead of asking the server to guess. Files use schema 1:
+
+```json
+{
+  "schemaVersion": 1,
+  "resources": [{
+    "aliases": ["散花"],
+    "locale": "ja-JP",
+    "locator": {
+      "source": { "rootId": "games", "path": "Rewrite/bgm/BGM042.nwa" }
+    },
+    "metadata": { "title": "Sange", "durationSeconds": 180 },
+    "expected": { "sha256": "<64 lowercase hex characters>" }
+  }]
+}
+```
+
+`search_resources` returns `resolved` only for one exact match. Partial or multiple matches are
+`ambiguous`; no evidence is `unsupported`. Both include a machine-readable next action.
+
+## Common outcome contract
+
+Every tool result includes `outcome.status`: `ok`, `partial`, `unsupported`, `ambiguous`, or
+`failed`. It also contains `warnings`, and when relevant `nextAction` and `verification` evidence.
+Existing tool-specific `status` fields remain during the protocol-2 migration. Request failures and
+fully failed operations set MCP `isError`; partial batches retain their structured results.
 
 ## Context-friendly defaults
 
-The interface still exposes only seven tools, without additional prompts or resources. Format lists
-default to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
+The interface exposes twelve tools without additional prompts or resources. Format lists default
+to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
 summaries by default. Set `detail: "full"` only when attribution, implementation notes, checksums,
 raw names, or metadata are needed. `list_formats` accepts an exact `formatId` filter; scans reference
 formats by ID rather than repeating full descriptors for each file.
@@ -59,7 +110,8 @@ Extraction returns counts and at most ten failed items by default (`inline: "err
 `inline: "summary"` for counts only, or `inline: "all"` for successful artifacts too. `itemLimit`
 is capped at 100, and the response budget still applies. `itemsOmitted` and `responseTruncated`
 make omitted details explicit. The complete report, including all outcomes and hashes, is saved to
-`<outputRoot>/.garbro-reports/<id>.json`; its `report` artifact includes its own size and SHA-256.
+`<selected output root>/.garbro-reports/<id>.json`; its `report` artifact includes its root ID,
+size, and SHA-256.
 If saving fails, `reportError` accompanies the actual extraction counts; completed extraction is
 not misreported as unexecuted.
 
@@ -68,6 +120,7 @@ Read report pages through the same tool, without performing extraction again:
 ```json
 {
   "reportPath": ".garbro-reports/<id>.json",
+  "outputRootId": "default",
   "inline": "all",
   "offset": 0,
   "itemLimit": 20

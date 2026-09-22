@@ -14,7 +14,7 @@ Extract the ZIP and configure your MCP client:
       "args": [
         "/absolute/path/garbro-mcp/garbro-mcp.cjs",
         "--input-root", "games=/absolute/path/games",
-        "--output-root", "/absolute/path/garbro-output"
+        "--output-root", "default=/absolute/path/garbro-output"
       ]
     }
   }
@@ -24,8 +24,10 @@ Extract the ZIP and configure your MCP client:
 On Windows, use paths such as `C:/Tools/garbro-mcp/garbro-mcp.cjs` and `D:/Games`.
 Use an absolute Node executable path if your client cannot find `node` on PATH.
 
-Check the build with `node garbro-mcp.cjs --version` or view options with `--help`. Input roots can
-be repeated. Extraction cannot escape the output root; overwriting must be explicitly requested.
+Check the exact build with `node garbro-mcp.cjs --version --json`, then run the same configured
+roots once with `--doctor --json`. Input and named output roots can be repeated. Extraction cannot
+escape a configured output root; overwriting must be explicitly requested. Use
+`--expected-build-id ID` to refuse to start a stale or different bundle.
 
 The optional `.tgz` installs locally with `npm install --global /path/to/garbro-mcp-VERSION.tgz`.
 It contains the same self-contained server and requires no registry downloads for runtime

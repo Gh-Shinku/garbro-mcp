@@ -18,7 +18,7 @@ Experimental release assets are published manually. If no portable ZIP is availa
 [source installation guide](docs/development.md#requirements-and-setup).
 
 Add the extracted stdio server to your MCP client configuration. Use absolute paths for the server,
-input roots, and output root:
+input roots, and named output roots:
 
 ```json
 {
@@ -28,7 +28,8 @@ input roots, and output root:
       "args": [
         "C:/Tools/garbro-mcp/garbro-mcp.cjs",
         "--input-root", "games=D:/Games",
-        "--output-root", "D:/garbro-output"
+        "--output-root", "default=D:/garbro-output",
+        "--output-root", "music=C:/Users/me/Music"
       ]
     }
   }
@@ -38,7 +39,9 @@ input roots, and output root:
 For filesystem policy, available tools, limits, and configuration details, read the
 [MCP guide](docs/mcp.md).
 
-Choose a fixed experimental version and verify it with `node garbro-mcp.cjs --version`. To update
+Choose a fixed experimental version and verify it with
+`node garbro-mcp.cjs --version --json`. Run `node garbro-mcp.cjs --doctor --json` with the same
+root arguments before configuring a client. To update
 or roll back, download another version, change the configured path, and restart your MCP client.
 The optional `.tgz` can be installed locally with npm; see the [distribution guide](docs/distribution.md).
 

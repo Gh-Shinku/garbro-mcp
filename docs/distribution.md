@@ -32,7 +32,7 @@ Alternatively, download the `.tgz` and install it locally:
 
 ```shell
 npm install --global /absolute/path/garbro-mcp-<version>.tgz
-garbro-mcp-server --version
+garbro-mcp-server --version --json
 ```
 
 The tarball contains the same bundle, has no runtime dependencies or installation scripts, and
@@ -57,7 +57,8 @@ The build generates these ignored artifacts under `dist/release/`:
 - `garbro-mcp-<version>-portable.zip`: portable directory containing the bundle, manifest, README,
   project license, and full bundled dependency license texts.
 - `garbro-mcp-<version>.tgz`: npm-installable package with the same files.
-- `garbro-mcp-<version>-build.json`: version, source commit, and bundled dependency versions/licenses.
+- `garbro-mcp-<version>-build.json`: build ID, version, source commit, build time, format-catalog
+  hash, dirty-tree flag, and bundled dependency versions/licenses.
 - `garbro-mcp-<version>-SHA256SUMS`: hashes for the three artifacts above.
 
 esbuild bundles internal workspace packages and third-party runtime dependencies. The build rejects
@@ -66,9 +67,10 @@ not read source files, support documents, or `node_modules` from the checkout.
 
 The verification command checks hashes, extracts the ZIP into a temporary directory, and installs
 the tarball using npm's offline mode with an empty cache. It starts each bundle through actual MCP
-stdio from an unrelated working directory, verifies all seven tools, CP932 decoding, extraction
-hashes, progress notifications, conflict skipping, and path confinement, then removes the temporary
-test directories. It also verifies npm's generated executable and identical package contents.
+stdio from an unrelated working directory, verifies the build identity and doctor command, all
+tools, planning, CP932 decoding, extraction and verification hashes, progress notifications,
+conflict skipping, and path confinement, then removes the temporary test directories. It also
+verifies npm's generated executable and identical package contents.
 
 ## Manual prerelease workflow
 
