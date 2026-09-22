@@ -2,10 +2,18 @@ import { GarbroError } from "@garbro-mcp/core";
 
 export const DEFAULT_RESPONSE_BYTES = 16 * 1024;
 export const MAX_RESPONSE_BYTES = 64 * 1024;
+const MAX_INLINE_TEXT_BYTES = 1024;
 
 export function toolResult<T extends Record<string, unknown>>(payload: T) {
+	const serialized = JSON.stringify(payload);
+	const text =
+		Buffer.byteLength(serialized, "utf8") <= MAX_INLINE_TEXT_BYTES
+			? serialized
+			: JSON.stringify({
+					notice: "Full result is available in structuredContent.",
+				});
 	return {
-		content: [{ type: "text" as const, text: JSON.stringify(payload) }],
+		content: [{ type: "text" as const, text }],
 		structuredContent: payload,
 	};
 }

@@ -386,13 +386,19 @@ describe("MCP server", () => {
 					inline: "all",
 					offset,
 					itemLimit: 40,
-					// Absolute Windows temp paths make one extracted item exceed 2 KiB
-					// once the MCP compatibility text copy is included.
-					maxResponseBytes: 3072,
+					maxResponseBytes: 2048,
 				},
 			});
 			expect(page.isError).not.toBe(true);
-			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(3072);
+			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(2048);
+			expect(page.content).toEqual([
+				{
+					type: "text",
+					text: JSON.stringify({
+						notice: "Full result is available in structuredContent.",
+					}),
+				},
+			]);
 			const payload = page.structuredContent as {
 				items: unknown[];
 				nextOffset: number | null;
