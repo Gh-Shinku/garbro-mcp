@@ -1,17 +1,22 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { regripsMrgAudioFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
-/** An MPEG frame header plus a little payload; the sync is eleven set bits. */
-function buildMp3(size = 0x40): Buffer {
-	const mp3: Buffer = Buffer.alloc(size, 0x5c);
-	mp3[0] = 0xff;
-	// MPEG-1 Layer III, no CRC, 128 kbps at 44100 Hz.
-	mp3[1] = 0xfb;
-	mp3[2] = 0x90;
-	mp3[3] = 0x64;
-	return mp3;
+/** Two MPEG-1 Layer III frames: 128 kbps at 44100 Hz gives 417 bytes per frame. */
+function buildMp3(): Buffer {
+	const frameLength = Math.floor((144000 * 128) / 44100);
+	const frames = [
+		Buffer.alloc(frameLength, 0x5c),
+		Buffer.alloc(frameLength, 0x5c),
+	];
+	for (const frame of frames) {
+		frame[0] = 0xff;
+		frame[1] = 0xfb;
+		frame[2] = 0x90;
+		frame[3] = 0x64;
+	}
+	return Buffer.concat(frames);
 }
 
 function scramble(input: Buffer): Buffer {
@@ -79,6 +84,20 @@ describe("regrips mrg audio", () => {
 		).toBe(false);
 	});
 
+	it("declines leading zeroes that only resemble an inverted frame sync", async () => {
+		const stored = Buffer.alloc(0x400, 0x00);
+		expect(
+			await regripsMrgAudioFormat.detect(sourceOf(stored), "picture.ico"),
+		).toBe(false);
+	});
+
+	it("declines a single plausible frame without a following frame", async () => {
+		const mp3 = buildMp3().subarray(0, 417);
+		expect(
+			await regripsMrgAudioFormat.detect(sourceOf(scramble(mp3)), "movie.mp4"),
+		).toBe(false);
+	});
+
 	it("declines a stream whose inverted frame header is truncated", async () => {
 		// A single `0xFF` byte with no second byte cannot describe a frame.
 		const stored = Buffer.from([0x00]);
@@ -100,7 +119,7 @@ describe("regrips mrg audio", () => {
 		// byte is not zero and the reference rejects it before looking any further.
 		const tagged = Buffer.concat([
 			Buffer.from("ID3\x04\x00\x00\x00\x00\x00\x00", "latin1"),
-			buildMp3(0x40),
+			buildMp3(),
 		]);
 		const stored = scramble(tagged);
 		expect(stored[0]).not.toBe(0);

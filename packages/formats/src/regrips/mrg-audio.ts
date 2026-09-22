@@ -1,13 +1,13 @@
 // Format reference: GARbro "Legacy/Regrips/AudioWRG.cs", class `MrgAudio` (an MP3 whose bytes are
 // inverted). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -24,20 +24,64 @@ function descramble(input: Buffer): Buffer {
 	return output;
 }
 
-/**
- * Checks an MPEG audio frame header at the start of the stream: eleven sync bits, then a version and a layer
- * field, neither of which may hold its reserved value. The check sits at offset zero because the stored
- * first byte is required to be zero, which fixes the decoded first byte at `0xFF` — an `ID3` tag, or any
- * other leading data, cannot survive that constraint.
- */
+interface MpegFrame {
+	length: number;
+	version: number;
+	sampleRate: number;
+}
+
+const MPEG1_LAYER3_BITRATES = [
+	0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320,
+];
+const MPEG2_LAYER3_BITRATES = [
+	0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160,
+];
+const MPEG1_SAMPLE_RATES = [44100, 48000, 32000];
+
+function readMpegLayer3Frame(
+	buffer: Buffer,
+	offset: number,
+): MpegFrame | undefined {
+	if (offset < 0 || offset + 4 > buffer.length) return undefined;
+	const header = buffer.readUInt32BE(offset);
+	if (header >>> 21 !== 0x7ff) return undefined;
+	const version = (header >>> 19) & 3;
+	const layer = (header >>> 17) & 3;
+	const bitrateIndex = (header >>> 12) & 0xf;
+	const sampleRateIndex = (header >>> 10) & 3;
+	if (
+		version === 1 ||
+		layer !== 1 ||
+		bitrateIndex === 0 ||
+		bitrateIndex === 0xf ||
+		sampleRateIndex === 3
+	)
+		return undefined;
+	const bitrate = (
+		version === 3 ? MPEG1_LAYER3_BITRATES : MPEG2_LAYER3_BITRATES
+	)[bitrateIndex];
+	const baseSampleRate = MPEG1_SAMPLE_RATES[sampleRateIndex];
+	if (bitrate === undefined || baseSampleRate === undefined) return undefined;
+	const sampleRate =
+		version === 3 ? baseSampleRate : baseSampleRate / (version === 2 ? 2 : 4);
+	const padding = (header >>> 9) & 1;
+	const length =
+		Math.floor(((version === 3 ? 144000 : 72000) * bitrate) / sampleRate) +
+		padding;
+	if (length < 4 || offset + length > buffer.length) return undefined;
+	return { length, version, sampleRate };
+}
+
+/** Requires two structurally compatible MPEG Layer III frames at their calculated boundaries. */
 function looksLikeMp3(buffer: Buffer): boolean {
-	if (buffer.length < 2) return false;
-	if ((buffer[0] ?? 0) !== 0xff) return false;
-	const second = buffer[1] ?? 0;
-	if ((second & 0xe0) !== 0xe0) return false;
-	if (((second >> 3) & 3) === 1) return false;
-	if (((second >> 1) & 3) === 0) return false;
-	return true;
+	const first = readMpegLayer3Frame(buffer, 0);
+	if (!first) return false;
+	const second = readMpegLayer3Frame(buffer, first.length);
+	return (
+		second !== undefined &&
+		second.version === first.version &&
+		second.sampleRate === first.sampleRate
+	);
 }
 
 /**
