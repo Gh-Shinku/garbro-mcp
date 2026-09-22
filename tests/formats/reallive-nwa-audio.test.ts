@@ -365,6 +365,20 @@ describe("RealLive engine audio format", () => {
 		expect(entry.size).toBe(BigInt(wav.length));
 		expect(entry.packedSize).toBe(BigInt(file.length));
 		expect(entry.compressed).toBe(false);
+		expect(entry.metadata).toMatchObject({
+			type: "audio",
+			decoderId: "reallive-nwa",
+			decodedBytes: 3,
+			serializedBytes: 47,
+			blockAlign: 1,
+			sampleFrames: 3,
+			durationSeconds: 3 / 8000,
+		});
+		expect(handle.metadata).toMatchObject({
+			audio: "wav",
+			decodedBytes: 3,
+			durationSeconds: 3 / 8000,
+		});
 		expect(wav.subarray(0x2c)).toEqual(Buffer.from([0x11, 0x22, 0x33]));
 	});
 

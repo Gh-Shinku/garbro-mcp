@@ -54,6 +54,24 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
+function audioMetadata(layout: NwaLayout): Record<string, string | number> {
+	const blockAlign = (layout.channels * layout.bitsPerSample) / PLACES_PER_WORD;
+	const sampleFrames = layout.pcmSize / blockAlign;
+	return {
+		type: "audio",
+		decoderId: "reallive-nwa",
+		channels: layout.channels,
+		bitsPerSample: layout.bitsPerSample,
+		sampleRate: layout.samplesPerSecond,
+		blockAlign,
+		decodedBytes: layout.pcmSize,
+		serializedBytes: WAVE_HEADER_SIZE + layout.pcmSize,
+		sampleFrames,
+		durationSeconds: sampleFrames / layout.samplesPerSecond,
+		compression: layout.compression,
+	};
+}
+
 export function readNwaLayout(
 	data: Buffer,
 	fileLength = data.length,
@@ -63,10 +81,12 @@ export function readNwaLayout(
 	if (channels === 0 || channels > 2) return undefined;
 	const bitsPerSample = data.readUInt16LE(BITS_FIELD);
 	if (bitsPerSample !== 8 && bitsPerSample !== 16) return undefined;
+	const samplesPerSecond = data.readUInt32LE(RATE_FIELD);
+	if (samplesPerSecond === 0) return undefined;
 	const layout: NwaLayout = {
 		channels,
 		bitsPerSample,
-		samplesPerSecond: data.readUInt32LE(RATE_FIELD),
+		samplesPerSecond,
 		compression: data.readInt32LE(COMPRESSION_FIELD),
 		runLengthEncoded: data.readInt32LE(RUN_LENGTH_FIELD) !== 0,
 		blockCount: data.readInt32LE(BLOCK_COUNT_FIELD),
@@ -79,6 +99,8 @@ export function readNwaLayout(
 	layout.packedSize = data.readInt32LE(0x18);
 	if (layout.pcmSize <= 0) return undefined;
 	if (layout.pcmSize > MAXIMUM_PCM_BYTES) return undefined;
+	const blockAlign = (layout.channels * layout.bitsPerSample) / PLACES_PER_WORD;
+	if (layout.pcmSize % blockAlign !== 0) return undefined;
 	if (layout.compression === RAW_COMPRESSION) {
 		if (layout.pcmSize > fileLength - DATA_OFFSET) return undefined;
 		return layout;
@@ -385,21 +407,12 @@ export const realliveNwaAudioFormat: ArchiveFormat = defineFixedArchive({
 					size: BigInt(WAVE_HEADER_SIZE + layout.pcmSize),
 					packedSize: source.size,
 					compressed: layout.compression !== RAW_COMPRESSION,
-					metadata: {
-						type: "audio",
-						channels: layout.channels,
-						bitsPerSample: layout.bitsPerSample,
-						sampleRate: layout.samplesPerSecond,
-						compression: layout.compression,
-					},
+					metadata: audioMetadata(layout),
 				}),
 			],
 			metadata: {
 				audio: "wav",
-				channels: layout.channels,
-				bitsPerSample: layout.bitsPerSample,
-				sampleRate: layout.samplesPerSecond,
-				compression: layout.compression,
+				...audioMetadata(layout),
 			},
 		};
 	},
