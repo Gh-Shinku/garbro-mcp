@@ -2,13 +2,13 @@
 // shared bit-packed decoder in that same file). GARbro commit
 // b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { writeBmp4 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -79,8 +79,8 @@ export const system98GImageDescriptor: FormatDescriptor = {
 
 export const system98GImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: system98GImageDescriptor,
-	// The reference declares no signature, so the format is a candidate for every file.
-	detection: { signatures: [] },
+	// The header is too weak to distinguish arbitrary files without the reference extension.
+	detection: { signatures: [], extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		return (await readLayout(source)) !== undefined;
 	},

@@ -1,6 +1,6 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { system98GImageFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 
 const PALETTE_OFFSET = 0x0a;
@@ -44,6 +44,7 @@ function sourceOf(file: Buffer): BufferByteSource {
 describe("system98 g image", () => {
 	it("declares no signature, since the reference has none", () => {
 		expect(system98GImageFormat.detection?.signatures).toEqual([]);
+		expect(system98GImageFormat.detection?.extensionOnly).toBe(true);
 	});
 
 	it("decodes a four bit bitmap", async () => {
