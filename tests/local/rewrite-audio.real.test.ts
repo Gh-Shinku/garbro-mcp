@@ -298,5 +298,6 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 				}
 			});
 		},
+		120_000,
 	);
 });

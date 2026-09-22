@@ -7,6 +7,7 @@ import {
 	rm,
 	stat,
 	symlink,
+	writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -572,10 +573,9 @@ describe("MCP server", () => {
 			"b.xp3",
 			"c.xp3",
 		];
+		const archiveBytes = await readFile(resolve(root, "basic.xp3"));
 		await Promise.all(
-			names.map((name) =>
-				copyFile(resolve(root, "basic.xp3"), resolve(root, name)),
-			),
+			names.map((name) => writeFile(resolve(root, name), archiveBytes)),
 		);
 		const createdNames = await readdir(root);
 		const seen: string[] = [];
