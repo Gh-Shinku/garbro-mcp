@@ -1,5 +1,5 @@
 import { lstat, readdir } from "node:fs/promises";
-import { relative, resolve, sep, matchesGlob } from "node:path";
+import { matchesGlob, relative, resolve, sep } from "node:path";
 import { decodeCp932 } from "./encoding.js";
 import { asGarbroError, GarbroError } from "./errors.js";
 import { extractEntry, resolveEntryOutputPath } from "./extract.js";
@@ -72,6 +72,9 @@ export interface ScanArchiveResult {
 	source: InputReference;
 	size: bigint;
 	format: FormatDescriptor;
+	validation: DetectionResult["validation"];
+	confidence: DetectionResult["confidence"];
+	warnings: readonly string[];
 }
 
 export interface ScanFailure {
@@ -658,7 +661,14 @@ export class ArchiveAutomationService {
 				unrecognizedCount += 1;
 				if (options.includeUnrecognized) unrecognized.push(source);
 			} else
-				archives.push({ source, size: result.size, format: result.format });
+				archives.push({
+					source,
+					size: result.size,
+					format: result.format,
+					validation: result.validation,
+					confidence: result.confidence,
+					warnings: result.warnings,
+				});
 		}
 		const complete = normalizedStart + page.length >= files.length;
 		return {

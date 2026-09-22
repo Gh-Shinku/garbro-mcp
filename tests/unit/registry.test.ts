@@ -108,6 +108,9 @@ describe("FormatRegistry detection catalog", () => {
 
 		await expect(registry.detectArchive(path)).resolves.toMatchObject({
 			format: { id: "signature" },
+			validation: "structural",
+			confidence: "high",
+			warnings: [],
 		});
 	});
 
@@ -139,6 +142,8 @@ describe("FormatRegistry detection catalog", () => {
 
 		await expect(registry.detectArchive(path)).resolves.toMatchObject({
 			format: { id: "variant" },
+			confidence: "medium",
+			warnings: [expect.stringContaining("extension fallback")],
 		});
 	});
 
@@ -187,6 +192,8 @@ describe("FormatRegistry detection catalog", () => {
 
 		await expect(registry.detectArchive(path)).resolves.toMatchObject({
 			format: { id: "valid" },
+			confidence: "low",
+			warnings: [expect.stringContaining("signatureless")],
 		});
 		const opened = await registry.openArchive(path);
 		try {

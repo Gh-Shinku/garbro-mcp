@@ -26,6 +26,11 @@ export interface DetectionResult {
 	path: string;
 	size: bigint;
 	format: FormatDescriptor;
+	/** Deepest validation completed before this result was returned. */
+	validation: "signature" | "structural" | "decoded";
+	/** Qualitative confidence based on the evidence used to select the format. */
+	confidence: "low" | "medium" | "high";
+	warnings: readonly string[];
 }
 
 export interface ArchiveEntry {

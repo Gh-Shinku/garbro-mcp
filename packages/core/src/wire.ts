@@ -39,5 +39,8 @@ export function detectionToWire(
 		path: result.path,
 		size: result.size.toString(),
 		format: formatToWire(result.format),
+		validation: result.validation,
+		confidence: result.confidence,
+		warnings: [...result.warnings],
 	};
 }

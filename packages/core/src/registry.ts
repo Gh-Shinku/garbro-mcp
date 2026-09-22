@@ -8,6 +8,13 @@ import type {
 	FormatDescriptor,
 } from "./types.js";
 
+interface DetectionCandidate {
+	format: ArchiveFormat;
+	signatureMatch: boolean;
+	extensionMatch: boolean;
+	hasSignatures: boolean;
+}
+
 export class FormatRegistry {
 	readonly #formats: ArchiveFormat[] = [];
 
@@ -44,7 +51,8 @@ export class FormatRegistry {
 
 	async detectArchive(inputPath: string): Promise<DetectionResult | undefined> {
 		const sourcePath = resolve(inputPath);
-		for (const format of await this.#candidateFormats(sourcePath)) {
+		for (const candidate of await this.#candidateFormats(sourcePath)) {
+			const { format } = candidate;
 			const source = await FileByteSource.open(sourcePath);
 			let handle: ArchiveHandle | undefined;
 			try {
@@ -54,6 +62,8 @@ export class FormatRegistry {
 						path: sourcePath,
 						size: source.size,
 						format: format.descriptor,
+						validation: "structural",
+						...detectionConfidence(candidate),
 					};
 				}
 			} catch (error) {
@@ -68,7 +78,7 @@ export class FormatRegistry {
 
 	async openArchive(inputPath: string): Promise<ArchiveHandle> {
 		const sourcePath = resolve(inputPath);
-		for (const format of await this.#candidateFormats(sourcePath)) {
+		for (const { format } of await this.#candidateFormats(sourcePath)) {
 			const source = await FileByteSource.open(sourcePath);
 			try {
 				if (await format.detect(source, sourcePath))
@@ -85,7 +95,7 @@ export class FormatRegistry {
 		);
 	}
 
-	async #candidateFormats(sourcePath: string): Promise<ArchiveFormat[]> {
+	async #candidateFormats(sourcePath: string): Promise<DetectionCandidate[]> {
 		const source = await FileByteSource.open(sourcePath);
 		try {
 			return await this.#detectionCandidates(source, sourcePath);
@@ -97,7 +107,7 @@ export class FormatRegistry {
 	async #detectionCandidates(
 		source: FileByteSource,
 		sourcePath: string,
-	): Promise<ArchiveFormat[]> {
+	): Promise<DetectionCandidate[]> {
 		const extension = extname(sourcePath).slice(1).toLowerCase();
 		const reads = new Map<string, Promise<Buffer>>();
 		const signatureMatches = new Set<ArchiveFormat>();
@@ -164,8 +174,35 @@ export class FormatRegistry {
 						(left.format.detection?.priority ?? 0) ||
 					left.registrationOrder - right.registrationOrder,
 			)
-			.map(({ format }) => format);
+			.map(({ format, signatureMatch, extensionMatch }) => ({
+				format,
+				signatureMatch,
+				extensionMatch,
+				hasSignatures: (format.detection?.signatures?.length ?? 0) > 0,
+			}));
 	}
+}
+
+function detectionConfidence(candidate: DetectionCandidate): {
+	confidence: DetectionResult["confidence"];
+	warnings: string[];
+} {
+	if (candidate.signatureMatch) return { confidence: "high", warnings: [] };
+	if (candidate.extensionMatch)
+		return {
+			confidence: "medium",
+			warnings: candidate.hasSignatures
+				? [
+						"The format signature did not match; detection used an extension fallback.",
+					]
+				: [],
+		};
+	return {
+		confidence: "low",
+		warnings: [
+			"Detection used a signatureless format without a matching extension.",
+		],
+	};
 }
 
 function isInvalidCandidate(error: unknown): boolean {
