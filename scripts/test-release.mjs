@@ -96,11 +96,13 @@ async function smoke(bundlePath, outputRoot) {
 			[
 				"get_server_info",
 				"list_formats",
+				"scan_resources",
 				"scan_archives",
 				"inspect_archive",
 				"list_entries",
 				"read_entry",
 				"extract_entries",
+				"extract_resources",
 			].sort(),
 		);
 		async function call(name, arguments_ = {}, options) {
@@ -119,6 +121,15 @@ async function smoke(bundlePath, outputRoot) {
 		);
 		assert.equal(
 			(await call("scan_archives", { rootId: "samples" })).archives[0].formatId,
+			"xp3",
+		);
+		assert.equal(
+			(
+				await call("scan_resources", {
+					rootId: "samples",
+					formatIds: ["xp3"],
+				})
+			).archives[0].formatId,
 			"xp3",
 		);
 		assert.equal(
@@ -170,6 +181,15 @@ async function smoke(bundlePath, outputRoot) {
 		assert.equal(
 			(await call("extract_entries", { source, conflictPolicy: "skip" }))
 				.skipped,
+			3,
+		);
+		assert.equal(
+			(
+				await call("extract_resources", {
+					sources: [source],
+					conflictPolicy: "skip",
+				})
+			).sources[0].skipped,
 			3,
 		);
 		const unsafe = await client.callTool({
