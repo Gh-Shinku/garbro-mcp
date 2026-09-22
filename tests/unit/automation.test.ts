@@ -1,11 +1,4 @@
 import {
-	ArchiveAutomationService,
-	WorkspacePolicy,
-	writeExtractionReport,
-	readExtractionReport,
-} from "@garbro-mcp/core";
-import { createDefaultRegistry } from "@garbro-mcp/formats";
-import {
 	copyFile,
 	mkdir,
 	mkdtemp,
@@ -16,6 +9,13 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+	ArchiveAutomationService,
+	readExtractionReport,
+	WorkspacePolicy,
+	writeExtractionReport,
+} from "@garbro-mcp/core";
+import { createDefaultRegistry } from "@garbro-mcp/formats";
 import { afterEach, describe, expect, it } from "vitest";
 
 const repositoryRoot = resolve(
@@ -62,6 +62,9 @@ describe("ArchiveAutomationService", () => {
 
 		await expect(service.inspectArchive(source)).resolves.toMatchObject({
 			recognized: true,
+			validation: "structural",
+			confidence: expect.stringMatching(/^(low|medium|high)$/),
+			warnings: expect.any(Array),
 			source: { rootId: "games", path: "archives/basic.xp3" },
 			format: { id: "xp3" },
 			summary: { entryCount: 3 },

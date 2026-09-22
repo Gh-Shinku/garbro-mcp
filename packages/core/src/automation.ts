@@ -64,6 +64,9 @@ export interface ArchiveInspection {
 	absolutePath: string;
 	size: bigint;
 	format: FormatDescriptor;
+	validation: DetectionResult["validation"];
+	confidence: DetectionResult["confidence"];
+	warnings: readonly string[];
 	metadata: Record<string, unknown>;
 	summary: ArchiveSummary;
 }
@@ -415,6 +418,9 @@ export class ArchiveAutomationService {
 			absolutePath: resolved.absolutePath,
 			size: archive.size,
 			format: archive.format,
+			validation: detection.validation,
+			confidence: detection.confidence,
+			warnings: detection.warnings,
 			metadata: archive.metadata,
 			summary: {
 				entryCount: archive.entries.length,
