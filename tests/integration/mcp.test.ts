@@ -29,7 +29,7 @@ afterEach(async () => {
 });
 
 async function connect(
-	overrides: Pick<BuildServerOptions, "registry"> = {},
+	overrides: Pick<BuildServerOptions, "registry" | "resourceAliases"> = {},
 	withMusicRoot = false,
 ) {
 	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
@@ -69,6 +69,7 @@ describe("MCP server", () => {
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual(
 			[
 				"get_server_info",
+				"search_resources",
 				"list_formats",
 				"scan_resources",
 				"scan_archives",
@@ -108,6 +109,50 @@ describe("MCP server", () => {
 					status: "partial",
 				},
 			],
+		});
+	});
+
+	it("resolves only evidence-backed aliases from an optional catalog", async () => {
+		const { client } = await connect({
+			resourceAliases: [
+				{
+					aliases: ["散花"],
+					locale: "ja-JP",
+					locator: {
+						source: { rootId: "games", path: "basic.xp3" },
+						entryId: "0",
+					},
+					metadata: { title: "Sange", durationSeconds: 180 },
+				},
+			],
+		});
+		const resolved = await client.callTool({
+			name: "search_resources",
+			arguments: { query: "散花", locale: "ja-JP" },
+		});
+		expect(resolved.isError).not.toBe(true);
+		expect(resolved.structuredContent).toMatchObject({
+			status: "resolved",
+			total: 1,
+			results: [
+				{
+					matchedBy: "alias",
+					exact: true,
+					locator: {
+						source: { rootId: "games", path: "basic.xp3" },
+						entryId: "0",
+					},
+				},
+			],
+		});
+		const unsupported = await client.callTool({
+			name: "search_resources",
+			arguments: { query: "不存在的曲名" },
+		});
+		expect(unsupported.structuredContent).toMatchObject({
+			status: "unsupported",
+			total: 0,
+			nextAction: expect.stringContaining("alias"),
 		});
 	});
 

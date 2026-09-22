@@ -1,4 +1,5 @@
 export * from "./binary.js";
+export * from "./catalog.js";
 export * from "./automation.js";
 export * from "./encoding.js";
 export * from "./errors.js";

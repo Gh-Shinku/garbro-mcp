@@ -122,6 +122,7 @@ async function smoke(bundlePath, outputRoot) {
 			names,
 			[
 				"get_server_info",
+				"search_resources",
 				"list_formats",
 				"scan_resources",
 				"scan_archives",

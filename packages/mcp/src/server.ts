@@ -10,6 +10,8 @@ import {
 	formatToWire,
 	GarbroError,
 	readExtractionReport,
+	ResourceCatalogIndex,
+	type ResourceAlias,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
 	verifyArtifact,
@@ -356,6 +358,7 @@ export interface BuildServerOptions
 		ArchiveAutomationOptions {
 	registry?: FormatRegistry;
 	workspace?: WorkspacePolicy;
+	resourceAliases?: readonly ResourceAlias[];
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -389,6 +392,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		(formatSupportCatalog.implementations as readonly SupportRecord[]).map(
 			(support) => [support.localId, support],
 		),
+	);
+	const configuredInputRoots = new Set(
+		workspace.inputRoots.map((root) => root.id),
+	);
+	for (const resource of options.resourceAliases ?? [])
+		if (!configuredInputRoots.has(resource.locator.source.rootId))
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				`Resource catalog uses unknown input root: ${resource.locator.source.rootId}`,
+			);
+	const resourceCatalog = new ResourceCatalogIndex(
+		options.resourceAliases ?? [],
 	);
 	const server = new McpServer({ name: "garbro-mcp", version: SERVER_VERSION });
 	const readOnly = {
@@ -434,6 +449,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						previewModes: z.array(z.enum(["auto", "text", "hex"])),
 						conflictPolicies: z.array(z.enum(["fail", "skip", "overwrite"])),
 						archiveCreation: z.literal(false),
+						resourceCatalogEntries: z.number().int().nonnegative(),
 					}),
 				}),
 			),
@@ -461,8 +477,135 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						previewModes: ["auto", "text", "hex"] as const,
 						conflictPolicies: ["fail", "skip", "overwrite"] as const,
 						archiveCreation: false as const,
+						resourceCatalogEntries: resourceCatalog.resources.length,
 					},
 				});
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"search_resources",
+		{
+			description:
+				"Search an optional user-supplied alias catalog. Results state whether resolution is exact, ambiguous, or unsupported; this tool never guesses titles from opaque filenames.",
+			inputSchema: z.object({
+				query: z.string().trim().min(1),
+				rootId: z.string().min(1).optional(),
+				locale: z.string().min(1).optional(),
+				minDurationSeconds: z.number().nonnegative().optional(),
+				maxDurationSeconds: z.number().nonnegative().optional(),
+				limit: z.number().int().positive().max(100).default(20),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					status: z.enum(["resolved", "ambiguous", "unsupported"]),
+					total: z.number().int().nonnegative(),
+					resultsOmitted: z.number().int().nonnegative(),
+					responseTruncated: z.boolean(),
+					nextAction: z.string().optional(),
+					results: z.array(
+						z.object({
+							aliases: z.array(z.string()),
+							locale: z.string().optional(),
+							locator: z.object({
+								source: sourceSchema,
+								entryId: z.string().optional(),
+							}),
+							metadata: z
+								.object({
+									title: z.string().optional(),
+									durationSeconds: z.number().optional(),
+									codec: z.string().optional(),
+									channels: z.number().int().positive().optional(),
+								})
+								.optional(),
+							expected: z
+								.object({
+									sha256: z.string().optional(),
+									decodedSha256: z.string().optional(),
+								})
+								.optional(),
+							matchedBy: z.enum(["alias", "title", "path"]),
+							matchedValue: z.string(),
+							exact: z.boolean(),
+						}),
+					),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async ({ query, limit, maxResponseBytes, ...filters }) => {
+			try {
+				if (
+					filters.minDurationSeconds !== undefined &&
+					filters.maxDurationSeconds !== undefined &&
+					filters.minDurationSeconds > filters.maxDurationSeconds
+				)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						"minDurationSeconds must not exceed maxDurationSeconds",
+					);
+				const matches = resourceCatalog.search(query, {
+					...(filters.rootId === undefined ? {} : { rootId: filters.rootId }),
+					...(filters.locale === undefined ? {} : { locale: filters.locale }),
+					...(filters.minDurationSeconds === undefined
+						? {}
+						: { minDurationSeconds: filters.minDurationSeconds }),
+					...(filters.maxDurationSeconds === undefined
+						? {}
+						: { maxDurationSeconds: filters.maxDurationSeconds }),
+				});
+				const candidates = matches.slice(0, limit).map((match) => ({
+					aliases: [...match.resource.aliases],
+					...(match.resource.locale === undefined
+						? {}
+						: { locale: match.resource.locale }),
+					locator: match.resource.locator,
+					...(match.resource.metadata === undefined
+						? {}
+						: { metadata: match.resource.metadata }),
+					...(match.resource.expected === undefined
+						? {}
+						: { expected: match.resource.expected }),
+					matchedBy: match.matchedBy,
+					matchedValue: match.matchedValue,
+					exact: match.exact,
+				}));
+				const status =
+					matches.length === 1 && matches[0]?.exact
+						? "resolved"
+						: matches.length === 0
+							? "unsupported"
+							: "ambiguous";
+				return success(
+					boundedPage(
+						candidates,
+						(visible) => ({
+							status,
+							total: matches.length,
+							resultsOmitted: matches.length - visible.length,
+							responseTruncated: visible.length < matches.length,
+							...(status === "unsupported"
+								? {
+										nextAction:
+											"Add an alias to a configured resource catalog or scan by path and metadata.",
+									}
+								: status === "ambiguous"
+									? {
+											nextAction:
+												"Narrow by root, locale, duration, or choose a returned locator explicitly.",
+										}
+									: {}),
+							results: visible,
+						}),
+						maxResponseBytes,
+						true,
+					),
+				);
 			} catch (error) {
 				return failure(error);
 			}

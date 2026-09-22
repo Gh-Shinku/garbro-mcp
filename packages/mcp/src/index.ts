@@ -2,9 +2,9 @@
 
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { constants } from "node:fs";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { WorkspacePolicy } from "@garbro-mcp/core";
+import { parseResourceCatalog, WorkspacePolicy } from "@garbro-mcp/core";
 import { BUILD_IDENTITY } from "./build.js";
 import { buildServer } from "./server.js";
 
@@ -14,6 +14,7 @@ async function main(): Promise<void> {
 			"input-root": { type: "string", multiple: true },
 			"output-root": { type: "string", multiple: true },
 			"expected-build-id": { type: "string" },
+			"resource-catalog": { type: "string", multiple: true },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
 			help: { type: "boolean", short: "h" },
@@ -28,6 +29,7 @@ Options:
   --input-root <id=path>    Add a named readable root (repeatable)
   --output-root [id=]<path> Add a writable root (repeatable with IDs)
   --expected-build-id <id> Refuse to start a different build
+  --resource-catalog <path> Load an external alias catalog (repeatable)
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
   -v, --version             Show the server version
@@ -93,6 +95,14 @@ Options:
 		...(outputRoot === undefined ? {} : { outputRoot }),
 		...(outputRoots === undefined ? {} : { outputRoots }),
 	});
+	const resourceCatalogs = await Promise.all(
+		(values["resource-catalog"] ?? []).map(async (path) =>
+			parseResourceCatalog(JSON.parse(await readFile(path, "utf8"))),
+		),
+	);
+	const resourceAliases = resourceCatalogs.flatMap(
+		(catalog) => catalog.resources,
+	);
 
 	if (values.doctor) {
 		await workspace.prepare();
@@ -104,6 +114,7 @@ Options:
 			inputRoots: workspace.inputRoots,
 			outputRoot: workspace.outputRoot,
 			outputRoots: workspace.outputRoots,
+			resourceCatalogEntries: resourceAliases.length,
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,
@@ -114,6 +125,7 @@ Options:
 	void serveStdio(() =>
 		buildServer({
 			workspace,
+			resourceAliases,
 		}),
 	);
 	console.error("garbro-mcp server running on stdio");
