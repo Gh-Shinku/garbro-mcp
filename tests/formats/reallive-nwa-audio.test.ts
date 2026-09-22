@@ -1,6 +1,10 @@
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	type ByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	createRealliveNwaAudioFormat,
@@ -13,6 +17,30 @@ import {
 const HEAD_SIZE = 0x28;
 const DATA_OFFSET = 0x2c;
 const PLACES_PER_WORD = 8;
+
+class TrackingByteSource implements ByteSource {
+	readonly inner: BufferByteSource;
+	readonly size: bigint;
+	maxReadAt = 0;
+
+	constructor(buffer: Buffer) {
+		this.inner = new BufferByteSource(buffer);
+		this.size = this.inner.size;
+	}
+
+	async readAt(offset: bigint, length: number): Promise<Buffer> {
+		this.maxReadAt = Math.max(this.maxReadAt, length);
+		return await this.inner.readAt(offset, length);
+	}
+
+	createReadStream(offset: bigint, length: bigint) {
+		return this.inner.createReadStream(offset, length);
+	}
+
+	async close(): Promise<void> {
+		await this.inner.close();
+	}
+}
 
 function packLsb(bits: number[]): Buffer {
 	const out = Buffer.alloc(Math.ceil(bits.length / PLACES_PER_WORD));
@@ -381,6 +409,32 @@ describe("RealLive engine audio format", () => {
 			durationSeconds: 3 / 8000,
 		});
 		expect(wav.subarray(0x2c)).toEqual(Buffer.from([0x11, 0x22, 0x33]));
+	});
+
+	it("streams long raw sounds without reading the complete source into memory", async () => {
+		const pcmSize = 1024 * 1024;
+		const file = Buffer.concat([
+			head({
+				channels: 1,
+				bps: 8,
+				compression: -1,
+				blockCount: 0,
+				pcmSize,
+				sampleCount: pcmSize,
+				blockSize: pcmSize,
+			}),
+			Buffer.alloc(4),
+			Buffer.alloc(pcmSize, 0x55),
+		]);
+		const source = new TrackingByteSource(file);
+		const handle = await realliveNwaAudioFormat.open(source, "long-raw.nwa");
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const wav = await consumeBuffer(await handle.openEntry(entry.id));
+		expect(source.maxReadAt).toBeLessThanOrEqual(DATA_OFFSET);
+		expect(wav.length).toBe(44 + pcmSize);
+		expect(wav.subarray(44, 48)).toEqual(Buffer.alloc(4, 0x55));
+		await handle.close();
 	});
 
 	it("accepts structurally valid long sounds above the old eight MiB limit", () => {

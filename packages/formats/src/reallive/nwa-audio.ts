@@ -10,7 +10,7 @@ import {
 	createFixedEntry,
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
-import { writeWave } from "../shared/wav.js";
+import { writeWave, writeWaveHeader } from "../shared/wav.js";
 
 const HEAD_SIZE = 0x28;
 const PCM_SIZE_FIELD = 0x14;
@@ -362,6 +362,114 @@ export function readNwaWave(data: Buffer, layout: NwaLayout): Buffer {
 	);
 }
 
+function waveFormat(layout: NwaLayout) {
+	const blockAlign = (layout.channels * layout.bitsPerSample) / PLACES_PER_WORD;
+	return {
+		formatTag: 1,
+		channels: layout.channels,
+		sampleRate: layout.samplesPerSecond,
+		blockAlign,
+		averageBytesPerSecond: blockAlign * layout.samplesPerSecond,
+		bitsPerSample: layout.bitsPerSample,
+	};
+}
+
+async function readNwaSourceLayout(
+	source: ByteSource,
+	maxDecodedBytes: number,
+): Promise<{ layout: NwaLayout; offsets: number[] }> {
+	if (source.size > BigInt(Number.MAX_SAFE_INTEGER))
+		throw invalidSound("NWA source is too large for safe integer offsets");
+	const header = Buffer.from(
+		await source.readAt(0n, Math.min(Number(source.size), DATA_OFFSET)),
+	);
+	const layout = readNwaLayout(header, Number(source.size), maxDecodedBytes);
+	if (!layout) throw invalidSound("Not a sound of this kind");
+	if (layout.compression === RAW_COMPRESSION) return { layout, offsets: [] };
+	const tableBytes = layout.blockCount * 4;
+	if (
+		!Number.isSafeInteger(tableBytes) ||
+		tableBytes <= 0 ||
+		BigInt(DATA_OFFSET + tableBytes) > source.size
+	)
+		throw invalidSound("The NWA block table is invalid");
+	const table = await source.readAt(BigInt(DATA_OFFSET), tableBytes);
+	const offsets: number[] = [];
+	const firstDataOffset = DATA_OFFSET + tableBytes;
+	for (let index = 0; index < layout.blockCount; index += 1) {
+		const offset = table.readUInt32LE(index * 4);
+		if (
+			offset < firstDataOffset ||
+			BigInt(offset) >= source.size ||
+			(index > 0 && offset <= (offsets[index - 1] ?? 0))
+		)
+			throw invalidSound("The NWA block offsets are invalid");
+		offsets.push(offset);
+	}
+	return { layout, offsets };
+}
+
+function decodeNwaBlockBuffer(
+	data: Buffer,
+	layout: NwaLayout,
+	blockSize: number,
+): Buffer {
+	const bytesPerSample = layout.bitsPerSample / PLACES_PER_WORD;
+	const output = Buffer.alloc(blockSize * bytesPerSample);
+	const written = decodeNwaBlock(
+		data,
+		new NwaBitReader(data, 0),
+		layout,
+		output,
+		0,
+		blockSize,
+	);
+	if (written !== output.length)
+		throw invalidSound(
+			`The NWA block decoder produced ${written} bytes instead of ${output.length}`,
+		);
+	return output;
+}
+
+function openNwaWaveStream(
+	source: ByteSource,
+	layout: NwaLayout,
+	offsets: readonly number[],
+): Readable {
+	return Readable.from(
+		(async function* () {
+			yield writeWaveHeader(waveFormat(layout), layout.pcmSize);
+			if (layout.compression === RAW_COMPRESSION) {
+				for await (const chunk of source.createReadStream(
+					BigInt(DATA_OFFSET),
+					BigInt(layout.pcmSize),
+				))
+					yield chunk;
+				return;
+			}
+			let produced = 0;
+			for (let index = 0; index < offsets.length; index += 1) {
+				const offset = offsets[index] ?? 0;
+				const nextOffset = offsets[index + 1] ?? Number(source.size);
+				if (nextOffset <= offset)
+					throw invalidSound("The NWA block offsets are invalid");
+				const stored = await source.readAt(BigInt(offset), nextOffset - offset);
+				const blockSize =
+					index === offsets.length - 1 && layout.finalBlockSize > 0
+						? layout.finalBlockSize
+						: layout.blockSize;
+				const decoded = decodeNwaBlockBuffer(stored, layout, blockSize);
+				produced += decoded.length;
+				yield decoded;
+			}
+			if (produced !== layout.pcmSize)
+				throw invalidSound(
+					`The NWA decoder produced ${produced} PCM bytes instead of ${layout.pcmSize}`,
+				);
+		})(),
+	);
+}
+
 export const realliveNwaAudioDescriptor: FormatDescriptor = {
 	id: "reallive-nwa-audio",
 	name: "RealLive engine audio format",
@@ -397,21 +505,7 @@ export function createRealliveNwaAudioFormat(
 		async detect(source: ByteSource): Promise<boolean> {
 			if (source.size < BigInt(HEAD_SIZE)) return false;
 			try {
-				const data = Buffer.from(
-					await source.readAt(0n, Math.min(Number(source.size), 0x1000)),
-				);
-				const layout = readNwaLayout(
-					data,
-					Number(source.size),
-					maxDecodedBytes,
-				);
-				if (!layout) return false;
-				if (
-					layout.compression !== RAW_COMPRESSION &&
-					layout.blockCount > 0 &&
-					DATA_OFFSET + layout.blockCount * 4 > source.size
-				)
-					return false;
+				await readNwaSourceLayout(source, maxDecodedBytes);
 				return true;
 			} catch (error) {
 				if (error instanceof GarbroError && error.code === "LIMIT_EXCEEDED")
@@ -420,13 +514,7 @@ export function createRealliveNwaAudioFormat(
 			}
 		},
 		async read(source: ByteSource, sourcePath: string) {
-			const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-			const layout = readNwaLayout(
-				stored,
-				Number(source.size),
-				maxDecodedBytes,
-			);
-			if (!layout) throw invalidSound("Not a sound of this kind");
+			const { layout } = await readNwaSourceLayout(source, maxDecodedBytes);
 			return {
 				entries: [
 					createFixedEntry({
@@ -446,14 +534,11 @@ export function createRealliveNwaAudioFormat(
 			};
 		},
 		async openEntry(source: ByteSource) {
-			const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-			const layout = readNwaLayout(
-				stored,
-				Number(source.size),
+			const { layout, offsets } = await readNwaSourceLayout(
+				source,
 				maxDecodedBytes,
 			);
-			if (!layout) throw invalidSound("Not a sound of this kind");
-			return Readable.from([readNwaWave(stored, layout)]);
+			return openNwaWaveStream(source, layout, offsets);
 		},
 	});
 }

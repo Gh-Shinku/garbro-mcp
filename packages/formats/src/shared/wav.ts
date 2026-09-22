@@ -66,5 +66,10 @@ export function readWave(buffer: Buffer): WavLayout | undefined {
  * ports that use this report `sizeKnown: false`.
  */
 export function writeWave(format: WavFormat, pcm: Buffer): Buffer {
-	return Buffer.concat([writeRiffHeader(format, pcm.length), pcm]);
+	return Buffer.concat([writeWaveHeader(format, pcm.length), pcm]);
+}
+
+/** Writes only the canonical 44-byte header for streaming PCM producers. */
+export function writeWaveHeader(format: WavFormat, dataSize: number): Buffer {
+	return writeRiffHeader(format, dataSize);
 }
