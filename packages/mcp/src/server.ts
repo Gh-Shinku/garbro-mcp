@@ -252,6 +252,8 @@ function batchItemToWire(item: ExtractionResult["items"][number]) {
 		entryId: item.entryId,
 		...(item.entryPath === undefined ? {} : { entryPath: item.entryPath }),
 		status: item.status,
+		formatId: item.formatId,
+		decoderId: item.decoderId,
 		error: {
 			code: item.error.code,
 			message: item.error.message.slice(0, 2048),
@@ -864,7 +866,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"extract_entries",
 		{
 			description:
-				"Extract entries with compact counts and a saved report. Use reportPath instead of source to page the report without extracting again.",
+				"Extract entries with compact counts and a saved report. Always check hasFailures and each item status. Use reportPath instead of source to page the report without extracting again.",
 			inputSchema: z.object({
 				source: sourceSchema.optional(),
 				reportPath: z.string().min(1).optional(),
@@ -896,6 +898,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			outputSchema: successOrFailure(
 				z.object({
 					status: z.enum(["completed", "partial", "failed"]),
+					hasFailures: z.boolean(),
 					outputDirectory: z.string(),
 					selected: z.number().int().nonnegative(),
 					extracted: z.number().int().nonnegative(),
@@ -926,6 +929,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 								entryId: z.string(),
 								entryPath: z.string().optional(),
 								status: z.literal("failed"),
+								formatId: z.string(),
+								decoderId: z.string(),
 								error: errorSchema,
 							}),
 						]),
@@ -991,6 +996,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							page,
 							(visible) => ({
 								...stored,
+								hasFailures: stored.failed > 0,
 								items: visible,
 								report: {
 									...loaded.artifact,
@@ -1074,6 +1080,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						inlineItems,
 						(visible) => ({
 							status: result.status,
+							hasFailures: result.hasFailures,
 							outputDirectory: result.outputDirectory,
 							selected: result.selected,
 							extracted: result.extracted,

@@ -198,6 +198,7 @@ describe("MCP server", () => {
 		expect(extracted.isError).not.toBe(true);
 		expect(extracted.structuredContent).toMatchObject({
 			status: "partial",
+			hasFailures: true,
 			extracted: 1,
 			failed: 1,
 			bytesWritten: "10",
@@ -206,6 +207,8 @@ describe("MCP server", () => {
 				{
 					entryId: "missing",
 					status: "failed",
+					formatId: "xp3",
+					decoderId: "xp3",
 					error: { code: "ENTRY_NOT_FOUND" },
 				},
 			],
@@ -422,6 +425,7 @@ describe("MCP server", () => {
 		});
 		expect(result.structuredContent).toMatchObject({
 			status: "completed",
+			hasFailures: false,
 			extracted: 3,
 			reportError: { code: "UNSAFE_PATH" },
 		});
