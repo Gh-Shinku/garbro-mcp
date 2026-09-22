@@ -68,6 +68,8 @@ export interface ArchiveDetectionHints {
 	readonly signatures?: readonly ByteSignature[];
 	readonly priority?: number;
 	readonly extensionFallback?: boolean;
+	/** Do not offer this format when the source extension is absent from its descriptor. */
+	readonly extensionOnly?: boolean;
 }
 
 export interface ArchiveFormat {

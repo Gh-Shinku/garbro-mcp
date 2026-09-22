@@ -139,8 +139,10 @@ export class FormatRegistry {
 					(candidate) => candidate.toLowerCase() === extension,
 				),
 			}))
-			.filter(({ format, signatureMatch }) => {
+			.filter(({ format, signatureMatch, extensionMatch }) => {
 				const signatures = format.detection?.signatures;
+				if (format.detection?.extensionOnly === true && !extensionMatch)
+					return false;
 				return (
 					signatureMatch ||
 					!signatures ||

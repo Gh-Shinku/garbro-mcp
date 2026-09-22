@@ -29,6 +29,7 @@ function testFormat(
 		signature?: Uint8Array;
 		priority?: number;
 		extensionFallback?: boolean;
+		extensionOnly?: boolean;
 		detected?: boolean;
 		onDetect?: () => void;
 		openError?: boolean;
@@ -57,6 +58,9 @@ function testFormat(
 			...(options.extensionFallback === undefined
 				? {}
 				: { extensionFallback: options.extensionFallback }),
+			...(options.extensionOnly === undefined
+				? {}
+				: { extensionOnly: options.extensionOnly }),
 		},
 		async detect() {
 			options.onDetect?.();
@@ -136,6 +140,23 @@ describe("FormatRegistry detection catalog", () => {
 		await expect(registry.detectArchive(path)).resolves.toMatchObject({
 			format: { id: "variant" },
 		});
+	});
+
+	it("does not offer extension-bound formats for unrelated files", async () => {
+		const path = await fixture("picture.ico", Buffer.from("ambiguous payload"));
+		let calls = 0;
+		const registry = new FormatRegistry([
+			testFormat("legacy", {
+				extensions: ["spl"],
+				extensionOnly: true,
+				onDetect: () => {
+					calls += 1;
+				},
+			}),
+		]);
+
+		await expect(registry.detectArchive(path)).resolves.toBeUndefined();
+		expect(calls).toBe(0);
 	});
 
 	it("skips detected candidates whose complete structure is invalid", async () => {
