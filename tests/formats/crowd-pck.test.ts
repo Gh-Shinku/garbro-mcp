@@ -1,10 +1,10 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import {
 	type ArchiveFormat,
 	BufferByteSource,
 	encodeCp932,
 } from "@garbro-mcp/core";
 import { crowdPckFormat, crowdPkwvFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -141,6 +141,11 @@ const STEREO_8: WaveFormat = {
 };
 
 describe("Crowd engine resource archive (PCK)", () => {
+	it("uses its extension to guard the signatureless layout", () => {
+		expect(crowdPckFormat.descriptor.extensions).toEqual(["pck"]);
+		expect(crowdPckFormat.detection?.extensionOnly).toBe(true);
+	});
+
 	it("lists entries whose names follow the records", async () => {
 		const first = Buffer.from("first crowd payload");
 		const second = Buffer.from("second");

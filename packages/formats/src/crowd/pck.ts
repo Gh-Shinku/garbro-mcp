@@ -1,14 +1,14 @@
 // Format reference: GARBro ArcFormats/Crowd/ArcPCK.cs, classes `PckOpener` and `PkwOpener`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -220,7 +220,7 @@ const openCrowdPkwvEntry: FixedEntryOpener = async (source, entry) => {
 export const crowdPckDescriptor: FormatDescriptor = {
 	id: "crowd-pck",
 	name: "Crowd engine resource archive",
-	extensions: [],
+	extensions: ["pck"],
 	capabilities: {
 		detect: true,
 		list: true,
@@ -247,7 +247,7 @@ export const crowdPkwvDescriptor: FormatDescriptor = {
 
 export const crowdPckFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: crowdPckDescriptor,
-	detection: { signatures: [] },
+	detection: { signatures: [], extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		try {
 			const entries = await readCrowdPck(source);
