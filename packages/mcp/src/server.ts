@@ -1634,6 +1634,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			inputSchema: z.object({
 				sources: z.array(sourceSchema).min(1).max(32),
 				outputRootId: z.string().min(1).optional(),
+				budgets: extractionBudgetsSchema.optional(),
 				inline: z.enum(["summary", "errors", "all"]).default("errors"),
 				itemLimit: z.number().int().min(0).max(100).default(10),
 				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
@@ -1667,6 +1668,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			{
 				sources,
 				outputRootId,
+				budgets,
 				inline,
 				itemLimit,
 				conflictPolicy,
@@ -1677,17 +1679,131 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			context,
 		) => {
 			try {
+				const coreBudgets = budgetsFromWire(budgets);
+				const baseControl = toControl(context);
+				const timeoutSignal =
+					coreBudgets?.timeoutMs === undefined
+						? undefined
+						: AbortSignal.timeout(coreBudgets.timeoutMs);
+				const batchSignal =
+					baseControl.signal === undefined
+						? timeoutSignal
+						: timeoutSignal === undefined
+							? baseControl.signal
+							: AbortSignal.any([baseControl.signal, timeoutSignal]);
+				const batchControl = {
+					...baseControl,
+					...(batchSignal === undefined ? {} : { signal: batchSignal }),
+				};
+				const plans = await Promise.all(
+					sources.map(async (source) => {
+						try {
+							return await automation.planExtraction(
+								source,
+								{
+									conflictPolicy,
+									...(outputRootId === undefined ? {} : { outputRootId }),
+									...(coreBudgets === undefined
+										? {}
+										: { budgets: coreBudgets }),
+								},
+								batchControl,
+							);
+						} catch (error) {
+							if (batchSignal?.aborted) throw error;
+							return undefined;
+						}
+					}),
+				);
+				if (coreBudgets !== undefined) {
+					const ready = plans.reduce(
+						(total, plan) => total + (plan?.ready ?? 0),
+						0,
+					);
+					const inputBytes = plans.reduce(
+						(total, plan) => total + (plan?.inputBytes ?? 0n),
+						0n,
+					);
+					const knownOutputBytes = plans.reduce(
+						(total, plan) => total + (plan?.outputBytes ?? 0n),
+						0n,
+					);
+					const unknownOutputSizes = plans.reduce(
+						(total, plan) => total + (plan?.unknownOutputSizes ?? 0),
+						0,
+					);
+					const violations: Array<Record<string, string>> = [];
+					if (
+						coreBudgets.maxResources !== undefined &&
+						ready > coreBudgets.maxResources
+					)
+						violations.push({
+							budget: "maxResources",
+							actual: String(ready),
+							limit: String(coreBudgets.maxResources),
+						});
+					if (
+						coreBudgets.maxInputBytes !== undefined &&
+						inputBytes > coreBudgets.maxInputBytes
+					)
+						violations.push({
+							budget: "maxInputBytes",
+							actual: inputBytes.toString(),
+							limit: coreBudgets.maxInputBytes.toString(),
+						});
+					if (
+						coreBudgets.maxOutputBytes !== undefined &&
+						unknownOutputSizes === 0 &&
+						knownOutputBytes > coreBudgets.maxOutputBytes
+					)
+						violations.push({
+							budget: "maxOutputBytes",
+							actual: knownOutputBytes.toString(),
+							limit: coreBudgets.maxOutputBytes.toString(),
+						});
+					const planViolations = plans.flatMap((plan) =>
+						(plan?.budgetViolations ?? [])
+							.filter(
+								(violation) =>
+									violation.budget === "maxDecodedBytesPerResource",
+							)
+							.map((violation) => ({
+								budget: violation.budget,
+								actual: violation.actual.toString(),
+								limit: violation.limit.toString(),
+							})),
+					);
+					violations.push(...planViolations);
+					const unknowns = [
+						...(coreBudgets.maxOutputBytes !== undefined &&
+						unknownOutputSizes > 0
+							? ["maxOutputBytes"]
+							: []),
+						...plans.flatMap((plan) => plan?.budgetUnknowns ?? []),
+					];
+					if (violations.length > 0 || unknowns.length > 0)
+						throw new GarbroError(
+							"LIMIT_EXCEEDED",
+							"Resource batch exceeds or cannot prove the requested total budgets",
+							{ details: { violations, unknowns } },
+						);
+				}
 				await workspace.prepare();
 				const results: Array<Record<string, unknown>> = [];
-				for (const source of sources) {
+				for (const [sourceIndex, source] of sources.entries()) {
 					try {
+						const plan = plans[sourceIndex];
 						const result = await automation.extractEntries(
 							source,
 							{
 								conflictPolicy,
 								...(outputRootId === undefined ? {} : { outputRootId }),
+								...(coreBudgets === undefined ? {} : { budgets: coreBudgets }),
+								...(plan === undefined
+									? {}
+									: { expectedPlanDigest: plan.planDigest }),
 							},
-							toControl(context),
+							batchControl,
 						);
 						let report: Record<string, unknown> | undefined;
 						let reportError:

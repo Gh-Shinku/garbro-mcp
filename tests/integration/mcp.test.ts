@@ -483,6 +483,35 @@ describe("MCP server", () => {
 		});
 	});
 
+	it("preflights total resource-batch budgets before writing", async () => {
+		const { client, output } = await connect();
+		const result = await client.callTool({
+			name: "extract_resources",
+			arguments: {
+				sources: [
+					{ rootId: "games", path: "basic.xp3" },
+					{ rootId: "games", path: "basic.xp3" },
+				],
+				budgets: { maxResources: 5, maxOutputBytes: "2048" },
+			},
+		});
+		expect(result).toMatchObject({
+			isError: true,
+			structuredContent: {
+				outcome: { status: "failed" },
+				error: {
+					code: "LIMIT_EXCEEDED",
+					details: {
+						violations: [{ budget: "maxResources", actual: "6", limit: "5" }],
+					},
+				},
+			},
+		});
+		await expect(stat(resolve(output, "games"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+	});
+
 	it("bounds default catalog responses and retains opt-in details", async () => {
 		const { client } = await connect();
 		const result = await client.callTool({ name: "list_formats" });
