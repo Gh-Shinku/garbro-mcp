@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	bananaGecImageFormat,
@@ -275,6 +275,8 @@ describe("Yellow Pig image format", () => {
 
 	it("is told by the words of the head of the picture", async () => {
 		expect(bananaGecImageFormat.descriptor.id).toBe("banana-gec-image");
+		expect(bananaGecImageFormat.descriptor.extensions).toEqual(["gec"]);
+		expect(bananaGecImageFormat.detection?.extensionOnly).toBe(true);
 		const file = Buffer.concat([
 			head({ type: 0, width: 2, height: 1 }),
 			Buffer.alloc(16),

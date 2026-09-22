@@ -1,10 +1,10 @@
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -381,7 +381,7 @@ export function unpackGecPicture(
 export const bananaGecImageDescriptor: FormatDescriptor = {
 	id: "banana-gec-image",
 	name: "Yellow Pig image format",
-	extensions: [],
+	extensions: ["gec"],
 	capabilities: {
 		detect: true,
 		list: true,
@@ -401,7 +401,7 @@ export const bananaGecImageDescriptor: FormatDescriptor = {
 
 export const bananaGecImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: bananaGecImageDescriptor,
-	detection: { signatures: [], priority: -1 },
+	detection: { signatures: [], priority: -1, extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
 		try {
