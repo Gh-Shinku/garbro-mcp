@@ -2,19 +2,19 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
 const COUNT_OFFSET = 4;
@@ -107,7 +107,12 @@ async function readTigermanPac(source: ByteSource): Promise<{
 export const tigermanPacFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: tigermanPacDescriptor,
 	async detect(source: ByteSource): Promise<boolean> {
-		return (await parseHeader(source)) !== undefined;
+		try {
+			await readTigermanPac(source);
+			return true;
+		} catch {
+			return false;
+		}
 	},
 	read: readTigermanPac,
 });

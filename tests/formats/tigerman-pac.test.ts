@@ -1,7 +1,7 @@
-import { encodeCp932 } from "@garbro-mcp/core";
+import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
 import { tigermanPacFormat } from "@garbro-mcp/formats";
+import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
-import { describe, it } from "vitest";
 
 function buildTigerman(entries: { name: string; content: Buffer }[]): Buffer {
 	const indexOffset = 0x14;
@@ -38,5 +38,23 @@ describe("Tigerman Project PAC archive", () => {
 			],
 			metadata: { entryCount: 2 },
 		});
+	});
+
+	it("does not claim a shallow header whose complete index is invalid", async () => {
+		const invalid = Buffer.alloc(0x40);
+		invalid.writeInt32LE(0, 0);
+		invalid.writeInt32LE(1, 4);
+		await expect(
+			tigermanPacFormat.detect(new BufferByteSource(invalid), "Gameexe.dat"),
+		).resolves.toBe(false);
+	});
+
+	it("validates the complete index during detection", async () => {
+		const archive = buildTigerman([
+			{ name: "data.bin", content: Buffer.from("plain") },
+		]);
+		await expect(
+			tigermanPacFormat.detect(new BufferByteSource(archive), "data.pac"),
+		).resolves.toBe(true);
 	});
 });
