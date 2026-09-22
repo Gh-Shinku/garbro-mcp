@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
 import { matchesGlob, relative, resolve, sep } from "node:path";
@@ -124,6 +125,49 @@ export type ExtractionSelection =
 	  };
 
 export type ConflictPolicy = "fail" | "skip" | "overwrite";
+
+export interface ExtractionBudgets {
+	maxResources?: number;
+	maxInputBytes?: bigint;
+	maxOutputBytes?: bigint;
+	maxDecodedBytesPerResource?: bigint;
+	timeoutMs?: number;
+}
+
+export interface ExtractionBudgetViolation {
+	budget: keyof Omit<ExtractionBudgets, "timeoutMs">;
+	actual: bigint;
+	limit: bigint;
+}
+
+export interface ExtractionPlanItem {
+	entryId: string;
+	entryPath?: string;
+	packedBytes?: bigint;
+	outputBytes?: bigint;
+	decodedBytes?: bigint;
+	status: "ready" | "skipped" | "failed";
+	reason?: string;
+	error?: GarbroError;
+}
+
+export interface ExtractionPlan {
+	source: InputReference;
+	formatId: string;
+	outputRootId: string;
+	outputDirectory: string;
+	selected: number;
+	ready: number;
+	skipped: number;
+	failed: number;
+	inputBytes: bigint;
+	outputBytes: bigint | null;
+	unknownOutputSizes: number;
+	budgetViolations: ExtractionBudgetViolation[];
+	budgetUnknowns: Array<"maxOutputBytes" | "maxDecodedBytesPerResource">;
+	items: ExtractionPlanItem[];
+	planDigest: string;
+}
 
 export interface ExtractedArtifact {
 	outputRootId: string;
@@ -283,6 +327,68 @@ async function pathInfo(
 		if (code === "ENOENT") return undefined;
 		throw error;
 	}
+}
+
+interface SelectedCandidate {
+	id: string;
+	entry: ArchiveEntry | undefined;
+}
+
+function selectCandidates(
+	archive: ArchiveHandle,
+	selection: ExtractionSelection,
+): SelectedCandidate[] {
+	if (selection.mode === "ids")
+		return [...new Set(selection.entryIds)].map((id) => ({
+			id,
+			entry: archive.entries.find((entry) => entry.id === id),
+		}));
+	const entries = filterArchiveEntries(archive.entries, {
+		includeGlobs: selection.mode === "glob" ? selection.includeGlobs : ["**/*"],
+		...(selection.excludeGlobs === undefined
+			? {}
+			: { excludeGlobs: selection.excludeGlobs }),
+		...(selection.mode === "glob" && selection.caseSensitive !== undefined
+			? { caseSensitive: selection.caseSensitive }
+			: {}),
+	});
+	return entries.map((entry) => ({ id: entry.id, entry }));
+}
+
+function validateExtractionBudgets(budgets: ExtractionBudgets): void {
+	if (
+		budgets.maxResources !== undefined &&
+		(!Number.isSafeInteger(budgets.maxResources) || budgets.maxResources <= 0)
+	)
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			"maxResources must be a positive integer",
+		);
+	if (
+		budgets.timeoutMs !== undefined &&
+		(!Number.isSafeInteger(budgets.timeoutMs) || budgets.timeoutMs <= 0)
+	)
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			"timeoutMs must be a positive integer",
+		);
+	for (const [name, value] of Object.entries(budgets)) {
+		if (name === "maxResources" || name === "timeoutMs" || value === undefined)
+			continue;
+		if (typeof value !== "bigint" || value <= 0n)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				`${name} must be a positive bigint`,
+			);
+	}
+}
+
+function decodedEntryBytes(entry: ArchiveEntry): bigint | undefined {
+	const value = entry.metadata?.decodedBytes;
+	if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0)
+		return BigInt(value);
+	if (typeof value === "string" && /^\d+$/.test(value)) return BigInt(value);
+	return entry.sizeKnown === false ? undefined : entry.size;
 }
 
 async function removeEmptyDirectoryTree(path: string): Promise<boolean> {
@@ -724,15 +830,87 @@ export class ArchiveAutomationService {
 	}
 
 	async extractEntries(
+		// Kept below planExtraction so callers can always preflight the same selection.
 		source: InputReference,
 		options: {
 			selection?: ExtractionSelection;
 			outputRootId?: string;
 			outputSubdirectory?: string;
 			conflictPolicy?: ConflictPolicy;
+			budgets?: ExtractionBudgets;
+			expectedPlanDigest?: string;
 		},
 		control: AutomationControl = {},
 	): Promise<BatchExtractionResult> {
+		const timeoutSignal =
+			options.budgets?.timeoutMs === undefined
+				? undefined
+				: AbortSignal.timeout(options.budgets.timeoutMs);
+		const operationSignal =
+			control.signal === undefined
+				? timeoutSignal
+				: timeoutSignal === undefined
+					? control.signal
+					: AbortSignal.any([control.signal, timeoutSignal]);
+		const operationControl = {
+			...control,
+			...(operationSignal === undefined ? {} : { signal: operationSignal }),
+		};
+		if (
+			options.budgets !== undefined ||
+			options.expectedPlanDigest !== undefined
+		) {
+			const plan = await this.planExtraction(
+				source,
+				{
+					...(options.selection === undefined
+						? {}
+						: { selection: options.selection }),
+					...(options.outputRootId === undefined
+						? {}
+						: { outputRootId: options.outputRootId }),
+					...(options.outputSubdirectory === undefined
+						? {}
+						: { outputSubdirectory: options.outputSubdirectory }),
+					...(options.conflictPolicy === undefined
+						? {}
+						: { conflictPolicy: options.conflictPolicy }),
+					...(options.budgets === undefined
+						? {}
+						: { budgets: options.budgets }),
+				},
+				operationControl,
+			);
+			if (
+				options.expectedPlanDigest !== undefined &&
+				options.expectedPlanDigest !== plan.planDigest
+			)
+				throw new GarbroError(
+					"PLAN_CHANGED",
+					"Extraction inputs or destinations changed after planning",
+					{
+						details: {
+							expectedPlanDigest: options.expectedPlanDigest,
+							actualPlanDigest: plan.planDigest,
+						},
+					},
+				);
+			if (plan.budgetViolations.length > 0 || plan.budgetUnknowns.length > 0)
+				throw new GarbroError(
+					"LIMIT_EXCEEDED",
+					"Extraction plan exceeds or cannot prove the requested budgets",
+					{
+						details: {
+							violations: plan.budgetViolations.map((violation) => ({
+								...violation,
+								actual: violation.actual.toString(),
+								limit: violation.limit.toString(),
+							})),
+							unknowns: plan.budgetUnknowns,
+						},
+					},
+				);
+		}
 		const resolved = await this.workspace.resolveInput(source, "file");
 		const defaultOutput = `${source.rootId}/${resolved.relativePath}.extracted`;
 		const outputRelative = options.outputSubdirectory ?? defaultOutput;
@@ -756,26 +934,7 @@ export class ArchiveAutomationService {
 		const conflictPolicy = options.conflictPolicy ?? "fail";
 		return await this.#withArchive(resolved.absolutePath, async (archive) => {
 			const selection = options.selection ?? { mode: "all" as const };
-			let selected: Array<{ id: string; entry: ArchiveEntry | undefined }>;
-			if (selection.mode === "ids") {
-				const ids = [...new Set(selection.entryIds)];
-				selected = ids.map((id) => ({
-					id,
-					entry: archive.entries.find((entry) => entry.id === id),
-				}));
-			} else {
-				const entries = filterArchiveEntries(archive.entries, {
-					includeGlobs:
-						selection.mode === "glob" ? selection.includeGlobs : ["**/*"],
-					...(selection.excludeGlobs === undefined
-						? {}
-						: { excludeGlobs: selection.excludeGlobs }),
-					...(selection.mode === "glob" && selection.caseSensitive !== undefined
-						? { caseSensitive: selection.caseSensitive }
-						: {}),
-				});
-				selected = entries.map((entry) => ({ id: entry.id, entry }));
-			}
+			const selected = selectCandidates(archive, selection);
 			if (selected.length > this.limits.maxBatchEntries)
 				throw new GarbroError(
 					"LIMIT_EXCEEDED",
@@ -867,7 +1026,7 @@ export class ArchiveAutomationService {
 			let skipped = 0;
 			let failed = 0;
 			for (const [index, candidate] of selected.entries()) {
-				throwIfCancelled(control.signal);
+				throwIfCancelled(operationControl.signal);
 				const entry = candidate.entry;
 				try {
 					const planned = preflight.get(candidate.id);
@@ -896,7 +1055,9 @@ export class ArchiveAutomationService {
 						outputDirectory,
 						safetyRoot: outputRoot,
 						overwrite: conflictPolicy === "overwrite",
-						...(control.signal === undefined ? {} : { signal: control.signal }),
+						...(operationControl.signal === undefined
+							? {}
+							: { signal: operationControl.signal }),
 					});
 					const artifactRelative = toPosix(
 						relative(outputRoot, result.outputPath),
@@ -916,7 +1077,7 @@ export class ArchiveAutomationService {
 						},
 					});
 				} catch (error) {
-					if (control.signal?.aborted)
+					if (operationControl.signal?.aborted)
 						throw new GarbroError("CANCELLED", "Operation was cancelled", {
 							cause: error,
 						});
@@ -933,7 +1094,7 @@ export class ArchiveAutomationService {
 						error: asGarbroError(error),
 					});
 				} finally {
-					await control.onProgress?.({
+					await operationControl.onProgress?.({
 						progress: index + 1,
 						total: selected.length,
 						message: entry?.path ?? candidate.id,
@@ -959,6 +1120,223 @@ export class ArchiveAutomationService {
 				failed,
 				bytesWritten,
 				items,
+			};
+		});
+	}
+
+	async planExtraction(
+		source: InputReference,
+		options: {
+			selection?: ExtractionSelection;
+			outputRootId?: string;
+			outputSubdirectory?: string;
+			conflictPolicy?: ConflictPolicy;
+			budgets?: ExtractionBudgets;
+		},
+		control: AutomationControl = {},
+	): Promise<ExtractionPlan> {
+		validateExtractionBudgets(options.budgets ?? {});
+		const resolved = await this.workspace.resolveInput(source, "file");
+		const sourceInfo = await lstat(resolved.absolutePath);
+		const defaultOutput = `${source.rootId}/${resolved.relativePath}.extracted`;
+		const outputRelative = options.outputSubdirectory ?? defaultOutput;
+		const outputRootId =
+			options.outputRootId ?? this.workspace.outputRoots[0]?.id ?? "default";
+		const { absolute: outputDirectory } = this.workspace.resolveOutputPath(
+			outputRelative,
+			outputRootId,
+		);
+		const conflictPolicy = options.conflictPolicy ?? "fail";
+		return await this.#withArchive(resolved.absolutePath, async (archive) => {
+			const selection = options.selection ?? { mode: "all" as const };
+			const selected = selectCandidates(archive, selection);
+			if (selected.length > this.limits.maxBatchEntries)
+				throw new GarbroError(
+					"LIMIT_EXCEEDED",
+					`Selection exceeds ${this.limits.maxBatchEntries} entries`,
+				);
+			const destinations = new Map<string, string[]>();
+			for (const candidate of selected) {
+				if (!candidate.entry) continue;
+				try {
+					const destination = resolveEntryOutputPath(
+						outputDirectory,
+						candidate.entry.path,
+					);
+					const key =
+						process.platform === "win32"
+							? destination.toLowerCase()
+							: destination;
+					const ids = destinations.get(key) ?? [];
+					ids.push(candidate.id);
+					destinations.set(key, ids);
+				} catch {
+					// The preflight pass below preserves the precise path error.
+				}
+			}
+			const duplicateIds = new Set(
+				[...destinations.values()].filter((ids) => ids.length > 1).flat(),
+			);
+			const items: ExtractionPlanItem[] = [];
+			let inputBytes = 0n;
+			let outputBytes = 0n;
+			let unknownOutputSizes = 0;
+			let ready = 0;
+			let skipped = 0;
+			let failed = 0;
+			for (const candidate of selected) {
+				throwIfCancelled(control.signal);
+				if (!candidate.entry) {
+					const error = new GarbroError(
+						"ENTRY_NOT_FOUND",
+						`Archive entry not found: ${candidate.id}`,
+					);
+					items.push({
+						entryId: candidate.id,
+						status: "failed",
+						error,
+					});
+					failed += 1;
+					continue;
+				}
+				const entry = candidate.entry;
+				const decodedBytes = decodedEntryBytes(entry);
+				const base = {
+					entryId: candidate.id,
+					entryPath: entry.path,
+					packedBytes: entry.packedSize,
+					...(entry.sizeKnown === false ? {} : { outputBytes: entry.size }),
+					...(decodedBytes === undefined ? {} : { decodedBytes }),
+				};
+				try {
+					if (duplicateIds.has(candidate.id))
+						throw new GarbroError(
+							"UNSAFE_PATH",
+							`Multiple entries resolve to the same output path: ${entry.path}`,
+						);
+					const destination = resolveEntryOutputPath(
+						outputDirectory,
+						entry.path,
+					);
+					const info = await pathInfo(destination);
+					if (info && conflictPolicy === "skip") {
+						items.push({ ...base, status: "skipped", reason: "output exists" });
+						skipped += 1;
+						continue;
+					}
+					if (info && conflictPolicy === "fail")
+						throw new GarbroError(
+							"OUTPUT_EXISTS",
+							`Output already exists: ${destination}`,
+						);
+					if (
+						info &&
+						conflictPolicy === "overwrite" &&
+						(info.isSymbolicLink() || !info.isFile())
+					)
+						throw new GarbroError(
+							"UNSAFE_PATH",
+							`Refusing to overwrite a non-regular file: ${destination}`,
+						);
+					items.push({ ...base, status: "ready" });
+					ready += 1;
+					inputBytes += entry.packedSize;
+					if (entry.sizeKnown === false) unknownOutputSizes += 1;
+					else outputBytes += entry.size;
+				} catch (error) {
+					items.push({
+						...base,
+						status: "failed",
+						error: asGarbroError(error),
+					});
+					failed += 1;
+				}
+			}
+			const budgets = options.budgets ?? {};
+			const budgetViolations: ExtractionBudgetViolation[] = [];
+			if (budgets.maxResources !== undefined && ready > budgets.maxResources)
+				budgetViolations.push({
+					budget: "maxResources",
+					actual: BigInt(ready),
+					limit: BigInt(budgets.maxResources),
+				});
+			if (
+				budgets.maxInputBytes !== undefined &&
+				inputBytes > budgets.maxInputBytes
+			)
+				budgetViolations.push({
+					budget: "maxInputBytes",
+					actual: inputBytes,
+					limit: budgets.maxInputBytes,
+				});
+			if (
+				budgets.maxOutputBytes !== undefined &&
+				unknownOutputSizes === 0 &&
+				outputBytes > budgets.maxOutputBytes
+			)
+				budgetViolations.push({
+					budget: "maxOutputBytes",
+					actual: outputBytes,
+					limit: budgets.maxOutputBytes,
+				});
+			if (budgets.maxDecodedBytesPerResource !== undefined)
+				for (const item of items) {
+					if (
+						item.status === "ready" &&
+						item.decodedBytes !== undefined &&
+						item.decodedBytes > budgets.maxDecodedBytesPerResource
+					)
+						budgetViolations.push({
+							budget: "maxDecodedBytesPerResource",
+							actual: item.decodedBytes,
+							limit: budgets.maxDecodedBytesPerResource,
+						});
+				}
+			const budgetUnknowns: ExtractionPlan["budgetUnknowns"] = [];
+			if (budgets.maxOutputBytes !== undefined && unknownOutputSizes > 0)
+				budgetUnknowns.push("maxOutputBytes");
+			if (
+				budgets.maxDecodedBytesPerResource !== undefined &&
+				items.some(
+					(item) => item.status === "ready" && item.decodedBytes === undefined,
+				)
+			)
+				budgetUnknowns.push("maxDecodedBytesPerResource");
+			const digestValue = JSON.stringify({
+				source: { rootId: source.rootId, path: resolved.relativePath },
+				sourceSize: sourceInfo.size,
+				sourceMtimeMs: sourceInfo.mtimeMs,
+				formatId: archive.format.id,
+				outputRootId,
+				outputDirectory,
+				conflictPolicy,
+				items: items.map((item) => ({
+					...item,
+					packedBytes: item.packedBytes?.toString(),
+					outputBytes: item.outputBytes?.toString(),
+					decodedBytes: item.decodedBytes?.toString(),
+					error:
+						item.error === undefined
+							? undefined
+							: { code: item.error.code, message: item.error.message },
+				})),
+			});
+			return {
+				source: { rootId: source.rootId, path: resolved.relativePath },
+				formatId: archive.format.id,
+				outputRootId,
+				outputDirectory,
+				selected: selected.length,
+				ready,
+				skipped,
+				failed,
+				inputBytes,
+				outputBytes: unknownOutputSizes === 0 ? outputBytes : null,
+				unknownOutputSizes,
+				budgetViolations,
+				budgetUnknowns,
+				items,
+				planDigest: createHash("sha256").update(digestValue).digest("hex"),
 			};
 		});
 	}

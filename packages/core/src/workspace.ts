@@ -220,9 +220,19 @@ export class WorkspacePolicy {
 	}
 
 	async resolveOutputDirectory(path: string, rootId?: string): Promise<string> {
-		const relativePath = normalizeWorkspaceRelativePath(path, true);
-		const outputRoot = this.resolveOutputRoot(rootId);
+		const { outputRoot, absolute } = this.resolveOutputPath(path, rootId);
 		await ensureDirectoryTree(outputRoot);
+		await ensureDirectoryTree(absolute);
+		return absolute;
+	}
+
+	resolveOutputPath(
+		path: string,
+		rootId?: string,
+	): { outputRootId: string; outputRoot: string; absolute: string } {
+		const relativePath = normalizeWorkspaceRelativePath(path, true);
+		const outputRootId = rootId ?? this.outputRoots[0]?.id ?? "default";
+		const outputRoot = this.resolveOutputRoot(outputRootId);
 		const absolute =
 			relativePath === "."
 				? outputRoot
@@ -238,8 +248,7 @@ export class WorkspacePolicy {
 					},
 				},
 			);
-		await ensureDirectoryTree(absolute);
-		return absolute;
+		return { outputRootId, outputRoot, absolute };
 	}
 
 	isOutputPath(path: string): boolean {

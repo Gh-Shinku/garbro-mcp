@@ -5,6 +5,7 @@ import {
 	asGarbroError,
 	DEFAULT_AUTOMATION_LIMITS,
 	entryToWire,
+	type ExtractionSelection,
 	type FormatRegistry,
 	formatToWire,
 	GarbroError,
@@ -37,6 +38,7 @@ const errorCodes = [
 	"ENTRY_NOT_FOUND",
 	"UNSAFE_PATH",
 	"OUTPUT_EXISTS",
+	"PLAN_CHANGED",
 	"LIMIT_EXCEEDED",
 	"CANCELLED",
 	"IO_ERROR",
@@ -51,6 +53,30 @@ const failureSchema = z.object({ error: errorSchema });
 const sourceSchema = z.object({
 	rootId: z.string().min(1),
 	path: z.string().min(1),
+});
+const extractionSelectionSchema = z.discriminatedUnion("mode", [
+	z.object({
+		mode: z.literal("all"),
+		excludeGlobs: z.array(z.string()).max(32).optional(),
+	}),
+	z.object({
+		mode: z.literal("ids"),
+		entryIds: z.array(z.string().min(1)).min(1).max(10000),
+	}),
+	z.object({
+		mode: z.literal("glob"),
+		includeGlobs: z.array(z.string()).min(1).max(32),
+		excludeGlobs: z.array(z.string()).max(32).optional(),
+		caseSensitive: z.boolean().default(false),
+	}),
+]);
+const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
+const extractionBudgetsSchema = z.object({
+	maxResources: z.number().int().positive().max(10000).optional(),
+	maxInputBytes: decimalBytesSchema.optional(),
+	maxOutputBytes: decimalBytesSchema.optional(),
+	maxDecodedBytesPerResource: decimalBytesSchema.optional(),
+	timeoutMs: z.number().int().positive().max(3_600_000).optional(),
 });
 const budgetSchema = z
 	.number()
@@ -124,6 +150,54 @@ function success<const T extends Record<string, unknown>>(payload: T) {
 			"Response exceeds 64 KiB. Request a smaller page or summary detail.",
 		);
 	return toolResult(payload);
+}
+
+function budgetsFromWire(
+	budgets: z.infer<typeof extractionBudgetsSchema> | undefined,
+) {
+	if (budgets === undefined) return undefined;
+	return {
+		...(budgets.maxResources === undefined
+			? {}
+			: { maxResources: budgets.maxResources }),
+		...(budgets.maxInputBytes === undefined
+			? {}
+			: { maxInputBytes: BigInt(budgets.maxInputBytes) }),
+		...(budgets.maxOutputBytes === undefined
+			? {}
+			: { maxOutputBytes: BigInt(budgets.maxOutputBytes) }),
+		...(budgets.maxDecodedBytesPerResource === undefined
+			? {}
+			: {
+					maxDecodedBytesPerResource: BigInt(
+						budgets.maxDecodedBytesPerResource,
+					),
+				}),
+		...(budgets.timeoutMs === undefined
+			? {}
+			: { timeoutMs: budgets.timeoutMs }),
+	};
+}
+
+function selectionFromWire(
+	selection: z.infer<typeof extractionSelectionSchema>,
+): ExtractionSelection {
+	if (selection.mode === "ids") return selection;
+	if (selection.mode === "all")
+		return {
+			mode: "all",
+			...(selection.excludeGlobs === undefined
+				? {}
+				: { excludeGlobs: selection.excludeGlobs }),
+		};
+	return {
+		mode: "glob",
+		includeGlobs: selection.includeGlobs,
+		caseSensitive: selection.caseSensitive,
+		...(selection.excludeGlobs === undefined
+			? {}
+			: { excludeGlobs: selection.excludeGlobs }),
+	};
 }
 
 function failure(error: unknown) {
@@ -889,6 +963,154 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		},
 	);
 
+	const planItemSchema = z.object({
+		entryId: z.string(),
+		entryPath: z.string().optional(),
+		packedBytes: z.string().optional(),
+		outputBytes: z.string().optional(),
+		decodedBytes: z.string().optional(),
+		status: z.enum(["ready", "skipped", "failed"]),
+		reason: z.string().optional(),
+		error: errorSchema.optional(),
+	});
+	server.registerTool(
+		"plan_extraction",
+		{
+			description:
+				"Preflight one extraction without writing files. Returns exact known costs, conflicts, budget findings, and a digest that execution can require.",
+			inputSchema: z.object({
+				source: sourceSchema,
+				selection: extractionSelectionSchema.default({ mode: "all" }),
+				outputRootId: z.string().min(1).optional(),
+				outputSubdirectory: z.string().min(1).optional(),
+				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
+				budgets: extractionBudgetsSchema.optional(),
+				inline: z.enum(["summary", "all"]).default("summary"),
+				itemLimit: z.number().int().min(0).max(100).default(20),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					source: sourceSchema,
+					formatId: z.string(),
+					outputRootId: z.string(),
+					outputDirectory: z.string(),
+					selected: z.number().int().nonnegative(),
+					ready: z.number().int().nonnegative(),
+					skipped: z.number().int().nonnegative(),
+					failed: z.number().int().nonnegative(),
+					inputBytes: z.string(),
+					outputBytes: z.string().nullable(),
+					unknownOutputSizes: z.number().int().nonnegative(),
+					budgetViolations: z.array(
+						z.object({
+							budget: z.enum([
+								"maxResources",
+								"maxInputBytes",
+								"maxOutputBytes",
+								"maxDecodedBytesPerResource",
+							]),
+							actual: z.string(),
+							limit: z.string(),
+						}),
+					),
+					budgetUnknowns: z.array(
+						z.enum(["maxOutputBytes", "maxDecodedBytesPerResource"]),
+					),
+					planDigest: z.string(),
+					itemsOmitted: z.number().int().nonnegative(),
+					responseTruncated: z.boolean(),
+					items: z.array(planItemSchema),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async (
+			{ source, budgets, inline, itemLimit, maxResponseBytes, ...options },
+			context,
+		) => {
+			try {
+				await workspace.prepare({ createOutput: false });
+				const coreBudgets = budgetsFromWire(budgets);
+				const result = await automation.planExtraction(
+					source,
+					{
+						selection: selectionFromWire(options.selection),
+						conflictPolicy: options.conflictPolicy,
+						...(options.outputRootId === undefined
+							? {}
+							: { outputRootId: options.outputRootId }),
+						...(options.outputSubdirectory === undefined
+							? {}
+							: { outputSubdirectory: options.outputSubdirectory }),
+						...(coreBudgets === undefined ? {} : { budgets: coreBudgets }),
+					},
+					toControl(context),
+				);
+				const candidates =
+					inline === "all"
+						? result.items.slice(0, itemLimit).map((item) => ({
+								entryId: item.entryId,
+								...(item.entryPath === undefined
+									? {}
+									: { entryPath: item.entryPath }),
+								...(item.packedBytes === undefined
+									? {}
+									: { packedBytes: item.packedBytes.toString() }),
+								...(item.outputBytes === undefined
+									? {}
+									: { outputBytes: item.outputBytes.toString() }),
+								...(item.decodedBytes === undefined
+									? {}
+									: { decodedBytes: item.decodedBytes.toString() }),
+								status: item.status,
+								...(item.reason === undefined ? {} : { reason: item.reason }),
+								...(item.error === undefined
+									? {}
+									: {
+											error: {
+												code: item.error.code,
+												message: item.error.message.slice(0, 2048),
+											},
+										}),
+							}))
+						: [];
+				return success(
+					boundedPage(
+						candidates,
+						(visible) => ({
+							source: result.source,
+							formatId: result.formatId,
+							outputRootId: result.outputRootId,
+							outputDirectory: result.outputDirectory,
+							selected: result.selected,
+							ready: result.ready,
+							skipped: result.skipped,
+							failed: result.failed,
+							inputBytes: result.inputBytes.toString(),
+							outputBytes: result.outputBytes?.toString() ?? null,
+							unknownOutputSizes: result.unknownOutputSizes,
+							budgetViolations: result.budgetViolations.map((violation) => ({
+								...violation,
+								actual: violation.actual.toString(),
+								limit: violation.limit.toString(),
+							})),
+							budgetUnknowns: result.budgetUnknowns,
+							planDigest: result.planDigest,
+							itemsOmitted: result.items.length - visible.length,
+							responseTruncated: visible.length < result.items.length,
+							items: visible,
+						}),
+						maxResponseBytes,
+						true,
+					),
+				);
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
 	const artifactSchema = z.object({
 		outputRootId: z.string(),
 		relativePath: z.string(),
@@ -905,25 +1127,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				source: sourceSchema.optional(),
 				reportPath: z.string().min(1).optional(),
 				outputRootId: z.string().min(1).optional(),
+				expectedPlanDigest: z.string().length(64).optional(),
+				budgets: extractionBudgetsSchema.optional(),
 				offset: z.number().int().nonnegative().default(0),
-				selection: z
-					.discriminatedUnion("mode", [
-						z.object({
-							mode: z.literal("all"),
-							excludeGlobs: z.array(z.string()).max(32).optional(),
-						}),
-						z.object({
-							mode: z.literal("ids"),
-							entryIds: z.array(z.string().min(1)).min(1).max(10000),
-						}),
-						z.object({
-							mode: z.literal("glob"),
-							includeGlobs: z.array(z.string()).min(1).max(32),
-							excludeGlobs: z.array(z.string()).max(32).optional(),
-							caseSensitive: z.boolean().default(false),
-						}),
-					])
-					.default({ mode: "all" }),
+				selection: extractionSelectionSchema.default({ mode: "all" }),
 				outputSubdirectory: z.string().min(1).optional(),
 				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
 				inline: z.enum(["summary", "errors", "all"]).default("errors"),
@@ -1058,29 +1265,19 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						"Extraction requires source and offset 0; use reportPath to continue a report",
 					);
 				await workspace.prepare();
-				const selection =
-					options.selection.mode === "ids"
-						? options.selection
-						: options.selection.mode === "all"
-							? {
-									mode: "all" as const,
-									...(options.selection.excludeGlobs === undefined
-										? {}
-										: { excludeGlobs: options.selection.excludeGlobs }),
-								}
-							: {
-									mode: "glob" as const,
-									includeGlobs: options.selection.includeGlobs,
-									caseSensitive: options.selection.caseSensitive,
-									...(options.selection.excludeGlobs === undefined
-										? {}
-										: { excludeGlobs: options.selection.excludeGlobs }),
-								};
+				const selection = selectionFromWire(options.selection);
+				const extractionBudgets = budgetsFromWire(options.budgets);
 				const result = await automation.extractEntries(
 					source,
 					{
 						selection,
 						conflictPolicy: options.conflictPolicy,
+						...(options.expectedPlanDigest === undefined
+							? {}
+							: { expectedPlanDigest: options.expectedPlanDigest }),
+						...(extractionBudgets === undefined
+							? {}
+							: { budgets: extractionBudgets }),
 						...(options.outputRootId === undefined
 							? {}
 							: { outputRootId: options.outputRootId }),

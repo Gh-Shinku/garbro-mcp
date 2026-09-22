@@ -128,6 +128,7 @@ async function smoke(bundlePath, outputRoot) {
 				"inspect_archive",
 				"list_entries",
 				"read_entry",
+				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
 			].sort(),
@@ -182,9 +183,19 @@ async function smoke(bundlePath, outputRoot) {
 			"cp932",
 		);
 		const progress = [];
+		const plan = await call("plan_extraction", {
+			source,
+			budgets: { maxResources: 3, maxOutputBytes: "1024" },
+		});
+		assert.equal(plan.ready, 3);
+		assert.equal(plan.budgetViolations.length, 0);
 		const extracted = await call(
 			"extract_entries",
-			{ source },
+			{
+				source,
+				expectedPlanDigest: plan.planDigest,
+				budgets: { maxResources: 3, maxOutputBytes: "1024" },
+			},
 			{
 				onprogress: (update) => {
 					progress.push(update.progress);

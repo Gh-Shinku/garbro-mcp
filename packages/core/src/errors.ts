@@ -5,6 +5,7 @@ export type GarbroErrorCode =
 	| "ENTRY_NOT_FOUND"
 	| "UNSAFE_PATH"
 	| "OUTPUT_EXISTS"
+	| "PLAN_CHANGED"
 	| "LIMIT_EXCEEDED"
 	| "CANCELLED"
 	| "IO_ERROR";

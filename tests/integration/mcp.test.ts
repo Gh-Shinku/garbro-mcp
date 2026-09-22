@@ -5,6 +5,7 @@ import {
 	readdir,
 	readFile,
 	rm,
+	stat,
 	symlink,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -74,6 +75,7 @@ describe("MCP server", () => {
 				"inspect_archive",
 				"list_entries",
 				"read_entry",
+				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
 			].sort(),
@@ -199,6 +201,52 @@ describe("MCP server", () => {
 				details: { allowedRoots: ["default", "music"] },
 			},
 		});
+	});
+
+	it("plans extraction costs and requires an unchanged plan before writing", async () => {
+		const { client, output } = await connect();
+		const source = { rootId: "games", path: "basic.xp3" };
+		const planned = await client.callTool({
+			name: "plan_extraction",
+			arguments: {
+				source,
+				outputSubdirectory: "planned",
+				budgets: { maxResources: 3, maxOutputBytes: "1024" },
+				inline: "all",
+			},
+		});
+		expect(planned.isError).not.toBe(true);
+		expect(planned.structuredContent).toMatchObject({
+			selected: 3,
+			ready: 3,
+			unknownOutputSizes: 0,
+			budgetViolations: [],
+			budgetUnknowns: [],
+		});
+		expect(
+			(planned.structuredContent as { items: Array<{ status: string }> }).items,
+		).toHaveLength(3);
+		expect(
+			(
+				planned.structuredContent as { items: Array<{ status: string }> }
+			).items.every((item) => item.status === "ready"),
+		).toBe(true);
+		await expect(stat(resolve(output, "planned"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+		const planDigest = (planned.structuredContent as { planDigest: string })
+			.planDigest;
+		const extracted = await client.callTool({
+			name: "extract_entries",
+			arguments: {
+				source,
+				outputSubdirectory: "planned",
+				expectedPlanDigest: planDigest,
+				budgets: { maxResources: 3, maxOutputBytes: "1024" },
+			},
+		});
+		expect(extracted.isError).not.toBe(true);
+		expect(extracted.structuredContent).toMatchObject({ extracted: 3 });
 	});
 
 	it("scans, inspects, filters, and previews by logical path", async () => {

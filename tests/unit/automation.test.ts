@@ -183,4 +183,57 @@ describe("ArchiveAutomationService", () => {
 			code: "ENOENT",
 		});
 	});
+
+	it("plans costs without writing and enforces digests and hard budgets", async () => {
+		const { output, service } = await setup();
+		const source = { rootId: "games", path: "archives/basic.xp3" };
+		const plan = await service.planExtraction(source, {
+			outputSubdirectory: "planned",
+			budgets: { maxResources: 2 },
+		});
+		expect(plan).toMatchObject({
+			selected: 3,
+			ready: 3,
+			failed: 0,
+			unknownOutputSizes: 0,
+			budgetViolations: [{ budget: "maxResources", actual: 3n, limit: 2n }],
+			budgetUnknowns: [],
+		});
+		expect(plan.inputBytes).toBeGreaterThan(0n);
+		expect(plan.outputBytes).toBeGreaterThan(0n);
+		expect(plan.planDigest).toHaveLength(64);
+		await expect(stat(resolve(output, "planned"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+
+		await expect(
+			service.extractEntries(source, {
+				outputSubdirectory: "planned",
+				expectedPlanDigest: plan.planDigest,
+				budgets: { maxResources: 2 },
+			}),
+		).rejects.toMatchObject({
+			code: "LIMIT_EXCEEDED",
+			details: {
+				violations: [{ budget: "maxResources", actual: "3", limit: "2" }],
+			},
+		});
+		await expect(stat(resolve(output, "planned"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+
+		const executable = await service.planExtraction(source, {
+			outputSubdirectory: "planned",
+			budgets: { maxResources: 3, maxOutputBytes: 1024n },
+		});
+		await mkdir(resolve(output, "planned"));
+		await writeFile(resolve(output, "planned/hello.txt"), "changed");
+		await expect(
+			service.extractEntries(source, {
+				outputSubdirectory: "planned",
+				expectedPlanDigest: executable.planDigest,
+				budgets: { maxResources: 3, maxOutputBytes: 1024n },
+			}),
+		).rejects.toMatchObject({ code: "PLAN_CHANGED" });
+	});
 });
