@@ -1,8 +1,8 @@
-import { encodeCp932 } from "@garbro-mcp/core";
+import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
 import { bananaPkFormat } from "@garbro-mcp/formats";
+import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 import { literalLzssStream } from "../helpers/lzss.js";
-import { describe, it } from "vitest";
 
 function obfuscateName(name: string): Buffer {
 	const plain = encodeCp932(name);
@@ -71,5 +71,23 @@ describe("BANANA Shu-Shu PK archive", () => {
 			],
 			metadata: { entryCount: 2 },
 		});
+	});
+
+	it("does not claim a shallow count whose complete index is invalid", async () => {
+		const invalid = Buffer.alloc(0x40);
+		invalid.writeInt32LE(1, 0);
+		invalid[4] = 0;
+		await expect(
+			bananaPkFormat.detect(new BufferByteSource(invalid), "save.sav"),
+		).resolves.toBe(false);
+	});
+
+	it("validates the complete index during detection", async () => {
+		const archive = buildBananaPk([
+			{ name: "data.bin", content: Buffer.from("plain") },
+		]);
+		await expect(
+			bananaPkFormat.detect(new BufferByteSource(archive), "data.pk"),
+		).resolves.toBe(true);
 	});
 });

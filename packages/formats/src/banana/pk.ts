@@ -1,23 +1,23 @@
 // Format reference: GARbro ArcFormats/Banana/ArcPK.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { inflateLzssAll } from "@garbro-mcp/codecs";
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
 
 const INDEX_OFFSET = 4;
@@ -133,7 +133,12 @@ export const bananaPkFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: bananaPkDescriptor,
 	detection: { extensionFallback: true },
 	async detect(source: ByteSource): Promise<boolean> {
-		return (await parseHeader(source)) !== undefined;
+		try {
+			await readBananaPk(source);
+			return true;
+		} catch {
+			return false;
+		}
 	},
 	read: readBananaPk,
 	openEntry: bananaEntryOpener,
