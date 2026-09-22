@@ -3,6 +3,7 @@ import {
 	ArchiveAutomationService,
 	type AutomationControl,
 	asGarbroError,
+	DEFAULT_AUTOMATION_LIMITS,
 	entryToWire,
 	type FormatRegistry,
 	formatToWire,
@@ -269,7 +270,13 @@ export interface BuildServerOptions
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
-	const registry = options.registry ?? createDefaultRegistry();
+	const registry =
+		options.registry ??
+		createDefaultRegistry({
+			maxDecodedBytes:
+				options.limits?.decodedResourceMaxBytes ??
+				DEFAULT_AUTOMATION_LIMITS.decodedResourceMaxBytes,
+		});
 	const workspace =
 		options.workspace ??
 		new WorkspacePolicy({
@@ -313,6 +320,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					inputRoots: z.array(z.object({ id: z.string(), path: z.string() })),
 					outputRoot: z.string(),
 					limits: z.object({
+						decodedResourceMaxBytes: z.number().int().positive(),
 						responseDefaultBytes: z.number().int().positive(),
 						responseMaxBytes: z.number().int().positive(),
 						previewDefaultBytes: z.number().int().positive(),

@@ -70,6 +70,7 @@ describe("MCP server", () => {
 		expect(info.structuredContent).toMatchObject({
 			inputRoots: [{ id: "games", path: root }],
 			outputRoot: output,
+			limits: { decodedResourceMaxBytes: 256 * 1024 * 1024 },
 			capabilities: { archiveCreation: false },
 		});
 
