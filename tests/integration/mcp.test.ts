@@ -57,6 +57,7 @@ describe("MCP server", () => {
 			[
 				"get_server_info",
 				"list_formats",
+				"scan_resources",
 				"scan_archives",
 				"inspect_archive",
 				"list_entries",
@@ -88,6 +89,51 @@ describe("MCP server", () => {
 		});
 	});
 
+	it("scans resources with filters and detection evidence", async () => {
+		const { client } = await connect();
+		const scanned = await client.callTool({
+			name: "scan_resources",
+			arguments: {
+				rootId: "games",
+				resourceTypes: ["archive"],
+				formatIds: ["xp3"],
+			},
+		});
+		expect(scanned.isError).not.toBe(true);
+		expect(scanned.structuredContent).toMatchObject({
+			complete: true,
+			counts: {
+				recognized: 1,
+				byResourceType: { archive: 1 },
+				byFormat: { xp3: 1 },
+			},
+			archives: [
+				{
+					formatId: "xp3",
+					format: {
+						id: "xp3",
+						resourceType: "archive",
+						status: expect.any(String),
+						verification: expect.any(String),
+					},
+					validation: "structural",
+					confidence: "high",
+					warnings: [],
+				},
+			],
+		});
+
+		const excluded = await client.callTool({
+			name: "scan_resources",
+			arguments: { rootId: "games", formatIds: ["reallive-nwa-audio"] },
+		});
+		expect(excluded.structuredContent).toMatchObject({
+			complete: true,
+			archives: [],
+			counts: { recognized: 0, byFormat: {} },
+		});
+	});
+
 	it("scans, inspects, filters, and previews by logical path", async () => {
 		const { client } = await connect();
 		const source = { rootId: "games", path: "basic.xp3" };
@@ -108,6 +154,9 @@ describe("MCP server", () => {
 		});
 		expect(inspected.structuredContent).toMatchObject({
 			recognized: true,
+			validation: "structural",
+			confidence: "high",
+			warnings: [],
 			format: { id: "xp3" },
 			summary: { entryCount: 3 },
 		});

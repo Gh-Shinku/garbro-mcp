@@ -1,16 +1,16 @@
 import {
+	type ArchiveAutomationOptions,
 	ArchiveAutomationService,
+	type AutomationControl,
 	asGarbroError,
 	entryToWire,
-	formatToWire,
-	type ArchiveAutomationOptions,
-	type AutomationControl,
 	type FormatRegistry,
+	formatToWire,
 	GarbroError,
 	readExtractionReport,
-	writeExtractionReport,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
+	writeExtractionReport,
 } from "@garbro-mcp/core";
 import {
 	createDefaultRegistry,
@@ -458,136 +458,194 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		},
 	);
 
+	const scanTool = {
+		description:
+			"Scan a configured input root for validated resources and return a resumable page with support metadata and aggregate counts.",
+		inputSchema: z.object({
+			rootId: z.string().min(1),
+			maxResponseBytes: budgetSchema,
+			path: z.string().min(1).default("."),
+			recursive: z.boolean().default(true),
+			includeGlobs: z.array(z.string()).max(32).optional(),
+			excludeGlobs: z.array(z.string()).max(32).optional(),
+			maxDepth: z.number().int().min(0).max(64).default(8),
+			cursor: z.string().min(1).optional(),
+			limit: z.number().int().positive().max(500).default(50),
+			includeUnrecognized: z.boolean().default(false),
+			resourceTypes: z.array(z.enum(resourceTypes)).max(4).optional(),
+			formatIds: z.array(z.string().min(1)).max(128).optional(),
+		}),
+		outputSchema: successOrFailure(
+			z.object({
+				scanned: z.number().int().nonnegative(),
+				archives: z.array(
+					z.object({
+						source: sourceSchema,
+						size: z.string(),
+						formatId: z.string(),
+						format: formatSummarySchema,
+						validation: z.enum(["signature", "structural", "decoded"]),
+						confidence: z.enum(["low", "medium", "high"]),
+						warnings: z.array(z.string()),
+					}),
+				),
+				unrecognized: z.array(sourceSchema),
+				unrecognizedCount: z.number().int().nonnegative(),
+				failures: z.array(
+					z.object({ source: sourceSchema, error: errorSchema }),
+				),
+				nextCursor: z.string().nullable(),
+				complete: z.boolean(),
+				responseTruncated: z.boolean(),
+				counts: z.object({
+					recognized: z.number().int().nonnegative(),
+					unrecognized: z.number().int().nonnegative(),
+					failures: z.number().int().nonnegative(),
+					byResourceType: z.record(z.string(), z.number().int().nonnegative()),
+					byFormat: z.record(z.string(), z.number().int().nonnegative()),
+				}),
+			}),
+		),
+		annotations: readOnly,
+	} as const;
+	const scanResources = async (
+		{ rootId, ...input }: z.infer<typeof scanTool.inputSchema>,
+		context: ServerContext,
+	) => {
+		try {
+			await workspace.prepare({ createOutput: false });
+			const scanOptions = {
+				path: input.path,
+				recursive: input.recursive,
+				maxDepth: input.maxDepth,
+				limit: input.limit,
+				includeUnrecognized: true,
+				...(input.includeGlobs === undefined
+					? {}
+					: { includeGlobs: input.includeGlobs }),
+				...(input.excludeGlobs === undefined
+					? {}
+					: { excludeGlobs: input.excludeGlobs }),
+				...(input.cursor === undefined ? {} : { cursor: input.cursor }),
+			};
+			const result = await automation.scanArchives(
+				rootId,
+				scanOptions,
+				toControl(context),
+			);
+			const requestedResourceTypes = new Set(input.resourceTypes ?? []);
+			const requestedFormatIds = new Set(input.formatIds ?? []);
+			const filteredArchives = result.archives.filter((item) => {
+				const support = supportById.get(item.format.id);
+				return (
+					(requestedFormatIds.size === 0 ||
+						requestedFormatIds.has(item.format.id)) &&
+					(requestedResourceTypes.size === 0 ||
+						(support !== undefined &&
+							requestedResourceTypes.has(support.reference.type)))
+				);
+			});
+			const byResourceType: Record<string, number> = {};
+			const byFormat: Record<string, number> = {};
+			for (const item of filteredArchives) {
+				byFormat[item.format.id] = (byFormat[item.format.id] ?? 0) + 1;
+				const resourceType = supportById.get(item.format.id)?.reference.type;
+				if (resourceType !== undefined)
+					byResourceType[resourceType] =
+						(byResourceType[resourceType] ?? 0) + 1;
+			}
+			const events = [
+				...filteredArchives.map((item) => ({
+					kind: "archive" as const,
+					source: item.source,
+					item,
+				})),
+				...result.failures.map((item) => ({
+					kind: "failure" as const,
+					source: item.source,
+					item,
+				})),
+				...result.unrecognized.map((source) => ({
+					kind: "unrecognized" as const,
+					source,
+				})),
+			].sort((a, b) =>
+				a.source.path < b.source.path
+					? -1
+					: a.source.path > b.source.path
+						? 1
+						: 0,
+			);
+			return success(
+				boundedPage(
+					events,
+					(visible) => {
+						const archives: Record<string, unknown>[] = [];
+						const failures: Record<string, unknown>[] = [];
+						const unrecognized = [];
+						for (const event of visible) {
+							if (event.kind === "archive")
+								archives.push({
+									source: event.source,
+									size: event.item.size.toString(),
+									formatId: event.item.format.id,
+									format: formatSummary(
+										event.item.format,
+										supportById.get(event.item.format.id),
+									),
+									validation: event.item.validation,
+									confidence: event.item.confidence,
+									warnings: [...event.item.warnings],
+								});
+							else if (event.kind === "failure")
+								failures.push({
+									source: event.source,
+									error: {
+										code: event.item.error.code,
+										message: event.item.error.message.slice(0, 2048),
+									},
+								});
+							else unrecognized.push(event.source);
+						}
+						const responseTruncated = visible.length < events.length;
+						return {
+							scanned: result.scanned,
+							archives,
+							failures,
+							unrecognized: input.includeUnrecognized ? unrecognized : [],
+							unrecognizedCount: result.unrecognizedCount,
+							counts: {
+								recognized: filteredArchives.length,
+								unrecognized: result.unrecognizedCount,
+								failures: result.failures.length,
+								byResourceType,
+								byFormat,
+							},
+							responseTruncated,
+							complete: result.complete && !responseTruncated,
+							nextCursor: responseTruncated
+								? Buffer.from(visible.at(-1)?.source.path ?? "").toString(
+										"base64url",
+									)
+								: result.nextCursor,
+						};
+					},
+					input.maxResponseBytes,
+				),
+			);
+		} catch (error) {
+			return failure(error);
+		}
+	};
+	server.registerTool("scan_resources", scanTool, scanResources);
 	server.registerTool(
 		"scan_archives",
 		{
+			...scanTool,
 			description:
-				"Scan a configured input root for supported resources and return a resumable page.",
-			inputSchema: z.object({
-				rootId: z.string().min(1),
-				maxResponseBytes: budgetSchema,
-				path: z.string().min(1).default("."),
-				recursive: z.boolean().default(true),
-				includeGlobs: z.array(z.string()).max(32).optional(),
-				excludeGlobs: z.array(z.string()).max(32).optional(),
-				maxDepth: z.number().int().min(0).max(64).default(8),
-				cursor: z.string().min(1).optional(),
-				limit: z.number().int().positive().max(500).default(50),
-				includeUnrecognized: z.boolean().default(false),
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					scanned: z.number().int().nonnegative(),
-					archives: z.array(
-						z.object({
-							source: sourceSchema,
-							size: z.string(),
-							formatId: z.string(),
-						}),
-					),
-					unrecognized: z.array(sourceSchema),
-					unrecognizedCount: z.number().int().nonnegative(),
-					failures: z.array(
-						z.object({ source: sourceSchema, error: errorSchema }),
-					),
-					nextCursor: z.string().nullable(),
-					complete: z.boolean(),
-					responseTruncated: z.boolean(),
-				}),
-			),
-			annotations: readOnly,
+				"Compatibility alias for scan_resources. Scan a configured input root for validated resources.",
 		},
-		async ({ rootId, ...input }, context) => {
-			try {
-				await workspace.prepare({ createOutput: false });
-				const scanOptions = {
-					path: input.path,
-					recursive: input.recursive,
-					maxDepth: input.maxDepth,
-					limit: input.limit,
-					includeUnrecognized: true,
-					...(input.includeGlobs === undefined
-						? {}
-						: { includeGlobs: input.includeGlobs }),
-					...(input.excludeGlobs === undefined
-						? {}
-						: { excludeGlobs: input.excludeGlobs }),
-					...(input.cursor === undefined ? {} : { cursor: input.cursor }),
-				};
-				const result = await automation.scanArchives(
-					rootId,
-					scanOptions,
-					toControl(context),
-				);
-				const events = [
-					...result.archives.map((item) => ({
-						kind: "archive" as const,
-						source: item.source,
-						item,
-					})),
-					...result.failures.map((item) => ({
-						kind: "failure" as const,
-						source: item.source,
-						item,
-					})),
-					...result.unrecognized.map((source) => ({
-						kind: "unrecognized" as const,
-						source,
-					})),
-				].sort((a, b) =>
-					a.source.path < b.source.path
-						? -1
-						: a.source.path > b.source.path
-							? 1
-							: 0,
-				);
-				return success(
-					boundedPage(
-						events,
-						(visible) => {
-							const archives: Record<string, unknown>[] = [];
-							const failures: Record<string, unknown>[] = [];
-							const unrecognized = [];
-							for (const event of visible) {
-								if (event.kind === "archive")
-									archives.push({
-										source: event.source,
-										size: event.item.size.toString(),
-										formatId: event.item.format.id,
-									});
-								else if (event.kind === "failure")
-									failures.push({
-										source: event.source,
-										error: {
-											code: event.item.error.code,
-											message: event.item.error.message.slice(0, 2048),
-										},
-									});
-								else unrecognized.push(event.source);
-							}
-							const responseTruncated = visible.length < events.length;
-							return {
-								scanned: visible.length,
-								archives,
-								failures,
-								unrecognized: input.includeUnrecognized ? unrecognized : [],
-								unrecognizedCount: unrecognized.length,
-								responseTruncated,
-								complete: result.complete && !responseTruncated,
-								nextCursor: responseTruncated
-									? Buffer.from(visible.at(-1)?.source.path ?? "").toString(
-											"base64url",
-										)
-									: result.nextCursor,
-							};
-						},
-						input.maxResponseBytes,
-					),
-				);
-			} catch (error) {
-				return failure(error);
-			}
-		},
+		scanResources,
 	);
 
 	server.registerTool(
@@ -608,6 +666,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						source: sourceSchema,
 						size: z.string(),
 						format: formatSummarySchema,
+						validation: z.enum(["signature", "structural", "decoded"]),
+						confidence: z.enum(["low", "medium", "high"]),
+						warnings: z.array(z.string()),
 						metadata: z.record(z.string(), z.unknown()).optional(),
 						summary: z.object({
 							entryCount: z.number().int().nonnegative(),
@@ -633,6 +694,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						result.format,
 						supportById.get(result.format.id),
 					),
+					validation: result.validation,
+					confidence: result.confidence,
+					warnings: [...result.warnings],
 					...(detail === "full" ? { metadata: result.metadata } : {}),
 					summary: result.summary,
 				};
