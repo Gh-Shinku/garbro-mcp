@@ -159,6 +159,22 @@ describe("FormatRegistry detection catalog", () => {
 		expect(calls).toBe(0);
 	});
 
+	it("uses declared extensions as the default gate for signatureless formats", async () => {
+		const path = await fixture("picture.ico", Buffer.from("ambiguous payload"));
+		let calls = 0;
+		const registry = new FormatRegistry([
+			testFormat("legacy", {
+				extensions: ["cg"],
+				onDetect: () => {
+					calls += 1;
+				},
+			}),
+		]);
+
+		await expect(registry.detectArchive(path)).resolves.toBeUndefined();
+		expect(calls).toBe(0);
+	});
+
 	it("skips detected candidates whose complete structure is invalid", async () => {
 		const path = await fixture("sample.dat", Buffer.from("ambiguous payload"));
 		const registry = new FormatRegistry([

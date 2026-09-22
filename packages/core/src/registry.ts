@@ -143,6 +143,12 @@ export class FormatRegistry {
 				const signatures = format.detection?.signatures;
 				if (format.detection?.extensionOnly === true && !extensionMatch)
 					return false;
+				if (
+					format.descriptor.extensions.length > 0 &&
+					(!signatures || signatures.length === 0) &&
+					!extensionMatch
+				)
+					return false;
 				return (
 					signatureMatch ||
 					!signatures ||
