@@ -12,6 +12,7 @@ import {
 	readExtractionReport,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
+	verifyArtifact,
 	writeExtractionReport,
 } from "@garbro-mcp/core";
 import {
@@ -1552,6 +1553,176 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							failed,
 							bytesWritten: bytesWritten.toString(),
 							sources: visible,
+						}),
+						maxResponseBytes,
+					),
+				);
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"verify_artifacts",
+		{
+			description:
+				"Hash and independently inspect extracted artifacts inside configured output roots. Optional expected hashes and sizes promote evidence to manifest verification.",
+			inputSchema: z.object({
+				artifacts: z
+					.array(
+						z.object({
+							outputRootId: z.string().min(1).optional(),
+							path: z.string().min(1),
+							expected: z
+								.object({
+									sha256: z
+										.string()
+										.regex(/^[0-9a-f]{64}$/i)
+										.optional(),
+									bytes: z.string().regex(/^\d+$/).optional(),
+								})
+								.optional(),
+						}),
+					)
+					.min(1)
+					.max(100),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					status: z.enum(["completed", "partial", "failed"]),
+					hasFailures: z.boolean(),
+					verified: z.number().int().nonnegative(),
+					mismatched: z.number().int().nonnegative(),
+					invalid: z.number().int().nonnegative(),
+					inspected: z.number().int().nonnegative(),
+					failed: z.number().int().nonnegative(),
+					resultsOmitted: z.number().int().nonnegative(),
+					responseTruncated: z.boolean(),
+					results: z.array(
+						z.union([
+							z.object({
+								status: z.enum([
+									"inspected",
+									"verified",
+									"mismatch",
+									"invalid",
+								]),
+								level: z.enum(["hash", "structural", "manifest"]),
+								outputRootId: z.string(),
+								relativePath: z.string(),
+								absolutePath: z.string(),
+								bytes: z.string(),
+								sha256: z.string(),
+								matched: z.boolean().nullable(),
+								format: z.enum(["wav", "ogg", "binary"]),
+								structuralValid: z.boolean().nullable(),
+								metadata: z.record(
+									z.string(),
+									z.union([z.string(), z.number()]),
+								),
+								warnings: z.array(z.string()),
+								nextAction: z.string().optional(),
+							}),
+							z.object({
+								status: z.literal("failed"),
+								outputRootId: z.string().optional(),
+								relativePath: z.string(),
+								error: errorSchema,
+							}),
+						]),
+					),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async ({ artifacts, maxResponseBytes }, context) => {
+			try {
+				await workspace.prepare({ createOutput: false });
+				const results: Array<Record<string, unknown>> = [];
+				for (const [index, artifact] of artifacts.entries()) {
+					try {
+						const result = await verifyArtifact(
+							workspace,
+							{
+								path: artifact.path,
+								...(artifact.outputRootId === undefined
+									? {}
+									: { outputRootId: artifact.outputRootId }),
+							},
+							{
+								...(artifact.expected?.sha256 === undefined
+									? {}
+									: { sha256: artifact.expected.sha256 }),
+								...(artifact.expected?.bytes === undefined
+									? {}
+									: { bytes: BigInt(artifact.expected.bytes) }),
+							},
+							context.mcpReq.signal,
+						);
+						results.push({
+							...result,
+							bytes: result.bytes.toString(),
+							...(result.status === "mismatch"
+								? {
+										nextAction: "Check the expected manifest or extract again.",
+									}
+								: result.status === "invalid"
+									? {
+											nextAction:
+												"Treat the artifact as unusable and inspect the decoder.",
+										}
+									: {}),
+						});
+					} catch (error) {
+						if (context.mcpReq.signal.aborted) throw error;
+						const converted = asGarbroError(error);
+						results.push({
+							status: "failed",
+							...(artifact.outputRootId === undefined
+								? {}
+								: { outputRootId: artifact.outputRootId }),
+							relativePath: artifact.path,
+							error: {
+								code: converted.code,
+								message: converted.message.slice(0, 2048),
+								...(converted.details === undefined
+									? {}
+									: { details: converted.details }),
+							},
+						});
+					}
+					await toControl(context).onProgress?.({
+						progress: index + 1,
+						total: artifacts.length,
+						message: artifact.path,
+					});
+				}
+				const count = (status: string) =>
+					results.filter((result) => result.status === status).length;
+				const failed = count("failed");
+				const invalid = count("invalid");
+				const mismatched = count("mismatch");
+				const hasFailures = failed + invalid + mismatched > 0;
+				return success(
+					boundedPage(
+						results,
+						(visible) => ({
+							status: !hasFailures
+								? "completed"
+								: failed + invalid + mismatched === results.length
+									? "failed"
+									: "partial",
+							hasFailures,
+							verified: count("verified"),
+							mismatched,
+							invalid,
+							inspected: count("inspected"),
+							failed,
+							resultsOmitted: results.length - visible.length,
+							responseTruncated: visible.length < results.length,
+							results: visible,
 						}),
 						maxResponseBytes,
 					),

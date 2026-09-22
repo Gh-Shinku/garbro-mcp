@@ -78,6 +78,7 @@ describe("MCP server", () => {
 				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
+				"verify_artifacts",
 			].sort(),
 		);
 
@@ -243,10 +244,45 @@ describe("MCP server", () => {
 				outputSubdirectory: "planned",
 				expectedPlanDigest: planDigest,
 				budgets: { maxResources: 3, maxOutputBytes: "1024" },
+				inline: "all",
 			},
 		});
 		expect(extracted.isError).not.toBe(true);
 		expect(extracted.structuredContent).toMatchObject({ extracted: 3 });
+		const artifact = (
+			extracted.structuredContent as {
+				items: Array<{
+					artifact: {
+						outputRootId: string;
+						relativePath: string;
+						sha256: string;
+						bytesWritten: string;
+					};
+				}>;
+			}
+		).items[0]?.artifact;
+		expect(artifact).toBeDefined();
+		const verified = await client.callTool({
+			name: "verify_artifacts",
+			arguments: {
+				artifacts: [
+					{
+						outputRootId: artifact?.outputRootId,
+						path: artifact?.relativePath,
+						expected: {
+							sha256: artifact?.sha256,
+							bytes: artifact?.bytesWritten,
+						},
+					},
+				],
+			},
+		});
+		expect(verified.isError).not.toBe(true);
+		expect(verified.structuredContent).toMatchObject({
+			status: "completed",
+			verified: 1,
+			results: [{ status: "verified", level: "manifest", matched: true }],
+		});
 	});
 
 	it("scans, inspects, filters, and previews by logical path", async () => {

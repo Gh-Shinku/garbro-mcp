@@ -131,6 +131,7 @@ async function smoke(bundlePath, outputRoot) {
 				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
+				"verify_artifacts",
 			].sort(),
 		);
 		async function call(name, arguments_ = {}, options) {
@@ -222,6 +223,21 @@ async function smoke(bundlePath, outputRoot) {
 				item.artifact.sha256,
 			);
 		}
+		const firstArtifact = report.items[0].artifact;
+		const verification = await call("verify_artifacts", {
+			artifacts: [
+				{
+					outputRootId: firstArtifact.outputRootId,
+					path: firstArtifact.relativePath,
+					expected: {
+						sha256: firstArtifact.sha256,
+						bytes: firstArtifact.bytesWritten,
+					},
+				},
+			],
+		});
+		assert.equal(verification.status, "completed");
+		assert.equal(verification.results[0].status, "verified");
 		assert.equal(
 			(await call("extract_entries", { source, conflictPolicy: "skip" }))
 				.skipped,

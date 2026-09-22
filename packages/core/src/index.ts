@@ -7,5 +7,6 @@ export * from "./registry.js";
 export * from "./reports.js";
 export * from "./source.js";
 export * from "./types.js";
+export * from "./verification.js";
 export * from "./wire.js";
 export * from "./workspace.js";

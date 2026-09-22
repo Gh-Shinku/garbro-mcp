@@ -226,6 +226,34 @@ export class WorkspacePolicy {
 		return absolute;
 	}
 
+	async resolveOutputArtifact(
+		path: string,
+		rootId?: string,
+	): Promise<{
+		outputRootId: string;
+		relativePath: string;
+		absolutePath: string;
+	}> {
+		const relativePath = normalizeWorkspaceRelativePath(path);
+		const outputRootId = rootId ?? this.outputRoots[0]?.id ?? "default";
+		const outputRoot = this.resolveOutputRoot(outputRootId);
+		const canonicalRoot = await realpath(outputRoot);
+		const candidate = resolve(outputRoot, ...relativePath.split("/"));
+		const absolutePath = await realpath(candidate);
+		if (!isWithin(canonicalRoot, absolutePath))
+			throw new GarbroError(
+				"UNSAFE_PATH",
+				`Output artifact escapes root ${outputRootId}: ${path}`,
+			);
+		const info = await lstat(absolutePath);
+		if (info.isSymbolicLink() || !info.isFile())
+			throw new GarbroError(
+				"UNSAFE_PATH",
+				`Output artifact is not a regular file: ${path}`,
+			);
+		return { outputRootId, relativePath, absolutePath };
+	}
+
 	resolveOutputPath(
 		path: string,
 		rootId?: string,
