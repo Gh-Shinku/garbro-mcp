@@ -1,11 +1,18 @@
-import { buildServer, type BuildServerOptions } from "@garbro-mcp/mcp/server";
-import { FormatRegistry, type ArchiveEntry } from "@garbro-mcp/core";
 import { createHash } from "node:crypto";
-import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
-import { copyFile, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
-import { Readable } from "node:stream";
+import {
+	copyFile,
+	mkdtemp,
+	readdir,
+	readFile,
+	rm,
+	symlink,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import { Readable } from "node:stream";
+import { type ArchiveEntry, FormatRegistry } from "@garbro-mcp/core";
+import { type BuildServerOptions, buildServer } from "@garbro-mcp/mcp/server";
+import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { afterEach, describe, expect, it } from "vitest";
 
 const closers: Array<() => Promise<void>> = [];
@@ -251,6 +258,7 @@ describe("MCP server", () => {
 				copyFile(resolve(root, "basic.xp3"), resolve(root, name)),
 			),
 		);
+		const createdNames = await readdir(root);
 		const seen: string[] = [];
 		let cursor: string | null = null;
 		for (let iteration = 0; iteration < 20; iteration += 1) {
@@ -277,7 +285,7 @@ describe("MCP server", () => {
 			if (response.complete) break;
 		}
 		expect(cursor).toBeNull();
-		expect(seen).toEqual([...names, "basic.xp3"].sort());
+		expect(seen).toEqual(createdNames.sort());
 	});
 
 	it("keeps large extraction results in a complete hashed report", async () => {
@@ -326,11 +334,13 @@ describe("MCP server", () => {
 					inline: "all",
 					offset,
 					itemLimit: 40,
-					maxResponseBytes: 2048,
+					// Absolute Windows temp paths make one extracted item exceed 2 KiB
+					// once the MCP compatibility text copy is included.
+					maxResponseBytes: 3072,
 				},
 			});
 			expect(page.isError).not.toBe(true);
-			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(2048);
+			expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThanOrEqual(3072);
 			const payload = page.structuredContent as {
 				items: unknown[];
 				nextOffset: number | null;
