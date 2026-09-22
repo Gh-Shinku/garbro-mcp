@@ -2,18 +2,18 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	normalizeEntryPath,
 	type FixedEntry,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
 
 const LENGTH_OFFSET = 0;
@@ -40,7 +40,7 @@ const ATTRIBUTION = [
 export const egoDatDescriptor: FormatDescriptor = {
 	id: "studio-ego-dat-1",
 	name: "Studio e.go! engine resource archive",
-	extensions: [],
+	extensions: ["dat"],
 	capabilities: {
 		detect: true,
 		list: true,
@@ -54,7 +54,7 @@ export const egoDatDescriptor: FormatDescriptor = {
 export const egoOldDatDescriptor: FormatDescriptor = {
 	id: "studio-ego-dat-0",
 	name: "Studio e.go! engine resource archive, older layout",
-	extensions: [],
+	extensions: ["dat"],
 	capabilities: {
 		detect: true,
 		list: true,
@@ -171,6 +171,7 @@ async function readEgoOldDatIndex(
 
 export const egoDatFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: egoDatDescriptor,
+	detection: { extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		return (await readEgoDatIndex(source)) !== undefined;
 	},
@@ -187,6 +188,7 @@ export const egoDatFormat: ArchiveFormat = defineFixedArchive({
 
 export const egoOldDatFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: egoOldDatDescriptor,
+	detection: { extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		return (await readEgoOldDatIndex(source)) !== undefined;
 	},

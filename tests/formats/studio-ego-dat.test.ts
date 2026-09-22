@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { egoDatFormat, egoOldDatFormat } from "@garbro-mcp/formats";
+import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
-import { describe, it } from "vitest";
 
 const INDEX_OFFSET = 4;
 
@@ -46,6 +46,12 @@ const ENTRIES: Entry[] = [
 ];
 
 describe("Studio e.go! DAT resource archives", () => {
+	it("uses the DAT extension to guard its signatureless layouts", () => {
+		expect(egoDatFormat.descriptor.extensions).toEqual(["dat"]);
+		expect(egoDatFormat.detection?.extensionOnly).toBe(true);
+		expect(egoOldDatFormat.detection?.extensionOnly).toBe(true);
+	});
+
 	it("reads the newer layout with its 0x10-byte record header", async () => {
 		const archive = buildEgo(ENTRIES, 0x10);
 		await expectArchive({
