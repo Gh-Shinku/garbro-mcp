@@ -1,10 +1,10 @@
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -32,7 +32,9 @@ const LONG_PLACES = 7;
 const PLACES_PER_WORD = 8;
 const LOST_PLACES = 8;
 const LONGEST_RUN = 3;
-const LIMIT = 8 * 1024 * 1024;
+/** Bounds one decoded sound while admitting the long BGM tracks used by verified RealLive games. */
+const MAXIMUM_PCM_BYTES = 256 * 1024 * 1024;
+const WAVE_HEADER_SIZE = 0x2c;
 
 export interface NwaLayout {
 	channels: number;
@@ -76,7 +78,7 @@ export function readNwaLayout(
 	};
 	layout.packedSize = data.readInt32LE(0x18);
 	if (layout.pcmSize <= 0) return undefined;
-	if (layout.pcmSize > LIMIT) return undefined;
+	if (layout.pcmSize > MAXIMUM_PCM_BYTES) return undefined;
 	if (layout.compression === RAW_COMPRESSION) {
 		if (layout.pcmSize > fileLength - DATA_OFFSET) return undefined;
 		return layout;
@@ -253,7 +255,7 @@ function decodeNwaBlock(
 			pcm[at] = value & 0xff;
 			at += 1;
 		} else {
-			pcm.writeInt16LE(value & 0xffff, at);
+			pcm.writeInt16LE(value, at);
 			at += 2;
 		}
 		if (layout.channels === 2) channel ^= 1;
@@ -283,10 +285,9 @@ export function unpackNwaPcm(data: Buffer, layout: NwaLayout): Buffer {
 	let dst = 0;
 	for (let i = 0; i < offsets.length - 1; i += 1) {
 		const offset = offsets[i] ?? 0;
-		if (offset > data.length)
-			throw invalidSound(
-				"The places of the picture of the walk of the places of the picture stand past the places of the picture",
-			);
+		const nextOffset = offsets[i + 1] ?? 0;
+		if (offset > data.length || nextOffset <= offset)
+			throw invalidSound("The NWA block offsets are invalid");
 		const reader = new NwaBitReader(data, offset);
 		dst = decodeNwaBlock(data, reader, layout, pcm, dst, layout.blockSize);
 	}
@@ -296,7 +297,7 @@ export function unpackNwaPcm(data: Buffer, layout: NwaLayout): Buffer {
 			"The places of the picture of the walk of the places of the picture stand past the places of the picture",
 		);
 	const reader = new NwaBitReader(data, last);
-	decodeNwaBlock(
+	dst = decodeNwaBlock(
 		data,
 		reader,
 		layout,
@@ -304,6 +305,11 @@ export function unpackNwaPcm(data: Buffer, layout: NwaLayout): Buffer {
 		dst,
 		layout.finalBlockSize > 0 ? layout.finalBlockSize : layout.blockSize,
 	);
+	if (dst !== pcm.length) {
+		throw invalidSound(
+			`The NWA decoder produced ${dst} PCM bytes instead of ${pcm.length}`,
+		);
+	}
 	return pcm;
 }
 
@@ -375,9 +381,10 @@ export const realliveNwaAudioFormat: ArchiveFormat = defineFixedArchive({
 				createFixedEntry({
 					id: 0,
 					path: changeExtension(sourcePath.replace(/^.*[/\\]/, ""), "wav"),
-					offset: BigInt(DATA_OFFSET),
-					size: source.size - BigInt(DATA_OFFSET),
-					compressed: true,
+					offset: 0n,
+					size: BigInt(WAVE_HEADER_SIZE + layout.pcmSize),
+					packedSize: source.size,
+					compressed: layout.compression !== RAW_COMPRESSION,
 					metadata: {
 						type: "audio",
 						channels: layout.channels,

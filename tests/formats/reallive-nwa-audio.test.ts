@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	readNwaLayout,
@@ -252,6 +252,20 @@ describe("RealLive engine audio format", () => {
 		);
 	});
 
+	it("writes reconstructed negative sixteen-bit samples as signed words", () => {
+		const file = oneBlock({
+			channels: 1,
+			bps: 16,
+			compression: 0,
+			blockSize: 1,
+			initial: Buffer.from([0x00, 0x00]),
+			bits: [...valueBits(7, 3), 0, ...valueBits(0x81, 8)],
+		});
+		const layout = readNwaLayout(file, file.length);
+		if (!layout) throw new Error("no layout");
+		expect(unpackNwaPcm(file, layout)).toEqual(Buffer.from([0x00, 0xfe]));
+	});
+
 	it("stands the places of the picture of the walk of the places of the picture of the picture of the walk of the places of them beside each other", () => {
 		const bits: number[] = [
 			...valueBits(7, 3),
@@ -314,6 +328,9 @@ describe("RealLive engine audio format", () => {
 		if (!entry) throw new Error("no entry");
 		expect(entry.path).toBe("theme.wav");
 		const wav = await consumeBuffer(await handle.openEntry(entry.id));
+		expect(entry.size).toBe(BigInt(wav.length));
+		expect(entry.packedSize).toBe(BigInt(file.length));
+		expect(entry.compressed).toBe(true);
 		expect(wav.subarray(0, 4).toString("latin1")).toBe("RIFF");
 		expect(wav.subarray(8, 12).toString("latin1")).toBe("WAVE");
 		expect(wav.readUInt16LE(0x16)).toBe(1);
@@ -321,6 +338,76 @@ describe("RealLive engine audio format", () => {
 		expect(wav.readUInt16LE(0x20)).toBe(2);
 		expect(wav.readUInt16LE(0x22)).toBe(16);
 		expect(wav.subarray(0x2c, 0x2e)).toEqual(Buffer.from([0x00, 0x00]));
+	});
+
+	it("reports raw sounds as uncompressed serialized wave entries", async () => {
+		const file = Buffer.concat([
+			head({
+				channels: 1,
+				bps: 8,
+				compression: -1,
+				blockCount: 0,
+				pcmSize: 3,
+				sampleCount: 3,
+				blockSize: 3,
+			}),
+			Buffer.alloc(4),
+			Buffer.from([0x11, 0x22, 0x33]),
+		]);
+		const handle = await realliveNwaAudioFormat.open(
+			new BufferByteSource(file),
+			"raw.nwa",
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const wav = await consumeBuffer(await handle.openEntry(entry.id));
+		expect(entry.size).toBe(47n);
+		expect(entry.size).toBe(BigInt(wav.length));
+		expect(entry.packedSize).toBe(BigInt(file.length));
+		expect(entry.compressed).toBe(false);
+		expect(wav.subarray(0x2c)).toEqual(Buffer.from([0x11, 0x22, 0x33]));
+	});
+
+	it("accepts structurally valid long sounds above the old eight MiB limit", () => {
+		const pcmSize = 12 * 1024 * 1024;
+		const file = Buffer.concat([
+			head({
+				channels: 2,
+				bps: 16,
+				compression: 5,
+				blockCount: 1,
+				pcmSize,
+				sampleCount: pcmSize / 2,
+				blockSize: pcmSize / 2,
+			}),
+			Buffer.alloc(8),
+		]);
+		expect(readNwaLayout(file, file.length)?.pcmSize).toBe(pcmSize);
+	});
+
+	it("rejects non-increasing block offsets", () => {
+		const offsets = Buffer.alloc(8);
+		offsets.writeUInt32LE(DATA_OFFSET + offsets.length, 0);
+		offsets.writeUInt32LE(DATA_OFFSET + offsets.length, 4);
+		const twoBlocks = Buffer.concat([
+			head({
+				channels: 1,
+				bps: 8,
+				compression: 0,
+				blockCount: 2,
+				pcmSize: 2,
+				sampleCount: 2,
+				blockSize: 1,
+			}),
+			Buffer.alloc(4),
+			offsets,
+			Buffer.from([0x10, 0x0f, 0x20, 0x0f]),
+		]);
+		const layout = readNwaLayout(twoBlocks, twoBlocks.length);
+		if (!layout) throw new Error("no layout");
+		expect(() => unpackNwaPcm(twoBlocks, layout)).toThrow(
+			"The NWA block offsets are invalid",
+		);
 	});
 
 	it("is told by the words of the head of the sound", async () => {
