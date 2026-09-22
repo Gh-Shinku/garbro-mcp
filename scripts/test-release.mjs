@@ -145,6 +145,7 @@ async function smoke(bundlePath, outputRoot) {
 		}
 		const source = { rootId: "samples", path: "basic.xp3" };
 		const serverInfo = await call("get_server_info");
+		assert.equal(serverInfo.outcome.status, "ok");
 		assert.equal(serverInfo.server.version, version);
 		assert.equal(serverInfo.server.buildId, buildManifest.buildId);
 		assert.equal(

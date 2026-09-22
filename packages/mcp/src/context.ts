@@ -23,8 +23,11 @@ export function fitsResponse(
 	payload: Record<string, unknown>,
 	budget: number,
 ): boolean {
+	// Server responses add the common outcome envelope after page composition.
+	const outcomeReserve = "outcome" in payload ? 0 : 256;
 	return (
-		Buffer.byteLength(JSON.stringify(toolResult(payload)), "utf8") <= budget
+		Buffer.byteLength(JSON.stringify(toolResult(payload)), "utf8") <=
+		budget - outcomeReserve
 	);
 }
 

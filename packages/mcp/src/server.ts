@@ -52,7 +52,23 @@ const errorSchema = z.object({
 	message: z.string(),
 	details: z.record(z.string(), z.unknown()).optional(),
 });
-const failureSchema = z.object({ error: errorSchema });
+const outcomeSchema = z.object({
+	status: z.enum(["ok", "partial", "unsupported", "ambiguous", "failed"]),
+	warnings: z.array(z.string()),
+	nextAction: z
+		.object({
+			code: z.string(),
+			message: z.string(),
+		})
+		.optional(),
+	verification: z
+		.object({
+			level: z.enum(["none", "signature", "structural", "decoded", "manifest"]),
+			evidence: z.array(z.record(z.string(), z.unknown())),
+		})
+		.optional(),
+});
+const failureSchema = z.object({ outcome: outcomeSchema, error: errorSchema });
 const sourceSchema = z.object({
 	rootId: z.string().min(1),
 	path: z.string().min(1),
@@ -144,15 +160,90 @@ const entrySchema = z.object({
 	metadata: z.record(z.string(), z.unknown()).optional(),
 });
 const successOrFailure = <T extends z.ZodType>(schema: T) =>
-	z.union([schema, failureSchema]);
+	z.union([
+		z.intersection(schema, z.object({ outcome: outcomeSchema })),
+		failureSchema,
+	]);
 
-function success<const T extends Record<string, unknown>>(payload: T) {
-	if (!fitsResponse(payload, MAX_RESPONSE_BYTES))
+type Outcome = z.infer<typeof outcomeSchema>;
+
+function inferOutcome(payload: Record<string, unknown>): Outcome {
+	const status =
+		payload.recognized === false || payload.status === "unsupported"
+			? "unsupported"
+			: payload.status === "ambiguous"
+				? "ambiguous"
+				: payload.status === "failed"
+					? "failed"
+					: payload.status === "partial" || payload.hasFailures === true
+						? "partial"
+						: "ok";
+	const warnings = Array.isArray(payload.warnings)
+		? payload.warnings.filter(
+				(warning): warning is string => typeof warning === "string",
+			)
+		: [];
+	const nextAction =
+		typeof payload.nextAction === "string"
+			? {
+					code:
+						status === "unsupported"
+							? "provide_metadata_or_supported_resource"
+							: status === "ambiguous"
+								? "narrow_selection"
+								: "review_result",
+					message: payload.nextAction,
+				}
+			: status === "failed"
+				? {
+						code: "inspect_error",
+						message: "Inspect the structured error and retry safely.",
+					}
+				: status === "partial"
+					? {
+							code: "review_failures",
+							message: "Review failed items before continuing.",
+						}
+					: undefined;
+	const validation = payload.validation;
+	const verification: Outcome["verification"] =
+		validation === "signature" ||
+		validation === "structural" ||
+		validation === "decoded"
+			? {
+					level: validation,
+					evidence: [
+						{
+							validation,
+							...(typeof payload.confidence === "string"
+								? { confidence: payload.confidence }
+								: {}),
+						},
+					],
+				}
+			: undefined;
+	return {
+		status,
+		warnings,
+		...(nextAction === undefined ? {} : { nextAction }),
+		...(verification === undefined ? {} : { verification }),
+	};
+}
+
+function success<const T extends Record<string, unknown>>(
+	payload: T,
+	outcome: Outcome = inferOutcome(payload),
+) {
+	const result = { ...payload, outcome };
+	if (!fitsResponse(result, MAX_RESPONSE_BYTES))
 		throw new GarbroError(
 			"LIMIT_EXCEEDED",
 			"Response exceeds 64 KiB. Request a smaller page or summary detail.",
 		);
-	return toolResult(payload);
+	return {
+		...toolResult(result),
+		...(outcome.status === "failed" ? { isError: true } : {}),
+	};
 }
 
 function budgetsFromWire(
@@ -217,6 +308,14 @@ function failure(error: unknown) {
 			: { details: garbroError.details }),
 	};
 	const payload = {
+		outcome: {
+			status: "failed" as const,
+			warnings: [],
+			nextAction: {
+				code: "inspect_error",
+				message: "Inspect the structured error and retry safely.",
+			},
+		},
 		error: errorPayload,
 	};
 	while (

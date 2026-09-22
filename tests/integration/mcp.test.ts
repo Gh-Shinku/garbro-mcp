@@ -85,9 +85,10 @@ describe("MCP server", () => {
 
 		const info = await client.callTool({ name: "get_server_info" });
 		expect(info.structuredContent).toMatchObject({
+			outcome: { status: "ok", warnings: [] },
 			server: {
 				buildId: "development",
-				protocolVersion: "1",
+				protocolVersion: "2",
 				dirty: true,
 			},
 			inputRoots: [{ id: "games", path: root }],
@@ -151,6 +152,10 @@ describe("MCP server", () => {
 		});
 		expect(unsupported.structuredContent).toMatchObject({
 			status: "unsupported",
+			outcome: {
+				status: "unsupported",
+				nextAction: { code: "provide_metadata_or_supported_resource" },
+			},
 			total: 0,
 			nextAction: expect.stringContaining("alias"),
 		});
@@ -394,6 +399,10 @@ describe("MCP server", () => {
 		expect(extracted.isError).not.toBe(true);
 		expect(extracted.structuredContent).toMatchObject({
 			status: "partial",
+			outcome: {
+				status: "partial",
+				nextAction: { code: "review_failures" },
+			},
 			hasFailures: true,
 			extracted: 1,
 			failed: 1,
@@ -437,7 +446,10 @@ describe("MCP server", () => {
 		});
 		expect(unsafe).toMatchObject({
 			isError: true,
-			structuredContent: { error: { code: "UNSAFE_PATH" } },
+			structuredContent: {
+				outcome: { status: "failed" },
+				error: { code: "UNSAFE_PATH" },
+			},
 		});
 	});
 
