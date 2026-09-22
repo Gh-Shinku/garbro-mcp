@@ -26,10 +26,9 @@ import {
 	MAX_RESPONSE_BYTES,
 	toolResult,
 } from "./context.js";
+import { BUILD_IDENTITY } from "./build.js";
 
-declare const GARBRO_MCP_VERSION: string;
-export const SERVER_VERSION =
-	typeof GARBRO_MCP_VERSION === "string" ? GARBRO_MCP_VERSION : "0.0.0";
+export const SERVER_VERSION = BUILD_IDENTITY.version;
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const errorCodes = [
 	"INVALID_ARCHIVE",
@@ -316,6 +315,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						name: z.literal("garbro-mcp"),
 						version: z.string(),
 						transport: z.literal("stdio"),
+						gitCommit: z.string(),
+						builtAt: z.string(),
+						buildId: z.string(),
+						formatCatalogSha256: z.string(),
+						dirty: z.boolean(),
+						protocolVersion: z.string(),
 					}),
 					inputRoots: z.array(z.object({ id: z.string(), path: z.string() })),
 					outputRoot: z.string(),
@@ -346,7 +351,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				return success({
 					server: {
 						name: "garbro-mcp" as const,
-						version: SERVER_VERSION,
+						...BUILD_IDENTITY,
 						transport: "stdio" as const,
 					},
 					inputRoots: workspace.inputRoots.map((root) => ({ ...root })),

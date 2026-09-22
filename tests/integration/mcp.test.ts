@@ -69,6 +69,11 @@ describe("MCP server", () => {
 
 		const info = await client.callTool({ name: "get_server_info" });
 		expect(info.structuredContent).toMatchObject({
+			server: {
+				buildId: "development",
+				protocolVersion: "1",
+				dirty: true,
+			},
 			inputRoots: [{ id: "games", path: root }],
 			outputRoot: output,
 			limits: { decodedResourceMaxBytes: 256 * 1024 * 1024 },

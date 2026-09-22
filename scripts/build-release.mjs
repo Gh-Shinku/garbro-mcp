@@ -34,6 +34,20 @@ const version = validateVersion(
 	values.version ?? manifest.version,
 	values.prerelease,
 );
+const commit = run("git", ["rev-parse", "HEAD"], {
+	cwd: repositoryRoot,
+}).trim();
+const dirty =
+	run("git", ["status", "--porcelain", "--untracked-files=no"], {
+		cwd: repositoryRoot,
+	}).trim().length > 0;
+const builtAt = new Date().toISOString();
+const formatCatalogSha256 = createHash("sha256")
+	.update(await readFile(resolve(repositoryRoot, "docs/support-status.json")))
+	.digest("hex");
+const buildId = createHash("sha256")
+	.update(`${version}\0${commit}\0${formatCatalogSha256}\0${dirty}`)
+	.digest("hex");
 await mkdir(releaseDirectory, { recursive: true });
 const staging = await mkdtemp(resolve(releaseDirectory, ".build-"));
 
@@ -96,7 +110,14 @@ try {
 		format: "cjs",
 		metafile: true,
 		legalComments: "eof",
-		define: { GARBRO_MCP_VERSION: JSON.stringify(version) },
+		define: {
+			GARBRO_MCP_VERSION: JSON.stringify(version),
+			GARBRO_MCP_GIT_COMMIT: JSON.stringify(commit),
+			GARBRO_MCP_BUILT_AT: JSON.stringify(builtAt),
+			GARBRO_MCP_BUILD_ID: JSON.stringify(buildId),
+			GARBRO_MCP_FORMAT_CATALOG_SHA256: JSON.stringify(formatCatalogSha256),
+			GARBRO_MCP_BUILD_DIRTY: JSON.stringify(dirty),
+		},
 	});
 	for (const output of Object.values(bundle.metafile.outputs))
 		for (const imported of output.imports)
@@ -153,9 +174,11 @@ try {
 		`${JSON.stringify(
 			{
 				version,
-				commit: run("git", ["rev-parse", "HEAD"], {
-					cwd: repositoryRoot,
-				}).trim(),
+				commit,
+				builtAt,
+				buildId,
+				formatCatalogSha256,
+				dirty,
 				dependencies,
 			},
 			null,

@@ -27,6 +27,9 @@ const manifest = JSON.parse(
 );
 const version = validateVersion(values.version ?? manifest.version);
 const prefix = `garbro-mcp-${version}`;
+const buildManifest = JSON.parse(
+	await readFile(resolve(releaseDirectory, `${prefix}-build.json`), "utf8"),
+);
 const checksums = (
 	await readFile(resolve(releaseDirectory, `${prefix}-SHA256SUMS`), "utf8")
 )
@@ -68,6 +71,30 @@ async function smoke(bundlePath, outputRoot) {
 		run(process.execPath, [bundlePath, "--version"], { cwd }).trim(),
 		version,
 	);
+	const versionJson = JSON.parse(
+		run(process.execPath, [bundlePath, "--version", "--json"], { cwd }),
+	);
+	assert.equal(versionJson.buildId, buildManifest.buildId);
+	assert.equal(versionJson.gitCommit, buildManifest.commit);
+	const doctor = JSON.parse(
+		run(
+			process.execPath,
+			[
+				bundlePath,
+				"--input-root",
+				`samples=${input}`,
+				"--output-root",
+				outputRoot,
+				"--expected-build-id",
+				buildManifest.buildId,
+				"--doctor",
+				"--json",
+			],
+			{ cwd },
+		),
+	);
+	assert.equal(doctor.status, "ok");
+	assert.equal(doctor.build.buildId, buildManifest.buildId);
 	const transport = new StdioClientTransport({
 		command: process.execPath,
 		args: [
@@ -114,7 +141,13 @@ async function smoke(bundlePath, outputRoot) {
 			return result.structuredContent;
 		}
 		const source = { rootId: "samples", path: "basic.xp3" };
-		assert.equal((await call("get_server_info")).server.version, version);
+		const serverInfo = await call("get_server_info");
+		assert.equal(serverInfo.server.version, version);
+		assert.equal(serverInfo.server.buildId, buildManifest.buildId);
+		assert.equal(
+			serverInfo.server.formatCatalogSha256,
+			buildManifest.formatCatalogSha256,
+		);
 		assert.equal(
 			(await call("list_formats", { extension: "xp3" })).formats[0].id,
 			"xp3",
