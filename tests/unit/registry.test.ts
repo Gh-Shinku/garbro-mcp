@@ -1,14 +1,15 @@
-import {
-	FormatRegistry,
-	type ArchiveFormat,
-	type ArchiveHandle,
-	type ByteSource,
-	type FormatDescriptor,
-} from "@garbro-mcp/core";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { Readable } from "node:stream";
+import {
+	type ArchiveFormat,
+	type ArchiveHandle,
+	type ByteSource,
+	type FormatDescriptor,
+	FormatRegistry,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { afterEach, describe, expect, it } from "vitest";
 
 const temporaryDirectories: string[] = [];
@@ -30,6 +31,7 @@ function testFormat(
 		extensionFallback?: boolean;
 		detected?: boolean;
 		onDetect?: () => void;
+		openError?: boolean;
 	},
 ): ArchiveFormat {
 	const descriptor: FormatDescriptor = {
@@ -61,6 +63,9 @@ function testFormat(
 			return options.detected ?? true;
 		},
 		async open(source: ByteSource, sourcePath: string): Promise<ArchiveHandle> {
+			if (options.openError) {
+				throw new GarbroError("INVALID_ARCHIVE", `${id} index is invalid`);
+			}
 			return {
 				sourcePath,
 				format: descriptor,
@@ -131,5 +136,26 @@ describe("FormatRegistry detection catalog", () => {
 		await expect(registry.detectArchive(path)).resolves.toMatchObject({
 			format: { id: "variant" },
 		});
+	});
+
+	it("skips detected candidates whose complete structure is invalid", async () => {
+		const path = await fixture("sample.dat", Buffer.from("ambiguous payload"));
+		const registry = new FormatRegistry([
+			testFormat("shallow", {
+				extensions: ["dat"],
+				openError: true,
+			}),
+			testFormat("valid", { detected: true }),
+		]);
+
+		await expect(registry.detectArchive(path)).resolves.toMatchObject({
+			format: { id: "valid" },
+		});
+		const opened = await registry.openArchive(path);
+		try {
+			expect(opened.format.id).toBe("valid");
+		} finally {
+			await opened.close();
+		}
 	});
 });

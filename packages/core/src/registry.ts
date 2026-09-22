@@ -44,44 +44,53 @@ export class FormatRegistry {
 
 	async detectArchive(inputPath: string): Promise<DetectionResult | undefined> {
 		const sourcePath = resolve(inputPath);
-		const source = await FileByteSource.open(sourcePath);
-		try {
-			for (const format of await this.#detectionCandidates(
-				source,
-				sourcePath,
-			)) {
+		for (const format of await this.#candidateFormats(sourcePath)) {
+			const source = await FileByteSource.open(sourcePath);
+			let handle: ArchiveHandle | undefined;
+			try {
 				if (await format.detect(source, sourcePath)) {
+					handle = await format.open(source, sourcePath);
 					return {
 						path: sourcePath,
 						size: source.size,
 						format: format.descriptor,
 					};
 				}
+			} catch (error) {
+				if (!isInvalidCandidate(error)) throw error;
+			} finally {
+				if (handle) await handle.close();
+				else await source.close();
 			}
-			return undefined;
-		} finally {
-			await source.close();
 		}
+		return undefined;
 	}
 
 	async openArchive(inputPath: string): Promise<ArchiveHandle> {
 		const sourcePath = resolve(inputPath);
-		const source = await FileByteSource.open(sourcePath);
-		try {
-			for (const format of await this.#detectionCandidates(
-				source,
-				sourcePath,
-			)) {
+		for (const format of await this.#candidateFormats(sourcePath)) {
+			const source = await FileByteSource.open(sourcePath);
+			try {
 				if (await format.detect(source, sourcePath))
 					return await format.open(source, sourcePath);
+				await source.close();
+			} catch (error) {
+				await source.close();
+				if (!isInvalidCandidate(error)) throw error;
 			}
-			throw new GarbroError(
-				"INVALID_ARCHIVE",
-				`No supported archive format detected: ${sourcePath}`,
-			);
-		} catch (error) {
+		}
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`No supported archive format detected: ${sourcePath}`,
+		);
+	}
+
+	async #candidateFormats(sourcePath: string): Promise<ArchiveFormat[]> {
+		const source = await FileByteSource.open(sourcePath);
+		try {
+			return await this.#detectionCandidates(source, sourcePath);
+		} finally {
 			await source.close();
-			throw error;
 		}
 	}
 
@@ -149,4 +158,8 @@ export class FormatRegistry {
 			)
 			.map(({ format }) => format);
 	}
+}
+
+function isInvalidCandidate(error: unknown): boolean {
+	return error instanceof GarbroError && error.code === "INVALID_ARCHIVE";
 }
