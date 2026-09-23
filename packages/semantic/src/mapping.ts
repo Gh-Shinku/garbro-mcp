@@ -237,10 +237,11 @@ function mapRowsToRecords(
 	rows: readonly SemanticMapRow[],
 	source: InputReference,
 	sha256: string,
+	defaultResourceRootId = source.rootId,
 ): SemanticRecord[] {
 	const records = new Map<string, SemanticRecord>();
 	for (const [index, row] of rows.entries()) {
-		const rootId = row.rootId ?? source.rootId;
+		const rootId = row.rootId ?? defaultResourceRootId;
 		const resourcePath = normalizeWorkspaceRelativePath(row.resourcePath);
 		const subjectId = stableSemanticId("entity", {
 			type: row.subjectType,
@@ -312,6 +313,7 @@ export function parseSemanticMap(
 	bytes: Uint8Array,
 	format: "json" | "csv",
 	source: InputReference,
+	options: { defaultResourceRootId?: string } = {},
 ): SemanticMapImport {
 	const buffer = Buffer.from(bytes);
 	const sha256 = createHash("sha256").update(buffer).digest("hex");
@@ -331,7 +333,12 @@ export function parseSemanticMap(
 	return {
 		sha256,
 		rows: rows.length,
-		records: mapRowsToRecords(rows, source, sha256),
+		records: mapRowsToRecords(
+			rows,
+			source,
+			sha256,
+			options.defaultResourceRootId ?? source.rootId,
+		),
 	};
 }
 

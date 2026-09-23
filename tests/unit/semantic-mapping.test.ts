@@ -59,7 +59,8 @@ describe("semantic mapping imports", () => {
 				}),
 			),
 			"json",
-			{ rootId: "games", path: "appearance.json" },
+			{ rootId: "external-map", path: "appearance.json" },
+			{ defaultResourceRootId: "games" },
 		);
 		expect(
 			imported.records.some(
@@ -67,6 +68,9 @@ describe("semantic mapping imports", () => {
 					record.kind === "entity" && record.type === "appearance:appearance",
 			),
 		).toBe(true);
+		expect(
+			[...imported.records].find((record) => record.kind === "resource"),
+		).toMatchObject({ locator: { source: { rootId: "games" } } });
 	});
 
 	it("bridges existing resource aliases into the semantic relation model", () => {
