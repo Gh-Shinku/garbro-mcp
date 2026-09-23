@@ -11,8 +11,6 @@ import {
 	formatToWire,
 	GarbroError,
 	readExtractionReport,
-	ResourceCatalogIndex,
-	type ResourceAlias,
 	entryResourceTypes,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
@@ -23,15 +21,6 @@ import {
 	createDefaultRegistry,
 	formatSupportCatalog,
 } from "@garbro-mcp/formats";
-import {
-	canonicalJson,
-	createDefaultVocabularyRegistry,
-	type LoadedSemanticCatalog,
-	readSemanticCatalog,
-	SemanticCatalogIndex,
-	type SemanticQuery,
-	type SemanticRecord,
-} from "@garbro-mcp/semantic";
 import { McpServer, type ServerContext } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import {
@@ -51,7 +40,6 @@ export const SERVER_SCOPE = [
 	"bounded metadata inspection",
 	"safe planned extraction",
 	"artifact verification",
-	"externally supplied resource mappings",
 ] as const;
 export const SERVER_NON_CAPABILITIES = [
 	"game logic reverse engineering",
@@ -62,9 +50,9 @@ export const SERVER_NON_CAPABILITIES = [
 ] as const;
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
-Use garbro-mcp for deterministic resource access: scan known files, inspect archives, classify entries, plan extraction, extract, and verify artifacts. It may query mappings explicitly supplied by the user or another external analysis tool.
+Use garbro-mcp for deterministic resource access: scan known files, inspect archives, classify entries, plan extraction, extract, and verify artifacts.
 
-Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a relationship that is not present in a configured mapping, report that the resource bytes may be extractable but the mapping requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
+Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a semantic relationship, report that the resource bytes may be extractable but the relationship requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const errorCodes = [
 	"INVALID_ARCHIVE",
@@ -106,15 +94,6 @@ const sourceSchema = z.object({
 	path: z.string().min(1),
 });
 const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
-const semanticNameSchema = z.string().regex(/^[^:]+:[^:]+$/);
-const assertionStatuses = [
-	"verified",
-	"user-confirmed",
-	"candidate",
-	"conflicted",
-	"rejected",
-	"unresolved",
-] as const;
 const extractionSelectionSchema = z.discriminatedUnion("mode", [
 	z.object({
 		mode: z.literal("all"),
@@ -522,9 +501,6 @@ export interface BuildServerOptions
 		ArchiveAutomationOptions {
 	registry?: FormatRegistry;
 	workspace?: WorkspacePolicy;
-	resourceAliases?: readonly ResourceAlias[];
-	resourceMappingRecords?: readonly SemanticRecord[];
-	resourceMappingCatalogs?: readonly LoadedSemanticCatalog[];
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -560,45 +536,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			(support) => [support.localId, support],
 		),
 	);
-	const configuredInputRoots = new Set(
-		workspace.inputRoots.map((root) => root.id),
-	);
-	for (const resource of options.resourceAliases ?? [])
-		if (!configuredInputRoots.has(resource.locator.source.rootId))
-			throw new GarbroError(
-				"INVALID_ARGUMENT",
-				`Resource catalog uses unknown input root: ${resource.locator.source.rootId}`,
-			);
-	const resourceCatalog = new ResourceCatalogIndex(
-		options.resourceAliases ?? [],
-	);
-	const semanticRecordMap = new Map<string, SemanticRecord>();
-	for (const record of options.resourceMappingRecords ?? []) {
-		const existing = semanticRecordMap.get(record.id);
-		if (
-			existing &&
-			canonicalJson(existing as never) !== canonicalJson(record as never)
-		)
-			throw new GarbroError(
-				"INVALID_ARGUMENT",
-				`Conflicting configured resource-mapping record ID: ${record.id}`,
-			);
-		semanticRecordMap.set(record.id, record);
-	}
-	const semanticRecords = [...semanticRecordMap.values()];
-	const semanticCatalogs = [...(options.resourceMappingCatalogs ?? [])];
-	for (const record of semanticRecords)
-		if (
-			record.kind === "resource" &&
-			!configuredInputRoots.has(record.locator.source.rootId)
-		)
-			throw new GarbroError(
-				"INVALID_ARGUMENT",
-				`Resource mapping uses unknown input root: ${record.locator.source.rootId}`,
-			);
-	const semanticVocabularies = createDefaultVocabularyRegistry();
-	const configuredSemanticIndex = new SemanticCatalogIndex();
-	for (const record of semanticRecords) configuredSemanticIndex.add(record);
 	const server = new McpServer(
 		{ name: "garbro-mcp", version: SERVER_VERSION },
 		{ instructions: SERVER_INSTRUCTIONS },
@@ -619,7 +556,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					purpose: z.string(),
 					scope: z.array(z.string()),
 					notSupported: z.array(z.string()),
-					mappingPolicy: z.literal("external-evidence-only"),
 					server: z.object({
 						name: z.literal("garbro-mcp"),
 						version: z.string(),
@@ -628,7 +564,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						builtAt: z.string(),
 						buildId: z.string(),
 						formatCatalogSha256: z.string(),
-						resourceMappingCatalogSha256: z.string(),
 						dirty: z.boolean(),
 						protocolVersion: z.string(),
 					}),
@@ -649,13 +584,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						entryResourceTypes: z.array(z.enum(entryResourceTypes)),
 						conflictPolicies: z.array(z.enum(["fail", "skip", "overwrite"])),
 						archiveCreation: z.literal(false),
-						resourceCatalogEntries: z.number().int().nonnegative(),
-						resourceMappings: z.object({
-							vocabularies: z.record(z.string(), z.number().int().positive()),
-							configuredRecords: z.number().int().nonnegative(),
-							configuredCatalogs: z.number().int().nonnegative(),
-							policy: z.literal("external-evidence-only"),
-						}),
 					}),
 				}),
 			),
@@ -668,7 +596,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					purpose: SERVER_PURPOSE,
 					scope: [...SERVER_SCOPE],
 					notSupported: [...SERVER_NON_CAPABILITIES],
-					mappingPolicy: "external-evidence-only" as const,
 					server: {
 						name: "garbro-mcp" as const,
 						...BUILD_IDENTITY,
@@ -687,350 +614,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						entryResourceTypes: [...entryResourceTypes],
 						conflictPolicies: ["fail", "skip", "overwrite"] as const,
 						archiveCreation: false as const,
-						resourceCatalogEntries: resourceCatalog.resources.length,
-						resourceMappings: {
-							vocabularies: semanticVocabularies.versions(),
-							configuredRecords: semanticRecords.length,
-							configuredCatalogs: semanticCatalogs.length,
-							policy: "external-evidence-only" as const,
-						},
 					},
 				});
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"query_resource_mappings",
-		{
-			description:
-				"Query only externally supplied or previously verified resource mappings. This tool does not infer game semantics, reverse-engineer game logic, or create mappings.",
-			inputSchema: z.object({
-				entityType: semanticNameSchema.optional(),
-				predicate: semanticNameSchema.optional(),
-				query: z.string().optional(),
-				resourceType: z.string().min(1).optional(),
-				statuses: z.array(z.enum(assertionStatuses)).min(1).optional(),
-				catalogPath: z.string().min(1).optional(),
-				outputRootId: z.string().min(1).optional(),
-				gameFingerprint: z
-					.string()
-					.regex(/^[0-9a-f]{64}$/)
-					.optional(),
-				includeEvidence: z.boolean().default(false),
-				offset: z.number().int().nonnegative().default(0),
-				limit: z.number().int().positive().max(1000).default(100),
-				maxResponseBytes: budgetSchema,
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					status: z.enum(["resolved", "ambiguous", "unsupported"]),
-					reason: z
-						.enum(["missing_resource_mapping", "unverified_resource_mapping"])
-						.optional(),
-					nextAction: z.string().optional(),
-					warnings: z.array(z.string()),
-					totalNodes: z.number().int().nonnegative(),
-					totalRelations: z.number().int().nonnegative(),
-					offset: z.number().int().nonnegative(),
-					limit: z.number().int().positive(),
-					nextOffset: z.number().int().nonnegative().nullable(),
-					responseTruncated: z.boolean(),
-					nodes: z.array(z.record(z.string(), z.unknown())),
-					relations: z.array(z.record(z.string(), z.unknown())),
-					resources: z.array(z.record(z.string(), z.unknown())),
-					evidence: z.array(z.record(z.string(), z.unknown())).optional(),
-				}),
-			),
-			annotations: readOnly,
-		},
-		async ({
-			includeEvidence,
-			offset,
-			limit,
-			maxResponseBytes,
-			catalogPath,
-			outputRootId,
-			gameFingerprint,
-			...query
-		}) => {
-			try {
-				if (catalogPath === undefined && outputRootId !== undefined)
-					throw new GarbroError(
-						"INVALID_ARGUMENT",
-						"outputRootId requires catalogPath",
-					);
-				const selectedCatalogs =
-					catalogPath === undefined
-						? semanticCatalogs.filter(
-								(catalog) =>
-									gameFingerprint === undefined ||
-									catalog.header.game.fingerprint === gameFingerprint,
-							)
-						: [
-								await readSemanticCatalog(
-									(
-										await workspace.resolveOutputArtifact(
-											catalogPath,
-											outputRootId,
-										)
-									).absolutePath,
-									semanticVocabularies,
-								),
-							];
-				if (
-					gameFingerprint !== undefined &&
-					selectedCatalogs.some(
-						(catalog) => catalog.header.game.fingerprint !== gameFingerprint,
-					)
-				)
-					throw new GarbroError(
-						"INVALID_ARGUMENT",
-						"Resource-mapping catalog game fingerprint does not match",
-					);
-				const indexes = [
-					...(catalogPath === undefined ? [configuredSemanticIndex] : []),
-					...selectedCatalogs.map((catalog) => catalog.index),
-				];
-				const nodes = new Map<string, SemanticRecord>();
-				const relations = new Map<string, SemanticRecord>();
-				for (const index of indexes) {
-					const result = index.query(
-						query as SemanticQuery,
-						semanticVocabularies,
-					);
-					for (const node of result.nodes) nodes.set(node.id, node);
-					for (const relation of result.relations)
-						relations.set(relation.id, relation);
-				}
-				const allRelations = [...relations.values()].sort((left, right) =>
-					left.id.localeCompare(right.id),
-				);
-				const allNodes = [...nodes.values()].sort((left, right) =>
-					left.id.localeCompare(right.id),
-				);
-				const allItems =
-					allRelations.length > 0 || query.predicate !== undefined
-						? allRelations
-						: allNodes;
-				const hasUnverifiedRelations = allRelations.some(
-					(record) =>
-						record.kind === "relation" &&
-						record.status !== "verified" &&
-						record.status !== "user-confirmed",
-				);
-				const mappingStatus =
-					allItems.length === 0
-						? ("unsupported" as const)
-						: hasUnverifiedRelations
-							? ("ambiguous" as const)
-							: ("resolved" as const);
-				const page = allItems.slice(offset, offset + limit);
-				return success(
-					boundedPage(
-						page,
-						(visible) => {
-							const visibleRelations = visible.filter(
-								(record) => record.kind === "relation",
-							);
-							const relatedNodes = new Map<string, SemanticRecord>();
-							for (const record of visible)
-								if (record.kind === "entity" || record.kind === "resource")
-									relatedNodes.set(record.id, record);
-							const referencedIds = new Set<string>();
-							for (const relation of visibleRelations) {
-								referencedIds.add(relation.subject);
-								if (relation.object.kind === "entity")
-									referencedIds.add(relation.object.id);
-							}
-							for (const index of indexes)
-								for (const id of referencedIds) {
-									const node = index.nodes.get(id);
-									if (node) relatedNodes.set(id, node);
-								}
-							const evidence = includeEvidence
-								? visibleRelations.flatMap((relation) =>
-										relation.evidenceIds.flatMap((id) =>
-											indexes.flatMap((index) => {
-												const item = index.evidence.get(id);
-												return item ? [item] : [];
-											}),
-										),
-									)
-								: undefined;
-							return {
-								status: mappingStatus,
-								warnings: hasUnverifiedRelations
-									? [
-											"Unverified mapping assertions are informational and must not drive extraction until confirmed externally.",
-										]
-									: [],
-								...(mappingStatus === "unsupported"
-									? {
-											reason: "missing_resource_mapping" as const,
-											nextAction:
-												"Provide a user-confirmed mapping or perform game-logic analysis outside garbro-mcp; this server will not infer the relationship.",
-										}
-									: mappingStatus === "ambiguous"
-										? {
-												reason: "unverified_resource_mapping" as const,
-												nextAction:
-													"Confirm the mapping outside garbro-mcp or supply a user-confirmed replacement before extraction.",
-											}
-										: {}),
-								totalNodes: allNodes.length,
-								totalRelations: allRelations.length,
-								offset,
-								limit,
-								nextOffset:
-									offset + visible.length < allItems.length
-										? offset + visible.length
-										: null,
-								responseTruncated: visible.length < page.length,
-								nodes: [...relatedNodes.values()].filter(
-									(record) => record.kind !== "resource",
-								),
-								relations: visibleRelations,
-								resources: [...relatedNodes.values()].filter(
-									(record) => record.kind === "resource",
-								),
-								...(evidence === undefined ? {} : { evidence }),
-							};
-						},
-						maxResponseBytes,
-						true,
-					),
-				);
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"search_resources",
-		{
-			description:
-				"Search an optional user-supplied alias catalog. Results state whether resolution is exact, ambiguous, or unsupported; this tool never guesses titles from opaque filenames.",
-			inputSchema: z.object({
-				query: z.string().trim().min(1),
-				rootId: z.string().min(1).optional(),
-				locale: z.string().min(1).optional(),
-				minDurationSeconds: z.number().nonnegative().optional(),
-				maxDurationSeconds: z.number().nonnegative().optional(),
-				limit: z.number().int().positive().max(100).default(20),
-				maxResponseBytes: budgetSchema,
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					status: z.enum(["resolved", "ambiguous", "unsupported"]),
-					reason: z.literal("missing_resource_mapping").optional(),
-					total: z.number().int().nonnegative(),
-					resultsOmitted: z.number().int().nonnegative(),
-					responseTruncated: z.boolean(),
-					nextAction: z.string().optional(),
-					results: z.array(
-						z.object({
-							aliases: z.array(z.string()),
-							locale: z.string().optional(),
-							locator: z.object({
-								source: sourceSchema,
-								entryId: z.string().optional(),
-							}),
-							metadata: z
-								.object({
-									title: z.string().optional(),
-									durationSeconds: z.number().optional(),
-									codec: z.string().optional(),
-									channels: z.number().int().positive().optional(),
-								})
-								.optional(),
-							expected: z
-								.object({
-									sha256: z.string().optional(),
-									decodedSha256: z.string().optional(),
-								})
-								.optional(),
-							matchedBy: z.enum(["alias", "title", "path"]),
-							matchedValue: z.string(),
-							exact: z.boolean(),
-						}),
-					),
-				}),
-			),
-			annotations: readOnly,
-		},
-		async ({ query, limit, maxResponseBytes, ...filters }) => {
-			try {
-				if (
-					filters.minDurationSeconds !== undefined &&
-					filters.maxDurationSeconds !== undefined &&
-					filters.minDurationSeconds > filters.maxDurationSeconds
-				)
-					throw new GarbroError(
-						"INVALID_ARGUMENT",
-						"minDurationSeconds must not exceed maxDurationSeconds",
-					);
-				const matches = resourceCatalog.search(query, {
-					...(filters.rootId === undefined ? {} : { rootId: filters.rootId }),
-					...(filters.locale === undefined ? {} : { locale: filters.locale }),
-					...(filters.minDurationSeconds === undefined
-						? {}
-						: { minDurationSeconds: filters.minDurationSeconds }),
-					...(filters.maxDurationSeconds === undefined
-						? {}
-						: { maxDurationSeconds: filters.maxDurationSeconds }),
-				});
-				const candidates = matches.slice(0, limit).map((match) => ({
-					aliases: [...match.resource.aliases],
-					...(match.resource.locale === undefined
-						? {}
-						: { locale: match.resource.locale }),
-					locator: match.resource.locator,
-					...(match.resource.metadata === undefined
-						? {}
-						: { metadata: match.resource.metadata }),
-					...(match.resource.expected === undefined
-						? {}
-						: { expected: match.resource.expected }),
-					matchedBy: match.matchedBy,
-					matchedValue: match.matchedValue,
-					exact: match.exact,
-				}));
-				const status =
-					matches.length === 1 && matches[0]?.exact
-						? "resolved"
-						: matches.length === 0
-							? "unsupported"
-							: "ambiguous";
-				return success(
-					boundedPage(
-						candidates,
-						(visible) => ({
-							status,
-							total: matches.length,
-							resultsOmitted: matches.length - visible.length,
-							responseTruncated: visible.length < matches.length,
-							...(status === "unsupported"
-								? {
-										reason: "missing_resource_mapping" as const,
-										nextAction:
-											"Provide an external alias mapping, or scan extractable resources by path and metadata; garbro-mcp will not infer the title or ownership.",
-									}
-								: status === "ambiguous"
-									? {
-											nextAction:
-												"Narrow by root, locale, duration, or choose a returned locator explicitly.",
-										}
-									: {}),
-							results: visible,
-						}),
-						maxResponseBytes,
-						true,
-					),
-				);
 			} catch (error) {
 				return failure(error);
 			}

@@ -18,7 +18,7 @@ The legacy single `--output-root <path>` form remains accepted as `default`. Wit
 `workspace` maps to the current directory and output defaults to `garbro-output` below it.
 
 Before connecting a client, run `--version --json` to record the immutable `buildId`, source commit,
-format-catalog hash, resource-mapping descriptor hash, and protocol version. `--doctor --json`
+format-catalog hash and protocol version. `--doctor --json`
 validates all configured roots. An
 optional `--expected-build-id` makes a stale or different bundle fail at startup.
 
@@ -27,8 +27,6 @@ optional `--expected-build-id` makes a stale or different bundle fail at startup
 | Tool | Purpose | Writes files |
 | --- | --- | --- |
 | `get_server_info` | Discover roots, output policy, limits, and capabilities | No |
-| `query_resource_mappings` | Query externally supplied, evidence-backed resource mappings | No |
-| `search_resources` | Resolve titles through an optional evidence-backed alias catalog | No |
 | `list_formats` | Query formats by resource type, status, or extension | No |
 | `scan_resources` | Detect supported resources under a logical directory | No |
 | `inspect_archive` | Detect and summarize one file | No |
@@ -65,49 +63,13 @@ preflights all sources and enforces budgets against the aggregate batch before i
 checks optional expected hashes/sizes, and validates WAV or Ogg structure. Its evidence level is
 `hash`, `structural`, or `manifest`; a successful write does not itself imply verified content.
 
-## Resource alias catalogs
-
-Opaque filenames do not contain soundtrack titles. Load user-supplied evidence outside the game
-directory with `--resource-catalog <json>` instead of asking the server to guess. Files use schema 1:
-
-```json
-{
-  "schemaVersion": 1,
-  "resources": [{
-    "aliases": ["散花"],
-    "locale": "ja-JP",
-    "locator": {
-      "source": { "rootId": "games", "path": "Rewrite/bgm/BGM042.nwa" }
-    },
-    "metadata": { "title": "Sange", "durationSeconds": 180 },
-    "expected": { "sha256": "<64 lowercase hex characters>" }
-  }]
-}
-```
-
-`search_resources` returns `resolved` only for one exact match. Partial or multiple matches are
-`ambiguous`; no evidence is `unsupported`. Both include a machine-readable next action.
-
-## Resource mappings and product boundary
+## Product boundary
 
 garbro-mcp detects, reads, decodes, extracts, and verifies supported resource formats. It does not
 reverse-engineer game logic, decompile executables, adapt itself to unknown engines, or infer
 character, dialogue, voice, or sprite relationships. An unknown engine may still contain supported
 archives and media; use `scan_resources` to discover those formats independently of the engine.
-
-Mappings must come from the user or an external analysis tool. Configure verified JSONL catalogs
-with `--resource-mapping-catalog <path>` and user-confirmed JSON or CSV mappings with
-`--resource-mapping <path>`; both options are repeatable. A mapping row contains `subjectType`,
-`subjectKey`, `predicate`, `resourceType`, `resourcePath`, and optionally `rootId`, `entryId`,
-`subjectName`, properties, and `override`. If `rootId` is omitted, the first configured input root
-is used.
-
-`query_resource_mappings` can read configured catalogs or a catalog below a named output root. Use
-`gameFingerprint` when several configured game catalogs are present. It returns only `verified` and
-`user-confirmed` relations by default. Candidate, conflicted, rejected, and unresolved assertions
-require an explicit `statuses` filter and must not drive extraction automatically. If no trusted
-mapping matches, the tool returns `missing_resource_mapping` and directs the agent to request user
-input or perform analysis outside garbro-mcp. It never guesses ownership from filenames.
+Semantic mappings belong in the calling agent or another specialized tool.
 
 ## Background extraction
 
@@ -123,12 +85,12 @@ modifies the source game files.
 
 Every tool result includes `outcome.status`: `ok`, `partial`, `unsupported`, `ambiguous`, or
 `failed`. It also contains `warnings`, and when relevant `nextAction` and `verification` evidence.
-Existing tool-specific `status` fields remain during the protocol-5 migration. Request failures and
+Existing tool-specific `status` fields remain during the protocol-6 migration. Request failures and
 fully failed operations set MCP `isError`; partial batches retain their structured results.
 
 ## Context-friendly defaults
 
-The interface exposes fourteen tools without additional prompts or resources. Format lists default
+The interface exposes twelve tools without additional prompts or resources. Format lists default
 to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
 summaries by default. Set `detail: "full"` only when attribution, implementation notes, checksums,
 raw names, or metadata are needed. `list_formats` accepts an exact `formatId` filter; scans reference

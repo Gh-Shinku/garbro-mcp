@@ -14,53 +14,11 @@ import { resolve } from "node:path";
 import { Readable } from "node:stream";
 import { type ArchiveEntry, FormatRegistry } from "@garbro-mcp/core";
 import { type BuildServerOptions, buildServer } from "@garbro-mcp/mcp/server";
-import type { SemanticRecord } from "@garbro-mcp/semantic";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { afterEach, describe, expect, it } from "vitest";
 
 const closers: Array<() => Promise<void>> = [];
 const temporaryDirectories: string[] = [];
-
-function voiceRecords(
-	status: "user-confirmed" | "candidate",
-): SemanticRecord[] {
-	return [
-		{
-			kind: "entity",
-			id: "character:kotori",
-			type: "vn:character",
-			properties: { name: "Kotori" },
-		},
-		{
-			kind: "resource",
-			id: "voice:kotori-1",
-			type: "garbro:resource",
-			resourceType: "audio",
-			locator: { source: { rootId: "games", path: "basic.xp3" }, entryId: "0" },
-			properties: {},
-		},
-		{
-			kind: "evidence",
-			id: "evidence:kotori-1",
-			type: "garbro:userMapping",
-			source: {
-				locator: { rootId: "games", path: "basic.xp3" },
-				sha256: "0".repeat(64),
-			},
-			producer: { analyzerId: "user.mapping", analyzerVersion: "1" },
-			method: "user-assertion",
-		},
-		{
-			kind: "relation",
-			id: "relation:kotori-1",
-			subject: "character:kotori",
-			predicate: "vn:voiceResource",
-			object: { kind: "entity", id: "voice:kotori-1" },
-			evidenceIds: ["evidence:kotori-1"],
-			status,
-		},
-	];
-}
 
 afterEach(async () => {
 	await Promise.all(closers.splice(0).map((close) => close()));
@@ -72,13 +30,7 @@ afterEach(async () => {
 });
 
 async function connect(
-	overrides: Pick<
-		BuildServerOptions,
-		| "registry"
-		| "resourceAliases"
-		| "resourceMappingRecords"
-		| "resourceMappingCatalogs"
-	> = {},
+	overrides: Pick<BuildServerOptions, "registry"> = {},
 	withMusicRoot = false,
 ) {
 	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
@@ -118,8 +70,6 @@ describe("MCP server", () => {
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual(
 			[
 				"get_server_info",
-				"query_resource_mappings",
-				"search_resources",
 				"list_formats",
 				"scan_resources",
 				"inspect_archive",
@@ -139,22 +89,18 @@ describe("MCP server", () => {
 			outcome: { status: "ok", warnings: [] },
 			server: {
 				buildId: "development",
-				protocolVersion: "5",
+				protocolVersion: "6",
 				dirty: true,
 			},
 			inputRoots: [{ id: "games", path: root }],
 			outputRoot: output,
 			limits: { decodedResourceMaxBytes: 256 * 1024 * 1024 },
 			purpose: expect.stringContaining("extract"),
-			mappingPolicy: "external-evidence-only",
 			notSupported: expect.arrayContaining([
 				"game logic reverse engineering",
 				"automatic semantic mapping",
 			]),
-			capabilities: {
-				archiveCreation: false,
-				resourceMappings: { policy: "external-evidence-only" },
-			},
+			capabilities: { archiveCreation: false },
 		});
 		expect(client.getInstructions()).toContain(
 			"Do not delegate game-logic reverse engineering",
@@ -173,102 +119,6 @@ describe("MCP server", () => {
 					status: "partial",
 				},
 			],
-		});
-	});
-
-	it("resolves only evidence-backed aliases from an optional catalog", async () => {
-		const { client } = await connect({
-			resourceAliases: [
-				{
-					aliases: ["散花"],
-					locale: "ja-JP",
-					locator: {
-						source: { rootId: "games", path: "basic.xp3" },
-						entryId: "0",
-					},
-					metadata: { title: "Sange", durationSeconds: 180 },
-				},
-			],
-		});
-		const resolved = await client.callTool({
-			name: "search_resources",
-			arguments: { query: "散花", locale: "ja-JP" },
-		});
-		expect(resolved.isError).not.toBe(true);
-		expect(resolved.structuredContent).toMatchObject({
-			status: "resolved",
-			total: 1,
-			results: [
-				{
-					matchedBy: "alias",
-					exact: true,
-					locator: {
-						source: { rootId: "games", path: "basic.xp3" },
-						entryId: "0",
-					},
-				},
-			],
-		});
-		const unsupported = await client.callTool({
-			name: "search_resources",
-			arguments: { query: "不存在的曲名" },
-		});
-		expect(unsupported.structuredContent).toMatchObject({
-			status: "unsupported",
-			reason: "missing_resource_mapping",
-			outcome: {
-				status: "unsupported",
-				nextAction: { code: "provide_metadata_or_supported_resource" },
-			},
-			total: 0,
-			nextAction: expect.stringContaining("alias"),
-		});
-	});
-
-	it("queries only externally supplied resource mappings", async () => {
-		const records = voiceRecords("user-confirmed");
-		const { client } = await connect({
-			resourceMappingRecords: records,
-		});
-		const queried = await client.callTool({
-			name: "query_resource_mappings",
-			arguments: { predicate: "vn:voiceResource", query: "Kotori" },
-		});
-		expect(queried.structuredContent).toMatchObject({
-			status: "resolved",
-			totalRelations: 1,
-			relations: [{ status: "user-confirmed" }],
-			resources: [{ resourceType: "audio" }],
-		});
-	});
-
-	it("reports that external analysis is required when no trusted mapping exists", async () => {
-		const { client } = await connect({
-			resourceMappingRecords: voiceRecords("candidate"),
-		});
-		const result = await client.callTool({
-			name: "query_resource_mappings",
-			arguments: { predicate: "vn:voiceResource" },
-		});
-		expect(result.structuredContent).toMatchObject({
-			status: "unsupported",
-			reason: "missing_resource_mapping",
-			totalRelations: 0,
-			nextAction: expect.stringContaining("outside garbro-mcp"),
-			outcome: { status: "unsupported" },
-		});
-		const candidate = await client.callTool({
-			name: "query_resource_mappings",
-			arguments: {
-				predicate: "vn:voiceResource",
-				statuses: ["candidate"],
-			},
-		});
-		expect(candidate.structuredContent).toMatchObject({
-			status: "ambiguous",
-			reason: "unverified_resource_mapping",
-			outcome: { status: "ambiguous" },
-			warnings: [expect.stringContaining("must not drive extraction")],
 		});
 	});
 

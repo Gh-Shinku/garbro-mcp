@@ -1,18 +1,10 @@
 #!/usr/bin/env node
 
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
-import { createHash } from "node:crypto";
 import { constants } from "node:fs";
-import { access, readFile } from "node:fs/promises";
-import { basename, extname, resolve } from "node:path";
+import { access } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { parseResourceCatalog, WorkspacePolicy } from "@garbro-mcp/core";
-import {
-	createDefaultVocabularyRegistry,
-	parseSemanticMap,
-	readSemanticCatalog,
-	resourceAliasesToSemanticRecords,
-} from "@garbro-mcp/semantic";
+import { WorkspacePolicy } from "@garbro-mcp/core";
 import { BUILD_IDENTITY } from "./build.js";
 import { buildServer } from "./server.js";
 
@@ -22,9 +14,6 @@ async function main(): Promise<void> {
 			"input-root": { type: "string", multiple: true },
 			"output-root": { type: "string", multiple: true },
 			"expected-build-id": { type: "string" },
-			"resource-catalog": { type: "string", multiple: true },
-			"resource-mapping-catalog": { type: "string", multiple: true },
-			"resource-mapping": { type: "string", multiple: true },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
 			help: { type: "boolean", short: "h" },
@@ -39,9 +28,6 @@ Options:
   --input-root <id=path>    Add a named readable root (repeatable)
   --output-root [id=]<path> Add a writable root (repeatable with IDs)
   --expected-build-id <id> Refuse to start a different build
-  --resource-catalog <path> Load an external alias catalog (repeatable)
-  --resource-mapping-catalog <path> Load a verified JSONL mapping catalog (repeatable)
-  --resource-mapping <path> Load a user-confirmed JSON or CSV mapping (repeatable)
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
   -v, --version             Show the server version
@@ -107,52 +93,6 @@ Options:
 		...(outputRoot === undefined ? {} : { outputRoot }),
 		...(outputRoots === undefined ? {} : { outputRoots }),
 	});
-	const resourceCatalogs = await Promise.all(
-		(values["resource-catalog"] ?? []).map(async (path) => {
-			const bytes = await readFile(path);
-			return {
-				path,
-				sha256: createHash("sha256").update(bytes).digest("hex"),
-				catalog: parseResourceCatalog(JSON.parse(bytes.toString("utf8"))),
-			};
-		}),
-	);
-	const resourceAliases = resourceCatalogs.flatMap(
-		({ catalog }) => catalog.resources,
-	);
-	const defaultResourceRootId = workspace.inputRoots[0]?.id;
-	if (defaultResourceRootId === undefined)
-		throw new Error("At least one input root is required");
-	const semanticMapImports = await Promise.all(
-		(values["resource-mapping"] ?? []).map(async (path) => {
-			const extension = extname(path).toLowerCase();
-			if (extension !== ".json" && extension !== ".csv")
-				throw new Error(`Resource mapping must be JSON or CSV: ${path}`);
-			return parseSemanticMap(
-				await readFile(path),
-				extension === ".csv" ? "csv" : "json",
-				{ rootId: "external-resource-mapping", path: basename(path) },
-				{ defaultResourceRootId },
-			);
-		}),
-	);
-	const semanticRecords = [
-		...resourceCatalogs.flatMap(({ path, catalog, sha256 }) =>
-			resourceAliasesToSemanticRecords(
-				catalog.resources,
-				{ rootId: "external-resource-catalog", path: basename(path) },
-				sha256,
-			),
-		),
-		...semanticMapImports.flatMap((item) => item.records),
-	];
-	const vocabularies = createDefaultVocabularyRegistry();
-	const semanticCatalogs = await Promise.all(
-		(values["resource-mapping-catalog"] ?? []).map((path) =>
-			readSemanticCatalog(resolve(path), vocabularies),
-		),
-	);
-
 	if (values.doctor) {
 		await workspace.prepare();
 		for (const root of workspace.outputRoots)
@@ -163,9 +103,6 @@ Options:
 			inputRoots: workspace.inputRoots,
 			outputRoot: workspace.outputRoot,
 			outputRoots: workspace.outputRoots,
-			resourceCatalogEntries: resourceAliases.length,
-			resourceMappingRecords: semanticRecords.length,
-			resourceMappingCatalogs: semanticCatalogs.length,
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,
@@ -173,14 +110,7 @@ Options:
 		return;
 	}
 
-	void serveStdio(() =>
-		buildServer({
-			workspace,
-			resourceAliases,
-			resourceMappingRecords: semanticRecords,
-			resourceMappingCatalogs: semanticCatalogs,
-		}),
-	);
+	void serveStdio(() => buildServer({ workspace }));
 	console.error("garbro-mcp server running on stdio");
 }
 

@@ -58,7 +58,6 @@ const input = resolve(sandbox, "input");
 const cwd = resolve(sandbox, "unrelated-working-directory");
 const portable = resolve(sandbox, "portable");
 const installation = resolve(sandbox, "installation");
-const resourceMapping = resolve(sandbox, "resource-mapping.json");
 const expectedFiles = [
 	"LICENSE",
 	"README.md",
@@ -77,10 +76,6 @@ async function smoke(bundlePath, outputRoot) {
 	);
 	assert.equal(versionJson.buildId, buildManifest.buildId);
 	assert.equal(versionJson.gitCommit, buildManifest.commit);
-	assert.equal(
-		versionJson.resourceMappingCatalogSha256,
-		buildManifest.resourceMappingCatalogSha256,
-	);
 	const doctor = JSON.parse(
 		run(
 			process.execPath,
@@ -90,8 +85,6 @@ async function smoke(bundlePath, outputRoot) {
 				`samples=${input}`,
 				"--output-root",
 				outputRoot,
-				"--resource-mapping",
-				resourceMapping,
 				"--expected-build-id",
 				buildManifest.buildId,
 				"--doctor",
@@ -110,8 +103,6 @@ async function smoke(bundlePath, outputRoot) {
 			`samples=${input}`,
 			"--output-root",
 			outputRoot,
-			"--resource-mapping",
-			resourceMapping,
 		],
 		cwd,
 		env: { ...process.env, NODE_PATH: "" },
@@ -131,8 +122,6 @@ async function smoke(bundlePath, outputRoot) {
 			names,
 			[
 				"get_server_info",
-				"query_resource_mappings",
-				"search_resources",
 				"list_formats",
 				"scan_resources",
 				"inspect_archive",
@@ -163,28 +152,7 @@ async function smoke(bundlePath, outputRoot) {
 			serverInfo.server.formatCatalogSha256,
 			buildManifest.formatCatalogSha256,
 		);
-		assert.equal(
-			serverInfo.server.resourceMappingCatalogSha256,
-			buildManifest.resourceMappingCatalogSha256,
-		);
-		assert.equal(serverInfo.mappingPolicy, "external-evidence-only");
 		assert(serverInfo.notSupported.includes("game logic reverse engineering"));
-		const mappedResource = await call("query_resource_mappings", {
-			predicate: "vn:voiceResource",
-			query: "fixture-character",
-		});
-		assert.equal(mappedResource.status, "resolved");
-		assert.equal(mappedResource.resources[0].locator.source.path, "basic.xp3");
-		const missingMapping = await client.callTool({
-			name: "query_resource_mappings",
-			arguments: { predicate: "vn:spokenBy" },
-		});
-		assert.equal(missingMapping.isError, undefined);
-		assert.equal(missingMapping.structuredContent.status, "unsupported");
-		assert.equal(
-			missingMapping.structuredContent.reason,
-			"missing_resource_mapping",
-		);
 		assert.equal(
 			(await call("list_formats", { extension: "xp3" })).formats[0].id,
 			"xp3",
@@ -323,22 +291,6 @@ try {
 	await copyFile(
 		resolve(repositoryRoot, "fixtures/xp3/basic.xp3"),
 		resolve(input, "basic.xp3"),
-	);
-	await writeFile(
-		resourceMapping,
-		JSON.stringify({
-			schemaVersion: 1,
-			mappings: [
-				{
-					subjectType: "vn:character",
-					subjectKey: "fixture-character",
-					subjectName: "fixture-character",
-					predicate: "vn:voiceResource",
-					resourceType: "audio",
-					resourcePath: "basic.xp3",
-				},
-			],
-		}),
 	);
 	const files = unzipSync(
 		await readFile(resolve(releaseDirectory, `${prefix}-portable.zip`)),

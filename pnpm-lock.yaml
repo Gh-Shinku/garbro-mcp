@@ -287,9 +287,6 @@ importers:
       '@garbro-mcp/formats':
         specifier: workspace:*
         version: link:../formats
-      '@garbro-mcp/semantic':
-        specifier: workspace:*
-        version: link:../semantic
       '@modelcontextprotocol/server':
         specifier: ^2.0.0
         version: 2.0.0
