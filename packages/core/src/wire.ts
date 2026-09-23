@@ -3,6 +3,7 @@ import type {
 	DetectionResult,
 	FormatDescriptor,
 } from "./types.js";
+import { entryResourceType } from "./resource-type.js";
 
 export function formatToWire(
 	format: FormatDescriptor,
@@ -20,6 +21,7 @@ export function entryToWire(entry: ArchiveEntry): Record<string, unknown> {
 	return {
 		id: entry.id,
 		path: entry.path,
+		resourceType: entryResourceType(entry),
 		...(entry.rawPath === undefined ? {} : { rawPath: entry.rawPath }),
 		size: entry.size.toString(),
 		...(entry.sizeKnown === undefined ? {} : { sizeKnown: entry.sizeKnown }),

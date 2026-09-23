@@ -124,10 +124,12 @@ describe("MCP server", () => {
 				"scan_resources",
 				"inspect_archive",
 				"list_entries",
-				"read_entry",
 				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
+				"start_extraction",
+				"get_extraction_status",
+				"cancel_extraction",
 				"verify_artifacts",
 			].sort(),
 		);
@@ -137,7 +139,7 @@ describe("MCP server", () => {
 			outcome: { status: "ok", warnings: [] },
 			server: {
 				buildId: "development",
-				protocolVersion: "4",
+				protocolVersion: "5",
 				dirty: true,
 			},
 			inputRoots: [{ id: "games", path: root }],
@@ -444,7 +446,7 @@ describe("MCP server", () => {
 		});
 	});
 
-	it("scans, inspects, filters, and previews by logical path", async () => {
+	it("scans, inspects, and filters by logical path", async () => {
 		const { client } = await connect();
 		const source = { rootId: "games", path: "basic.xp3" };
 
@@ -478,17 +480,67 @@ describe("MCP server", () => {
 		expect(entries.structuredContent).toMatchObject({
 			archiveTotal: 3,
 			matchedTotal: 1,
-			entries: [{ id: "1", path: "scripts/startup.tjs", size: "26" }],
+			entries: [
+				{
+					id: "1",
+					path: "scripts/startup.tjs",
+					size: "26",
+					resourceType: "script",
+				},
+			],
 		});
+		const scripts = await client.callTool({
+			name: "list_entries",
+			arguments: { source, resourceTypes: ["script"] },
+		});
+		expect(scripts.structuredContent).toMatchObject({
+			matchedTotal: 2,
+			entries: [{ resourceType: "script" }, { resourceType: "script" }],
+		});
+	});
 
-		const preview = await client.callTool({
-			name: "read_entry",
-			arguments: { source, entryId: "0", maxBytes: 5 },
+	it("runs extraction in a background job with pollable progress", async () => {
+		const { client, output } = await connect();
+		const started = await client.callTool({
+			name: "start_extraction",
+			arguments: {
+				source: { rootId: "games", path: "basic.xp3" },
+				outputSubdirectory: "async-output",
+				selection: { mode: "all", resourceTypes: ["script"] },
+			},
 		});
-		expect(preview.structuredContent).toMatchObject({
-			entry: { id: "0" },
-			preview: { kind: "text", bytesRead: 5, truncated: true },
+		expect(started.isError).not.toBe(true);
+		const jobId = (started.structuredContent as { jobId: string }).jobId;
+		let status:
+			| {
+					state: string;
+					status?: string;
+					selected?: number;
+					extracted?: number;
+			  }
+			| undefined;
+		for (let attempt = 0; attempt < 100; attempt += 1) {
+			const polled = await client.callTool({
+				name: "get_extraction_status",
+				arguments: { jobId, inline: "all" },
+			});
+			status = polled.structuredContent as typeof status;
+			if (
+				status !== undefined &&
+				["completed", "partial", "failed", "cancelled"].includes(status.state)
+			)
+				break;
+			await new Promise((resolve) => setTimeout(resolve, 5));
+		}
+		expect(status).toMatchObject({
+			state: "completed",
+			status: "completed",
+			selected: 2,
+			extracted: 2,
 		});
+		expect(
+			await stat(resolve(output, "async-output/scripts/startup.tjs")),
+		).toBeTruthy();
 	});
 
 	it("batch extracts per item and confines writes", async () => {
@@ -816,7 +868,7 @@ describe("MCP server", () => {
 		});
 	});
 
-	it("omits metadata by default and budgets escaped text and hex previews", async () => {
+	it("omits metadata by default and enforces response budgets", async () => {
 		const bytes = Buffer.alloc(65536, 0);
 		const entry: ArchiveEntry = {
 			id: "0",
@@ -877,25 +929,5 @@ describe("MCP server", () => {
 		expect(full.structuredContent).toMatchObject({
 			error: { code: "LIMIT_EXCEEDED" },
 		});
-		for (const mode of ["hex", "text"]) {
-			const preview = await client.callTool({
-				name: "read_entry",
-				arguments: {
-					source,
-					entryId: "0",
-					mode,
-					maxBytes: 65536,
-					maxResponseBytes: 2048,
-				},
-			});
-			expect(preview.isError).not.toBe(true);
-			expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThanOrEqual(
-				2048,
-			);
-			expect(preview.structuredContent).toMatchObject({
-				responseTruncated: true,
-				preview: { truncated: true },
-			});
-		}
 	});
 });

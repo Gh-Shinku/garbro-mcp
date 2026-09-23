@@ -80,24 +80,6 @@ describe("ArchiveAutomationService", () => {
 		});
 	});
 
-	it("returns bounded text and hex previews", async () => {
-		const { service } = await setup();
-		const source = { rootId: "games", path: "archives/basic.xp3" };
-
-		const text = await service.previewEntry(source, "0", { maxBytes: 5 });
-		expect(text.preview).toMatchObject({
-			kind: "text",
-			bytesRead: 5,
-			truncated: true,
-		});
-		const binary = await service.previewEntry(source, "2");
-		expect(binary.preview).toMatchObject({
-			kind: "hex",
-			bytesRead: 6,
-			truncated: false,
-		});
-	});
-
 	it("scans deterministically with opaque cursors and skips its output root", async () => {
 		const { root, output, service } = await setup();
 		await copyFile(xp3Fixture, resolve(root, "archives/second.xp3"));

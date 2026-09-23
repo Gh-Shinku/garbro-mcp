@@ -1,7 +1,7 @@
 # MCP automation interface
 
-The MCP server is a thin stdio adapter around `@garbro-mcp/core`. Detection, parsing, previews,
-selection, and extraction policy remain usable without MCP.
+The MCP server is a thin stdio adapter around `@garbro-mcp/core`. Detection, parsing, selection,
+and extraction policy remain usable without MCP.
 
 ## Filesystem policy
 
@@ -32,17 +32,20 @@ optional `--expected-build-id` makes a stale or different bundle fail at startup
 | `list_formats` | Query formats by resource type, status, or extension | No |
 | `scan_resources` | Detect supported resources under a logical directory | No |
 | `inspect_archive` | Detect and summarize one file | No |
-| `list_entries` | Filter and page an archive's entries | No |
-| `read_entry` | Return a capped text or hexadecimal preview | No |
+| `list_entries` | Filter and page an archive's entries, including conservative resource types | No |
 | `plan_extraction` | Preflight selection, conflicts, costs, budgets, and plan digest | No |
 | `extract_entries` | Extract all, selected IDs, or glob-matched entries | Yes |
 | `extract_resources` | Extract several source resources with total budgets | Yes |
+| `start_extraction` | Submit one extraction as a background job | Yes |
+| `get_extraction_status` | Poll a background extraction and read its report | No |
+| `cancel_extraction` | Request cancellation of a background extraction | No |
 | `verify_artifacts` | Hash and structurally verify output artifacts | No |
 
 `scan_resources` uses an opaque cursor and reports failures per file. `list_entries` uses numeric
-offset pagination and supports include/exclude globs plus compression and encryption filters.
-`read_entry` defaults to a 2 KiB preview, detects UTF-8/UTF-16LE/CP932 text, and falls back to hex
-for binary data. Larger previews are opt-in, up to 64 KiB of source bytes, subject to the response budget.
+offset pagination and supports include/exclude globs, compression/encryption filters, and
+`resourceTypes` (`audio`, `image`, `script`, `unknown`). Each entry reports a conservative type
+based on explicit format metadata or a recognized extension; it reports `unknown` instead of
+guessing. This is a media category, not a character, dialogue, or other semantic relationship.
 
 Call `plan_extraction` before a material write. It reports exact known input/output sizes, unknown
 sizes, conflicts, budget violations, and a `planDigest` without creating an output directory.
@@ -106,16 +109,26 @@ require an explicit `statuses` filter and must not drive extraction automaticall
 mapping matches, the tool returns `missing_resource_mapping` and directs the agent to request user
 input or perform analysis outside garbro-mcp. It never guesses ownership from filenames.
 
+## Background extraction
+
+For long-running work, use `start_extraction`. It returns a `jobId` without holding the MCP request
+open. Poll `get_extraction_status` until `state` is `completed`, `partial`, `failed`, or
+`cancelled`; terminal results include the same extraction counts and saved report metadata as
+`extract_entries`. `cancel_extraction` requests cancellation for queued or running work. Jobs are
+kept in the server process, so callers should persist the returned report path if they need the
+result after a server restart. Extraction still writes only below configured output roots and never
+modifies the source game files.
+
 ## Common outcome contract
 
 Every tool result includes `outcome.status`: `ok`, `partial`, `unsupported`, `ambiguous`, or
 `failed`. It also contains `warnings`, and when relevant `nextAction` and `verification` evidence.
-Existing tool-specific `status` fields remain during the protocol-4 migration. Request failures and
+Existing tool-specific `status` fields remain during the protocol-5 migration. Request failures and
 fully failed operations set MCP `isError`; partial batches retain their structured results.
 
 ## Context-friendly defaults
 
-The interface exposes twelve tools without additional prompts or resources. Format lists default
+The interface exposes fourteen tools without additional prompts or resources. Format lists default
 to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
 summaries by default. Set `detail: "full"` only when attribution, implementation notes, checksums,
 raw names, or metadata are needed. `list_formats` accepts an exact `formatId` filter; scans reference
@@ -123,8 +136,8 @@ formats by ID rather than repeating full descriptors for each file.
 
 Data tools accept `maxResponseBytes`, defaulting to 16 KiB, with a range of 2–64 KiB. This budgets
 the serialized tool result, including both structured content and its compatibility text copy, not
-just preview source bytes. It is a byte bound, not a token guarantee or a bound on protocol framing.
-Pages shrink and return `nextOffset` or `nextCursor`; previews shrink and mark `responseTruncated`.
+just serialized result bytes. It is a byte bound, not a token guarantee or a bound on protocol framing.
+Pages shrink and return `nextOffset` or `nextCursor`; extraction status pages mark `responseTruncated`.
 Always follow the returned continuation rather than adding the requested limit. A single item that
 cannot fit fails explicitly instead of being silently skipped. Request a summary or a larger budget.
 

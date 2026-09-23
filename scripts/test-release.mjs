@@ -137,10 +137,12 @@ async function smoke(bundlePath, outputRoot) {
 				"scan_resources",
 				"inspect_archive",
 				"list_entries",
-				"read_entry",
 				"plan_extraction",
 				"extract_entries",
 				"extract_resources",
+				"start_extraction",
+				"get_extraction_status",
+				"cancel_extraction",
 				"verify_artifacts",
 			].sort(),
 		);
@@ -207,15 +209,9 @@ async function smoke(bundlePath, outputRoot) {
 		);
 		assert.equal((await call("list_entries", { source })).entries.length, 3);
 		assert.equal(
-			(
-				await call("read_entry", {
-					source,
-					entryId: "0",
-					mode: "text",
-					encoding: "cp932",
-				})
-			).preview.encoding,
-			"cp932",
+			(await call("list_entries", { source, resourceTypes: ["script"] }))
+				.matchedTotal,
+			2,
 		);
 		const progress = [];
 		const plan = await call("plan_extraction", {
@@ -257,6 +253,27 @@ async function smoke(bundlePath, outputRoot) {
 				item.artifact.sha256,
 			);
 		}
+		const asyncJob = await call("start_extraction", {
+			source,
+			outputSubdirectory: "async-release-smoke",
+			selection: { mode: "all", resourceTypes: ["script"] },
+		});
+		let asyncStatus;
+		for (let attempt = 0; attempt < 100; attempt += 1) {
+			asyncStatus = await call("get_extraction_status", {
+				jobId: asyncJob.jobId,
+				inline: "all",
+			});
+			if (
+				["completed", "partial", "failed", "cancelled"].includes(
+					asyncStatus.state,
+				)
+			)
+				break;
+			await new Promise((resolve) => setTimeout(resolve, 5));
+		}
+		assert.equal(asyncStatus.state, "completed");
+		assert.equal(asyncStatus.extracted, 2);
 		const firstArtifact = report.items[0].artifact;
 		const verification = await call("verify_artifacts", {
 			artifacts: [

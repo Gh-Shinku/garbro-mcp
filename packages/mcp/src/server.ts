@@ -1,6 +1,7 @@
 import {
 	type ArchiveAutomationOptions,
 	ArchiveAutomationService,
+	AsyncJobManager,
 	type AutomationControl,
 	asGarbroError,
 	DEFAULT_AUTOMATION_LIMITS,
@@ -12,6 +13,7 @@ import {
 	readExtractionReport,
 	ResourceCatalogIndex,
 	type ResourceAlias,
+	entryResourceTypes,
 	WorkspacePolicy,
 	type WorkspacePolicyOptions,
 	verifyArtifact,
@@ -46,7 +48,7 @@ export const SERVER_PURPOSE =
 	"Detect, inspect, decode, extract, and verify supported game resource formats.";
 export const SERVER_SCOPE = [
 	"known archive and resource formats",
-	"bounded previews and metadata inspection",
+	"bounded metadata inspection",
 	"safe planned extraction",
 	"artifact verification",
 	"externally supplied resource mappings",
@@ -60,7 +62,7 @@ export const SERVER_NON_CAPABILITIES = [
 ] as const;
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
-Use garbro-mcp for deterministic resource access: scan known files, inspect archives, preview entries, plan extraction, extract, and verify artifacts. It may query mappings explicitly supplied by the user or another external analysis tool.
+Use garbro-mcp for deterministic resource access: scan known files, inspect archives, classify entries, plan extraction, extract, and verify artifacts. It may query mappings explicitly supplied by the user or another external analysis tool.
 
 Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a relationship that is not present in a configured mapping, report that the resource bytes may be extractable but the mapping requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
@@ -117,16 +119,19 @@ const extractionSelectionSchema = z.discriminatedUnion("mode", [
 	z.object({
 		mode: z.literal("all"),
 		excludeGlobs: z.array(z.string()).max(32).optional(),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
 	}),
 	z.object({
 		mode: z.literal("ids"),
 		entryIds: z.array(z.string().min(1)).min(1).max(10000),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
 	}),
 	z.object({
 		mode: z.literal("glob"),
 		includeGlobs: z.array(z.string()).min(1).max(32),
 		excludeGlobs: z.array(z.string()).max(32).optional(),
 		caseSensitive: z.boolean().default(false),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
 	}),
 ]);
 const extractionBudgetsSchema = z.object({
@@ -193,6 +198,7 @@ const entrySchema = z.object({
 	packedSize: z.string(),
 	compressed: z.boolean(),
 	encrypted: z.boolean(),
+	resourceType: z.enum(entryResourceTypes),
 	checksum: z
 		.object({ algorithm: z.literal("adler32"), value: z.string() })
 		.optional(),
@@ -315,13 +321,23 @@ function budgetsFromWire(
 function selectionFromWire(
 	selection: z.infer<typeof extractionSelectionSchema>,
 ): ExtractionSelection {
-	if (selection.mode === "ids") return selection;
+	if (selection.mode === "ids")
+		return {
+			mode: "ids",
+			entryIds: selection.entryIds,
+			...(selection.resourceTypes === undefined
+				? {}
+				: { resourceTypes: selection.resourceTypes }),
+		};
 	if (selection.mode === "all")
 		return {
 			mode: "all",
 			...(selection.excludeGlobs === undefined
 				? {}
 				: { excludeGlobs: selection.excludeGlobs }),
+			...(selection.resourceTypes === undefined
+				? {}
+				: { resourceTypes: selection.resourceTypes }),
 		};
 	return {
 		mode: "glob",
@@ -330,6 +346,9 @@ function selectionFromWire(
 		...(selection.excludeGlobs === undefined
 			? {}
 			: { excludeGlobs: selection.excludeGlobs }),
+		...(selection.resourceTypes === undefined
+			? {}
+			: { resourceTypes: selection.resourceTypes }),
 	};
 }
 
@@ -436,6 +455,7 @@ function entrySummary(entry: Parameters<typeof entryToWire>[0]) {
 	return {
 		id: entry.id,
 		path: entry.path,
+		resourceType: entryToWire(entry).resourceType,
 		size: entry.size.toString(),
 		packedSize: entry.packedSize.toString(),
 		compressed: entry.compressed,
@@ -465,6 +485,12 @@ function formatSummary(
 type ExtractionResult = Awaited<
 	ReturnType<ArchiveAutomationService["extractEntries"]>
 >;
+
+type AsyncExtractionPayload = {
+	result: ExtractionResult;
+	report?: Record<string, unknown>;
+	reportError?: { code: (typeof errorCodes)[number]; message: string };
+};
 
 function batchItemToWire(item: ExtractionResult["items"][number]) {
 	if (item.status === "extracted")
@@ -528,6 +554,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	const automation = new ArchiveAutomationService(registry, workspace, {
 		...(options.limits === undefined ? {} : { limits: options.limits }),
 	});
+	const extractionJobs = new AsyncJobManager<AsyncExtractionPayload>();
 	const supportById = new Map<string, SupportRecord>(
 		(formatSupportCatalog.implementations as readonly SupportRecord[]).map(
 			(support) => [support.localId, support],
@@ -612,8 +639,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						decodedResourceMaxBytes: z.number().int().positive(),
 						responseDefaultBytes: z.number().int().positive(),
 						responseMaxBytes: z.number().int().positive(),
-						previewDefaultBytes: z.number().int().positive(),
-						previewMaxBytes: z.number().int().positive(),
 						scanPageMax: z.number().int().positive(),
 						entryPageMax: z.number().int().positive(),
 						maxBatchEntries: z.number().int().positive(),
@@ -621,7 +646,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					}),
 					capabilities: z.object({
 						resourceTypes: z.array(z.enum(resourceTypes)),
-						previewModes: z.array(z.enum(["auto", "text", "hex"])),
+						entryResourceTypes: z.array(z.enum(entryResourceTypes)),
 						conflictPolicies: z.array(z.enum(["fail", "skip", "overwrite"])),
 						archiveCreation: z.literal(false),
 						resourceCatalogEntries: z.number().int().nonnegative(),
@@ -659,7 +684,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					},
 					capabilities: {
 						resourceTypes,
-						previewModes: ["auto", "text", "hex"] as const,
+						entryResourceTypes: [...entryResourceTypes],
 						conflictPolicies: ["fail", "skip", "overwrite"] as const,
 						archiveCreation: false as const,
 						resourceCatalogEntries: resourceCatalog.resources.length,
@@ -1369,6 +1394,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				caseSensitive: z.boolean().default(false),
 				compressed: z.boolean().optional(),
 				encrypted: z.boolean().optional(),
+				resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
 				offset: z.number().int().nonnegative().default(0),
 				limit: z.number().int().positive().max(1000).default(50),
 			}),
@@ -1404,6 +1430,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					...(options.encrypted === undefined
 						? {}
 						: { encrypted: options.encrypted }),
+					...(options.resourceTypes === undefined
+						? {}
+						: { resourceTypes: options.resourceTypes }),
 				});
 				const entries = result.entries.map(
 					options.detail === "full" ? entryToWire : entrySummary,
@@ -1423,75 +1452,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						options.maxResponseBytes,
 					),
 				);
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"read_entry",
-		{
-			description:
-				"Read a bounded prefix of one entry as detected text or hexadecimal bytes.",
-			inputSchema: z.object({
-				source: sourceSchema,
-				entryId: z.string().min(1),
-				maxResponseBytes: budgetSchema,
-				mode: z.enum(["auto", "text", "hex"]).default("auto"),
-				encoding: z.enum(["auto", "utf8", "utf16le", "cp932"]).default("auto"),
-				maxBytes: z.number().int().positive().max(65536).optional(),
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					entry: entrySchema,
-					responseTruncated: z.boolean(),
-					preview: z.union([
-						z.object({
-							kind: z.literal("text"),
-							text: z.string(),
-							encoding: z.enum(["utf8", "utf16le", "cp932"]),
-							bytesRead: z.number().int().nonnegative(),
-							truncated: z.boolean(),
-						}),
-						z.object({
-							kind: z.literal("hex"),
-							hex: z.string(),
-							bytesRead: z.number().int().nonnegative(),
-							truncated: z.boolean(),
-						}),
-					]),
-				}),
-			),
-			annotations: readOnly,
-		},
-		async ({ source, entryId, ...options }, context) => {
-			try {
-				await workspace.prepare({ createOutput: false });
-				const requested =
-					options.maxBytes ?? automation.limits.previewDefaultBytes;
-				let maxBytes = requested;
-				for (;;) {
-					const result = await automation.previewEntry(source, entryId, {
-						mode: options.mode,
-						encoding: options.encoding,
-						maxBytes,
-						signal: context.mcpReq.signal,
-					});
-					const payload = {
-						entry: entrySummary(result.entry),
-						preview: result.preview,
-						responseTruncated: maxBytes < requested,
-					};
-					if (fitsResponse(payload, options.maxResponseBytes))
-						return success(payload);
-					if (maxBytes === 1)
-						throw new GarbroError(
-							"LIMIT_EXCEEDED",
-							"Entry header cannot fit the response budget.",
-						);
-					maxBytes = Math.max(1, Math.floor(maxBytes / 2));
-				}
 			} catch (error) {
 				return failure(error);
 			}
@@ -1918,6 +1878,242 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		itemsOmitted: z.number().int().nonnegative(),
 		items: z.array(batchItemSchema),
 	});
+	const asyncJobStateSchema = z.enum([
+		"queued",
+		"running",
+		"completed",
+		"partial",
+		"failed",
+		"cancelled",
+	]);
+	const asyncJobHeaderSchema = z.object({
+		jobId: z.string().uuid(),
+		state: asyncJobStateSchema,
+		createdAt: z.string(),
+		startedAt: z.string().optional(),
+		finishedAt: z.string().optional(),
+		progress: z.number().int().nonnegative(),
+		total: z.number().int().nonnegative().optional(),
+		message: z.string().optional(),
+	});
+	const asyncExtractionStatusSchema = asyncJobHeaderSchema.extend({
+		status: z.enum(["completed", "partial", "failed"]).optional(),
+		hasFailures: z.boolean().optional(),
+		outputRootId: z.string().optional(),
+		outputDirectory: z.string().optional(),
+		selected: z.number().int().nonnegative().optional(),
+		extracted: z.number().int().nonnegative().optional(),
+		skipped: z.number().int().nonnegative().optional(),
+		failed: z.number().int().nonnegative().optional(),
+		bytesWritten: z.string().optional(),
+		report: artifactSchema.optional(),
+		reportError: errorSchema.optional(),
+		error: errorSchema.optional(),
+		itemsOmitted: z.number().int().nonnegative().optional(),
+		responseTruncated: z.boolean().optional(),
+		offset: z.number().int().nonnegative().optional(),
+		nextOffset: z.number().int().nonnegative().nullable().optional(),
+		items: z.array(batchItemSchema).optional(),
+	});
+	server.registerTool(
+		"start_extraction",
+		{
+			description:
+				"Submit one extraction as a background job and return immediately. Poll get_extraction_status for progress and the saved report.",
+			inputSchema: z.object({
+				source: sourceSchema,
+				outputRootId: z.string().min(1).optional(),
+				expectedPlanDigest: z.string().length(64).optional(),
+				budgets: extractionBudgetsSchema.optional(),
+				selection: extractionSelectionSchema.default({ mode: "all" }),
+				outputSubdirectory: z.string().min(1).optional(),
+				conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
+			}),
+			outputSchema: successOrFailure(asyncJobHeaderSchema),
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: false,
+			},
+		},
+		async (input) => {
+			try {
+				await workspace.prepare();
+				const extractionBudgets = budgetsFromWire(input.budgets);
+				const job = extractionJobs.start(
+					async (control) => {
+						const result = await automation.extractEntries(
+							input.source,
+							{
+								selection: selectionFromWire(input.selection),
+								conflictPolicy: input.conflictPolicy,
+								...(input.expectedPlanDigest === undefined
+									? {}
+									: { expectedPlanDigest: input.expectedPlanDigest }),
+								...(extractionBudgets === undefined
+									? {}
+									: { budgets: extractionBudgets }),
+								...(input.outputRootId === undefined
+									? {}
+									: { outputRootId: input.outputRootId }),
+								...(input.outputSubdirectory === undefined
+									? {}
+									: { outputSubdirectory: input.outputSubdirectory }),
+							},
+							control,
+						);
+						let report: Record<string, unknown> | undefined;
+						let reportError:
+							| { code: (typeof errorCodes)[number]; message: string }
+							| undefined;
+						try {
+							const artifact = await writeExtractionReport(workspace, result);
+							report = {
+								...artifact,
+								bytesWritten: artifact.bytesWritten.toString(),
+							};
+						} catch (error) {
+							const converted = asGarbroError(error);
+							reportError = {
+								code: converted.code,
+								message: converted.message.slice(0, 2048),
+							};
+						}
+						return {
+							result,
+							...(report === undefined ? {} : { report }),
+							...(reportError === undefined ? {} : { reportError }),
+						};
+					},
+					{ stateFromResult: (payload) => payload.result.status },
+				);
+				return success({ ...job });
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"get_extraction_status",
+		{
+			description:
+				"Poll a background extraction job. Terminal states include counts, report metadata, and optionally paged item results.",
+			inputSchema: z.object({
+				jobId: z.string().uuid(),
+				inline: z.enum(["summary", "errors", "all"]).default("errors"),
+				itemLimit: z.number().int().min(0).max(100).default(10),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(asyncExtractionStatusSchema),
+			annotations: readOnly,
+		},
+		async ({ jobId, inline, itemLimit, maxResponseBytes }) => {
+			try {
+				const snapshot = extractionJobs.get(jobId);
+				if (snapshot === undefined)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						`Unknown extraction job: ${jobId}`,
+					);
+				const header = {
+					jobId: snapshot.jobId,
+					state: snapshot.state,
+					createdAt: snapshot.createdAt,
+					...(snapshot.startedAt === undefined
+						? {}
+						: { startedAt: snapshot.startedAt }),
+					...(snapshot.finishedAt === undefined
+						? {}
+						: { finishedAt: snapshot.finishedAt }),
+					progress: snapshot.progress,
+					...(snapshot.total === undefined ? {} : { total: snapshot.total }),
+					...(snapshot.message === undefined
+						? {}
+						: { message: snapshot.message }),
+				};
+				if (snapshot.result === undefined) {
+					return success({
+						...header,
+						...(snapshot.error === undefined
+							? {}
+							: {
+									error: {
+										code: snapshot.error.code,
+										message: snapshot.error.message.slice(0, 2048),
+									},
+								}),
+					});
+				}
+				const { result, report, reportError } = snapshot.result;
+				const candidates =
+					inline === "summary"
+						? []
+						: result.items.filter(
+								(item) => inline === "all" || item.status === "failed",
+							);
+				const visible = candidates.slice(0, itemLimit).map(batchItemToWire);
+				return success(
+					boundedPage(
+						visible,
+						(items) => ({
+							...header,
+							status: result.status,
+							hasFailures: result.hasFailures,
+							outputRootId: result.outputRootId,
+							outputDirectory: result.outputDirectory,
+							selected: result.selected,
+							extracted: result.extracted,
+							skipped: result.skipped,
+							failed: result.failed,
+							bytesWritten: result.bytesWritten.toString(),
+							...(report === undefined ? {} : { report }),
+							...(reportError === undefined ? {} : { reportError }),
+							itemsOmitted: Math.max(0, candidates.length - items.length),
+							responseTruncated: items.length < candidates.length,
+							offset: 0,
+							nextOffset:
+								items.length < candidates.length ? items.length : null,
+							items,
+						}),
+						maxResponseBytes,
+						true,
+					),
+				);
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"cancel_extraction",
+		{
+			description:
+				"Request cancellation of a queued or running extraction job.",
+			inputSchema: z.object({ jobId: z.string().uuid() }),
+			outputSchema: successOrFailure(asyncJobHeaderSchema),
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: true,
+				idempotentHint: true,
+			},
+		},
+		async ({ jobId }) => {
+			try {
+				const snapshot = extractionJobs.cancel(jobId);
+				if (snapshot === undefined)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						`Unknown extraction job: ${jobId}`,
+					);
+				return success({ ...snapshot });
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
 	server.registerTool(
 		"extract_resources",
 		{

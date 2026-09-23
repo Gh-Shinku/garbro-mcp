@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
 import { matchesGlob, relative, resolve, sep } from "node:path";
-import { decodeCp932 } from "./encoding.js";
 import { asGarbroError, GarbroError } from "./errors.js";
 import { extractEntry, resolveEntryOutputPath } from "./extract.js";
 import type { FormatRegistry } from "./registry.js";
@@ -12,6 +11,7 @@ import type {
 	DetectionResult,
 	FormatDescriptor,
 } from "./types.js";
+import { entryResourceType, type EntryResourceType } from "./resource-type.js";
 import {
 	type InputReference,
 	normalizeWorkspaceRelativePath,
@@ -20,8 +20,6 @@ import {
 
 export interface AutomationLimits {
 	decodedResourceMaxBytes: number;
-	previewDefaultBytes: number;
-	previewMaxBytes: number;
 	scanPageMax: number;
 	entryPageMax: number;
 	maxBatchEntries: number;
@@ -30,8 +28,6 @@ export interface AutomationLimits {
 
 export const DEFAULT_AUTOMATION_LIMITS: AutomationLimits = {
 	decodedResourceMaxBytes: 256 * 1024 * 1024,
-	previewDefaultBytes: 2 * 1024,
-	previewMaxBytes: 64 * 1024,
 	scanPageMax: 500,
 	entryPageMax: 1000,
 	maxBatchEntries: 10_000,
@@ -53,6 +49,7 @@ export interface EntryFilter {
 	caseSensitive?: boolean;
 	compressed?: boolean;
 	encrypted?: boolean;
+	resourceTypes?: readonly EntryResourceType[];
 }
 
 export interface ArchiveSummary {
@@ -99,29 +96,23 @@ export interface ScanResult {
 	complete: boolean;
 }
 
-export type EntryPreview =
+export type ExtractionSelection =
 	| {
-			kind: "text";
-			text: string;
-			encoding: "utf8" | "utf16le" | "cp932";
-			bytesRead: number;
-			truncated: boolean;
+			mode: "all";
+			excludeGlobs?: readonly string[];
+			resourceTypes?: readonly EntryResourceType[];
 	  }
 	| {
-			kind: "hex";
-			hex: string;
-			bytesRead: number;
-			truncated: boolean;
-	  };
-
-export type ExtractionSelection =
-	| { mode: "all"; excludeGlobs?: readonly string[] }
-	| { mode: "ids"; entryIds: readonly string[] }
+			mode: "ids";
+			entryIds: readonly string[];
+			resourceTypes?: readonly EntryResourceType[];
+	  }
 	| {
 			mode: "glob";
 			includeGlobs: readonly string[];
 			excludeGlobs?: readonly string[];
 			caseSensitive?: boolean;
+			resourceTypes?: readonly EntryResourceType[];
 	  };
 
 export type ConflictPolicy = "fail" | "skip" | "overwrite";
@@ -228,11 +219,6 @@ function resolveLimits(overrides: Partial<AutomationLimits>): AutomationLimits {
 	const limits = { ...DEFAULT_AUTOMATION_LIMITS, ...overrides };
 	for (const [name, value] of Object.entries(limits))
 		validatePositiveLimit(name, value);
-	if (limits.previewDefaultBytes > limits.previewMaxBytes)
-		throw new GarbroError(
-			"INVALID_ARGUMENT",
-			"previewDefaultBytes must not exceed previewMaxBytes",
-		);
 	return limits;
 }
 
@@ -293,7 +279,10 @@ export function filterArchiveEntries(
 			!pathMatches(entry.path, exclude, caseSensitive) &&
 			(filter.compressed === undefined ||
 				entry.compressed === filter.compressed) &&
-			(filter.encrypted === undefined || entry.encrypted === filter.encrypted),
+			(filter.encrypted === undefined ||
+				entry.encrypted === filter.encrypted) &&
+			(filter.resourceTypes === undefined ||
+				filter.resourceTypes.includes(entryResourceType(entry))),
 	);
 }
 
@@ -339,10 +328,16 @@ function selectCandidates(
 	selection: ExtractionSelection,
 ): SelectedCandidate[] {
 	if (selection.mode === "ids")
-		return [...new Set(selection.entryIds)].map((id) => ({
-			id,
-			entry: archive.entries.find((entry) => entry.id === id),
-		}));
+		return [...new Set(selection.entryIds)].flatMap((id) => {
+			const entry = archive.entries.find((candidate) => candidate.id === id);
+			if (
+				entry !== undefined &&
+				selection.resourceTypes !== undefined &&
+				!selection.resourceTypes.includes(entryResourceType(entry))
+			)
+				return [];
+			return [{ id, entry }];
+		});
 	const entries = filterArchiveEntries(archive.entries, {
 		includeGlobs: selection.mode === "glob" ? selection.includeGlobs : ["**/*"],
 		...(selection.excludeGlobs === undefined
@@ -351,6 +346,9 @@ function selectCandidates(
 		...(selection.mode === "glob" && selection.caseSensitive !== undefined
 			? { caseSensitive: selection.caseSensitive }
 			: {}),
+		...(selection.resourceTypes === undefined
+			? {}
+			: { resourceTypes: selection.resourceTypes }),
 	});
 	return entries.map((entry) => ({ id: entry.id, entry }));
 }
@@ -417,90 +415,6 @@ async function removeEmptyDirectoryTree(path: string): Promise<boolean> {
 
 function toPosix(path: string): string {
 	return path.split(sep).join("/");
-}
-
-async function consumePrefix(
-	archive: ArchiveHandle,
-	entryId: string,
-	maxBytes: number,
-	signal?: AbortSignal,
-): Promise<{ bytes: Buffer; truncated: boolean }> {
-	const stream = await archive.openEntry(entryId);
-	const chunks: Buffer[] = [];
-	let length = 0;
-	try {
-		for await (const value of stream) {
-			throwIfCancelled(signal);
-			const chunk = Buffer.isBuffer(value) ? value : Buffer.from(value);
-			const wanted = Math.min(chunk.length, maxBytes + 1 - length);
-			if (wanted > 0) {
-				chunks.push(chunk.subarray(0, wanted));
-				length += wanted;
-			}
-			if (length > maxBytes) break;
-		}
-	} finally {
-		stream.destroy();
-	}
-	const bytes = Buffer.concat(chunks, length);
-	return {
-		bytes: bytes.subarray(0, maxBytes),
-		truncated: bytes.length > maxBytes,
-	};
-}
-
-function looksBinary(bytes: Buffer): boolean {
-	if (bytes.includes(0)) return true;
-	let controls = 0;
-	for (const byte of bytes) {
-		if (byte < 0x20 && byte !== 0x09 && byte !== 0x0a && byte !== 0x0d)
-			controls += 1;
-	}
-	return bytes.length > 0 && controls / bytes.length > 0.1;
-}
-
-function hasTextBom(bytes: Buffer): boolean {
-	return (
-		bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf])) ||
-		bytes.subarray(0, 2).equals(Buffer.from([0xff, 0xfe]))
-	);
-}
-
-function decodeText(
-	bytes: Buffer,
-	encoding: "auto" | "utf8" | "utf16le" | "cp932",
-	truncated: boolean,
-): { text: string; encoding: "utf8" | "utf16le" | "cp932" } {
-	if (encoding === "utf16le")
-		return {
-			text: bytes
-				.subarray(
-					bytes.subarray(0, 2).equals(Buffer.from([0xff, 0xfe])) ? 2 : 0,
-				)
-				.toString("utf16le"),
-			encoding,
-		};
-	if (encoding === "cp932") return { text: decodeCp932(bytes), encoding };
-	const utf8Bytes = bytes.subarray(
-		bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf])) ? 3 : 0,
-	);
-	if (encoding === "utf8")
-		return { text: utf8Bytes.toString("utf8"), encoding };
-	if (bytes.subarray(0, 2).equals(Buffer.from([0xff, 0xfe])))
-		return {
-			text: bytes.subarray(2).toString("utf16le"),
-			encoding: "utf16le",
-		};
-	try {
-		return {
-			text: new TextDecoder("utf-8", { fatal: true }).decode(utf8Bytes, {
-				stream: truncated,
-			}),
-			encoding: "utf8",
-		};
-	} catch {
-		return { text: decodeCp932(bytes), encoding: "cp932" };
-	}
 }
 
 async function mapConcurrent<T, R>(
@@ -611,69 +525,6 @@ export class ArchiveAutomationService {
 						? offset + entries.length
 						: null,
 				entries,
-			};
-		});
-	}
-
-	async previewEntry(
-		source: InputReference,
-		entryId: string,
-		options: {
-			mode?: "auto" | "text" | "hex";
-			encoding?: "auto" | "utf8" | "utf16le" | "cp932";
-			maxBytes?: number;
-			signal?: AbortSignal;
-		} = {},
-	): Promise<{ entry: ArchiveEntry; preview: EntryPreview }> {
-		const maxBytes = options.maxBytes ?? this.limits.previewDefaultBytes;
-		if (
-			!Number.isSafeInteger(maxBytes) ||
-			maxBytes <= 0 ||
-			maxBytes > this.limits.previewMaxBytes
-		)
-			throw new GarbroError(
-				"LIMIT_EXCEEDED",
-				`maxBytes must be between 1 and ${this.limits.previewMaxBytes}`,
-			);
-		const resolved = await this.workspace.resolveInput(source, "file");
-		return await this.#withArchive(resolved.absolutePath, async (archive) => {
-			const entry = archive.entries.find(
-				(candidate) => candidate.id === entryId,
-			);
-			if (!entry)
-				throw new GarbroError(
-					"ENTRY_NOT_FOUND",
-					`Archive entry not found: ${entryId}`,
-				);
-			const { bytes, truncated } = await consumePrefix(
-				archive,
-				entry.id,
-				maxBytes,
-				options.signal,
-			);
-			const mode = options.mode ?? "auto";
-			if (
-				mode === "hex" ||
-				(mode === "auto" && !hasTextBom(bytes) && looksBinary(bytes))
-			)
-				return {
-					entry,
-					preview: {
-						kind: "hex",
-						hex: bytes.toString("hex"),
-						bytesRead: bytes.length,
-						truncated,
-					},
-				};
-			const decoded = decodeText(bytes, options.encoding ?? "auto", truncated);
-			return {
-				entry,
-				preview: {
-					kind: "text",
-					...decoded,
-					bytesRead: bytes.length,
-					truncated,
-				},
 			};
 		});
 	}
