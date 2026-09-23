@@ -66,6 +66,18 @@ const expectedFiles = [
 	"package.json",
 ];
 
+function sceneFixture() {
+	const offsets = [92, 100, 108, 110, 118, 126, 128, 136, 138, 146];
+	const output = Buffer.alloc(147);
+	output.writeUInt32LE(92, 0);
+	for (let index = 0; index < offsets.length; index += 1) {
+		output.writeUInt32LE(offsets[index] ?? 0, 4 + index * 8);
+		output.writeUInt32LE(1, 8 + index * 8);
+	}
+	output[146] = 1;
+	return output;
+}
+
 async function smoke(bundlePath, outputRoot) {
 	assert.equal(
 		run(process.execPath, [bundlePath, "--version"], { cwd }).trim(),
@@ -76,6 +88,10 @@ async function smoke(bundlePath, outputRoot) {
 	);
 	assert.equal(versionJson.buildId, buildManifest.buildId);
 	assert.equal(versionJson.gitCommit, buildManifest.commit);
+	assert.equal(
+		versionJson.semanticCatalogSha256,
+		buildManifest.semanticCatalogSha256,
+	);
 	const doctor = JSON.parse(
 		run(
 			process.execPath,
@@ -122,6 +138,10 @@ async function smoke(bundlePath, outputRoot) {
 			names,
 			[
 				"get_server_info",
+				"inspect_game",
+				"plan_semantic_analysis",
+				"build_semantic_catalog",
+				"query_semantics",
 				"search_resources",
 				"list_formats",
 				"scan_resources",
@@ -152,6 +172,25 @@ async function smoke(bundlePath, outputRoot) {
 			serverInfo.server.formatCatalogSha256,
 			buildManifest.formatCatalogSha256,
 		);
+		assert.equal(
+			serverInfo.server.semanticCatalogSha256,
+			buildManifest.semanticCatalogSha256,
+		);
+		const inspection = await call("inspect_game", {
+			game: { rootId: "samples", path: "." },
+		});
+		assert.equal(inspection.status, "resolved");
+		assert.equal(inspection.matches[0].engineId, "siglus");
+		const semanticPlan = await call("plan_semantic_analysis", {
+			game: { rootId: "samples", path: "." },
+			goal: {},
+		});
+		assert.equal(semanticPlan.status, "ready");
+		const semanticBuild = await call("build_semantic_catalog", {
+			planDigest: semanticPlan.planDigest,
+		});
+		assert.equal(semanticBuild.summary.records, 0);
+		assert.equal((await call("query_semantics", {})).totalRelations, 0);
 		assert.equal(
 			(await call("list_formats", { extension: "xp3" })).formats[0].id,
 			"xp3",
@@ -275,6 +314,10 @@ try {
 		resolve(repositoryRoot, "fixtures/xp3/basic.xp3"),
 		resolve(input, "basic.xp3"),
 	);
+	await writeFile(resolve(input, "Scene.pck"), sceneFixture());
+	const gameexe = Buffer.alloc(16);
+	gameexe.writeUInt32LE(1, 4);
+	await writeFile(resolve(input, "Gameexe.dat"), gameexe);
 	const files = unzipSync(
 		await readFile(resolve(releaseDirectory, `${prefix}-portable.zip`)),
 	);

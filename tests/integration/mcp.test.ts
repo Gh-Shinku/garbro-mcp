@@ -14,11 +14,65 @@ import { resolve } from "node:path";
 import { Readable } from "node:stream";
 import { type ArchiveEntry, FormatRegistry } from "@garbro-mcp/core";
 import { type BuildServerOptions, buildServer } from "@garbro-mcp/mcp/server";
+import type { SemanticRecord } from "@garbro-mcp/semantic";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { afterEach, describe, expect, it } from "vitest";
 
 const closers: Array<() => Promise<void>> = [];
 const temporaryDirectories: string[] = [];
+
+function sceneFixture(): Buffer {
+	const offsets = [92, 100, 108, 110, 118, 126, 128, 136, 138, 146];
+	const output = Buffer.alloc(147);
+	output.writeUInt32LE(92, 0);
+	for (let index = 0; index < offsets.length; index += 1) {
+		output.writeUInt32LE(offsets[index] ?? 0, 4 + index * 8);
+		output.writeUInt32LE(1, 8 + index * 8);
+	}
+	output[146] = 1;
+	return output;
+}
+
+function voiceRecords(
+	status: "user-confirmed" | "candidate",
+): SemanticRecord[] {
+	return [
+		{
+			kind: "entity",
+			id: "character:kotori",
+			type: "vn:character",
+			properties: { name: "Kotori" },
+		},
+		{
+			kind: "resource",
+			id: "voice:kotori-1",
+			type: "garbro:resource",
+			resourceType: "audio",
+			locator: { source: { rootId: "games", path: "basic.xp3" }, entryId: "0" },
+			properties: {},
+		},
+		{
+			kind: "evidence",
+			id: "evidence:kotori-1",
+			type: "garbro:userMapping",
+			source: {
+				locator: { rootId: "games", path: "basic.xp3" },
+				sha256: "0".repeat(64),
+			},
+			producer: { analyzerId: "user.mapping", analyzerVersion: "1" },
+			method: "user-assertion",
+		},
+		{
+			kind: "relation",
+			id: "relation:kotori-1",
+			subject: "character:kotori",
+			predicate: "vn:voiceResource",
+			object: { kind: "entity", id: "voice:kotori-1" },
+			evidenceIds: ["evidence:kotori-1"],
+			status,
+		},
+	];
+}
 
 afterEach(async () => {
 	await Promise.all(closers.splice(0).map((close) => close()));
@@ -30,7 +84,10 @@ afterEach(async () => {
 });
 
 async function connect(
-	overrides: Pick<BuildServerOptions, "registry" | "resourceAliases"> = {},
+	overrides: Pick<
+		BuildServerOptions,
+		"registry" | "resourceAliases" | "semanticRecords" | "semanticCatalogs"
+	> = {},
 	withMusicRoot = false,
 ) {
 	const root = await mkdtemp(resolve(tmpdir(), "garbro-mcp-input-"));
@@ -70,6 +127,10 @@ describe("MCP server", () => {
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual(
 			[
 				"get_server_info",
+				"inspect_game",
+				"plan_semantic_analysis",
+				"build_semantic_catalog",
+				"query_semantics",
 				"search_resources",
 				"list_formats",
 				"scan_resources",
@@ -89,13 +150,16 @@ describe("MCP server", () => {
 			outcome: { status: "ok", warnings: [] },
 			server: {
 				buildId: "development",
-				protocolVersion: "2",
+				protocolVersion: "3",
 				dirty: true,
 			},
 			inputRoots: [{ id: "games", path: root }],
 			outputRoot: output,
 			limits: { decodedResourceMaxBytes: 256 * 1024 * 1024 },
-			capabilities: { archiveCreation: false },
+			capabilities: {
+				archiveCreation: false,
+				semantic: { engines: ["siglus"], analyzers: [] },
+			},
 		});
 
 		const formats = await client.callTool({
@@ -160,6 +224,87 @@ describe("MCP server", () => {
 			total: 0,
 			nextAction: expect.stringContaining("alias"),
 		});
+	});
+
+	it("probes, plans, builds, and queries semantic catalogs", async () => {
+		const records = voiceRecords("user-confirmed");
+		const { client, root, output } = await connect({
+			semanticRecords: records,
+		});
+		await writeFile(resolve(root, "Scene.pck"), sceneFixture());
+		const gameexe = Buffer.alloc(16);
+		gameexe.writeUInt32LE(1, 4);
+		await writeFile(resolve(root, "Gameexe.dat"), gameexe);
+
+		const inspected = await client.callTool({
+			name: "inspect_game",
+			arguments: { game: { rootId: "games", path: "." } },
+		});
+		expect(inspected.structuredContent).toMatchObject({
+			status: "resolved",
+			matches: [{ engineId: "siglus", status: "matched" }],
+		});
+
+		const planned = await client.callTool({
+			name: "plan_semantic_analysis",
+			arguments: {
+				game: { rootId: "games", path: "." },
+				goal: { predicate: "vn:voiceResource" },
+			},
+		});
+		expect(planned.structuredContent).toMatchObject({
+			status: "ready",
+			missingPredicates: [],
+		});
+		const planDigest = (planned.structuredContent as { planDigest: string })
+			.planDigest;
+		const built = await client.callTool({
+			name: "build_semantic_catalog",
+			arguments: { planDigest },
+		});
+		expect(built.isError).not.toBe(true);
+		expect(built.structuredContent).toMatchObject({
+			artifact: { outputRootId: "default" },
+			summary: { relations: 1 },
+		});
+		const artifact = (
+			built.structuredContent as {
+				artifact: { relativePath: string };
+			}
+		).artifact;
+		expect(await stat(resolve(output, artifact.relativePath))).toBeDefined();
+
+		const queried = await client.callTool({
+			name: "query_semantics",
+			arguments: { predicate: "vn:voiceResource", query: "Kotori" },
+		});
+		expect(queried.structuredContent).toMatchObject({
+			totalRelations: 1,
+			relations: [{ status: "user-confirmed" }],
+			resources: [{ resourceType: "audio" }],
+		});
+		const queriedArtifact = await client.callTool({
+			name: "query_semantics",
+			arguments: {
+				catalogPath: artifact.relativePath,
+				predicate: "vn:voiceResource",
+			},
+		});
+		expect(queriedArtifact.structuredContent).toMatchObject({
+			totalRelations: 1,
+			resources: [{ resourceType: "audio" }],
+		});
+	});
+
+	it("does not return candidate semantic relations by default", async () => {
+		const { client } = await connect({
+			semanticRecords: voiceRecords("candidate"),
+		});
+		const result = await client.callTool({
+			name: "query_semantics",
+			arguments: { predicate: "vn:voiceResource" },
+		});
+		expect(result.structuredContent).toMatchObject({ totalRelations: 0 });
 	});
 
 	it("scans resources with filters and detection evidence", async () => {

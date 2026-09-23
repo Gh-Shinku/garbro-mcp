@@ -14,6 +14,7 @@ import {
 import { dirname, resolve } from "node:path";
 import { builtinModules } from "node:module";
 import { parseArgs } from "node:util";
+import { pathToFileURL } from "node:url";
 import {
 	releaseDirectory,
 	repositoryRoot,
@@ -45,8 +46,47 @@ const builtAt = new Date().toISOString();
 const formatCatalogSha256 = createHash("sha256")
 	.update(await readFile(resolve(repositoryRoot, "docs/support-status.json")))
 	.digest("hex");
+const {
+	createDefaultEngineAdapterRegistry,
+	createDefaultSemanticAnalyzerRegistry,
+	createDefaultVocabularyRegistry,
+} = await import(
+	pathToFileURL(resolve(repositoryRoot, "packages/semantic/dist/index.js")).href
+);
+const semanticDescriptorCatalog = {
+	schemaVersion: 1,
+	vocabularies: createDefaultVocabularyRegistry()
+		.list()
+		.map((vocabulary) => ({
+			namespace: vocabulary.namespace,
+			version: vocabulary.version,
+			entityTypes: Object.values(vocabulary.entityTypes)
+				.map(({ type }) => type)
+				.sort(),
+			predicates: Object.values(vocabulary.predicates)
+				.map((definition) => ({
+					predicate: definition.predicate,
+					subjectTypes: [...definition.subjectTypes].sort(),
+					objectTypes: [...(definition.objectTypes ?? [])].sort(),
+					allowLiteral: definition.allowLiteral ?? false,
+					cardinality: definition.cardinality ?? "many",
+				}))
+				.sort((left, right) => left.predicate.localeCompare(right.predicate)),
+		})),
+	engines: createDefaultEngineAdapterRegistry()
+		.list()
+		.map((adapter) => adapter.descriptor),
+	analyzers: createDefaultSemanticAnalyzerRegistry()
+		.list()
+		.map((analyzer) => analyzer.descriptor),
+};
+const semanticCatalogSha256 = createHash("sha256")
+	.update(JSON.stringify(semanticDescriptorCatalog))
+	.digest("hex");
 const buildId = createHash("sha256")
-	.update(`${version}\0${commit}\0${formatCatalogSha256}\0${dirty}`)
+	.update(
+		`${version}\0${commit}\0${formatCatalogSha256}\0${semanticCatalogSha256}\0${dirty}`,
+	)
 	.digest("hex");
 await mkdir(releaseDirectory, { recursive: true });
 const staging = await mkdtemp(resolve(releaseDirectory, ".build-"));
@@ -116,6 +156,7 @@ try {
 			GARBRO_MCP_BUILT_AT: JSON.stringify(builtAt),
 			GARBRO_MCP_BUILD_ID: JSON.stringify(buildId),
 			GARBRO_MCP_FORMAT_CATALOG_SHA256: JSON.stringify(formatCatalogSha256),
+			GARBRO_MCP_SEMANTIC_CATALOG_SHA256: JSON.stringify(semanticCatalogSha256),
 			GARBRO_MCP_BUILD_DIRTY: JSON.stringify(dirty),
 		},
 	});
@@ -178,6 +219,7 @@ try {
 				builtAt,
 				buildId,
 				formatCatalogSha256,
+				semanticCatalogSha256,
 				dirty,
 				dependencies,
 			},

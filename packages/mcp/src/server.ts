@@ -21,6 +21,17 @@ import {
 	createDefaultRegistry,
 	formatSupportCatalog,
 } from "@garbro-mcp/formats";
+import {
+	canonicalJson,
+	type LoadedSemanticCatalog,
+	readSemanticCatalog,
+	SemanticAnalysisService,
+	SemanticCatalogIndex,
+	type SemanticAnalysisPlanResult,
+	type SemanticGoal,
+	type SemanticQuery,
+	type SemanticRecord,
+} from "@garbro-mcp/semantic";
 import { McpServer, type ServerContext } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import {
@@ -73,6 +84,28 @@ const sourceSchema = z.object({
 	rootId: z.string().min(1),
 	path: z.string().min(1),
 });
+const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
+const semanticNameSchema = z.string().regex(/^[^:]+:[^:]+$/);
+const semanticGoalSchema = z.object({
+	subjectType: semanticNameSchema.optional(),
+	query: z.string().min(1).optional(),
+	predicate: semanticNameSchema.optional(),
+	objectType: semanticNameSchema.optional(),
+	resourceType: z.string().min(1).optional(),
+});
+const semanticBudgetsSchema = z.object({
+	maxInputBytes: decimalBytesSchema.optional(),
+	maxFacts: z.number().int().positive().max(1_000_000).optional(),
+	timeoutMs: z.number().int().positive().max(3_600_000).optional(),
+});
+const assertionStatuses = [
+	"verified",
+	"user-confirmed",
+	"candidate",
+	"conflicted",
+	"rejected",
+	"unresolved",
+] as const;
 const extractionSelectionSchema = z.discriminatedUnion("mode", [
 	z.object({
 		mode: z.literal("all"),
@@ -89,7 +122,6 @@ const extractionSelectionSchema = z.discriminatedUnion("mode", [
 		caseSensitive: z.boolean().default(false),
 	}),
 ]);
-const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
 const extractionBudgetsSchema = z.object({
 	maxResources: z.number().int().positive().max(10000).optional(),
 	maxInputBytes: decimalBytesSchema.optional(),
@@ -452,12 +484,72 @@ function batchItemToWire(item: ExtractionResult["items"][number]) {
 	};
 }
 
+function engineMatchToWire(
+	match: Awaited<ReturnType<SemanticAnalysisService["inspect"]>>[number],
+) {
+	return {
+		engineId: match.engineId,
+		adapterVersion: match.adapterVersion,
+		status: match.status,
+		confidence: match.confidence,
+		...(match.profile === undefined ? {} : { profile: match.profile }),
+		...(match.fingerprint === undefined
+			? {}
+			: {
+					fingerprint: {
+						algorithm: match.fingerprint.algorithm,
+						value: match.fingerprint.value,
+						files: match.fingerprint.files.map((file) => ({
+							...file,
+							size: file.size.toString(),
+						})),
+					},
+				}),
+		bytesRead: match.bytesRead.toString(),
+		evidence: match.evidence.map((item) => ({ ...item })),
+		requiredInputs: match.requiredInputs.map((item) => ({ ...item })),
+		capabilities: match.capabilities.map((item) => ({ ...item })),
+		warnings: [...match.warnings],
+	};
+}
+
+function semanticPlanToWire(plan: SemanticAnalysisPlanResult) {
+	return {
+		status: plan.status,
+		planDigest: plan.planDigest,
+		engineMatches: plan.engineMatches.map(engineMatchToWire),
+		...(plan.selectedEngine === undefined
+			? {}
+			: { selectedEngine: engineMatchToWire(plan.selectedEngine) }),
+		stages:
+			plan.graph?.stages.map((stage) =>
+				stage.map((analyzer) => ({
+					id: analyzer.id,
+					version: analyzer.version,
+				})),
+			) ?? [],
+		analyzerPlans: plan.analyzerPlans.map((item) => ({
+			...item,
+			inputBytes: item.inputBytes?.toString() ?? null,
+		})),
+		inputBytes: plan.inputBytes?.toString() ?? null,
+		estimatedFacts: plan.estimatedFacts,
+		missingPredicates: [...plan.missingPredicates],
+		availablePredicates: [...plan.availablePredicates],
+		budgetViolations: plan.budgetViolations.map((item) => ({ ...item })),
+		warnings: [...plan.warnings],
+	};
+}
+
 export interface BuildServerOptions
 	extends WorkspacePolicyOptions,
 		ArchiveAutomationOptions {
 	registry?: FormatRegistry;
 	workspace?: WorkspacePolicy;
 	resourceAliases?: readonly ResourceAlias[];
+	semanticRecords?: readonly SemanticRecord[];
+	semanticCatalogs?: readonly LoadedSemanticCatalog[];
+	semanticService?: SemanticAnalysisService;
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -504,6 +596,45 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	const resourceCatalog = new ResourceCatalogIndex(
 		options.resourceAliases ?? [],
 	);
+	const semanticRecordMap = new Map<string, SemanticRecord>();
+	for (const record of options.semanticRecords ?? []) {
+		const existing = semanticRecordMap.get(record.id);
+		if (
+			existing &&
+			canonicalJson(existing as never) !== canonicalJson(record as never)
+		)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				`Conflicting configured semantic record ID: ${record.id}`,
+			);
+		semanticRecordMap.set(record.id, record);
+	}
+	const semanticRecords = [...semanticRecordMap.values()];
+	const semanticCatalogs = [...(options.semanticCatalogs ?? [])];
+	for (const record of semanticRecords)
+		if (
+			record.kind === "resource" &&
+			!configuredInputRoots.has(record.locator.source.rootId)
+		)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				`Semantic resource uses unknown input root: ${record.locator.source.rootId}`,
+			);
+	const semanticService =
+		options.semanticService ??
+		new SemanticAnalysisService(workspace, {
+			producer: { name: "garbro-mcp", version: SERVER_VERSION },
+		});
+	const configuredSemanticIndex = new SemanticCatalogIndex();
+	for (const record of semanticRecords) configuredSemanticIndex.add(record);
+	const availablePredicates = [
+		...new Set([
+			...semanticRecords.flatMap((record) =>
+				record.kind === "relation" ? [record.predicate] : [],
+			),
+		]),
+	].sort();
+	const semanticPlans = new Map<string, SemanticAnalysisPlanResult>();
 	const server = new McpServer({ name: "garbro-mcp", version: SERVER_VERSION });
 	const readOnly = {
 		readOnlyHint: true,
@@ -526,6 +657,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						builtAt: z.string(),
 						buildId: z.string(),
 						formatCatalogSha256: z.string(),
+						semanticCatalogSha256: z.string(),
 						dirty: z.boolean(),
 						protocolVersion: z.string(),
 					}),
@@ -549,6 +681,13 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						conflictPolicies: z.array(z.enum(["fail", "skip", "overwrite"])),
 						archiveCreation: z.literal(false),
 						resourceCatalogEntries: z.number().int().nonnegative(),
+						semantic: z.object({
+							vocabularies: z.record(z.string(), z.number().int().positive()),
+							engines: z.array(z.string()),
+							analyzers: z.array(z.string()),
+							configuredRecords: z.number().int().nonnegative(),
+							configuredCatalogs: z.number().int().nonnegative(),
+						}),
 					}),
 				}),
 			),
@@ -577,8 +716,347 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						conflictPolicies: ["fail", "skip", "overwrite"] as const,
 						archiveCreation: false as const,
 						resourceCatalogEntries: resourceCatalog.resources.length,
+						semantic: {
+							vocabularies: semanticService.vocabularies.versions(),
+							engines: semanticService.engineAdapters
+								.list()
+								.map((adapter) => adapter.descriptor.id),
+							analyzers: semanticService.analyzers
+								.list()
+								.map((analyzer) => analyzer.descriptor.id),
+							configuredRecords: semanticRecords.length,
+							configuredCatalogs: semanticCatalogs.length,
+						},
 					},
 				});
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"inspect_game",
+		{
+			description:
+				"Inspect a game directory using bounded, read-only engine probes. Executables are not inspected unless explicitly allowed.",
+			inputSchema: z.object({
+				game: sourceSchema,
+				allowExecutableInspection: z.boolean().default(false),
+				maxInputBytes: decimalBytesSchema.default("67108864"),
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					status: z.enum(["resolved", "ambiguous", "unsupported"]),
+					matches: z.array(z.record(z.string(), z.unknown())),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async ({ game, allowExecutableInspection, maxInputBytes }, context) => {
+			try {
+				const matches = await semanticService.inspect(game, {
+					allowExecutableInspection,
+					maxInputBytes: BigInt(maxInputBytes),
+					signal: context.mcpReq.signal,
+				});
+				const matched = matches.filter((match) => match.status === "matched");
+				return success({
+					status:
+						matched.length === 1
+							? ("resolved" as const)
+							: matched.length > 1
+								? ("ambiguous" as const)
+								: ("unsupported" as const),
+					matches: matches.map(engineMatchToWire),
+				});
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"plan_semantic_analysis",
+		{
+			description:
+				"Create a reproducible semantic-analysis plan before reading broadly or writing a catalog.",
+			inputSchema: z.object({
+				game: sourceSchema,
+				goal: semanticGoalSchema,
+				strategies: z
+					.array(z.enum(["user-mapping", "engine-parser", "static-executable"]))
+					.min(1)
+					.default(["user-mapping", "engine-parser"]),
+				allowExecutableInspection: z.boolean().default(false),
+				budgets: semanticBudgetsSchema.default({}),
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					status: z.enum(["ready", "unsupported", "ambiguous"]),
+					planDigest: z.string(),
+					engineMatches: z.array(z.record(z.string(), z.unknown())),
+					selectedEngine: z.record(z.string(), z.unknown()).optional(),
+					stages: z.array(z.array(z.record(z.string(), z.string()))),
+					analyzerPlans: z.array(z.record(z.string(), z.unknown())),
+					inputBytes: z.string().nullable(),
+					estimatedFacts: z.number().int().nonnegative().nullable(),
+					missingPredicates: z.array(z.string()),
+					availablePredicates: z.array(z.string()),
+					budgetViolations: z.array(z.record(z.string(), z.string())),
+					warnings: z.array(z.string()),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async (
+			{ game, goal, strategies, allowExecutableInspection, budgets },
+			context,
+		) => {
+			try {
+				const plan = await semanticService.plan(
+					{
+						game,
+						goal: goal as SemanticGoal,
+						strategies,
+						allowExecutableInspection,
+						budgets: {
+							...(budgets.maxInputBytes === undefined
+								? {}
+								: { maxInputBytes: BigInt(budgets.maxInputBytes) }),
+							...(budgets.maxFacts === undefined
+								? {}
+								: { maxFacts: budgets.maxFacts }),
+							...(budgets.timeoutMs === undefined
+								? {}
+								: { timeoutMs: budgets.timeoutMs }),
+						},
+					},
+					{ availablePredicates, signal: context.mcpReq.signal },
+				);
+				semanticPlans.set(plan.planDigest, plan);
+				if (semanticPlans.size > 128) {
+					const oldest = semanticPlans.keys().next().value;
+					if (oldest !== undefined) semanticPlans.delete(oldest);
+				}
+				return success(semanticPlanToWire(plan));
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"build_semantic_catalog",
+		{
+			description:
+				"Execute a previously returned semantic plan and atomically write a portable JSONL catalog under a configured output root.",
+			inputSchema: z.object({
+				planDigest: z.string().regex(/^[0-9a-f]{64}$/),
+				outputRootId: z.string().min(1).optional(),
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					planDigest: z.string(),
+					engine: z.record(z.string(), z.unknown()),
+					artifact: z.record(z.string(), z.unknown()),
+					summary: z.record(z.string(), z.unknown()),
+				}),
+			),
+		},
+		async ({ planDigest, outputRootId }, context) => {
+			try {
+				const plan = semanticPlans.get(planDigest);
+				if (!plan)
+					throw new GarbroError(
+						"PLAN_CHANGED",
+						"Semantic plan is unknown or expired; plan again before execution",
+					);
+				const result = await semanticService.execute(
+					plan,
+					planDigest,
+					semanticRecords,
+					{
+						...(outputRootId === undefined ? {} : { outputRootId }),
+						signal: context.mcpReq.signal,
+					},
+				);
+				return success({
+					planDigest: result.planDigest,
+					engine: engineMatchToWire(result.engine),
+					artifact: result.artifact,
+					summary: result.summary,
+				});
+			} catch (error) {
+				return failure(error);
+			}
+		},
+	);
+
+	server.registerTool(
+		"query_semantics",
+		{
+			description:
+				"Query configured semantic facts. By default only verified and user-confirmed relations are returned.",
+			inputSchema: z.object({
+				entityType: semanticNameSchema.optional(),
+				predicate: semanticNameSchema.optional(),
+				query: z.string().optional(),
+				resourceType: z.string().min(1).optional(),
+				statuses: z.array(z.enum(assertionStatuses)).min(1).optional(),
+				catalogPath: z.string().min(1).optional(),
+				outputRootId: z.string().min(1).optional(),
+				gameFingerprint: z
+					.string()
+					.regex(/^[0-9a-f]{64}$/)
+					.optional(),
+				includeEvidence: z.boolean().default(false),
+				offset: z.number().int().nonnegative().default(0),
+				limit: z.number().int().positive().max(1000).default(100),
+				maxResponseBytes: budgetSchema,
+			}),
+			outputSchema: successOrFailure(
+				z.object({
+					totalNodes: z.number().int().nonnegative(),
+					totalRelations: z.number().int().nonnegative(),
+					offset: z.number().int().nonnegative(),
+					limit: z.number().int().positive(),
+					nextOffset: z.number().int().nonnegative().nullable(),
+					responseTruncated: z.boolean(),
+					nodes: z.array(z.record(z.string(), z.unknown())),
+					relations: z.array(z.record(z.string(), z.unknown())),
+					resources: z.array(z.record(z.string(), z.unknown())),
+					evidence: z.array(z.record(z.string(), z.unknown())).optional(),
+				}),
+			),
+			annotations: readOnly,
+		},
+		async ({
+			includeEvidence,
+			offset,
+			limit,
+			maxResponseBytes,
+			catalogPath,
+			outputRootId,
+			gameFingerprint,
+			...query
+		}) => {
+			try {
+				if (catalogPath === undefined && outputRootId !== undefined)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						"outputRootId requires catalogPath",
+					);
+				const selectedCatalogs =
+					catalogPath === undefined
+						? semanticCatalogs.filter(
+								(catalog) =>
+									gameFingerprint === undefined ||
+									catalog.header.game.fingerprint === gameFingerprint,
+							)
+						: [
+								await readSemanticCatalog(
+									(
+										await workspace.resolveOutputArtifact(
+											catalogPath,
+											outputRootId,
+										)
+									).absolutePath,
+									semanticService.vocabularies,
+								),
+							];
+				if (
+					gameFingerprint !== undefined &&
+					selectedCatalogs.some(
+						(catalog) => catalog.header.game.fingerprint !== gameFingerprint,
+					)
+				)
+					throw new GarbroError(
+						"INVALID_ARGUMENT",
+						"Semantic catalog game fingerprint does not match",
+					);
+				const indexes = [
+					...(catalogPath === undefined ? [configuredSemanticIndex] : []),
+					...selectedCatalogs.map((catalog) => catalog.index),
+				];
+				const nodes = new Map<string, SemanticRecord>();
+				const relations = new Map<string, SemanticRecord>();
+				for (const index of indexes) {
+					const result = index.query(
+						query as SemanticQuery,
+						semanticService.vocabularies,
+					);
+					for (const node of result.nodes) nodes.set(node.id, node);
+					for (const relation of result.relations)
+						relations.set(relation.id, relation);
+				}
+				const allRelations = [...relations.values()].sort((left, right) =>
+					left.id.localeCompare(right.id),
+				);
+				const allNodes = [...nodes.values()].sort((left, right) =>
+					left.id.localeCompare(right.id),
+				);
+				const allItems =
+					allRelations.length > 0 || query.predicate !== undefined
+						? allRelations
+						: allNodes;
+				const page = allItems.slice(offset, offset + limit);
+				return success(
+					boundedPage(
+						page,
+						(visible) => {
+							const visibleRelations = visible.filter(
+								(record) => record.kind === "relation",
+							);
+							const relatedNodes = new Map<string, SemanticRecord>();
+							for (const record of visible)
+								if (record.kind === "entity" || record.kind === "resource")
+									relatedNodes.set(record.id, record);
+							const referencedIds = new Set<string>();
+							for (const relation of visibleRelations) {
+								referencedIds.add(relation.subject);
+								if (relation.object.kind === "entity")
+									referencedIds.add(relation.object.id);
+							}
+							for (const index of indexes)
+								for (const id of referencedIds) {
+									const node = index.nodes.get(id);
+									if (node) relatedNodes.set(id, node);
+								}
+							const evidence = includeEvidence
+								? visibleRelations.flatMap((relation) =>
+										relation.evidenceIds.flatMap((id) =>
+											indexes.flatMap((index) => {
+												const item = index.evidence.get(id);
+												return item ? [item] : [];
+											}),
+										),
+									)
+								: undefined;
+							return {
+								totalNodes: allNodes.length,
+								totalRelations: allRelations.length,
+								offset,
+								limit,
+								nextOffset:
+									offset + visible.length < allItems.length
+										? offset + visible.length
+										: null,
+								responseTruncated: visible.length < page.length,
+								nodes: [...relatedNodes.values()].filter(
+									(record) => record.kind !== "resource",
+								),
+								relations: visibleRelations,
+								resources: [...relatedNodes.values()].filter(
+									(record) => record.kind === "resource",
+								),
+								...(evidence === undefined ? {} : { evidence }),
+							};
+						},
+						maxResponseBytes,
+						true,
+					),
+				);
 			} catch (error) {
 				return failure(error);
 			}

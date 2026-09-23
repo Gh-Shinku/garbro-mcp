@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import { createHash } from "node:crypto";
 import { constants } from "node:fs";
 import { access, readFile } from "node:fs/promises";
+import { basename, extname, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { parseResourceCatalog, WorkspacePolicy } from "@garbro-mcp/core";
+import {
+	createDefaultVocabularyRegistry,
+	parseSemanticMap,
+	readSemanticCatalog,
+	resourceAliasesToSemanticRecords,
+} from "@garbro-mcp/semantic";
 import { BUILD_IDENTITY } from "./build.js";
 import { buildServer } from "./server.js";
 
@@ -15,6 +23,8 @@ async function main(): Promise<void> {
 			"output-root": { type: "string", multiple: true },
 			"expected-build-id": { type: "string" },
 			"resource-catalog": { type: "string", multiple: true },
+			"semantic-catalog": { type: "string", multiple: true },
+			"semantic-map": { type: "string", multiple: true },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
 			help: { type: "boolean", short: "h" },
@@ -30,6 +40,8 @@ Options:
   --output-root [id=]<path> Add a writable root (repeatable with IDs)
   --expected-build-id <id> Refuse to start a different build
   --resource-catalog <path> Load an external alias catalog (repeatable)
+  --semantic-catalog <path> Load a portable semantic JSONL catalog (repeatable)
+  --semantic-map <path>     Load a user JSON or CSV semantic map (repeatable)
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
   -v, --version             Show the server version
@@ -96,12 +108,49 @@ Options:
 		...(outputRoots === undefined ? {} : { outputRoots }),
 	});
 	const resourceCatalogs = await Promise.all(
-		(values["resource-catalog"] ?? []).map(async (path) =>
-			parseResourceCatalog(JSON.parse(await readFile(path, "utf8"))),
-		),
+		(values["resource-catalog"] ?? []).map(async (path) => {
+			const bytes = await readFile(path);
+			return {
+				path,
+				sha256: createHash("sha256").update(bytes).digest("hex"),
+				catalog: parseResourceCatalog(JSON.parse(bytes.toString("utf8"))),
+			};
+		}),
 	);
 	const resourceAliases = resourceCatalogs.flatMap(
-		(catalog) => catalog.resources,
+		({ catalog }) => catalog.resources,
+	);
+	const defaultResourceRootId = workspace.inputRoots[0]?.id;
+	if (defaultResourceRootId === undefined)
+		throw new Error("At least one input root is required");
+	const semanticMapImports = await Promise.all(
+		(values["semantic-map"] ?? []).map(async (path) => {
+			const extension = extname(path).toLowerCase();
+			if (extension !== ".json" && extension !== ".csv")
+				throw new Error(`Semantic map must be JSON or CSV: ${path}`);
+			return parseSemanticMap(
+				await readFile(path),
+				extension === ".csv" ? "csv" : "json",
+				{ rootId: "external-semantic-map", path: basename(path) },
+				{ defaultResourceRootId },
+			);
+		}),
+	);
+	const semanticRecords = [
+		...resourceCatalogs.flatMap(({ path, catalog, sha256 }) =>
+			resourceAliasesToSemanticRecords(
+				catalog.resources,
+				{ rootId: "external-resource-catalog", path: basename(path) },
+				sha256,
+			),
+		),
+		...semanticMapImports.flatMap((item) => item.records),
+	];
+	const vocabularies = createDefaultVocabularyRegistry();
+	const semanticCatalogs = await Promise.all(
+		(values["semantic-catalog"] ?? []).map((path) =>
+			readSemanticCatalog(resolve(path), vocabularies),
+		),
 	);
 
 	if (values.doctor) {
@@ -115,6 +164,8 @@ Options:
 			outputRoot: workspace.outputRoot,
 			outputRoots: workspace.outputRoots,
 			resourceCatalogEntries: resourceAliases.length,
+			semanticRecords: semanticRecords.length,
+			semanticCatalogs: semanticCatalogs.length,
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,
@@ -126,6 +177,8 @@ Options:
 		buildServer({
 			workspace,
 			resourceAliases,
+			semanticRecords,
+			semanticCatalogs,
 		}),
 	);
 	console.error("garbro-mcp server running on stdio");

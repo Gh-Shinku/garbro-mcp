@@ -15,6 +15,7 @@
 	"dependencies": {
 		"@garbro-mcp/core": "workspace:*",
 		"@garbro-mcp/formats": "workspace:*",
+		"@garbro-mcp/semantic": "workspace:*",
 		"@modelcontextprotocol/server": "^2.0.0",
 		"zod": "^4.6.2"
 	}
