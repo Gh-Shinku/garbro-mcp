@@ -64,6 +64,17 @@ separate commits unless they are inseparable parts of the same behavior.
 Do not include unrelated user changes in a commit. If a task requires several logical changes,
 finish and commit each validated change before starting the next one.
 
+## Test Scope
+
+Choose verification in proportion to the change. Small or localized changes should run the narrowest
+relevant unit or integration tests plus any required typecheck, lint, or formatting checks. Do not run
+the complete test suite by default after every small edit, documentation change, or test-only cleanup.
+
+Run the full test suite only when the change is broad or cross-cutting, when preparing a release,
+when targeted tests cannot provide adequate confidence, or when the user explicitly requests it.
+Do not repeat a full run after a minor follow-up edit if the earlier result remains applicable; run
+the affected targeted checks instead.
+
 ## Agent Workflow
 
 When implementing a format, follow this order:
@@ -76,7 +87,7 @@ When implementing a format, follow this order:
 5. Implement the smallest useful functionality.
 6. Add tests.
 7. Compare against GARBro.
-8. Run lint, typecheck, and tests.
+8. Run scoped lint, typecheck, and relevant tests.
 9. Review the diff for unrelated changes.
 10. Commit using Conventional Commits.
 ```
