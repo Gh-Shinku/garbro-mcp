@@ -13,6 +13,7 @@ export const garbroVocabulary = defineVocabulary({
 			predicate: "garbro:aliasOf",
 			subjectTypes: ["garbro:alias"],
 			objectTypes: ["garbro:resource"],
+			cardinality: "one",
 		},
 	},
 } as const);
@@ -31,6 +32,7 @@ export const visualNovelVocabulary = defineVocabulary({
 			predicate: "vn:spokenBy",
 			subjectTypes: ["vn:dialogue"],
 			objectTypes: ["vn:character"],
+			cardinality: "one",
 		},
 		playsResource: {
 			predicate: "vn:playsResource",

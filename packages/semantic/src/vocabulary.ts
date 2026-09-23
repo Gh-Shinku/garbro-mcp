@@ -26,6 +26,7 @@ export interface PredicateDefinition {
 	subjectTypes: readonly SemanticName[];
 	objectTypes?: readonly SemanticName[];
 	allowLiteral?: boolean;
+	cardinality?: "one" | "many";
 	validateQualifiers?: PropertiesValidator;
 }
 
