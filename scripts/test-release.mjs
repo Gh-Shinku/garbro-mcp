@@ -95,6 +95,7 @@ async function smoke(bundlePath, outputRoot) {
 	);
 	assert.equal(doctor.status, "ok");
 	assert.equal(doctor.build.buildId, buildManifest.buildId);
+
 	const transport = new StdioClientTransport({
 		command: process.execPath,
 		args: [
@@ -115,104 +116,101 @@ async function smoke(bundlePath, outputRoot) {
 	const client = new Client({ name: "release-smoke", version: "1.0.0" });
 	try {
 		await client.connect(transport);
-		const names = (await client.listTools()).tools
-			.map((tool) => tool.name)
-			.sort();
 		assert.deepEqual(
-			names,
-			[
-				"get_server_info",
-				"list_formats",
-				"scan_resources",
-				"inspect_archive",
-				"list_entries",
-				"plan_extraction",
-				"extract_entries",
-				"extract_resources",
-				"start_extraction",
-				"get_extraction_status",
-				"cancel_extraction",
-				"verify_artifacts",
-			].sort(),
+			(await client.listTools()).tools.map((tool) => tool.name).sort(),
+			["cancel_task", "get_task", "submit_task"],
 		);
-		async function call(name, arguments_ = {}, options) {
-			const result = await client.callTool(
-				{ name, arguments: arguments_ },
-				options,
-			);
+
+		async function call(name, arguments_ = {}) {
+			const result = await client.callTool({ name, arguments: arguments_ });
 			assert.notEqual(result.isError, true, JSON.stringify(result));
 			return result.structuredContent;
 		}
-		const source = { rootId: "samples", path: "basic.xp3" };
-		const serverInfo = await call("get_server_info");
-		assert.equal(serverInfo.outcome.status, "ok");
+		async function submit(task, idempotencyKey) {
+			return await call("submit_task", {
+				task,
+				...(idempotencyKey === undefined ? {} : { idempotencyKey }),
+			});
+		}
+		async function waitForTask(taskId) {
+			for (let attempt = 0; attempt < 200; attempt += 1) {
+				const status = await call("get_task", { taskId });
+				if (
+					["completed", "partial", "failed", "cancelled"].includes(status.state)
+				)
+					return status;
+				await new Promise((resolvePromise) => setTimeout(resolvePromise, 5));
+			}
+			throw new Error(`Task ${taskId} did not finish`);
+		}
+
+		const infoResource = await client.readResource({
+			uri: "garbro://server/info",
+		});
+		const serverInfo = JSON.parse(infoResource.contents[0].text);
 		assert.equal(serverInfo.server.version, version);
 		assert.equal(serverInfo.server.buildId, buildManifest.buildId);
 		assert.equal(
 			serverInfo.server.formatCatalogSha256,
 			buildManifest.formatCatalogSha256,
 		);
+		assert.equal(serverInfo.capabilities.mandatoryExtractionVerification, true);
 		assert(serverInfo.notSupported.includes("game logic reverse engineering"));
-		assert.equal(
-			(await call("list_formats", { extension: "xp3" })).formats[0].id,
-			"xp3",
-		);
-		assert.equal(
-			(await call("scan_resources", { rootId: "samples" })).archives[0]
-				.formatId,
-			"xp3",
-		);
-		assert.equal(
+		const formatsResource = await client.readResource({
+			uri: "garbro://formats",
+		});
+		const formats = JSON.parse(formatsResource.contents[0].text);
+		assert(formats.some((format) => format.id === "xp3"));
+
+		const source = { rootId: "samples", path: "basic.xp3" };
+		const scan = await waitForTask(
 			(
-				await call("scan_resources", {
+				await submit({
+					type: "scan",
 					rootId: "samples",
 					formatIds: ["xp3"],
 				})
-			).archives[0].formatId,
-			"xp3",
+			).taskId,
 		);
-		assert.equal(
-			(await call("inspect_archive", { source })).summary.entryCount,
-			3,
+		assert.equal(scan.result.archives[0].formatId, "xp3");
+		const inspected = await waitForTask(
+			(
+				await submit({
+					type: "inspect",
+					source,
+					resourceTypes: ["script"],
+				})
+			).taskId,
 		);
-		assert.equal((await call("list_entries", { source })).entries.length, 3);
-		assert.equal(
-			(await call("list_entries", { source, resourceTypes: ["script"] }))
-				.matchedTotal,
-			2,
-		);
-		const progress = [];
-		const plan = await call("plan_extraction", {
-			source,
+		assert.equal(inspected.result.summary.entryCount, 3);
+		assert.equal(inspected.result.entries.matchedTotal, 2);
+
+		const extractionInput = {
+			type: "extract",
+			sources: [{ source }],
 			budgets: { maxResources: 3, maxOutputBytes: "1024" },
-		});
-		assert.equal(plan.ready, 3);
-		assert.equal(plan.budgetViolations.length, 0);
-		const extracted = await call(
-			"extract_entries",
-			{
-				source,
-				expectedPlanDigest: plan.planDigest,
-				budgets: { maxResources: 3, maxOutputBytes: "1024" },
-			},
-			{
-				onprogress: (update) => {
-					progress.push(update.progress);
-				},
-			},
+		};
+		const extraction = await submit(
+			extractionInput,
+			"release-smoke-extraction",
 		);
-		assert.equal(extracted.status, "completed");
-		assert.equal(extracted.extracted, 3);
-		assert.deepEqual(progress, [1, 2, 3]);
-		assert.equal(extracted.items.length, 0);
-		assert.equal(extracted.itemsOmitted, 3);
-		const reportBytes = await readFile(extracted.report.absolutePath);
+		assert.equal(
+			(await submit(extractionInput, "release-smoke-extraction")).taskId,
+			extraction.taskId,
+		);
+		const extracted = await waitForTask(extraction.taskId);
+		assert.equal(extracted.state, "completed");
+		assert.equal(extracted.result.extracted, 3);
+		assert.equal(extracted.result.sources[0].verification.verified, 3);
+		const reportArtifact = extracted.result.sources[0].report;
+		const reportBytes = await readFile(reportArtifact.absolutePath);
 		assert.equal(
 			createHash("sha256").update(reportBytes).digest("hex"),
-			extracted.report.sha256,
+			reportArtifact.sha256,
 		);
 		const report = JSON.parse(reportBytes.toString());
 		assert.equal(report.items.length, 3);
+		assert.equal(report.verification.verified, 3);
 		for (const item of report.items) {
 			const bytes = await readFile(item.artifact.absolutePath);
 			assert.equal(BigInt(bytes.length).toString(), item.artifact.bytesWritten);
@@ -221,62 +219,14 @@ async function smoke(bundlePath, outputRoot) {
 				item.artifact.sha256,
 			);
 		}
-		const asyncJob = await call("start_extraction", {
-			source,
-			outputSubdirectory: "async-release-smoke",
-			selection: { mode: "all", resourceTypes: ["script"] },
+
+		const unsafeSubmission = await submit({
+			type: "inspect",
+			source: { rootId: "samples", path: "../escape" },
 		});
-		let asyncStatus;
-		for (let attempt = 0; attempt < 100; attempt += 1) {
-			asyncStatus = await call("get_extraction_status", {
-				jobId: asyncJob.jobId,
-				inline: "all",
-			});
-			if (
-				["completed", "partial", "failed", "cancelled"].includes(
-					asyncStatus.state,
-				)
-			)
-				break;
-			await new Promise((resolve) => setTimeout(resolve, 5));
-		}
-		assert.equal(asyncStatus.state, "completed");
-		assert.equal(asyncStatus.extracted, 2);
-		const firstArtifact = report.items[0].artifact;
-		const verification = await call("verify_artifacts", {
-			artifacts: [
-				{
-					outputRootId: firstArtifact.outputRootId,
-					path: firstArtifact.relativePath,
-					expected: {
-						sha256: firstArtifact.sha256,
-						bytes: firstArtifact.bytesWritten,
-					},
-				},
-			],
-		});
-		assert.equal(verification.status, "completed");
-		assert.equal(verification.results[0].status, "verified");
-		assert.equal(
-			(await call("extract_entries", { source, conflictPolicy: "skip" }))
-				.skipped,
-			3,
-		);
-		assert.equal(
-			(
-				await call("extract_resources", {
-					sources: [source],
-					conflictPolicy: "skip",
-				})
-			).sources[0].skipped,
-			3,
-		);
-		const unsafe = await client.callTool({
-			name: "inspect_archive",
-			arguments: { source: { rootId: "samples", path: "../escape" } },
-		});
-		assert.equal(unsafe.isError, true);
-		assert.equal(unsafe.structuredContent.error.code, "UNSAFE_PATH");
+		const unsafe = await waitForTask(unsafeSubmission.taskId);
+		assert.equal(unsafe.state, "failed");
+		assert.equal(unsafe.error.code, "UNSAFE_PATH");
 	} catch (error) {
 		throw new Error(`Release smoke failed:\n${stderr}`, { cause: error });
 	} finally {

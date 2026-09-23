@@ -75,6 +75,43 @@ async function withClient<T>(
 	}
 }
 
+function structured(value: {
+	structuredContent?: unknown;
+}): Record<string, unknown> {
+	if (
+		typeof value.structuredContent !== "object" ||
+		value.structuredContent === null
+	)
+		throw new Error("expected structured MCP content");
+	return value.structuredContent as Record<string, unknown>;
+}
+
+async function submitTask(client: Client, task: Record<string, unknown>) {
+	const submitted = await client.callTool({
+		name: "submit_task",
+		arguments: { task },
+	});
+	expect(submitted.isError).not.toBe(true);
+	const taskId = structured(submitted).taskId;
+	if (typeof taskId !== "string") throw new Error("expected task ID");
+	for (let attempt = 0; attempt < 1_000; attempt += 1) {
+		const response = await client.callTool({
+			name: "get_task",
+			arguments: { taskId },
+		});
+		expect(response.isError).not.toBe(true);
+		const payload = structured(response);
+		if (
+			["completed", "partial", "failed", "cancelled"].includes(
+				String(payload.state),
+			)
+		)
+			return payload;
+		await new Promise((resolvePromise) => setTimeout(resolvePromise, 10));
+	}
+	throw new Error(`task ${taskId} did not finish`);
+}
+
 async function extractSample(client: Client, sample: PrivateSample) {
 	if (!sample.extraction) {
 		throw new Error(`no extraction expectation for ${sample.path}`);
@@ -87,43 +124,32 @@ async function extractSample(client: Client, sample: PrivateSample) {
 			? {}
 			: { maxDecodedBytesPerResource: sample.audio.decodedBytes.toString() }),
 	};
-	const planned = await client.callTool({
-		name: "plan_extraction",
-		arguments: {
-			source: { rootId: "rewrite", path: sample.path },
-			budgets,
-			inline: "all",
-		},
+	const task = await submitTask(client, {
+		type: "extract",
+		sources: [{ source: { rootId: "rewrite", path: sample.path } }],
+		budgets,
 	});
-	expect(planned.isError).not.toBe(true);
-	const plan = planned.structuredContent as {
-		selected: number;
-		ready: number;
-		budgetViolations: unknown[];
-		budgetUnknowns: unknown[];
-		planDigest: string;
-	};
-	expect(plan).toMatchObject({
-		selected: 1,
-		ready: 1,
-		budgetViolations: [],
-		budgetUnknowns: [],
-	});
-	const response = await client.callTool({
-		name: "extract_entries",
-		arguments: {
-			source: { rootId: "rewrite", path: sample.path },
-			expectedPlanDigest: plan.planDigest,
-			budgets,
-			inline: "all",
-		},
-	});
-	expect(response.isError).not.toBe(true);
-	const payload = response.structuredContent as {
+	const payload = task.result as {
 		status: string;
 		hasFailures: boolean;
+		sources: Array<{
+			verification: { verified: number; mismatched: number; invalid: number };
+			report: { absolutePath: string };
+		}>;
+	};
+	expect(payload).toMatchObject({
+		status: "completed",
+		hasFailures: false,
+		sources: [
+			{
+				verification: { verified: 1, mismatched: 0, invalid: 0 },
+			},
+		],
+	});
+	const reportPath = payload.sources[0]?.report.absolutePath;
+	if (!reportPath) throw new Error(`no extraction report for ${sample.path}`);
+	const report = JSON.parse(readFileSync(reportPath, "utf8")) as {
 		items: Array<{
-			status: string;
 			artifact?: {
 				outputRootId: string;
 				relativePath: string;
@@ -132,41 +158,23 @@ async function extractSample(client: Client, sample: PrivateSample) {
 				sha256: string;
 			};
 		}>;
+		verification: {
+			items: Array<{
+				status: string;
+				verification: { format: string; structuralValid: boolean | null };
+			}>;
+		};
 	};
-	expect(payload).toMatchObject({
-		status: "completed",
-		hasFailures: false,
-	});
-	const artifact = payload.items[0]?.artifact;
+	const artifact = report.items[0]?.artifact;
 	if (!artifact) throw new Error(`no extracted artifact for ${sample.path}`);
-	const verified = await client.callTool({
-		name: "verify_artifacts",
-		arguments: {
-			artifacts: [
-				{
-					outputRootId: artifact.outputRootId,
-					path: artifact.relativePath,
-					expected: {
-						sha256: sample.extraction.sha256,
-						bytes: sample.extraction.bytesWritten.toString(),
-					},
-				},
-			],
-		},
-	});
-	expect(verified.isError).not.toBe(true);
-	expect(verified.structuredContent).toMatchObject({
-		status: "completed",
-		verified: 1,
-		mismatched: 0,
-		invalid: 0,
-		results: [
+	expect(report.verification).toMatchObject({
+		items: [
 			{
 				status: "verified",
-				level: "manifest",
-				matched: true,
-				format: sample.extraction.codec === "vorbis" ? "ogg" : "wav",
-				structuralValid: true,
+				verification: {
+					format: sample.extraction.codec === "vorbis" ? "ogg" : "wav",
+					structuralValid: true,
+				},
 			},
 		],
 	});
@@ -181,14 +189,13 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 				const source = resolve(manifest.gameRoot, ...sample.path.split("/"));
 				expect((await stat(source)).size).toBe(sample.size);
 				expect(await sha256(source)).toBe(sample.sha256);
-				const inspected = await client.callTool({
-					name: "inspect_archive",
-					arguments: {
-						source: { rootId: "rewrite", path: sample.path },
-						detail: "full",
-					},
+				const inspected = await submitTask(client, {
+					type: "inspect",
+					source: { rootId: "rewrite", path: sample.path },
+					includeEntries: false,
+					includeMetadata: true,
 				});
-				const payload = inspected.structuredContent as Record<string, unknown>;
+				const payload = inspected.result as Record<string, unknown>;
 				if (sample.expectedFormatId === null) {
 					expect(payload).toMatchObject({ recognized: false });
 					continue;
@@ -209,19 +216,15 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 			const seen = new Set<string>();
 			let cursor: string | undefined;
 			for (;;) {
-				const response = await client.callTool({
-					name: "scan_resources",
-					arguments: {
-						rootId: "rewrite",
-						includeGlobs: ["**/*.nwa"],
-						formatIds: ["reallive-nwa-audio"],
-						limit: 500,
-						maxResponseBytes: 65536,
-						...(cursor === undefined ? {} : { cursor }),
-					},
+				const response = await submitTask(client, {
+					type: "scan",
+					rootId: "rewrite",
+					includeGlobs: ["**/*.nwa"],
+					formatIds: ["reallive-nwa-audio"],
+					limit: 200,
+					...(cursor === undefined ? {} : { cursor }),
 				});
-				expect(response.isError).not.toBe(true);
-				const page = response.structuredContent as {
+				const page = response.result as {
 					archives: Array<{ source: { path: string } }>;
 					nextCursor: string | null;
 					complete: boolean;
