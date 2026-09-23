@@ -112,6 +112,7 @@ describe("engine adapter registry", () => {
 						adapterVersion: "1",
 						status,
 						confidence,
+						bytesRead: 0n,
 						evidence: [],
 						requiredInputs: [],
 						capabilities: [],

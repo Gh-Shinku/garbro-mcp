@@ -16,12 +16,24 @@ export interface EngineCapability {
 	reason?: string;
 }
 
+export interface GameFingerprint {
+	algorithm: "sha256";
+	value: string;
+	files: readonly {
+		path: string;
+		size: bigint;
+		sha256: string;
+	}[];
+}
+
 export interface EngineProbeResult {
 	engineId: string;
 	adapterVersion: string;
 	status: EngineProbeStatus;
 	confidence: EngineProbeConfidence;
 	profile?: string;
+	fingerprint?: GameFingerprint;
+	bytesRead: bigint;
 	evidence: readonly EngineProbeEvidence[];
 	requiredInputs: readonly {
 		pattern: string;

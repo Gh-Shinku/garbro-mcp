@@ -1,6 +1,7 @@
 export * from "./analyzer.js";
 export * from "./catalog.js";
 export * from "./engine.js";
+export * from "./engines/siglus.js";
 export * from "./identity.js";
 export * from "./mapping.js";
 export * from "./model.js";
