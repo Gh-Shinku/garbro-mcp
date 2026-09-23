@@ -24,9 +24,9 @@ Get-FileHash ./garbro-mcp-<version>-portable.zip -Algorithm SHA256
 
 Checksums detect incomplete or modified downloads; they are not a separate authenticity signature.
 Extract the ZIP, then configure the client to run `node /absolute/path/garbro-mcp/garbro-mcp.cjs`
-with the root arguments described in [mcp.md](mcp.md). Use an absolute Node executable path if the
-client does not inherit Node's PATH. No runtime dependency installation or registry access is
-needed. All three desktop operating systems use the same bundle.
+with the root arguments described in [configuration.md](configuration.md). Use an absolute Node
+executable path if the client does not inherit Node's PATH. No runtime dependency installation or
+registry access is needed. All three desktop operating systems use the same bundle.
 
 Alternatively, download the `.tgz` and install it locally:
 

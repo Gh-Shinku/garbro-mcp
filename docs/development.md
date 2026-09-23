@@ -10,7 +10,6 @@ git clone https://github.com/Gh-Shinku/garbro-mcp.git
 cd garbro-mcp
 pnpm install --frozen-lockfile
 pnpm build
-pnpm check
 ```
 
 For source installations, configure the MCP client to run Node with the absolute path to
@@ -54,14 +53,15 @@ names, and symbolic-link destinations are always rejected.
 ## Tests and differential validation
 
 ```shell
-pnpm test
+pnpm exec vitest run tests/unit/<relevant-test>.test.ts
 pnpm test:differential -- --archive fixtures/private/sample.xp3 --reference fixtures/private/garbro-output
 ```
 
 The regular test suite uses deterministic, redistributable synthetic fixtures committed to the
 repository. Differential tests compare this project's output with a private reference directory
 extracted by GARBro, matching path, size, and SHA-256. `fixtures/private/` is excluded from version
-control.
+control. Run the narrowest tests that cover a change. Reserve `pnpm test` for broad, cross-cutting
+changes and release validation.
 
 Format-specific sources, implementation details, and limitations belong under `docs/formats/`.
 The generated GARBro compatibility baseline and status definitions are documented in

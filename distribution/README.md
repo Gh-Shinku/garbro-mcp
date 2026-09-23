@@ -4,9 +4,9 @@ This is an experimental build, not a stable release. Keep a backup of your input
 separate output directory. Install Node.js 24 or newer; no Git, pnpm, or dependency installation is
 needed for the portable ZIP.
 
-The server handles supported resource formats and externally supplied mappings. It does not
-reverse-engineer game logic, infer character or voice ownership, or automatically support unknown
-engines. Clients should keep those tasks with the user or an external analysis workflow.
+The server handles supported resource formats. It does not reverse-engineer game logic, infer
+character or voice ownership, or automatically support unknown engines. Clients should keep those
+tasks with the user or an external analysis workflow.
 
 Extract the ZIP and configure your MCP client:
 
