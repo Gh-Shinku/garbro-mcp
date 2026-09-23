@@ -16,12 +16,12 @@ codecs documented by [GARBro](https://github.com/morkt/GARBro).
   audio, and scripts with validation evidence.
 - **Select the data that matters:** Filter archive entries by path, compression, encryption, and
   conservative media category.
-- **Extract safely:** Preflight destinations and budgets, write only below configured output roots,
-  and preserve source game files.
-- **Handle long operations:** Submit large single-archive extractions as background jobs and poll
-  progress without holding an MCP request open.
-- **Verify output:** Record byte counts and SHA-256 hashes, save complete extraction reports, and
-  inspect WAV or Ogg structure.
+- **Extract safely:** Every extraction task preflights destinations and budgets, writes only below
+  configured output roots, and preserves source game files.
+- **Handle long operations:** Scans, inspections, and extractions all run as background tasks with
+  progress, cancellation, and one consistent control interface.
+- **Verify automatically:** Extraction reopens every output, checks its size and SHA-256, inspects
+  WAV or Ogg structure, and saves complete evidence without an extra agent step.
 
 ## Product boundary
 
@@ -72,21 +72,21 @@ filesystem policy.
 
 ### Your first prompt
 
-Try a request that keeps discovery and extraction explicit:
+Try a request that states the desired resources and output boundary:
 
 ```text
 Scan the Rewrite game under the configured games root. Identify archives containing audio entries,
-plan extraction into the default output root, then start the extraction as a background job. Do not
-modify any game files.
+extract the audio into the default output root, and report any extraction or verification failures.
+Do not modify any game files.
 ```
 
-The agent should use `scan_resources`, `list_entries`, and `plan_extraction` before writing, then
-`start_extraction` and `get_extraction_status` for a large operation.
+The agent submits `scan`, `inspect`, and `extract` tasks through `submit_task`, polling each with
+`get_task`. Planning and post-extraction verification are mandatory internal extraction phases.
 
 ## Tools
 
-See the complete [tool reference](docs/tool-reference.md) for all 12 MCP tools, their parameters,
-selection modes, budgets, pagination, extraction reports, and asynchronous job states.
+See the complete [tool reference](docs/tool-reference.md) for the three task-control tools, task
+types, selection modes, budgets, automatic verification, reports, and lifecycle states.
 
 ## Format documentation
 

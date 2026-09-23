@@ -11,8 +11,12 @@ These principles define the intended boundary of the MCP server.
   format metadata or a recognized extension.
 - **No semantic guessing:** Character, dialogue, voice, sprite, or story relationships require
   external analysis or user input.
-- **Plan before material writes:** Preflight selection, destinations, conflicts, and budgets before
-  extracting large resources.
+- **One asynchronous work model:** Scan, inspect, and extract operations are submitted as tasks;
+  agents never need to choose between synchronous and background variants.
+- **Plan before material writes:** Every extraction task preflights selection, destinations,
+  conflicts, and budgets before writing.
+- **Verification is part of extraction:** A task cannot complete successfully until every written
+  artifact has been independently reopened and verified at its supported evidence level.
 - **Explicit partial success:** Batch operations return per-item status and `hasFailures`; they do
   not hide failed entries behind a successful top-level call.
 - **Source files are immutable:** Tools read configured game roots and write only to separate,
