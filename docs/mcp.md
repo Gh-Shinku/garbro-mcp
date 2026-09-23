@@ -18,7 +18,7 @@ The legacy single `--output-root <path>` form remains accepted as `default`. Wit
 `workspace` maps to the current directory and output defaults to `garbro-output` below it.
 
 Before connecting a client, run `--version --json` to record the immutable `buildId`, source commit,
-format-catalog hash, and protocol version. `--doctor --json` validates all configured roots. An
+format-catalog hash, semantic-descriptor hash, and protocol version. `--doctor --json` validates all configured roots. An
 optional `--expected-build-id` makes a stale or different bundle fail at startup.
 
 ## Tools
@@ -26,6 +26,10 @@ optional `--expected-build-id` makes a stale or different bundle fail at startup
 | Tool | Purpose | Writes files |
 | --- | --- | --- |
 | `get_server_info` | Discover roots, output policy, limits, and capabilities | No |
+| `inspect_game` | Detect a game engine with bounded, read-only structural probes | No |
+| `plan_semantic_analysis` | Plan semantic analyzers, inputs, budgets, and missing facts | No |
+| `build_semantic_catalog` | Execute an unchanged plan and write a portable JSONL catalog | Yes |
+| `query_semantics` | Query trusted semantic relations and their resource locators | No |
 | `search_resources` | Resolve titles through an optional evidence-backed alias catalog | No |
 | `list_formats` | Query formats by resource type, status, or extension | No |
 | `scan_resources` | Detect supported resources under a logical directory | No |
@@ -84,16 +88,40 @@ directory with `--resource-catalog <json>` instead of asking the server to guess
 `search_resources` returns `resolved` only for one exact match. Partial or multiple matches are
 `ambiguous`; no evidence is `unsupported`. Both include a machine-readable next action.
 
+## Semantic analysis
+
+The semantic layer relates engine concepts such as characters or dialogue to extracted resources.
+It uses namespaced vocabularies and independently registered engine adapters and analyzers, so a
+future sprite or scene model does not require changing the catalog core. Configure existing JSONL
+catalogs with `--semantic-catalog <path>` and user-confirmed JSON or CSV mappings with
+`--semantic-map <path>`; both options are repeatable. A mapping row contains `subjectType`,
+`subjectKey`, `predicate`, `resourceType`, `resourcePath`, and optionally `rootId`, `entryId`,
+`subjectName`, properties, and `override`. If `rootId` is omitted, the first configured input root
+is used.
+
+Use `inspect_game`, then `plan_semantic_analysis`, and only pass a returned `planDigest` to
+`build_semantic_catalog`. Execution probes again and returns `PLAN_CHANGED` if inputs or analyzer
+descriptors changed. Executable inspection is static, disabled by default, and requires both the
+`static-executable` strategy and `allowExecutableInspection: true`.
+
+`query_semantics` can read configured catalogs or a generated `catalogPath` below a named output
+root. Use `gameFingerprint` when several configured game catalogs are present. It returns only
+`verified` and `user-confirmed` relations by default. Candidate,
+conflicted, rejected, and unresolved assertions require an explicit `statuses` filter and must not
+drive extraction automatically. The first Siglus adapter only validates the Scene/Gameexe layout;
+it does not yet decode bytecode or infer character-to-voice mappings. Supply a mapping for those
+relations until a separately tested analyzer is available.
+
 ## Common outcome contract
 
 Every tool result includes `outcome.status`: `ok`, `partial`, `unsupported`, `ambiguous`, or
 `failed`. It also contains `warnings`, and when relevant `nextAction` and `verification` evidence.
-Existing tool-specific `status` fields remain during the protocol-2 migration. Request failures and
+Existing tool-specific `status` fields remain during the protocol-3 migration. Request failures and
 fully failed operations set MCP `isError`; partial batches retain their structured results.
 
 ## Context-friendly defaults
 
-The interface exposes twelve tools without additional prompts or resources. Format lists default
+The interface exposes sixteen tools without additional prompts or resources. Format lists default
 to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
 summaries by default. Set `detail: "full"` only when attribution, implementation notes, checksums,
 raw names, or metadata are needed. `list_formats` accepts an exact `formatId` filter; scans reference
