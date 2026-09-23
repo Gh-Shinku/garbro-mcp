@@ -115,7 +115,7 @@ fully failed operations set MCP `isError`; partial batches retain their structur
 
 ## Context-friendly defaults
 
-The interface exposes thirteen tools without additional prompts or resources. Format lists default
+The interface exposes twelve tools without additional prompts or resources. Format lists default
 to 20 items; scans and entry lists default to 50. Formats, inspections, and entry lists return
 summaries by default. Set `detail: "full"` only when attribution, implementation notes, checksums,
 raw names, or metadata are needed. `list_formats` accepts an exact `formatId` filter; scans reference
