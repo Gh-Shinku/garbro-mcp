@@ -122,7 +122,6 @@ describe("MCP server", () => {
 				"search_resources",
 				"list_formats",
 				"scan_resources",
-				"scan_archives",
 				"inspect_archive",
 				"list_entries",
 				"read_entry",
@@ -450,7 +449,7 @@ describe("MCP server", () => {
 		const source = { rootId: "games", path: "basic.xp3" };
 
 		const scanned = await client.callTool({
-			name: "scan_archives",
+			name: "scan_resources",
 			arguments: { rootId: "games", path: "." },
 		});
 		expect(scanned.structuredContent).toMatchObject({
@@ -691,7 +690,7 @@ describe("MCP server", () => {
 		let cursor: string | null = null;
 		for (let iteration = 0; iteration < 20; iteration += 1) {
 			const result = await client.callTool({
-				name: "scan_archives",
+				name: "scan_resources",
 				arguments: {
 					rootId: "games",
 					limit: 500,

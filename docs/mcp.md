@@ -31,7 +31,6 @@ optional `--expected-build-id` makes a stale or different bundle fail at startup
 | `search_resources` | Resolve titles through an optional evidence-backed alias catalog | No |
 | `list_formats` | Query formats by resource type, status, or extension | No |
 | `scan_resources` | Detect supported resources under a logical directory | No |
-| `scan_archives` | Compatibility alias for `scan_resources` | No |
 | `inspect_archive` | Detect and summarize one file | No |
 | `list_entries` | Filter and page an archive's entries | No |
 | `read_entry` | Return a capped text or hexadecimal preview | No |

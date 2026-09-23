@@ -1291,15 +1291,6 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		}
 	};
 	server.registerTool("scan_resources", scanTool, scanResources);
-	server.registerTool(
-		"scan_archives",
-		{
-			...scanTool,
-			description:
-				"Compatibility alias for scan_resources. Scan a configured input root for validated resources.",
-		},
-		scanResources,
-	);
 
 	server.registerTool(
 		"inspect_archive",

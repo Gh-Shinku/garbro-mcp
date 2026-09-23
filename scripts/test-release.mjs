@@ -135,7 +135,6 @@ async function smoke(bundlePath, outputRoot) {
 				"search_resources",
 				"list_formats",
 				"scan_resources",
-				"scan_archives",
 				"inspect_archive",
 				"list_entries",
 				"read_entry",
@@ -189,7 +188,8 @@ async function smoke(bundlePath, outputRoot) {
 			"xp3",
 		);
 		assert.equal(
-			(await call("scan_archives", { rootId: "samples" })).archives[0].formatId,
+			(await call("scan_resources", { rootId: "samples" })).archives[0]
+				.formatId,
 			"xp3",
 		);
 		assert.equal(
