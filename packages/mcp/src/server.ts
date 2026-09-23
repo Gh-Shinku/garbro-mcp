@@ -23,12 +23,10 @@ import {
 } from "@garbro-mcp/formats";
 import {
 	canonicalJson,
+	createDefaultVocabularyRegistry,
 	type LoadedSemanticCatalog,
 	readSemanticCatalog,
-	SemanticAnalysisService,
 	SemanticCatalogIndex,
-	type SemanticAnalysisPlanResult,
-	type SemanticGoal,
 	type SemanticQuery,
 	type SemanticRecord,
 } from "@garbro-mcp/semantic";
@@ -44,6 +42,27 @@ import {
 import { BUILD_IDENTITY } from "./build.js";
 
 export const SERVER_VERSION = BUILD_IDENTITY.version;
+export const SERVER_PURPOSE =
+	"Detect, inspect, decode, extract, and verify supported game resource formats.";
+export const SERVER_SCOPE = [
+	"known archive and resource formats",
+	"bounded previews and metadata inspection",
+	"safe planned extraction",
+	"artifact verification",
+	"externally supplied resource mappings",
+] as const;
+export const SERVER_NON_CAPABILITIES = [
+	"game logic reverse engineering",
+	"automatic adaptation to unknown engines",
+	"character, dialogue, voice, or sprite inference",
+	"executable decompilation",
+	"automatic semantic mapping",
+] as const;
+export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
+
+Use garbro-mcp for deterministic resource access: scan known files, inspect archives, preview entries, plan extraction, extract, and verify artifacts. It may query mappings explicitly supplied by the user or another external analysis tool.
+
+Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a relationship that is not present in a configured mapping, report that the resource bytes may be extractable but the mapping requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const errorCodes = [
 	"INVALID_ARCHIVE",
@@ -86,18 +105,6 @@ const sourceSchema = z.object({
 });
 const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
 const semanticNameSchema = z.string().regex(/^[^:]+:[^:]+$/);
-const semanticGoalSchema = z.object({
-	subjectType: semanticNameSchema.optional(),
-	query: z.string().min(1).optional(),
-	predicate: semanticNameSchema.optional(),
-	objectType: semanticNameSchema.optional(),
-	resourceType: z.string().min(1).optional(),
-});
-const semanticBudgetsSchema = z.object({
-	maxInputBytes: decimalBytesSchema.optional(),
-	maxFacts: z.number().int().positive().max(1_000_000).optional(),
-	timeoutMs: z.number().int().positive().max(3_600_000).optional(),
-});
 const assertionStatuses = [
 	"verified",
 	"user-confirmed",
@@ -484,72 +491,14 @@ function batchItemToWire(item: ExtractionResult["items"][number]) {
 	};
 }
 
-function engineMatchToWire(
-	match: Awaited<ReturnType<SemanticAnalysisService["inspect"]>>[number],
-) {
-	return {
-		engineId: match.engineId,
-		adapterVersion: match.adapterVersion,
-		status: match.status,
-		confidence: match.confidence,
-		...(match.profile === undefined ? {} : { profile: match.profile }),
-		...(match.fingerprint === undefined
-			? {}
-			: {
-					fingerprint: {
-						algorithm: match.fingerprint.algorithm,
-						value: match.fingerprint.value,
-						files: match.fingerprint.files.map((file) => ({
-							...file,
-							size: file.size.toString(),
-						})),
-					},
-				}),
-		bytesRead: match.bytesRead.toString(),
-		evidence: match.evidence.map((item) => ({ ...item })),
-		requiredInputs: match.requiredInputs.map((item) => ({ ...item })),
-		capabilities: match.capabilities.map((item) => ({ ...item })),
-		warnings: [...match.warnings],
-	};
-}
-
-function semanticPlanToWire(plan: SemanticAnalysisPlanResult) {
-	return {
-		status: plan.status,
-		planDigest: plan.planDigest,
-		engineMatches: plan.engineMatches.map(engineMatchToWire),
-		...(plan.selectedEngine === undefined
-			? {}
-			: { selectedEngine: engineMatchToWire(plan.selectedEngine) }),
-		stages:
-			plan.graph?.stages.map((stage) =>
-				stage.map((analyzer) => ({
-					id: analyzer.id,
-					version: analyzer.version,
-				})),
-			) ?? [],
-		analyzerPlans: plan.analyzerPlans.map((item) => ({
-			...item,
-			inputBytes: item.inputBytes?.toString() ?? null,
-		})),
-		inputBytes: plan.inputBytes?.toString() ?? null,
-		estimatedFacts: plan.estimatedFacts,
-		missingPredicates: [...plan.missingPredicates],
-		availablePredicates: [...plan.availablePredicates],
-		budgetViolations: plan.budgetViolations.map((item) => ({ ...item })),
-		warnings: [...plan.warnings],
-	};
-}
-
 export interface BuildServerOptions
 	extends WorkspacePolicyOptions,
 		ArchiveAutomationOptions {
 	registry?: FormatRegistry;
 	workspace?: WorkspacePolicy;
 	resourceAliases?: readonly ResourceAlias[];
-	semanticRecords?: readonly SemanticRecord[];
-	semanticCatalogs?: readonly LoadedSemanticCatalog[];
-	semanticService?: SemanticAnalysisService;
+	resourceMappingRecords?: readonly SemanticRecord[];
+	resourceMappingCatalogs?: readonly LoadedSemanticCatalog[];
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -597,7 +546,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		options.resourceAliases ?? [],
 	);
 	const semanticRecordMap = new Map<string, SemanticRecord>();
-	for (const record of options.semanticRecords ?? []) {
+	for (const record of options.resourceMappingRecords ?? []) {
 		const existing = semanticRecordMap.get(record.id);
 		if (
 			existing &&
@@ -605,12 +554,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		)
 			throw new GarbroError(
 				"INVALID_ARGUMENT",
-				`Conflicting configured semantic record ID: ${record.id}`,
+				`Conflicting configured resource-mapping record ID: ${record.id}`,
 			);
 		semanticRecordMap.set(record.id, record);
 	}
 	const semanticRecords = [...semanticRecordMap.values()];
-	const semanticCatalogs = [...(options.semanticCatalogs ?? [])];
+	const semanticCatalogs = [...(options.resourceMappingCatalogs ?? [])];
 	for (const record of semanticRecords)
 		if (
 			record.kind === "resource" &&
@@ -618,24 +567,15 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		)
 			throw new GarbroError(
 				"INVALID_ARGUMENT",
-				`Semantic resource uses unknown input root: ${record.locator.source.rootId}`,
+				`Resource mapping uses unknown input root: ${record.locator.source.rootId}`,
 			);
-	const semanticService =
-		options.semanticService ??
-		new SemanticAnalysisService(workspace, {
-			producer: { name: "garbro-mcp", version: SERVER_VERSION },
-		});
+	const semanticVocabularies = createDefaultVocabularyRegistry();
 	const configuredSemanticIndex = new SemanticCatalogIndex();
 	for (const record of semanticRecords) configuredSemanticIndex.add(record);
-	const availablePredicates = [
-		...new Set([
-			...semanticRecords.flatMap((record) =>
-				record.kind === "relation" ? [record.predicate] : [],
-			),
-		]),
-	].sort();
-	const semanticPlans = new Map<string, SemanticAnalysisPlanResult>();
-	const server = new McpServer({ name: "garbro-mcp", version: SERVER_VERSION });
+	const server = new McpServer(
+		{ name: "garbro-mcp", version: SERVER_VERSION },
+		{ instructions: SERVER_INSTRUCTIONS },
+	);
 	const readOnly = {
 		readOnlyHint: true,
 		destructiveHint: false,
@@ -649,6 +589,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				"Return configured logical roots, output policy, limits, and supported resource categories.",
 			outputSchema: successOrFailure(
 				z.object({
+					purpose: z.string(),
+					scope: z.array(z.string()),
+					notSupported: z.array(z.string()),
+					mappingPolicy: z.literal("external-evidence-only"),
 					server: z.object({
 						name: z.literal("garbro-mcp"),
 						version: z.string(),
@@ -657,7 +601,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						builtAt: z.string(),
 						buildId: z.string(),
 						formatCatalogSha256: z.string(),
-						semanticCatalogSha256: z.string(),
+						resourceMappingCatalogSha256: z.string(),
 						dirty: z.boolean(),
 						protocolVersion: z.string(),
 					}),
@@ -681,12 +625,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						conflictPolicies: z.array(z.enum(["fail", "skip", "overwrite"])),
 						archiveCreation: z.literal(false),
 						resourceCatalogEntries: z.number().int().nonnegative(),
-						semantic: z.object({
+						resourceMappings: z.object({
 							vocabularies: z.record(z.string(), z.number().int().positive()),
-							engines: z.array(z.string()),
-							analyzers: z.array(z.string()),
 							configuredRecords: z.number().int().nonnegative(),
 							configuredCatalogs: z.number().int().nonnegative(),
+							policy: z.literal("external-evidence-only"),
 						}),
 					}),
 				}),
@@ -697,6 +640,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			try {
 				await workspace.prepare({ createOutput: false });
 				return success({
+					purpose: SERVER_PURPOSE,
+					scope: [...SERVER_SCOPE],
+					notSupported: [...SERVER_NON_CAPABILITIES],
+					mappingPolicy: "external-evidence-only" as const,
 					server: {
 						name: "garbro-mcp" as const,
 						...BUILD_IDENTITY,
@@ -716,16 +663,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						conflictPolicies: ["fail", "skip", "overwrite"] as const,
 						archiveCreation: false as const,
 						resourceCatalogEntries: resourceCatalog.resources.length,
-						semantic: {
-							vocabularies: semanticService.vocabularies.versions(),
-							engines: semanticService.engineAdapters
-								.list()
-								.map((adapter) => adapter.descriptor.id),
-							analyzers: semanticService.analyzers
-								.list()
-								.map((analyzer) => analyzer.descriptor.id),
+						resourceMappings: {
+							vocabularies: semanticVocabularies.versions(),
 							configuredRecords: semanticRecords.length,
 							configuredCatalogs: semanticCatalogs.length,
+							policy: "external-evidence-only" as const,
 						},
 					},
 				});
@@ -736,168 +678,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	);
 
 	server.registerTool(
-		"inspect_game",
+		"query_resource_mappings",
 		{
 			description:
-				"Inspect a game directory using bounded, read-only engine probes. Executables are not inspected unless explicitly allowed.",
-			inputSchema: z.object({
-				game: sourceSchema,
-				allowExecutableInspection: z.boolean().default(false),
-				maxInputBytes: decimalBytesSchema.default("67108864"),
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					status: z.enum(["resolved", "ambiguous", "unsupported"]),
-					matches: z.array(z.record(z.string(), z.unknown())),
-				}),
-			),
-			annotations: readOnly,
-		},
-		async ({ game, allowExecutableInspection, maxInputBytes }, context) => {
-			try {
-				const matches = await semanticService.inspect(game, {
-					allowExecutableInspection,
-					maxInputBytes: BigInt(maxInputBytes),
-					signal: context.mcpReq.signal,
-				});
-				const matched = matches.filter((match) => match.status === "matched");
-				return success({
-					status:
-						matched.length === 1
-							? ("resolved" as const)
-							: matched.length > 1
-								? ("ambiguous" as const)
-								: ("unsupported" as const),
-					matches: matches.map(engineMatchToWire),
-				});
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"plan_semantic_analysis",
-		{
-			description:
-				"Create a reproducible semantic-analysis plan before reading broadly or writing a catalog.",
-			inputSchema: z.object({
-				game: sourceSchema,
-				goal: semanticGoalSchema,
-				strategies: z
-					.array(z.enum(["user-mapping", "engine-parser", "static-executable"]))
-					.min(1)
-					.default(["user-mapping", "engine-parser"]),
-				allowExecutableInspection: z.boolean().default(false),
-				budgets: semanticBudgetsSchema.default({}),
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					status: z.enum(["ready", "unsupported", "ambiguous"]),
-					planDigest: z.string(),
-					engineMatches: z.array(z.record(z.string(), z.unknown())),
-					selectedEngine: z.record(z.string(), z.unknown()).optional(),
-					stages: z.array(z.array(z.record(z.string(), z.string()))),
-					analyzerPlans: z.array(z.record(z.string(), z.unknown())),
-					inputBytes: z.string().nullable(),
-					estimatedFacts: z.number().int().nonnegative().nullable(),
-					missingPredicates: z.array(z.string()),
-					availablePredicates: z.array(z.string()),
-					budgetViolations: z.array(z.record(z.string(), z.string())),
-					warnings: z.array(z.string()),
-				}),
-			),
-			annotations: readOnly,
-		},
-		async (
-			{ game, goal, strategies, allowExecutableInspection, budgets },
-			context,
-		) => {
-			try {
-				const plan = await semanticService.plan(
-					{
-						game,
-						goal: goal as SemanticGoal,
-						strategies,
-						allowExecutableInspection,
-						budgets: {
-							...(budgets.maxInputBytes === undefined
-								? {}
-								: { maxInputBytes: BigInt(budgets.maxInputBytes) }),
-							...(budgets.maxFacts === undefined
-								? {}
-								: { maxFacts: budgets.maxFacts }),
-							...(budgets.timeoutMs === undefined
-								? {}
-								: { timeoutMs: budgets.timeoutMs }),
-						},
-					},
-					{ availablePredicates, signal: context.mcpReq.signal },
-				);
-				semanticPlans.set(plan.planDigest, plan);
-				if (semanticPlans.size > 128) {
-					const oldest = semanticPlans.keys().next().value;
-					if (oldest !== undefined) semanticPlans.delete(oldest);
-				}
-				return success(semanticPlanToWire(plan));
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"build_semantic_catalog",
-		{
-			description:
-				"Execute a previously returned semantic plan and atomically write a portable JSONL catalog under a configured output root.",
-			inputSchema: z.object({
-				planDigest: z.string().regex(/^[0-9a-f]{64}$/),
-				outputRootId: z.string().min(1).optional(),
-			}),
-			outputSchema: successOrFailure(
-				z.object({
-					planDigest: z.string(),
-					engine: z.record(z.string(), z.unknown()),
-					artifact: z.record(z.string(), z.unknown()),
-					summary: z.record(z.string(), z.unknown()),
-				}),
-			),
-		},
-		async ({ planDigest, outputRootId }, context) => {
-			try {
-				const plan = semanticPlans.get(planDigest);
-				if (!plan)
-					throw new GarbroError(
-						"PLAN_CHANGED",
-						"Semantic plan is unknown or expired; plan again before execution",
-					);
-				const result = await semanticService.execute(
-					plan,
-					planDigest,
-					semanticRecords,
-					{
-						...(outputRootId === undefined ? {} : { outputRootId }),
-						signal: context.mcpReq.signal,
-					},
-				);
-				return success({
-					planDigest: result.planDigest,
-					engine: engineMatchToWire(result.engine),
-					artifact: result.artifact,
-					summary: result.summary,
-				});
-			} catch (error) {
-				return failure(error);
-			}
-		},
-	);
-
-	server.registerTool(
-		"query_semantics",
-		{
-			description:
-				"Query configured semantic facts. By default only verified and user-confirmed relations are returned.",
+				"Query only externally supplied or previously verified resource mappings. This tool does not infer game semantics, reverse-engineer game logic, or create mappings.",
 			inputSchema: z.object({
 				entityType: semanticNameSchema.optional(),
 				predicate: semanticNameSchema.optional(),
@@ -917,6 +701,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			}),
 			outputSchema: successOrFailure(
 				z.object({
+					status: z.enum(["resolved", "ambiguous", "unsupported"]),
+					reason: z
+						.enum(["missing_resource_mapping", "unverified_resource_mapping"])
+						.optional(),
+					nextAction: z.string().optional(),
+					warnings: z.array(z.string()),
 					totalNodes: z.number().int().nonnegative(),
 					totalRelations: z.number().int().nonnegative(),
 					offset: z.number().int().nonnegative(),
@@ -962,7 +752,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 											outputRootId,
 										)
 									).absolutePath,
-									semanticService.vocabularies,
+									semanticVocabularies,
 								),
 							];
 				if (
@@ -973,7 +763,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				)
 					throw new GarbroError(
 						"INVALID_ARGUMENT",
-						"Semantic catalog game fingerprint does not match",
+						"Resource-mapping catalog game fingerprint does not match",
 					);
 				const indexes = [
 					...(catalogPath === undefined ? [configuredSemanticIndex] : []),
@@ -984,7 +774,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				for (const index of indexes) {
 					const result = index.query(
 						query as SemanticQuery,
-						semanticService.vocabularies,
+						semanticVocabularies,
 					);
 					for (const node of result.nodes) nodes.set(node.id, node);
 					for (const relation of result.relations)
@@ -1000,6 +790,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					allRelations.length > 0 || query.predicate !== undefined
 						? allRelations
 						: allNodes;
+				const hasUnverifiedRelations = allRelations.some(
+					(record) =>
+						record.kind === "relation" &&
+						record.status !== "verified" &&
+						record.status !== "user-confirmed",
+				);
+				const mappingStatus =
+					allItems.length === 0
+						? ("unsupported" as const)
+						: hasUnverifiedRelations
+							? ("ambiguous" as const)
+							: ("resolved" as const);
 				const page = allItems.slice(offset, offset + limit);
 				return success(
 					boundedPage(
@@ -1034,6 +836,25 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 									)
 								: undefined;
 							return {
+								status: mappingStatus,
+								warnings: hasUnverifiedRelations
+									? [
+											"Unverified mapping assertions are informational and must not drive extraction until confirmed externally.",
+										]
+									: [],
+								...(mappingStatus === "unsupported"
+									? {
+											reason: "missing_resource_mapping" as const,
+											nextAction:
+												"Provide a user-confirmed mapping or perform game-logic analysis outside garbro-mcp; this server will not infer the relationship.",
+										}
+									: mappingStatus === "ambiguous"
+										? {
+												reason: "unverified_resource_mapping" as const,
+												nextAction:
+													"Confirm the mapping outside garbro-mcp or supply a user-confirmed replacement before extraction.",
+											}
+										: {}),
 								totalNodes: allNodes.length,
 								totalRelations: allRelations.length,
 								offset,
@@ -1080,6 +901,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			outputSchema: successOrFailure(
 				z.object({
 					status: z.enum(["resolved", "ambiguous", "unsupported"]),
+					reason: z.literal("missing_resource_mapping").optional(),
 					total: z.number().int().nonnegative(),
 					resultsOmitted: z.number().int().nonnegative(),
 					responseTruncated: z.boolean(),
@@ -1168,8 +990,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							responseTruncated: visible.length < matches.length,
 							...(status === "unsupported"
 								? {
+										reason: "missing_resource_mapping" as const,
 										nextAction:
-											"Add an alias to a configured resource catalog or scan by path and metadata.",
+											"Provide an external alias mapping, or scan extractable resources by path and metadata; garbro-mcp will not infer the title or ownership.",
 									}
 								: status === "ambiguous"
 									? {

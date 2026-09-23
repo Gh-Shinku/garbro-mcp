@@ -58,6 +58,7 @@ const input = resolve(sandbox, "input");
 const cwd = resolve(sandbox, "unrelated-working-directory");
 const portable = resolve(sandbox, "portable");
 const installation = resolve(sandbox, "installation");
+const resourceMapping = resolve(sandbox, "resource-mapping.json");
 const expectedFiles = [
 	"LICENSE",
 	"README.md",
@@ -65,18 +66,6 @@ const expectedFiles = [
 	"garbro-mcp.cjs",
 	"package.json",
 ];
-
-function sceneFixture() {
-	const offsets = [92, 100, 108, 110, 118, 126, 128, 136, 138, 146];
-	const output = Buffer.alloc(147);
-	output.writeUInt32LE(92, 0);
-	for (let index = 0; index < offsets.length; index += 1) {
-		output.writeUInt32LE(offsets[index] ?? 0, 4 + index * 8);
-		output.writeUInt32LE(1, 8 + index * 8);
-	}
-	output[146] = 1;
-	return output;
-}
 
 async function smoke(bundlePath, outputRoot) {
 	assert.equal(
@@ -89,8 +78,8 @@ async function smoke(bundlePath, outputRoot) {
 	assert.equal(versionJson.buildId, buildManifest.buildId);
 	assert.equal(versionJson.gitCommit, buildManifest.commit);
 	assert.equal(
-		versionJson.semanticCatalogSha256,
-		buildManifest.semanticCatalogSha256,
+		versionJson.resourceMappingCatalogSha256,
+		buildManifest.resourceMappingCatalogSha256,
 	);
 	const doctor = JSON.parse(
 		run(
@@ -101,6 +90,8 @@ async function smoke(bundlePath, outputRoot) {
 				`samples=${input}`,
 				"--output-root",
 				outputRoot,
+				"--resource-mapping",
+				resourceMapping,
 				"--expected-build-id",
 				buildManifest.buildId,
 				"--doctor",
@@ -119,6 +110,8 @@ async function smoke(bundlePath, outputRoot) {
 			`samples=${input}`,
 			"--output-root",
 			outputRoot,
+			"--resource-mapping",
+			resourceMapping,
 		],
 		cwd,
 		env: { ...process.env, NODE_PATH: "" },
@@ -138,10 +131,7 @@ async function smoke(bundlePath, outputRoot) {
 			names,
 			[
 				"get_server_info",
-				"inspect_game",
-				"plan_semantic_analysis",
-				"build_semantic_catalog",
-				"query_semantics",
+				"query_resource_mappings",
 				"search_resources",
 				"list_formats",
 				"scan_resources",
@@ -173,24 +163,27 @@ async function smoke(bundlePath, outputRoot) {
 			buildManifest.formatCatalogSha256,
 		);
 		assert.equal(
-			serverInfo.server.semanticCatalogSha256,
-			buildManifest.semanticCatalogSha256,
+			serverInfo.server.resourceMappingCatalogSha256,
+			buildManifest.resourceMappingCatalogSha256,
 		);
-		const inspection = await call("inspect_game", {
-			game: { rootId: "samples", path: "." },
+		assert.equal(serverInfo.mappingPolicy, "external-evidence-only");
+		assert(serverInfo.notSupported.includes("game logic reverse engineering"));
+		const mappedResource = await call("query_resource_mappings", {
+			predicate: "vn:voiceResource",
+			query: "fixture-character",
 		});
-		assert.equal(inspection.status, "resolved");
-		assert.equal(inspection.matches[0].engineId, "siglus");
-		const semanticPlan = await call("plan_semantic_analysis", {
-			game: { rootId: "samples", path: "." },
-			goal: {},
+		assert.equal(mappedResource.status, "resolved");
+		assert.equal(mappedResource.resources[0].locator.source.path, "basic.xp3");
+		const missingMapping = await client.callTool({
+			name: "query_resource_mappings",
+			arguments: { predicate: "vn:spokenBy" },
 		});
-		assert.equal(semanticPlan.status, "ready");
-		const semanticBuild = await call("build_semantic_catalog", {
-			planDigest: semanticPlan.planDigest,
-		});
-		assert.equal(semanticBuild.summary.records, 0);
-		assert.equal((await call("query_semantics", {})).totalRelations, 0);
+		assert.equal(missingMapping.isError, undefined);
+		assert.equal(missingMapping.structuredContent.status, "unsupported");
+		assert.equal(
+			missingMapping.structuredContent.reason,
+			"missing_resource_mapping",
+		);
 		assert.equal(
 			(await call("list_formats", { extension: "xp3" })).formats[0].id,
 			"xp3",
@@ -314,10 +307,22 @@ try {
 		resolve(repositoryRoot, "fixtures/xp3/basic.xp3"),
 		resolve(input, "basic.xp3"),
 	);
-	await writeFile(resolve(input, "Scene.pck"), sceneFixture());
-	const gameexe = Buffer.alloc(16);
-	gameexe.writeUInt32LE(1, 4);
-	await writeFile(resolve(input, "Gameexe.dat"), gameexe);
+	await writeFile(
+		resourceMapping,
+		JSON.stringify({
+			schemaVersion: 1,
+			mappings: [
+				{
+					subjectType: "vn:character",
+					subjectKey: "fixture-character",
+					subjectName: "fixture-character",
+					predicate: "vn:voiceResource",
+					resourceType: "audio",
+					resourcePath: "basic.xp3",
+				},
+			],
+		}),
+	);
 	const files = unzipSync(
 		await readFile(resolve(releaseDirectory, `${prefix}-portable.zip`)),
 	);

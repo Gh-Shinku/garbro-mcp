@@ -23,8 +23,8 @@ async function main(): Promise<void> {
 			"output-root": { type: "string", multiple: true },
 			"expected-build-id": { type: "string" },
 			"resource-catalog": { type: "string", multiple: true },
-			"semantic-catalog": { type: "string", multiple: true },
-			"semantic-map": { type: "string", multiple: true },
+			"resource-mapping-catalog": { type: "string", multiple: true },
+			"resource-mapping": { type: "string", multiple: true },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
 			help: { type: "boolean", short: "h" },
@@ -40,8 +40,8 @@ Options:
   --output-root [id=]<path> Add a writable root (repeatable with IDs)
   --expected-build-id <id> Refuse to start a different build
   --resource-catalog <path> Load an external alias catalog (repeatable)
-  --semantic-catalog <path> Load a portable semantic JSONL catalog (repeatable)
-  --semantic-map <path>     Load a user JSON or CSV semantic map (repeatable)
+  --resource-mapping-catalog <path> Load a verified JSONL mapping catalog (repeatable)
+  --resource-mapping <path> Load a user-confirmed JSON or CSV mapping (repeatable)
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
   -v, --version             Show the server version
@@ -124,14 +124,14 @@ Options:
 	if (defaultResourceRootId === undefined)
 		throw new Error("At least one input root is required");
 	const semanticMapImports = await Promise.all(
-		(values["semantic-map"] ?? []).map(async (path) => {
+		(values["resource-mapping"] ?? []).map(async (path) => {
 			const extension = extname(path).toLowerCase();
 			if (extension !== ".json" && extension !== ".csv")
-				throw new Error(`Semantic map must be JSON or CSV: ${path}`);
+				throw new Error(`Resource mapping must be JSON or CSV: ${path}`);
 			return parseSemanticMap(
 				await readFile(path),
 				extension === ".csv" ? "csv" : "json",
-				{ rootId: "external-semantic-map", path: basename(path) },
+				{ rootId: "external-resource-mapping", path: basename(path) },
 				{ defaultResourceRootId },
 			);
 		}),
@@ -148,7 +148,7 @@ Options:
 	];
 	const vocabularies = createDefaultVocabularyRegistry();
 	const semanticCatalogs = await Promise.all(
-		(values["semantic-catalog"] ?? []).map((path) =>
+		(values["resource-mapping-catalog"] ?? []).map((path) =>
 			readSemanticCatalog(resolve(path), vocabularies),
 		),
 	);
@@ -164,8 +164,8 @@ Options:
 			outputRoot: workspace.outputRoot,
 			outputRoots: workspace.outputRoots,
 			resourceCatalogEntries: resourceAliases.length,
-			semanticRecords: semanticRecords.length,
-			semanticCatalogs: semanticCatalogs.length,
+			resourceMappingRecords: semanticRecords.length,
+			resourceMappingCatalogs: semanticCatalogs.length,
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,
@@ -177,8 +177,8 @@ Options:
 		buildServer({
 			workspace,
 			resourceAliases,
-			semanticRecords,
-			semanticCatalogs,
+			resourceMappingRecords: semanticRecords,
+			resourceMappingCatalogs: semanticCatalogs,
 		}),
 	);
 	console.error("garbro-mcp server running on stdio");

@@ -8,6 +8,11 @@ A modern TypeScript toolkit for parsing and extracting ADV/Galgame resource form
 uses [GARbro](https://github.com/morkt/GARbro) as a format and algorithm reference while providing
 independent, streaming implementations of its core API, CLI, and MCP server.
 
+garbro-mcp is resource-access infrastructure: it detects, reads, decodes, extracts, and verifies
+supported formats. It does not reverse-engineer game logic, adapt unknown engines, decompile
+executables, or infer relationships such as character-to-voice ownership. Those mappings must be
+provided by the user or an external analysis tool.
+
 ## Install the MCP server
 
 Install Node.js 24 or newer, then download a versioned `garbro-mcp-<version>-portable.zip` from

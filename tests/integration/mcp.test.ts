@@ -21,18 +21,6 @@ import { afterEach, describe, expect, it } from "vitest";
 const closers: Array<() => Promise<void>> = [];
 const temporaryDirectories: string[] = [];
 
-function sceneFixture(): Buffer {
-	const offsets = [92, 100, 108, 110, 118, 126, 128, 136, 138, 146];
-	const output = Buffer.alloc(147);
-	output.writeUInt32LE(92, 0);
-	for (let index = 0; index < offsets.length; index += 1) {
-		output.writeUInt32LE(offsets[index] ?? 0, 4 + index * 8);
-		output.writeUInt32LE(1, 8 + index * 8);
-	}
-	output[146] = 1;
-	return output;
-}
-
 function voiceRecords(
 	status: "user-confirmed" | "candidate",
 ): SemanticRecord[] {
@@ -86,7 +74,10 @@ afterEach(async () => {
 async function connect(
 	overrides: Pick<
 		BuildServerOptions,
-		"registry" | "resourceAliases" | "semanticRecords" | "semanticCatalogs"
+		| "registry"
+		| "resourceAliases"
+		| "resourceMappingRecords"
+		| "resourceMappingCatalogs"
 	> = {},
 	withMusicRoot = false,
 ) {
@@ -127,10 +118,7 @@ describe("MCP server", () => {
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual(
 			[
 				"get_server_info",
-				"inspect_game",
-				"plan_semantic_analysis",
-				"build_semantic_catalog",
-				"query_semantics",
+				"query_resource_mappings",
 				"search_resources",
 				"list_formats",
 				"scan_resources",
@@ -150,17 +138,26 @@ describe("MCP server", () => {
 			outcome: { status: "ok", warnings: [] },
 			server: {
 				buildId: "development",
-				protocolVersion: "3",
+				protocolVersion: "4",
 				dirty: true,
 			},
 			inputRoots: [{ id: "games", path: root }],
 			outputRoot: output,
 			limits: { decodedResourceMaxBytes: 256 * 1024 * 1024 },
+			purpose: expect.stringContaining("extract"),
+			mappingPolicy: "external-evidence-only",
+			notSupported: expect.arrayContaining([
+				"game logic reverse engineering",
+				"automatic semantic mapping",
+			]),
 			capabilities: {
 				archiveCreation: false,
-				semantic: { engines: ["siglus"], analyzers: [] },
+				resourceMappings: { policy: "external-evidence-only" },
 			},
 		});
+		expect(client.getInstructions()).toContain(
+			"Do not delegate game-logic reverse engineering",
+		);
 
 		const formats = await client.callTool({
 			name: "list_formats",
@@ -217,6 +214,7 @@ describe("MCP server", () => {
 		});
 		expect(unsupported.structuredContent).toMatchObject({
 			status: "unsupported",
+			reason: "missing_resource_mapping",
 			outcome: {
 				status: "unsupported",
 				nextAction: { code: "provide_metadata_or_supported_resource" },
@@ -226,85 +224,51 @@ describe("MCP server", () => {
 		});
 	});
 
-	it("probes, plans, builds, and queries semantic catalogs", async () => {
+	it("queries only externally supplied resource mappings", async () => {
 		const records = voiceRecords("user-confirmed");
-		const { client, root, output } = await connect({
-			semanticRecords: records,
+		const { client } = await connect({
+			resourceMappingRecords: records,
 		});
-		await writeFile(resolve(root, "Scene.pck"), sceneFixture());
-		const gameexe = Buffer.alloc(16);
-		gameexe.writeUInt32LE(1, 4);
-		await writeFile(resolve(root, "Gameexe.dat"), gameexe);
-
-		const inspected = await client.callTool({
-			name: "inspect_game",
-			arguments: { game: { rootId: "games", path: "." } },
-		});
-		expect(inspected.structuredContent).toMatchObject({
-			status: "resolved",
-			matches: [{ engineId: "siglus", status: "matched" }],
-		});
-
-		const planned = await client.callTool({
-			name: "plan_semantic_analysis",
-			arguments: {
-				game: { rootId: "games", path: "." },
-				goal: { predicate: "vn:voiceResource" },
-			},
-		});
-		expect(planned.structuredContent).toMatchObject({
-			status: "ready",
-			missingPredicates: [],
-		});
-		const planDigest = (planned.structuredContent as { planDigest: string })
-			.planDigest;
-		const built = await client.callTool({
-			name: "build_semantic_catalog",
-			arguments: { planDigest },
-		});
-		expect(built.isError).not.toBe(true);
-		expect(built.structuredContent).toMatchObject({
-			artifact: { outputRootId: "default" },
-			summary: { relations: 1 },
-		});
-		const artifact = (
-			built.structuredContent as {
-				artifact: { relativePath: string };
-			}
-		).artifact;
-		expect(await stat(resolve(output, artifact.relativePath))).toBeDefined();
-
 		const queried = await client.callTool({
-			name: "query_semantics",
+			name: "query_resource_mappings",
 			arguments: { predicate: "vn:voiceResource", query: "Kotori" },
 		});
 		expect(queried.structuredContent).toMatchObject({
+			status: "resolved",
 			totalRelations: 1,
 			relations: [{ status: "user-confirmed" }],
 			resources: [{ resourceType: "audio" }],
 		});
-		const queriedArtifact = await client.callTool({
-			name: "query_semantics",
-			arguments: {
-				catalogPath: artifact.relativePath,
-				predicate: "vn:voiceResource",
-			},
-		});
-		expect(queriedArtifact.structuredContent).toMatchObject({
-			totalRelations: 1,
-			resources: [{ resourceType: "audio" }],
-		});
 	});
 
-	it("does not return candidate semantic relations by default", async () => {
+	it("reports that external analysis is required when no trusted mapping exists", async () => {
 		const { client } = await connect({
-			semanticRecords: voiceRecords("candidate"),
+			resourceMappingRecords: voiceRecords("candidate"),
 		});
 		const result = await client.callTool({
-			name: "query_semantics",
+			name: "query_resource_mappings",
 			arguments: { predicate: "vn:voiceResource" },
 		});
-		expect(result.structuredContent).toMatchObject({ totalRelations: 0 });
+		expect(result.structuredContent).toMatchObject({
+			status: "unsupported",
+			reason: "missing_resource_mapping",
+			totalRelations: 0,
+			nextAction: expect.stringContaining("outside garbro-mcp"),
+			outcome: { status: "unsupported" },
+		});
+		const candidate = await client.callTool({
+			name: "query_resource_mappings",
+			arguments: {
+				predicate: "vn:voiceResource",
+				statuses: ["candidate"],
+			},
+		});
+		expect(candidate.structuredContent).toMatchObject({
+			status: "ambiguous",
+			reason: "unverified_resource_mapping",
+			outcome: { status: "ambiguous" },
+			warnings: [expect.stringContaining("must not drive extraction")],
+		});
 	});
 
 	it("scans resources with filters and detection evidence", async () => {
