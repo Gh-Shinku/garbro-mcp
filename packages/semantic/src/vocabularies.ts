@@ -37,6 +37,11 @@ export const visualNovelVocabulary = defineVocabulary({
 			subjectTypes: ["vn:dialogue", "vn:scene"],
 			objectTypes: ["garbro:resource"],
 		},
+		voiceResource: {
+			predicate: "vn:voiceResource",
+			subjectTypes: ["vn:character"],
+			objectTypes: ["garbro:resource"],
+		},
 		appearsIn: {
 			predicate: "vn:appearsIn",
 			subjectTypes: ["vn:character"],
