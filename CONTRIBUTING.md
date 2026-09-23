@@ -1,51 +1,26 @@
 # Contributing
 
-## Commit Messages
+## Commits
 
-Use Conventional Commits and a meaningful scope when possible.
-
-Format:
+Use Conventional Commits with a meaningful scope when possible:
 
 ```text
 <type>(<scope>): <description>
 ```
 
-Examples:
-
 ```text
 feat(xp3): add archive index parsing
-
-feat(ald): support multi-volume archives
-
 fix(lzss): preserve unsigned 32-bit overflow
-
 test(afa): add extraction golden fixture
-
-docs(xp3): document index encryption
-
-refactor(core): simplify binary reader API
-
-perf(huffman): reduce decoder allocations
-
-chore(deps): update vitest
 ```
 
-Rules:
-
-* use lowercase type and scope;
-* use imperative, concise descriptions;
-* do not end the subject with a period;
-* keep each commit focused on one logical change;
-* do not combine unrelated refactoring with feature work;
-* avoid messages such as `update`, `fix stuff`, or `wip`.
-
-## Commit Discipline
-
-Commit completed work promptly instead of accumulating a large working tree. Each commit must have
-one explicit logical boundary, include only files required for that change, and leave the repository
-in a reviewable state. Before committing, inspect the staged diff and run the checks appropriate to
-the changed scope. Keep documentation, infrastructure, codecs, and individual format ports in
-separate commits unless they are inseparable parts of the same behavior.
-
-Do not include unrelated changes in a commit. If a task requires several logical changes, finish and
-commit each validated change before starting the next one.
+* Use lowercase types and scopes.
+* Write concise, imperative subjects without a trailing period; avoid vague subjects such as
+  `update`, `fix stuff`, or `wip`.
+* Commit completed work promptly. Give each commit one explicit logical boundary and include only
+  the files it requires; do not mix unrelated refactoring or other changes into it.
+* Keep documentation, infrastructure, codecs, and individual format ports in separate commits
+  unless they are inseparable parts of the same behavior.
+* Before committing, inspect the staged diff and run checks appropriate to the changed scope so the
+  commit remains reviewable.
+* For a task with multiple logical changes, validate and commit each one before starting the next.
