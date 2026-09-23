@@ -12,6 +12,7 @@ export type AsyncJobState =
 
 export interface AsyncJobSnapshot<T> {
 	jobId: string;
+	kind?: string;
 	state: AsyncJobState;
 	createdAt: string;
 	startedAt?: string;
@@ -19,6 +20,7 @@ export interface AsyncJobSnapshot<T> {
 	progress: number;
 	total?: number;
 	message?: string;
+	phase?: string;
 	result?: T;
 	error?: GarbroError;
 }
@@ -45,6 +47,7 @@ export class AsyncJobManager<T> {
 	start(
 		run: (control: AutomationControl) => Promise<T>,
 		options: {
+			kind?: string;
 			stateFromResult?: (
 				result: T,
 			) => Exclude<AsyncJobState, "queued" | "running" | "cancelled">;
@@ -54,6 +57,7 @@ export class AsyncJobManager<T> {
 		const now = new Date().toISOString();
 		const record: JobRecord<T> = {
 			jobId: randomUUID(),
+			...(options.kind === undefined ? {} : { kind: options.kind }),
 			state: "queued",
 			createdAt: now,
 			progress: 0,
@@ -91,12 +95,14 @@ export class AsyncJobManager<T> {
 		try {
 			const result = await record.run({
 				signal: record.controller.signal,
-				onProgress: ({ progress, total, message }) => {
+				onProgress: ({ progress, total, message, phase }) => {
 					record.progress = progress;
 					if (total === undefined) delete record.total;
 					else record.total = total;
 					if (message === undefined) delete record.message;
 					else record.message = message;
+					if (phase === undefined) delete record.phase;
+					else record.phase = phase;
 				},
 			});
 			if (record.controller.signal.aborted) {
@@ -120,6 +126,7 @@ export class AsyncJobManager<T> {
 	#snapshot(record: JobRecord<T>): AsyncJobSnapshot<T> {
 		return {
 			jobId: record.jobId,
+			...(record.kind === undefined ? {} : { kind: record.kind }),
 			state: record.state,
 			createdAt: record.createdAt,
 			...(record.startedAt === undefined
@@ -131,6 +138,7 @@ export class AsyncJobManager<T> {
 			progress: record.progress,
 			...(record.total === undefined ? {} : { total: record.total }),
 			...(record.message === undefined ? {} : { message: record.message }),
+			...(record.phase === undefined ? {} : { phase: record.phase }),
 			...(record.result === undefined ? {} : { result: record.result }),
 			...(record.error === undefined ? {} : { error: record.error }),
 		};

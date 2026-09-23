@@ -40,6 +40,7 @@ export interface AutomationControl {
 		progress: number;
 		total?: number;
 		message?: string;
+		phase?: string;
 	}) => void | Promise<void>;
 }
 

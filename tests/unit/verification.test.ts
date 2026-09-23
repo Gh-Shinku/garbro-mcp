@@ -2,7 +2,12 @@ import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import { verifyArtifact, WorkspacePolicy } from "@garbro-mcp/core";
+import {
+	type BatchExtractionResult,
+	verifyArtifact,
+	verifyExtractionResult,
+	WorkspacePolicy,
+} from "@garbro-mcp/core";
 import { afterEach, describe, expect, it } from "vitest";
 
 const temporaryDirectories: string[] = [];
@@ -79,5 +84,55 @@ describe("artifact verification", () => {
 		await expect(
 			verifyArtifact(workspace, { path: "../track.wav" }),
 		).rejects.toMatchObject({ code: "UNSAFE_PATH" });
+	});
+
+	it("marks an extraction partial when a written artifact no longer matches", async () => {
+		const directory = await mkdtemp(resolve(tmpdir(), "garbro-verify-test-"));
+		temporaryDirectories.push(directory);
+		const input = resolve(directory, "input");
+		const output = resolve(directory, "output");
+		await mkdir(input);
+		await mkdir(output);
+		await writeFile(resolve(output, "changed.bin"), "changed");
+		const workspace = new WorkspacePolicy({
+			inputRoots: { games: input },
+			outputRoot: output,
+		});
+		const extraction: BatchExtractionResult = {
+			status: "completed",
+			hasFailures: false,
+			outputRootId: "default",
+			outputDirectory: output,
+			selected: 1,
+			extracted: 1,
+			skipped: 0,
+			failed: 0,
+			bytesWritten: 8n,
+			items: [
+				{
+					entryId: "0",
+					entryPath: "changed.bin",
+					status: "extracted",
+					artifact: {
+						outputRootId: "default",
+						relativePath: "changed.bin",
+						absolutePath: resolve(output, "changed.bin"),
+						bytesWritten: 8n,
+						sha256: "0".repeat(64),
+					},
+				},
+			],
+		};
+
+		await expect(
+			verifyExtractionResult(workspace, extraction),
+		).resolves.toMatchObject({
+			status: "partial",
+			hasFailures: true,
+			verification: {
+				mismatched: 1,
+				items: [{ status: "mismatch" }],
+			},
+		});
 	});
 });

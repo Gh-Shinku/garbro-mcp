@@ -4,20 +4,35 @@ import { describe, expect, it } from "vitest";
 describe("AsyncJobManager", () => {
 	it("runs in the background and records progress", async () => {
 		const manager = new AsyncJobManager<number>();
-		const job = manager.start(async ({ onProgress }) => {
-			await onProgress?.({ progress: 1, total: 2, message: "first" });
-			await new Promise((resolve) => setTimeout(resolve, 1));
-			await onProgress?.({ progress: 2, total: 2, message: "second" });
-			return 42;
-		});
+		const job = manager.start(
+			async ({ onProgress }) => {
+				await onProgress?.({
+					progress: 1,
+					total: 2,
+					message: "first",
+					phase: "working",
+				});
+				await new Promise((resolve) => setTimeout(resolve, 1));
+				await onProgress?.({
+					progress: 2,
+					total: 2,
+					message: "second",
+					phase: "working",
+				});
+				return 42;
+			},
+			{ kind: "test" },
+		);
 		expect(job.state).toBe("queued");
 		for (;;) {
 			const current = manager.get(job.jobId);
 			if (current?.state === "completed") {
 				expect(current).toMatchObject({
+					kind: "test",
 					progress: 2,
 					total: 2,
 					message: "second",
+					phase: "working",
 					result: 42,
 				});
 				break;

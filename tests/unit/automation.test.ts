@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import {
 	ArchiveAutomationService,
 	readExtractionReport,
+	verifyExtractionResult,
 	WorkspacePolicy,
 	writeExtractionReport,
 } from "@garbro-mcp/core";
@@ -137,7 +138,9 @@ describe("ArchiveAutomationService", () => {
 		expect(await readFile(resolve(target, "scripts/startup.tjs"))).toHaveLength(
 			26,
 		);
-		const report = await writeExtractionReport(service.workspace, result);
+		const verified = await verifyExtractionResult(service.workspace, result);
+		expect(verified.verification.verified).toBe(1);
+		const report = await writeExtractionReport(service.workspace, verified);
 		const saved = JSON.parse(await readFile(report.absolutePath, "utf8"));
 		expect(saved.bytesWritten).toBe("26");
 		expect(saved.items[0].error.code).toBe("OUTPUT_EXISTS");

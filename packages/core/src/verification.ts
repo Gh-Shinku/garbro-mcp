@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { constants } from "node:fs";
 import { open } from "node:fs/promises";
 import { GarbroError } from "./errors.js";
+import type { AutomationControl, BatchExtractionResult } from "./automation.js";
 import type { WorkspacePolicy } from "./workspace.js";
 
 export interface ArtifactExpectation {
@@ -22,6 +23,31 @@ export interface ArtifactVerification {
 	structuralValid: boolean | null;
 	metadata: Record<string, string | number>;
 	warnings: string[];
+}
+
+export type ExtractionVerificationItem =
+	| {
+			entryId: string;
+			entryPath: string;
+			status: ArtifactVerification["status"];
+			verification: ArtifactVerification;
+	  }
+	| {
+			entryId: string;
+			entryPath: string;
+			status: "failed";
+			error: GarbroError;
+	  };
+
+export interface VerifiedExtractionResult extends BatchExtractionResult {
+	verification: {
+		verified: number;
+		mismatched: number;
+		invalid: number;
+		inspected: number;
+		failed: number;
+		items: ExtractionVerificationItem[];
+	};
 }
 
 interface WaveInspection {
@@ -202,4 +228,94 @@ export async function verifyArtifact(
 	} finally {
 		await file.close();
 	}
+}
+
+/** Reopen and independently verify every artifact produced by an extraction. */
+export async function verifyExtractionResult(
+	workspace: WorkspacePolicy,
+	result: BatchExtractionResult,
+	control: AutomationControl = {},
+): Promise<VerifiedExtractionResult> {
+	const extractedItems = result.items.filter(
+		(item) => item.status === "extracted",
+	);
+	const items: ExtractionVerificationItem[] = [];
+	const counts = {
+		verified: 0,
+		mismatched: 0,
+		invalid: 0,
+		inspected: 0,
+		failed: 0,
+	};
+
+	for (const [index, item] of extractedItems.entries()) {
+		if (control.signal?.aborted)
+			throw new GarbroError("CANCELLED", "Verification was cancelled", {
+				cause: control.signal.reason,
+			});
+		await control.onProgress?.({
+			progress: index,
+			total: extractedItems.length,
+			message: item.entryPath,
+		});
+		try {
+			const verification = await verifyArtifact(
+				workspace,
+				{
+					outputRootId: item.artifact.outputRootId,
+					path: item.artifact.relativePath,
+				},
+				{
+					sha256: item.artifact.sha256,
+					bytes: item.artifact.bytesWritten,
+				},
+				control.signal,
+			);
+			if (verification.status === "mismatch") counts.mismatched += 1;
+			else counts[verification.status] += 1;
+			items.push({
+				entryId: item.entryId,
+				entryPath: item.entryPath,
+				status: verification.status,
+				verification,
+			});
+		} catch (error) {
+			if (control.signal?.aborted) throw error;
+			counts.failed += 1;
+			items.push({
+				entryId: item.entryId,
+				entryPath: item.entryPath,
+				status: "failed",
+				error: asVerificationError(error),
+			});
+		}
+	}
+
+	await control.onProgress?.({
+		progress: extractedItems.length,
+		total: extractedItems.length,
+	});
+	const verificationFailures =
+		counts.mismatched + counts.invalid + counts.failed;
+	const totalFailures = result.failed + verificationFailures;
+	return {
+		...result,
+		status:
+			totalFailures === 0
+				? "completed"
+				: result.extracted > 0 || result.skipped > 0
+					? "partial"
+					: "failed",
+		hasFailures: totalFailures > 0,
+		verification: { ...counts, items },
+	};
+}
+
+function asVerificationError(error: unknown): GarbroError {
+	if (error instanceof GarbroError) return error;
+	return new GarbroError(
+		"IO_ERROR",
+		error instanceof Error ? error.message : String(error),
+		{ cause: error },
+	);
 }

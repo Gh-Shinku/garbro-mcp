@@ -2,14 +2,15 @@ import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, realpath, writeFile } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
-import type { BatchExtractionResult, ExtractedArtifact } from "./automation.js";
+import type { ExtractedArtifact } from "./automation.js";
 import { GarbroError } from "./errors.js";
+import type { VerifiedExtractionResult } from "./verification.js";
 import type { WorkspacePolicy } from "./workspace.js";
 
 /** Store a complete extraction report outside the caller's inline response. */
 export async function writeExtractionReport(
 	workspace: WorkspacePolicy,
-	result: BatchExtractionResult,
+	result: VerifiedExtractionResult,
 ): Promise<ExtractedArtifact> {
 	const directory = await workspace.resolveOutputDirectory(
 		".garbro-reports",
