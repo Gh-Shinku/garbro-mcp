@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { WorkspacePolicy } from "@garbro-mcp/core";
 import {
+	createDefaultEngineAdapterRegistry,
+	createDefaultSemanticAnalyzerRegistry,
 	EngineAdapterRegistry,
 	type SemanticAnalyzer,
 	SemanticAnalyzerRegistry,
@@ -67,6 +69,15 @@ async function serviceFixture(analyzers: SemanticAnalyzer[] = []) {
 }
 
 describe("semantic analysis service", () => {
+	it("exposes compile-time default registries for descriptor catalogs", () => {
+		expect(
+			createDefaultEngineAdapterRegistry()
+				.list()
+				.map((adapter) => adapter.descriptor.id),
+		).toEqual(["siglus"]);
+		expect(createDefaultSemanticAnalyzerRegistry().list()).toEqual([]);
+	});
+
 	it("plans and executes a deterministic analyzer graph", async () => {
 		const analyzer: SemanticAnalyzer = {
 			descriptor: {

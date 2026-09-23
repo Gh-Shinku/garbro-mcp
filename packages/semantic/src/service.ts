@@ -77,10 +77,14 @@ export interface SemanticServiceOptions {
 	producer?: { name: string; version: string };
 }
 
-function defaultEngineAdapters(): EngineAdapterRegistry {
+export function createDefaultEngineAdapterRegistry(): EngineAdapterRegistry {
 	const registry = new EngineAdapterRegistry();
 	registry.register(siglusEngineAdapter);
 	return registry;
+}
+
+export function createDefaultSemanticAnalyzerRegistry(): SemanticAnalyzerRegistry {
+	return new SemanticAnalyzerRegistry();
 }
 
 function digestPayload(
@@ -165,8 +169,10 @@ export class SemanticAnalysisService {
 		options: SemanticServiceOptions = {},
 	) {
 		this.#workspace = workspace;
-		this.engineAdapters = options.engineAdapters ?? defaultEngineAdapters();
-		this.analyzers = options.analyzers ?? new SemanticAnalyzerRegistry();
+		this.engineAdapters =
+			options.engineAdapters ?? createDefaultEngineAdapterRegistry();
+		this.analyzers =
+			options.analyzers ?? createDefaultSemanticAnalyzerRegistry();
 		this.vocabularies =
 			options.vocabularies ?? createDefaultVocabularyRegistry();
 		this.producer = options.producer ?? {
