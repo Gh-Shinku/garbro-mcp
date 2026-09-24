@@ -24,27 +24,67 @@ describe("AsyncJobManager", () => {
 			{ kind: "test" },
 		);
 		expect(job.state).toBe("queued");
-		for (;;) {
-			const current = manager.get(job.jobId);
-			if (current?.state === "completed") {
-				expect(current).toMatchObject({
-					kind: "test",
-					progress: 2,
-					total: 2,
-					message: "second",
-					phase: "working",
-					result: 42,
-				});
-				break;
-			}
-			await new Promise((resolve) => setTimeout(resolve, 1));
-		}
+		const waited = await manager.wait(job.jobId, {
+			until: "terminal",
+			timeoutMs: 1_000,
+		});
+		expect(waited).toMatchObject({
+			outcome: "terminal",
+			snapshot: {
+				kind: "test",
+				state: "completed",
+				progress: 2,
+				total: 2,
+				message: "second",
+				phase: "working",
+				result: 42,
+			},
+		});
+	});
+
+	it("waits for a revision change without guessing a polling delay", async () => {
+		let release!: () => void;
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const manager = new AsyncJobManager<void>();
+		const job = manager.start(async () => await gate);
+		const changed = await manager.wait(job.jobId, {
+			until: "change",
+			afterRevision: job.revision,
+			timeoutMs: 1_000,
+		});
+		expect(changed).toMatchObject({
+			outcome: "changed",
+			snapshot: { state: "running", revision: 1 },
+		});
+		release();
+		await expect(
+			manager.wait(job.jobId, { until: "terminal", timeoutMs: 1_000 }),
+		).resolves.toMatchObject({ outcome: "terminal" });
+	});
+
+	it("returns the latest snapshot when a server-side wait times out", async () => {
+		let release!: () => void;
+		const gate = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const manager = new AsyncJobManager<void>();
+		const job = manager.start(async () => await gate);
+		await expect(
+			manager.wait(job.jobId, { until: "terminal", timeoutMs: 5 }),
+		).resolves.toMatchObject({
+			outcome: "timeout",
+			snapshot: { state: "running" },
+		});
+		release();
+		await manager.wait(job.jobId, { until: "terminal", timeoutMs: 1_000 });
 	});
 
 	it("cancels a running job through its AbortSignal", async () => {
 		const manager = new AsyncJobManager<void>();
 		const job = manager.start(async ({ signal }) => {
-			await new Promise<void>((resolve, reject) => {
+			await new Promise<void>((_resolve, reject) => {
 				if (signal?.aborted)
 					return reject(new GarbroError("CANCELLED", "cancelled"));
 				signal?.addEventListener(
@@ -54,17 +94,17 @@ describe("AsyncJobManager", () => {
 				);
 			});
 		});
-		for (;;) {
-			const current = manager.get(job.jobId);
-			if (current?.state === "running") break;
-			await new Promise((resolve) => setTimeout(resolve, 1));
-		}
+		await manager.wait(job.jobId, {
+			until: "change",
+			afterRevision: job.revision,
+			timeoutMs: 1_000,
+		});
 		manager.cancel(job.jobId);
-		for (;;) {
-			const current = manager.get(job.jobId);
-			if (current?.state === "cancelled") break;
-			await new Promise((resolve) => setTimeout(resolve, 1));
-		}
-		expect(manager.get(job.jobId)?.state).toBe("cancelled");
+		await expect(
+			manager.wait(job.jobId, { until: "terminal", timeoutMs: 1_000 }),
+		).resolves.toMatchObject({
+			outcome: "terminal",
+			snapshot: { state: "cancelled" },
+		});
 	});
 });

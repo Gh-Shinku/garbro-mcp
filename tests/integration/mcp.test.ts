@@ -66,6 +66,7 @@ async function submit(
 		name: "submit_task",
 		arguments: {
 			task,
+			waitMs: 0,
 			...(idempotencyKey === undefined ? {} : { idempotencyKey }),
 		},
 	});
@@ -75,21 +76,11 @@ async function submit(
 }
 
 async function waitForTask(client: Client, taskId: string) {
-	for (let attempt = 0; attempt < 500; attempt += 1) {
-		const response = await client.callTool({
-			name: "get_task",
-			arguments: { taskId },
-		});
-		const payload = structured(response);
-		if (
-			["completed", "partial", "failed", "cancelled"].includes(
-				String(payload.state),
-			)
-		)
-			return payload;
-		await new Promise((resolvePromise) => setTimeout(resolvePromise, 2));
-	}
-	throw new Error(`Task ${taskId} did not finish`);
+	const response = await client.callTool({
+		name: "get_task",
+		arguments: { taskId, waitUntil: "terminal", timeoutMs: 30_000 },
+	});
+	return structured(response);
 }
 
 describe("MCP task server", () => {
@@ -130,6 +121,7 @@ describe("MCP task server", () => {
 		expect(client.getInstructions()).toContain(
 			"Extraction always writes to an isolated expiring task directory",
 		);
+		expect(client.getInstructions()).toContain("Never use sleep");
 	});
 
 	it("runs scan and entry inspection through the same asynchronous interface", async () => {
@@ -171,6 +163,23 @@ describe("MCP task server", () => {
 					entries: [{ path: "scripts/startup.tjs", resourceType: "script" }],
 				},
 			},
+		});
+	});
+
+	it("completes fast work during the submission window", async () => {
+		const { client, root } = await connect();
+		const response = await client.callTool({
+			name: "submit_task",
+			arguments: {
+				task: { type: "scan", path: root, resourceTypes: ["archive"] },
+				waitMs: 5_000,
+			},
+		});
+		expect(structured(response)).toMatchObject({
+			state: "completed",
+			waitOutcome: "terminal",
+			revision: expect.any(Number),
+			result: { archives: [{ formatId: "xp3" }] },
 		});
 	});
 

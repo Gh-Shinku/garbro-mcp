@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { AutomationControl } from "./automation.js";
-import { asGarbroError, type GarbroError } from "./errors.js";
+import { asGarbroError, GarbroError } from "./errors.js";
 
 export type AsyncJobState =
 	| "queued"
@@ -14,6 +14,7 @@ export interface AsyncJobSnapshot<T> {
 	jobId: string;
 	kind?: string;
 	state: AsyncJobState;
+	revision: number;
 	createdAt: string;
 	startedAt?: string;
 	finishedAt?: string;
@@ -23,6 +24,14 @@ export interface AsyncJobSnapshot<T> {
 	phase?: string;
 	result?: T;
 	error?: GarbroError;
+}
+
+export type AsyncJobWaitUntil = "change" | "terminal";
+export type AsyncJobWaitOutcome = "changed" | "terminal" | "timeout";
+
+export interface AsyncJobWaitResult<T> {
+	snapshot: AsyncJobSnapshot<T>;
+	outcome: AsyncJobWaitOutcome;
 }
 
 interface JobRecord<T> extends AsyncJobSnapshot<T> {
@@ -36,6 +45,7 @@ interface JobRecord<T> extends AsyncJobSnapshot<T> {
 /** In-process background task manager with cancellation and progress snapshots. */
 export class AsyncJobManager<T> {
 	readonly #jobs = new Map<string, JobRecord<T>>();
+	readonly #waiters = new Map<string, Set<() => void>>();
 	readonly #maxJobs: number;
 
 	constructor(options: { maxJobs?: number } = {}) {
@@ -59,6 +69,7 @@ export class AsyncJobManager<T> {
 			jobId: randomUUID(),
 			...(options.kind === undefined ? {} : { kind: options.kind }),
 			state: "queued",
+			revision: 0,
 			createdAt: now,
 			progress: 0,
 			controller: new AbortController(),
@@ -77,6 +88,69 @@ export class AsyncJobManager<T> {
 		return record === undefined ? undefined : this.#snapshot(record);
 	}
 
+	async wait(
+		jobId: string,
+		options: {
+			until: AsyncJobWaitUntil;
+			afterRevision?: number;
+			timeoutMs: number;
+			signal?: AbortSignal;
+		},
+	): Promise<AsyncJobWaitResult<T> | undefined> {
+		if (!Number.isSafeInteger(options.timeoutMs) || options.timeoutMs < 0)
+			throw new Error("timeoutMs must be a non-negative integer");
+		const initial = this.#jobs.get(jobId);
+		if (initial === undefined) return undefined;
+		const waitOptions = {
+			...options,
+			afterRevision: options.afterRevision ?? initial.revision,
+		};
+		const outcome = this.#waitOutcome(initial, waitOptions);
+		if (outcome !== undefined)
+			return { snapshot: this.#snapshot(initial), outcome };
+
+		return await new Promise<AsyncJobWaitResult<T>>((resolve, reject) => {
+			let settled = false;
+			let timeout: ReturnType<typeof setTimeout> | undefined;
+			const waiters = this.#waiters.get(jobId) ?? new Set<() => void>();
+			this.#waiters.set(jobId, waiters);
+			const cleanup = () => {
+				if (timeout !== undefined) clearTimeout(timeout);
+				options.signal?.removeEventListener("abort", onAbort);
+				waiters.delete(onChange);
+				if (waiters.size === 0) this.#waiters.delete(jobId);
+			};
+			const finish = (result: AsyncJobWaitResult<T>) => {
+				if (settled) return;
+				settled = true;
+				cleanup();
+				resolve(result);
+			};
+			const onChange = () => {
+				const record = this.#jobs.get(jobId);
+				if (record === undefined) return;
+				const nextOutcome = this.#waitOutcome(record, waitOptions);
+				if (nextOutcome !== undefined)
+					finish({ snapshot: this.#snapshot(record), outcome: nextOutcome });
+			};
+			const onAbort = () => {
+				if (settled) return;
+				settled = true;
+				cleanup();
+				reject(new GarbroError("CANCELLED", "Task status wait was cancelled"));
+			};
+			waiters.add(onChange);
+			if (options.signal?.aborted) return onAbort();
+			options.signal?.addEventListener("abort", onAbort, { once: true });
+			timeout = setTimeout(() => {
+				const record = this.#jobs.get(jobId);
+				if (record !== undefined)
+					finish({ snapshot: this.#snapshot(record), outcome: "timeout" });
+			}, options.timeoutMs);
+			onChange();
+		});
+	}
+
 	cancel(jobId: string): AsyncJobSnapshot<T> | undefined {
 		const record = this.#jobs.get(jobId);
 		if (record === undefined) return undefined;
@@ -84,6 +158,7 @@ export class AsyncJobManager<T> {
 			record.controller.abort();
 			record.state = "cancelled";
 			record.finishedAt = new Date().toISOString();
+			this.#changed(record);
 		} else if (record.state === "running") record.controller.abort();
 		return this.#snapshot(record);
 	}
@@ -92,6 +167,7 @@ export class AsyncJobManager<T> {
 		if (record.state !== "queued") return;
 		record.state = "running";
 		record.startedAt = new Date().toISOString();
+		this.#changed(record);
 		try {
 			const result = await record.run(
 				{
@@ -104,6 +180,7 @@ export class AsyncJobManager<T> {
 						else record.message = message;
 						if (phase === undefined) delete record.phase;
 						else record.phase = phase;
+						this.#changed(record);
 					},
 				},
 				record.jobId,
@@ -123,7 +200,27 @@ export class AsyncJobManager<T> {
 					: "failed";
 		} finally {
 			record.finishedAt = new Date().toISOString();
+			this.#changed(record);
 		}
+	}
+
+	#changed(record: JobRecord<T>): void {
+		record.revision += 1;
+		for (const notify of [...(this.#waiters.get(record.jobId) ?? [])]) notify();
+	}
+
+	#waitOutcome(
+		record: JobRecord<T>,
+		options: { until: AsyncJobWaitUntil; afterRevision?: number },
+	): Exclude<AsyncJobWaitOutcome, "timeout"> | undefined {
+		if (isTerminal(record.state)) return "terminal";
+		if (
+			options.until === "change" &&
+			options.afterRevision !== undefined &&
+			record.revision > options.afterRevision
+		)
+			return "changed";
+		return undefined;
 	}
 
 	#snapshot(record: JobRecord<T>): AsyncJobSnapshot<T> {
@@ -131,6 +228,7 @@ export class AsyncJobManager<T> {
 			jobId: record.jobId,
 			...(record.kind === undefined ? {} : { kind: record.kind }),
 			state: record.state,
+			revision: record.revision,
 			createdAt: record.createdAt,
 			...(record.startedAt === undefined
 				? {}
@@ -155,4 +253,8 @@ export class AsyncJobManager<T> {
 			if (this.#jobs.size < this.#maxJobs) return;
 		}
 	}
+}
+
+function isTerminal(state: AsyncJobState): boolean {
+	return !["queued", "running"].includes(state);
 }

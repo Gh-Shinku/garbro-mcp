@@ -46,7 +46,7 @@ export const SERVER_NON_CAPABILITIES = [
 ] as const;
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
-Use submit_task for scan, inspect, and extract work. Paths are absolute local paths supplied from the user's current request; no readable roots are configured at server startup. Every call returns immediately with a taskId. Poll get_task until it reaches completed, partial, failed, or cancelled. Use cancel_task to request cooperative cancellation.
+Use submit_task for scan, inspect, and extract work. Paths are absolute local paths supplied from the user's current request; no readable roots are configured at server startup. Submission waits briefly for fast work, then returns a taskId if work remains active. Call get_task with its default server-side terminal wait until the task reaches completed, partial, failed, or cancelled. If that wait times out, call get_task again immediately. Never use sleep or choose a polling delay. Use cancel_task to request cooperative cancellation.
 
 Extraction always writes to an isolated expiring task directory below the server's temporary directory, performs an internal preflight, and independently reopens every written artifact for size, SHA-256, and supported structural validation before it can complete. Do not submit a separate verification step. The agent, not this server, decides whether and where verified artifacts are delivered to the user.
 
@@ -357,6 +357,7 @@ function taskHeader(snapshot: AsyncJobSnapshot<TaskPayload>) {
 		taskId: snapshot.jobId,
 		type: snapshot.kind,
 		state: snapshot.state,
+		revision: snapshot.revision,
 		createdAt: snapshot.createdAt,
 		...(snapshot.startedAt === undefined
 			? {}
@@ -368,6 +369,22 @@ function taskHeader(snapshot: AsyncJobSnapshot<TaskPayload>) {
 		...(snapshot.total === undefined ? {} : { total: snapshot.total }),
 		...(snapshot.phase === undefined ? {} : { phase: snapshot.phase }),
 		...(snapshot.message === undefined ? {} : { message: snapshot.message }),
+	};
+}
+
+function taskResponse(
+	snapshot: AsyncJobSnapshot<TaskPayload>,
+	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
+) {
+	return {
+		...taskHeader(snapshot),
+		waitOutcome,
+		...(snapshot.result === undefined
+			? {}
+			: { result: snapshot.result.result }),
+		...(snapshot.error === undefined
+			? {}
+			: { error: serializeError(snapshot.error) }),
 	};
 }
 
@@ -457,6 +474,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				mandatoryExtractionVerification: true,
 				dynamicAbsolutePaths: true,
 				temporaryExtraction: true,
+				serverSideTaskWaiting: true,
 			},
 		};
 	};
@@ -828,10 +846,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"submit_task",
 		{
 			description:
-				"Submit a bounded scan, inspect, or extract task and return immediately. Extract tasks always preflight and verify written artifacts.",
+				"Submit a bounded scan, inspect, or extract task. Waits briefly for fast completion, otherwise returns an active taskId. Extract tasks always preflight and verify written artifacts.",
 			inputSchema: z.object({
 				task: taskSchema,
 				idempotencyKey: z.string().min(1).max(128).optional(),
+				waitMs: z.number().int().min(0).max(5000).default(1000),
 			}),
 			annotations: {
 				readOnlyHint: false,
@@ -839,13 +858,35 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				idempotentHint: true,
 			},
 		},
-		async ({ task, idempotencyKey }) => {
+		async ({ task, idempotencyKey, waitMs }, context) => {
 			try {
+				const waitForSubmission = async (
+					snapshot: AsyncJobSnapshot<TaskPayload>,
+				) => {
+					if (
+						terminalStates.includes(
+							snapshot.state as (typeof terminalStates)[number],
+						)
+					)
+						return success(taskResponse(snapshot, "terminal"));
+					if (waitMs === 0) return success(taskResponse(snapshot, "submitted"));
+					const waited = await jobs.wait(snapshot.jobId, {
+						until: "terminal",
+						timeoutMs: waitMs,
+						signal: context.mcpReq.signal,
+					});
+					if (waited === undefined)
+						throw new GarbroError(
+							"INVALID_ARGUMENT",
+							`Unknown task: ${snapshot.jobId}`,
+						);
+					return success(taskResponse(waited.snapshot, waited.outcome));
+				};
 				if (idempotencyKey !== undefined) {
 					const existingId = idempotency.get(idempotencyKey);
 					const existing =
 						existingId === undefined ? undefined : jobs.get(existingId);
-					if (existing !== undefined) return success(taskHeader(existing));
+					if (existing !== undefined) return await waitForSubmission(existing);
 				}
 				const snapshot = jobs.start(
 					(control, jobId) => runTask(task, control, jobId),
@@ -856,7 +897,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				);
 				if (idempotencyKey !== undefined)
 					idempotency.set(idempotencyKey, snapshot.jobId);
-				return success(taskHeader(snapshot));
+				return await waitForSubmission(snapshot);
 			} catch (error) {
 				return failure(error);
 			}
@@ -867,28 +908,34 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Return progress and the terminal result for a submitted task.",
-			inputSchema: z.object({ taskId: z.string().uuid() }),
+				"Wait server-side for a submitted task. Defaults to terminal completion for 30 seconds; on timeout call again immediately without sleeping.",
+			inputSchema: z.object({
+				taskId: z.string().uuid(),
+				waitUntil: z.enum(["none", "change", "terminal"]).default("terminal"),
+				afterRevision: z.number().int().min(0).optional(),
+				timeoutMs: z.number().int().min(0).max(55_000).default(30_000),
+			}),
 			annotations: {
 				readOnlyHint: true,
 				destructiveHint: false,
 				idempotentHint: true,
 			},
 		},
-		async ({ taskId }) => {
+		async ({ taskId, waitUntil, afterRevision, timeoutMs }, context) => {
 			try {
-				const snapshot = jobs.get(taskId);
+				const waited =
+					waitUntil === "none"
+						? undefined
+						: await jobs.wait(taskId, {
+								until: waitUntil,
+								timeoutMs,
+								...(afterRevision === undefined ? {} : { afterRevision }),
+								signal: context.mcpReq.signal,
+							});
+				const snapshot = waited?.snapshot ?? jobs.get(taskId);
 				if (snapshot === undefined)
 					throw new GarbroError("INVALID_ARGUMENT", `Unknown task: ${taskId}`);
-				return success({
-					...taskHeader(snapshot),
-					...(snapshot.result === undefined
-						? {}
-						: { result: snapshot.result.result }),
-					...(snapshot.error === undefined
-						? {}
-						: { error: serializeError(snapshot.error) }),
-				});
+				return success(taskResponse(snapshot, waited?.outcome ?? "snapshot"));
 			} catch (error) {
 				return failure(error);
 			}

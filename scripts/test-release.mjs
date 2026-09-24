@@ -121,19 +121,16 @@ async function smoke(bundlePath, outputRoot) {
 		async function submit(task, idempotencyKey) {
 			return await call("submit_task", {
 				task,
+				waitMs: 0,
 				...(idempotencyKey === undefined ? {} : { idempotencyKey }),
 			});
 		}
 		async function waitForTask(taskId) {
-			for (let attempt = 0; attempt < 200; attempt += 1) {
-				const status = await call("get_task", { taskId });
-				if (
-					["completed", "partial", "failed", "cancelled"].includes(status.state)
-				)
-					return status;
-				await new Promise((resolvePromise) => setTimeout(resolvePromise, 5));
-			}
-			throw new Error(`Task ${taskId} did not finish`);
+			return await call("get_task", {
+				taskId,
+				waitUntil: "terminal",
+				timeoutMs: 30_000,
+			});
 		}
 
 		const infoResource = await client.readResource({

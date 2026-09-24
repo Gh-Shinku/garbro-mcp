@@ -88,27 +88,17 @@ function structured(value: {
 async function submitTask(client: Client, task: Record<string, unknown>) {
 	const submitted = await client.callTool({
 		name: "submit_task",
-		arguments: { task },
+		arguments: { task, waitMs: 0 },
 	});
 	expect(submitted.isError).not.toBe(true);
 	const taskId = structured(submitted).taskId;
 	if (typeof taskId !== "string") throw new Error("expected task ID");
-	for (let attempt = 0; attempt < 1_000; attempt += 1) {
-		const response = await client.callTool({
-			name: "get_task",
-			arguments: { taskId },
-		});
-		expect(response.isError).not.toBe(true);
-		const payload = structured(response);
-		if (
-			["completed", "partial", "failed", "cancelled"].includes(
-				String(payload.state),
-			)
-		)
-			return payload;
-		await new Promise((resolvePromise) => setTimeout(resolvePromise, 10));
-	}
-	throw new Error(`task ${taskId} did not finish`);
+	const response = await client.callTool({
+		name: "get_task",
+		arguments: { taskId, waitUntil: "terminal", timeoutMs: 55_000 },
+	});
+	expect(response.isError).not.toBe(true);
+	return structured(response);
 }
 
 async function extractSample(client: Client, sample: PrivateSample) {
