@@ -1,5 +1,8 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource } from "@garbro-mcp/core";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { BufferByteSource, FormatRegistry } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	gameresMp3AudioFormat,
@@ -123,5 +126,30 @@ describe("MPEG Layer 3 audio format", () => {
 		expect(handle.entries[0]?.path).toBe("cg.mp3");
 		expect(handle.entries[0]?.metadata).toMatchObject({ type: "audio" });
 		expect(await extract(data)).toEqual(data);
+	});
+
+	it("does not offer weak frame sync evidence for non-MP3 paths", async () => {
+		const directory = await mkdtemp(resolve(tmpdir(), "garbro-mp3-detection-"));
+		try {
+			const payload = Buffer.concat([
+				Buffer.alloc(5, 0x00),
+				FRAME,
+				Buffer.alloc(0x300, 0x11),
+			]);
+			const misleading = resolve(directory, "voice.paz");
+			const audio = resolve(directory, "voice.mp3");
+			await Promise.all([
+				writeFile(misleading, payload),
+				writeFile(audio, payload),
+			]);
+			const registry = new FormatRegistry([gameresMp3AudioFormat]);
+			await expect(registry.detectArchive(misleading)).resolves.toBeUndefined();
+			await expect(registry.detectArchive(audio)).resolves.toMatchObject({
+				format: { id: "gameres-mp3-audio" },
+				confidence: "medium",
+			});
+		} finally {
+			await rm(directory, { recursive: true, force: true });
+		}
 	});
 });

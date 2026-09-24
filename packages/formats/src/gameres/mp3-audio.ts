@@ -1,13 +1,13 @@
 // Format reference: GARbro "ArcFormats/AudioMP3.cs", classes `Mp3Audio` and `Mp3Input` (MPEG Layer 3 audio
 // format). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -97,7 +97,7 @@ async function readStored(source: ByteSource): Promise<Buffer> {
 export const gameresMp3AudioDescriptor: FormatDescriptor = {
 	id: "gameres-mp3-audio",
 	name: "MPEG Layer 3 audio format",
-	extensions: [],
+	extensions: ["mp3"],
 	capabilities: {
 		detect: true,
 		list: true,
@@ -117,7 +117,11 @@ export const gameresMp3AudioDescriptor: FormatDescriptor = {
 
 export const gameresMp3AudioFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: gameresMp3AudioDescriptor,
-	detection: { signatures: [], extensionFallback: true },
+	// A frame-sync-sized bit pattern is too weak to offer against every file: large game containers and
+	// installers commonly contain one by chance near the front. Dedicated container formats may still
+	// reuse `looksLikeMp3` for embedded payloads, while registry-level standalone detection is extension
+	// bound.
+	detection: { signatures: [], extensionOnly: true },
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < 4n) return false;
 		return looksLikeMp3(await readStored(source));
