@@ -154,6 +154,13 @@ structural inspection. There is no separate verification tool and verification c
 Each source produces a complete JSON report under `.garbro-reports`. A task is `partial` when any
 entry fails extraction or verification; verification failures are never reduced to warnings.
 
+Formats that can identify media bytes behind an extensionless archive name may provide a safe
+`outputExtension`. Planning exposes the resulting `outputEntryPath`, and extraction uses that same
+path for conflict checks and writing. Reports retain the original `entryPath` while the artifact's
+`relativePath` records the usable output name; media metadata may also include `mediaFormat` and
+`mimeType`. This identifies the file representation only and does not imply character, dialogue, or
+other semantic ownership.
+
 ## `get_task`
 
 Returns the latest task snapshot.

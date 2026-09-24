@@ -1,14 +1,15 @@
-import {
-	GarbroError,
-	extractEntry,
-	normalizeArchivePath,
-	type ArchiveHandle,
-	type FormatDescriptor,
-} from "@garbro-mcp/core";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { Readable } from "node:stream";
+import {
+	type ArchiveHandle,
+	extractEntry,
+	extractionPathForEntry,
+	type FormatDescriptor,
+	GarbroError,
+	normalizeArchivePath,
+} from "@garbro-mcp/core";
 import { afterEach, describe, expect, it } from "vitest";
 
 const temporaryDirectories: string[] = [];
@@ -118,6 +119,52 @@ describe("safe extraction", () => {
 		expect(await readFile(extracted.outputPath, "utf8")).toBe(
 			"decompressed payload",
 		);
+	});
+
+	it("uses a safe detected extension without changing the original entry", async () => {
+		const outputDirectory = await temporaryDirectory();
+		const entry = {
+			id: "0",
+			path: "opaque/0123456789ABCDEF",
+			size: 4n,
+			packedSize: 4n,
+			compressed: false,
+			encrypted: false,
+			metadata: { type: "audio", outputExtension: "OGG" },
+		};
+		const archive: ArchiveHandle = {
+			sourcePath: "memory",
+			format: descriptor,
+			size: 4n,
+			metadata: {},
+			entries: [entry],
+			async openEntry() {
+				return Readable.from([Buffer.from("OggS")]);
+			},
+			async close() {},
+		};
+
+		expect(extractionPathForEntry(entry)).toBe("opaque/0123456789ABCDEF.ogg");
+		const extracted = await extractEntry(archive, "0", { outputDirectory });
+		expect(extracted.entry.path).toBe("opaque/0123456789ABCDEF");
+		expect(extracted.outputPath).toBe(
+			resolve(outputDirectory, "opaque/0123456789ABCDEF.ogg"),
+		);
+		expect(await readFile(extracted.outputPath, "utf8")).toBe("OggS");
+	});
+
+	it("rejects an unsafe format-provided output extension", () => {
+		expect(() =>
+			extractionPathForEntry({
+				id: "0",
+				path: "opaque",
+				size: 0n,
+				packedSize: 0n,
+				compressed: false,
+				encrypted: false,
+				metadata: { outputExtension: "../ogg" },
+			}),
+		).toThrow(GarbroError);
 	});
 
 	it("still rejects an undeclared size mismatch", async () => {

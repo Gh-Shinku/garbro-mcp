@@ -3,7 +3,11 @@ import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
 import { extname, matchesGlob, relative, resolve, sep } from "node:path";
 import { asGarbroError, GarbroError } from "./errors.js";
-import { extractEntry, resolveEntryOutputPath } from "./extract.js";
+import {
+	extractEntry,
+	extractionPathForEntry,
+	resolveEntryOutputPath,
+} from "./extract.js";
 import type { FormatRegistry } from "./registry.js";
 import { type EntryResourceType, entryResourceType } from "./resource-type.js";
 import type {
@@ -154,6 +158,7 @@ export interface ExtractionBudgetViolation {
 export interface ExtractionPlanItem {
 	entryId: string;
 	entryPath?: string;
+	outputEntryPath?: string;
 	packedBytes?: bigint;
 	outputBytes?: bigint;
 	decodedBytes?: bigint;
@@ -825,7 +830,7 @@ export class ArchiveAutomationService {
 				try {
 					const destination = resolveEntryOutputPath(
 						outputDirectory,
-						candidate.entry.path,
+						extractionPathForEntry(candidate.entry),
 					);
 					resolvedDestinations.set(candidate.id, destination);
 					const key =
@@ -867,7 +872,10 @@ export class ArchiveAutomationService {
 						);
 					const destination =
 						resolvedDestinations.get(candidate.id) ??
-						resolveEntryOutputPath(outputDirectory, candidate.entry.path);
+						resolveEntryOutputPath(
+							outputDirectory,
+							extractionPathForEntry(candidate.entry),
+						);
 					const info = await pathInfo(destination);
 					if (info && conflictPolicy === "skip") {
 						preflight.set(candidate.id, {
@@ -1039,7 +1047,7 @@ export class ArchiveAutomationService {
 				try {
 					const destination = resolveEntryOutputPath(
 						outputDirectory,
-						candidate.entry.path,
+						extractionPathForEntry(candidate.entry),
 					);
 					const key =
 						process.platform === "win32"
@@ -1079,7 +1087,7 @@ export class ArchiveAutomationService {
 				}
 				const entry = candidate.entry;
 				const decodedBytes = decodedEntryBytes(entry);
-				const base = {
+				const common = {
 					entryId: candidate.id,
 					entryPath: entry.path,
 					packedBytes: entry.packedSize,
@@ -1087,6 +1095,8 @@ export class ArchiveAutomationService {
 					...(decodedBytes === undefined ? {} : { decodedBytes }),
 				};
 				try {
+					const outputEntryPath = extractionPathForEntry(entry);
+					const base = { ...common, outputEntryPath };
 					if (duplicateIds.has(candidate.id))
 						throw new GarbroError(
 							"UNSAFE_PATH",
@@ -1094,7 +1104,7 @@ export class ArchiveAutomationService {
 						);
 					const destination = resolveEntryOutputPath(
 						outputDirectory,
-						entry.path,
+						outputEntryPath,
 					);
 					const info = await pathInfo(destination);
 					if (info && conflictPolicy === "skip") {
@@ -1123,7 +1133,7 @@ export class ArchiveAutomationService {
 					else outputBytes += entry.size;
 				} catch (error) {
 					items.push({
-						...base,
+						...common,
 						status: "failed",
 						error: asGarbroError(error),
 					});

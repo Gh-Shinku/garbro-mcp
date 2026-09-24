@@ -2,21 +2,21 @@
 // Blowfish implementation in "ArcFormats/Blowfish.cs".
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { Blowfish, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import { detectFileType } from "../shared/detect-type.js";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
 const TAC_MARKER = "TArc";
@@ -145,13 +145,12 @@ async function sniffType(
 	offset: bigint,
 	size: number,
 	key: Buffer,
-): Promise<string | undefined> {
+): Promise<ReturnType<typeof detectFileType>> {
 	if (size < BLOCK_SIZE) return undefined;
 	if (!checkPlacement(offset, BigInt(BLOCK_SIZE), source.size))
 		return undefined;
 	const head = Buffer.from(await source.readAt(offset, BLOCK_SIZE));
-	return detectFileType(new Blowfish(key).decipherBlocks(head).readUInt32LE(0))
-		?.type;
+	return detectFileType(new Blowfish(key).decipherBlocks(head).readUInt32LE(0));
 }
 
 export const tanukiTacDescriptor: FormatDescriptor = {
@@ -206,7 +205,7 @@ export const tanukiTacFormat = defineFixedArchive({
 			const key = entryKey(entry.hash);
 			// The reference types entries from the missing name list first; without it the deciphered
 			// first block is the only type source.
-			const type = await sniffType(source, offset, entry.size, key);
+			const detected = await sniffType(source, offset, entry.size, key);
 			entries.push(
 				createFixedEntry({
 					id,
@@ -219,10 +218,20 @@ export const tanukiTacFormat = defineFixedArchive({
 					metadata: {
 						key: key.toString("latin1"),
 						encryptedSize:
-							type === "image"
+							detected?.type === "image"
 								? Math.min(MAX_ENCRYPTED_IMAGE, entry.size)
 								: entry.size,
-						...(type === undefined ? {} : { type }),
+						...(detected === undefined
+							? {}
+							: {
+									type: detected.type,
+									mediaFormat: detected.extension,
+									mimeType:
+										detected.type === "audio"
+											? `audio/${detected.extension}`
+											: `image/${detected.extension}`,
+									outputExtension: detected.extension,
+								}),
 					},
 				}),
 			);

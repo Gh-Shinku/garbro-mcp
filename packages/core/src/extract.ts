@@ -2,8 +2,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { constants, createWriteStream } from "node:fs";
 import {
 	access,
-	lstat,
 	link,
+	lstat,
 	mkdir,
 	rename,
 	rm,
@@ -25,6 +25,7 @@ import { GarbroError } from "./errors.js";
 import type { ArchiveEntry, ArchiveHandle } from "./types.js";
 
 const WINDOWS_RESERVED_NAME = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
+const SAFE_OUTPUT_EXTENSION = /^[a-z0-9][a-z0-9_+-]{0,15}$/i;
 
 export interface ExtractOptions {
 	outputDirectory: string;
@@ -101,6 +102,20 @@ export function resolveEntryOutputPath(
 		);
 	}
 	return outputPath;
+}
+
+/** Resolve a format-provided media extension without changing the archive's original entry name. */
+export function extractionPathForEntry(entry: ArchiveEntry): string {
+	const extension = entry.metadata?.outputExtension;
+	if (extension === undefined) return entry.path;
+	if (typeof extension !== "string" || !SAFE_OUTPUT_EXTENSION.test(extension))
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`Invalid output extension for ${entry.path}`,
+		);
+	const name = entry.path.replaceAll("\\", "/").split("/").at(-1) ?? "";
+	if (name.includes(".")) return entry.path;
+	return `${entry.path}.${extension.toLowerCase()}`;
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -196,7 +211,10 @@ export async function extractEntry(
 		);
 
 	const outputDirectory = resolve(options.outputDirectory);
-	const outputPath = resolveEntryOutputPath(outputDirectory, entry.path);
+	const outputPath = resolveEntryOutputPath(
+		outputDirectory,
+		extractionPathForEntry(entry),
+	);
 	await ensureDirectoryWithoutSymlinks(
 		resolve(options.safetyRoot ?? outputDirectory),
 		dirname(outputPath),
@@ -259,7 +277,10 @@ export async function extractArchive(
 	const outputDirectory = resolve(options.outputDirectory);
 	const seen = new Set<string>();
 	for (const entry of archive.entries) {
-		const outputPath = resolveEntryOutputPath(outputDirectory, entry.path);
+		const outputPath = resolveEntryOutputPath(
+			outputDirectory,
+			extractionPathForEntry(entry),
+		);
 		const key =
 			process.platform === "win32" ? outputPath.toLowerCase() : outputPath;
 		if (seen.has(key)) {

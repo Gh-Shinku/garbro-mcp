@@ -1,8 +1,8 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
+import { deflateSync } from "node:zlib";
 import { Blowfish } from "@garbro-mcp/codecs";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { tanukiTacFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
-import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -232,7 +232,12 @@ describe("TanukiSoft resource archive", () => {
 		try {
 			const entry = archive.entries[0];
 			expect(entry).toBeDefined();
-			expect(entry?.metadata?.type).toBe("image");
+			expect(entry?.metadata).toMatchObject({
+				type: "image",
+				mediaFormat: "bmp",
+				mimeType: "image/bmp",
+				outputExtension: "bmp",
+			});
 			// Images keep everything behind the first block unencrypted.
 			expect(entry?.metadata?.encryptedSize).toBe(10240);
 			const data = await consumeBuffer(
