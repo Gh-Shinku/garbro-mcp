@@ -1,16 +1,16 @@
 import {
 	type ArchiveAutomationOptions,
 	ArchiveAutomationService,
-	type AsyncJobSnapshot,
 	AsyncJobManager,
+	type AsyncJobSnapshot,
 	type AutomationControl,
 	asGarbroError,
 	DEFAULT_AUTOMATION_LIMITS,
-	entryResourceTypes,
-	entryToWire,
 	type ExtractionBudgets,
 	type ExtractionPlan,
 	type ExtractionSelection,
+	entryResourceTypes,
+	entryToWire,
 	type FormatRegistry,
 	GarbroError,
 	verifyExtractionResult,
@@ -555,7 +555,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			return {
 				type: "inspect",
 				status: "failed",
-				result: { recognized: false, source: inspection.source },
+				result: {
+					recognized: false,
+					source: inspection.source,
+					diagnosis: inspection.diagnosis,
+				},
 			};
 		const entries = input.includeEntries
 			? await automation.listEntries(input.source, {

@@ -1,17 +1,17 @@
 import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
-import { matchesGlob, relative, resolve, sep } from "node:path";
+import { extname, matchesGlob, relative, resolve, sep } from "node:path";
 import { asGarbroError, GarbroError } from "./errors.js";
 import { extractEntry, resolveEntryOutputPath } from "./extract.js";
 import type { FormatRegistry } from "./registry.js";
+import { type EntryResourceType, entryResourceType } from "./resource-type.js";
 import type {
 	ArchiveEntry,
 	ArchiveHandle,
 	DetectionResult,
 	FormatDescriptor,
 } from "./types.js";
-import { entryResourceType, type EntryResourceType } from "./resource-type.js";
 import {
 	type InputReference,
 	normalizeWorkspaceRelativePath,
@@ -73,6 +73,25 @@ export interface ArchiveInspection {
 	summary: ArchiveSummary;
 }
 
+export interface UnrecognizedFormatDiagnosis {
+	kind:
+		| "registered-extension-no-match"
+		| "no-registered-format"
+		| "unknown-format";
+	extension: string | null;
+	candidateFormatIds: readonly string[];
+	message: string;
+}
+
+export interface UnrecognizedResource {
+	source: InputReference;
+	diagnosis: UnrecognizedFormatDiagnosis;
+}
+
+export interface UnrecognizedInspection extends UnrecognizedResource {
+	recognized: false;
+}
+
 export interface ScanArchiveResult {
 	source: InputReference;
 	size: bigint;
@@ -90,7 +109,7 @@ export interface ScanFailure {
 export interface ScanResult {
 	scanned: number;
 	archives: ScanArchiveResult[];
-	unrecognized: InputReference[];
+	unrecognized: UnrecognizedResource[];
 	unrecognizedCount: number;
 	failures: ScanFailure[];
 	nextCursor: string | null;
@@ -455,16 +474,19 @@ export class ArchiveAutomationService {
 
 	async inspectArchive(
 		source: InputReference,
-	): Promise<
-		ArchiveInspection | { recognized: false; source: InputReference }
-	> {
+	): Promise<ArchiveInspection | UnrecognizedInspection> {
 		const resolved = await this.workspace.resolveInput(source, "file");
 		const normalizedSource = {
 			rootId: source.rootId,
 			path: resolved.relativePath,
 		};
 		const detection = await this.registry.detectArchive(resolved.absolutePath);
-		if (!detection) return { recognized: false, source: normalizedSource };
+		if (!detection)
+			return {
+				recognized: false,
+				source: normalizedSource,
+				diagnosis: this.#diagnoseUnrecognized(resolved.relativePath),
+			};
 		return await this.#withArchive(resolved.absolutePath, async (archive) => ({
 			recognized: true,
 			source: normalizedSource,
@@ -645,7 +667,7 @@ export class ArchiveAutomationService {
 		);
 		const archives: ScanArchiveResult[] = [];
 		const failures: ScanFailure[] = [];
-		const unrecognized: InputReference[] = [];
+		const unrecognized: UnrecognizedResource[] = [];
 		let unrecognizedCount = 0;
 		for (const [index, result] of inspected.entries()) {
 			const file = page[index];
@@ -655,7 +677,11 @@ export class ArchiveAutomationService {
 				failures.push({ source, error: result });
 			else if (!result) {
 				unrecognizedCount += 1;
-				if (options.includeUnrecognized) unrecognized.push(source);
+				if (options.includeUnrecognized)
+					unrecognized.push({
+						source,
+						diagnosis: this.#diagnoseUnrecognized(file.rootRelative),
+					});
 			} else
 				archives.push({
 					source,
@@ -1203,5 +1229,33 @@ export class ArchiveAutomationService {
 		} finally {
 			await archive.close();
 		}
+	}
+
+	#diagnoseUnrecognized(path: string): UnrecognizedFormatDiagnosis {
+		const extension = extname(path).slice(1).toLowerCase();
+		if (extension.length === 0)
+			return {
+				kind: "unknown-format",
+				extension: null,
+				candidateFormatIds: [],
+				message:
+					"No supported format matched and the file has no extension to identify a known family.",
+			};
+		const candidates = this.registry.listFormatsForExtension(extension);
+		if (candidates.length > 0) {
+			const candidateFormatIds = candidates.map((format) => format.id);
+			return {
+				kind: "registered-extension-no-match",
+				extension,
+				candidateFormatIds,
+				message: `Registered formats for .${extension} did not match this file; it may be an unsupported variant. Candidates: ${candidateFormatIds.join(", ")}.`,
+			};
+		}
+		return {
+			kind: "no-registered-format",
+			extension,
+			candidateFormatIds: [],
+			message: `No registered format supports the .${extension} extension.`,
+		};
 	}
 }

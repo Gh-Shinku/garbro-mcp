@@ -49,6 +49,18 @@ export class FormatRegistry {
 		return this.#formats.map((format) => format.descriptor);
 	}
 
+	listFormatsForExtension(extension: string): readonly FormatDescriptor[] {
+		const normalized = extension.replace(/^\./, "").toLowerCase();
+		if (normalized.length === 0) return [];
+		return this.#formats
+			.filter((format) =>
+				format.descriptor.extensions.some(
+					(candidate) => candidate.toLowerCase() === normalized,
+				),
+			)
+			.map((format) => format.descriptor);
+	}
+
 	async detectArchive(inputPath: string): Promise<DetectionResult | undefined> {
 		const sourcePath = resolve(inputPath);
 		for (const candidate of await this.#candidateFormats(sourcePath)) {

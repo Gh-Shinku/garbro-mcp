@@ -1,4 +1,11 @@
-import { copyFile, mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import {
+	copyFile,
+	mkdtemp,
+	readFile,
+	rm,
+	stat,
+	writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { BuildServerOptions } from "@garbro-mcp/mcp/server";
@@ -241,6 +248,26 @@ describe("MCP task server", () => {
 		expect(response.structuredContent).toMatchObject({
 			outcome: { status: "failed" },
 			error: { code: "INVALID_ARGUMENT" },
+		});
+	});
+
+	it("explains unsupported variants without claiming recognition", async () => {
+		const { client, root } = await connect();
+		await writeFile(resolve(root, "voice.cpz"), "CPZ6 unsupported");
+		const taskId = await submit(client, {
+			type: "inspect",
+			source: { rootId: "games", path: "voice.cpz" },
+		});
+		await expect(waitForTask(client, taskId)).resolves.toMatchObject({
+			state: "failed",
+			result: {
+				recognized: false,
+				diagnosis: {
+					kind: "registered-extension-no-match",
+					extension: "cpz",
+					candidateFormatIds: ["cmvs-cpz1", "cmvs-cpz2"],
+				},
+			},
 		});
 	});
 });

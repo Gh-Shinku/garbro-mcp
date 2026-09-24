@@ -103,9 +103,45 @@ describe("ArchiveAutomationService", () => {
 		});
 		expect(second.archives).toHaveLength(1);
 		expect(second.unrecognized).toEqual([
-			{ rootId: "games", path: "archives/readme.txt" },
+			{
+				source: { rootId: "games", path: "archives/readme.txt" },
+				diagnosis: {
+					kind: "registered-extension-no-match",
+					extension: "txt",
+					candidateFormatIds: ["ugos-txt-image"],
+					message:
+						"Registered formats for .txt did not match this file; it may be an unsupported variant. Candidates: ugos-txt-image.",
+				},
+			},
 		]);
 		expect(second.complete).toBe(true);
+	});
+
+	it("distinguishes unsupported variants from unregistered extensions", async () => {
+		const { root, service } = await setup();
+		await writeFile(resolve(root, "archives/voice.cpz"), "CPZ6 unsupported");
+		await writeFile(resolve(root, "archives/voice.paz"), "PAZ unsupported");
+
+		await expect(
+			service.inspectArchive({ rootId: "games", path: "archives/voice.cpz" }),
+		).resolves.toMatchObject({
+			recognized: false,
+			diagnosis: {
+				kind: "registered-extension-no-match",
+				extension: "cpz",
+				candidateFormatIds: ["cmvs-cpz1", "cmvs-cpz2"],
+			},
+		});
+		await expect(
+			service.inspectArchive({ rootId: "games", path: "archives/voice.paz" }),
+		).resolves.toMatchObject({
+			recognized: false,
+			diagnosis: {
+				kind: "no-registered-format",
+				extension: "paz",
+				candidateFormatIds: [],
+			},
+		});
 	});
 
 	it("preflights conflicts and reports per-entry extraction outcomes", async () => {

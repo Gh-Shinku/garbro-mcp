@@ -87,7 +87,10 @@ Submits a bounded `scan`, `inspect`, or `extract` task and immediately returns i
 
 Optional fields are `includeGlobs`, `excludeGlobs`, `maxDepth`, `cursor`, `limit`,
 `includeUnrecognized`, `resourceTypes`, and `formatIds`. Use the returned `nextCursor` to submit the
-next page.
+next page. When `includeUnrecognized` is true, each unrecognized item includes a structured
+`diagnosis`: `registered-extension-no-match` lists implemented candidates that rejected the file,
+`no-registered-format` reports an extension with no implementation, and `unknown-format` is used
+when no extension is available.
 
 ### Inspect task
 
@@ -109,6 +112,11 @@ Inspection combines the former archive-summary and entry-list operations:
 Optional entry filters are `includeGlobs`, `excludeGlobs`, `caseSensitive`, `compressed`,
 `encrypted`, and `resourceTypes`. Set `includeMetadata` to include archive-specific metadata or
 `includeEntries` to `false` when only a summary is needed.
+
+An unrecognized source returns the same structured diagnosis used by scanning. For example, a CPZ
+variant not handled by the implemented CPZ1/CPZ2 readers reports
+`registered-extension-no-match` with both reader IDs; a PAZ file reports `no-registered-format`
+until a PAZ reader is registered. These results are format-support evidence, not generic I/O errors.
 
 ### Extract task
 
