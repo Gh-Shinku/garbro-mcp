@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
-import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { constants } from "node:fs";
 import { access } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { WorkspacePolicy } from "@garbro-mcp/core";
+import { TemporaryWorkspaceManager } from "@garbro-mcp/core";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { BUILD_IDENTITY } from "./build.js";
 import { buildServer } from "./server.js";
 
 async function main(): Promise<void> {
 	const { values } = parseArgs({
 		options: {
-			"input-root": { type: "string", multiple: true },
-			"output-root": { type: "string", multiple: true },
+			"temp-dir": { type: "string" },
+			"temp-retention-hours": { type: "string" },
 			"expected-build-id": { type: "string" },
 			doctor: { type: "boolean" },
 			json: { type: "boolean" },
@@ -25,8 +25,8 @@ async function main(): Promise<void> {
 		console.error(`Usage: garbro-mcp-server [options]
 
 Options:
-  --input-root <id=path>    Add a named readable root (repeatable)
-  --output-root [id=]<path> Add a writable root (repeatable with IDs)
+  --temp-dir <path>         Override the OS temporary workspace directory
+  --temp-retention-hours <n> Keep completed task artifacts for n hours (default: 24)
   --expected-build-id <id> Refuse to start a different build
   --doctor                  Validate build identity and workspace access
   --json                    Emit machine-readable version or doctor output
@@ -42,43 +42,10 @@ Options:
 		return;
 	}
 
-	const inputRoots = values["input-root"]?.reduce<Record<string, string>>(
-		(roots, declaration) => {
-			const separator = declaration.indexOf("=");
-			if (separator <= 0 || separator === declaration.length - 1)
-				throw new Error(`Invalid --input-root value: ${declaration}`);
-			const id = declaration.slice(0, separator);
-			if (roots[id] !== undefined)
-				throw new Error(`Duplicate --input-root ID: ${id}`);
-			roots[id] = declaration.slice(separator + 1);
-			return roots;
-		},
-		Object.create(null) as Record<string, string>,
-	);
-	const outputDeclarations = values["output-root"];
-	let outputRoot: string | undefined;
-	let outputRoots: Record<string, string> | undefined;
-	if (outputDeclarations !== undefined) {
-		outputRoots = Object.create(null) as Record<string, string>;
-		for (const declaration of outputDeclarations) {
-			const separator = declaration.indexOf("=");
-			if (separator < 0) {
-				if (outputDeclarations.length > 1)
-					throw new Error(
-						"Repeated --output-root values must use id=path declarations",
-					);
-				outputRoot = declaration;
-				outputRoots = undefined;
-				break;
-			}
-			if (separator === 0 || separator === declaration.length - 1)
-				throw new Error(`Invalid --output-root value: ${declaration}`);
-			const id = declaration.slice(0, separator);
-			if (outputRoots[id] !== undefined)
-				throw new Error(`Duplicate --output-root ID: ${id}`);
-			outputRoots[id] = declaration.slice(separator + 1);
-		}
-	}
+	const retentionHours = Number(values["temp-retention-hours"] ?? "24");
+	if (!Number.isFinite(retentionHours) || retentionHours <= 0)
+		throw new Error("--temp-retention-hours must be a positive number");
+	const retentionMs = Math.round(retentionHours * 60 * 60 * 1000);
 
 	if (
 		values["expected-build-id"] !== undefined &&
@@ -88,21 +55,22 @@ Options:
 			`Build identity mismatch: expected ${values["expected-build-id"]}, running ${BUILD_IDENTITY.buildId}`,
 		);
 
-	const workspace = new WorkspacePolicy({
-		...(inputRoots === undefined ? {} : { inputRoots }),
-		...(outputRoot === undefined ? {} : { outputRoot }),
-		...(outputRoots === undefined ? {} : { outputRoots }),
+	const temporary = new TemporaryWorkspaceManager({
+		...(values["temp-dir"] === undefined
+			? {}
+			: { tempDirectory: values["temp-dir"] }),
+		retentionMs,
 	});
 	if (values.doctor) {
-		await workspace.prepare();
-		for (const root of workspace.outputRoots)
-			await access(root.path, constants.R_OK | constants.W_OK);
+		await temporary.prepare();
+		await access(temporary.tempDirectory, constants.R_OK | constants.W_OK);
 		const result = {
 			status: "ok",
 			build: BUILD_IDENTITY,
-			inputRoots: workspace.inputRoots,
-			outputRoot: workspace.outputRoot,
-			outputRoots: workspace.outputRoots,
+			temporaryWorkspace: {
+				path: temporary.tempDirectory,
+				retentionMs: temporary.retentionMs,
+			},
 		};
 		console.log(
 			values.json ? JSON.stringify(result) : `ok ${BUILD_IDENTITY.buildId}`,
@@ -110,7 +78,12 @@ Options:
 		return;
 	}
 
-	void serveStdio(() => buildServer({ workspace }));
+	void serveStdio(() =>
+		buildServer({
+			tempDirectory: temporary.tempDirectory,
+			retentionMs: temporary.retentionMs,
+		}),
+	);
 	console.error("garbro-mcp server running on stdio");
 }
 

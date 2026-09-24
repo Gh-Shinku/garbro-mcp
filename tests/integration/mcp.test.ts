@@ -34,8 +34,7 @@ async function connect(overrides: Pick<BuildServerOptions, "registry"> = {}) {
 		InMemoryTransport.createLinkedPair();
 	const server = buildServer({
 		...overrides,
-		inputRoots: { games: root },
-		outputRoot: output,
+		tempDirectory: output,
 	});
 	const client = new Client({ name: "garbro-mcp-test", version: "0.0.0" });
 	closers.push(
@@ -95,7 +94,7 @@ async function waitForTask(client: Client, taskId: string) {
 
 describe("MCP task server", () => {
 	it("exposes only the task control tools and publishes metadata as resources", async () => {
-		const { client, root, output } = await connect();
+		const { client, output } = await connect();
 		const tools = await client.listTools();
 		expect(tools.tools.map((tool) => tool.name).sort()).toEqual([
 			"cancel_task",
@@ -113,11 +112,12 @@ describe("MCP task server", () => {
 		if (!infoContent || !("text" in infoContent))
 			throw new Error("Missing server info");
 		expect(JSON.parse(infoContent.text)).toMatchObject({
-			inputRoots: [{ id: "games", path: root }],
-			outputRoot: output,
+			temporaryWorkspace: { path: output },
 			capabilities: {
 				taskTypes: ["scan", "inspect", "extract"],
 				mandatoryExtractionVerification: true,
+				dynamicAbsolutePaths: true,
+				temporaryExtraction: true,
 			},
 		});
 		const formats = await client.readResource({ uri: "garbro://formats" });
@@ -128,15 +128,15 @@ describe("MCP task server", () => {
 			expect.arrayContaining([expect.objectContaining({ id: "xp3" })]),
 		);
 		expect(client.getInstructions()).toContain(
-			"Extraction always performs an internal preflight",
+			"Extraction always writes to an isolated expiring task directory",
 		);
 	});
 
 	it("runs scan and entry inspection through the same asynchronous interface", async () => {
-		const { client } = await connect();
+		const { client, root } = await connect();
 		const scanId = await submit(client, {
 			type: "scan",
-			rootId: "games",
+			path: root,
 			resourceTypes: ["archive"],
 		});
 		const scan = await waitForTask(client, scanId);
@@ -146,7 +146,7 @@ describe("MCP task server", () => {
 			result: {
 				archives: [
 					{
-						source: { rootId: "games", path: "basic.xp3" },
+						source: { path: resolve(root, "basic.xp3") },
 						formatId: "xp3",
 					},
 				],
@@ -155,7 +155,7 @@ describe("MCP task server", () => {
 
 		const inspectId = await submit(client, {
 			type: "inspect",
-			source: { rootId: "games", path: "basic.xp3" },
+			source: { path: resolve(root, "basic.xp3") },
 			includeGlobs: ["**/*.tjs"],
 			resourceTypes: ["script"],
 		});
@@ -175,17 +175,15 @@ describe("MCP task server", () => {
 	});
 
 	it("preflights, extracts, verifies, and reports artifacts inside one task", async () => {
-		const { client, output } = await connect();
+		const { client, root, output } = await connect();
 		const taskId = await submit(client, {
 			type: "extract",
 			sources: [
 				{
-					source: { rootId: "games", path: "basic.xp3" },
+					source: { path: resolve(root, "basic.xp3") },
 					selection: { mode: "ids", entryIds: ["0", "1"] },
-					outputSubdirectory: "result",
 				},
 			],
-			conflictPolicy: "fail",
 		});
 		const task = await waitForTask(client, taskId);
 		expect(task).toMatchObject({
@@ -194,6 +192,9 @@ describe("MCP task server", () => {
 			result: {
 				status: "completed",
 				hasFailures: false,
+				temporary: true,
+				artifactDirectory: resolve(output, taskId, "artifacts"),
+				expiresAt: expect.any(String),
 				extracted: 2,
 				sources: [
 					{
@@ -211,7 +212,7 @@ describe("MCP task server", () => {
 			},
 		});
 		await expect(
-			stat(resolve(output, "result/hello.txt")),
+			stat(resolve(output, taskId, "artifacts/0001/hello.txt")),
 		).resolves.toMatchObject({
 			size: 10,
 		});
@@ -231,8 +232,8 @@ describe("MCP task server", () => {
 	});
 
 	it("deduplicates retried submissions by idempotency key", async () => {
-		const { client } = await connect();
-		const task = { type: "scan", rootId: "games" };
+		const { client, root } = await connect();
+		const task = { type: "scan", path: root };
 		const first = await submit(client, task, "scan-basic");
 		const second = await submit(client, task, "scan-basic");
 		expect(second).toBe(first);
@@ -256,7 +257,7 @@ describe("MCP task server", () => {
 		await writeFile(resolve(root, "voice.cpz"), "CPZ6 unsupported");
 		const taskId = await submit(client, {
 			type: "inspect",
-			source: { rootId: "games", path: "voice.cpz" },
+			source: { path: resolve(root, "voice.cpz") },
 		});
 		await expect(waitForTask(client, taskId)).resolves.toMatchObject({
 			state: "failed",

@@ -60,8 +60,7 @@ async function withClient<T>(
 	const [clientTransport, serverTransport] =
 		InMemoryTransport.createLinkedPair();
 	const server = buildServer({
-		inputRoots: { rewrite: manifest.gameRoot },
-		outputRoot: output,
+		tempDirectory: output,
 	});
 	const client = new Client({ name: "rewrite-private-test", version: "0" });
 	try {
@@ -113,6 +112,7 @@ async function submitTask(client: Client, task: Record<string, unknown>) {
 }
 
 async function extractSample(client: Client, sample: PrivateSample) {
+	if (!manifest) throw new Error("private manifest is unavailable");
 	if (!sample.extraction) {
 		throw new Error(`no extraction expectation for ${sample.path}`);
 	}
@@ -126,7 +126,13 @@ async function extractSample(client: Client, sample: PrivateSample) {
 	};
 	const task = await submitTask(client, {
 		type: "extract",
-		sources: [{ source: { rootId: "rewrite", path: sample.path } }],
+		sources: [
+			{
+				source: {
+					path: resolve(manifest.gameRoot, ...sample.path.split("/")),
+				},
+			},
+		],
 		budgets,
 	});
 	const payload = task.result as {
@@ -151,7 +157,6 @@ async function extractSample(client: Client, sample: PrivateSample) {
 	const report = JSON.parse(readFileSync(reportPath, "utf8")) as {
 		items: Array<{
 			artifact?: {
-				outputRootId: string;
 				relativePath: string;
 				absolutePath: string;
 				bytesWritten: string;
@@ -191,7 +196,7 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 				expect(await sha256(source)).toBe(sample.sha256);
 				const inspected = await submitTask(client, {
 					type: "inspect",
-					source: { rootId: "rewrite", path: sample.path },
+					source: { path: source },
 					includeEntries: false,
 					includeMetadata: true,
 				});
@@ -218,7 +223,7 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 			for (;;) {
 				const response = await submitTask(client, {
 					type: "scan",
-					rootId: "rewrite",
+					path: manifest.gameRoot,
 					includeGlobs: ["**/*.nwa"],
 					formatIds: ["reallive-nwa-audio"],
 					limit: 200,

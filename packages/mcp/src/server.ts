@@ -1,3 +1,4 @@
+import { basename, dirname, isAbsolute, resolve } from "node:path";
 import {
 	type ArchiveAutomationOptions,
 	ArchiveAutomationService,
@@ -13,9 +14,9 @@ import {
 	entryToWire,
 	type FormatRegistry,
 	GarbroError,
+	TemporaryWorkspaceManager,
 	verifyExtractionResult,
 	WorkspacePolicy,
-	type WorkspacePolicyOptions,
 	writeExtractionReport,
 } from "@garbro-mcp/core";
 import {
@@ -45,17 +46,20 @@ export const SERVER_NON_CAPABILITIES = [
 ] as const;
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
-Use submit_task for scan, inspect, and extract work. Every call returns immediately with a taskId. Poll get_task until it reaches completed, partial, failed, or cancelled. Use cancel_task to request cooperative cancellation.
+Use submit_task for scan, inspect, and extract work. Paths are absolute local paths supplied from the user's current request; no readable roots are configured at server startup. Every call returns immediately with a taskId. Poll get_task until it reaches completed, partial, failed, or cancelled. Use cancel_task to request cooperative cancellation.
 
-Extraction always performs an internal preflight and independently reopens every written artifact for size, SHA-256, and supported structural validation before it can complete. Do not submit a separate verification step.
+Extraction always writes to an isolated expiring task directory below the server's temporary directory, performs an internal preflight, and independently reopens every written artifact for size, SHA-256, and supported structural validation before it can complete. Do not submit a separate verification step. The agent, not this server, decides whether and where verified artifacts are delivered to the user.
 
 Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a semantic relationship, report that the resource bytes may be extractable but the relationship requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
 
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const terminalStates = ["completed", "partial", "failed", "cancelled"] as const;
+const absolutePathSchema = z
+	.string()
+	.min(1)
+	.refine(isAbsolute, "Expected an absolute local path for this system");
 const sourceSchema = z.object({
-	rootId: z.string().min(1),
-	path: z.string().min(1),
+	path: absolutePathSchema,
 });
 const decimalBytesSchema = z.string().regex(/^[1-9]\d*$/);
 const extractionSelectionSchema = z.discriminatedUnion("mode", [
@@ -86,8 +90,7 @@ const extractionBudgetsSchema = z.object({
 });
 const scanTaskSchema = z.object({
 	type: z.literal("scan"),
-	rootId: z.string().min(1),
-	path: z.string().min(1).default("."),
+	path: absolutePathSchema,
 	recursive: z.boolean().default(true),
 	includeGlobs: z.array(z.string()).max(32).optional(),
 	excludeGlobs: z.array(z.string()).max(32).optional(),
@@ -115,13 +118,10 @@ const inspectTaskSchema = z.object({
 const extractSourceSchema = z.object({
 	source: sourceSchema,
 	selection: extractionSelectionSchema.default({ mode: "all" }),
-	outputSubdirectory: z.string().min(1).optional(),
 });
 const extractTaskSchema = z.object({
 	type: z.literal("extract"),
 	sources: z.array(extractSourceSchema).min(1).max(32),
-	outputRootId: z.string().min(1).optional(),
-	conflictPolicy: z.enum(["fail", "skip", "overwrite"]).default("fail"),
 	budgets: extractionBudgetsSchema.optional(),
 });
 const taskSchema = z.discriminatedUnion("type", [
@@ -154,11 +154,10 @@ interface SupportRecord {
 	remainingVerification?: readonly string[];
 }
 
-export interface BuildServerOptions
-	extends WorkspacePolicyOptions,
-		ArchiveAutomationOptions {
+export interface BuildServerOptions extends ArchiveAutomationOptions {
 	registry?: FormatRegistry;
-	workspace?: WorkspacePolicy;
+	tempDirectory?: string;
+	retentionMs?: number;
 }
 
 function success(payload: Record<string, unknown>) {
@@ -380,25 +379,50 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				options.limits?.decodedResourceMaxBytes ??
 				DEFAULT_AUTOMATION_LIMITS.decodedResourceMaxBytes,
 		});
-	const workspace =
-		options.workspace ??
-		new WorkspacePolicy({
-			...(options.inputRoots === undefined
-				? {}
-				: { inputRoots: options.inputRoots }),
-			...(options.outputRoot === undefined
-				? {}
-				: { outputRoot: options.outputRoot }),
-			...(options.outputRoots === undefined
-				? {}
-				: { outputRoots: options.outputRoots }),
-			...(options.workingDirectory === undefined
-				? {}
-				: { workingDirectory: options.workingDirectory }),
-		});
-	const automation = new ArchiveAutomationService(registry, workspace, {
-		...(options.limits === undefined ? {} : { limits: options.limits }),
+	const temporary = new TemporaryWorkspaceManager({
+		...(options.tempDirectory === undefined
+			? {}
+			: { tempDirectory: options.tempDirectory }),
+		...(options.retentionMs === undefined
+			? {}
+			: { retentionMs: options.retentionMs }),
 	});
+	const automationOptions = {
+		...(options.limits === undefined ? {} : { limits: options.limits }),
+	};
+	const fileContext = (path: string, outputRoot = temporary.tempDirectory) => {
+		const absolutePath = resolve(path);
+		const workspace = new WorkspacePolicy({
+			inputRoots: { source: dirname(absolutePath) },
+			outputRoot,
+		});
+		return {
+			workspace,
+			automation: new ArchiveAutomationService(
+				registry,
+				workspace,
+				automationOptions,
+			),
+			reference: { rootId: "source", path: basename(absolutePath) },
+			absolutePath,
+		};
+	};
+	const directoryContext = (path: string) => {
+		const absolutePath = resolve(path);
+		const workspace = new WorkspacePolicy({
+			inputRoots: { source: absolutePath },
+			outputRoot: temporary.tempDirectory,
+		});
+		return {
+			workspace,
+			automation: new ArchiveAutomationService(
+				registry,
+				workspace,
+				automationOptions,
+			),
+			absolutePath,
+		};
+	};
 	const jobs = new AsyncJobManager<TaskPayload>();
 	const idempotency = new Map<string, string>();
 	const supportById = new Map<string, SupportRecord>(
@@ -412,22 +436,27 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	);
 
 	const serverInfo = async () => {
-		await workspace.prepare({ createOutput: false });
+		await temporary.prepare();
 		return {
 			purpose: SERVER_PURPOSE,
 			scope: [...SERVER_SCOPE],
 			notSupported: [...SERVER_NON_CAPABILITIES],
 			server: { name: "garbro-mcp", ...BUILD_IDENTITY, transport: "stdio" },
-			inputRoots: workspace.inputRoots.map((root) => ({ ...root })),
-			outputRoot: workspace.outputRoot,
-			outputRoots: workspace.outputRoots.map((root) => ({ ...root })),
-			limits: automation.limits,
+			temporaryWorkspace: {
+				path: temporary.tempDirectory,
+				retentionMs: temporary.retentionMs,
+			},
+			limits: {
+				...DEFAULT_AUTOMATION_LIMITS,
+				...(options.limits ?? {}),
+			},
 			capabilities: {
 				taskTypes: ["scan", "inspect", "extract"],
 				resourceTypes,
 				entryResourceTypes: [...entryResourceTypes],
-				conflictPolicies: ["fail", "skip", "overwrite"],
 				mandatoryExtractionVerification: true,
+				dynamicAbsolutePaths: true,
+				temporaryExtraction: true,
 			},
 		};
 	};
@@ -437,7 +466,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"garbro://server/info",
 		{
 			title: "garbro-mcp server information",
-			description: "Configured roots, limits, scope, and build identity.",
+			description:
+				"Temporary workspace, limits, scope, capabilities, and build identity.",
 			mimeType: "application/json",
 		},
 		async (uri) => ({
@@ -486,11 +516,13 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		input: z.infer<typeof scanTaskSchema>,
 		control: AutomationControl,
 	): Promise<TaskPayload> => {
+		const context = directoryContext(input.path);
+		const { automation, workspace } = context;
 		await workspace.prepare({ createOutput: false });
 		const result = await automation.scanArchives(
-			input.rootId,
+			"source",
 			{
-				path: input.path,
+				path: ".",
 				recursive: input.recursive,
 				maxDepth: input.maxDepth,
 				limit: input.limit,
@@ -518,7 +550,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				);
 			})
 			.map((item) => ({
-				source: item.source,
+				source: { path: resolve(context.absolutePath, item.source.path) },
 				size: item.size.toString(),
 				formatId: item.format.id,
 				resourceType: supportById.get(item.format.id)?.reference.type,
@@ -532,10 +564,19 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			result: {
 				scanned: result.scanned,
 				archives,
-				unrecognized: input.includeUnrecognized ? result.unrecognized : [],
+				unrecognized: input.includeUnrecognized
+					? result.unrecognized.map((item) => ({
+							source: {
+								path: resolve(context.absolutePath, item.source.path),
+							},
+							diagnosis: item.diagnosis,
+						}))
+					: [],
 				unrecognizedCount: result.unrecognizedCount,
 				failures: result.failures.map((item) => ({
-					source: item.source,
+					source: {
+						path: resolve(context.absolutePath, item.source.path),
+					},
 					error: serializeError(item.error),
 				})),
 				nextCursor: result.nextCursor,
@@ -548,21 +589,23 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		input: z.infer<typeof inspectTaskSchema>,
 		control: AutomationControl,
 	): Promise<TaskPayload> => {
+		const context = fileContext(input.source.path);
+		const { automation, workspace } = context;
 		await workspace.prepare({ createOutput: false });
 		await control.onProgress?.({ progress: 0, total: 1, phase: "inspecting" });
-		const inspection = await automation.inspectArchive(input.source);
+		const inspection = await automation.inspectArchive(context.reference);
 		if (!inspection.recognized)
 			return {
 				type: "inspect",
 				status: "failed",
 				result: {
 					recognized: false,
-					source: inspection.source,
+					source: { path: context.absolutePath },
 					diagnosis: inspection.diagnosis,
 				},
 			};
 		const entries = input.includeEntries
-			? await automation.listEntries(input.source, {
+			? await automation.listEntries(context.reference, {
 					caseSensitive: input.caseSensitive,
 					offset: input.offset,
 					limit: input.limit,
@@ -589,7 +632,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			status: "completed",
 			result: {
 				recognized: true,
-				source: inspection.source,
+				source: { path: context.absolutePath },
 				size: inspection.size.toString(),
 				format: {
 					id: inspection.format.id,
@@ -617,87 +660,85 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	const runExtract = async (
 		input: z.infer<typeof extractTaskSchema>,
 		baseControl: AutomationControl,
+		taskId: string,
 	): Promise<TaskPayload> => {
-		await workspace.prepare();
+		const temporaryTask = await temporary.allocate(taskId);
 		const budgets = budgetsFromWire(input.budgets);
 		const control = operationControl(baseControl, budgets?.timeoutMs);
 		const planBudgets =
 			budgets?.maxDecodedBytesPerResource === undefined
 				? undefined
 				: { maxDecodedBytesPerResource: budgets.maxDecodedBytesPerResource };
-		const plans: ExtractionPlan[] = [];
-		for (const [index, item] of input.sources.entries()) {
+		const contexts = input.sources.map((item, index) => ({
+			item,
+			...fileContext(item.source.path, temporaryTask.path),
+			outputSubdirectory: `artifacts/${String(index + 1).padStart(4, "0")}`,
+		}));
+		const planned: Array<{
+			context: (typeof contexts)[number];
+			plan: ExtractionPlan;
+		}> = [];
+		for (const [index, context] of contexts.entries()) {
 			throwIfCancelled(control.signal);
+			await context.workspace.prepare();
 			await control.onProgress?.({
 				progress: index,
-				total: input.sources.length,
+				total: contexts.length,
 				phase: "planning",
-				message: item.source.path,
+				message: context.absolutePath,
 			});
-			plans.push(
-				await automation.planExtraction(
-					item.source,
+			planned.push({
+				context,
+				plan: await context.automation.planExtraction(
+					context.reference,
 					{
-						selection: selectionFromWire(item.selection),
-						conflictPolicy: input.conflictPolicy,
-						...(input.outputRootId === undefined
-							? {}
-							: { outputRootId: input.outputRootId }),
-						...(item.outputSubdirectory === undefined
-							? {}
-							: { outputSubdirectory: item.outputSubdirectory }),
+						selection: selectionFromWire(context.item.selection),
+						conflictPolicy: "fail",
+						outputSubdirectory: context.outputSubdirectory,
 						...(planBudgets === undefined ? {} : { budgets: planBudgets }),
 					},
 					phaseControl(control, "planning"),
 				),
-			);
+			});
 		}
-		assertAggregateBudgets(plans, budgets);
+		assertAggregateBudgets(
+			planned.map((item) => item.plan),
+			budgets,
+		);
 
 		const sources: Array<Record<string, unknown>> = [];
-		for (const [index, item] of input.sources.entries()) {
+		for (const [index, item] of planned.entries()) {
 			throwIfCancelled(control.signal);
 			try {
-				const plan = plans[index];
-				if (plan === undefined)
-					throw new GarbroError(
-						"IO_ERROR",
-						`Missing extraction plan for ${item.source.path}`,
-					);
+				const { context, plan } = item;
 				await control.onProgress?.({
 					progress: index,
-					total: input.sources.length,
+					total: planned.length,
 					phase: "extracting",
-					message: item.source.path,
+					message: context.absolutePath,
 				});
-				const extracted = await automation.extractEntries(
-					item.source,
+				const extracted = await context.automation.extractEntries(
+					context.reference,
 					{
-						selection: selectionFromWire(item.selection),
-						conflictPolicy: input.conflictPolicy,
+						selection: selectionFromWire(context.item.selection),
+						conflictPolicy: "fail",
 						expectedPlanDigest: plan.planDigest,
-						...(input.outputRootId === undefined
-							? {}
-							: { outputRootId: input.outputRootId }),
-						...(item.outputSubdirectory === undefined
-							? {}
-							: { outputSubdirectory: item.outputSubdirectory }),
+						outputSubdirectory: context.outputSubdirectory,
 						...(planBudgets === undefined ? {} : { budgets: planBudgets }),
 					},
 					phaseControl(control, "extracting"),
 				);
 				const verified = await verifyExtractionResult(
-					workspace,
+					context.workspace,
 					extracted,
 					phaseControl(control, "verifying"),
 				);
-				const report = await writeExtractionReport(workspace, verified);
+				const report = await writeExtractionReport(context.workspace, verified);
 				sources.push({
-					source: item.source,
+					source: { path: context.absolutePath },
 					status: verified.status,
 					hasFailures: verified.hasFailures,
-					outputRootId: verified.outputRootId,
-					outputDirectory: verified.outputDirectory,
+					artifactDirectory: verified.outputDirectory,
 					selected: verified.selected,
 					extracted: verified.extracted,
 					skipped: verified.skipped,
@@ -710,12 +751,17 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						inspected: verified.verification.inspected,
 						failed: verified.verification.failed,
 					},
-					report: { ...report, bytesWritten: report.bytesWritten.toString() },
+					report: {
+						relativePath: report.relativePath,
+						absolutePath: report.absolutePath,
+						bytesWritten: report.bytesWritten.toString(),
+						sha256: report.sha256,
+					},
 				});
 			} catch (error) {
 				throwIfCancelled(control.signal);
 				sources.push({
-					source: item.source,
+					source: { path: item.context.absolutePath },
 					status: "failed",
 					hasFailures: true,
 					selected: 0,
@@ -751,6 +797,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			result: {
 				status,
 				hasFailures,
+				temporary: true,
+				artifactDirectory: resolve(temporaryTask.path, "artifacts"),
+				expiresAt: temporaryTask.expiresAt,
 				totalSources: sources.length,
 				extracted,
 				skipped,
@@ -763,6 +812,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	const runTask = (
 		task: TaskInput,
 		control: AutomationControl,
+		taskId: string,
 	): Promise<TaskPayload> => {
 		switch (task.type) {
 			case "scan":
@@ -770,7 +820,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			case "inspect":
 				return runInspect(task, control);
 			case "extract":
-				return runExtract(task, control);
+				return runExtract(task, control, taskId);
 		}
 	};
 
@@ -797,10 +847,13 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						existingId === undefined ? undefined : jobs.get(existingId);
 					if (existing !== undefined) return success(taskHeader(existing));
 				}
-				const snapshot = jobs.start((control) => runTask(task, control), {
-					kind: task.type,
-					stateFromResult: (payload) => payload.status,
-				});
+				const snapshot = jobs.start(
+					(control, jobId) => runTask(task, control, jobId),
+					{
+						kind: task.type,
+						stateFromResult: (payload) => payload.status,
+					},
+				);
 				if (idempotencyKey !== undefined)
 					idempotency.set(idempotencyKey, snapshot.jobId);
 				return success(taskHeader(snapshot));

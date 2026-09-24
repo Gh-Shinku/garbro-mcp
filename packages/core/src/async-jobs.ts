@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { asGarbroError, type GarbroError } from "./errors.js";
 import type { AutomationControl } from "./automation.js";
+import { asGarbroError, type GarbroError } from "./errors.js";
 
 export type AsyncJobState =
 	| "queued"
@@ -27,7 +27,7 @@ export interface AsyncJobSnapshot<T> {
 
 interface JobRecord<T> extends AsyncJobSnapshot<T> {
 	controller: AbortController;
-	run: (control: AutomationControl) => Promise<T>;
+	run: (control: AutomationControl, jobId: string) => Promise<T>;
 	stateFromResult?: (
 		result: T,
 	) => Exclude<AsyncJobState, "queued" | "running" | "cancelled">;
@@ -45,7 +45,7 @@ export class AsyncJobManager<T> {
 	}
 
 	start(
-		run: (control: AutomationControl) => Promise<T>,
+		run: (control: AutomationControl, jobId: string) => Promise<T>,
 		options: {
 			kind?: string;
 			stateFromResult?: (
@@ -93,18 +93,21 @@ export class AsyncJobManager<T> {
 		record.state = "running";
 		record.startedAt = new Date().toISOString();
 		try {
-			const result = await record.run({
-				signal: record.controller.signal,
-				onProgress: ({ progress, total, message, phase }) => {
-					record.progress = progress;
-					if (total === undefined) delete record.total;
-					else record.total = total;
-					if (message === undefined) delete record.message;
-					else record.message = message;
-					if (phase === undefined) delete record.phase;
-					else record.phase = phase;
+			const result = await record.run(
+				{
+					signal: record.controller.signal,
+					onProgress: ({ progress, total, message, phase }) => {
+						record.progress = progress;
+						if (total === undefined) delete record.total;
+						else record.total = total;
+						if (message === undefined) delete record.message;
+						else record.message = message;
+						if (phase === undefined) delete record.phase;
+						else record.phase = phase;
+					},
 				},
-			});
+				record.jobId,
+			);
 			if (record.controller.signal.aborted) {
 				record.state = "cancelled";
 			} else {

@@ -1,6 +1,3 @@
-import { Client } from "@modelcontextprotocol/client";
-import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
-import { unzipSync } from "fflate";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -14,6 +11,9 @@ import {
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { unzipSync } from "fflate";
 import {
 	releaseDirectory,
 	repositoryRoot,
@@ -81,9 +81,7 @@ async function smoke(bundlePath, outputRoot) {
 			process.execPath,
 			[
 				bundlePath,
-				"--input-root",
-				`samples=${input}`,
-				"--output-root",
+				"--temp-dir",
 				outputRoot,
 				"--expected-build-id",
 				buildManifest.buildId,
@@ -98,13 +96,7 @@ async function smoke(bundlePath, outputRoot) {
 
 	const transport = new StdioClientTransport({
 		command: process.execPath,
-		args: [
-			bundlePath,
-			"--input-root",
-			`samples=${input}`,
-			"--output-root",
-			outputRoot,
-		],
+		args: [bundlePath, "--temp-dir", outputRoot],
 		cwd,
 		env: { ...process.env, NODE_PATH: "" },
 		stderr: "pipe",
@@ -155,6 +147,8 @@ async function smoke(bundlePath, outputRoot) {
 			buildManifest.formatCatalogSha256,
 		);
 		assert.equal(serverInfo.capabilities.mandatoryExtractionVerification, true);
+		assert.equal(serverInfo.capabilities.dynamicAbsolutePaths, true);
+		assert.equal(serverInfo.temporaryWorkspace.path, outputRoot);
 		assert(serverInfo.notSupported.includes("game logic reverse engineering"));
 		const formatsResource = await client.readResource({
 			uri: "garbro://formats",
@@ -162,12 +156,12 @@ async function smoke(bundlePath, outputRoot) {
 		const formats = JSON.parse(formatsResource.contents[0].text);
 		assert(formats.some((format) => format.id === "xp3"));
 
-		const source = { rootId: "samples", path: "basic.xp3" };
+		const source = { path: resolve(input, "basic.xp3") };
 		const scan = await waitForTask(
 			(
 				await submit({
 					type: "scan",
-					rootId: "samples",
+					path: input,
 					formatIds: ["xp3"],
 				})
 			).taskId,
@@ -200,6 +194,11 @@ async function smoke(bundlePath, outputRoot) {
 		);
 		const extracted = await waitForTask(extraction.taskId);
 		assert.equal(extracted.state, "completed");
+		assert.equal(extracted.result.temporary, true);
+		assert.equal(
+			extracted.result.artifactDirectory,
+			resolve(outputRoot, extraction.taskId, "artifacts"),
+		);
 		assert.equal(extracted.result.extracted, 3);
 		assert.equal(extracted.result.sources[0].verification.verified, 3);
 		const reportArtifact = extracted.result.sources[0].report;
@@ -220,13 +219,13 @@ async function smoke(bundlePath, outputRoot) {
 			);
 		}
 
-		const unsafeSubmission = await submit({
-			type: "inspect",
-			source: { rootId: "samples", path: "../escape" },
+		const unsafe = await client.callTool({
+			name: "submit_task",
+			arguments: {
+				task: { type: "inspect", source: { path: "../escape" } },
+			},
 		});
-		const unsafe = await waitForTask(unsafeSubmission.taskId);
-		assert.equal(unsafe.state, "failed");
-		assert.equal(unsafe.error.code, "UNSAFE_PATH");
+		assert.equal(unsafe.isError, true);
 	} catch (error) {
 		throw new Error(`Release smoke failed:\n${stderr}`, { cause: error });
 	} finally {
