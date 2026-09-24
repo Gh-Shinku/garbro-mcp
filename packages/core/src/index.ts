@@ -1,7 +1,7 @@
+export * from "./async-jobs.js";
+export * from "./automation.js";
 export * from "./binary.js";
 export * from "./catalog.js";
-export * from "./automation.js";
-export * from "./async-jobs.js";
 export * from "./encoding.js";
 export * from "./errors.js";
 export * from "./extract.js";
@@ -9,6 +9,7 @@ export * from "./registry.js";
 export * from "./reports.js";
 export * from "./resource-type.js";
 export * from "./source.js";
+export * from "./temporary-workspace.js";
 export * from "./types.js";
 export * from "./verification.js";
 export * from "./wire.js";
