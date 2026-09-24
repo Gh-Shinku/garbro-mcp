@@ -35,9 +35,11 @@ bounded entry page. Entries without explicit metadata or a recognized extension 
 
 ## Extraction is slow or the MCP request times out
 
-All operations already run asynchronously. Poll `get_task` using the ID returned by `submit_task`.
-The task ID is in-memory state and is lost if the server process restarts. Completed artifacts and
-reports remain in the task's temporary directory only until its reported `expiresAt` time.
+All operations run asynchronously. Call `get_task` using the ID returned by `submit_task`; its
+default behavior waits server-side for terminal completion. Do not use `sleep`. If the 30-second
+wait returns `waitOutcome: "timeout"`, call `get_task` again immediately. The task ID is in-memory
+state and is lost if the server process restarts. Completed artifacts and reports remain in the
+task's temporary directory only until its reported `expiresAt` time.
 
 ## An extraction is partial
 

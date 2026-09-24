@@ -78,8 +78,9 @@ audio to temporary storage, and report any extraction or verification failures. 
 game files. After I review the result, copy the selected files to D:/Exports/Rewrite-audio.
 ```
 
-The agent submits `scan`, `inspect`, and `extract` tasks through `submit_task`, polling each with
-`get_task`. Planning and post-extraction verification are mandatory internal extraction phases.
+The agent submits `scan`, `inspect`, and `extract` tasks through `submit_task`, then uses
+`get_task`'s server-side wait. It does not sleep or guess polling intervals. Planning and
+post-extraction verification are mandatory internal extraction phases.
 The MCP does not choose a permanent destination or copy artifacts there; the calling agent follows
 the user's delivery instruction after extraction.
 

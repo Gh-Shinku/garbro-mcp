@@ -13,8 +13,12 @@ Server metadata and the format catalog are MCP resources rather than tools:
 
 ## Task lifecycle
 
-`submit_task` returns immediately with a `taskId`. Poll `get_task` until `state` is one of
-`completed`, `partial`, `failed`, or `cancelled`. Active states are `queued` and `running`.
+`submit_task` waits up to one second by default so short work can finish in one call. Otherwise it
+returns an active `taskId`. Call `get_task` with its default server-side wait until `state` is one
+of `completed`, `partial`, `failed`, or `cancelled`. Active states are `queued` and `running`.
+
+Do not call `sleep` or choose a polling interval. When `get_task` returns `waitOutcome: "timeout"`,
+call it again immediately; the next call waits on the server again.
 
 Running tasks may report these phases:
 
@@ -62,13 +66,15 @@ type, not character ownership or another semantic role.
 
 ## `submit_task`
 
-Submits a bounded `scan`, `inspect`, or `extract` task and immediately returns its initial snapshot.
+Submits a bounded `scan`, `inspect`, or `extract` task and waits briefly for fast completion.
 
 ### Parameters
 
 - **task** (task object) **required**: Work description documented below.
 - **idempotencyKey** (string) optional: Repeated submissions with the same key return the existing
   task while it remains known to the server.
+- **waitMs** (integer, 0–5000) optional: Fast-completion window. The default is `1000`; use `0` when
+  the caller must receive the task ID without waiting.
 
 ### Scan task
 
@@ -163,15 +169,23 @@ other semantic ownership.
 
 ## `get_task`
 
-Returns the latest task snapshot.
+Waits on the server and returns a task snapshot. The default waits up to 30 seconds for a terminal
+state, so the calling agent does not need a timer.
 
 ### Parameters
 
 - **taskId** (UUID string) **required**: ID returned by `submit_task`.
+- **waitUntil** (`none`, `change`, or `terminal`) optional: Defaults to `terminal`. `none` returns an
+  immediate snapshot. `change` waits for a revision newer than `afterRevision`.
+- **afterRevision** (non-negative integer) optional: Last observed `revision`, used with `change` to
+  avoid missed-update races.
+- **timeoutMs** (integer, 0–55000) optional: Maximum server-side wait; defaults to `30000`.
 
-Active snapshots include progress, total, phase, and the current path when available. Terminal
-snapshots include a compact result. Extraction results contain counts, verification totals, output
-directories, and report artifacts; detailed per-entry evidence is stored in the report.
+Every snapshot includes a monotonically increasing `revision` and a `waitOutcome`: `snapshot`,
+`changed`, `terminal`, `timeout`, or `submitted`. Active snapshots include progress, total, phase,
+and the current path when available. Terminal snapshots include a compact result. Extraction
+results contain counts, verification totals, output directories, and report artifacts; detailed
+per-entry evidence is stored in the report.
 
 ## `cancel_task`
 
@@ -181,8 +195,8 @@ Requests cooperative cancellation of a queued or running task.
 
 - **taskId** (UUID string) **required**: ID returned by `submit_task`.
 
-Cancellation does not roll back files already written. Continue polling `get_task` until the task
-reaches a terminal state.
+Cancellation does not roll back files already written. Call `get_task` with its default terminal
+wait until the task reaches a terminal state.
 
 ## Resources
 
