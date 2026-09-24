@@ -5,7 +5,7 @@ declare const GARBRO_MCP_BUILD_ID: string;
 declare const GARBRO_MCP_FORMAT_CATALOG_SHA256: string;
 declare const GARBRO_MCP_BUILD_DIRTY: boolean;
 
-export const MCP_PROTOCOL_VERSION = "6";
+export const MCP_PROTOCOL_VERSION = "7";
 
 export interface BuildIdentity {
 	version: string;
