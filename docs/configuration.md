@@ -1,26 +1,27 @@
 # Configuration
 
-garbro-mcp is a stdio MCP server. Its command-line options define which game directories the agent
-may read and where extracted files may be written.
+garbro-mcp is a stdio MCP server. Game paths are supplied as absolute paths when an agent submits a
+task, so changing games does not require editing the MCP configuration or restarting the server.
+Extraction always goes to server-managed temporary storage first.
 
 ## Server options
 
-- **`--input-root <id=path>`**
-  Add a named readable root. Repeat the option to expose multiple directories.
-  - **Type:** string
-  - **Example:** `--input-root games=D:/Games`
+- **`--temp-dir <path>`**
+  Override the temporary workspace root. The default is `garbro-mcp` below the operating system's
+  standard temporary directory.
+  - **Type:** absolute path
 
-- **`--output-root <[id=]path>`**
-  Add a writable root. Repeatable declarations must use an ID.
-  - **Type:** string
-  - **Example:** `--output-root default=D:/garbro-output`
+- **`--temp-retention-hours <n>`**
+  Set how long task directories remain eligible for access before cleanup.
+  - **Type:** positive number
+  - **Default:** `24`
 
 - **`--expected-build-id <id>`**
   Refuse to start when the bundle does not have the expected immutable build ID.
   - **Type:** string
 
 - **`--doctor`**
-  Validate the build identity and configured roots, then exit.
+  Validate the build identity and temporary workspace, then exit.
   - **Type:** boolean
   - **Default:** `false`
 
@@ -46,18 +47,13 @@ Portable ZIP example on Windows:
   "mcpServers": {
     "garbro": {
       "command": "node",
-      "args": [
-        "C:/Tools/garbro-mcp/garbro-mcp.cjs",
-        "--input-root", "games=D:/Games",
-        "--output-root", "default=D:/garbro-output",
-        "--output-root", "audio=D:/ExtractedAudio"
-      ]
+      "args": ["C:/Tools/garbro-mcp/garbro-mcp.cjs"]
     }
   }
 }
 ```
 
-Source checkout example:
+Source checkout example with a custom temporary directory:
 
 ```json
 {
@@ -66,57 +62,54 @@ Source checkout example:
       "command": "node",
       "args": [
         "C:/Users/me/Code/garbro-mcp/packages/mcp/dist/index.js",
-        "--input-root", "games=D:/Games",
-        "--output-root", "default=D:/garbro-output"
+        "--temp-dir", "D:/garbro-temporary",
+        "--temp-retention-hours", "48"
       ]
     }
   }
 }
 ```
 
-Use absolute paths for the server and root directories. If the MCP client cannot find `node`, use
-the absolute path to the Node.js executable.
+Use absolute paths for the server and custom temporary directory. If the MCP client cannot find
+`node`, use the absolute path to the Node.js executable.
 
 ## Filesystem policy
 
-Tools address input files with logical references such as:
+Tasks address a game directory or resource file with an absolute local path selected from the
+current conversation:
 
 ```json
-{ "rootId": "games", "path": "Rewrite/voice.xp3" }
+{ "path": "D:/Games/Rewrite/voice.xp3" }
 ```
 
-The server rejects:
+The server rejects relative task paths, unsafe archive entry destinations, and writes outside its
+temporary workspace. Source game files are opened read-only. Each extraction task receives a new
+UUID-named directory and returns its `artifactDirectory` and `expiresAt`; existing task artifacts
+are never selected as an overwrite destination.
 
-- absolute input and output paths supplied through tools;
-- `..` traversal and paths outside the selected root;
-- unknown root IDs;
-- symbolic-link escapes;
-- unsafe archive entry destinations;
-- implicit overwrite of existing files.
+The temporary directory is staging storage, not the user's final delivery location. After a task
+finishes, the calling agent may inspect, transform, or copy verified artifacts according to the
+user's instruction and its own filesystem permissions. garbro-mcp does not choose or restrict that
+final destination.
 
-Game files below input roots are opened read-only. Extraction writes only below a configured output
-root. Use a separate output directory rather than placing output inside the game installation.
-
-The legacy single `--output-root <path>` form is accepted as root ID `default`. With no root
-arguments, input root `workspace` maps to the current directory and output defaults to
-`garbro-output` below it.
+Cleanup is lazy: expired UUID task directories are removed when the temporary workspace is next
+prepared. Files should not be expected to remain available after `expiresAt`.
 
 ## Check a configuration
 
-Record the exact build:
+Record the exact build and validate the temporary workspace:
 
 ```powershell
 node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
+node C:/Tools/garbro-mcp/garbro-mcp.cjs --doctor --json
 ```
 
-Then validate the same roots used by the MCP client:
+When overriding temporary storage, pass the same option used by the MCP client:
 
 ```powershell
 node C:/Tools/garbro-mcp/garbro-mcp.cjs `
-  --input-root games=D:/Games `
-  --output-root default=D:/garbro-output `
+  --temp-dir D:/garbro-temporary `
   --doctor --json
 ```
 
-See the [tool reference](tool-reference.md) for the logical source and output-root fields accepted by
-individual tools.
+See the [tool reference](tool-reference.md) for task fields and result lifecycle.

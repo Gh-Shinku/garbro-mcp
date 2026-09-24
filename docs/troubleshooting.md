@@ -11,10 +11,11 @@ node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
 garbro-mcp requires Node.js 24 or newer. Use an absolute Node executable path when the MCP client
 does not inherit your terminal's `PATH`.
 
-## A configured root is rejected
+## The temporary workspace is rejected
 
-Run `--doctor --json` with the same root declarations used by the client. Input roots must exist and
-be readable. Output roots must be writable. Repeated output roots require `id=path` declarations.
+Run `--doctor --json` with the same `--temp-dir` used by the client. It must be an absolute path to
+a real writable directory and cannot be a filesystem root. Omit the option to use the operating
+system's standard temporary directory.
 
 See [configuration](configuration.md) for examples.
 
@@ -32,21 +33,11 @@ Submit an `inspect` task without a resource-type filter. It returns both the arc
 bounded entry page. Entries without explicit metadata or a recognized extension are classified as
 `unknown`. The server does not infer relationships such as which character owns a voice file.
 
-## Extraction reports `OUTPUT_EXISTS`
-
-The default conflict policy is `fail`. Choose one of these deliberate actions:
-
-- select a new `outputSubdirectory`;
-- use `conflictPolicy: "skip"` to preserve existing files;
-- use `conflictPolicy: "overwrite"` to replace existing regular files.
-
-The server never overwrites directories, symbolic links, or other non-regular destinations.
-
 ## Extraction is slow or the MCP request times out
 
 All operations already run asynchronously. Poll `get_task` using the ID returned by `submit_task`.
-The task ID is in-memory state and is lost if the server process restarts. Completed output files
-and saved reports remain on disk.
+The task ID is in-memory state and is lost if the server process restarts. Completed artifacts and
+reports remain in the task's temporary directory only until its reported `expiresAt` time.
 
 ## An extraction is partial
 

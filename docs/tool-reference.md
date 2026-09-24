@@ -24,19 +24,19 @@ Running tasks may report these phases:
 - `extracting`
 - `verifying`
 
-Task IDs are held by the running MCP process. A server restart loses task status, but extracted
-files and completed reports remain on disk.
+Task IDs are held by the running MCP process. A server restart loses task status. Extraction
+artifacts remain in temporary storage only until their reported `expiresAt` time and should be
+delivered elsewhere by the calling agent when the user requests it.
 
 ## Common values
 
-Sources use logical paths below a configured input root:
+Sources use absolute paths for the current operating system:
 
 ```json
-{ "rootId": "games", "path": "Rewrite/voice.xp3" }
+{ "path": "D:/Games/Rewrite/voice.xp3" }
 ```
 
-Absolute paths and paths that escape a root are rejected. Byte budgets are decimal strings so they
-remain lossless in JSON.
+Relative paths are rejected. Byte budgets are decimal strings so they remain lossless in JSON.
 
 Extraction selections are:
 
@@ -76,8 +76,7 @@ Submits a bounded `scan`, `inspect`, or `extract` task and immediately returns i
 {
   "task": {
     "type": "scan",
-    "rootId": "games",
-    "path": "Rewrite",
+    "path": "D:/Games/Rewrite",
     "recursive": true,
     "resourceTypes": ["archive", "audio"],
     "limit": 50
@@ -100,7 +99,7 @@ Inspection combines the former archive-summary and entry-list operations:
 {
   "task": {
     "type": "inspect",
-    "source": { "rootId": "games", "path": "Rewrite/voice.xp3" },
+    "source": { "path": "D:/Games/Rewrite/voice.xp3" },
     "includeEntries": true,
     "resourceTypes": ["audio"],
     "offset": 0,
@@ -128,13 +127,10 @@ One task may extract between 1 and 32 sources:
     "type": "extract",
     "sources": [
       {
-        "source": { "rootId": "games", "path": "Rewrite/voice.xp3" },
-        "selection": { "mode": "all", "resourceTypes": ["audio"] },
-        "outputSubdirectory": "Rewrite/audio"
+        "source": { "path": "D:/Games/Rewrite/voice.xp3" },
+        "selection": { "mode": "all", "resourceTypes": ["audio"] }
       }
     ],
-    "outputRootId": "default",
-    "conflictPolicy": "fail",
     "budgets": {
       "maxResources": 10000,
       "maxOutputBytes": "10737418240",
@@ -144,15 +140,19 @@ One task may extract between 1 and 32 sources:
 }
 ```
 
-`conflictPolicy` is `fail`, `skip`, or `overwrite`. Budgets may include `maxResources`,
-`maxInputBytes`, `maxOutputBytes`, `maxDecodedBytesPerResource`, and `timeoutMs`.
+Budgets may include `maxResources`, `maxInputBytes`, `maxOutputBytes`,
+`maxDecodedBytesPerResource`, and `timeoutMs`.
 
 The task always performs preflight before the first write. After extraction, every written artifact
 is reopened and checked against its expected size and SHA-256. WAV and Ogg outputs also receive
 structural inspection. There is no separate verification tool and verification cannot be disabled.
 
-Each source produces a complete JSON report under `.garbro-reports`. A task is `partial` when any
-entry fails extraction or verification; verification failures are never reduced to warnings.
+Each task gets a fresh UUID-named directory below the configured or operating-system temporary
+root. Its result includes `temporary: true`, `artifactDirectory`, and `expiresAt`. Each source also
+produces a complete JSON report under `.garbro-reports`. A task is `partial` when any entry fails
+extraction or verification; verification failures are never reduced to warnings. Permanent
+delivery is deliberately outside the MCP: the calling agent copies or transforms selected
+artifacts only when instructed by the user.
 
 Formats that can identify media bytes behind an extensionless archive name may provide a safe
 `outputExtension`. Planning exposes the resulting `outputEntryPath`, and extraction uses that same
@@ -188,8 +188,8 @@ reaches a terminal state.
 
 ### `garbro://server/info`
 
-Returns build identity, configured roots, limits, supported task and resource categories, and
-explicit non-capabilities.
+Returns build identity, temporary-workspace policy, limits, supported task and resource categories,
+and explicit non-capabilities.
 
 ### `garbro://formats`
 

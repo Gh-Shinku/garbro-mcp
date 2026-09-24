@@ -13,10 +13,11 @@ pnpm build
 ```
 
 For source installations, configure the MCP client to run Node with the absolute path to
-`packages/mcp/dist/index.js`, followed by `--input-root id=/path/to/input` and
-`--output-root id=/path/to/output`. Repeat either option to expose additional named roots. Ordinary
-users should prefer the prebuilt portable distribution; see [distribution.md](distribution.md) for
-local artifact builds and release verification.
+`packages/mcp/dist/index.js`. Game paths are supplied to tasks from the conversation, not fixed in
+server startup arguments. Use `--temp-dir /absolute/path` only when the operating system's default
+temporary directory is unsuitable. Ordinary users should prefer the prebuilt portable
+distribution; see [distribution.md](distribution.md) for local artifact builds and release
+verification.
 
 The repository is a private pnpm workspace:
 

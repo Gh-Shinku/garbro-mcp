@@ -23,10 +23,12 @@ Get-FileHash ./garbro-mcp-<version>-portable.zip -Algorithm SHA256
 ```
 
 Checksums detect incomplete or modified downloads; they are not a separate authenticity signature.
-Extract the ZIP, then configure the client to run `node /absolute/path/garbro-mcp/garbro-mcp.cjs`
-with the root arguments described in [configuration.md](configuration.md). Use an absolute Node
-executable path if the client does not inherit Node's PATH. No runtime dependency installation or
-registry access is needed. All three desktop operating systems use the same bundle.
+Extract the ZIP, then configure the client to run
+`node /absolute/path/garbro-mcp/garbro-mcp.cjs`. Game paths are supplied in tool tasks. Use an
+absolute Node executable path if the client does not inherit Node's PATH. No runtime dependency
+installation or registry access is needed. All three desktop operating systems use the same
+bundle. Optional temporary-workspace settings are documented in
+[configuration.md](configuration.md).
 
 Alternatively, download the `.tgz` and install it locally:
 
@@ -37,7 +39,7 @@ garbro-mcp-server --version --json
 
 The tarball contains the same bundle, has no runtime dependencies or installation scripts, and
 can be installed offline. Global installation requires a writable npm prefix. Configure the MCP
-client with `garbro-mcp-server` (or its absolute executable path) and the same root arguments.
+client with `garbro-mcp-server` (or its absolute executable path).
 
 Keep versions in separate directories. Updating or rolling back is an explicit path change and
 client restart; the server does not download updates or follow `main` automatically.

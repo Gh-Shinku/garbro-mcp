@@ -16,8 +16,8 @@ codecs documented by [GARBro](https://github.com/morkt/GARBro).
   audio, and scripts with validation evidence.
 - **Select the data that matters:** Filter archive entries by path, compression, encryption, and
   conservative media category.
-- **Extract safely:** Every extraction task preflights destinations and budgets, writes only below
-  configured output roots, and preserves source game files.
+- **Extract safely:** Every extraction task preflights destinations and budgets, writes into an
+  isolated expiring temporary directory, and preserves source game files.
 - **Handle long operations:** Scans, inspections, and extractions all run as background tasks with
   progress, cancellation, and one consistent control interface.
 - **Verify automatically:** Extraction reopens every output, checks its size and SHA-256, inspects
@@ -37,7 +37,7 @@ resource's role in the game. When the available evidence is insufficient, the se
 
 - Node.js 24 or newer
 - A portable release bundle, or a source checkout built with pnpm 11.26.0
-- Separate readable game and writable output directories
+- Read access to the game directory selected in the conversation
 
 ## Getting started
 
@@ -51,37 +51,37 @@ MCP client with absolute paths:
     "garbro": {
       "command": "node",
       "args": [
-        "C:/Tools/garbro-mcp/garbro-mcp.cjs",
-        "--input-root", "games=D:/Games",
-        "--output-root", "default=D:/garbro-output"
+        "C:/Tools/garbro-mcp/garbro-mcp.cjs"
       ]
     }
   }
 }
 ```
 
-Before connecting the client, verify the bundle and roots:
+Before connecting the client, verify the bundle and temporary workspace:
 
 ```powershell
 node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --input-root games=D:/Games --output-root default=D:/garbro-output --doctor --json
+node C:/Tools/garbro-mcp/garbro-mcp.cjs --doctor --json
 ```
 
-See [configuration](docs/configuration.md) for multiple roots, source-checkout setup, and the
-filesystem policy.
+See [configuration](docs/configuration.md) for temporary-directory overrides, source-checkout
+setup, and the filesystem policy.
 
 ### Your first prompt
 
-Try a request that states the desired resources and output boundary:
+Give the game path and desired resources in the request. Delivery is a separate agent action:
 
 ```text
-Scan the Rewrite game under the configured games root. Identify archives containing audio entries,
-extract the audio into the default output root, and report any extraction or verification failures.
-Do not modify any game files.
+Scan the Rewrite game at D:/Games/Rewrite. Identify archives containing audio entries, extract the
+audio to temporary storage, and report any extraction or verification failures. Do not modify any
+game files. After I review the result, copy the selected files to D:/Exports/Rewrite-audio.
 ```
 
 The agent submits `scan`, `inspect`, and `extract` tasks through `submit_task`, polling each with
 `get_task`. Planning and post-extraction verification are mandatory internal extraction phases.
+The MCP does not choose a permanent destination or copy artifacts there; the calling agent follows
+the user's delivery instruction after extraction.
 
 ## Tools
 

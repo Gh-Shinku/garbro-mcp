@@ -19,8 +19,8 @@ These principles define the intended boundary of the MCP server.
   artifact has been independently reopened and verified at its supported evidence level.
 - **Explicit partial success:** Batch operations return per-item status and `hasFailures`; they do
   not hide failed entries behind a successful top-level call.
-- **Source files are immutable:** Tools read configured game roots and write only to separate,
-  configured output roots.
+- **Source files are immutable:** Tools read absolute game paths selected for the current request
+  and write extraction artifacts only to isolated temporary task directories.
 - **Bounded context:** Lists are paginated and responses have explicit byte budgets.
 - **Agent-agnostic contracts:** Tools use MCP structured content and do not depend on one client or
   language model.
