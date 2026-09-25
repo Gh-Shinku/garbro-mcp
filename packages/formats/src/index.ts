@@ -193,6 +193,7 @@ import { mgpkFormat } from "./manga-gamer/mgpk.js";
 import { kgImageFormat } from "./abogado/kg-image.js";
 import { graFormat, mblFormat } from "./marble/mbl-archive.js";
 import { moonhirFpkFormat } from "./moonhir/fpk-archive.js";
+import { lagImageFormat } from "./strikes/lag-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1142,6 +1143,7 @@ export * from "./malie/index.js";
 export * from "./manga-gamer/index.js";
 export * from "./marble/index.js";
 export * from "./moonhir/index.js";
+export * from "./strikes/index.js";
 export * from "./marron/index.js";
 export * from "./masys/index.js";
 export * from "./maybesoft/index.js";
@@ -1261,7 +1263,6 @@ export * from "./spack/index.js";
 export * from "./speed/index.js";
 export * from "./splush-wave/index.js";
 export * from "./squadrad/index.js";
-export * from "./strikes/index.js";
 export * from "./studio-ego/index.js";
 export * from "./studio-jikkenshitsu/index.js";
 export * from "./studio-sakura/index.js";
@@ -1354,6 +1355,7 @@ export function createDefaultRegistry(
 		mblFormat,
 		graFormat,
 		moonhirFpkFormat,
+		lagImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

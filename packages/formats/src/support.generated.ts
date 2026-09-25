@@ -16212,6 +16212,40 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "LAG",
+				class: "LagFormat",
+				source: "ArcFormats/Strikes/ImageLAG.cs",
+			},
+			localId: "strikes-lag-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head the other way round: the size, the scanline, the chunks and the flags",
+				"the depth, the palette and the alpha channel the flags name",
+				"the chunks, with a length whose highest bit names a stream of its own",
+				"the colour map a picture may carry in front of its chunks",
+				"the length of a scanline, counted in whole units of two hundred and fifty six bytes",
+				"the frame a row is packed with, and the copy that reads the byte it has just written",
+				"the four ways a run of a row is packed, with the sign of every value carried up",
+				"the sum of a row's own bytes, read back as the differences it stands for",
+				"the planes of a row and the order the pixels are written in",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"picture creation",
+				"pictures of eight or sixteen bits, which the reference detects and refuses while drawing",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show which of the three packings its rows use and how its chunks are cut",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "BMX",
 				class: "BmxOpener",
