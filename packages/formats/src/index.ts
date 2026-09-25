@@ -187,6 +187,7 @@ import { willWipImageFormat } from "./will/wip-image.js";
 import { clsImageFormat } from "./lambda/cls-image.js";
 import { rmskImageFormat } from "./silky/rmsk-image.js";
 import { czImageFormat } from "./key/cz-image.js";
+import { ncgImageFormat } from "./nekotaro/ncg-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1340,6 +1341,7 @@ export function createDefaultRegistry(
 		clsImageFormat,
 		rmskImageFormat,
 		czImageFormat,
+		ncgImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

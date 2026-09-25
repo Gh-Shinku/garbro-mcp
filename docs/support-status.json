@@ -16250,6 +16250,39 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "NCG",
+				"class": "NcgFormat",
+				"source": "Legacy/Nekotaro/ImageNCG.cs"
+			},
+			"localId": "nekotaro-ncg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the four byte head, every value in its own unit, and the screen it has to fit",
+				"the shape of the head telling a picture that carries no word of its own",
+				"the colour map of sixteen colours, keyed with the name of the engine",
+				"the two parts of the picture, in blocks of eight by two and of four by two",
+				"the four commands of the first part and the two of the second",
+				"the pattern read in front of each part, and the one the third walk reads as it fills",
+				"the blocks neither part drew, filled from behind the picture",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": [
+				"picture creation",
+				"a picture whose sides do not stand in whole blocks of four by two"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture, which would show how its two parts and their runs are cut in practice",
+				"whether the run down of the reference really steps a block's width to the left, which its own arithmetic says and a real file would settle"
+			]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "DAT/BLD",
 				"class": "BldOpener",
