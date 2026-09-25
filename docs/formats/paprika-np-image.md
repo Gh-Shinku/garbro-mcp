@@ -76,8 +76,16 @@ stand at nothing, and the places the second run leaves as they were. The picture
 two headers, its top down rows and its places) is pinned beside them, as are the head and the turning away
 of a mark of another engine, of a count of no frames, of a picture of no places and of a walk of no places.
 
+A second fixture reaches the token that rebuilds the tables (the word 272): two places of their own, then
+the token with the first of its sixteen counts at eight places and the rest of them at none, which leaves
+the pairs of the codes at eight places a pair and the places of the list two hundred and fifty six words
+apart, and then thirty places of the list the two sorts of the reference have rebuilt. The places those
+thirty ask for - the places nineteen and twenty of the rebuilt list - are the places 0xFF and 0xFE of a
+picture, and the fixture turns them over in the places of the picture the walk hands out.
+
 The checksum of the places of the picture was worked out with a transcription of the walk of the reference
 (`NpReader`, its two sorts and its ring); the places themselves are the ones the fixture asks for rather
 than a recording of what the walk did, so a slip in the tables, in the walk or in the ring shows up as a
-difference. The token that rebuilds the tables (the word 272) is not reached by a fixture yet: the walk
-carries it, and its place is on the list of what is left to check in `docs/support-status.json`.
+difference. The order the two sorts leave the list in, and therefore the two places the second fixture
+asks for, stands of the sorts themselves: no fixture can ask for it in the words of the format alone, so it
+is pinned as the reference leaves it.

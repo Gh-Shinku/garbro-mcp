@@ -95,6 +95,45 @@ function npFixtureStream(): Buffer {
 	return writer.bytes();
 }
 
+/** The token that rebuilds the codes of the two tables, and the counts of its sixteen pairs. */
+function resetToken(writer: BitWriter, counts: readonly number[]): void {
+	word(writer, 272);
+	for (const count of counts) {
+		writer.put(0, count);
+		writer.put(1, 1);
+	}
+}
+
+/** A token of a pair the reset has rebuilt: a prefix of four places and then the code of the pair. */
+function pairCode(
+	writer: BitWriter,
+	pair: number,
+	code: number,
+	width: number,
+): void {
+	writer.put(pair, 4);
+	writer.put(code, width);
+}
+
+/**
+ * The stream of a picture whose walk rebuilds its tables: two places of their own, then the token 272
+ * with the first of its sixteen counts at eight places and the rest of them at none, and then two places
+ * of the list the sorts have rebuilt - which stand at the places nineteen and twenty of it, the places
+ * 0xFF and 0xFE of a picture.
+ */
+function npResetFixtureStream(): Buffer {
+	const writer = new BitWriter();
+	word(writer, 0x41);
+	word(writer, 0x42);
+	resetToken(writer, [8, ...new Array(15).fill(0)]);
+	// Thirty places of the list the sorts have rebuilt, of the two places nineteen and twenty of it.
+	for (let i = 0; i < 30; i += 1) {
+		pairCode(writer, 0, 0 === i % 2 ? 19 : 20, 8);
+	}
+	word(writer, 273);
+	return writer.bytes();
+}
+
 /** `NpFormat.ReadMetaData`: the mark, a count of the frames and the head of the walk. */
 function buildNp(spec: {
 	stream: Buffer;
@@ -161,6 +200,29 @@ describe("Paprika NP picture", () => {
 			Buffer.alloc(4, 0),
 		);
 		expect(pixels[520 - 0x1c]).toBe(0);
+	});
+
+	it("rebuilds the codes of its tables when the stream asks it to", () => {
+		// The two sorts of the reference halve every count they take and leave the words of the list in
+		// the order they find, which no fixture can ask for in the words of the format alone: the places
+		// below are what the sorts of the reference leave at the places nineteen and twenty.
+		const stream = npResetFixtureStream();
+		expect(stream.subarray(0, 10).toString("hex")).toBe("6e6ffe007fff80980a00");
+		expect(crc32(stream) >>> 0).toBe(2182526574);
+		const file = buildNp({ stream, places: 0x1c + 16 });
+		const layout = readNpLayout(file);
+		if (!layout) throw new Error("no layout");
+		const pixels = unpackNpPicture(file, layout);
+		// The two places of the picture itself stand in front of the head the walk keeps, so the places
+		// of this picture are the places the rebuilt codes ask for.
+		expect(crc32(pixels) >>> 0).toBe(2610101650);
+		expect([...pixels]).toEqual([
+			0xff,
+			0xfe,
+			0xff,
+			0xfe,
+			...(new Array(12).fill(0) as number[]),
+		]);
 	});
 
 	it("reads the picture through the format", async () => {

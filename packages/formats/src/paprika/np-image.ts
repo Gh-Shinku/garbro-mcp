@@ -69,7 +69,7 @@ const RUN_COUNT_BASE = 4;
 const SHELL_GAP = 40;
 const SHELL_STEP = 3;
 const SORT_SCALE = 2;
-const SORT_OFFSET = -2;
+const SORT_OFFSET = -1;
 const UINT16 = 0xffff;
 const BITS_PER_BYTE = 8;
 const WORD_BITS = 32;
@@ -151,11 +151,13 @@ function sortPairs(
 		let saved = gap + 1;
 		if (index <= count) {
 			do {
-				let at = 4 * index;
+				// The reference walks its records in bytes, two places behind the pair they came from,
+				// which in the words of the flat array is one place behind.
+				let at = SORT_SCALE * index;
 				let place = index;
 				scratch[0] = readPair(words, offset + at);
 				if (index > gap) {
-					const step = 4 * gap;
+					const step = SORT_SCALE * gap;
 					do {
 						scratch[1] = readPair(words, offset + at - step);
 						let order = toInt16(scratch[1] >>> 16) - toInt16(scratch[0] >>> 16);
@@ -171,7 +173,7 @@ function sortPairs(
 					index = saved;
 				}
 				index += 1;
-				writePair(words, offset + place * 4, scratch[0] ?? 0);
+				writePair(words, offset + place * SORT_SCALE, scratch[0] ?? 0);
 				saved = index;
 			} while (index <= count);
 		}
