@@ -21667,5 +21667,34 @@ export const formatSupportCatalog = {
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "PT1",
+				class: "Pt1Format",
+				source: "ArcFormats/Ffa/ImagePT1.cs",
+			},
+			localId: "ffa-pt1-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the kind of it, the word of the engine, the box, the width and the height and the two counts of the walk",
+				"the frame of the walk the walk fills itself, of 0x1000 places",
+				"the walk of the places of the kinds of 0 and 1: the flag byte, the places of their own and the runs of the two bytes behind it, over the frame as a ring",
+				"the places of a picture of the kind of 1, three of them for every place of the walk",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the kinds of 2 and 3, whose walk is a predictor over the places of the row above, refused by name",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the walk of the kinds of 2 and 3, which is a predictor walk of its own with an escape to a run and is not carried here",
+			],
+		},
 	],
 } as const;

@@ -378,12 +378,6 @@ the first forty of them.
   drawing. The index of the format could be listed without either.
 
 
-- `PT1` (`ArcFormats/Ffa/ImagePT1.cs`, class `Pt1Format`, 642 lines) carries four versions of its walk. The
-  two oldest are LZSS walks over a frame of their own (`PopulateLzssFrame`, with the picture of the version
-  naming the places of the frame), which this project could carry on its own. The two newer ones walk a bit
-  stream whose `ReadNext` **re-reads** the letters of its reservoir wherever the deficit it fills is not a
-  whole number of bytes, so a fixture needs a writer that mirrors that reservoir letter for letter before
-  the walk can be checked. A staged port of the two LZSS versions is the way in.
 - `IMG` (`ArcFormats/ScrPlayer/ImageIMG.cs`, class `ImgFormat`) and `IMG2` (`ArcFormats/ScrPlayer/ImageI.cs`,
   class `Img2Format`) are the pictures of the ScrPlayer engine. Neither stands on anything outside the
   reference tree, but each walks its places through a table of its own that ships beside it: the first

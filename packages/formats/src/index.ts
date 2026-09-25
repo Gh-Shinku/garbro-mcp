@@ -338,6 +338,7 @@ import { wm2ImageFormat } from "./fc01/wm2-image.js";
 import { wmkImageFormat } from "./fc01/wmk-image.js";
 import { ffaFormat } from "./ffa/arc.js";
 import { ffaDatFormat, ffaJdatFormat } from "./ffa/dat.js";
+import { ffaPt1ImageFormat } from "./ffa/pt1-image.js";
 import { ffaWa1AudioFormat } from "./ffa/wa1-audio.js";
 import { ffaWa2AudioFormat } from "./ffa/wa2-audio.js";
 import { flyingShinePd3Format } from "./flying-shine/pd.js";
@@ -1978,6 +1979,7 @@ export function createDefaultRegistry(
 		ankhDatFormat,
 		shapeShifterBndFormat,
 		ffaDatFormat,
+		ffaPt1ImageFormat,
 		ffaJdatFormat,
 		malieLibFormat,
 		malieLibuFormat,

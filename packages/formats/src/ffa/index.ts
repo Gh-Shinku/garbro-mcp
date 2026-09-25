@@ -3,3 +3,4 @@ export * from "./dat.js";
 export * from "./wa2-audio.js";
 export * from "./wa-core.js";
 export * from "./wa1-audio.js";
+export * from "./pt1-image.js";
