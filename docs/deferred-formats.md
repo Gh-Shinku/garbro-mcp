@@ -359,10 +359,12 @@ the first forty of them.
   `packages/codecs/src/primel-sha256.ts` is the `Primel.SHA256` its keys stand of - a copy of the walk
   **whose round is not the one of the standard**, which that file writes out - and
   `packages/codecs/src/rc6.ts` is `GameRes.Cryptography.RC6`, the cipher of the scheme of `0x80000`, which
-  the published vectors of the cipher hold. What remains is the three `Primel1/2/3Encyption` ciphers
-  (`Encryption.cs`, 510 lines), AES in CFB mode with zero padding, and the `Range`, `Rle`, `Mtf` and `Lzss`
-  packed streams the flags select between (`Compression.cs`, 357 lines), and then the archive itself
-  (`ArcPCF.cs`, 259 lines). That is a staged port of the kind TLG6 and JBP took, not a single one.
+  the published vectors of the cipher hold. Three of the packed streams the flags select between have landed as
+  well, in `packages/codecs/src/primel-streams.ts`: the walks of `LzssPackedStream`, `RlePackedStream` and
+  `MtfPackedStream`, of which the first two read the count of the places they turn out from their own head and
+  the third is handed one, since the walk of the reference never stops on its own. What remains is the three
+  `Primel1/2/3Encyption` ciphers (`Encryption.cs`, 510 lines), AES in CFB mode with zero padding, the
+  `RangePackedStream` of `Compression.cs`, and then the archive itself (`ArcPCF.cs`, 259 lines). That is a staged port of the kind TLG6 and JBP took, not a single one.
 
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of

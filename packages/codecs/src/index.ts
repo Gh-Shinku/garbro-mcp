@@ -26,3 +26,4 @@ export * from "./fast-mersenne-twister.js";
 export * from "./primel-sha256.js";
 export * from "./rc6.js";
 export * from "./cmvs-md5.js";
+export * from "./primel-streams.js";
