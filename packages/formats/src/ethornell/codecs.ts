@@ -1,6 +1,6 @@
 import { GarbroError } from "@garbro-mcp/core";
 
-class MsbBitReader {
+export class MsbBitReader {
 	readonly #buffer: Buffer;
 	#byteOffset: number;
 	#bitOffset = 0;
@@ -111,7 +111,7 @@ export function decryptBseHeader(
 	return data;
 }
 
-function updateDscKey(state: { key: number; magic: number }): number {
+export function updateDscKey(state: { key: number; magic: number }): number {
 	const lowProduct = 20021 * (state.key & 0xffff);
 	let high = (state.magic | (state.key >>> 16)) >>> 0;
 	high = (Math.imul(high, 20021) + Math.imul(state.key, 346)) >>> 0;

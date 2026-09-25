@@ -306,6 +306,7 @@ import { mirisDatFormat } from "./eternity/miris.js";
 import { eternitySgfImageFormat } from "./eternity/sgf-image.js";
 import { BgiArcFormat, BurikoArcFormat } from "./ethornell/arc.js";
 import { ethornellBgiImageFormat } from "./ethornell/bgi-image.js";
+import { ethornellCbgImageFormat } from "./ethornell/cbg-image.js";
 import { bgiAudioFormat } from "./ethornell/bw-audio.js";
 import { eushullyAgfImageFormat } from "./eushully/agf-image.js";
 import { eushullyAlfFormat } from "./eushully/alf.js";
@@ -2420,6 +2421,7 @@ export function createDefaultRegistry(
 		saikiBmxImageFormat,
 		pandoraXl24ImageFormat,
 		jamesJmgImageFormat,
+		ethornellCbgImageFormat,
 		ethornellBgiImageFormat,
 		cswareB5ImageFormat,
 		ikuraDoImageFormat,

@@ -21542,5 +21542,37 @@ export const formatSupportCatalog = {
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "CompressedBG",
+				class: "CompressedBGFormat",
+				source: "ArcFormats/Ethornell/ImageCBG.cs",
+			},
+			localId: "ethornell-cbg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head: the size, the depth, the count of the stored places, the key and the two letters of the check",
+				"the key walk of the stored stream, with the sum and the exclusive or of the head checked",
+				"the weight table of 0x100 leaves and the join rule of the reference, both of its tie breaks",
+				"the code walk from the root down, a bit at a time",
+				"the runs of literal places and of places of nothing, with the counts of the walk",
+				"the average sampling of the picture, a place of a colour at a time",
+				"the pictures of eight, twenty four and thirty two places to a colour",
+			],
+			unsupported: [
+				"creating a picture",
+				"the second walk of the engine (version 2): its two weight tables, the offsets of its blocks of rows, its walk of a block and its alpha walk",
+				"the versions behind the second one",
+			],
+			remainingVerification: [
+				"the second walk of the engine",
+				"real-game GARbro differential output",
+			],
+		},
 	],
 } as const;
