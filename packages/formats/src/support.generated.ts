@@ -21217,5 +21217,37 @@ export const formatSupportCatalog = {
 				"a picture of the walk standing of the count of the places of the file of two places of them (of the places of the picture of more than 0x100 of them)",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "SPD",
+				class: "SpdFormat",
+				source: "ArcFormats/TopCat/ImageSPD.cs",
+			},
+			localId: "topcat-spd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of the picture, of the places of the file of the words of the walk of it and of the three marks of the engine",
+				"the walk of the places of the file, of the places of the file of a control place each and of the runs of the places of the picture",
+				"the walk of the places of the picture itself, of the places of the file of the places of the picture before the place of the walk and of the places of the file of the kind of the walk",
+				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture of the walk of a JPEG of the places of the file of it",
+				"a picture of the places of a colour of a place of it of no walk of the engine",
+				"a picture of a walk of the places of the file this project does not know",
+				"the walks of the runs of the picture (0, 0x100, 2 and 0x102)",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of the walks of the runs of the picture (0, 0x100, 2 and 0x102): the walk of the places of the file of this port stands of a run of the places of the picture before the places of the file of the walk of them there",
+				"a picture of the places of the file of the walk of the places of the picture itself of the places of the file of the table of the colours of it",
+			],
+		},
 	],
 } as const;
