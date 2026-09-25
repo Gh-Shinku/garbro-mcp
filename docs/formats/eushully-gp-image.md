@@ -44,11 +44,11 @@ carries none, and the reference hands it over without one.
 
 ## Verification
 
-Five tests over synthetic fixtures (`tests/formats/eushully-gp-image.test.ts`): the head and the pictures it
+Seven tests over synthetic fixtures (`tests/formats/eushully-gp-image.test.ts`): the head and the pictures it
 turns away; the places of a picture that stand as they are, both as the walk hands them over and as a bitmap
 holds them; a picture of eight places to a byte, with the colour map of a bitmap around them; elements holding
 two places each, of a colour map read the other way round; a slice naming the places behind it and the places
-in front of it, of a colour counted from the end of the colour map; and a picture told by the shape of its
-head alone. The alpha channel of a picture and the colour map of one that stands eight places to a byte are
-read by the port as they stand in the reference, but no fixture of them was finished here: both stand in the
-places still to be verified of the record of this format.
+in front of it, of a colour counted from the end of the colour map; a picture told by the shape of its
+head alone; and both the alpha channel of a picture that carries one - with the picture whose alpha channel
+names places other than its own, which carries none - and the colour map of one that stands eight places to a
+byte, handed over as a bitmap with the colour map of the file around it.

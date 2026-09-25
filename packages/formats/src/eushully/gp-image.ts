@@ -290,6 +290,15 @@ export function unpackGpPicture(data: Buffer, layout: GpLayout): GpPicture {
 			: METHOD_PALETTE === layout.method
 				? readPalettePicture(data, at, layout)
 				: readSlicePicture(data, at, layout);
+	// A picture of eight places to a byte and no alpha channel of its own stands as it is, the colour map of
+	// the file beside it; every other way of drawing one stands four bytes to a place.
+	if (
+		METHOD_PALETTE === layout.method &&
+		BITS_8 === layout.bitsPerPixel &&
+		!layout.hasAlpha
+	) {
+		return { kind: "indexed8", pixels: drawn.pixels };
+	}
 	if (!layout.hasAlpha) {
 		return { kind: "bgr32", pixels: drawn.pixels };
 	}

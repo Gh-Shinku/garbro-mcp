@@ -19308,13 +19308,13 @@ export const formatSupportCatalog = {
 				"the colour map of a picture, read the way the reference's own viewer holds it",
 				"the alpha channel of a picture that carries one, and a picture whose alpha channel names other places",
 				"the bitmap the reference hands over",
+				"the alpha channel of a picture that carries one, and a picture whose alpha channel names places other than its own",
+				"a picture of eight places to a byte handed over with the colour map of the file",
 			],
 			unsupported: ["picture creation"],
 			remainingVerification: [
 				"real-game GARbro differential output",
 				"a real picture, which would show which of the three ways of the reference draws it",
-				"the alpha channel of a picture, whose walk stands in the port and whose fixture was not finished",
-				"a picture of eight places to a byte handed to a bitmap, the colour map of the file standing beside it",
 			],
 		},
 		{
