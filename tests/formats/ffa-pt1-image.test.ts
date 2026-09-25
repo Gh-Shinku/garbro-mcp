@@ -195,6 +195,51 @@ describe("FFA System PT1 picture", () => {
 		]);
 	});
 
+	it("walks every branch of the places of the newer kinds", () => {
+		// A picture of four by four pixels whose every place stands of a step of its own, so that the
+		// branches of the walk the picture of two by two pixels above does not reach are checked as
+		// well. The stream is written from the steps, lowest place of a byte first, and the pixel of
+		// every place stands of the step of it and of the places it reads:
+		//
+		//   place 1  a difference of each colour from the place to its left, of one, nothing and minus
+		//            one, so it is 02 02 02
+		//   place 2  the place to its left again
+		//   place 3  a pixel of its own, aa bb cc
+		//   place 4  the first of row one: a difference of each colour from the place above, of
+		//            nothing, two and nothing, so it is 01 04 03
+		//   place 5  the gradient of the left, the up-left and the up places with a difference of
+		//            three, so 01-01+02+3, 04-02+02, 03-03+02 is 05 04 02
+		//   place 6  the same gradient without a difference, which is 05 04 02 as well
+		//   place 7  the place to its left again, of the third step of two places
+		//   place 8  the first of row two: a pixel of its own, 11 22 33
+		//   place 9  a pixel of its own, of the second step of two places, 44 55 66
+		//   place 10 a difference from the place to its left, of nothing, nothing and one, so 44 55 67
+		//   place 11 the up-left pixel, of the first step of four places, which is place 7
+		//   place 12 the first of row three: the place above, which is place 8
+		//   place 13 the pixel above, of the second step of four places, which is place 9
+		//   place 14 a difference from the up-left pixel, of one for every colour, so 45 56 67
+		//   place 15 a difference from the pixel above, of two for every colour, so 07 06 04
+		const stream = Buffer.from(
+			"0102032aa3bacb6c1bbe4c84c80c125599d10208082409c4cc00",
+			"hex",
+		);
+		const file = buildPt1({
+			kind: 2,
+			stream,
+			width: 4,
+			height: 4,
+			unpackedSize: 48,
+		});
+		const layout = readPt1Layout(file);
+		if (!layout) throw new Error("no layout");
+		expect([...unpackPt1Picture(file, layout)]).toEqual([
+			0x01, 0x02, 0x03, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0xaa, 0xbb, 0xcc,
+			0x01, 0x04, 0x03, 0x05, 0x04, 0x02, 0x05, 0x04, 0x02, 0x05, 0x04, 0x02,
+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x44, 0x55, 0x67, 0x05, 0x04, 0x02,
+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x45, 0x56, 0x67, 0x07, 0x06, 0x04,
+		]);
+	});
+
 	it("reads the picture through the format", async () => {
 		const archive = buildPt1({
 			kind: 0,

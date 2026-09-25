@@ -79,6 +79,10 @@ places, and the walk tells each one of them of the lowest places of the reservoi
   more: **0** repeats the up-left pixel, **8** the pixel above, and any other value is a difference of each
   colour from the pixel above, of the up-left pixel when the value is **4**.
 
+Every place of the second step of a walk is **taken whether it is set or not**: the reference shifts the
+reservoir of the second step before it looks at every place behind it, of the row and of the gradient alike,
+and the places of the step of two places are read on from there.
+
 A difference of a colour is a code of its own, read one code at a time from the lowest places of the
 reservoir. Codes of three to fifteen places name the differences of minus one to minus twelve and of one
 to twelve, and a pattern no code names is the escape of thirteen places that stands for minus thirteen:
@@ -127,6 +131,13 @@ stream. The bit pattern of **every** difference of the walk is pinned beside it 
 escape of the top count included - read off the ladder of the reference rather than off this port. The
 alpha of the kind of three is pinned with the four places its own walk turns out, and the bitmap of the
 format is read back for a picture of the kind of 0 and for one of the kind of three.
+
+A picture of four by four pixels pins the branches the smaller one does not reach: a stream written from a
+step of its own for every place, of a difference from the place to its left, of one from the place above, of
+the gradient with and without a difference, of both steps of two places, of both runs of the four-place step
+and of a four-place value that is neither of them. The places of that picture are read off the steps of the
+stream by hand, which the comment of the test writes down, so the test is what found the shift of the second
+step of a place: it stood in one branch of the walk alone before it was fixed.
 
 The head, the refusal of a kind this engine has none of, of a word that is not `-1`, of a count of places
 that stands of another picture, of a file that ends before its packed places and of a picture of the kind

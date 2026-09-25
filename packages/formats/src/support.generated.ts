@@ -21689,12 +21689,10 @@ export const formatSupportCatalog = {
 				"the gradient of the left, the up-left and the up places, with and without a difference, and the repeats of the left, the up and the up-left pixel",
 				"every difference of the walk: the twenty six codes of one to fifteen places and the escape of the top count",
 				"the walk of the alpha of the kind of three, of the first kind, and the picture of thirty two bits a place it hands over",
+				"every branch of the walk of a place, of a picture whose every place stands of a step of its own: the differences from the left, from above and from the up-left pixel, the gradient with and without a difference, both steps of two places and both runs of the four-place step",
 			],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the four-place step of a place that repeats the up-left pixel or the pixel above, and the step of a value of 4, which the fixture does not reach",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 	],
 } as const;

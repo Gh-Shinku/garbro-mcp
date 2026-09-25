@@ -427,6 +427,8 @@ export function unpackPt1Predictor(
 					}
 					at += COLOR_PLACES;
 				} else {
+					// The reference shifts the place of the second step whether it is set or not.
+					bits.take(1);
 					const step = bits.peek(2);
 					if (STEPS_3 === step) {
 						bits.take(2);
