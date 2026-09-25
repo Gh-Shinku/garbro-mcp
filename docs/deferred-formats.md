@@ -370,8 +370,17 @@ the first forty of them.
   `Primel2Encyption` and `Primel3Encyption`, of one block of sixteen places, of a key schedule that runs the
   words of the key through a table of the places of a byte of its own, and of a chaining place that feeds
   back its own input - so the engine reads an archive of the direction a cipher text of it stands in, and the
-  walks are not involutions. What remains is AES in CFB mode with zero padding, and then the archive itself
-  (`ArcPCF.cs`, 259 lines).
+  walks are not involutions. The AES of the last scheme has landed as well, in
+  `packages/codecs/src/aes.ts`. The reference has no AES of its own - it hands the key and the chaining
+  place to the platform's `Rijndael` - so the block and the walk stand here of the standard and are held to
+  the vectors of the standard: the appendix of FIPS-197 for the block and the appendix of SP 800-38A for the
+  walk. The walk is the **byte wise** CFB, of the default feedback size of the platform rather than of the
+  sixteen places of the block, and its chaining place is the cipher text the walk turns out. The reference
+  stands of `PaddingMode.Zeros` as well, which on a stream of that platform drops the zero places of the end
+  of a run; this port leaves them where they stand, since the engine's own readers stop at the count of the
+  places of an entry. What remains of the archive is `ArcPCF.cs` itself, 259 lines, of the two schemes of it
+  (the older over the SHA-256 of the engine, the newer over the SHA-256 of the standard), its header, its
+  index and the walk of its entries.
   
   The fixtures of the four packed streams and of the three ciphers stand of the terms of those walks rather
   than of a stream out of an archive: the streams turn a run of places out of a head written for them, and

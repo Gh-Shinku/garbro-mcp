@@ -29,3 +29,4 @@ export * from "./cmvs-md5.js";
 export * from "./primel-streams.js";
 export * from "./primel-cipher-tables.js";
 export * from "./primel-cipher.js";
+export * from "./aes.js";
