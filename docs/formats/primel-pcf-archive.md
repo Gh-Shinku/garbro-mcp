@@ -88,6 +88,12 @@ hashes in `primel-sha256.ts` and `crypto` of the platform.
 `tests/formats/primel-pcf-archive.test.ts` builds the archives it reads, of the head of the reference, the
 block of the entries and an index behind them: an archive whose places stand as they are (of its listing and
 of the reading of two entries), an archive whose record names the cipher of AES (of the walk of AES worked
-out in the test, the other way), and an archive whose index the head names the cipher of `RC6` for - of the
-walk of `RC6` backwards, which stands of the block of the cipher over the chaining place. The head, a count
-of no entries, an index past the file and a mark of another engine are pinned beside them.
+out in the test, the other way), an archive whose index the head names the cipher of `RC6` for - of the walk
+of `RC6` backwards, which stands of the block of the cipher over the chaining place - and an archive whose
+records name the packed streams, of the window walk and of the walk of a run of one place behind the table of
+the places of a byte. That last stream is a piece of work of its own: the walk of the table of the places of
+a byte turns a picture **out of the run of those places rather than out of the places themselves**, of the
+place of every place of the run within a stable count of them by their own place, so the fixture works out
+the places of the run, the place the walk begins at and the picture of it together, over a picture of places
+that are all of them different. The head, a count of no entries, an index past the file and a mark of another
+engine are pinned beside them.

@@ -21973,12 +21973,14 @@
 				"the key and the chaining place a scheme spells out of a seed of eight places",
 				"the cipher of the flags: the three of the engine, RC6, and AES of a segment of one byte",
 				"the packed streams of the flags: the range walk, the walk of a run of one place and the table of the places of a byte, and the window walk",
-				"the count an entry unpacks to"
+				"the count an entry unpacks to",
+				"the packed streams a record stands of behind its cipher: the window walk, and the walk of a run of one place behind the table of the places of a byte"
 			],
 			"unsupported": ["archive creation"],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the entry flag paths of the packed streams and of the ciphers of the engine itself, which the fixtures do not reach: the fixtures carry the walk of AES over an entry and the walk of RC6 over an index",
+				"the cipher of the engine itself over an entry or an index, which no fixture reaches: the fixtures carry the walk of AES over an entry and the walk of RC6 over an index",
+				"the range walk of a record, of the flag of its low places, which no fixture reaches: the reference carries no writer of that walk",
 				"the newer scheme over the SHA-256 of the standard, which no fixture reaches"
 			]
 		}
