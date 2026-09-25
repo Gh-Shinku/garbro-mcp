@@ -20067,5 +20067,31 @@ export const formatSupportCatalog = {
 				"a wrapped archive of a game whose phrase is not the one the reference falls back to",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "MIA",
+				class: "MiaFormat",
+				source: "Legacy/Miami/ImageMIA.cs",
+			},
+			localId: "miami-mia-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head a picture is told by, which names its own kind of picture",
+				"the colour map of a picture, green, red and blue to a colour",
+				"the places of a picture drawn two of them to a byte",
+				"the bitmap the reference hands over",
+			],
+			unsupported: ["picture creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the frame of a picture and the groups drawn out of its pattern, whose walk stands in the port",
+				"the groups standing as the places of another one, out of the four places behind the walk and out of the group behind it turned about",
+			],
+		},
 	],
 } as const;
