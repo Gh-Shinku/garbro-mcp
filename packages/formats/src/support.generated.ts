@@ -17129,6 +17129,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CMB",
+				class: "CmbOpener",
+				source: "Legacy/PineSoft/ArcCMB.cs",
+			},
+			localId: "pinesoft-cmb-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the table of the places of the entries of the archives of the game",
+				"the rule that tells an archive by the number of its name",
+				"the last place of an archive, held to the end of the archive itself",
+				"the names of the entries, counted from the place of each of them",
+				"the four kinds of entry told from the words they open with",
+				"a picture of the engine, handed over behind the head of its own length",
+				"the walk the packed entries are read with",
+			],
+			unsupported: [
+				"archive creation",
+				"the tables of other games than the one the reference names",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an archive of the game the table names, whose rows stand in tens of megabytes",
+				"the pictures of the engine themselves, whose own decoder stands in another row of the gap",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "FLK",
 				class: "FlkOpener",
 				source: "Legacy/Liddell/ArcFLK.cs",
