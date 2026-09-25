@@ -20184,6 +20184,38 @@
 				"a run whose places stand short of the file",
 				"a colour map of a depth the reference does not know"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "BMP/FC",
+				"class": "FcFormat",
+				"source": "Legacy/Mink/ImageFC.cs"
+			},
+			"localId": "mink-fc-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, of the eight kinds this engine names",
+				"the bits of a picture, standing in words of four bytes from the highest place down",
+				"the runs of the bits, whose first place standing clear ends the count",
+				"the places of a picture taken from the place before them and from the place above",
+				"the places taken from the place above and to the right of them",
+				"a place of three colours standing as it stands in the bits",
+				"a place the picture takes in a run of its own",
+				"the alpha of a picture of four places to a pixel",
+				"a picture of the second kind, whose colours stand below the place above them",
+				"the bitmap the reference hands over, whose rows stand from the bottom of the picture up"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the places taken from the place above and to the left of them",
+				"the runs of the alpha naming more places than the picture holds"
+			]
 		}
 	]
 }
