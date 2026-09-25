@@ -41,8 +41,14 @@ These archives carry no usable key; the reference asks the user, and its own def
 A port cannot read such a file without a key the file does not contain, so a port would only be able to
 open archives that the shipped defaults already cover.
 
-- `ACV` (`ArcFormats/NonColor/ArcACV.cs`, `QueryScheme` at line 51) and `DAT/MINATO`
-  (`ArcFormats/NonColor/ArcMinato.cs`, `QueryScheme` at line 68, with `NcSchemeCrc32` beside it).
+- `ACV` (`ArcFormats/NonColor/ArcACV.cs`, `AcvOpener`) and `DAT/MINATO` (`ArcFormats/NonColor/ArcMinato.cs`,
+  `MinatoDatOpener`) both stand of a scheme of `ArcFormats/NonColor/ArcDAT.cs`: `QueryScheme` (there, at
+  line 246) looks the title of the archive up in `ArcDatScheme.KnownSchemes` and otherwise takes
+  `options.Scheme`, and the shipped default hands over `new Dictionary<string, Scheme>()` (at line 244) - an
+  **empty** dictionary - so no scheme is found and `TryOpen` returns nothing for every file. The count checks
+  in front of that are all the two readers do on their own: `count ^ 0x8B6A4E5F` at offset 4 for `ACV`, and
+  the big endian count at offset 0 of a `.dat` for `DAT/MINATO`, whose index then stands of CRC32 hashes
+  (`NcSchemeCrc32`) rather than of the folding hash of the older reader.
 - `PKZ` (`ArcFormats/Sviu/ArcPKZ.cs`), `PKG/2` (`ArcFormats/Yatagarasu/ArcPKG2.cs`),
   `ADS` (`ArcFormats/BlackRainbow/ArcADS.cs`), `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`),
   `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
@@ -216,8 +222,16 @@ further than the reference's own list of them.
   tiled picture of the same engine.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library.
 - `AIFF` (`ArcFormats/AudioAIFF.cs`) and `WMA` (`ArcFormats/AudioWMA.cs`) hand theirs to NAudio.
-- `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries
-  open through an `ISA` archive) depend on external readers in the same way.
+- `OPUS` (`Experimental/Opus/AudioOPUS.cs`) hands its stream to an Opus library.
+- `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, class `PngIsmFormat`) has no layout of its own to port: it is a
+  **plain PNG**, whose head the reference reads through `Png.ReadMetaData`, and whose picture it takes from
+  the platform's own decoder (`PngBitmapDecoder`), of one twist - where the decoded frame stands of four
+  places a colour its alpha is **inverted**, place by place (`pixels[i] ^= 0xFF`). The picture is gated on
+  the archive it is read out of: `ReadMetaData` returns nothing unless `VFS.CurrentArchive.Tag` reads `ISA`,
+  which is the archive of `ArcFormats/Ism/ArcISA.cs` this project reads (`ism-isa`), and `Write` throws, so
+  the reference never turns the picture into bytes. There is therefore nothing for a port to lay out: the
+  places of a `.png` entry of an ISA archive stand as the file they were, which the general PNG picture of
+  this project (`gameres-png-image`) reads, exactly as `PngFormat` reads them in the reference.
 - `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
   which would need an XML walk this project does not have. `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`)
   splits one such picture into its frames and layers, so it stands on the same walk and is not a
