@@ -20283,5 +20283,33 @@ export const formatSupportCatalog = {
 				"a picture of the kind `diff` standing of a picture of the other kind",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "MI3",
+				class: "Mai3Format",
+				source: "Legacy/Izumi/ImageMAI3.cs",
+			},
+			localId: "izumi-mai3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, and the ones it turns away",
+				"the colour map of a picture, of four places to a colour",
+				"the greys a picture stands of where its head names no colour map of its own",
+				"the bits of a picture, standing of words of two places of the lowest place first",
+				"the buffer of a picture, of four planes standing over each other",
+				"a line standing of the places behind it, of the count of the places behind the run",
+				"the places of a picture, handed over as a bitmap of four places to a pixel",
+			],
+			unsupported: ["creating a picture"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a line standing of the places of a colour, of the place of the line above it",
+			],
+		},
 	],
 } as const;

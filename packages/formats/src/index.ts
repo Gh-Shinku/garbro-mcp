@@ -86,6 +86,7 @@ import { muwAudioFormat } from "./artel/muw-audio.js";
 import { pfdFormat } from "./artel/pfd.js";
 import { mjaFormat } from "./artemis/mja.js";
 import { iptImageFormat } from "./artemis/ipt-image.js";
+import { mai3ImageFormat } from "./izumi/mai3-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1009,6 +1010,7 @@ export * from "./arcx/index.js";
 export * from "./ark/index.js";
 export * from "./artel/index.js";
 export * from "./artemis/index.js";
+export * from "./izumi/index.js";
 export * from "./ast/index.js";
 export * from "./astronauts/index.js";
 export * from "./asura/index.js";
@@ -1469,6 +1471,7 @@ export function createDefaultRegistry(
 		gsdFormat,
 		mjaFormat,
 		iptImageFormat,
+		mai3ImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
