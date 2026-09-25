@@ -318,10 +318,10 @@ export function reverseCbgAverageSampling(
 }
 
 /**
- * `CbgReader.UnpackV1`: the weights of the tree stand at the head of the walked stream and the coded places
- * behind them. The reference reads the weights from the walked stream and the codes through the bit reader
- * of the picture, which by then stands past that stream; this port reads the codes from the walked stream
- * itself, which is where the sum and the exclusive or of the head say they stand.
+ * `CbgReader.UnpackV1`: the weights of the tree stand in the walked stream of the head and the coded places
+ * stand behind that stream, in the clear. The picture itself is the bit stream the reference reads the
+ * codes through, and the reference leaves it standing right behind the walked stream of the head, so the
+ * codes begin at the place behind it.
  */
 export function unpackCbgFirstWalk(
 	data: Buffer,
@@ -337,7 +337,7 @@ export function unpackCbgFirstWalk(
 		at = weight.at;
 	}
 	const nodes = buildCbgHuffmanTree(weights);
-	const bits = new MsbBitReader(payload, at);
+	const bits = new MsbBitReader(data, HEADER_SIZE + header.encodedLength);
 	const packed = Buffer.alloc(header.intermediateLength, 0);
 	for (let i = 0; i < packed.length; i += 1) {
 		packed[i] = decodeCbgToken(bits, nodes) & BYTE_MASK;

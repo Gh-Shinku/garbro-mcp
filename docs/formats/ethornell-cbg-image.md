@@ -36,8 +36,11 @@ and a stream that does not stand is refused.
 
 ## The first walk
 
-The walked stream holds the weights of the leaves first: 0x100 counts, seven bits to a letter with the
-high bit of the last one clear. The weights are joined two at a time, the lightest first and the lower
+The walked stream of the head holds the weights of the leaves: 0x100 counts, seven bits to a letter with
+the high bit of the last one clear. The coded places stand **behind** that stream, in the clear: the
+picture of the reference is itself the bit stream its tree walk reads, and it leaves that stream standing
+right behind the walked stream of the head, which the port's bit reader follows. Nothing behind the head is
+keyed, so the sum and the exclusive or of the head cover the weights alone. The weights are joined two at a time, the lightest first and the lower
 place winning a draw, until the joined weight reaches the sum of the weights of the leaves; the last node
 of the run is the root. A place is then read a bit at a time from the root down, and the node it lands on
 is the place of the walked stream. `HuffmanTree` is written twice in the reference: the second walk takes
@@ -73,7 +76,7 @@ region of its own, so a port can walk them one after another and lay down the sa
 
 The second walk is refused with `UNSUPPORTED_FEATURE`, both in the record of this format and in the tests.
 
-## Tests and deviations
+## Tests
 
 `tests/formats/ethornell-cbg-image.test.ts` builds its fixtures out of the reference's own head, key walk
 and weight tables: the weights of a tree of one weight each, the places of the walked stream coded by
@@ -85,8 +88,8 @@ colour and one of four, a stream whose sum does not stand, a key of the head tha
 the second walk and of a count of the stored stream below the 0x80 of the reference, and the heads the
 reference cannot read.
 
-One deviation stands in the reading of the codes of the first walk. The reference reads the weights from
-the walked stream and then reads the codes through the bit reader of the picture itself, whose stream
-stands past the walked stream by then; this port reads the codes from the walked stream, right behind the
-weights, which is where the sum and the exclusive or of the head say they stand. The comment on
-`unpackCbgFirstWalk` records the same.
+The fixtures then place the weights inside the walked stream of the head (keyed, and covered by the sum
+and the exclusive or) and the coded places behind it in the clear, which is what the reference reads: its
+`ReadEncoded` walks the stream of the head and its tree walk then reads bits through the picture itself,
+whose stream stands right behind that stream by then. The comment on `unpackCbgFirstWalk` records the
+same.

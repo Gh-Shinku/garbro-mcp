@@ -102,13 +102,16 @@ function buildCbg(spec: CbgSpec): Buffer {
 		if (code === undefined) throw new Error(`no code for ${symbol}`);
 		for (const letter of code) bits.push("1" === letter ? 1 : 0);
 	}
+	// The walked stream of the head holds the weights of the leaves alone; the coded places stand behind it
+	// in the clear, which is where the bit reader of the picture finds them.
 	const payload: number[] = [...weightsOf(spec.leaves)];
+	const coded: number[] = [];
 	for (let at = 0; at < bits.length; at += 8) {
 		let value = 0;
 		for (let i = 0; i < 8; i += 1) {
 			value = (value << 1) | (bits[at + i] ?? 0);
 		}
-		payload.push(value);
+		coded.push(value);
 	}
 	const key = spec.key ?? 0x12345678;
 	let sum = 0;
@@ -135,7 +138,7 @@ function buildCbg(spec: CbgSpec): Buffer {
 		// puts it on.
 		stored[at] = ((payload[at] ?? 0) + updateKey(state)) & 0xff;
 	}
-	return Buffer.concat([header, stored]);
+	return Buffer.concat([header, stored, Buffer.from(coded)]);
 }
 
 async function pictureOf(archive: Buffer): Promise<Buffer> {
@@ -165,9 +168,8 @@ describe("Ethornell compressed picture", () => {
 		expect(header?.bitsPerPixel).toBe(8);
 		expect(header?.version).toBe(1);
 		expect(header?.key).toBe(0x12345678);
-		// The weights of the six leaves stand as a letter each and the five coded places need two bytes
-		// behind them.
-		expect(header?.encodedLength).toBe(0x102);
+		// The weights of the six leaves stand as a letter each inside the walked stream of the head.
+		expect(header?.encodedLength).toBe(0x100);
 	});
 
 	it("joins the weights of the leaves the way the reference does", () => {
