@@ -19464,6 +19464,38 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PMS",
+				"class": "PmsFormat",
+				"source": "ArcFormats/AliceSoft/ImagePMS.cs"
+			},
+			"localId": "alicesoft-pms-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the PM word, the byte behind it and the head of the picture",
+				"the two depths of eight and sixteen bits",
+				"the runs of a sixteen bit picture, all eight of them",
+				"the words built of two bytes that carry five, six and five bits",
+				"the runs of an eight bit picture, whose control byte is the pixel itself",
+				"the runs copied from the rows above, which the narrower depth copies progressively",
+				"the colour map of an eight bit picture and the alpha plane of a sixteen bit one",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": [
+				"picture creation",
+				"a picture whose depth is neither eight nor sixteen bits"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture, which would show which of the runs a game reaches for and how its alpha plane is laid out"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "PGX",
 				"class": "PgxFormat",
 				"source": "ArcFormats/Glib2/ImagePGX.cs"
