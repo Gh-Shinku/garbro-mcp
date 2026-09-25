@@ -371,9 +371,12 @@ the first forty of them.
   crops of a **sibling PNG** whose name is the base name of the archive (the reference finds it through
   `VFS`, so it may sit inside another archive). The composite is then drawn with **WPF**: a
   `DrawingVisual`, thirty two by thirty two `CroppedBitmap` crops and a `RenderTargetBitmap` of 1920 by
-  1080. A port would need a PNG decoder, which this project does not carry yet (it writes PNGs through
-  `shared/png-image.ts` but reads only the head fields), and a source-over compositor in place of the WPF
-  drawing. The index of the format could be listed without either.
+  1080. Both of the things a port of it stands of are now in hand - the walk of the places of a PNG is
+  `shared/png-image.ts`, which reads a graphic rather than its head fields alone, and the lookup of a
+  sibling by the stem of a name is `shared/companion.ts` (`listCompanionFiles`), which is what the port of
+  `DIF/MnV` stands of - so what stands between this row and a port is a **source-over compositor** in place
+  of the WPF drawing: the places of a crop of the sibling are drawn over the places of the picture at the
+  places the index names, of the alpha of the graphic where it carries one.
 
 
 - `IMG` (`ArcFormats/ScrPlayer/ImageIMG.cs`, class `ImgFormat`) and `IMG2` (`ArcFormats/ScrPlayer/ImageI.cs`,
