@@ -88,6 +88,7 @@ import { mjaFormat } from "./artemis/mja.js";
 import { iptImageFormat } from "./artemis/ipt-image.js";
 import { mai3ImageFormat } from "./izumi/mai3-image.js";
 import { abcImageFormat } from "./sarang/abc-image.js";
+import { exhibitGyuImageFormat } from "./exhibit/gyu-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1259,6 +1260,7 @@ export * from "./risa/index.js";
 export * from "./rits/index.js";
 export * from "./rpg-maker/index.js";
 export * from "./sarang/index.js";
+export * from "./exhibit/index.js";
 export * from "./rpm/index.js";
 export * from "./rsystem/index.js";
 export * from "./rugp/index.js";
@@ -1477,6 +1479,7 @@ export function createDefaultRegistry(
 		iptImageFormat,
 		mai3ImageFormat,
 		abcImageFormat,
+		exhibitGyuImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,

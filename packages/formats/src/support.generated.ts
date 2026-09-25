@@ -20403,5 +20403,38 @@ export const formatSupportCatalog = {
 				"a texture behind the walks standing of the word of the walks of the engine itself (the word stands of the places `DD)` and not of the places of `DDS `)",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GYU",
+				class: "GyuFormat",
+				source: "ArcFormats/ExHibit/ImageGYU.cs",
+			},
+			localId: "exhibit-gyu-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and its colour map",
+				"the obfuscation of the places of a picture, taken away by the twister the key seeds",
+				"colour data stored as it stands",
+				"the runs of the engine, of a count of its own and of a count of places of its own",
+				"colour data standing of a stream of the engine",
+				"a picture of eight, of twenty four and of thirty two places to a place",
+				"the alpha behind the colours of a picture, of the places of it of a count of sixteen",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture carrying no key of its own, which the reference asks the user for",
+				"a colour map of more than two hundred and fifty six colours",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the alpha of a picture standing of a stream of the engine",
+				"the alpha of a picture of a kind standing as it stands",
+			],
+		},
 	],
 } as const;
