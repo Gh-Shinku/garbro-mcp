@@ -526,6 +526,11 @@ import { lunePackFormat } from "./lune/pack.js";
 import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { maiFormat } from "./mai/arc.js";
+import {
+	maiAmImageFormat,
+	maiCmImageFormat,
+	maiMskImageFormat,
+} from "./mai/image-mai.js";
 import { maikaBkFormat } from "./maika/bk.js";
 import { maikaMik01Format } from "./maika/mik01.js";
 import { maikaMk2Format } from "./maika/mk2.js";
@@ -1828,6 +1833,9 @@ export function createDefaultRegistry(
 		amusePacFormat,
 		scrPlayerPakFormat,
 		maiFormat,
+		maiCmImageFormat,
+		maiAmImageFormat,
+		maiMskImageFormat,
 		arFormat,
 		activeSoftEd8ImageFormat,
 		activeSoftEdtImageFormat,
