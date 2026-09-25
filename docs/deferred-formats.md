@@ -141,6 +141,13 @@ open archives that the shipped defaults already cover.
   `new Dictionary<string, string>()` in the source and filled from a data file, and the payloads of the
   archives of that engine are **bzip2** streams this project has no decoder for.
 
+- `NPK` (`ArcFormats/NitroPlus/ArcNPK.cs`, class `NpkOpener`, signature `NPK2`): the whole index is
+  **AES-CBC** encrypted under a key of the game of the archive. `TryOpen` asks `QueryEncryption` for it,
+  which looks the file name up in `KnownKeys` - a dictionary the source ships **empty** - and gives up
+  without a key (`if (null == key) return null`), so with no key the index cannot even be located: a
+  stock build reads none of these archives. The payloads are raw deflate streams before that (`NpkStream`),
+  which this project already reads, and an entry of a single uncompressed segment is a plain stream.
+
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
@@ -325,6 +332,26 @@ like.
   block shuffled plane, a per channel block map, the JBP form, and four XORed channels. It stands on the
   shared `PbReaderBase` of `ImagePB.cs`, whose LZSS and JBP walks this project already carries for PB3,
   so the remaining work is the four variants and the header.
+
+- `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`, class `LayOpener`, extension gated on `.lay`): the index
+  of the engine is plain - a count of the layers, a count of the tile coordinates, then a record per layer
+  (a word of its own, a first and a count) and a run of four words per coordinate - and the tiles are
+  crops of a **sibling PNG** whose name is the base name of the archive (the reference finds it through
+  `VFS`, so it may sit inside another archive). The composite is then drawn with **WPF**: a
+  `DrawingVisual`, thirty two by thirty two `CroppedBitmap` crops and a `RenderTargetBitmap` of 1920 by
+  1080. A port would need a PNG decoder, which this project does not carry yet (it writes PNGs through
+  `shared/png-image.ts` but reads only the head fields), and a source-over compositor in place of the WPF
+  drawing. The index of the format could be listed without either.
+- `GPH` (`ArcFormats/elf/ImageGPH.cs`, 442 lines): a four bit image of the elf engine. Its head is plain
+  and its walk is a self contained bespoke Huffman code - two trees (tokens and offsets) built from a bit
+  stream, a two hundred and fifty six entry offset table and a 0x1400 byte sliding window - so the port
+  itself is a single file. What holds it back is the fixture: the reference carries no writer, so
+  checking it needs a matching encoder for the tree shape, which is a larger piece of work than the
+  reader.
+- `PIC/NP` (`Legacy/Paprika/ImageNP.cs`, class `NpFormat`, 412 lines) has the same shape as `GPH`: a plain
+  head (a word of its own, a width and a height, twenty four bits a place) and a bespoke walk - an
+  `UnpackBits` run of literal places and a block coded LZ with two tables built from the stream - and no
+  writer to check the reader against. The signature is a word that reads `NP\x01`.
 
 ## Two engines can share a tag and a class name
 
