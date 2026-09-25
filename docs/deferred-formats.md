@@ -77,6 +77,21 @@ open archives that the shipped defaults already cover.
 - `CRZ` (`ArcFormats/Crowd/ImageCRZ.cs`) is an `SZDD` stream, which this project can already walk, behind
   a header whose key comes from `CrzScheme.KnownKeys`, empty in the shipped `DefaultScheme`.
 
+- `PCK/TAMAMO` (`ArcFormats/Tamamo/ArcPCK.cs`, `PckScheme` at line 221): the archive opens with `PACK` and
+  the mark `_FILE001`, but its **whole index** is decrypted with a key `QueryKey (file.Name)` looks up in
+  `KnownKeys`, which the shipped `DefaultScheme` holds as `new Dictionary<string, byte[]>()`, and `TryOpen`
+  gives up when there is no key (`if (null == key) return null`). A build without the runtime scheme a game
+  was shipped with reads no archive of this engine at all - not even its listing. What a key would unlock is
+  an index of two words an entry, every entry a **bzip2** stream behind it, which this project has no decoder
+  for either. The keys stand in GARbro's `Formats.dat`, not in its source.
+- `DAT/RepiPack` (`ArcFormats/Littlewitch/ArcDAT.cs`, `RepiScheme` at line 192): `Repi` followed by `Pack`,
+  version five and nothing else, a length of the name at 0xC and a key of the name at 0x10. The key comes out
+  of `FindKey (file.Name, name_key)`, which walks `KnownSchemes` - held as `new Dictionary<string, uint[]>()`
+  and filled from the data file `littlewitch.lst` - and `TryOpen` gives up when it finds none
+  (`if (null == key) return null`), which is the way it stands in the source. What it would unlock is the
+  whole index, two words a record, decrypted with two words of the key; the names of the entries are folded
+  from an MD5 of the lowercase name, and an entry may be encrypted again with a key built out of its own name.
+
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
