@@ -170,6 +170,12 @@ than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`Arc
   with three bytes of the *name* (`entry.Offset ^= Extend8Bit (raw_name[raw_name.Length >> 1])` and the two
   beside it), so the places of the file of such an entry cannot be found at all without the listing.
 
+- `ALL/GIGA` (`Legacy/Giga/ArcALL.cs`) carries **no index at all**: `TryOpen` looks the archive's file
+  name up in `FileMap273`, a table of entries written out **inside the reference's own source** (the file
+  is 2090 lines, of which that table is nearly all), and returns `null` for anything else. Its walk of
+  the places of the file of an entry (an LZSS of its own, `LzssUnpack`) is readable and portable, but
+  no entry can be placed without the table that names it.
+
 - `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
   `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).
 - `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
