@@ -2,7 +2,7 @@
 
 Reference: `GARbro/ArcFormats/FC01/ArcMRG.cs`, class `Mrg2Opener` (the Overture variant of the same
 file as the F&C `MrgOpener`, which is a separate record; the `MrgDecoder` codec of methods two and
-three is out of scope) (GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT).
+three stands in `packages/formats/src/fc01/mrg-decoder.ts`) (GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT).
 
 Implementation: `packages/formats/src/fc01/mrg2.ts` (`mrg2Descriptor`, `mrg2Format`, id
 `fc01-mrg2`).
@@ -63,8 +63,8 @@ dots with a left shift of six: `checksum = checksum + char + (checksum << 6)`.
 |--------|---------|
 | `0` | stored but masked, extracted after the table is applied |
 | `1` | LZSS, extracted through the reader of the F&C layout |
-| `2` | `MrgDecoder` then LZSS (decoder out of scope) |
-| `3` | `MrgDecoder` only (decoder out of scope), then extracted |
+| `2` | `MrgDecoder` only |
+| `3` | `MrgDecoder` then LZSS |
 | above `3` | stored, extracted verbatim |
 
 The LZSS reader is shared with `packages/formats/src/fc01/mrg.ts`; see that document for the frame
@@ -72,6 +72,8 @@ semantics.
 
 ## Deviations
 
-* Methods two and three are listed but their payloads are passed through as stored, because the
-  `MrgDecoder` codec is out of scope; the entries are still flagged as compressed.
+* Methods two and three stand of the walk of the codec of the engine: method two of the walk of it
+  alone, method three of the walk of it and of the walk of the words behind it. The reference stands of
+  the walk of the codec of a payload of no count of the places of the file of it and throws; the port
+  refuses it with `INVALID_ARCHIVE`.
 * Archive creation is out of scope.

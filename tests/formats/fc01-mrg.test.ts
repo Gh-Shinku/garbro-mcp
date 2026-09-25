@@ -114,6 +114,24 @@ function sourceOf(file: Buffer): BufferByteSource {
 	return new BufferByteSource(file);
 }
 
+/**
+ * A walk of the codec of the engine: the count of the places of the walk of the picture of the head of it,
+ * the counts of the cells of the table of them (one cell of the count of the places of the file and the
+ * others of nought) and the places of the code of them, which stand of nought.
+ */
+function decoderStream(symbol: number, size: number): Buffer {
+	const head: Buffer = Buffer.alloc(4, 0x00);
+	head.writeUInt32LE(size, 0);
+	const counts: Buffer = Buffer.alloc(0x100, 0x00);
+	counts[symbol] = 0xff;
+	return Buffer.concat([
+		head,
+		counts,
+		Buffer.alloc(4, 0x00),
+		Buffer.alloc(size + 0x10, 0x00),
+	]);
+}
+
 /** The packed method is only used when the stored payload is at least 0x108 bytes. */
 function paddedStream(plain: Buffer): Buffer {
 	return Buffer.concat([
@@ -217,6 +235,52 @@ describe("fc01 mrg", () => {
 			if (!entry) throw new Error("missing entry");
 			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
 				Buffer.from("ABCABC"),
+			);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture of the walk of the codec of the engine", async () => {
+		// Method three stands of the walk of the codec alone, of the count of the places of the walk of
+		// the picture of the head of the places of the file of it.
+		const file = buildMrg([
+			{
+				name: "DECODED.BIN",
+				method: 3,
+				payload: decoderStream(0x41, 12),
+				unpackedSize: 6,
+			},
+		]);
+		const archive = await mrgFormat.open(sourceOf(file), "GAME.MRG");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				Buffer.alloc(12, 0x41),
+			);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture of the walk of the codec of the engine and of the walk of the words behind it", async () => {
+		// Method two stands of the walk of the codec of the engine and of the walk of the words behind
+		// it: the places of the walk of the codec stand of nought here.
+		const file = buildMrg([
+			{
+				name: "DECODED.LZ",
+				method: 2,
+				payload: decoderStream(0x00, 0x100),
+				unpackedSize: 0x40,
+			},
+		]);
+		const archive = await mrgFormat.open(sourceOf(file), "GAME.MRG");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				Buffer.alloc(0x40, 0x00),
 			);
 		} finally {
 			await archive.close();

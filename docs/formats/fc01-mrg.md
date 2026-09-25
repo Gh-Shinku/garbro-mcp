@@ -1,8 +1,8 @@
 # F&C Co. engine MRG resource archive
 
 Reference: `GARbro/ArcFormats/FC01/ArcMRG.cs`, class `MrgOpener` (the Overture variant `Mrg2Opener`
-of the same file is a separate record, and the `MrgDecoder` codec of methods two and three is out of
-scope) (GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT).
+of the same file is a separate record; the `MrgDecoder` codec of methods two and three stands in
+`packages/formats/src/fc01/mrg-decoder.ts`) (GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT).
 
 Implementation: `packages/formats/src/fc01/mrg.ts` (`mrgDescriptor`, `mrgFormat`, id `fc01-mrg`).
 
@@ -60,8 +60,8 @@ key     = key + length   (with length decreasing by one per byte)
 |--------|---------|
 | `0` | stored, extracted verbatim |
 | `1` | LZSS, extracted through the format's own reader |
-| `2` | `MrgDecoder` then LZSS (decoder out of scope) |
-| `3` | `MrgDecoder` only (decoder out of scope) |
+| `2` | `MrgDecoder` then LZSS |
+| `3` | `MrgDecoder` only |
 | above `3` | stored, extracted verbatim |
 
 The LZSS reader is a sliding window variant: control bits are read least significant bit first, a set
@@ -72,8 +72,14 @@ zero filled, and writing starts at `0xFEE`. This does **not** match GARbro's sha
 
 ## Deviations
 
-* Methods two and three are listed but their payloads are passed through as stored, because the
-  `MrgDecoder` codec is out of scope; the entries are still flagged as compressed.
+* The `MrgDecoder` walk of a count of the places of the file of the head of it stands of the count of
+  the places of the walk of the picture, of the two words of the head of it the other way round; the
+  counts of the cells of the table of the walk stand of the counts of the places of the file of the
+  picture, and every count stands of the places of the file alone, of no count of the places of the
+  picture above `0x10000` of them. A walk of the codec of nought places the table stands of no count of
+  the places of the file and is refused with `INVALID_ARCHIVE`, of the reference's own refusal of it.
+* Methods two and three stand of the walk of the codec of the engine; a payload of less than `0x108`
+  places of the file is handed over as it stands, as the reference hands it over.
 * The reference throws `UnknownEncryptionScheme` when the key guess fails; the port declines the
   archive so that probing never throws.
 * Archive creation is out of scope.

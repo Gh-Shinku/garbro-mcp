@@ -1,5 +1,5 @@
 // Format reference: GARbro "ArcFormats/FC01/ArcMRG.cs", class `Mrg2Opener` (the Overture variant; the
-// `MrgDecoder` codec of methods two and three is out of scope).
+// `MrgDecoder` codec of methods two and three lives in `mrg-decoder.ts`).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
@@ -19,6 +19,7 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 import { unpackMrgLzss } from "./mrg.js";
+import { MrgDecoder } from "./mrg-decoder.js";
 
 /** The header starts with the little endian spelling of `MRG\0`. */
 const SIGNATURE = Buffer.from("MRG\0", "latin1");
@@ -40,6 +41,8 @@ const TABLE_SIZE = 0x100;
 const STORED_METHOD = 0;
 const LZSS_METHOD = 1;
 const MATCH_LITERAL_METHOD = 3;
+/** Methods two and three stand of the `MrgDecoder` codec of the engine. */
+const DECODER_METHOD = 2;
 /** Rotating the checksum left by sixteen bits is the same as swapping its halves. */
 const CHECKSUM_ROTATION = 16;
 
@@ -218,16 +221,22 @@ export const mrg2Format: ArchiveFormat = defineFixedArchive({
 			decrypt(data, 0, data.length, metadata?.key ?? 0, metadata?.arcKey ?? 0);
 			return Readable.from([data]);
 		}
-		if (method !== LZSS_METHOD) {
-			// Methods two and three need the `MrgDecoder` codec, which is out of scope, so their
-			// payloads are passed through as they are stored.
-			return Readable.from([data]);
+		// Methods two and three stand of the `MrgDecoder` codec: of the count of the places of the walk
+		// of the picture of the head of the places of the file of it.
+		let payload: Buffer = data;
+		if (method >= DECODER_METHOD) {
+			const decoder = MrgDecoder.fromHeader(data);
+			decoder.unpack();
+			payload = decoder.data;
 		}
-		if (unpackedSize === 0)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"Overture MRG payload has no unpacked size",
-			);
-		return Readable.from([unpackMrgLzss(data, unpackedSize)]);
+		if (LZSS_METHOD === method || MATCH_LITERAL_METHOD === method) {
+			if (unpackedSize === 0)
+				throw new GarbroError(
+					"UNSUPPORTED_FEATURE",
+					"Overture MRG payload has no unpacked size",
+				);
+			return Readable.from([unpackMrgLzss(payload, unpackedSize)]);
+		}
+		return Readable.from([payload]);
 	},
 });

@@ -80,6 +80,24 @@ interface BuildOptions {
  * Builds an archive: the fixed header, the masked index and the payloads. Records are 0x57 bytes
  * apart, so the end offset field of one record is the start offset field of the next one.
  */
+/**
+ * A walk of the codec of the engine: the count of the places of the walk of the picture of the head of it,
+ * the counts of the cells of the table of them (one cell of the count of the places of the file and the
+ * others of nought) and the places of the code of them, which stand of nought.
+ */
+function decoderStream(symbol: number, size: number): Buffer {
+	const head: Buffer = Buffer.alloc(4, 0x00);
+	head.writeUInt32LE(size, 0);
+	const counts: Buffer = Buffer.alloc(0x100, 0x00);
+	counts[symbol] = 0xff;
+	return Buffer.concat([
+		head,
+		counts,
+		Buffer.alloc(4, 0x00),
+		Buffer.alloc(size + 0x10, 0x00),
+	]);
+}
+
 function buildMrg2(specs: EntrySpec[], options: BuildOptions = {}): Buffer {
 	const count = options.count ?? specs.length;
 	const indexSize = options.indexSize ?? (count - 1) * RECORD_SIZE + 0xaa;
@@ -246,15 +264,45 @@ describe("fc01 mrg2", () => {
 		}
 	});
 
-	it("passes the mrgs decoder methods through untouched", async () => {
-		const file = buildMrg2(SPECS);
-		const source = sourceOf(file);
-		const archive = await mrg2Format.open(source, "GAME.MRG");
+	it("reads a picture of the walk of the codec of the engine", async () => {
+		// The count of the places of the walk of the picture stands of the two words of the head of it.
+		const file = buildMrg2([
+			{
+				name: "DECODED.BIN",
+				method: 2,
+				payload: decoderStream(0x41, 12),
+				unpackedSize: 6,
+			},
+		]);
+		const archive = await mrg2Format.open(sourceOf(file), "GAME.MRG");
 		try {
-			const entry = archive.entries[2];
+			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				Buffer.from("opaque method two"),
+				Buffer.alloc(12, 0x41),
+			);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture of the walk of the codec of the engine and of the walk of the words behind it", async () => {
+		// The places of the walk of the codec stand of nought of the cells of the table of the counts of
+		// them, of the places of the file of the words of the walk of the engine behind it.
+		const file = buildMrg2([
+			{
+				name: "DECODED.LZ",
+				method: 3,
+				payload: decoderStream(0x00, 0x100),
+				unpackedSize: 0x40,
+			},
+		]);
+		const archive = await mrg2Format.open(sourceOf(file), "GAME.MRG");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				Buffer.alloc(0x40, 0x00),
 			);
 		} finally {
 			await archive.close();

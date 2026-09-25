@@ -6761,8 +6761,9 @@ export const formatSupportCatalog = {
 				"name checksums",
 				"mask table decryption",
 				"lzss payloads",
+				"the walk of the codec of the engine of the methods two and three",
 			],
-			unsupported: ["archive creation", "mrgdecoder payloads"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -6782,8 +6783,9 @@ export const formatSupportCatalog = {
 				"key guessing",
 				"index decryption",
 				"lzss payloads",
+				"the walk of the codec of the engine of the methods two and three",
 			],
-			unsupported: ["archive creation", "mrgdecoder payloads"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

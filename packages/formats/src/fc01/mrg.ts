@@ -1,6 +1,6 @@
 // Format reference: GARbro "ArcFormats/FC01/ArcMRG.cs", class `MrgOpener` (the `MrgOverture` variant
-// lives in a separate record). The `MrgDecoder` payload codec of methods two and three is out of
-// scope. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
+// lives in a separate record). The `MrgDecoder` payload codec of methods two and three stands in
+// `mrg-decoder.ts`. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
 import type {
@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { MrgDecoder } from "./mrg-decoder.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -35,14 +36,23 @@ const START_OFFSET_OFFSET = 0x1c;
 const END_OFFSET_OFFSET = 0x3c;
 /** The index ends with a big endian file size that the key guess reads back. */
 const KEY_PROBE_SIZE = 4;
-/** Method one uses the plain LZSS reader, methods two and three the `MrgDecoder` codec. */
+/** Method one stands of the plain LZSS reader alone. */
 const LZSS_METHOD = 1;
+/** Method two stands of the `MrgDecoder` codec and of the LZSS reader behind it. */
+const DECODER_METHOD = 2;
+/** Method three stands of the `MrgDecoder` codec alone. */
+const MATCH_LITERAL_METHOD = 3;
+/** The count of the places of the file of the head of a walk of the words of the codec. */
+const DECODER_HEAD_SIZE = 0x108;
 /** The LZSS frame is zero filled, starts near its end and is indexed by the low bits of the word. */
 const FRAME_SIZE = 0x1000;
 const FRAME_MASK = FRAME_SIZE - 1;
 const FRAME_INIT_POSITION = 0xfee;
 const MATCH_COUNT_SHIFT = 12;
 const MATCH_COUNT_BIAS = 3;
+
+/** The method of a picture of the places of the file of the picture itself. */
+const STORED_METHOD = 0;
 
 interface MrgEntry {
 	path: string;
@@ -262,16 +272,25 @@ export const mrgFormat: ArchiveFormat = defineFixedArchive({
 		const data = Buffer.from(
 			await source.readAt(entry.offset, Number(entry.size)),
 		);
-		if (method !== LZSS_METHOD) {
-			// Methods two and three need the `MrgDecoder` codec, which is out of scope, so their
-			// payloads are passed through as they are stored.
-			return Readable.from([data]);
+		if (method > MATCH_LITERAL_METHOD) return Readable.from([data]);
+		if (method === STORED_METHOD) return Readable.from([data]);
+		// Methods two and three stand of the `MrgDecoder` codec, of the count of the places of the walk
+		// of the picture of the head of the places of the file of it.
+		let payload: Buffer = data;
+		if (method >= DECODER_METHOD) {
+			if (data.length < DECODER_HEAD_SIZE) return Readable.from([data]);
+			const decoder = MrgDecoder.fromHeader(data);
+			decoder.unpack();
+			payload = decoder.data;
 		}
-		if (unpackedSize === 0)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"F&C MRG payload has no unpacked size",
-			);
-		return Readable.from([unpackMrgLzss(data, unpackedSize)]);
+		if (LZSS_METHOD === method || DECODER_METHOD === method) {
+			if (unpackedSize === 0)
+				throw new GarbroError(
+					"UNSUPPORTED_FEATURE",
+					"F&C MRG payload has no unpacked size",
+				);
+			return Readable.from([unpackMrgLzss(payload, unpackedSize)]);
+		}
+		return Readable.from([payload]);
 	},
 });
