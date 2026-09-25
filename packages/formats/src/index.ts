@@ -541,6 +541,7 @@ import { maikaMk2Format } from "./maika/mk2.js";
 import { maikaWv5AudioFormat } from "./maika/wv5-audio.js";
 import { MajiroArcFormat } from "./majiro/arc.js";
 import { majiroRc8ImageFormat } from "./majiro/rc8-image.js";
+import { rctImageFormat } from "./majiro/rct-image.js";
 import { malieLibFormat } from "./malie/lib.js";
 import { malieLibuFormat } from "./malie/libu.js";
 import { mgfImageFormat } from "./malie/mgf-image.js";
@@ -1727,6 +1728,7 @@ export function createDefaultRegistry(
 		sohfuDtlImageFormat,
 		sohfuDtlcImageFormat,
 		majiroRc8ImageFormat,
+		rctImageFormat,
 		basilBcfImageFormat,
 		unknownCtfImageFormat,
 		cottonClubLmgImageFormat,

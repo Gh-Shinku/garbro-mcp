@@ -21078,5 +21078,37 @@ export const formatSupportCatalog = {
 				"a picture of the places of the colour of it standing of the places of the colours of a picture behind it",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "RCT",
+				class: "RctFormat",
+				source: "ArcFormats/Majiro/ImageRCT.cs",
+			},
+			localId: "majiro-rct-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, of the mark of it, of the walks of it, of the kind of it and of the count of the places of a picture beside it",
+				"the walk of the places of a picture standing of the places of the file of it, of runs of the places of a pixel of the picture",
+				"the runs of the second kind of the walk, of the counts of the places of the file of them and of the words behind them",
+				"the places of the picture of the runs of the walk standing of the table of the engine, of the places of a row of the picture and of the places of a pixel to either side of it",
+				"a picture of the second kind, of the places of the file of the name of the picture beside it",
+				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture of a key (of a key standing of no places of the file of the picture itself)",
+				"the places of the picture of the file of it standing of the places of a picture beside it",
+				"the places of the colours of a picture standing of the mask of the engine beside it",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of the places of the file of it of more than one chunk of them, of a run of the walk of the engine standing of the places of the row of the picture",
+			],
+		},
 	],
 } as const;
