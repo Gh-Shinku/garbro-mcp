@@ -340,14 +340,12 @@ the first forty of them.
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
   reason that picture stands unread.
 - `EXE` (`Experimental/Microsoft/ArcEXE.cs`) is **not portable**: it reads an executable's resources through the reference's `ExeFile.ResourceAccessor`, which is a set of Windows loader calls (`LoadLibraryEx`, `FreeLibrary`, `FindResource`, `LoadResource`, `SizeofResource` and the enumeration callbacks behind them) rather than anything read out of the file. The managed half of the same file - the headers, the sections, the overlay, the loaded base, addresses and a byte search - **is** portable and now stands in this project as `packages/formats/src/microsoft/exe-file.ts`, which is what the ported `BIN/PAC` archive and, later, any other reader of an executable needs.
-- `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`, 155 lines) is a difference against a base image: its
-  header names that image without an extension and the reference finds it by globbing the directory
-  (`VFS.GetFiles (base_name+".*")`) and decodes it with whichever format reads it. A port would need the
-  companion lookup, which this project has, and then a way to hand the companion to another image
-  format, which it does not have yet. The stored diff is two LZSS streams, one holding a pixel index and
-  one the differences themselves.
-
-
+- The **base picture of a difference** is the one place the reference hands a file to another format of
+  its own outside an archive: `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`) names its base beside itself
+  and the reference reads it with whichever format of its registry takes it. That port is
+  `mnoviolet-dif-image`, and its base stands of a bitmap or of a portable network graphic, the two kinds a
+  format of this project can read out of a file on its own; a registry to reach the rest of them stands at
+  the front of this project rather than within a format, and no other row of this list stands of it.
 - `ARC/Tactics/2` (`ArcFormats/Tactics/ArcTactics.cs`, `Arc2Opener`) reads a flat list of pictures at
   `0x10` (the count of the places of a picture, the count of them as they stand, the count of the places of
   its name, then the name and the places of the picture) and then **refuses the picture itself**:

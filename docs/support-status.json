@@ -21823,6 +21823,38 @@
 				"real-game GARbro differential output",
 				"a graphic whose streams stand of a palette, of a grey or of a depth below eight places, which the walk of the places of a graphic of this project carries and no fixture here reaches"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DIF/MnV",
+				"class": "DifFormat",
+				"source": "ArcFormats/MnoViolet/ImageDIF.cs"
+			},
+			"localId": "mnoviolet-dif-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the mark, the name of the base it carries without an extension and the counts of the two walks of it",
+				"the base picture of the name the head carries, of the first file that shares its stem beside the difference, of a bitmap or of a graphic of its own",
+				"the base of twenty four places of a colour, of its rows turned over and of every row padded to four places",
+				"the index of the difference: the plain LZSS of the reference and the parts of eight places each it turns out",
+				"the difference itself: the plain LZSS of the reference, read on part after part and laid into the picture at the places the index names",
+				"the bitmap of the picture, of its rows from the bottom up"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a base of any format of this project beyond a bitmap and a portable network graphic, which the reference hands to its own registry"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a base of a kind this port reads no places of, of another depth of a bitmap or of a graphic",
+				"the turning away of a part of the difference that stands past the picture, which the fixtures of the composition do not reach"
+			]
 		}
 	]
 }

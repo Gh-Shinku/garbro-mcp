@@ -613,6 +613,7 @@ import { mngFormat } from "./mng/mng.js";
 import { mngImageFormat } from "./mng/mng-image.js";
 import { mnvFormat } from "./mno-violet/dat.js";
 import { mnoVioletGraImageFormat } from "./mnoviolet/gra-image.js";
+import { mnoVioletDifImageFormat } from "./mnoviolet/dif-image.js";
 import { mmaFormat } from "./mnp/mma.js";
 import { mokoProBmpImageFormat } from "./moko-pro/bmp-image.js";
 import { mokoProNnnnFormat } from "./moko-pro/nnnn.js";
@@ -2332,6 +2333,7 @@ export function createDefaultRegistry(
 		tanukiAmapImageFormat,
 		silkyMfgImageFormat,
 		interheartKgImageFormat,
+		mnoVioletDifImageFormat,
 		mnoVioletGraImageFormat,
 		interheartHmpImageFormat,
 		fc01ClmImageFormat,
