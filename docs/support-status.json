@@ -21789,6 +21789,40 @@
 				"real-game GARbro differential output",
 				"a graphic whose streams stand of a palette, of a grey or of a depth below eight places, which the walk of the places of a graphic of this project carries and no fixture here reaches"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "BIP",
+				"class": "BipFormat",
+				"source": "ArcFormats/Cri/ImageBIP.cs"
+			},
+			"localId": "cri-bip-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture, of five or of ten words, and the place under every place of a tile it names",
+				"the list of the tiles: the count, the word of nothing, the box of the picture and the record of every tile, of the place of it, its box and the place of its stream",
+				"the box of the picture of the head, grown to hold the tiles that stand past it",
+				"the stream of a tile: the mark `PNGFILE2`, the count of the whole stream, the word that stands for the alpha and the place of the tile within its own box",
+				"the graphic of a tile, of four places of a colour with an alpha or of three without one",
+				"the composition of the tiles into a picture of four places a place, of the places of a graphic overwriting the ones it stands on",
+				"the alpha of a place, of a full one where the stream names none and of a place of one hundred and twenty eight of the place of two hundred and fifty five where it names one",
+				"the places of a tile held to the picture it stands past",
+				"the bitmap of the picture"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"the order of the places the reference swaps for the sake of the Windows imaging stack"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a graphic whose streams stand of a palette, of a grey or of a depth below eight places, which the walk of the places of a graphic of this project carries and no fixture here reaches"
+			]
 		}
 	]
 }
