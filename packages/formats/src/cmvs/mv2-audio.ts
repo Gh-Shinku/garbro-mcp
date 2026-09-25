@@ -83,7 +83,9 @@ export class Mv2Decoder {
 
 	/** `Mv2Decoder.FillSample1`: the coefficients of one run, gathered into the first place. */
 	private fillSample1(count: number, index: number, bits: MvBits): void {
-		for (let at = 0; at < PRE1_SIZE; at += 1) this.pre1[at] = 0;
+		// Only the first row is cleared, as the reference does: the tail of the place is left as the run
+		// before this one left it, and the first filter reads into it.
+		for (let at = 0; at < MV_RUN_SAMPLES; at += 1) this.pre1[at] = 0;
 		const scale = MV2_SAMPLE_TABLE[index] ?? 0;
 		let at = 0;
 		while (at < count && !bits.exhausted) {

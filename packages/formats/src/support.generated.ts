@@ -19103,6 +19103,7 @@ export const formatSupportCatalog = {
 				"the two filters of the walk, and the ring the first of them gathers into",
 				"the samples of both channels, interleaved inside a frame",
 				"the wave file the reference wraps around them",
+				"the tail of the place its coefficients are gathered in, which the reference leaves as the run before it left it",
 			],
 			unsupported: ["sound creation"],
 			remainingVerification: [
@@ -19110,6 +19111,7 @@ export const formatSupportCatalog = {
 				"a real file, which would show how a real run's coefficients and scales are laid out",
 				"the filter chain is pinned against a mirror of the same reference source rather than against decoded output of a real sound",
 				"the ring the first filter gathers into is masked here where the reference writes past its own place",
+				"the reference clears only the first row of that place where this port once cleared the whole of it, which changes what a sound decodes to",
 			],
 		},
 		{

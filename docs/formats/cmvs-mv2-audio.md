@@ -34,6 +34,13 @@ one. Between the two passes the place the first gather wrote at steps back by si
 kiloword ring. Every sample is then taken down by `6 - shift` and clamped to a sixteen bit value, which is
 the reference's own `Clamp (pre_sample3[j] >> shift)` - the shift first and the clamp behind it.
 
+## What the place its coefficients are gathered in holds
+
+The reference clears only the **first row** of that place at the start of every run and leaves the rest as the
+run before it left it, while the first filter reads as far as `0x15F`; the older sound of the same engine
+clears the whole place instead. Both are transcribed as they stand, since the tail decides what a sound
+decodes to.
+
 ## Deviations from the reference
 
 * The reference writes the first gather at `pre2_index + channel * 0x400 + j` **without** keeping it inside
