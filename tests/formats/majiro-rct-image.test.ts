@@ -137,6 +137,39 @@ describe("Majiro game engine RGB image", () => {
 		]);
 	});
 
+	it("reads the places of a picture of the chunks of the file of it and of the row of it", async () => {
+		// The places of the file of the walk of the engine stand of the places of the picture of the
+		// chunks of it: of the places of the file of the picture of the walk of the row of the picture
+		// before the walk of the engine itself (of the places of the file of the table of the walk of the
+		// engine of the places of the file of the picture of it of no more than the places of the picture
+		// of four of them) and of the places of the file of the count of the walk of the engine of the
+		// places of the file of the picture of the row behind it.
+		const data = rctFile(
+			4,
+			3,
+			Buffer.concat([
+				// The places of the file of the picture of the first row of the walk of the engine: of the
+				// places of the file of a pixel of it and of the run of the three places of the file of the
+				// pixel before it.
+				Buffer.from([0x11, 0x22, 0x33]),
+				Buffer.from([0x82]),
+				// The places of the file of the picture of the second row of the walk of the engine: of the
+				// places of the file of a pixel of it of its own and of the run of the three places of the
+				// file of the row before it.
+				Buffer.from([0x00, 0x44, 0x55, 0x66]),
+				Buffer.from([0x8e]),
+				// The places of the file of the picture of the third row of the walk of the engine.
+				Buffer.from([0x00, 0x77, 0x88, 0x99]),
+				Buffer.from([0x82]),
+			]),
+		);
+		expect(await placesOf(data, 4, 3)).toEqual([
+			0x11, 0x22, 0x33, 0x11, 0x22, 0x33, 0x11, 0x22, 0x33, 0x11, 0x22, 0x33,
+			0x44, 0x55, 0x66, 0x11, 0x22, 0x33, 0x11, 0x22, 0x33, 0x11, 0x22, 0x33,
+			0x77, 0x88, 0x99, 0x77, 0x88, 0x99, 0x77, 0x88, 0x99, 0x77, 0x88, 0x99,
+		]);
+	});
+
 	it("reads a picture of the second kind, of the head of it of the places of the file of its own", async () => {
 		const walk = Buffer.concat([
 			Buffer.from([0x11, 0x22, 0x33]),

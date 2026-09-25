@@ -85,3 +85,10 @@ before it, a picture standing of a run of the table of the walk of the engine fi
 first pixel of the picture), a picture of the second kind (of the places of the file of the head of it), a
 picture of a key (standing of `UNSUPPORTED_FEATURE`), a picture of a walk standing past the places of the
 picture and one standing behind the file of it, and the marks of the head of the picture.
+
+A picture of the places of the file of 4 and 3 of them stands of the three chunks of the walk of the
+engine: the places of the file of a pixel of the picture and of the run of the three places of the file of
+the pixel before it, of the places of the file of a pixel of its own and of the run of the three places of
+the file of the row before it (of the places of the file of the table of the walk of the engine of the
+places of the file of the picture of the four places of the row of it), and of the places of the file of the
+pixel of the third row of it and of the run of the three places of the file of the pixel before it.
