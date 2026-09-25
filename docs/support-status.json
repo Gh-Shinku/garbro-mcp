@@ -20612,6 +20612,35 @@
 				"a picture of a kind of walk of an order of the colours behind the first",
 				"a picture whose walk stands short of the file"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DGC",
+				"class": "DgcFormat",
+				"source": "ArcFormats/Dac/ImageDGC.cs"
+			},
+			"localId": "dac-dgc-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and the flags of it",
+				"the rows of a picture standing of the walks of the file itself",
+				"the rows of a picture standing of the rows before them",
+				"the runs of a walk of the places before them",
+				"a picture of a small colour table",
+				"a picture of a colour table of its own, of groups of rows",
+				"the alpha behind the places of a picture"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture whose alpha stands of the places before it",
+				"a colour table of a count of no places of its own"
+			]
 		}
 	]
 }
