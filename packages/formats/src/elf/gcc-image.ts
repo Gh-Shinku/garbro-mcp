@@ -94,7 +94,7 @@ class GccReader {
 	}
 
 	/** `GccFormat.Reader.NextBit`: the places of a walk of a picture, of the lowest place of a place first. */
-	private nextBit(): boolean {
+	nextBit(): boolean {
 		this.mask <<= 1;
 		if (0x100 === this.mask) {
 			if (this.index >= this.data.length) {
@@ -191,21 +191,292 @@ function convertToBgra(
 	return converted;
 }
 
+/** The places of the file of a chunk of the walk of the places of a picture. */
+const CHUNK_LIMIT = 0xffff;
+const MTF_SIZE = 16;
+/** The number the walk of the reference names a value standing in none of its lists of sixteen. */
+const NO_RANK = 0xff;
+
+/** The places of a picture a chunk of it hands over, and the place of them the walk stands at. */
+interface ChunkWalk {
+	readonly output: Buffer;
+	dst: number;
+}
+
+function readAt(data: Buffer, at: number): number {
+	if (at < 0 || at >= data.length) {
+		throw invalidPicture("The places of the walk stand short of the file");
+	}
+	return data[at] ?? 0;
+}
+
+/** The place of a value in one of the lists of sixteen of the walk, or `0xff` where it stands in none. */
+function rankOf(list: Uint8Array, value: number): number {
+	for (let at = 0; at < MTF_SIZE; at += 1) {
+		if (list[at] === value) return at;
+	}
+	return NO_RANK;
+}
+
+/** The value of one of the lists of sixteen stands at the front of it, the ones before it behind it. */
+function moveToFront(list: Uint8Array, rank: number, value: number): void {
+	for (let at = rank & 0xf; at > 0; at -= 1) list[at] = list[at - 1] ?? 0;
+	list[0] = value;
+}
+
+/**
+ * `GccFormat.Reader.ReadRawChunk`: the places of a chunk of a picture standing in the file itself, one
+ * place of a pixel at a time, or as a run of the places of one.
+ */
+function readRawChunk(
+	data: Buffer,
+	reader: GccReader,
+	source: number,
+	walk: ChunkWalk,
+	chunkSize: number,
+): number {
+	let at = source;
+	let done = 0;
+	while (done < chunkSize) {
+		if (!reader.nextBit()) {
+			for (let place = 0; place < COLOR_PLACES; place += 1) {
+				if (walk.dst >= walk.output.length) {
+					throw invalidPicture(
+						"The places of the walk stand past the places of the picture",
+					);
+				}
+				walk.output[walk.dst] = readAt(data, at);
+				walk.dst += 1;
+				at += 1;
+			}
+			done += COLOR_PLACES;
+		} else {
+			const count = reader.readCount();
+			const blue = readAt(data, at);
+			const green = readAt(data, at + 1);
+			const red = readAt(data, at + 2);
+			at += COLOR_PLACES;
+			for (let place = 0; place < count; place += 1) {
+				if (walk.dst + COLOR_PLACES > walk.output.length) {
+					throw invalidPicture(
+						"The run of the walk stands past the places of the picture",
+					);
+				}
+				walk.output[walk.dst] = blue;
+				walk.output[walk.dst + 1] = green;
+				walk.output[walk.dst + 2] = red;
+				walk.dst += COLOR_PLACES;
+			}
+			done += COLOR_PLACES * count;
+		}
+	}
+	return at;
+}
+
+/**
+ * `GccFormat.Reader.ReadCompressedChunk`: the places of a chunk of a picture standing of two runs of
+ * sixteen values, of which the one at the front of a run stands first, and of the runs of the values
+ * themselves.
+ */
+function readCompressedChunk(
+	data: Buffer,
+	reader: GccReader,
+	source: number,
+	chunk: Buffer,
+	chunkSize: number,
+): number {
+	const first = new Uint8Array(MTF_SIZE);
+	const second = new Uint8Array(MTF_SIZE);
+	for (let at = 0; at < MTF_SIZE; at += 1) {
+		first[at] = at;
+		second[at] = at;
+	}
+	let at = source;
+	let written = 0;
+	// The place of the byte behind the one the walk last read, held as a place of eight bits: the
+	// reference holds it as a place of eight bits whose top one is its sign, and takes the runs off it as
+	// the places of eight bits they stand of.
+	let previous = 0xff;
+	while (written < chunkSize) {
+		let rank: number;
+		let value: number;
+		// The first place of the walk names either a place of a run of sixteen values or a place of the
+		// file itself.
+		const fromTable = reader.nextBit();
+		if (!fromTable) {
+			const fromSecond = reader.nextBit();
+			if (fromSecond) {
+				rank = reader.readCount();
+				if (rank >= MTF_SIZE) {
+					throw invalidPicture(
+						"The walk of the chunk names no place of its run of sixteen",
+					);
+				}
+				value = second[rank] ?? 0;
+			} else {
+				const fromRun = reader.nextBit();
+				if (fromRun) {
+					const delta = reader.readCount();
+					const behind = reader.nextBit();
+					value = behind
+						? (previous - delta) & 0xff
+						: (previous + delta) & 0xff;
+				} else {
+					value = readAt(data, at);
+					at += 1;
+				}
+				chunk[written] = value;
+				written += 1;
+				rank = rankOf(second, value);
+			}
+			if (fromSecond) {
+				chunk[written] = value;
+				written += 1;
+			}
+		} else {
+			const count = reader.readCount();
+			const ofTheRun = reader.nextBit();
+			// A place of the run of sixteen the value stands in standing first names the value itself;
+			// behind it stands the place of the run the value stands in.
+			const fromRun = ofTheRun ? false : reader.nextBit();
+			if (ofTheRun) {
+				rank = 0;
+				value = first[0] ?? 0;
+			} else if (fromRun) {
+				rank = reader.readCount();
+				if (rank >= MTF_SIZE) {
+					throw invalidPicture(
+						"The walk of the chunk names no place of its run of sixteen",
+					);
+				}
+				value = first[rank] ?? 0;
+			} else {
+				const fromDelta = reader.nextBit();
+				if (fromDelta) {
+					const delta = reader.readCount();
+					const behind = reader.nextBit();
+					value = behind
+						? (previous - delta) & 0xff
+						: (previous + delta) & 0xff;
+				} else {
+					value = readAt(data, at);
+					at += 1;
+				}
+				rank = rankOf(first, value);
+			}
+			if (0 !== rank) moveToFront(first, rank, value);
+			for (let place = 0; place < count; place += 1) {
+				if (written >= chunk.length) {
+					throw invalidPicture(
+						"The run of the walk stands past the places of the chunk",
+					);
+				}
+				chunk[written] = value;
+				written += 1;
+			}
+			rank = rankOf(second, value);
+		}
+		if (0 !== rank) moveToFront(second, rank, value);
+		previous = value;
+	}
+	return at;
+}
+
+/**
+ * `GccFormat.Reader.DecodeChunk`: the places of a chunk of a picture, read of the places of the chunk
+ * itself: every place of it stands behind the place taking the byte before it, and the place the chunk
+ * opens with names the place of the byte the walk stands at.
+ */
+function decodeChunk(chunk: Buffer, chunkSize: number): Buffer {
+	const counts = new Uint16Array(0x100);
+	for (let at = 0; at < chunkSize; at += 1) {
+		const value = chunk[2 + at] ?? 0;
+		counts[value] = ((counts[value] ?? 0) + 1) & 0xffff;
+	}
+	const base = new Uint16Array(0x100);
+	let total = 0;
+	for (let at = 0; at < 0x100; at += 1) {
+		base[at] = total;
+		total = (total + (counts[at] ?? 0)) & 0xffff;
+		counts[at] = 0;
+	}
+	const next = new Uint16Array(0x10000);
+	for (let at = 0; at < chunkSize; at += 1) {
+		const value = chunk[2 + at] ?? 0;
+		const rank = ((counts[value] ?? 0) + (base[value] ?? 0)) & 0xffff;
+		if (rank >= next.length) {
+			throw invalidPicture(
+				"The walk of the chunk stands past the places of it",
+			);
+		}
+		next[rank] = at;
+		counts[value] = ((counts[value] ?? 0) + 1) & 0xffff;
+	}
+	const places: Buffer = Buffer.alloc(chunkSize, 0x00);
+	// The place the chunk opens with names a place of the table of the walk of it, not a place of the
+	// chunk itself: the reference stands the walk at `v17[a3]` before it reads the first place of it.
+	const first = chunk.readUInt16LE(0);
+	if (first >= next.length) {
+		throw invalidPicture("The walk of the chunk stands past the places of it");
+	}
+	let at = next[first] ?? 0;
+	for (let place = 0; place < chunkSize; place += 1) {
+		if (2 + at >= chunk.length) {
+			throw invalidPicture(
+				"The walk of the chunk stands past the places of it",
+			);
+		}
+		places[place] = chunk[2 + at] ?? 0;
+		at = next[at] ?? 0;
+	}
+	return places;
+}
+
+/**
+ * `GccFormat.Reader.AltUnpack`: the walk of the places of a picture of the second kind, which stands of
+ * chunks of no more than sixty five thousand five hundred and thirty five places, every chunk standing
+ * either of the places of the file itself or of the two runs of sixteen values behind it.
+ */
+function altUnpack(data: Buffer, layout: GccLayout, start: number): Buffer {
+	if (data.length < 0x14) {
+		throw invalidPicture("The head of the picture stands short of the file");
+	}
+	const total = layout.width * layout.height * COLOR_PLACES;
+	const output: Buffer = Buffer.alloc(total, 0x00);
+	const reader = new GccReader(data, start);
+	const walk: ChunkWalk = { output, dst: 0 };
+	let source = start + data.readInt32LE(0x10);
+	let placed = 0;
+	while (placed < total) {
+		const chunkSize = Math.min(total - placed, CHUNK_LIMIT);
+		if (reader.nextBit()) {
+			const chunk: Buffer = Buffer.alloc(chunkSize + 2, 0x00);
+			source = readCompressedChunk(data, reader, source, chunk, chunkSize + 2);
+			const places = decodeChunk(chunk, chunkSize);
+			if (walk.dst + chunkSize > output.length) {
+				throw invalidPicture(
+					"The places of the chunk stand past the places of the picture",
+				);
+			}
+			places.copy(output, walk.dst);
+			walk.dst += chunkSize;
+		} else {
+			source = readRawChunk(data, reader, source, walk, chunkSize);
+		}
+		placed += chunkSize;
+	}
+	return output;
+}
+
 /** `GccFormat.Reader.Unpack`: the places of the picture, handed over as a bitmap. */
 export function unpackGccPicture(data: Buffer, layout: GccLayout): Buffer {
-	if (layout.alt) {
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"the R24 pictures of the AI5WIN engine stand of a walk of their own",
-		);
-	}
+	const start = layout.masked ? MASKED_OFFSET : PLAIN_OFFSET;
 	const expected = layout.width * layout.height * COLOR_PLACES;
-	// The walks of the alpha of a picture stand behind the walk of the colours of it: the walk of the LZSS
-	// engine stands of the places of the picture alone, as the walk of the reference stands of them.
-	const pixels = inflateLzss(
-		data.subarray(layout.masked ? MASKED_OFFSET : PLAIN_OFFSET),
-		{ outputLength: expected },
-	);
+	// The walks of the alpha of a picture stand behind the walk of the colours of it: the walk of the
+	// colours stands of the places of the picture alone, as the walk of the reference stands of them.
+	const pixels = layout.alt
+		? altUnpack(data, layout, start)
+		: inflateLzss(data.subarray(start), { outputLength: expected });
 	const flipped = flipRows(pixels, layout.width * COLOR_PLACES, layout.height);
 	if (!layout.masked) {
 		return writeBmp24(layout.width, layout.height, flipped);
