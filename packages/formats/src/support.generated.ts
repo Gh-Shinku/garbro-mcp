@@ -19031,6 +19031,36 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "MI4",
+				class: "Mi4Format",
+				source: "ArcFormats/ShiinaRio/ImageMI4.cs",
+			},
+			localId: "shiina-rio-mi4-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head and the places of the width and the height",
+				"the bits of a picture, read out of words of four bytes from the highest of them down",
+				"a place of its own, read out of the file behind the word its bits stand in",
+				"the five ways of a run, every one of them over the three bytes of a place",
+				"the places the walks copy out of the picture itself",
+				"the second walk of the picture, which reaches further in two of its ways",
+				"the first walk of the picture, which names the place above and to the left of its own",
+				"a picture drawn again with the first walk when the second stands short",
+				"the bitmap the reference hands over",
+			],
+			unsupported: ["picture creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show which of the two walks of the reference draws it",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "ACG",
 				class: "AgFormat",
 				source: "ArcFormats/Masys/ImageAG.cs",
