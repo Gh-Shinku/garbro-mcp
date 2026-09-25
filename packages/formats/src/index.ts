@@ -199,6 +199,7 @@ import { csafArchiveFormat } from "./family-adv-system/csaf-archive.js";
 import { advizGiz3ImageFormat } from "./adviz/giz3-image.js";
 import { cmbArchiveFormat } from "./pinesoft/cmb-archive.js";
 import { mi4ImageFormat } from "./shiina-rio/mi4-image.js";
+import { gpImageFormat } from "./eushully/gp-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1367,6 +1368,7 @@ export function createDefaultRegistry(
 		advizGiz3ImageFormat,
 		cmbArchiveFormat,
 		mi4ImageFormat,
+		gpImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

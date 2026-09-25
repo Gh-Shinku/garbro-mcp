@@ -19289,6 +19289,37 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GP/EUSHULLY",
+				class: "GpFormat",
+				source: "ArcFormats/Eushully/ImageGP.cs",
+			},
+			localId: "eushully-gp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head and the way a picture is drawn",
+				"the places of a picture that stand as they are",
+				"a picture of eight places to a byte with the colour map of a bitmap around them",
+				"elements of many places each, of as many bits as the depth of the picture",
+				"the slices of a picture, with the colour behind their places and the places in front of them",
+				"the colour map of a picture, read the way the reference's own viewer holds it",
+				"the alpha channel of a picture that carries one, and a picture whose alpha channel names other places",
+				"the bitmap the reference hands over",
+			],
+			unsupported: ["picture creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show which of the three ways of the reference draws it",
+				"the alpha channel of a picture, whose walk stands in the port and whose fixture was not finished",
+				"a picture of eight places to a byte handed to a bitmap, the colour map of the file standing beside it",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GD/C4",
 				class: "GdFormat",
 				source: "ArcFormats/C4/ImageGD.cs",
