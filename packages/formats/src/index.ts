@@ -871,6 +871,7 @@ import { sudFormat } from "./triangle/sud.js";
 import { triangleTriImageFormat } from "./triangle/tri-image.js";
 import { mcdFormat } from "./tsd/mcd.js";
 import { typesArcFormat } from "./types/arc.js";
+import { tpgfImageFormat } from "./types/tpgf-image.js";
 import { ucomDataFormat } from "./ucom/data.js";
 import { ucomGpcImageFormat } from "./ucom/gpc-image.js";
 import { ugImageFormat } from "./ucom/ug-image.js";
@@ -1549,6 +1550,7 @@ export function createDefaultRegistry(
 		chrFormat,
 		witchArcFormat,
 		typesArcFormat,
+		tpgfImageFormat,
 		gdFormat,
 		aapFormat,
 		mirisDatFormat,
