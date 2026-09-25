@@ -356,11 +356,14 @@ the first forty of them.
   port could list the pictures of a file and never read one of them. The walk of the pictures of the plain
   `ArcOpener` (`ARC/Tactics`) **is** ported, as `tactics-arc`; the custom LZ walk would be a staged port of
   the kind TLG6 and JBP took, and would still stand of no picture to check it against without the password.
-- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are whose index and entries are
-  transformed by one of two schemes the reference tries in turn. It would have to carry `Primel.SHA256`,
-  the three `Primel1/2/3Encyption` ciphers, `GameRes.Cryptography.RC6`, AES in CFB mode with zero
-  padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between. That is a
-  staged port of the kind TLG6 and JBP took, not a single one.
+- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are
+  transformed by one of two schemes the reference tries in turn. It stands of `Primel.SHA256`, which is now
+  ported as `packages/codecs/src/primel-sha256.ts` - a copy of the walk **whose round is not the one of the
+  standard**, which that file writes out - and of the three `Primel1/2/3Encyption` ciphers
+  (`Encryption.cs`, 510 lines), `GameRes.Cryptography.RC6` (`RC6.cs`, 155 lines), AES in CFB mode with zero
+  padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between
+  (`Compression.cs`, 357 lines). That is a staged port of the kind TLG6 and JBP took, not a single one, and
+  its first stage has landed.
 
 - `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`, class `LayOpener`, extension gated on `.lay`): the index
   of the engine is plain - a count of the layers, a count of the tile coordinates, then a record per layer
