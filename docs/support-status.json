@@ -20338,6 +20338,37 @@
 				"real-game GARbro differential output",
 				"a line standing of the places of a colour, of the place of the line above it"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "CRX",
+				"class": "CrxFormat",
+				"source": "ArcFormats/Circus/ImageCRX.cs"
+			},
+			"localId": "circus-crx-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, of the places of a place of it and of the kind of its walks",
+				"the colour map of a picture, of three or four places to a colour",
+				"the walks of the engine of the first kind, of a window of 64K places standing over itself",
+				"the walks of the engine of the second and third kinds, of a word of the places of their own",
+				"a row standing of the places before it, above it, above and to the left, or above and to the right",
+				"a row standing of runs of every colour of it",
+				"the places of a colour of a picture of four places to a place, of the kind of the picture",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the three kinds of a run of the first kind the fixtures do not name",
+				"the head of a picture of the third kind, and the word of the length of its places",
+				"a picture of eight places to a pixel standing of the walks of a word of its own places"
+			]
 		}
 	]
 }

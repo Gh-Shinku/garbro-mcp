@@ -173,6 +173,7 @@ import { mykFormat } from "./cherry/myk.js";
 import { cherryPak2Format, cherryPakFormat } from "./cherry/pak.js";
 import { crmFormat } from "./circus/crm.js";
 import { circusDatFormat } from "./circus/dat.js";
+import { crxImageFormat } from "./circus/crx-image.js";
 import { circusPckFormat } from "./circus/pck.js";
 import { circusVcPacFormat, vcPakFormat } from "./circus/vc.js";
 import { clickTeamMfsFormat } from "./clickteam/mf.js";
@@ -1789,6 +1790,7 @@ export function createDefaultRegistry(
 		system21PakFormat,
 		isaFormat,
 		circusDatFormat,
+		crxImageFormat,
 		mgxFormat,
 		broomPkFormat,
 		broomEncryptedPkFormat,
