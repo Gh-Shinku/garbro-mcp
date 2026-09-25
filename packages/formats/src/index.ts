@@ -191,6 +191,7 @@ import { ncgImageFormat } from "./nekotaro/ncg-image.js";
 import { pmsImageFormat } from "./alicesoft/pms-image.js";
 import { mgpkFormat } from "./manga-gamer/mgpk.js";
 import { kgImageFormat } from "./abogado/kg-image.js";
+import { graFormat, mblFormat } from "./marble/mbl-archive.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1348,6 +1349,8 @@ export function createDefaultRegistry(
 		pmsImageFormat,
 		mgpkFormat,
 		kgImageFormat,
+		mblFormat,
+		graFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

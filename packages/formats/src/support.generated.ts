@@ -16117,6 +16117,68 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MBL",
+				class: "MblOpener",
+				source: "ArcFormats/Marble/ArcMBL.cs",
+			},
+			localId: "marble-mbl-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the three layouts of the index, tried in the order the reference tries them",
+				"the names of the records, with the extension that stands behind them in the same field",
+				"the names folded to lower case, as the reference folds them",
+				"the kind of an entry by its extension, the image, sound and script ones this port knows",
+				"every entry's placement inside the archive, and its place behind the index",
+				"the entries of an archive handed over as they stand",
+				"the bytes of a script of an archive that holds them, every one of them negated",
+			],
+			unsupported: [
+				"archive creation",
+				"the pass phrase the reference can key a script with, which stands in a table that ships empty and is otherwise asked of a user, so it cannot be reached without a person to ask",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real archive, which would show which of the three layouts a game writes and which kinds its entries carry",
+				"whether a real script of this engine is really keyed, which only a file written with a pass phrase would show",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
+				tag: "MBL/GRA",
+				class: "GraMblOpener",
+				source: "ArcFormats/Marble/ArcMBL.cs",
+			},
+			localId: "marble-gra-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the name the file has to carry, which is the only way this archive is told",
+				"the length of a name and the count of the head, within the bounds the reference asks",
+				"the entries named after pictures, as the reference names them",
+				"every entry's placement inside the archive",
+				"the zlib stream of an entry inflated, told by the first byte of the entry",
+				"the entries that are not streams handed over as they stand",
+			],
+			unsupported: [
+				"archive creation",
+				"an entry whose zlib stream does not read, which is refused rather than handed over half read",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real graphics archive, which would show which of its entries are streams",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BMX",
 				class: "BmxOpener",
 				source: "ArcFormats/Tanaka/ArcBMX.cs",
