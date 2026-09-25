@@ -236,8 +236,14 @@ export function unpackImgPicture(data: Buffer, layout: ImgLayout): Buffer {
 	return output;
 }
 
-/** The places of the picture of a tight row of the places of its format. */
-function tightImgPlaces(places: Buffer, layout: ImgLayout): Buffer {
+/**
+ * The places of the picture of a tight row of the places of its format: the walk of this engine turns the
+ * places of a picture out of four places a place of it, of a blue, a green, a red and an alpha place.
+ */
+export function tightImgPlaces(
+	places: Buffer,
+	layout: { width: number; height: number; bitsPerPixel: number },
+): Buffer {
 	const tight = layout.width * (PLACES_32 === layout.bitsPerPixel ? 4 : 3);
 	const wide = layout.width * PLACES_WIDE;
 	if (tight === wide) return places;

@@ -349,13 +349,6 @@ the first forty of them.
   (`Compression.cs`, 357 lines). That is a staged port of the kind TLG6 and JBP took, not a single one, and
   its first stage has landed.
 
-- `IMG2` (`ArcFormats/ScrPlayer/ImageI.cs`, class `Img2Format`) is the second picture of the ScrPlayer
-  engine, and its walk is the one of `IMG` (`ArcFormats/ScrPlayer/ImageIMG.cs`), which is ported as
-  `scrplayer-img-image`: both peek the window of a table of codes and stand of the entry it names, of the
-  pairs of a place and of a row, of three rows turned over as the walk goes. The tables of the second stand
-  in the same directory (`IControlTable1`, `IControlTable2`, `IControlTable32`, `IColorBitsTable1` and
-  `IColorBitsTable2`) and one of them - the table of the places a tile reaches back to - is read by the walk
-  of the first as well, so a port of the second reads the tables of the first and walks its own places.
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
