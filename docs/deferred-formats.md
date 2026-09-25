@@ -161,6 +161,15 @@ than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`Arc
   at run time (`DeserializeScheme`, off `FormatCatalog.Instance.DataDirectory`), not from anything in its own
   source, so there is no scheme here to port and nothing to compare a container against.
 
+- `ARC/noncolor` (`ArcFormats/NonColor/ArcDAT.cs`) keeps three things outside the archive. The **scheme**:
+  `QueryScheme` looks the archive's title up in `KnownSchemes`, which ships **empty**, and otherwise
+  **prompts the user** through `ArcDatOptions`; with no scheme `TryOpen` returns `null`. The **names**:
+  `ReadFilenameMap` reads `scheme.FileListName` out of GARbro's data directory, or `NCFileMap.dat` and the
+  `.idx` beside it, because the archive itself carries CRC64 hashes alone. And through the names even the
+  **entry table**: while `Flags & 2` stands clear the opener XORs the offset, the size and the unpacked size
+  with three bytes of the *name* (`entry.Offset ^= Extend8Bit (raw_name[raw_name.Length >> 1])` and the two
+  beside it), so the places of the file of such an entry cannot be found at all without the listing.
+
 - `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
   `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).
 - `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
