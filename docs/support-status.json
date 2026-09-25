@@ -19030,6 +19030,35 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "GSA",
+				"class": "GsaFormat",
+				"source": "ArcFormats/Bishop/ImageGSA.cs"
+			},
+			"localId": "bishop-gsa-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, which stands far behind the word it opens with",
+				"the bits of a picture, of which the lowest of a byte comes first",
+				"the blocks of two places by two a picture is drawn as",
+				"the places of a picture themselves, of six, of seven and of eight bits",
+				"the turning about of a picture as the reference hands it over",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": ["picture creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the runs of a block added to the block beside it or to the block two rows above it",
+				"the places of the deepest kind of a picture, spread over the whole of a byte",
+				"the drawing of a part of a picture over the picture it belongs to"
+			]
+		},
+		{
+			"reference": {
 				"type": "audio",
 				"tag": "PAD",
 				"class": "PadAudio",
