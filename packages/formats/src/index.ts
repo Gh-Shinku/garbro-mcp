@@ -184,6 +184,7 @@ import { mv2AudioFormat } from "./cmvs/mv2-audio.js";
 import { mvAudioFormat } from "./cmvs/mv-audio.js";
 import { actressDatFormat } from "./actgs/dat-archive.js";
 import { willWipImageFormat } from "./will/wip-image.js";
+import { clsImageFormat } from "./lambda/cls-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1334,6 +1335,7 @@ export function createDefaultRegistry(
 		mvAudioFormat,
 		actressDatFormat,
 		willWipImageFormat,
+		clsImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

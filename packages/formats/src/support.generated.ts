@@ -15607,6 +15607,41 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "CLS",
+				class: "ClsFormat",
+				source: "ArcFormats/Lambda/ImageCLS.cs",
+			},
+			localId: "lambda-cls-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the CLS_TEXFILE mark and the two steps that name the frame",
+				"the frame's head: its version, size, place on a larger canvas, packed byte and depth",
+				"the three depths of eight, twenty four and thirty two bits",
+				"the channels' places and lengths, counted from the frame",
+				"the colour map of a picture of eight bits",
+				"rows that stand as they are, and the place every channel of a picture shares",
+				"packed rows: the chunk lengths in front of their bodies and the two kinds of run",
+				"the bytes of a pixel, red first and the fourth where the reference puts it",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"picture creation",
+				"a method of packing a channel other than the two the reference knows, which is refused by name",
+				"an unpacked picture of more than one channel shorter than the picture its head names",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real texture, which would show how its chunks and rows are cut in practice",
+				"whether a packed channel's bodies really stand behind all of its lengths, which the reference's own walk implies but a real file would settle",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "DAT/FPK",
 				class: "FpkOpener",
