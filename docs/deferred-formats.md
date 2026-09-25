@@ -22,6 +22,18 @@ There is no reading algorithm to port, because the reference itself never reache
 - `AF2` (`ArcFormats/CsWare/AudioAF2.cs`) ends at `format.SetBPS()` and returns no `SoundInput`.
 - `BIN/DXLIB` (`ArcFormats/DxLib/ArcDX8.cs`) reaches `return null;` with its `// decrypt-2` and
   `// decompress` steps still standing as comments rather than as code.
+- `WBC` (`ArcFormats/Primel/AudioWBC.cs`, 525 lines) stands of a **dump of a decompilation of the
+  engine's own code**, kept as it came out of the decompiler rather than resolved. `DecodeChunk` stands of
+  the places `v2` and `rate` (which stand nowhere in the file), of `field_C`, and of `a1->output` of an
+  `a1` standing nowhere either; the class `WbcDecoder` holds no places of the file the walk of a chunk
+  stands of (`this->field_4`, `this->field_1C[a3]`, `this->field_28[a3]` and the rest stand nowhere in it
+  as well); and the walks `sub_582550` calls (`sub_58BFF0`, `sub_58C050`, `sub_58C120`, `sub_639810`) stand
+  of no places of the file of the reference at all, as `sub_580CE0` and `sub_690850` do not. The file
+  therefore does not compile, and there is no walk of the engine to stand of here: the audio of the engine
+  would have to be worked out of the places of the engine itself, of no reference at all. What stands
+  readable is the head of the picture of the engine (the places of the file of the head of it, the count of
+  the chunks of it, the table of the places of the chunks and the kind of a chunk, of the four kinds
+  `DwordTable` names); what stands of no reading is the walk of the places of a chunk of it.
 
 ## The key is not in the archive
 
