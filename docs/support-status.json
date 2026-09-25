@@ -20522,6 +20522,37 @@
 				"a run of the walks of the first kind standing over the bottom of the picture",
 				"a run of the walks of the second kind of more than one row"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "S25",
+				"class": "S25Format",
+				"source": "ArcFormats/ShiinaRio/ImageS25.cs"
+			},
+			"localId": "shiina-rio-s25-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and the first frame of it",
+				"the rows of a picture standing as they stand, of three and of four places to a place",
+				"the rows of a picture standing of a colour behind them, of three and of four places to a place",
+				"the places of a row standing of no walk of its own",
+				"the rows of a picture standing of the rows before them, of the count of the rows and frames naming them",
+				"a row of the picture named by rows of more than one frame"
+			],
+			"unsupported": [
+				"creating a picture",
+				"the frames of a picture behind the first frame"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a row of the picture standing at a place of the file of an odd count",
+				"a picture whose rows stand of the rows of a frame of another count of rows"
+			]
 		}
 	]
 }

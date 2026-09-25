@@ -91,6 +91,7 @@ import { abcImageFormat } from "./sarang/abc-image.js";
 import { exhibitGyuImageFormat } from "./exhibit/gyu-image.js";
 import { blackCycDwqImageFormat } from "./black-cyc/dwq-image.js";
 import { pearlPl4ImageFormat } from "./pearl/pl4-image.js";
+import { shiinaRioS25ImageFormat } from "./shiina-rio/s25-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1484,6 +1485,7 @@ export function createDefaultRegistry(
 		exhibitGyuImageFormat,
 		blackCycDwqImageFormat,
 		pearlPl4ImageFormat,
+		shiinaRioS25ImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
