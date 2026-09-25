@@ -20553,6 +20553,38 @@
 				"a row of the picture standing at a place of the file of an odd count",
 				"a picture whose rows stand of the rows of a frame of another count of rows"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "SG",
+				"class": "SgFormat",
+				"source": "ArcFormats/Ivory/ImageSG.cs"
+			},
+			"localId": "ivory-sg-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of places and of a picture of a kind of its own",
+				"places standing as they stand",
+				"the places of a picture standing of the walks of every colour of it",
+				"a picture of places standing of the colours behind them",
+				"a picture of places standing of the colours and the alpha behind them, of a walk of bits",
+				"the places of a picture standing of the walks of every row of it",
+				"a picture of a kind of its own, of the key of the head taken away from it"
+			],
+			"unsupported": [
+				"creating a picture",
+				"a picture of a kind of its own read of a reader of this project"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a walk naming more places than a colour of a row holds",
+				"a picture of four places to a place of the walks of every colour of it"
+			]
 		}
 	]
 }
