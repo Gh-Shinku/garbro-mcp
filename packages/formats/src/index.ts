@@ -408,6 +408,7 @@ import { lpkFormat } from "./hypatia/lpk.js";
 import { hypatiaLsgImageFormat } from "./hypatia/lsg-image.js";
 import { wbmImageFormat } from "./hypatia/wbm-image.js";
 import { gImageFormat } from "./hyperworks/g-image.js";
+import { i24ImageFormat } from "./hyperworks/i24-image.js";
 import { hyperworksPakFormat } from "./hyperworks/pak.js";
 import { ibmImageFormat } from "./ice/ibm-image.js";
 import { isdScriptFormat } from "./ice/isd-script.js";
@@ -1552,6 +1553,7 @@ export function createDefaultRegistry(
 		alkFormat,
 		alicesoftQntImageFormat,
 		cdpaPackFormat,
+		i24ImageFormat,
 		gImageFormat,
 		hyperworksPakFormat,
 		nafFormat,

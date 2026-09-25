@@ -21451,6 +21451,30 @@
 				"a name of the picture before the walk of the engine outside the file of the picture of the engine itself"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "I24",
+				"class": "I24Format",
+				"source": "Legacy/HyperWorks/ImageI24.cs"
+			},
+			"localId": "hyperworks-i24-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine, of the two marks of it and of the places of the file of a colour of a place of the picture of it of 24 of them",
+				"the walk of the places of the file of the three tables of the walk of the engine of every 0x3FFF tokens of the places of the file of it",
+				"the places of the file of a colour of a place of the picture of the walk of the engine, of the runs of the tokens of 216 or above",
+				"the places of the file of the third table of the walk of the engine, of a place of the file of the colour of the walk of the engine of no places of the file of it",
+				"the walk of the places of the file of the table of the walk of a row of the engine, of the two kinds of the walk of the picture of it",
+				"the places of the file of the picture of the engine of the four places of the file of a colour to a place of it, handed over as the places of the file of a BMP of it"
+			],
+			"unsupported": ["writing a picture of the engine"],
+			"remainingVerification": ["real-game GARbro differential output"]
 		}
 	]
 }
