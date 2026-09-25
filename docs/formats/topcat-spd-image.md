@@ -73,3 +73,8 @@ lowest place of the control byte first: a picture of the walk of the runs of our
 the file of the walk of the reference only where the places of the file of the walk of the runs of the
 picture stand behind the places of the file of a control byte to eight places of the picture of the walk of
 them, as the walk of the reference stands of them.
+
+The reference stands of no walk of the places of a picture of the places of the file of the table of the
+colours of it: `SpdReader` takes the pictures of the twenty four and of the thirty two places of a colour
+alone, and stands of `NotSupportedException` of the places of the file of a colour of a place of the picture
+of the other walks of it.
