@@ -288,9 +288,11 @@ the reference is complete. What delays them is the size or the shape of the port
 input, so each entry records what the port would have to carry. They are the first candidates when porting
 continues.
 
-The survey that fills this section reads the gap inventory through `node scripts/garbro-gap.mjs --all`:
-without `--all` the tool prints only the first forty pending rows, which is a shorter list than it looks
-like.
+The survey that fills this section reads the gap inventory through
+`node scripts/garbro-gap.mjs --all --json`. The text form lists the rows that are only partly ported
+beside the ones nothing has been written for yet, so the queue of untouched rows comes from the `pending`
+list of the `--json` form, which holds exactly the not-started rows. Without `--all` both forms stop at
+the first forty of them.
 
 - `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
