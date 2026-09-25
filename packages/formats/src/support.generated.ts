@@ -3100,6 +3100,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "GCC",
+				class: "GccFormat",
+				source: "ArcFormats/elf/ImageGCC.cs",
+			},
+			localId: "elf-gcc-image",
+			verification: "synthetic-fixtures",
+			status: "partial",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the marks G24n, G24m, R24n and R24m",
+				"the walk of the places of the colours of a picture of the LZSS engine",
+				"the places of a picture of a mask, of the four places of a place of it",
+				"the walk of the alpha of a picture, of the counts of the places of it",
+				"the places of the picture standing of the rows of the file, of the row of the display the first",
+				"the alpha of a picture standing of the places of the picture where its width and height stand of them",
+			],
+			unsupported: [
+				"creating a picture",
+				"the walk of the places of the colours of an R24 picture",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the walk of the places of the colours of an R24 picture",
+				"a picture of a walk of the alpha standing of runs of the places of the file of its own",
+				"a picture whose alpha stands of the places of the file of it beyond the places of the picture",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MSK/AI5",
 				class: "MskFormat",
 				source: "ArcFormats/elf/ImageGP8.cs",
