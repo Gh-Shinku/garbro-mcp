@@ -20585,6 +20585,33 @@
 				"a walk naming more places than a colour of a row holds",
 				"a picture of four places to a place of the walks of every colour of it"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "ERP",
+				"class": "ErpFormat",
+				"source": "Legacy/BRoom/ImageERP.cs"
+			},
+			"localId": "broom-erp-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and the place of the key tables it stands of",
+				"a picture of eight places to a place, of a run of its colours",
+				"the walks of the first kind, of a run of one colour of the picture after another",
+				"the walks of kinds 1 to 6, of the runs of every colour of the picture",
+				"the walks of kinds 7 to 12, of the runs of the colours behind one another"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of a kind of walk of an order of the colours behind the first",
+				"a picture whose walk stands short of the file"
+			]
 		}
 	]
 }

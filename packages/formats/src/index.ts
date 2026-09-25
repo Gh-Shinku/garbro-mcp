@@ -93,6 +93,7 @@ import { blackCycDwqImageFormat } from "./black-cyc/dwq-image.js";
 import { pearlPl4ImageFormat } from "./pearl/pl4-image.js";
 import { shiinaRioS25ImageFormat } from "./shiina-rio/s25-image.js";
 import { ivorySgImageFormat } from "./ivory/sg-image.js";
+import { broomErpImageFormat } from "./broom/erp-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1488,6 +1489,7 @@ export function createDefaultRegistry(
 		pearlPl4ImageFormat,
 		shiinaRioS25ImageFormat,
 		ivorySgImageFormat,
+		broomErpImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
