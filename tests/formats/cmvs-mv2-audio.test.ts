@@ -55,13 +55,16 @@ function emptyRunBits(): number[] {
 function streamWords(wordBits: number[][]): Buffer {
 	const out: Buffer[] = [];
 	for (const bits of wordBits) {
-		let word = 0;
-		for (const [index, bit] of bits.entries()) {
-			if (bit) word = (word | (1 << index)) >>> 0;
+		// The bits of a run are laid out in words of their own, thirty two to a word.
+		for (let at = 0; at < bits.length; at += 32) {
+			let word = 0;
+			for (const [index, bit] of bits.slice(at, at + 32).entries()) {
+				if (bit) word = (word | (1 << index)) >>> 0;
+			}
+			const bytes = Buffer.alloc(4, 0x00);
+			bytes.writeUInt32LE(word, 0);
+			out.push(bytes);
 		}
-		const bytes = Buffer.alloc(4, 0x00);
-		bytes.writeUInt32LE(word, 0);
-		out.push(bytes);
 	}
 	return Buffer.concat(out);
 }
