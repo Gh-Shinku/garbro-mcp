@@ -679,6 +679,7 @@ import { tblImageFormat } from "./pan/tbl-image.js";
 import { pandoraPbxFormat } from "./pandora/pbx.js";
 import { pandoraXl24ImageFormat } from "./pandora/xl24-image.js";
 import { pkDatFormat } from "./paprika/pkdat.js";
+import { paprikaNpImageFormat } from "./paprika/np-image.js";
 import { parsleyCgV1Format, parsleyYanepackFormat } from "./parsley/cg.js";
 import { cgV2Format } from "./parsley/cg2.js";
 import { parsleyDesertCgFormat } from "./parsley/cg3.js";
@@ -1697,6 +1698,7 @@ export function createDefaultRegistry(
 		electriciteitDatFormat,
 		dskFormat,
 		pkDatFormat,
+		paprikaNpImageFormat,
 		plaFormat,
 		cpnFormat,
 		mcdFormat,

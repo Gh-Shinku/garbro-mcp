@@ -21673,6 +21673,32 @@
 			],
 			"unsupported": ["archive creation", "image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "PIC/NP",
+				"class": "NpFormat",
+				"source": "Legacy/Paprika/ImageNP.cs"
+			},
+			"localId": "paprika-np-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the count of the frames, the width, the height and the place of the walk",
+				"the two tables of the walk the reference carries itself: the pairs of codes and the list of words",
+				"the walk of the places: the places of a picture, the runs of a short word and of a long one with the counts and the places of the two tables",
+				"the ring of 0x10000 places a run reaches back into, and the four places the walk moves on behind a run",
+				"the word that ends the walk"
+			],
+			"unsupported": ["archive creation", "image encoding"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the token that rebuilds the codes of the two tables out of the counts of the words (the word 272) and its two sorts, which the walk carries and no fixture reaches yet"
+			]
 		}
 	]
 }
