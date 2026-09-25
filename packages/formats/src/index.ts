@@ -1187,7 +1187,6 @@ export * from "./ipac/index.js";
 export * from "./iris/index.js";
 export * from "./irrlicht/index.js";
 export * from "./ism/index.js";
-export * from "./ism/index.js";
 export * from "./ivory/index.js";
 export * from "./jam-creation/index.js";
 export * from "./james/index.js";
