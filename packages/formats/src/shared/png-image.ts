@@ -212,10 +212,12 @@ function expandRow(
 			values.push(read(column * channels + channel));
 		}
 		if (COLOUR_PALETTE === colourType) {
+			// The colours of a picture stand of the places of the file, of the blue of a colour first, as
+			// the colours of the places of the file itself stand.
 			const entry = (values[0] ?? 0) * PLTE_ENTRY_SIZE;
-			output[at] = palette[entry] ?? 0;
+			output[at] = palette[entry + 2] ?? 0;
 			output[at + 1] = palette[entry + 1] ?? 0;
-			output[at + 2] = palette[entry + 2] ?? 0;
+			output[at + 2] = palette[entry] ?? 0;
 		} else if (COLOUR_GREY === colourType || COLOUR_GREY_ALPHA === colourType) {
 			const grey =
 				bitDepth < BYTE_BITS

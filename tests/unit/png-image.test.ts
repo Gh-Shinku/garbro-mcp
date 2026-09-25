@@ -135,9 +135,10 @@ describe("PNG picture reader", () => {
 				rows: [row(0, [0x10])],
 			}),
 		);
-		// The first place of a picture of four places to a byte stands in the higher half of it.
+		// The first place of a picture of four places to a byte stands in the higher half of it, and the
+		// colours of a picture stand of the places of the file, of the blue of a colour first.
 		expect([...(mapped?.pixels ?? Buffer.alloc(0))]).toEqual([
-			4, 5, 6, 1, 2, 3,
+			6, 5, 4, 3, 2, 1,
 		]);
 		// A picture of greys standing of an alpha of its own stands of four places to a place.
 		const greyAlpha = await readPngImage(
