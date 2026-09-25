@@ -379,6 +379,29 @@ the first forty of them.
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
   the unit is that pair rather than a missing input.
+- `CPZ` (`ArcFormats/Cmvs/ArcCPZ.cs`, class `CpzOpener`, the layouts whose mark reads `CPZ5`, `CPZ6` or
+  `CPZ7`) is the newer archive of the CVNS engine, and its unit is four files rather than one: the opener
+  itself (776 lines), the head (`CpzHeader.cs`, 175), the walk of its entries (`Cpz5Decoder` and
+  `ArchiveKey`, in the opener), a Huffman reader of its own (`HuffmanDecoder.cs`, 108) and a **custom MD5**
+  (`CmvsMD5.cs`, 194) whose state feeds the keys of every step. Every index is encrypted end to end: the
+  head is checked against an MD5 of its own, the seventh layout unpacks its index key through the Huffman
+  reader, and the index itself then goes through a mix over a twenty four word secret, the walk of the
+  `Cpz5Decoder` (twice), a directory walk and an entry walk. None of that needs an input this project does
+  not have - the `ArchiveKey` of the newer versions comes from a key file that a stock build replaces with
+  zeros - so what holds the port back is the **fixture**: every one of those steps is a decoder, so a
+  fixture index has to be written *through* them, and while the mixes and the dword walks are invertible,
+  the inverse of the `Cpz5Decoder` is a compressor this project would have to write first. That is a
+  bigger piece of work than the port itself, which is why the two older archives of the same engine
+  (`cmvs-cpz1` and `cmvs-cpz2`) are ported and this one is not.
+- `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
+  its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
+  tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven
+  deserializer** (`SerializationContext`, `DirectorFile`, `DirectorEntry` and a `Reader` of its own). The
+  archive side then lists the chunks the reference calls raw (`RTE0`, `FXmp`, `VWFI`, `VWSC`, `Lscr`,
+  `STXT`, `XMED`, `File`), and the pictures and sounds of the engine need their palette and alpha
+  resources. A fixture needs a writer for that serialised shape - the same shape the port's own reader
+  would have to produce - so this one is a staged port of the kind TLG6 and JBP took rather than a single
+  file.
 - `NOA` (`ArcFormats/Entis/ArcNOA.cs`, class `NoaOpener`, 616 lines) is the archive of the same engine. Its
   index and its own `ERISADecodeContext` are portable, but every entry it lists is an `ERI`, `EMI`, `MIO`,
   `EMS` or `TXT` file of that engine, so listing an archive of it without the whole Entis stack
