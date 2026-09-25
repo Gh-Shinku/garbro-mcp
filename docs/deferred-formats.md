@@ -361,7 +361,9 @@ the first forty of them.
 - `CPZ` (`ArcFormats/Cmvs/ArcCPZ.cs`, class `CpzOpener`, the layouts whose mark reads `CPZ5`, `CPZ6` or
   `CPZ7`) is the newer archive of the CVNS engine, and its unit is four files rather than one: the opener
   itself (776 lines), the head (`CpzHeader.cs`, 175), the walk of its entries (`Cpz5Decoder` and
-  `ArchiveKey`, in the opener), a Huffman reader of its own (`HuffmanDecoder.cs`, 108) and a **custom MD5**
+  `ArchiveKey`, in the opener), a Huffman reader of its own (`HuffmanDecoder.cs`, 108), now ported as
+  `packages/codecs/src/cmvs-huffman.ts` - the tree of the walk of `HuffmanCompression.cs` over a stream of
+  words read from the lowest place of a byte up - and a **custom MD5**
   (`CmvsMD5.cs`, 194), whose state feeds the keys of every step - that piece is now ported, as
   `packages/codecs/src/cmvs-md5.ts`: the round is the round of RFC 1321 over the block the engine shapes
   (`w0 w1 w2 w3 80 … 80 00`, of its own initial state), and the seven keys of the engine differ in that
