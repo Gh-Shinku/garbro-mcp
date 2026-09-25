@@ -1,21 +1,21 @@
 // Format reference: GARbro ArcFormats/Kaguya/ArcLIN2.cs, class `Lin2Opener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
 
 /** 'LIN2' */
@@ -49,7 +49,7 @@ interface Lin2Metadata extends Record<string, unknown> {
  * The reference allocates the declared output and stops when the control byte runs out, which leaves the
  * remainder zeroed; a literal or match byte that runs out instead throws.
  */
-function unpackLin2(input: Buffer, outputLength: number): Buffer {
+export function unpackLin2(input: Buffer, outputLength: number): Buffer {
 	const output = Buffer.alloc(outputLength);
 	const frame = Buffer.alloc(FRAME_SIZE);
 	let framePosition = FRAME_INITIAL_POSITION;

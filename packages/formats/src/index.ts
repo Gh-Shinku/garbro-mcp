@@ -471,6 +471,7 @@ import { apsImageFormat } from "./kaguya/aps-image.js";
 import { aps3ImageFormat } from "./kaguya/aps3-image.js";
 import { kaguyaAriFormat } from "./kaguya/ari.js";
 import { kaguyaLin2Format } from "./kaguya/lin2.js";
+import { kaguyaLinkFormat } from "./kaguya/link.js";
 import { kaguyaPl10Format } from "./kaguya/pl10.js";
 import { kaguyaPltFormat } from "./kaguya/plt.js";
 import { kaguyaUfFormat } from "./kaguya/uf.js";
@@ -2002,6 +2003,7 @@ export function createDefaultRegistry(
 		leafAmFormat,
 		carriereArcFormat,
 		carriereScenarioFormat,
+		kaguyaLinkFormat,
 		kaguyaLin2Format,
 		system98LibFormat,
 		frontWingFltFormat,

@@ -21568,5 +21568,32 @@ export const formatSupportCatalog = {
 			unsupported: ["creating a picture", "the versions behind the second one"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "ARC/LINK",
+				class: "LinkOpener",
+				source: "ArcFormats/Kaguya/ArcLINK.cs",
+			},
+			localId: "kaguya-link-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of the third to the sixth version, including the byte of length of the sixth",
+				"the record walk, with a record of no places ending it and the flags of every record",
+				"the names of the older layouts (a byte of length and a cp932 name) and of the sixth (a word of length and a UTF-16 name)",
+				"the older layout, whose names and places stand apart",
+				"an entry whose places carry the letters BM, read through the Lin2 walk of the same engine",
+				"the walk of a packed entry: its tree, its move to front, its places sorted by their own colour and its runs down the columns",
+			],
+			unsupported: [
+				"archive creation",
+				"an encrypted entry (it needs scheme of the game, read out of a params.dat beside the archive)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
 	],
 } as const;
