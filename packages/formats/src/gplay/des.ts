@@ -144,16 +144,11 @@ export class GplayDes {
 			for (let at = 0; at < 8; at += 1) {
 				places.push(Number((value >> BigInt(6 * at)) & 0xffn));
 			}
-			// The places of the file of the walk of the engine stand of the places of the file of the walk of
-			// the places of the colour of a place of the picture, of the places of the file of the eight places
-			// of the walk of the engine itself: the places of the file of the table of the walk of the engine
-			// stand of the places of the file of the walk of the eight S tables of the engine, of the four
-			// places of the file of a place of the table of a colour of the picture.
-			const tables = [320, 448, 192, 128, 256, 0, 64, 384];
+			const tables = [384, 64, 0, 256, 128, 192, 448, 320];
 			let packed = 0;
 			for (let at = 0; at < 8; at += 1) {
 				const place = ((places[at] ?? 0) & 0x3f) + (tables[at] ?? 0);
-				packed = (packed * 16 + (this.state[place] ?? 0)) >>> 0;
+				packed = (packed | ((this.state[place] ?? 0) << (4 * at))) >>> 0;
 			}
 			let swapped = 0;
 			for (let bit = 0; bit < 32; bit += 1) {

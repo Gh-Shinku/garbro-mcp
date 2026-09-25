@@ -12,46 +12,51 @@ the count of the entries of it as a word of four places of the file. The index s
 name of the engine of the places of the file of the archive), then the places of the file of the entry. The
 places of the file of the entries stand behind the index, one behind the other, in the order of the index.
 
+## The walk of the cipher of the engine
+
+The places of the file of the engine stand of a walk of the places of the file of the cipher of the engine
+itself (`DesTransform`), of the key `0x1234567812345678` of the places of the file of the walk of the engine:
+the walk of the places of the file of the cipher stands of the places of the file of the key of it (of the
+sixteen places of the file of the walk of the engine, of the places of the file of the sixteen places of the
+walk of the engine of a place of the walk of a colour of a place of the picture) and of the walk of the
+places of the file of the block of eight places of them at a time, of the places of the file of the walk of
+it of the lowest place of a place of the file first.
+
+The reference stands of the walk of the places of the file of the cipher of the engine for the places of the
+file of the text of it (of every entry of `.TXT` and `.DAT` of no mark `#` or `*` at the front of it), for the
+eight first places of the file of every block of 0x1000 places of them of every entry of `.JPG`, and for the
+places of the file of every 0xA0 places of the file of the BMP of the engine behind the places 0x493AA of
+it.
+
 ## What this port does not carry
 
-* **The places of the file of the cipher of the engine** (`DesTransform`). The reference stands of a walk of
-  the places of the file of the cipher of the engine itself for the places of the file of the text of it (of
-  every entry of `.TXT` and `.DAT` of no mark `#` or `*` at the front of it), for the eight first places of
-  the file of every block of 0x1000 places of them of every entry of `.JPG`, and for the places of the file
-  of every 0xA0 places of the file of the BMP of the engine behind the places 0x493AA of it. This port
-  stands of a walk of the places of the file of the cipher of the engine itself, of the key of the engine
-  (`0x1234567812345678`, of the places of the file of the walk of the engine) **which stands of no
-  verification yet**: the places of the file of the walk of the key schedule of it (the sixteen places of the
-  file of the walk of the engine, of the places of the file of the key of it) stand of the places of the file
-  of an independent walk of the same reference written apart from this port, and the walk of the places of a
-  block of the places of the file of it stands of different places of the file from the walk of that
-  reference (the places of the file of the block `0x1122334455667788` stand of `0x3FA4D9DC3C863E03` of this
-  port and of `0xD09828A88801A6BA` of the walk of the places of the file written apart from it).
-  The entries of the archive that stand of the cipher, and the places of the file of the BMP of the engine
-  behind the places 0x493AA of it, stand of `UNSUPPORTED_FEATURE` here.
 * **The places of the file of an entry standing beyond the places of the file of the archive of it, a count
   of the entries of the archive standing of no places of it, and a name of the head of the archive of no
   places of the file of the digits of the engine.** Each of them stands of `INVALID_ARCHIVE` here, as the
   reference stands of `null` and of its own guards.
-
-## What this port carries
-
-* The index of the archive, of the names of the entries of it (of the places of the file of the engine
-  itself, of the places of the file of the digits of the version of it), the places of the file of the
-  entries of it and the places of the file of the entry of an entry standing beyond the places of the file of
-  the archive.
-* The places of the file of an entry of the archive that stands of no walk of the cipher of the engine (of
-  the places of the file of an entry of no `.TXT`, `.DAT`, `.JPG` or `.BMP` behind it, and of the places of
-  the file of the text of the engine of a mark `#` or `*` at the front of it).
-* The places of the file of the kind of the places of a colour of a place of the picture of the BMP of the
-  engine: the walk of the reference stands of the places of the file of the BMP of the engine itself, of the
-  places of the file of the walk of the places of a colour of a place of the picture of its own.
+* **Packing an archive.** `YskOpener` stands of no walk of it in the reference.
 
 ## How the walk stands verified
 
-Two walks of our own stand of the archive of the engine: the index of it (of the names of the entries of it,
+Six walks of our own stand of the archive of the engine: the index of it (of the names of the entries of it,
 of the places of the file of the entries of it, of the places of the file of the digits of the version of it,
 of a count of the entries of it standing of no places of the file of the archive, of the places of the file
-of an entry of it standing beyond the places of the file of the archive), and the places of the file of the
-head of the archive of it (of the marks of the head of the archive of the engine, of the entry of an entry of
-it of no walk of the cipher of the engine).
+of an entry of it standing beyond the places of the file of the archive), the places of the file of the head
+of the archive of it (of the marks of the head of the archive of the engine), the walk of the places of the
+file of the cipher of it (of the places of the file of the walk of the key of the engine and of the places
+of the file of the walk of the block of it), and the places of the file of the entries of it: the text of
+the engine of a mark `#` at the front of it, the text of the engine of no mark of it, the places of the file
+of an entry of no walk of the cipher of the engine, the places of the file of a picture of the engine (of the
+places of the file of the block of it), and the places of the file of the BMP of the engine (of the places of
+the file of the kind of the places of a colour of a place of the picture of it and of the places of the file
+of the walk of the places of the BMP of it behind the places 0x493AA of it).
+
+The walk of the places of the file of the cipher of this port stands of the places of the file of a walk of
+the same reference written apart from it of the same places of the file of every picture of it: the places of
+the file of the block `0x1122334455667788` stand of `0xD09828A88801A6BA` of both of them, and the places of
+the file of the block of `AABBCCDD` of `F6472BD0`. The walk of the places of the file of the *tables* of the
+cipher of this port caught a walk of the places of the file of the table of the walk of the engine standing
+of the places of the file of the walk of the eight S tables of the engine at the *other* end of the places of
+the file of the table of a colour of the picture: the places of the file of the first place of the walk of
+the engine stand of the lowest of the places of the file of the table of the colour of the picture, of no
+places of the file of the highest of them.

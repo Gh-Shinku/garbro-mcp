@@ -8,6 +8,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { GplayDes } from "./des.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -15,6 +16,8 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
+/** The key of the walk of the places of the file of the cipher of the engine stands of the engine itself. */
+const DEFAULT_KEY = 0x1234567812345678n;
 /** The picture of the engine opens with the letters `AA` and ten places of the file of the digits of it. */
 const LETTERS = "AA";
 const DIGITS = 10;
@@ -29,6 +32,11 @@ const SIGNATURES = [
 const BMP_BITS_FIELD = 0x1c;
 const BMP_PIXELS = 0x36;
 const BMP_TAIL = 0x493aa;
+const BMP_STRIDE = 0xa0;
+const BMP_HEAD = 8;
+/** The places of the file of the walk of the places of the file of a picture of the engine. */
+const JPG_BLOCK = 0x1000;
+const JPG_HEAD = 8;
 
 const TEXT_MARKS = [0x23, 0x2a];
 
@@ -88,20 +96,17 @@ export function yskSignatures(): readonly { bytes: Uint8Array }[] {
 /** `YskOpener.OpenEntry`: the places of the file of an entry, of the walks of the cipher of the engine. */
 export function unpackYskEntry(data: Buffer, entry: YskEntry): Buffer {
 	const output = Buffer.from(data);
+	const des = new GplayDes(DEFAULT_KEY);
 	if ("text" === entry.kind) {
 		if (TEXT_MARKS.includes(output[0] ?? 0)) return output;
-		// The places of the file of the text of the engine stand of the walk of the places of the cipher of
-		// it, which stands of no verification of this port yet (see the notes of the walk of the cipher).
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"the places of the file of the text of the engine stand of the cipher of it",
-		);
+		des.transform(output, 0, output.length);
+		return output;
 	}
 	if ("jpg" === entry.kind) {
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"the places of the file of a picture of the engine stand of the cipher of it",
-		);
+		for (let at = 0; at < output.length; at += JPG_BLOCK) {
+			des.transform(output, at, Math.min(JPG_HEAD, output.length - at));
+		}
+		return output;
 	}
 	if ("bmp" === entry.kind) {
 		if (output.length < BMP_BITS_FIELD + 2) return output;
@@ -111,10 +116,13 @@ export function unpackYskEntry(data: Buffer, entry: YskEntry): Buffer {
 		if (4 === bits) output.writeUInt16LE(8, BMP_BITS_FIELD);
 		else if (16 === bits) output.writeUInt16LE(24, BMP_BITS_FIELD);
 		if (output.length - BMP_PIXELS > BMP_TAIL) {
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"the places of the file of the BMP of the engine stand of the cipher of it",
-			);
+			for (
+				let at = BMP_PIXELS + BMP_TAIL;
+				at + BMP_HEAD <= output.length;
+				at += BMP_STRIDE
+			) {
+				des.transform(output, at, BMP_HEAD);
+			}
 		}
 		return output;
 	}
