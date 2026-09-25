@@ -92,6 +92,15 @@ open archives that the shipped defaults already cover.
   whole index, two words a record, decrypted with two words of the key; the names of the entries are folded
   from an MD5 of the lowercase name, and an entry may be encrypted again with a key built out of its own name.
 
+- `LIBP` (`ArcFormats/Malie/ArcLIB.cs`, the `DatOpener` of the Malie engine; the plain `LIB` of the same file
+  is ported as `malie-lib`) decrypts the first sixteen bytes of a file with every scheme it knows before it can
+  tell whether the file is one of its own: it walks `KnownSchemes` and keeps the scheme whose decryptor turns
+  the head into `LIBP` or `LIBU`. That table stands as `new Dictionary<string, LibScheme>()` in the source -
+  a scheme carries the decryptor itself and where the index is aligned - so a stock build reads no encrypted
+  archive of this engine at all. What a scheme would unlock is a directory of two words a record, whose entries
+  stand at places counted in whole kilobytes, with the names of the directories themselves folded into the
+  same records; every entry's payload is decrypted block by block as it is read.
+
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
