@@ -2,6 +2,7 @@ export * from "./cpz.js";
 export * from "./cpz1.js";
 export * from "./cpz2.js";
 export * from "./msk-image.js";
+export * from "./mv-audio.js";
 export * from "./mv-common.js";
 export * from "./mv-tables.js";
 export * from "./mv2-audio.js";

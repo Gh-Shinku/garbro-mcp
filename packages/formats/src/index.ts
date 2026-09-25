@@ -181,6 +181,7 @@ import { cpz2Format } from "./cmvs/cpz2.js";
 import { mskImageFormat } from "./cmvs/msk-image.js";
 import { cmvsPb2ImageFormat } from "./cmvs/pb2-image.js";
 import { mv2AudioFormat } from "./cmvs/mv2-audio.js";
+import { mvAudioFormat } from "./cmvs/mv-audio.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1327,6 +1328,7 @@ export function createDefaultRegistry(
 		hexenhausImgdImageFormat,
 		cmvsPb2ImageFormat,
 		mv2AudioFormat,
+		mvAudioFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

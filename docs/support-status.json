@@ -19144,6 +19144,36 @@
 		},
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "MV",
+				"class": "MvAudio",
+				"source": "ArcFormats/Cmvs/AudioMV.cs"
+			},
+			"localId": "cmvs-mv-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the MKVS word and the eighteen byte head",
+				"the engine's own bit reader, shared with the newer sound",
+				"the runs of coefficients, with their scale taken from the table's own entry",
+				"the first filter, over the whole of the place the coefficients are gathered in",
+				"the second filter, reading sixteen coefficients per sample straight through its table",
+				"the samples, written flat, one channel after the other, as the reference does",
+				"the wave file wrapped around them"
+			],
+			"unsupported": ["sound creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real file, which would show how a real run's coefficients and scales are laid out",
+				"the filter chain is pinned against a mirror of the same reference source rather than against decoded output of a real sound",
+				"the flat write stops at the end of the buffer the head names, where the reference would write past it for a sound of more than one channel"
+			]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "PX",
 				"class": "PxFormat",
