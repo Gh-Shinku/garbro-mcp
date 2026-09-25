@@ -92,6 +92,12 @@ The places the walk turns out are then the values the tokens ask for, packed the
 — a table of the same packing stands in the test beside the walk — so a slip in either tree, in the walks,
 in the window or in the packing shows up as a difference rather than as a picture that merely looks wrong.
 
+A second fixture walks a picture whose offset tree carries the whole table of codes, so a code above the
+sixteenth of one turns into a distance that stands of the **stride** of the picture: the same stream is read
+once over a stride of sixteen and once over one of thirty two, and the run at the end of it reaches a place
+of the period of the picture in either of them that the other does not, so the two forms of the offset table
+are told apart rather than merely walked.
+
 The head of the picture, the palette of a frame that carries one, the sixteen colours of the engine, the
 bitmap the format hands over (its two headers, its palette and its top down rows) and the turning away of a
 mark of another engine, of a count of no frames, of a place of a frame beyond the file and of a box of no

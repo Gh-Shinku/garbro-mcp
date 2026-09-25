@@ -86,10 +86,10 @@ const PLACES = (() => {
 	return places;
 })();
 
-/** The same places packed four bits to a byte, in the order the walk of the reference packs them. */
-const PACKED = (() => {
-	const packed = Buffer.alloc(PLACES.length, 0);
-	for (const [at, value] of PLACES.entries()) {
+/** The places of a picture packed four bits to a byte, the way the walk of the reference packs them. */
+function packPlaces(places: Buffer): Buffer {
+	const packed = Buffer.alloc(places.length, 0);
+	for (const [at, value] of places.entries()) {
 		let place = (value & 0x80) | ((value & 0x20) << 1);
 		place |= ((value & 0x08) << 2) | ((value & 0x02) << 3);
 		place |= (value & 0x01) | ((value & 0x04) >> 1);
@@ -97,7 +97,55 @@ const PACKED = (() => {
 		packed[at] = place & 0xff;
 	}
 	return packed;
-})();
+}
+
+const PACKED = packPlaces(PLACES);
+
+/** The tree of a walk of `count` leaves whose codes are the places of the stream below them. */
+function fullTree(writer: BitWriter, count: number, width: number): void {
+	const walk = (from: number, length: number): void => {
+		if (1 === length) {
+			writer.leaf(from, width);
+			return;
+		}
+		writer.bit(1);
+		const half = length >> 1;
+		walk(from, half);
+		walk(from + half, half);
+	};
+	walk(0, count);
+}
+
+/**
+ * The stream of a picture whose offset table walks the places of the frame: its offset tree carries the
+ * whole table of codes, so a code above the sixteenth of one turns into a distance that stands of the
+ * stride of the picture.
+ */
+function wideFixtureStream(places: number): Buffer {
+	const writer = new BitWriter();
+	// The token tree: 'A' at '0', 'B' at '10', 'C' at '110' and a run of three at '111'.
+	writer.bit(1);
+	writer.leaf(0x41, 9);
+	writer.bit(1);
+	writer.leaf(0x42, 9);
+	writer.bit(1);
+	writer.leaf(0x43, 9);
+	writer.leaf(0x100, 9);
+	fullTree(writer, 0x100, 8);
+	// Three places of their own, then runs of three that reach three places back and stay on the period
+	// of them, and one last run of the like that reaches sixteen places back.
+	writer.code(0, 1);
+	writer.code(0b10, 2);
+	writer.code(0b110, 3);
+	const runs = (places - 6) / 3;
+	for (let i = 0; i < runs; i += 1) {
+		writer.code(0b111, 3);
+		writer.code(2, 8);
+	}
+	writer.code(0b111, 3);
+	writer.code(0x10, 8);
+	return writer.bytes();
+}
 
 /**
  * `GphFormat.ReadMetaData`: the mark, the count of the frames and the places of the first of them, and
@@ -195,6 +243,29 @@ describe("elf GPH picture", () => {
 		]);
 		expect(new Set([...places.subarray(6)]).size).toBe(1);
 		expect(places[63]).toBe(0x18);
+	});
+
+	it("walks the places of a picture whose stride is wide", () => {
+		// The same stream, once over a stride of sixteen and once over one of thirty two: the offset
+		// table of the second walks the places of the frame rather than counting them, so the last run
+		// of three places reaches a different place in either of them.
+		const stream = wideFixtureStream(96);
+		const pattern = "ABC".repeat(31);
+		const places = (box: readonly [number, number, number, number]) => {
+			const file = buildGph({ stream, box });
+			const layout = readGphLayout(file);
+			if (!layout) throw new Error("no layout");
+			return unpackGphPicture(file, layout);
+		};
+		const narrow = places([0, 0, 15, 5]);
+		const wide = places([0, 0, 31, 2]);
+		expect(narrow.length).toBe(96);
+		expect(wide.length).toBe(96);
+		// Sixteen places back of the ninety third place stands a 'B' of the period, thirty two of them
+		// stand an 'A' of it.
+		expect(narrow).toEqual(packPlaces(Buffer.from(`${pattern}BCA`)));
+		expect(wide).toEqual(packPlaces(Buffer.from(`${pattern}ABC`)));
+		expect(narrow.subarray(93)).not.toEqual(wide.subarray(93));
 	});
 
 	it("reads the picture through the format", async () => {

@@ -21638,12 +21638,10 @@ export const formatSupportCatalog = {
 				"the two trees of the engine, read out of the stream of the frame: the tokens and the places of the window",
 				"the walk of the places, the window of 0x1400 bytes and the offset table of the frame",
 				"the four bit places of a picture, packed the way the format packs them",
+				"the offset table of a frame of a wide stride, which walks the places of the frame rather than counting them",
 			],
 			unsupported: ["archive creation", "image encoding"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture whose stride stands above sixteen, where the offset table walks the places of the frame rather than counting them",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 	],
 } as const;
