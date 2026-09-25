@@ -859,6 +859,7 @@ import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 import { tobeWbiImageFormat } from "./tobe/wbi-image.js";
 import { tcd1Format } from "./topcat/tcd1.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
+import { iafImageFormat } from "./triangle/iaf-image.js";
 import { cgfFormat } from "./triangle/cgf.js";
 import { triangleDatFormat } from "./triangle/dat.js";
 import { iafFormat } from "./triangle/iaf.js";
@@ -1846,6 +1847,7 @@ export function createDefaultRegistry(
 		yoxDatFormat,
 		entisPacFormat,
 		triangleBmxFormat,
+		iafImageFormat,
 		digitalWorksPacFormat,
 		pspQpkFormat,
 		nitroplusPakFormat,
