@@ -365,9 +365,18 @@ the first forty of them.
   and the third is handed one, since the walk of the reference never stops on its own - and the range walk of
   `RangePackedStream`, of twelve places of precision, whose counts the engine has to bring to the four
   thousand and ninety six places of the range between them, since the walk reads a place of the range as the
-  place of its run over that count rather than over the sum of the counts of the table. What remains is the
-  three `Primel1/2/3Encyption` ciphers (`Encryption.cs`, 510 lines), AES in CFB mode with zero padding, and
-  then the archive itself (`ArcPCF.cs`, 259 lines). That is a staged port of the kind TLG6 and JBP took, not a single one.
+  place of its run over that count rather than over the sum of the counts of the table. The three ciphers the flags name have landed as well, in
+  `packages/codecs/src/primel-cipher.ts` (of their tables in `primel-cipher-tables.ts`): `Primel1Encyption`,
+  `Primel2Encyption` and `Primel3Encyption`, of one block of sixteen places, of a key schedule that runs the
+  words of the key through a table of the places of a byte of its own, and of a chaining place that feeds
+  back its own input - so the engine reads an archive of the direction a cipher text of it stands in, and the
+  walks are not involutions. What remains is AES in CFB mode with zero padding, and then the archive itself
+  (`ArcPCF.cs`, 259 lines).
+  
+  The fixtures of the four packed streams and of the three ciphers stand of the terms of those walks rather
+  than of a stream out of an archive: the streams turn a run of places out of a head written for them, and
+  the ciphers of a second transcription of the same source, the reference carrying no inverse of either. A
+  payload out of an archive of that engine is therefore still unverified. That is a staged port of the kind TLG6 and JBP took, not a single one.
 
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
