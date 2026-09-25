@@ -145,7 +145,8 @@ export function unpackMiaPicture(data: Buffer, layout: MiaLayout): MiaPicture {
 	const output = Buffer.alloc(stride * layout.height, 0x00);
 	const buffer = Buffer.alloc(layout.height * ROW_GROUP_SIZE, 0x00);
 	const pattern = setupPattern();
-	const bits = new MiaBits(data, HEAD_SIZE + PALETTE_SIZE);
+	// The order of the ways of a picture stands in front of the bits of its places.
+	const bits = new MiaBits(data, HEAD_SIZE + PALETTE_SIZE + ORDER_SIZE);
 	const order = Buffer.from(
 		data.subarray(
 			HEAD_SIZE + PALETTE_SIZE,

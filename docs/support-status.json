@@ -20111,13 +20111,15 @@
 				"extract",
 				"the head a picture is told by, which names its own kind of picture",
 				"the colour map of a picture, green, red and blue to a colour",
+				"the frame of a picture, which stands of eight bytes to a group of four places",
+				"a group drawn out of the pattern of the picture, one place of it asked for by the bits",
+				"a picture whose bits stand short, handed over as far as it was drawn",
 				"the places of a picture drawn two of them to a byte",
 				"the bitmap the reference hands over"
 			],
 			"unsupported": ["picture creation"],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the frame of a picture and the groups drawn out of its pattern, whose walk stands in the port",
 				"the groups standing as the places of another one, out of the four places behind the walk and out of the group behind it turned about"
 			]
 		}

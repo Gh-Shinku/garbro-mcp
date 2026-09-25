@@ -1,10 +1,13 @@
 import { Buffer } from "node:buffer";
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
 	miaImageFormat,
 	readMiaLayout,
 	readMiaPalette,
+	unpackMiaPicture,
 } from "../../packages/formats/src/miami/mia-image.js";
 
 const HEAD_SIZE = 0x10;
@@ -86,5 +89,35 @@ describe("Miamisoft image", () => {
 		expect(await miaImageFormat.detect?.(new BufferByteSource(bad))).toBe(
 			false,
 		);
+	});
+
+	it("draws a picture of nothing when the places of the pattern stand of nothing", () => {
+		// The first bit of a group stands of its own and the four places behind it name places of the pattern
+		// the picture draws out of; a picture drawn out of places of nothing is a picture of nothing.
+		const picture = unpackMiaPicture(miaFile(8, 1, [1, 1, 1, 1, 1]), {
+			width: 8,
+			height: 1,
+		});
+		expect([...picture.places]).toEqual([0, 0, 0, 0]);
+	});
+
+	it("draws the places of a picture out of the pattern of its own", async () => {
+		// One place of the pattern is asked for by one bit standing clear in front of the next one that
+		// stands, and the places of the other three of the group stand at the place the walk has reached.
+		const data = miaFile(8, 1, [1, 0, 1, 1, 1, 1]);
+		const picture = unpackMiaPicture(data, { width: 8, height: 1 });
+		expect([...picture.places]).toEqual([0x11, 0x11, 0x00, 0x00]);
+		const handle = await miaImageFormat.open(
+			new BufferByteSource(data),
+			"picture.mia",
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		if (!image) throw new Error("no picture");
+		// The places of a picture stand two of them to a byte, the first of them the higher.
+		expect([...image.pixels]).toEqual([1, 1, 1, 1, 0, 0, 0, 0]);
 	});
 });

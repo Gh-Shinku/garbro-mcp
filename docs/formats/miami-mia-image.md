@@ -36,15 +36,15 @@ reference hands it over.
 
 ## Verification
 
-Three tests over synthetic fixtures (`tests/formats/miami-mia-image.test.ts`): the head and the pictures it
-turns away; the colour map of a picture, green, red and blue to a colour; and a picture told by the shape of its
-head alone.
+Five tests over synthetic fixtures (`tests/formats/miami-mia-image.test.ts`): the head and the pictures it turns
+away; a picture of nothing, whose groups are drawn out of places of the pattern that are worth nothing; the
+places of a picture drawn out of the pattern of their own - one place of the pattern asked for by one bit
+standing clear in front of the next one that stands, and the three places behind it standing where the walk has
+reached - both as the frame hands them over and as a bitmap holds them; the colour map of a picture, green, red
+and blue to a colour; and a picture told by the shape of its head alone.
 
-The frame of a picture and the groups drawn out of its pattern, and the groups standing as the places of
-another one, stand in the port as they stand in the reference, but no fixture of them was finished here: their
-fixtures did not tell the two readings apart, so they stand among the places still to be verified of the record
-of this format.
-
-The groups standing as the places of another one do - the four places behind the group the walk stands at, and
-the group behind it turned about - stand in the port as they stand in the reference, but no fixture of them was
-finished here; they stand among the places still to be verified of the record of this format.
+The groups standing as the places of another one do - out of the four places behind the group the walk stands
+at, and out of the group behind it with its places turned about - stand in the port as they stand in the
+reference, but no fixture of them was finished here: of a picture of this engine such a group stands as the
+group beside it does within the frame, so the two readings of it are not told apart by a fixture; they stand
+among the places still to be verified of the record of this format.
