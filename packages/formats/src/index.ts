@@ -523,6 +523,7 @@ import { imgPngImageFormat } from "./lilim/img-png-image.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
 import { loggArfFormat } from "./logg/arf.js";
 import { frmImageFormat } from "./logg/frm-image.js";
+import { elgImageFormat } from "./lucifen/elg-image.js";
 import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { lunaPacFormat } from "./luna-soft/pac.js";
 import { lunePackFormat } from "./lune/pack.js";
@@ -2066,6 +2067,7 @@ export function createDefaultRegistry(
 		gssLsdFormat,
 		strikesPckFormat,
 		lucifenLpkFormat,
+		elgImageFormat,
 		ellefinEpkFormat,
 		g2PakFormat,
 		g2ArchiveFormat,
