@@ -379,10 +379,15 @@ the first forty of them.
   secret of the scheme, the digest of the head of the archive and a seed - **both directions of it**, which
   the reference carries as `Encode` and `EncryptEntry` beside `Decode` and `DecryptEntry`. An earlier note
   here said the inverse of that walk was a compressor the port would have to write first; the reference
-  carries it, so a fixture can be written *through* it, and the note was wrong. What remains is the opener
-  itself (776 lines: the mark `CPZ5`/`CPZ6`/`CPZ7`, `UnpackIndexKey`, `UnpackLzss`, the directory and entry
-  walks), the head (`CpzHeader.cs`, 175) and the key file (`ArchiveKey`), of which a stock build stands of
-  zeros.
+  carries it, so a fixture can be written *through* it, and the note was wrong. The head has landed as well, in
+  `packages/formats/src/cmvs/cpz5-header.ts`: the places of the fields of a head stand of the version its
+  mark spells, of the constants the reference takes every one of them apart with, the head is held to a sum
+  of the places of its own (which for the seventh layout covers places the head does not end at, since that
+  layout carries the count of the places of the key of its index behind the sum), and the places of an index
+  are held to the digest the head carries, and to the digest of the key behind them of the seventh layout.
+  What remains is the opener itself (776 lines: the mark `CPZ5`/`CPZ6`/`CPZ7`, `UnpackIndexKey`,
+  `UnpackLzss`, the directory and the entry walks) and the key file (`ArchiveKey`), of which a stock build
+  stands of zeros.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
   its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
   tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven
