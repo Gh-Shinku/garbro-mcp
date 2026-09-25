@@ -786,6 +786,7 @@ import { sceplayPakFormat } from "./sceplay/pak.js";
 import { gxFormat } from "./scoop/gx.js";
 import { scoopScpImageFormat } from "./scoop/scp-image.js";
 import { scrPlayerPakFormat } from "./scrplayer/pak.js";
+import { scrPlayerImgImageFormat } from "./scrplayer/img-image.js";
 import { KcapFormat } from "./selene/kcap.js";
 import { cp3Format } from "./seraphim/cp3.js";
 import { cp3ImageFormat } from "./seraphim/cp3-image.js";
@@ -1888,6 +1889,7 @@ export function createDefaultRegistry(
 		broomEncryptedPkFormat,
 		softpalPacFormat,
 		amusePacFormat,
+		scrPlayerImgImageFormat,
 		scrPlayerPakFormat,
 		maiFormat,
 		maiCmImageFormat,
