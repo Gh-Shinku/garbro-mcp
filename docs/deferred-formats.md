@@ -167,8 +167,15 @@ further than the reference's own list of them.
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries
   open through an `ISA` archive) depend on external readers in the same way.
 - `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`) reads a companion PNG for every entry.
-- `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`) stands on the `CRX` reader of the same engine, which this
-  project has not ported.
+- `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`, class `CrxdFormat`, which stands on the `CrxFormat` of the same
+  engine, now ported as `circus-crx-image`) is a **differential** picture: its head names the picture it
+  stands on by name and by offset in the archive the picture came from (`BaseOffset` at 8, `BaseFileName` as
+  a string at 0xc), and the difference stands either behind the head (the word `CRXG` at 0x20) or at an
+  offset of that same archive (the word `CRXJ` at 0x20, the offset as a word behind it). Both the base and
+  the difference are read through the engine's own file system -
+  `VFS.Top as ArchiveFileSystem` and `arc.Source as CrmArchive`, `arc.OpenByOffset (offset)` - so the picture
+  cannot be read from the file it stands in alone: the port would hand over the difference where the picture
+  stands of the base and the difference together.
 - `DZI` (`ArcFormats/Malie/ImageDZI.cs`) reads a directory of tiles whose data comes through `VFS`, i.e.
   through other files beside it, rather than from the picture.
 - `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
