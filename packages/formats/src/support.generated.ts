@@ -21132,13 +21132,10 @@ export const formatSupportCatalog = {
 				"the places of a picture of the rows of it above them",
 				"the walk of the alpha of a picture of thirty two places of a colour to a place of it",
 				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
+				"the places of the file of the count of the walk of the engine of the two places of the file of the picture of it (of the word behind the count of the walk of the engine), of the walk of the eight places of a colour of the engine and of the twenty four of them",
 			],
 			unsupported: ["creating a picture"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture of the run of the second kind of the walk of the places of the file of more than 0x20 places of the picture",
-				"a picture of the run of the places of the picture of the second kind of the walk of the places of the file (of the word behind the count)",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {

@@ -125,6 +125,49 @@ describe("Lucifen Easy Game System image", () => {
 		]);
 	});
 
+	it("reads a picture of eight places of a colour, of a run of more than 0x20 places of the picture", async () => {
+		// The places of the file of the count of the walk of the engine stand of the places of the file of
+		// the *two* of them where the places of the file of the picture of it stand of `0x20` of them or
+		// above: the word behind the count of the walk of the engine of the places of the file of it.
+		const palette: Buffer = Buffer.alloc(0x400, 0x00);
+		palette[4] = 0x33;
+		palette[5] = 0x22;
+		palette[6] = 0x11;
+		const places: Buffer = Buffer.alloc(40, 0x00);
+		for (let at = 0; at < 40; at += 1) places[at] = (at * 5) & 0xff;
+		const walk = Buffer.concat([
+			Buffer.from([0x23, 0xdf]),
+			palette,
+			Buffer.from([0xff]),
+			// The count of the places of the file of the picture of the walk of the engine of the word
+			// behind the count of it: of `0x07 + 33` places of the file of the picture of the engine.
+			Buffer.from([0x20, 0x07]),
+			places,
+			Buffer.from([0xff]),
+		]);
+		const data = Buffer.concat([elgHead(40, 1, 8), walk]);
+		const bytes = await bmpOf(data);
+		const image = readBmpImage(bytes);
+		if (!image) throw new Error("the port handed over no bitmap");
+		expect([...image.pixels]).toEqual([...places]);
+		expect([...bytes.subarray(0x36 + 4, 0x36 + 8)]).toEqual([
+			0x33, 0x22, 0x11, 0x00,
+		]);
+	});
+
+	it("reads the places of a picture of twenty four places of a colour, of a run of more than 0x20 of them", async () => {
+		const places: Buffer = Buffer.alloc(120, 0x00);
+		for (let at = 0; at < 120; at += 1) places[at] = (at * 7) & 0xff;
+		const data = Buffer.concat([
+			elgHead(40, 1, 24),
+			Buffer.from([0x20, 0x07]),
+			places,
+			Buffer.from([0xff]),
+		]);
+		const bytes = await bmpOf(data);
+		expect(pixelsOf(bytes, 40, 1)).toEqual([...places]);
+	});
+
 	it("reads the places of a picture of twenty four places of a colour, of the row before it", async () => {
 		// A picture of two rows of two places of a colour to a place of them: the places of the row below
 		// stand of the places of the picture one row up, of no places of the file behind the walk of them.

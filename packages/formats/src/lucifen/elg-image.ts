@@ -236,7 +236,8 @@ class ElgWalk {
 			const flags = this.byte();
 			if (END === flags || dst >= output.length) break;
 			if (LITERAL === (flags & 0xc0)) {
-				for (let place = 0; place < this.count(flags, 33, 1); place += 1) {
+				const count = this.count(flags, 33, 1);
+				for (let place = 0; place < count; place += 1) {
 					dst = this.putPixel(
 						output,
 						dst,
@@ -324,7 +325,8 @@ class ElgWalk {
 			const flags = this.byte();
 			if (END === flags || dst >= output.length) break;
 			if (LITERAL === (flags & 0xc0)) {
-				for (let place = 0; place < this.count(flags, 33, 1); place += 1) {
+				const count = this.count(flags, 33, 1);
+				for (let place = 0; place < count; place += 1) {
 					dst = this.putPixel(
 						output,
 						dst,

@@ -70,6 +70,17 @@ the place of the file of its end.
   the file of the picture as noughts.
 * **Packing a picture.** `ElgFormat.Write` stands of no walk of it in the reference.
 
+The count of the places of the file of the walk of the engine of the two places of the file of the
+picture of it stands of the places of the file of it of `0x20` of them or above: a picture of the places
+of the file of 40 and 1 of them of the walk of the eight places of a colour of the engine (and of the
+twenty four of them) stands of the places of the file of the count of the walk of the engine of the word
+behind the count of it (`0x20`, `0x07` of the places of the file of the walk of the engine of the
+`40` places of the file of the picture of the engine) and of the places of the file of the picture of
+them behind it. The walk of the places of the file of this port stood of the places of the file of the
+count of the walk of the engine *every* place of the picture of the engine of them; the reference
+stands of the places of the file of the count of it alone (of the places of the file of the engines of
+the third and fourth kinds of the walk of it).
+
 ## How the walk stands verified
 
 Eight pictures of our own stand of the walk of the engine: the head of the three kinds of the picture (of
