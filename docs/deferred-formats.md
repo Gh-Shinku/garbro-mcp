@@ -148,6 +148,14 @@ open archives that the shipped defaults already cover.
   stock build reads none of these archives. The payloads are raw deflate streams before that (`NpkStream`),
   which this project already reads, and an entry of a single uncompressed segment is a plain stream.
 
+- `GAL` (`ArcFormats/LiveMaker/ImageGAL.cs`, class `GalFormat`, mark `Gale`): the head of the versions 100
+  to 107 is plain - the version stands in the letters 4 to 6 - and the walk of the places stands on the
+  file alone. What is not in the file is the **key of a shuffled picture**: `QueryKey` asks `KnownKeys`,
+  which the shipped `DefaultScheme` keeps empty, and the reference's own setting, and hands the places of
+  a picture over unshuffled under the key of nothing when neither of them stands (`if (!KnownKeys.Any())
+  return 0;`). A port could read every picture that carries no shuffle bit and list all of them; the
+  shuffled ones would stand of a key of nothing.
+
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
@@ -186,6 +194,12 @@ than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`Arc
 - `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
   `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).
 - `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
+
+- `DAT/WEAPON` (`Legacy/Weapon/ArcDAT.cs`, class `DatOpener`, no mark of its own): the archive carries no
+  index at all. Its entries come out of `KnownFileTables`, a table of **274** hand written sizes keyed by
+  the name of the file itself (`eventcg.dat` and its like), and the walk of a picture behind them is a
+  plain sixteen bit one. A port would carry that table of sizes as it stands, the way the port of
+  `ALL/GIGA` would carry the file map of that engine.
 
 ## The payload needs a decoder this project does not have
 
@@ -232,6 +246,13 @@ further than the reference's own list of them.
 - `BYTES/UNITY` (`ArcFormats/Unity/ArcSpVM.cs`) reads its entries through `BinaryFormatter` with a binder
   that maps the game's `LinkerInfo` types onto its own. Deserializing that graph needs the game's own
   assemblies, and the format is a serialization of them rather than a byte layout.
+
+- `DAT/GX4LIB` (`ArcFormats/Unity/Gx4Lib/ArcDAT.cs`, class `DatOpener`, no mark): the index of the archive
+  is a **.NET object graph** of the reference's own serialization (`GameRes.Gx4Lib.PackageFile.Deserialize`
+  reads an index of `PFAudioHeaders` or of `PFImageHeaders`), the entries behind it are packed with
+  **QLZ** (`QlzUnpack`), a decoder this project does not carry, and their pictures stand of the Gx4
+  decoders and of a table of visual differences the reference keeps beside it. Three things outside the
+  file stand between it and a port.
 
 ## The picture is a palette kept beside the game
 
@@ -281,6 +302,11 @@ further than the reference's own list of them.
   of the marks `SCW `, `Scw5` and `Scw4` of the first of them and of no mark of the second of them (of
   the description "Unidentified data file" of it). The archives of the GsPack engine stand in this project
   as `gspack`; the scripts of it stand of no walk of them here.
+
+- `AMP/LEAF` (`ArcFormats/Leaf/ArcPAK.cs`, class `AmpFormat`) stands on `GenericScriptFormat` as well and
+  carries no walk of a file at all: the class holds a tag, a description, a mark of nothing and, beside it,
+  a single alias of the extension `SDT` to the scripts of the engine. There is no reading algorithm in it
+  to port.
 
 - `TIFF` (`GameRes/ImageTIFF.cs`, `TifFormat`) parses its own tags - the class `Parser` walks the image
   file directory of the file, its types and its counts - and then **hands the pixels to WPF**:
