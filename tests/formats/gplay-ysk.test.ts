@@ -49,6 +49,24 @@ it("walks the places of the file of the cipher of the engine", () => {
 	const part = Buffer.from("aabbccdd", "hex");
 	des.transform(part, 0, part.length);
 	expect([...part]).toEqual([...Buffer.from("f6472bd0", "hex")]);
+	// The walk of the places of the file of the cipher of the engine stands of the places of the file of
+	// the key of it: the places of the file of the walk of the engine of this port and of a walk of the
+	// same reference written apart from it stand of the same places of the file of the keys of the game
+	// of the engine itself.
+	const other = new GplayDes(0xdeadbeefcafebaben);
+	expect(other.transformQWord(0x1122334455667788n).toString(16)).toBe(
+		"b7031d97614b8a6f",
+	);
+	expect(other.transformQWord(0x0123456789abcdefn).toString(16)).toBe(
+		"8aeabfd2ad2dbc43",
+	);
+	const third = new GplayDes(0x0f1e2d3c4b5a6978n);
+	expect(third.transformQWord(0xffffffffffffffffn).toString(16)).toBe(
+		"3c21a023caa1a9ff",
+	);
+	expect(third.transformQWord(0x0000000000000000n).toString(16)).toBe(
+		"46c6b622077ed9bf",
+	);
 });
 
 it("reads the places of the file of the text of the archive, of the cipher of the engine", async () => {

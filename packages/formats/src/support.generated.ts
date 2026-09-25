@@ -21259,12 +21259,10 @@ export const formatSupportCatalog = {
 				"the places of the file of the text of the engine, of no mark # or * at the front of it",
 				"the places of the file of a picture of the engine, of the eight first places of the file of every block of 0x1000 places of them",
 				"the places of the file of the BMP of the engine behind the places 0x493AA of it, of every 0xA0 places of the file",
+				"the places of the file of the walk of the cipher of the engine of the keys of the game of it (of the walk of the places of the file of the key of the engine itself and of the places of the file of the block of it alone)",
 			],
 			unsupported: ["creating an archive"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"the places of the file of the walk of the cipher of the engine of a key of no places of the file of the engine itself",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {

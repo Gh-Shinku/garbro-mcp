@@ -60,3 +60,9 @@ of the places of the file of the walk of the eight S tables of the engine at the
 the file of the table of a colour of the picture: the places of the file of the first place of the walk of
 the engine stand of the lowest of the places of the file of the table of the colour of the picture, of no
 places of the file of the highest of them.
+
+The places of the file of the walk of the engine of the keys of the game stand of the places of the file of
+the walk of the engine of this port and of a walk of the same reference written apart from it: the places of
+the file of the block `0x1122334455667788` of the key `0xDEADBEEFCAFEBABE` stand of `0xB7031D97614B8A6F`,
+of the block `0x0123456789ABCDEF` of the same key of `0x8AEABFD2AD2DBC43`, and the two places of the file of
+the key `0x0F1E2D3C4B5A6978` of `0x3C21A023CAA1A9FF` and `0x46C6B622077ED9BF`.
