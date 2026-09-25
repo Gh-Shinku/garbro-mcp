@@ -447,6 +447,7 @@ import { htfImageFormat } from "./jam-creation/htf-image.js";
 import { jamesJmgImageFormat } from "./james/jmg-image.js";
 import { lb5Format } from "./jupiter/lb5.js";
 import { kaasAudioFormat } from "./kaas/kaas-audio.js";
+import { kaasPicImageFormat } from "./kaas/pic-image.js";
 import { kaasPbFormat } from "./kaas/pb.js";
 import { kaasPdFormat } from "./kaas/pd.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
@@ -1728,6 +1729,7 @@ export function createDefaultRegistry(
 		frontWingFwgiImageFormat,
 		frontWingFweiImageFormat,
 		kaasAudioFormat,
+		kaasPicImageFormat,
 		mebiusMcgImageFormat,
 		sceplayG24aImageFormat,
 		sceplayG2408ImageFormat,

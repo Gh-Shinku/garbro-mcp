@@ -1394,6 +1394,35 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "PIC/KAAS",
+				"class": "PicFormat",
+				"source": "ArcFormats/Kaas/ImageKAAS.cs"
+			},
+			"localId": "kaas-pic-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine and its three walks",
+				"the walk of the places of the file of a picture of the walk of five places to a count",
+				"the counts of the scramble of the places of a picture of the walk of six",
+				"the walk of the places of the file of a picture of the walk of eight places to a count",
+				"the walk of the places of the file of a picture of the walk of nine places to a count",
+				"the places of the picture standing of the three places of a place of it"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the counts of the walk of five places to a count of the places of the file of the counts of them (of the places of the file of the walk of them of one and of three)",
+				"the count of the places of the picture of the walk of five of four places of the file and of twelve places of the counts of it",
+				"the counts of the scramble of a picture of a count of the places of the file of the picture behind `0x3F` of them"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "FG/FWEI",
 				"class": "FweiFormat",
 				"source": "ArcFormats/FrontWing/ImageFG.cs"
