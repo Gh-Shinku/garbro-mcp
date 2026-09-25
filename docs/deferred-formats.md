@@ -430,11 +430,35 @@ the first forty of them.
   `EMS` or `TXT` file of that engine, so listing an archive of it without the whole Entis stack
   (`EriReader.cs` of 2844 lines, `MioDecoder.cs` of 968, `ErisaMatrix.cs` of 488, `ErisaNemesis.cs` of 338)
   names files that cannot be read. It is the last port of that engine.
-- `PIC/NP` (`Legacy/Paprika/ImageNP.cs`, class `NpFormat`, 412 lines) has the shape of the now ported
-  `elf-gph-image`: a plain
-  head (a word of its own, a width and a height, twenty four bits a place) and a bespoke walk - an
-  `UnpackBits` run of literal places and a block coded LZ with two tables built from the stream - and no
-  writer to check the reader against. The signature is a word that reads `NP\x01`.
+- `PIC/NP` (`Legacy/Paprika/ImageNP.cs`, class `NpFormat`, 412 lines, signature `NP\x01`): the head is
+  plain - a count of the frames at 2, a width at 4, a height at 8, the place of the walk at 0xC, twenty
+  four bits a place - and the walk behind it is now read off the reference down to the last index, so the
+  port is a single file. What it carries:
+
+  * a walk of two tables it keeps in the file itself: `bitMap` (sixteen pairs of a count of places and a
+    place of the list of words) and `wordList` (two hundred and seventy four words, the places of the
+    picture below 0x100 and the tokens of a run above it), beside `dword_425810` (seven pairs of a count
+    of places and a base) and `dword_4257CC` (eight pairs of the like) - all of them in the source and
+    none of them of any size;
+  * the reader of the walk: `GetBits` holds thirty two places of the stream and takes a byte at a time,
+    most significant bit first - the same shape as the reader of `elf-gph-image`, so a fixture is an
+    ordinary bit writer;
+  * the tokens: a word below 0x100 is a place of the picture, a word of 256 to 263 a run whose count
+    stands in it, a word above it a run whose count and place stand in the two tables above; the place of
+    a run is a count of three places and fifteen of them, with the low place read first and the high one
+    behind it;
+  * the window: a ring of 0x10000 places that every place written is copied into as well, so a run reaches
+    back over the picture itself;
+  * a reset token (the word 272): the counts of the words of the list are sorted by
+    `sub_416E80`/`sub_416DC0` - a shell sort of the pairs `(word, count)` with the counts halved as they
+    are taken - and the codes of the words are then read from the stream a count of places at a time
+    (unary runs of clear places behind a set one), which is what a picture of the format uses when its
+    own counts stand in the stream.
+
+  What held the entry back was the fixture, and the port of `elf-gph-image` settled that: the reader of
+  both formats is an ordinary bit stream, so a fixture is an ordinary bit writer and the first tokens of
+  the walk can be taken from the tables the reference ships, with the reset token covered by a second
+  fixture that writes its own counts.
 
 ## Two engines can share a tag and a class name
 
