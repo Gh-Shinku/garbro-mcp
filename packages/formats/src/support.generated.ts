@@ -21595,5 +21595,32 @@ export const formatSupportCatalog = {
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "audio",
+				tag: "PCM",
+				class: "PcmAudio",
+				source: "ArcFormats/Circus/AudioPCM.cs",
+			},
+			localId: "circus-pcm-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head: the count of the places, the mode and the extra field of it, and the wave format behind them",
+				"the plain mode, handed over as a wave of the format of the head",
+				"the fifth mode, handed over as the Ogg stream it names",
+			],
+			unsupported: [
+				"audio creation",
+				"the transform of the two packed modes (the LZSS container of the first and the zlib stream of the third)",
+			],
+			remainingVerification: [
+				"the transform of the two packed modes",
+				"real-game GARbro differential output",
+			],
+		},
 	],
 } as const;

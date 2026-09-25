@@ -184,6 +184,7 @@ import {
 import { mykFormat } from "./cherry/myk.js";
 import { cherryPak2Format, cherryPakFormat } from "./cherry/pak.js";
 import { crmFormat } from "./circus/crm.js";
+import { circusPcmAudioFormat } from "./circus/pcm-audio.js";
 import { circusDatFormat } from "./circus/dat.js";
 import { crxImageFormat } from "./circus/crx-image.js";
 import { circusPckFormat } from "./circus/pck.js";
@@ -1464,6 +1465,7 @@ export function createDefaultRegistry(
 		advSysGwdImageFormat,
 		bishopBscFormat,
 		ccfFormat,
+		circusPcmAudioFormat,
 		circusPckFormat,
 		flkFormat,
 		fpk2Format,
