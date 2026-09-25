@@ -722,6 +722,7 @@ import { pspQpkFormat } from "./psp/qpk.js";
 import { abmp7Format, abmpFormat } from "./q-lie/abmp.js";
 import { qlieAbmpImageFormat } from "./qlie/abmp-image.js";
 import { qliePackArchiveFormat } from "./qlie/pack.js";
+import { qlieDpngImageFormat } from "./qlie/dpng-image.js";
 import { qsoftBpeImageFormat } from "./qsoft/bpe-image.js";
 import { rainBinFormat } from "./rain/bin.js";
 import { bcdFormat } from "./ransel/bcd.js";
@@ -2393,6 +2394,7 @@ export function createDefaultRegistry(
 		mermaidPwvAudioFormat,
 		forceDzpImageFormat,
 		qlieAbmpImageFormat,
+		qlieDpngImageFormat,
 		qliePackArchiveFormat,
 		minkDatImageFormat,
 		fcImageFormat,

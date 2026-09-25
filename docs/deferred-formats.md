@@ -206,22 +206,20 @@ than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`Arc
 The archive side is walkable, but every entry is a picture or a sound in a format the project reads no
 further than the reference's own list of them.
 
-- `DPNG` (`ArcFormats/Qlie/ImageDPNG.cs`, 102 lines, mark `DPNG`) and `BIP`
-  (`ArcFormats/Cri/ImageBIP.cs`, 152 lines, no mark of its own) are tiled pictures whose tiles are PNG
-  streams, and both hand every tile to the PNG reader of the Windows imaging stack. DPNG holds the count
-  of its tiles and the box of the picture behind its mark and, for every tile, its place, its box and the
-  count of its stream behind eight places it skips; BIP holds a head of five or ten words, the place of
-  the tiles at the second word and the place of the places at the last word of the head less eight, then
-  a tile list (the count, a word of nothing and the box of the picture, and for every tile the place of
-  it and its box) and the streams the places name.
-- `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`, 114 lines) stands of the same two readers of another shape: a
-  head of `ARGBSaveData1` and the kind 3 in it, the count of a **JPEG** at the seventeenth place of the
-  head and the count of a **PNG** mask behind it, which it joins into a picture of the places of the JPEG
-  and the grey places of the mask. What all three stand of is one walk of the places of a PNG and one of a
-  JPEG: the project holds a PNG reader of its own (`shared/png.ts`, the places and the chunks of a stream)
-  but none of the places of one, and its inflate is in hand, so a decoder of the kinds these streams stand
-  of (eight places a colour with an alpha or without one, a palette and grey) is the unit that would carry
-  them, with the JPEG of `ARGB` beside it.
+- `BIP` (`ArcFormats/Cri/ImageBIP.cs`, 152 lines, no mark of its own) is a tiled picture whose tiles are
+  PNG streams, and it hands every tile to the PNG reader of the Windows imaging stack: a head of five or
+  ten words, the place of the tiles at the second word and the place of the places at the last word of the
+  head less eight, then a tile list (the count, a word of nothing and the box of the picture, and for every
+  tile the place of it and its box) and the streams the places name. The port of `DPNG`
+  (`ArcFormats/Qlie/ImageDPNG.cs`) is `qlie-dpng-image`, and the walk of the places of a graphic it stands
+  of is in hand as `shared/png-image.ts`, so what stands between `BIP` and a port is the reading of its
+  list rather than a missing input.
+- `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`, 114 lines) stands of a head of `ARGBSaveData1` and the kind 3 in
+  it, the count of a **JPEG** at the seventeenth place of the head and the count of a **PNG** mask behind
+  it, which it joins into a picture of the places of the JPEG and the grey places of the mask. The walk of
+  the places of a PNG stands in hand (`shared/png-image.ts`), so what stands of this row is the walk of the
+  places of a **JPEG**: the project holds the head fields of one (`shared/jpeg.ts`) and no decoder, and
+  `gameres-jpeg-image` hands a graphic of that kind over as it stands rather than reading its places.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library.
 - `AIFF` (`ArcFormats/AudioAIFF.cs`) and `WMA` (`ArcFormats/AudioWMA.cs`) hand theirs to NAudio.
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries

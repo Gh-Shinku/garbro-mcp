@@ -21757,6 +21757,38 @@
 				"real-game GARbro differential output",
 				"the rebuild of the tree, which the fixtures of the walk do not reach: it stands of the root reaching the top of the weights, of some thousands of places"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DPNG",
+				"class": "DpngFormat",
+				"source": "ArcFormats/Qlie/ImageDPNG.cs"
+			},
+			"localId": "qlie-dpng-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the mark, the word behind it, the count of the tiles and the box of the picture",
+				"the list of the tiles: the left and the top of a tile, its box, the count of its stream and the eight places behind them",
+				"the place of the stream of a tile, of the count of it, and the passing over of a tile that names no places",
+				"the graphic of a tile of its own, of four places of a colour with an alpha or of three without one",
+				"the composition of the tiles into a picture of four places a place, of the places of a graphic overwriting the ones it stands on",
+				"the places of a tile held to the picture it stands past",
+				"the bitmap of the picture"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"the places of a display of the reference, which premultiplies the colours of a graphic by its alpha"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a graphic whose streams stand of a palette, of a grey or of a depth below eight places, which the walk of the places of a graphic of this project carries and no fixture here reaches"
+			]
 		}
 	]
 }
