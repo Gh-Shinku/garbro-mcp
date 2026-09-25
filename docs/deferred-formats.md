@@ -218,22 +218,6 @@ further than the reference's own list of them.
 - `AIFF` (`ArcFormats/AudioAIFF.cs`) and `WMA` (`ArcFormats/AudioWMA.cs`) hand theirs to NAudio.
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries
   open through an `ISA` archive) depend on external readers in the same way.
-- `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`) reads a companion PNG for every entry.
-
-- `UNITY/FS` (`ArcFormats/Unity/ArcUnityFS.cs`, class `UnityFSOpener`) needs two decoders this project does
-  not carry: the index of the container is an **LZMA** stream where its flags say so (`UnpackLzma`), and
-  every entry behind the index is an **LZ4** block (`Lz4Compressor.DecompressBlock`).
-- `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`, class `CrxdFormat`, which stands on the `CrxFormat` of the same
-  engine, now ported as `circus-crx-image`) is a **differential** picture: its head names the picture it
-  stands on by name and by offset in the archive the picture came from (`BaseOffset` at 8, `BaseFileName` as
-  a string at 0xc), and the difference stands either behind the head (the word `CRXG` at 0x20) or at an
-  offset of that same archive (the word `CRXJ` at 0x20, the offset as a word behind it). Both the base and
-  the difference are read through the engine's own file system -
-  `VFS.Top as ArchiveFileSystem` and `arc.Source as CrmArchive`, `arc.OpenByOffset (offset)` - so the picture
-  cannot be read from the file it stands in alone: the port would hand over the difference where the picture
-  stands of the base and the difference together.
-- `DZI` (`ArcFormats/Malie/ImageDZI.cs`) reads a directory of tiles whose data comes through `VFS`, i.e.
-  through other files beside it, rather than from the picture.
 - `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
   which would need an XML walk this project does not have. `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`)
   splits one such picture into its frames and layers, so it stands on the same walk and is not a
@@ -364,20 +348,6 @@ the first forty of them.
   padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between
   (`Compression.cs`, 357 lines). That is a staged port of the kind TLG6 and JBP took, not a single one, and
   its first stage has landed.
-
-- `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`, class `LayOpener`, extension gated on `.lay`): the index
-  of the engine is plain - a count of the layers, a count of the tile coordinates, then a record per layer
-  (a word of its own, a first and a count) and a run of four words per coordinate - and the tiles are
-  crops of a **sibling PNG** whose name is the base name of the archive (the reference finds it through
-  `VFS`, so it may sit inside another archive). The composite is then drawn with **WPF**: a
-  `DrawingVisual`, thirty two by thirty two `CroppedBitmap` crops and a `RenderTargetBitmap` of 1920 by
-  1080. Both of the things a port of it stands of are now in hand - the walk of the places of a PNG is
-  `shared/png-image.ts`, which reads a graphic rather than its head fields alone, and the lookup of a
-  sibling by the stem of a name is `shared/companion.ts` (`listCompanionFiles`), which is what the port of
-  `DIF/MnV` stands of - so what stands between this row and a port is a **source-over compositor** in place
-  of the WPF drawing: the places of a crop of the sibling are drawn over the places of the picture at the
-  places the index names, of the alpha of the graphic where it carries one.
-
 
 - `IMG` (`ArcFormats/ScrPlayer/ImageIMG.cs`, class `ImgFormat`) and `IMG2` (`ArcFormats/ScrPlayer/ImageI.cs`,
   class `Img2Format`) are the pictures of the ScrPlayer engine. Neither stands on anything outside the

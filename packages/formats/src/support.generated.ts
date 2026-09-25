@@ -21825,5 +21825,38 @@ export const formatSupportCatalog = {
 				"the turning away of a part of the difference that stands past the picture, which the fixtures of the composition do not reach",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "LAY/MAGES",
+				class: "LayOpener",
+				source: "ArcFormats/NitroPlus/ArcLAY.cs",
+			},
+			localId: "nitroplus-lay-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of an index: the count of the layers and of the places, the word of every layer with the place of its first tile and its count",
+				"the list of the places, of four single places each: the place of a tile within the picture of the engine and the place of it within the graphic, of one taken off the two behind it",
+				"the graphic beside the index, of the base name of it less a trailing underline and of the extension png",
+				"the layer of the word one under the layer the engine asks for, and the face of the picture behind a layer whose top place stands at four",
+				"the tiles of thirty two by thirty two places, cut out of the graphic and laid down at the middle of a picture of 1920 by 1080 places",
+				"the blend of a place of a tile over the place behind it, of the alpha of each of them",
+				"the bitmap of the picture",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of a display of the reference, which lays its tiles into a Pbgra32 surface",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a layer whose face stands at a word in front of the one the layer names, which no fixture reaches",
+				"the places of a tile the reference reads fractionally, which this port takes as whole places",
+			],
+		},
 	],
 } as const;

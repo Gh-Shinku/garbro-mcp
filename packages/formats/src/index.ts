@@ -652,6 +652,7 @@ import { mpkFormat } from "./nitroplus/mpk.js";
 import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { nitroplusNpaSteinsGateFormat } from "./nitroplus/npa-sg.js";
 import { nppFormat } from "./nitroplus/npp.js";
+import { nitroplusLayImageFormat } from "./nitroplus/lay-image.js";
 import { nitroplusNpaFormat } from "./nitroplus/npa.js";
 import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { igaFormat } from "./noesis/iga.js";
@@ -1483,6 +1484,7 @@ export function createDefaultRegistry(
 		sudFormat,
 		lnk2Format,
 		nitroplusNpaFormat,
+		nitroplusLayImageFormat,
 		nppFormat,
 		new AfsFormat(),
 		new CpkFormat(),
