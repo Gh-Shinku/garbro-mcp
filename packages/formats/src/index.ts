@@ -89,6 +89,7 @@ import { iptImageFormat } from "./artemis/ipt-image.js";
 import { mai3ImageFormat } from "./izumi/mai3-image.js";
 import { abcImageFormat } from "./sarang/abc-image.js";
 import { exhibitGyuImageFormat } from "./exhibit/gyu-image.js";
+import { blackCycDwqImageFormat } from "./black-cyc/dwq-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1480,6 +1481,7 @@ export function createDefaultRegistry(
 		mai3ImageFormat,
 		abcImageFormat,
 		exhibitGyuImageFormat,
+		blackCycDwqImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,

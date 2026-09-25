@@ -20463,6 +20463,38 @@
 				"the alpha of a picture standing of a stream of the engine",
 				"the alpha of a picture of a kind standing as it stands"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DWQ",
+				"class": "DwqFormat",
+				"source": "ArcFormats/BlackCyc/ImageDWQ.cs"
+			},
+			"localId": "black-cyc-dwq-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the text header of a picture and the kind of the picture behind it",
+				"the head of the file itself naming the measurements of the picture behind it",
+				"a bitmap of the file itself, of the red and blue places of every place of it swapped",
+				"a bitmap of the runs of the engine, of the row standing of the row above it",
+				"the mask behind a picture, of the colours of it naming the alpha of the places of it",
+				"a picture of a kind of its own, standing behind the header",
+				"a picture of a kind this project reads none of, handed over as it stands"
+			],
+			"unsupported": [
+				"creating a picture",
+				"a picture of a mask behind a picture this project reads none of"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of sixteen places to a place behind a mask",
+				"a picture of a kind of its own of a byte order the other way round"
+			]
 		}
 	]
 }
