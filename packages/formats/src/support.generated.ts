@@ -11650,6 +11650,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "MGPK",
+				class: "MgpkOpener",
+				source: "ArcFormats/MangaGamer/ArcMGPK.cs",
+			},
+			localId: "mangagamer-mgpk",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the MGPK word and the version from one up",
+				"the index of forty eight byte records, with the length of every name in front of it",
+				"the names read as text of their own, an empty one kept",
+				"every entry's placement inside the archive",
+				"the entries of an archive handed over as they stand",
+				"the names an archive holds that the reference would key, reported as holdsKeyedNames",
+			],
+			unsupported: [
+				"archive creation",
+				"the keyed way: the reference keys such an archive with a key from a scheme that ships empty or from a user, and unwraps a txt entry out of an LZF stream behind it, so a stock build reads no such archive at all",
+				"the older layout of this word, which is ported as mangagamer-mgpk0",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a keyed archive, which needs a key the reference does not carry",
+				"a real archive, which would show how its names and places are laid out in practice",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "AOIMY/UNICODE",
 				class: "AoiMyUnicodeOpener",
 				source: "ArcFormats/Aoi/ArcBOX.cs",
