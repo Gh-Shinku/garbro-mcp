@@ -37,6 +37,35 @@ does with them.
 * every other mode — refused by the reference as well (`NotSupportedException`), so such a file is not one
   of the sounds this port reads and its detection stands clear.
 
+## An independent reading of the same codec
+
+The two packed modes carry a codec the reference wrote out of a disassembly. A second, independent reading of
+the same codec stands in the vgmstream project (its test tool `xpcm.c`, by bnnm,
+<https://gist.github.com/bnnm/ce4ca7be8950614df96b4f4f8a91c766>), which was read out of the games' own
+executables as well. Step for step:
+
+* **The tables agree.** The table of sines and cosines the reference carries (`dword_43A358`, 2048 words) is
+  `trunc(cos(2*pi*k/4096) * 4096)` and `trunc(sin(2*pi*k/4096) * 4096)` for `k` below 1024, and the
+  independent reading computes exactly that table. The four blocks of scales the reference carries
+  (`unk_43A254`, 256 places) hold, in their first eight words, the rows of the independent table's own
+  scales, place for place. Every block of the reference holds eight more words of a whole one, which its own
+  walk never reaches: the walk takes a scale per 0x100 places of the window, so only the eight stand used.
+* **The window of a frame agrees.** Both readings put the odd places of a frame first and then the even ones
+  out of the nibbles of the two halves of the frame (`interleave`), and both build the two arrays of the
+  transform out of that window with the rule that the lowest letter of a code is its own sign (`scale`; the
+  reference's own `word_6A56C8` is that table, built by `InitTable`).
+* **The transform agrees**, down to the shifted sixty four bit products of every butterfly, the four block
+  and two block tails, the reversion of the places, and the closing `>> 14`, which the independent reading
+  writes as a division by 1024 and which the reference carries as a shift with the sign correction of a
+  division.
+* **The frame overlap agrees.** A frame carries 4064 samples and keeps 32 more, which the frame after it
+  mixes into its first 32 places. The independent reading mixes the last 32 samples of the frame before into
+  them, and so does the reference: its walk writes the places of a frame at the **sample** of the frame's own
+  place while reading the places of the frame before out of the same buffer, and the two steps of a frame —
+  4096 places written, 4064 places apart — meet in exactly those 32 places.
+* **The samples agree.** The tests of this port pin the samples of a two frame stream to the values of the
+  independent reading.
+
 ## Deviations
 
 * A head that declares more places than the file holds is read to the end of the file rather than refused,
