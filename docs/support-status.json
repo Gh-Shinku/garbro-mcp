@@ -12679,6 +12679,36 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "PIC/SOFTPAL",
+				"class": "PicFormat",
+				"source": "ArcFormats/Softpal/ImagePIC.cs"
+			},
+			"localId": "softpal-pic-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine and the counts of the walks of its blocks",
+				"the places of the file of the walk of the block of the picture of eight places to a place",
+				"the places of the file of the walk of the block of the picture of twenty four and of thirty two places to a place",
+				"the counts of the places of the file of the walk of the block of them of the counts of the places of it of two, of four and of six places of the file",
+				"the counts of the walk of the block of the picture of the counts of the file of a whole block of the picture of the places of the file of it",
+				"the places of the file of the walk of the block of the picture standing of the counts of the places of the file of the block of it and of the counts of the walk of them",
+				"the channels of the block of the picture of twenty four and of thirty two places to a place",
+				"the places of the picture of the rows of the file of the block of them the last of them the first"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of more than one block of the places of the file (the walks of the blocks of the picture behind the first of them)",
+				"a picture of the blocks of the count of the places of the file of the walk of the block of it of the counts of the places of the file of them above the count of the places of the file of the walk of the whole block of it"
+			]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "PAC/SOFTPAL",
 				"class": "PacOpener",

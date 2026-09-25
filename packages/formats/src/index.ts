@@ -801,6 +801,7 @@ import { timImageFormat } from "./slg/tim-image.js";
 import { voiAudioFormat } from "./slg/voi-audio.js";
 import { softpalBgmAudioFormat } from "./softpal/bgm-audio.js";
 import { bpicImageFormat } from "./softpal/bpic-image.js";
+import { softpalPicImageFormat } from "./softpal/pic-image.js";
 import { amusePacFormat, softpalPacFormat } from "./softpal/pac.js";
 import { vafsFormat } from "./softpal/vafs.js";
 import { sognaDatFormat } from "./sogna/dat.js";
@@ -2211,6 +2212,7 @@ export function createDefaultRegistry(
 		hotImageFormat,
 		pgaImageFormat,
 		bpicImageFormat,
+		softpalPicImageFormat,
 		rmtImageFormat,
 		picImageFormat,
 		lgfImageFormat,
