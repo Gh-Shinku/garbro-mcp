@@ -296,7 +296,8 @@ further than the reference's own list of them.
 These carry no key, no outside listing and no reader outside the reference tree: the screening looked, and
 the reference is complete. What delays them is the size or the shape of the port rather than a missing
 input, so each entry records what the port would have to carry. They are the first candidates when porting
-continues.
+continues, and an entry leaves this section once the port lands: what remains of a ported format stands in
+`docs/support-status.json` rather than here.
 
 The survey that fills this section reads the gap inventory through
 `node scripts/garbro-gap.mjs --all --json`. The text form lists the rows that are only partly ported
@@ -339,11 +340,6 @@ the first forty of them.
   the three `Primel1/2/3Encyption` ciphers, `GameRes.Cryptography.RC6`, AES in CFB mode with zero
   padding, and the `Range`, `Rle`, `Mtf` and `Lzss` packed streams the flags select between. That is a
   staged port of the kind TLG6 and JBP took, not a single one.
-- `PB2` (`ArcFormats/Cmvs/ImagePB2.cs`, 265 lines) is the CVNS picture format whose header is encrypted
-  with a twenty seven byte key stored at the end of the file, and it unpacks in four different ways: a
-  block shuffled plane, a per channel block map, the JBP form, and four XORed channels. It stands on the
-  shared `PbReaderBase` of `ImagePB.cs`, whose LZSS and JBP walks this project already carries for PB3,
-  so the remaining work is the four variants and the header.
 
 - `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`, class `LayOpener`, extension gated on `.lay`): the index
   of the engine is plain - a count of the layers, a count of the tile coordinates, then a record per layer
@@ -402,16 +398,6 @@ the first forty of them.
   resources. A fixture needs a writer for that serialised shape - the same shape the port's own reader
   would have to produce - so this one is a staged port of the kind TLG6 and JBP took rather than a single
   file.
-- `PCM` (`ArcFormats/Circus/AudioPCM.cs`, class `PcmAudio`, 802 lines) is the audio of the Circus engine,
-  and it is portable from end to end: the head is a size, a mode and a wave format, the older mode is a
-  plain stream, the fifth mode hands an Ogg stream over, and the two packed modes are a decoder of their
-  own (`PcmDecoder`) with an LZSS container walk (`UnpackV1`), a programmatic table of 0x10000 words and a
-  fixed point transform written out of a disassembly (`sub_4121C0` and `sub_411AB0`, with their twiddle
-  table). What holds the whole of it back at once is the **fixture**: the reference carries no writer, so a
-  fixture is an arbitrary stream, and the only thing its places can be checked against is a mirror of the
-  same disassembly - a second transcription of arithmetic this project would have to write and keep in
-  step, which makes the transform a staged port of its own rather than part of the container's. The head,
-  the plain mode, the Ogg mode and the LZSS container walk are the part that can land first.
 - `HCA` (`ArcFormats/Cri/AudioHCA.cs`, class `HcaAudio`, 1213 lines) is the audio of the Cri engine and is
   the same shape on a larger scale: a big endian container, a table of scale factors built from a type of
   the head (`AthTable`), a cipher of the head's own type (`Cipher`, with the key of the game), a Huffman
