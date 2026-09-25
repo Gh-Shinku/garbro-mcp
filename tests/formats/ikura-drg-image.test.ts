@@ -223,6 +223,81 @@ describe("Digital Romance System image", () => {
 		await expect(bmpOf(gga0ImageFormat, data)).rejects.toThrow(GarbroError);
 	});
 
+	it("reads the places of a picture of the engine of the run of the places of the file of more than 0x100 of them", async () => {
+		// The walk of the places of the file of a run of the second kind of the engine stands of the
+		// places of the file of the walk itself of the places of the picture before them: the places of
+		// the file of the count of the run stand of the places of the file of the picture of the count of
+		// the walk of the engine (of the places of the file of 0x5A of them), of no places of the file of
+		// the walk of the engine of the places of the count of the picture of it alone.
+		const pattern = Buffer.from([0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+		const tail = Buffer.from([
+			0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac,
+		]);
+		const body = Buffer.concat([
+			Buffer.from([0x06]),
+			pattern,
+			Buffer.from([0x02, 0x5a, 0x02, 0x00]),
+			Buffer.from([0x08]),
+			tail,
+		]);
+		const data = drgFile("FULL", 8, 12, body);
+		const layout = readDrgLayout(data);
+		expect(layout?.width).toBe(8);
+		expect(layout?.height).toBe(12);
+		const image = await bmpOf(drgImageFormat, data);
+		const places: number[] = [];
+		for (let i = 0; i < 46; i += 1) places.push(...pattern);
+		places.push(...tail);
+		expect([...image.subarray(0x36, 0x36 + 288)]).toEqual(places);
+	});
+
+	it("reads the places of the indexed picture of the engine of the picture of more than 0x1000 of them", async () => {
+		// The walk of the places of the file of the indexed picture of the engine stands of the places of
+		// the file of the picture of the walk of the engine of the count of the places of the picture of
+		// it: the walk of the places of the file of the picture of the engine of the places of the file of
+		// more than 0x1000 of them.
+		const width = 64;
+		const height = 68;
+		const places: Buffer = Buffer.alloc(width * height, 0x00);
+		places[0] = 0x07;
+		places[width * height - 1] = 0x09;
+		const data = ggdFile(
+			width,
+			height,
+			Buffer.alloc(0x400, 0x00),
+			literalLzssStream(places),
+			{
+				bitmapSize: places.length,
+			},
+		);
+		const layout = readGgdLayout(data);
+		expect(layout?.bitmapSize).toBe(0x1100);
+		const bytes = await bmpOf(ggdIndexedImageFormat, data);
+		const image = readBmpImage(bytes);
+		if (!image) throw new Error("the port handed over no bitmap");
+		expect(image.width).toBe(width);
+		expect(image.height).toBe(height);
+		expect(image.pixels.length).toBe(width * height);
+		expect(image.pixels[0]).toBe(0x07);
+		expect(image.pixels[width * height - 1]).toBe(0x09);
+	});
+
+	it("reads the places of a picture of the fourth kind of the count of the places of the file of more than 0x100 of them", async () => {
+		// The walk of the places of a picture of the fourth kind stands of the places of the file of the
+		// count of the walk of the engine behind the place of the walk of it: the count of the places of
+		// the file of the walk itself stands of the places of the picture of 0x100 of them or above.
+		const body: Buffer = Buffer.alloc(1 + 276, 0xa5);
+		body[0] = 0x50;
+		const data = gga0File(69, 1, body);
+		expect(readGga0Layout(data)?.width).toBe(69);
+		const image = await bmpOf(gga0ImageFormat, data);
+		const places = pixelsOf(image, 69, 1, 4);
+		expect(places.length).toBe(276);
+		expect(places[0]).toBe(0xa5);
+		expect(places[275]).toBe(0xa5);
+		expect(new Set(places)).toEqual(new Set([0xa5]));
+	});
+
 	it("tells the pictures of the engine by the heads of them", async () => {
 		expect(
 			await drgImageFormat.detect?.(

@@ -41,6 +41,14 @@ the row over to the bitmap of the picture, of the places of the file of the row 
 * **Packing a picture.** The reference stands of a writer of its own (`DrgFormat.Write`); this port stands
   of the walk of the places of the file alone.
 
+The walk of the places of the file of a run of the second kind of the engine stands of the places of the
+file of the walk itself of the places of the picture before them. A picture of the places of the file of
+8 and 12 of them stands of a run of the count of the places of the file of `0x5A` of them (of `270`
+places of the file of the picture, of more than `0x100` of them) of the places of the picture of the two
+places of the file of the pattern of the walk of the engine behind the walk of the places of the file of
+the picture of it, of the places of the file of the pattern of the walk of the engine of the places of
+the file of the picture of the walk of it of the tail of the places of the file of the picture itself.
+
 ## How the walk stands verified
 
 Four pictures of our own stand of the walk of the engine: the head of the three marks of it (of the places

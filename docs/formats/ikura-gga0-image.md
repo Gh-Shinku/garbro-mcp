@@ -49,6 +49,11 @@ walk.
   walk of it as they stand, and records the places of the file of the kind of it in the entry of it.
 * **Packing a picture.** `Gga0Format.Write` stands of no walk of it in the reference.
 
+The count of the places of the file of the walk itself stands of the places of the file of the picture
+of `0x100` of them or above: a picture of the places of the file of 69 and 1 of them stands of the
+count of the places of the file of the walk of the engine of `0x50` of them (`276` places of the file of
+the picture, of more than `0x100` of them).
+
 ## How the walk stands verified
 
 Four pictures of our own stand of the walk of the engine: the head of the picture, a picture of the places

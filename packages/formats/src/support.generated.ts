@@ -21160,10 +21160,7 @@ export const formatSupportCatalog = {
 				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
 			],
 			unsupported: ["creating a picture"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture of the walk of the places of the file standing of the places of the file of a run of more than 0x100 places of the picture",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -21186,10 +21183,7 @@ export const formatSupportCatalog = {
 				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
 			],
 			unsupported: ["creating a picture"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture of a walk of the places of the file standing of the places of the file of a frame of them of more than 0x1000 of them",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
@@ -21212,10 +21206,7 @@ export const formatSupportCatalog = {
 				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
 			],
 			unsupported: ["creating a picture"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture of the walk standing of the count of the places of the file of two places of them (of the places of the picture of more than 0x100 of them)",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {

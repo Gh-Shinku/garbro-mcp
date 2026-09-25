@@ -37,6 +37,12 @@ the file of the row behind them.
   the other way up in the places of the entry of it.
 * **Packing a picture.** `DrgIndexedFormat.Write` stands of no walk of it in the reference.
 
+The walk of the places of the file of the indexed picture of the engine stands of the places of the file
+of the picture of the walk of the engine of the count of the places of the picture of it. A picture of
+the places of the file of 64 and 68 of them stands of the places of the file of the walk of the engine
+of `0x1100` places of the file of the picture of the walk of it (of more than `0x1000` of them), of the
+places of the picture of the walk of the engine itself at the two ends of the picture of it.
+
 ## How the walk stands verified
 
 Three pictures of our own stand of the walk of the engine: the head of the picture (of the places of the file
