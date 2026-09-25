@@ -20,6 +20,17 @@
 // in a comment of its own - so its count of places is handed to it here.
 
 const WORD_PLACES = 4;
+/** The places of precision of the walk of `RangePackedStream`, of the range it begins at. */
+const RANGE_SHIFT = 12;
+const RANGE_START = 0xc0000000;
+const RANGE_NORMAL = 0xff000000;
+/** The flag of a chunk that stands of another chunk behind it. */
+const RANGE_MORE = 0x80;
+const RANGE_CONTROL_MASK = 0x1f;
+const RANGE_LIST = 1;
+const RANGE_ALL = 2;
+const HIGH_PLACE_FLAG = 0x80;
+const HIGH_PLACE_BITS = 7;
 /** The window of the walk of `LzssPackedStream`: two places to the power of the word of the head. */
 const FRAME_BASE = 2;
 /** The places of a run of the walk of `LzssPackedStream`, behind the place of the count. */
@@ -64,6 +75,19 @@ class StreamReader {
 	/** `ArcView.Reader.ReadUInt16`. */
 	uint16(): number {
 		return this.wordPlaces(2);
+	}
+
+	/** `Binary.BigEndian (reader.ReadUInt32())`: the places of a word from the highest place down. */
+	bigEndianWord(): number {
+		let value = 0;
+		for (let index = 0; index < WORD_PLACES; index += 1) {
+			const place = this.byte();
+			if (place < 0) {
+				throw new RangeError("The stream of the walk stands short of its head");
+			}
+			value = ((value << 8) | place) >>> 0;
+		}
+		return value >>> 0;
 	}
 }
 
@@ -200,4 +224,109 @@ export function unpackPrimelMtf(input: Buffer, count: number): Buffer {
 		out[at] = places[index] ?? 0;
 	}
 	return out;
+}
+
+/**
+ * `RangePackedStream.Unpack`: the stream stands of one or more chunks, every one of them of the count of the
+ * places it turns out, of a byte of flags whose lowest places name how the places of the run of the stream
+ * stand, and of the places of the table of their counts. The places of the run then stand of a walk of the
+ * range of the stream, of twelve places of precision: the places of the table stand of the place of the
+ * stream over the range, and the range of the place stands of its own count.
+ *
+ * The reference builds the table of the run as a place per place of the run of the stream, which for a run of
+ * the counts it reads can reach sixteen million places; this port searches the place of the stream among the
+ * counts themselves instead, which stands of the same place of the run without laying it out.
+ */
+export function unpackPrimelRange(input: Buffer): Buffer {
+	const reader = new StreamReader(input);
+	const out: number[] = [];
+	for (;;) {
+		const chunkSize = reader.int32();
+		const control = reader.byte();
+		if (control < 0) break;
+		const freq = new Uint16Array(TABLE_PLACES);
+		switch (control & RANGE_CONTROL_MASK) {
+			case RANGE_LIST: {
+				const count = reader.byte();
+				if (count < 0) break;
+				for (let at = 0; at < count; at += 1) {
+					const place = reader.byte();
+					const low = reader.byte();
+					if (place < 0 || low < 0) break;
+					freq[place] = readFrequency(reader, low);
+				}
+				break;
+			}
+			case RANGE_ALL:
+				for (let place = 0; place < TABLE_PLACES; place += 1) {
+					const low = reader.byte();
+					if (low < 0) break;
+					freq[place] = readFrequency(reader, low);
+				}
+				break;
+			default:
+				break;
+		}
+		const start = new Uint32Array(TABLE_PLACES);
+		let total = 0;
+		for (let place = 0; place < TABLE_PLACES; place += 1) {
+			start[place] = total;
+			total += freq[place] ?? 0;
+		}
+		if (0 === total) {
+			throw new RangeError(
+				"The run of the places of the stream stands of no places",
+			);
+		}
+		let range = RANGE_START;
+		let high = reader.bigEndianWord();
+		for (let at = 0; at < chunkSize; at += 1) {
+			const span = range >>> RANGE_SHIFT;
+			const index = Math.floor(high / span);
+			const place = placeOfRange(start, freq, index);
+			if (place < 0) {
+				throw new RangeError(
+					"The place of the stream stands past the run of the places",
+				);
+			}
+			out.push(place);
+			high = (high - Math.imul(span, start[place] ?? 0)) >>> 0;
+			range = Math.imul(span, freq[place] ?? 0) >>> 0;
+			while (0 === (range & RANGE_NORMAL)) {
+				const next = reader.byte();
+				if (next < 0) {
+					throw new RangeError(
+						"The stream of the walk stands short of the places of its range",
+					);
+				}
+				high = ((high << 8) | next) >>> 0;
+				range = (range << 8) >>> 0;
+			}
+		}
+		if (0 === (control & RANGE_MORE)) break;
+	}
+	return Buffer.from(out);
+}
+
+/** The count of a place of the table, of the seven places it stands of or of the fifteen behind them. */
+function readFrequency(reader: StreamReader, low: number): number {
+	if (0 !== (low & HIGH_PLACE_FLAG)) return low & (HIGH_PLACE_FLAG - 1);
+	const high = reader.byte();
+	return ((high < 0 ? 0 : high) << HIGH_PLACE_BITS) | low;
+}
+
+/** The place of the run the place of the stream stands of, of the counts of the places of the table. */
+function placeOfRange(
+	start: Uint32Array,
+	freq: Uint16Array,
+	index: number,
+): number {
+	if (index < 0) return -1;
+	for (let place = 0; place < TABLE_PLACES; place += 1) {
+		const count = freq[place] ?? 0;
+		if (0 === count) continue;
+		const from = start[place] ?? 0;
+		if (index < from + count) return place;
+	}
+	return -1;
 }
