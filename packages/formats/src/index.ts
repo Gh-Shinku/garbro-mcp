@@ -196,6 +196,7 @@ import { moonhirFpkFormat } from "./moonhir/fpk-archive.js";
 import { lagImageFormat } from "./strikes/lag-image.js";
 import { tmrHiroGrdImageFormat } from "./tmr-hiro/grd-image.js";
 import { csafArchiveFormat } from "./family-adv-system/csaf-archive.js";
+import { advizGiz3ImageFormat } from "./adviz/giz3-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1361,6 +1362,7 @@ export function createDefaultRegistry(
 		lagImageFormat,
 		tmrHiroGrdImageFormat,
 		csafArchiveFormat,
+		advizGiz3ImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

@@ -3957,6 +3957,39 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "GIZ",
+				class: "Giz3Format",
+				source: "Legacy/Adviz/ImageGIZ.cs",
+			},
+			localId: "adviz-giz3-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head, the place of the picture inside its screen and the map of its planes",
+				"the ring of four strips of four planes, a plane of a strip at a place of its own",
+				"the two halves of a strip, the first above the second",
+				"the planes the map of the planes names, which stand as the strip before them left them",
+				"the tokens of a plane: places of their own and runs of nothing, of fifteen and of the places behind them",
+				"the tree of the tokens, its records of three bytes and its own root",
+				"the bits of a picture, read from the highest bit of a word down",
+				"the colour map a picture carries, and the grey one it falls back on",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"picture creation",
+				"the colour map of the game a picture belongs to, which the reference does not read either",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show how its runs are laid out over several strips",
+			],
+		},
+		{
+			reference: {
 				type: "audio",
 				tag: "WAV/CSWARE",
 				class: "WavAudio",

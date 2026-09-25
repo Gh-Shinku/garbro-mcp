@@ -3,3 +3,4 @@ export * from "./biz-image.js";
 export * from "./palette.js";
 export * from "./giz2-image.js";
 export * from "./giz2-reader.js";
+export * from "./giz3-image.js";
