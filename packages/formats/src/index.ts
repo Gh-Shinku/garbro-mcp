@@ -96,6 +96,7 @@ import { ivorySgImageFormat } from "./ivory/sg-image.js";
 import { broomErpImageFormat } from "./broom/erp-image.js";
 import { dacDgcImageFormat } from "./dac/dgc-image.js";
 import { izumiMai2ImageFormat } from "./izumi/mai2-image.js";
+import { liarWcgImageFormat } from "./liar/wcg-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1495,6 +1496,7 @@ export function createDefaultRegistry(
 		broomErpImageFormat,
 		dacDgcImageFormat,
 		izumiMai2ImageFormat,
+		liarWcgImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,

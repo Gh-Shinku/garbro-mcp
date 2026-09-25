@@ -20646,5 +20646,35 @@ export const formatSupportCatalog = {
 				"a picture of the places of two planes standing of one another",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "WCG",
+				class: "WcgFormat",
+				source: "ArcFormats/Liar/ImageWCG.cs",
+			},
+			localId: "liar-wcg-image",
+			verification: "synthetic-fixtures",
+			status: "partial",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and the two walks of it",
+				"the words of the places of a picture, of the places of the word table",
+				"the places of a picture standing of a count of the places of a word of the walk behind it",
+				"the places of a picture standing of the words of the head of the walk",
+				"the alpha of the places of a picture, of the places of the file the other way round",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture standing of a word table of more than 0x1001 words",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of a word table of more than 0x1001 words, of four places to a count",
+				"a picture whose walks stand of the places of the file behind the count of the last count of them",
+			],
+		},
 	],
 } as const;
