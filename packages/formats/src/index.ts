@@ -182,6 +182,7 @@ import { mskImageFormat } from "./cmvs/msk-image.js";
 import { cmvsPb2ImageFormat } from "./cmvs/pb2-image.js";
 import { mv2AudioFormat } from "./cmvs/mv2-audio.js";
 import { mvAudioFormat } from "./cmvs/mv-audio.js";
+import { actressDatFormat } from "./actgs/dat-archive.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1011,6 +1012,7 @@ export * from "./circus/index.js";
 export * from "./clickteam/index.js";
 export * from "./clio/index.js";
 export * from "./cmvs/index.js";
+export * from "./actgs/index.js";
 export * from "./cotton-club/index.js";
 export * from "./creative/index.js";
 export * from "./cri/index.js";
@@ -1329,6 +1331,7 @@ export function createDefaultRegistry(
 		cmvsPb2ImageFormat,
 		mv2AudioFormat,
 		mvAudioFormat,
+		actressDatFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

@@ -19419,5 +19419,36 @@ export const formatSupportCatalog = {
 				"a picture whose channels differ in length from the rows of the picture, which no fixture carries",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "DAT/ACTGS",
+				class: "DatOpener",
+				source: "ArcFormats/Actgs/ArcDAT.cs",
+			},
+			localId: "actgs-dat-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head: a sane count and three words that have to be nothing",
+				"the index at 0x10, thirty two bytes to an entry",
+				"the entry names, a field of twenty four bytes cut at its first nothing",
+				"every entry's placement inside the archive",
+				"the entries of a plain archive, handed over as they stand",
+			],
+			unsupported: [
+				"archive creation",
+				"a keyed archive, which the reference cannot read either: its own key table ships empty, so the way is refused by name",
+				"the unwrapping of an entry - the keyed script runs, the packed streams and the keyed headers - all of which stand behind that same key",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a plain archive from a real game, which would show whether the engine ever writes one and how its names read",
+				"a keyed archive, which needs a key the reference does not carry",
+			],
+		},
 	],
 } as const;
