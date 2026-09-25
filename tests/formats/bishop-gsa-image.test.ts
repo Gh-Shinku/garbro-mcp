@@ -1,10 +1,14 @@
 import { Buffer } from "node:buffer";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
 	gsaImageFormat,
 	readGsaLayout,
+	readGsaPart,
 	unpackGsaPicture,
 } from "../../packages/formats/src/bishop/gsa-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
@@ -117,5 +121,150 @@ describe("Bishop image", () => {
 		expect(await gsaImageFormat.detect?.(new BufferByteSource(bad))).toBe(
 			false,
 		);
+	});
+
+	it("draws a block out of the block beside it, of a run of its own", () => {
+		// A way of one bit adds a run of its own, one bit to a place, to the block beside the walk.
+		const bits = [
+			...literal([1, 2, 3, 4]),
+			...bitsOf(1, 3),
+			...bitsOf(1, 1),
+			...bitsOf(0, 1),
+			...bitsOf(1, 1),
+			...bitsOf(0, 1),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+		];
+		const layout = { type: 3, width: 4, height: 2, offsetX: 0, offsetY: 0 };
+		const picture = unpackGsaPicture(
+			gsaFile({ type: 3, width: 4, height: 2, bits }),
+			layout,
+		);
+		expect(picture.stride).toBe(12);
+		expect(
+			[...picture.pixels].filter((_, at) => 0 === at % 3).slice(0, 8),
+		).toEqual([1, 2, 2, 2, 3, 4, 4, 4]);
+	});
+
+	it("draws a block as the block beside it stands", () => {
+		// A way of nothing stands as the block beside it stands, every place of it at once.
+		const bits = [
+			...literal([1, 2, 3, 4]),
+			...bitsOf(0, 3),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+		];
+		const layout = { type: 3, width: 4, height: 2, offsetX: 0, offsetY: 0 };
+		const picture = unpackGsaPicture(
+			gsaFile({ type: 3, width: 4, height: 2, bits }),
+			layout,
+		);
+		expect(
+			[...picture.pixels].filter((_, at) => 0 === at % 3).slice(0, 8),
+		).toEqual([1, 2, 1, 2, 3, 4, 3, 4]);
+	});
+
+	it("draws a block out of the block two rows above it", () => {
+		// A way of four bits adds a run of its own, smaller by seven, to the block two rows above the walk.
+		const bits = [
+			...literal([1, 2, 3, 4]),
+			...bitsOf(4, 3),
+			...bitsOf(8, 4),
+			...bitsOf(8, 4),
+			...bitsOf(8, 4),
+			...bitsOf(8, 4),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+			...literal([0, 0, 0, 0]),
+		];
+		const layout = { type: 3, width: 2, height: 4, offsetX: 0, offsetY: 0 };
+		const picture = unpackGsaPicture(
+			gsaFile({ type: 3, width: 2, height: 4, bits }),
+			layout,
+		);
+		// A run of eight stands one above the place two rows above the walk, of every place of the block.
+		const blue = (x: number, y: number): number =>
+			picture.pixels[y * picture.stride + x * 3] ?? 0;
+		expect([
+			blue(0, 0),
+			blue(1, 0),
+			blue(0, 1),
+			blue(1, 1),
+			blue(0, 2),
+			blue(1, 2),
+			blue(0, 3),
+			blue(1, 3),
+		]).toEqual([1, 2, 3, 4, 2, 3, 4, 5]);
+	});
+
+	it("spreads the deepest places of a picture over the whole of their own", () => {
+		// A picture of the deepest kind stands three places to a byte as well, and spreads the first of them
+		// over three bits and the other two over two.
+		const bits = [
+			...literal([0x1f, 0x00, 0x00, 0x00]),
+			...literal([0x3f, 0x00, 0x00, 0x00]),
+			...literal([0x3f, 0x00, 0x00, 0x00]),
+		];
+		const data = gsaFile({ type: 0x83, width: 2, height: 2, bits });
+		const layout = readGsaLayout(data);
+		if (!layout) throw new Error("the head of the fixture stands");
+		const picture = unpackGsaPicture(data, layout);
+		expect(picture.format).toBe("bgr24");
+		expect(picture.pixelSize).toBe(3);
+		expect([...picture.pixels]).toEqual([
+			0xf8, 0xfc, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+		]);
+	});
+
+	it("draws a part of a picture over the picture it belongs to", async () => {
+		const root = await mkdtemp(join(tmpdir(), "gsa-"));
+		try {
+			const game = join(root, "game");
+			await mkdir(game, { recursive: true });
+			// The picture a part belongs to stands in whole places of nothing.
+			const base = gsaFile({
+				type: 3,
+				width: 2,
+				height: 2,
+				bits: [
+					...literal([0, 0, 0, 0]),
+					...literal([0, 0, 0, 0]),
+					...literal([0, 0, 0, 0]),
+					...literal([0, 0, 0, 0]),
+				],
+			});
+			// The alpha channel of a part stands in front of the places of its colour.
+			const part = gsaFile({
+				type: 4,
+				width: 2,
+				height: 2,
+				bits: [
+					...literal([0x80, 0x80, 0x80, 0x80]),
+					...literal([0xff, 0xff, 0xff, 0xff]),
+					...literal([0xff, 0xff, 0xff, 0xff]),
+					...literal([0xff, 0xff, 0xff, 0xff]),
+				],
+			});
+			await writeFile(join(game, "FACE.GSA"), base);
+			const partPath = join(game, "FACE.G01");
+			await writeFile(partPath, part);
+			const layout = readGsaLayout(part);
+			if (!layout) throw new Error("the head of the fixture stands");
+			const blended = await readGsaPart(part, layout, partPath);
+			// Every place of the part stands half way between the picture and the place of the part.
+			expect(blended.pixelSize).toBe(3);
+			expect([...blended.pixels].slice(0, 3)).toEqual([0x80, 0x80, 0x80]);
+			// A part of a picture whose picture stands elsewhere beside it stands as it is.
+			const alone = await readGsaPart(part, layout, join(game, "OTHER.G01"));
+			expect(alone.pixelSize).toBe(4);
+		} finally {
+			await rm(root, { recursive: true, force: true });
+		}
 	});
 });

@@ -35,12 +35,10 @@ that stands no picture beside it stands as it is, and so stands one whose drawin
 
 ## Verification
 
-Three tests over synthetic fixtures (`tests/formats/bishop-gsa-image.test.ts`): the head and the pictures it
+Eight tests over synthetic fixtures (`tests/formats/bishop-gsa-image.test.ts`): the head and the pictures it
 turns away; the places of a picture themselves, three of them to a place, both as the walk of it draws them and
-as a bitmap holds them - which pins the bits of a picture and the turning about of the reference; and a picture
-told by the word it opens with.
-
-The runs of a block other than the places themselves, the places of the deepest kind spread over the whole of a
-byte, and the drawing of a part of a picture over the picture it belongs to stand in the port as they stand in
-the reference, but no fixture of them was finished here: their fixtures did not tell the two readings apart, so
-they stand among the places still to be verified of the record of this format rather than among the tests.
+as a bitmap holds them - which pins the bits of a picture and the turning about of the reference; a block drawn
+out of the block beside it by a run of one bit to a place; a block standing as the block beside it stands; a
+block drawn out of the block two rows above it by a run of four bits, smaller by seven; the places of the
+deepest kind spread over the whole of a byte; the drawing of a part of a picture over the picture it belongs
+to, and a part whose picture stands elsewhere standing as it is; and a picture told by the word it opens with.
