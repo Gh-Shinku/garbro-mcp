@@ -21542,6 +21542,33 @@
 				"the alpha plane of DefineBitsJpeg3 (the JPEG is handed over without it)"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "NPA",
+				"class": "NpaOpener",
+				"source": "ArcFormats/NitroPlus/ArcNPA.cs"
+			},
+			"localId": "nitroplus-npa",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head: both keys, the compressed and encrypted flags, the record counts and the index size",
+				"the record walk of the index, with the folder records left out",
+				"the names restored from the per-place amounts of the key and the record number",
+				"the places of an entry, from the head and the index size plus the offset of the record",
+				"the entries of a compressed archive, read as zlib streams"
+			],
+			"unsupported": [
+				"archive creation",
+				"an encrypted archive (it needs the game scheme and its title table, which ship outside this port)",
+				"the key table the reference builds for a game scheme"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
 		}
 	]
 }

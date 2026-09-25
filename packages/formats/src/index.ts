@@ -644,6 +644,7 @@ import { mpkFormat } from "./nitroplus/mpk.js";
 import { nitroplusNitroPakFormat } from "./nitroplus/nitro-pak.js";
 import { nitroplusNpaSteinsGateFormat } from "./nitroplus/npa-sg.js";
 import { nppFormat } from "./nitroplus/npp.js";
+import { nitroplusNpaFormat } from "./nitroplus/npa.js";
 import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { igaFormat } from "./noesis/iga.js";
 import { nononoNpfFormat } from "./nonono/npf.js";
@@ -1469,6 +1470,7 @@ export function createDefaultRegistry(
 		pinesoftVoiceFormat,
 		sudFormat,
 		lnk2Format,
+		nitroplusNpaFormat,
 		nppFormat,
 		new AfsFormat(),
 		new CpkFormat(),
