@@ -36,6 +36,13 @@ export interface Cpz5Scheme {
 	readonly entryInitKey: number;
 	readonly entryTailKey: number;
 	readonly entryKeyPos: number;
+	/** The places of the index: the seed of the walk of its entries, and its room and count. */
+	readonly indexSeed: number;
+	readonly indexAddend: number;
+	readonly indexSubtrahend: number;
+	readonly dirKeyAddend: readonly number[];
+	/** The count the place of the key of an entry of the archive is taken apart with. */
+	readonly entrySubKey: number;
 }
 
 /** `CpzOpener.CreateCpz5Scheme`: the scheme of the layout of the engine of the mark `CPZ5`. */
@@ -45,6 +52,11 @@ export const CMVS_CPZ5_SCHEME: Cpz5Scheme = {
 	entryInitKey: 0x2547a39e,
 	entryTailKey: 0xbc,
 	entryKeyPos: 9,
+	indexSeed: 0x2a65cb4e,
+	indexAddend: 0x784c5962,
+	indexSubtrahend: 0x79,
+	dirKeyAddend: [0, 0x00112233, 0, 0x34258765],
+	entrySubKey: 0x5c29e87b,
 };
 
 /** `Binary.RotR`: a rotation of a word of thirty two places, of the lowest five places of the count. */

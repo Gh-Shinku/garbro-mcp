@@ -385,9 +385,20 @@ the first forty of them.
   of the places of its own (which for the seventh layout covers places the head does not end at, since that
   layout carries the count of the places of the key of its index behind the sum), and the places of an index
   are held to the digest the head carries, and to the digest of the key behind them of the seventh layout.
-  What remains is the opener itself (776 lines: the mark `CPZ5`/`CPZ6`/`CPZ7`, `UnpackIndexKey`,
-  `UnpackLzss`, the directory and the entry walks) and the key file (`ArchiveKey`), of which a stock build
-  stands of zeros.
+  The index and payload walks have landed as well, in
+  `packages/formats/src/cmvs/cpz5-index.ts`: the three mixes of the places of an index (the first, the rooms
+  of a directory and the runs of its entries), each of them **both ways** as the reference carries them, the
+  reader of the key behind the index of the seventh layout, the window walk of a payload (which the opener of
+  the older layouts of the engine stands of as well, `cmvs/cpz.ts`) and the places of a `PS2A` and of a
+  `PB3B` payload. Every walk of the index is held to its own inverse and to a second transcription of
+  `ArcCPZ.cs` written apart from the port; that transcription is what caught the one place the port had
+  dropped (the addend of the first mix, whose absence the round trip alone would have caught as well). The
+  walk of a directory adds the key of the archive to its seed on the way in alone, so the two directions are
+  each other's inverse for an archive whose key stands of nothing — the key of a stock build — and part
+  company for any other; both places are kept as the reference writes them, and the difference is pinned by
+  the test. What remains is the opener itself (the mark `CPZ5`/`CPZ6`/`CPZ7`, the directory and the entry
+  walks, `OpenEntry`) and the key file (`ArchiveKey`), of which a stock build stands of zeros: the reference
+  reads it out of a `start.ps3` beside the archive.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
   its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
   tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven
