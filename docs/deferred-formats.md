@@ -402,6 +402,22 @@ the first forty of them.
   resources. A fixture needs a writer for that serialised shape - the same shape the port's own reader
   would have to produce - so this one is a staged port of the kind TLG6 and JBP took rather than a single
   file.
+- `PCM` (`ArcFormats/Circus/AudioPCM.cs`, class `PcmAudio`, 802 lines) is the audio of the Circus engine,
+  and it is portable from end to end: the head is a size, a mode and a wave format, the older mode is a
+  plain stream, the fifth mode hands an Ogg stream over, and the two packed modes are a decoder of their
+  own (`PcmDecoder`) with an LZSS container walk (`UnpackV1`), a programmatic table of 0x10000 words and a
+  fixed point transform written out of a disassembly (`sub_4121C0` and `sub_411AB0`, with their twiddle
+  table). What holds the whole of it back at once is the **fixture**: the reference carries no writer, so a
+  fixture is an arbitrary stream, and the only thing its places can be checked against is a mirror of the
+  same disassembly - a second transcription of arithmetic this project would have to write and keep in
+  step, which makes the transform a staged port of its own rather than part of the container's. The head,
+  the plain mode, the Ogg mode and the LZSS container walk are the part that can land first.
+- `HCA` (`ArcFormats/Cri/AudioHCA.cs`, class `HcaAudio`, 1213 lines) is the audio of the Cri engine and is
+  the same shape on a larger scale: a big endian container, a table of scale factors built from a type of
+  the head (`AthTable`), a cipher of the head's own type (`Cipher`, with the key of the game), a Huffman
+  walk and the sample packers the sound input hands over. It is self contained - every one of those classes
+  stands in the same file - but the whole of it is a codec whose places can only be pinned by a mirror of
+  its own arithmetic, so it is a staged port too, and a longer one than `PCM`.
 - `NOA` (`ArcFormats/Entis/ArcNOA.cs`, class `NoaOpener`, 616 lines) is the archive of the same engine. Its
   index and its own `ERISADecodeContext` are portable, but every entry it lists is an `ERI`, `EMI`, `MIO`,
   `EMS` or `TXT` file of that engine, so listing an archive of it without the whole Entis stack
