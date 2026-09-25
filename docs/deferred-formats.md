@@ -350,12 +350,35 @@ the first forty of them.
   1080. A port would need a PNG decoder, which this project does not carry yet (it writes PNGs through
   `shared/png-image.ts` but reads only the head fields), and a source-over compositor in place of the WPF
   drawing. The index of the format could be listed without either.
-- `GPH` (`ArcFormats/elf/ImageGPH.cs`, 442 lines): a four bit image of the elf engine. Its head is plain
-  and its walk is a self contained bespoke Huffman code - two trees (tokens and offsets) built from a bit
-  stream, a two hundred and fifty six entry offset table and a 0x1400 byte sliding window - so the port
-  itself is a single file. What holds it back is the fixture: the reference carries no writer, so
-  checking it needs a matching encoder for the tree shape, which is a larger piece of work than the
-  reader.
+- `GPH` (`ArcFormats/elf/ImageGPH.cs`, 442 lines, class `GphFormat`, reader `GphReader`): a four bit
+  image of the elf engine, and the reading of it is now read off the reference down to the last index, so
+  the port is a single file of about three hundred lines with no tables to extract. What it carries:
+
+  * the head: `GPH\x1D`, a count of the frames at 4 and the place of the first of them at 6; at that place
+    a count of the places of the frame, the flags and then the box of the picture (four words, the right
+    and the bottom one above the left and the top, the left and the right doubled, the width then the
+    stride of half of it), the palette of sixteen colours behind the flags bit 4 unless that bit stands,
+    in which case the engine's own sixteen colours stand;
+  * the two trees: they are read from the places of the frame themselves, a node per bit (a set bit is an
+    inner node of two children, a clear one a leaf whose value is the next nine bits for a token and the
+    next eight for an offset), and the token nodes stand at `NodeTable[2n]` of a table of six hundred
+    words while the offset nodes stand at `NodeTable[2n + 0x400]`, a leaf being any value below the root
+    of its own tree (0x200 and 0x100);
+  * the two walks: the codes of the eight bits a reader holds name the first step of a walk
+    (`LengthTable`/`TokenTable`, two tables of two hundred words), and every step behind it takes one bit
+    and reads `NodeTable`;
+  * the places: a token below 0x100 is a place of its own, a token above it a run whose count is the low
+    byte of it plus three and whose place stands in a table of two hundred and fifty six words - every
+    word of it one above the last for a stride of sixteen or less, and otherwise a walk of the four bit
+    places of the frame - over a window of 0x1400 bytes;
+  * the picture: four bits a place, packed by the four walks of the bits of a byte, so a row of the
+    output is half the width of the picture.
+
+  What held it back was the fixture, and that is smaller than the reader: the bit reader of the reference
+  holds sixteen bits and takes a byte at a time, most significant bit first, so its stream is an ordinary
+  bit stream and a fixture is an ordinary bit writer - a tree of two or three leaves written out, then
+  the tokens that walk it. The port is a single commit's work and the fixture of it is a mirror writer of
+  the reader rather than of an arithmetic.
 
 - `PT1` (`ArcFormats/Ffa/ImagePT1.cs`, class `Pt1Format`, 642 lines) carries four versions of its walk. The
   two oldest are LZSS walks over a frame of their own (`PopulateLzssFrame`, with the picture of the version
