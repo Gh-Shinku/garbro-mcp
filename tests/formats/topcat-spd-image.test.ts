@@ -32,6 +32,15 @@ function spdFile(
 	return Buffer.concat([head, body]);
 }
 
+/** The walk of the places of the file of the engine: a place of a control place to eight of them. */
+function lzStream(data: Buffer): Buffer {
+	const parts: Buffer[] = [];
+	for (let at = 0; at < data.length; at += 8) {
+		parts.push(Buffer.from([0xff]), data.subarray(at, at + 8));
+	}
+	return Buffer.concat(parts);
+}
+
 async function bmpOf(data: Buffer): Promise<Buffer> {
 	const handle = await spdImageFormat.open(
 		new BufferByteSource(data),
@@ -94,6 +103,48 @@ describe("TopCat compressed image", () => {
 		);
 		expect(pixelsOf(await bmpOf(data), 1, 2)).toEqual([
 			0x11, 0x22, 0x33, 0x11, 0x22, 0x33,
+		]);
+	});
+
+	it("reads the places of a picture of the runs of it, of the places of the file of the runs", async () => {
+		// The places of a picture of a walk of the second kind stand of the places of the picture behind the
+		// places of the file of it: of the places of the file of the walk of the places of it, of a count of
+		// the places of the pixel of a run and of the places of the file of the runs of them. The places of
+		// the walk of the picture of this reference stand of a place of the file of the places of the colour
+		// of the runs of it, of the places of the file of a place of the picture a run of no places of it.
+		const places: Buffer = Buffer.alloc(24, 0x00);
+		places.writeInt32LE(0, 0);
+		places.writeUInt32LE(16, 4);
+		places.writeInt32LE(0, 8);
+		places.writeInt32LE(2, 12);
+		// The places of the file of the walk of the runs stand of four places of the file to a place of the
+		// picture, of the places of a colour of it and of no place of an alpha of it.
+		places.set([0x11, 0x22, 0x33, 0x00, 0x44, 0x55, 0x66, 0x00], 16);
+		const data = spdFile("SPD7", 1, 2, 32, 0, 24, lzStream(places));
+		expect(pixelsOf(await bmpOf(data), 1, 2, 4)).toEqual([
+			0x11, 0x22, 0x33, 0xff, 0x44, 0x55, 0x66, 0xff,
+		]);
+	});
+
+	it("reads the places of the alpha of a picture of the runs of the second kind", async () => {
+		// The places of the alpha of a picture of the second kind stand of the places of the file of the runs
+		// of it, of a place of the file of a run and of the places of a colour of the picture behind them; a
+		// run of the places of the file of a control standing of two places of them stands of the places of
+		// the alpha of the picture itself, of the places of the file of the walk of the alpha.
+		const places: Buffer = Buffer.alloc(16, 0x00);
+		places.writeUInt32LE(12, 0);
+		places[8] = 0x01;
+		places[9] = 0x00;
+		places.set([0x11, 0x22, 0x33], 12);
+		const data = spdFile("SPD8", 1, 1, 32, 0x102, 16, lzStream(places));
+		expect(pixelsOf(await bmpOf(data), 1, 1, 4)).toEqual([
+			0x11, 0x22, 0x33, 0xff,
+		]);
+		const second = Buffer.from(places);
+		second[8] = 0xfe;
+		const other = spdFile("SPD8", 1, 1, 32, 0x102, 16, lzStream(second));
+		expect(pixelsOf(await bmpOf(other), 1, 1, 4)).toEqual([
+			0x11, 0x22, 0x33, 0x02,
 		]);
 	});
 

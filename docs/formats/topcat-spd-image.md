@@ -59,12 +59,17 @@ file (of the places of the file of the walk of the runs of the picture), a pictu
 of the picture itself (of the places of the file of the walk of the engine), the walks this port does not
 carry, and the marks of the head of the picture.
 
-**The walks of the runs of the picture stand of no verification here.** The pictures of our own of the walks
-of the runs (0, 0x100, 2 and 0x102) stand of the places of the file of the walk of the runs of the picture
-behind the places of the file of the walk of the places of it: the walk of the places of the file of this
-port stands of a run of the places of the picture before the places of the file of the walk of them there,
-of `INVALID_ARCHIVE`, where the walk of the reference stands of the places of the picture of the file of the
-picture itself. The places of the file of the walk of the runs of the engine stand readable here, and the
-places of the picture of the walk of the places of the file of it (`SPDC`) stand of the places of the file
-of a walk of the same reference written apart from this port, which stands of the same places of the picture
-as this port of every picture of the walk of the places of the picture itself.
+The walks of the runs of the picture (of the walks 0, 0x100, 2 and 0x102) stand of the pictures of our own
+of them: the places of the file of the walk of the runs of the picture stand behind the places of the file of
+the walk of the places of it, of a place of the file of the places of the colour of a run and of the places of
+the file of the runs of the counts of them. The places of a pixel of the run of the walk of the places of the
+file stand of the places of the file of the count of the run of the walk of the engine, of a place of the file
+of the colour of the run (of the places of the file of the alpha of the picture of it where the places of the
+file of the run stand of a control of two places of it), and of no places of the file of the picture where
+the run stands of no places of it.
+
+The walk of the places of the file stands of a place of a control byte to eight places of the picture, of the
+lowest place of the control byte first: a picture of the walk of the runs of our own stands of the places of
+the file of the walk of the reference only where the places of the file of the walk of the runs of the
+picture stand behind the places of the file of a control byte to eight places of the picture of the walk of
+them, as the walk of the reference stands of them.
