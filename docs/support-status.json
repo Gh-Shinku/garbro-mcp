@@ -12090,6 +12090,42 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "CZ",
+				"class": "CzFormat",
+				"source": "ArcFormats/Key/ImageCZ.cs"
+			},
+			"localId": "key-cz-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the CZ word, the version character and the head behind it",
+				"the place the picture stands at, behind a head longer than twenty four bytes",
+				"the oldest version, whose pixels stand as they are",
+				"the parts of the three newer versions, with their lengths written in whole pixels",
+				"the three ways a part draws: a byte of its own, a copy of a range, and a range that is itself a range",
+				"the place of a range remembered, so one named twice is drawn once",
+				"the byte the chain of copies ends at",
+				"the rows added up again, a byte at a time and a whole word at a time",
+				"the colour map of an eight bit picture",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": [
+				"picture creation",
+				"pictures of twenty four bits, which the reference lays out three bytes to the pixel and hands over as four",
+				"a chain of copies that turns on itself or runs deeper than thirty two steps"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture, which would show how its parts and ranges are cut in practice",
+				"whether the carry of the word-wise rows is really lost in the files the engine writes, which the reference's own arithmetic says it is"
+			]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "SAR",
 				"class": "SarOpener",
