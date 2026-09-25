@@ -14009,6 +14009,40 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "KG/ABOGADO",
+				class: "KgFormat",
+				source: "ArcFormats/Abogado/ImageKG.cs",
+			},
+			localId: "abogado-kg-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the KG word with its four versions and the two depths behind it",
+				"the head: the size, the colour map, the place the channels begin and the alpha channel",
+				"the channels walked over one shared stream, each filling its own byte of every pixel",
+				"a byte of its own, whole or out of the dictionary of the byte before it",
+				"the dictionary of eight entries to every byte, moved to the front as it is drawn from",
+				"runs copied from the row behind, its two neighbours, two pixels back and one pixel back",
+				"the lengths of a run, out of four widths",
+				"the colour map of an eight bit picture, as the file stores it",
+				"the alpha channel drawn into the fourth byte, with a picture whose alpha cannot be read handed over without it",
+				"the bitmap the reference hands over, built flipped",
+			],
+			unsupported: [
+				"picture creation",
+				"a run longer than sixteen million bytes",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture, which would show how often the dictionary and the runs are reached for",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "DAT/electr",
 				class: "DatOpener",
