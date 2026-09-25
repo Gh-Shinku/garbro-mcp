@@ -20679,6 +20679,38 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "LIM",
+				class: "LimFormat",
+				source: "ArcFormats/Liar/ImageLIM.cs",
+			},
+			localId: "liar-lim-image",
+			verification: "synthetic-fixtures",
+			status: "partial",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of a count of the places of a colour of sixteen and of thirty two",
+				"the four walks of the channels of a picture of thirty two places to a place",
+				"the alpha of the picture standing of the places of the file the other way round",
+				"the places of a picture of sixteen places to a place as they stand",
+				"the places of a picture of sixteen places to a place, of a walk of the words of a table",
+				"the alpha of a picture of sixteen places to a place, of a walk of the places of the file of it",
+				"the alpha of a picture of sixteen places to a place, of a colour of four places",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture standing of a word table of more than 8192 places, of four places to a count",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of a picture of thirty two places to a place standing of a count of places beyond the first channel of it",
+				"a picture of a word table of more than 8192 places, of four places to a count",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "PNG",
 				class: "PngFormat",
 				source: "GameRes/ImagePNG.cs",
