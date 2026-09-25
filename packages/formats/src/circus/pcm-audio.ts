@@ -9,7 +9,13 @@ import {
 	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
+import { inflateZlibBufferCapped } from "@garbro-mcp/codecs";
 import { changeExtension } from "../shared/companion.js";
+import {
+	decodePcmStream,
+	unpackPcmLzss,
+	walkedStreamSize,
+} from "./pcm-decoder.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -34,6 +40,9 @@ const OGG_AT = 0x10;
 const FORMAT_AT = 0x0c;
 const FORMAT_SIZE = 0x10;
 const HEAD_SIZE = FORMAT_AT + FORMAT_SIZE;
+/** The two packed modes carry the count of the packed places and then the packed stream itself. */
+const PACKED_SIZE_AT = HEAD_SIZE;
+const PACKED_AT = PACKED_SIZE_AT + 4;
 const PLAIN_MODE = 0;
 const LZSS_MODE = 1;
 const ZLIB_MODE = 3;
@@ -43,8 +52,45 @@ function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-function unsupported(message: string): GarbroError {
-	return new GarbroError("UNSUPPORTED_FEATURE", message);
+/**
+ * `PcmDecoder` + `PcmAudio.TryOpen` of the two packed modes: the count of the packed places stands at
+ * 0x1C, the packed stream itself at 0x20, and the walk of it turns `sourceSize` places of samples out.
+ * The first packed mode reads its own container, the third one a zlib stream; both then hand the walked
+ * stream to `DecodeV1` and the samples to the wave format of the head.
+ */
+async function decodePackedPcm(
+	data: Buffer,
+	layout: PcmLayout,
+	format: NonNullable<PcmLayout["format"]>,
+): Promise<Buffer> {
+	if (data.length < PACKED_AT) {
+		throw invalidSound(
+			"A packed sound of the engine with no stream behind its head",
+		);
+	}
+	const packedSize = data.readInt32LE(PACKED_SIZE_AT);
+	if (packedSize < 0) {
+		throw invalidSound("A packed sound of the engine of no packed places");
+	}
+	const encoded = Buffer.alloc(walkedStreamSize(layout.sourceSize), 0);
+	if (LZSS_MODE === layout.mode) {
+		if (PACKED_AT + packedSize > data.length) {
+			throw invalidSound("A packed sound of the engine the file cuts short");
+		}
+		unpackPcmLzss(
+			data.subarray(PACKED_AT, PACKED_AT + packedSize),
+			packedSize,
+			encoded,
+		);
+	} else {
+		const walked = await inflateZlibBufferCapped(
+			data.subarray(PACKED_AT),
+			encoded.length,
+		);
+		encoded.set(walked.subarray(0, encoded.length));
+	}
+	const samples = decodePcmStream(encoded, layout.sourceSize, layout.extra);
+	return writeWave(format, samples);
 }
 
 async function readStored(source: ByteSource): Promise<Buffer> {
@@ -93,7 +139,13 @@ export function readPcmLayout(data: Buffer): PcmLayout | undefined {
 	if (kind !== PLAIN_MODE && kind !== LZSS_MODE && kind !== ZLIB_MODE) {
 		return undefined;
 	}
-	if (extra < 0 || extra > EXTRA_MAX) return undefined;
+	// Only the decoder of the two packed modes reads `extra`: the reference checks it there alone.
+	if (
+		(kind === LZSS_MODE || kind === ZLIB_MODE) &&
+		(extra < 0 || extra > EXTRA_MAX)
+	) {
+		return undefined;
+	}
 	if (data.length < HEAD_SIZE) return undefined;
 	return {
 		mode: kind,
@@ -174,7 +226,8 @@ export const circusPcmAudioFormat: ArchiveFormat = defineFixedArchive({
 		}
 		const format = layout.format;
 		if (!format) throw invalidSound("Not a sound of the engine");
-		const start = HEAD_SIZE;
+		const packed = LZSS_MODE === layout.mode || ZLIB_MODE === layout.mode;
+		const start = packed ? PACKED_AT : HEAD_SIZE;
 		const end = Math.min(data.length, start + layout.sourceSize);
 		return {
 			entries: [
@@ -187,6 +240,7 @@ export const circusPcmAudioFormat: ArchiveFormat = defineFixedArchive({
 						metadata: {
 							type: "audio",
 							mode: layout.mode,
+							packed,
 							sampleRate: format.sampleRate,
 							channels: format.channels,
 							bitsPerSample: format.bitsPerSample,
@@ -208,11 +262,10 @@ export const circusPcmAudioFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readPcmLayout(data);
 		if (!layout) throw invalidSound("Not a sound of the engine");
 		if (LZSS_MODE === layout.mode || ZLIB_MODE === layout.mode) {
-			// The two packed modes carry a transform of the engine whose places this port does not walk
-			// yet: `PcmDecoder.Unpack` hands them to `DecodeV1`.
-			throw unsupported(
-				"The walk of the places of the engine (the transform of the two packed modes of it)",
-			);
+			const format = layout.format;
+			if (!format) throw invalidSound("Not a sound of the engine");
+			const pcm = await decodePackedPcm(data, layout, format);
+			return Readable.from([pcm]);
 		}
 		if (layout.ogg) {
 			const size = data.readUInt32LE(OGG_SIZE_AT);
