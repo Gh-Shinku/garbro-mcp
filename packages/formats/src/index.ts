@@ -448,6 +448,7 @@ import { jamesJmgImageFormat } from "./james/jmg-image.js";
 import { lb5Format } from "./jupiter/lb5.js";
 import { kaasAudioFormat } from "./kaas/kaas-audio.js";
 import { kaasPicImageFormat } from "./kaas/pic-image.js";
+import { maplMi2ImageFormat } from "./mapl/mi2-image.js";
 import { kaasPbFormat } from "./kaas/pb.js";
 import { kaasPdFormat } from "./kaas/pd.js";
 import { kaguyaAn21Format } from "./kaguya/an21.js";
@@ -1152,6 +1153,7 @@ export * from "./jam-creation/index.js";
 export * from "./james/index.js";
 export * from "./jupiter/index.js";
 export * from "./kaas/index.js";
+export * from "./mapl/index.js";
 export * from "./kaguya/index.js";
 export * from "./kapp/index.js";
 export * from "./kasane/index.js";
@@ -1730,6 +1732,7 @@ export function createDefaultRegistry(
 		frontWingFweiImageFormat,
 		kaasAudioFormat,
 		kaasPicImageFormat,
+		maplMi2ImageFormat,
 		mebiusMcgImageFormat,
 		sceplayG24aImageFormat,
 		sceplayG2408ImageFormat,

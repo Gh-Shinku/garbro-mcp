@@ -1423,6 +1423,38 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "MI2",
+				"class": "Mi2Format",
+				"source": "Legacy/Mapl/ImageMI2.cs"
+			},
+			"localId": "mapl-mi2-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine and the count of the words of its colour map",
+				"the places of the block of the walk of the places of the file standing as they stand",
+				"the places of the block of the walk of the places of the file of one place of the file",
+				"the places of the block of the walk of the places of the file of the mask of them",
+				"the places of the block of the walk of the places of the file of the two places of the mask of them",
+				"the places of the block of the walk of the places of the file of the counts of two places of the file",
+				"the places of the block of the walk of the places of the file of the counts of four places of the file",
+				"the places of the block of the walk of the places of the file of the colour map of the walk of it",
+				"the counts of the places of the block behind the walk of the places of the file of it",
+				"the places of the picture of the colour map of it and of the three channels of the walk of a picture of twenty four places to a place"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of more than one block of the places of the file (the walks of the blocks of the picture behind the first of them)",
+				"the counts of the walk of the places of the file of the places of the file of the colour map of the walk of it of six, of seven, of twelve and of thirteen places of the file (the counts of the places of the file of the walk of them of no place of the file)"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "FG/FWEI",
 				"class": "FweiFormat",
 				"source": "ArcFormats/FrontWing/ImageFG.cs"
