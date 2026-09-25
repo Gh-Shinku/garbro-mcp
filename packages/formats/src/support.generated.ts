@@ -20676,5 +20676,34 @@ export const formatSupportCatalog = {
 				"a picture whose walks stand of the places of the file behind the count of the last count of them",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "PNG",
+				class: "PngFormat",
+				source: "GameRes/ImagePNG.cs",
+			},
+			localId: "gameres-png-image",
+			verification: "synthetic-fixtures",
+			status: "partial",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, of the count of the places of a place of the file and of the colours of it",
+				"the place of the picture in the picture it stands of, of the places of the file",
+				"the places of a picture of one colour, of the colours of it, of a colour map and of the alpha behind them",
+			],
+			unsupported: [
+				"creating a picture",
+				"writing the places of a picture",
+				"a picture standing of the places of another picture",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of sixteen places to a place of a colour",
+				"a picture of the places of a colour map of its own standing of the alpha behind the colours",
+			],
+		},
 	],
 } as const;
