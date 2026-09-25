@@ -21613,7 +21613,7 @@ export const formatSupportCatalog = {
 				"the plain mode, handed over as a wave of the format of the head",
 				"the fifth mode, handed over as the Ogg stream it names",
 				"the LZSS container of the first packed mode and the zlib stream of the third",
-				"the walk of the places of the two packed modes: the interleave of a frame, the scales of it, the fixed point transform with its twiddle table, the frame overlap and the samples they turn out",
+				"the walk of the places of the two packed modes: the interleave of a frame, the scales of it (two of the four kinds of `extra`), the fixed point transform with its twiddle table, the frame overlap and the samples they turn out",
 			],
 			unsupported: ["audio creation"],
 			remainingVerification: ["real-game GARbro differential output"],

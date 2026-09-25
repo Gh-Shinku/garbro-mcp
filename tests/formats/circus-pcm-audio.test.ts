@@ -262,6 +262,30 @@ describe("Circus PCM sound", () => {
 		expect(sum).toBe(ORACLE.invSum >>> 0);
 	});
 
+	it("walks a sound whose scales are of another kind", () => {
+		const { frame } = frameOfCodes();
+		const data = new Int32Array(4096);
+		const temp = new Int32Array(4096);
+		scalePcmWindow(frameOfCodes().window, 2, data, temp);
+		transformPcmFrame(data, temp);
+		expect([...data.slice(0, 6)]).toEqual([60, 33, 25, 16, -9, -16]);
+		let sum = 0;
+		for (const value of data) sum = (sum + value) >>> 0;
+		expect(sum).toBe(7975);
+		const pcm = decodePcmStream(Buffer.concat([frame, frame]), PCM_SIZE, 2);
+		expect(crc32(pcm) >>> 0).toBe(4006157779);
+		const words: number[] = [];
+		for (let i = 0; i < 12; i += 1) words.push(pcm.readInt16LE(2 * i));
+		expect(words).toEqual([60, 33, 25, 16, -9, -16, 21, 56, 44, 15, 5, -3]);
+		const overlap: number[] = [];
+		for (let i = 0; i < 32; i += 1)
+			overlap.push(pcm.readInt16LE(2 * (4064 + i)));
+		expect(overlap).toEqual([
+			21, 3, 1, -3, -30, -43, -7, 34, 35, 13, 8, 2, -24, -33, 3, 41, 34, 8, -1,
+			-9, -36, -41, -4, 27, 14, -17, -27, -36, -60, -61, -21, 5,
+		]);
+	});
+
 	it("walks the whole coded stream of a sound", () => {
 		const { frame } = frameOfCodes();
 		const stream = Buffer.concat([frame, frame]);
