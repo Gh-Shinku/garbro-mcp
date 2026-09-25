@@ -84,6 +84,9 @@ zeros the picture was built of.
 
 * A picture of no width, of no height, of no places in a row, or one whose walk stands past the end of the
   file, is turned away rather than read past the end like the reference would.
+* A picture whose places as they stand run past the end of the file is read as far as the file goes, and the
+  places behind that keep the zeros the picture was built of; the reference would read past the end of its
+  own stream.
 * A picture whose walk reads past the end of the packed places reads a place of nothing for every place it
   is missing, which is what the reference does as well, since it hands a place of nothing back for a read
   that stands past the end.
