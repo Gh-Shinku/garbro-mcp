@@ -324,6 +324,7 @@ import { fc01AcdImageFormat } from "./fc01/acd-image.js";
 import { fc01BdtFormat } from "./fc01/bdt.js";
 import { fc01ClmImageFormat } from "./fc01/clm-image.js";
 import { mcaFormat } from "./fc01/mca.js";
+import { fc01McgImageFormat } from "./fc01/mcg-image.js";
 import { mrgFormat } from "./fc01/mrg.js";
 import { mrg0Format } from "./fc01/mrg0.js";
 import { mrg2Format } from "./fc01/mrg2.js";
@@ -2002,6 +2003,7 @@ export function createDefaultRegistry(
 		aaruFl4Format,
 		wagFormat,
 		mcaFormat,
+		fc01McgImageFormat,
 		dpmFormat,
 		detFormat,
 		daiPacFormat,

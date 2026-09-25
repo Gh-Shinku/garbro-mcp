@@ -68,6 +68,11 @@ export class MrgDecoder {
 		return new MrgDecoder(data, index + HEADER_SIZE, unpackedSize);
 	}
 
+	/** The place of the file the walk of the places of the file stands at (of the walk behind it). */
+	get cursor(): number {
+		return this.src;
+	}
+
 	/** `MrgDecoder.ResetKey`: the walk of the places of the file stands of the head of it again. */
 	resetKey(key: number): void {
 		this.src = this.start;

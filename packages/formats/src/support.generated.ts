@@ -8587,6 +8587,39 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "MCG",
+				class: "McgFormat",
+				source: "ArcFormats/FC01/ImageMCG.cs",
+			},
+			localId: "fc01-mcg-image",
+			verification: "synthetic-fixtures",
+			status: "partial",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine and its version",
+				"the walk of the words of the codec of the engine of the three planes of a picture of the version 2.00",
+				"the places of the picture standing of the green, the blue and the red of the places of the file of it",
+				"the walk of the places of the file of the row of the picture behind the place of it",
+				"the count of the places of the file of the blue and the red of a place of the picture of the green of it",
+				"the masks of the channels of a picture standing behind the places of the head of it",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture of a version behind 2.00 (the password of the picture stands of the medium of the engine)",
+				"a picture of the version 2.00 of a count of the places of a colour of its own",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture whose places of the file of a row stand of the places of the file of its own (the walks of the places of the file of the count of the places of the picture of the place of it)",
+				"the colour map of a picture of eight places to a place, of the walk of the words of it",
+				"the masks of the channels of a picture of sixteen places to a place",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "WAG/IAF",
 				class: "WagOpener",
