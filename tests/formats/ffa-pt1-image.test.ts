@@ -1,7 +1,7 @@
-// The walk of the places of an FFA System PT1 picture of the first two kinds, against streams written by
-// hand: a flag byte and, behind it, a place of its own and runs whose place and count stand in the frame
-// the walk fills itself. Every place the walk has to turn out is known from the stream, so the places of
-// the picture are the ones the fixture asks for rather than a recording of what the walk did.
+// The walk of the places of a picture of the FFA System engine. The two oldest kinds stand of an LZSS
+// stream over a frame the walk fills itself and the two newer ones of a bit stream whose bits are read from
+// the lowest place of a byte up: every fixture writes the stream the walk asks for, so the places of the
+// picture are the values the fixture asks for rather than a recording of what the walk did.
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
@@ -9,6 +9,7 @@ import { ffaPt1ImageFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import {
 	populatePt1Frame,
+	Pt1Bits,
 	readPt1Layout,
 	unpackPt1Picture,
 } from "../../packages/formats/src/ffa/pt1-image.js";
@@ -18,6 +19,7 @@ import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 function buildPt1(spec: {
 	kind: number;
 	stream: Buffer;
+	alpha?: Buffer;
 	width?: number;
 	height?: number;
 	unpackedSize?: number;
@@ -34,11 +36,38 @@ function buildPt1(spec: {
 	head.writeUInt32LE(height, 20);
 	head.writeInt32LE(spec.stream.length, 24);
 	head.writeInt32LE(spec.unpackedSize ?? width * height * 3, 28);
-	return Buffer.concat([head, spec.stream]);
+	const parts = [head, spec.stream];
+	if (spec.alpha) {
+		const size = Buffer.alloc(4, 0);
+		size.writeInt32LE(spec.alpha.length, 0);
+		parts.push(size, spec.alpha);
+	}
+	return Buffer.concat(parts);
 }
+
+/** The stream of the two newer kinds of the picture of two by two pixels, of its first pixel in front. */
+function predictorStream(): Buffer {
+	// The first pixel, then the bits of the walk from the lowest place of the fourth byte up: a place
+	// written like the one to its left, one like the place above it and a last one of the gradient of the
+	// left, the up-left and the up places with a difference of minus one for its first colour.
+	return Buffer.from([0x10, 0x20, 0x30, 0xe7, 0x00, 0x00, 0x00, 0x00]);
+}
+const PREDICTOR_PIXELS = [
+	0x10, 0x20, 0x30, 0x10, 0x20, 0x30, 0x10, 0x20, 0x30, 0x0f, 0x20, 0x30,
+];
 
 /** The frame of the walk: thirteen of every place of a byte, and then the tail of the frame. */
 const FRAME = populatePt1Frame();
+
+/** A writer of the bits of the stream of the two newer kinds, from the lowest place of a byte up. */
+function writeLsbBits(bits: readonly number[]): Buffer {
+	const out = Buffer.alloc(Math.ceil(bits.length / 8), 0);
+	bits.forEach((bit, index) => {
+		if (0 !== bit)
+			out[index >> 3] = (out[index >> 3] ?? 0) | (1 << (index & 7));
+	});
+	return out;
+}
 
 describe("FFA System PT1 picture", () => {
 	it("reads the head of the picture", () => {
@@ -51,7 +80,11 @@ describe("FFA System PT1 picture", () => {
 		expect(plain?.unpackedSize).toBe(12);
 		expect(plain?.bitsPerPixel).toBe(24);
 		// The kind of three carries a place of its own for the alpha of the picture as well.
-		expect(readPt1Layout(buildPt1({ kind: 3, stream }))?.bitsPerPixel).toBe(32);
+		const alpha = readPt1Layout(
+			buildPt1({ kind: 3, stream, alpha: Buffer.from([0xff, 0xaa]) }),
+		);
+		expect(alpha?.bitsPerPixel).toBe(32);
+		expect(alpha?.alphaPackedSize).toBe(2);
 		expect(readPt1Layout(buildPt1({ kind: 2, stream }))?.bitsPerPixel).toBe(24);
 	});
 
@@ -99,6 +132,69 @@ describe("FFA System PT1 picture", () => {
 		]);
 	});
 
+	it("reads the difference of a place of the newer kinds of the reservoir", () => {
+		// The code of every difference of the walk, one at a time, behind the first pixel of the picture.
+		const cases: readonly (readonly [readonly number[], number])[] = [
+			[[1], 0],
+			[[0, 0, 1], -1],
+			[[0, 1, 0], 1],
+			[[0, 1, 1, 1], -2],
+			[[0, 1, 1, 0], 2],
+			[[0, 0, 0, 1], -3],
+			[[0, 0, 0, 0, 1, 1, 1], 3],
+			[[0, 0, 0, 0, 1, 1, 0], -4],
+			[[0, 0, 0, 0, 1, 0, 1], 4],
+			[[0, 0, 0, 0, 1, 0, 0], -5],
+			[[0, 0, 0, 0, 0, 1, 1], 5],
+			[[0, 0, 0, 0, 0, 1, 0], -6],
+			[[0, 0, 0, 0, 0, 0, 1], 6],
+			[[0, 0, 0, 0, 0, 0, 0, 1, 1], -7],
+			[[0, 0, 0, 0, 0, 0, 0, 1, 0], 7],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 1], -8],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], 8],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], -9],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 9],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], -10],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], 10],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], -11],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], 11],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], -12],
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 12],
+			// A difference no code names is the escape of the walk, of the top count of places.
+			[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], -13],
+		];
+		for (const [bits, want] of cases) {
+			const stream = Buffer.concat([
+				Buffer.from([0x10, 0x20, 0x30]),
+				writeLsbBits(bits),
+			]);
+			const reader = Pt1Bits.seeded(stream);
+			reader.readNext();
+			expect([bits.length, reader.difference()]).toEqual([bits.length, want]);
+		}
+	});
+
+	it("walks the places of the kind of the predictor", () => {
+		const file = buildPt1({ kind: 2, stream: predictorStream() });
+		const layout = readPt1Layout(file);
+		if (!layout) throw new Error("no layout");
+		expect([...unpackPt1Picture(file, layout)]).toEqual(PREDICTOR_PIXELS);
+	});
+
+	it("walks the place of the alpha of the kind of three", () => {
+		const file = buildPt1({
+			kind: 3,
+			stream: predictorStream(),
+			alpha: Buffer.from([0xff, 0xaa, 0xbb, 0xcc, 0xdd]),
+		});
+		const layout = readPt1Layout(file);
+		if (!layout) throw new Error("no layout");
+		expect([...unpackPt1Picture(file, layout)]).toEqual([
+			0x10, 0x20, 0x30, 0xaa, 0x10, 0x20, 0x30, 0xbb, 0x10, 0x20, 0x30, 0xcc,
+			0x0f, 0x20, 0x30, 0xdd,
+		]);
+	});
+
 	it("reads the picture through the format", async () => {
 		const archive = buildPt1({
 			kind: 0,
@@ -122,18 +218,27 @@ describe("FFA System PT1 picture", () => {
 		]);
 	});
 
-	it("refuses the kinds of two and three", async () => {
-		for (const kind of [2, 3]) {
-			const handle = await ffaPt1ImageFormat.open(
-				new BufferByteSource(
-					buildPt1({ kind, stream: Buffer.from([0x01, 0x41]) }),
-				),
-				"sample.pt1",
-			);
-			const entry = handle.entries[0];
-			if (!entry) throw new Error("no entry");
-			await expect(handle.openEntry(entry.id)).rejects.toThrow(GarbroError);
-		}
+	it("reads a picture of the kind of the predictor through the format", async () => {
+		const handle = await ffaPt1ImageFormat.open(
+			new BufferByteSource(
+				buildPt1({
+					kind: 3,
+					stream: predictorStream(),
+					alpha: Buffer.from([0xff, 0xaa, 0xbb, 0xcc, 0xdd]),
+				}),
+			),
+			"sample.pt1",
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const bmp = await consumeBuffer(await handle.openEntry(entry.id));
+		expect(bmp.readUInt16LE(28)).toBe(32);
+		const read = readBmpImage(bmp);
+		if (!read) throw new Error("no bitmap");
+		expect([...read.pixels]).toEqual([
+			0x10, 0x20, 0x30, 0xaa, 0x10, 0x20, 0x30, 0xbb, 0x10, 0x20, 0x30, 0xcc,
+			0x0f, 0x20, 0x30, 0xdd,
+		]);
 	});
 
 	it("turns away what is not one of its pictures", async () => {
@@ -157,10 +262,22 @@ describe("FFA System PT1 picture", () => {
 				new BufferByteSource(cut.subarray(0, 0x20 + 1)),
 			),
 		).toBe(false);
+		// A picture of the kind of three whose alpha stream is not there is broken as well.
+		const noAlpha = buildPt1({ kind: 3, stream });
+		expect(await ffaPt1ImageFormat.detect(new BufferByteSource(noAlpha))).toBe(
+			false,
+		);
 		expect(
 			await ffaPt1ImageFormat.detect(
 				new BufferByteSource(buildPt1({ kind: 1, stream })),
 			),
 		).toBe(true);
+		expect(
+			await ffaPt1ImageFormat.detect(
+				new BufferByteSource(buildPt1({ kind: 2, stream: predictorStream() })),
+			),
+		).toBe(true);
 	});
 });
+
+void GarbroError;
