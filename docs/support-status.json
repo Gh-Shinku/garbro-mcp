@@ -20277,6 +20277,39 @@
 				"a picture standing of blocks with four places to a pixel",
 				"the places of the block data standing short of the picture"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "IPT",
+				"class": "IptFormat",
+				"source": "Experimental/Artemis/ImageIPT.cs"
+			},
+			"localId": "artemis-ipt-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the language the picture stands of, read by a small reader of this project",
+				"the canvas of the picture, of the places of the pictures standing beside it",
+				"a picture of the kind `cut`, standing of the places of the pictures over it alone",
+				"a picture of the kind `diff`, standing on the picture its canvas names",
+				"the alpha of a picture of four places to a pixel, standing over the places of the canvas",
+				"the places of a picture standing over the edge of the canvas and past it",
+				"the pictures the descriptor names, read beside it of the PNG files of this project"
+			],
+			"unsupported": [
+				"creating a picture",
+				"a picture standing of a kind of its own this engine does not name",
+				"a PNG picture standing of its places in more than one pass"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a PNG picture of a colour map standing of an alpha of its own",
+				"a picture of the kind `diff` standing of a picture of the other kind"
+			]
 		}
 	]
 }

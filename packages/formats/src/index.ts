@@ -85,6 +85,7 @@ import { artelMrlImageFormat } from "./artel/mrl-image.js";
 import { muwAudioFormat } from "./artel/muw-audio.js";
 import { pfdFormat } from "./artel/pfd.js";
 import { mjaFormat } from "./artemis/mja.js";
+import { iptImageFormat } from "./artemis/ipt-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
 import { gxpFormat } from "./astronauts/gxp.js";
@@ -1467,6 +1468,7 @@ export function createDefaultRegistry(
 		dpkFormat,
 		gsdFormat,
 		mjaFormat,
+		iptImageFormat,
 		mifFormat,
 		bishopPkFormat,
 		ivorySgFormat,
