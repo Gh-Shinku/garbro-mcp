@@ -838,6 +838,7 @@ import { texImageFormat } from "./system21/tex-image.js";
 import { system98GImageFormat } from "./system98/g-image.js";
 import { system98LibFormat } from "./system98/lib.js";
 import { tacticsTgfImageFormat } from "./tactics/tgf-image.js";
+import { tacticsArcFormat } from "./tactics/arc-tactics.js";
 import { yuFormat } from "./tactics/yu.js";
 import { tailCafFormat } from "./tail/caf.js";
 import { tailCfp2ImageFormat, tailCfpImageFormat } from "./tail/cfp-image.js";
@@ -2319,6 +2320,7 @@ export function createDefaultRegistry(
 		melodyMgoImageFormat,
 		pochetteGdtImageFormat,
 		tacticsTgfImageFormat,
+		tacticsArcFormat,
 		riddleGcpImageFormat,
 		cswareGdtImageFormat,
 		reallivePdtImageFormat,

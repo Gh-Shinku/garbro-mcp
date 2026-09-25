@@ -14012,6 +14012,37 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "ARC/Tactics",
+				"class": "ArcOpener",
+				"source": "ArcFormats/Tactics/ArcTactics.cs"
+			},
+			"localId": "tactics-arc",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the words of the index of it",
+				"the walk of the index of the places of the file, of the places of the file the other way round, of five places less",
+				"the walk of the index of the words of the picture itself, of a password of it",
+				"the words of the index of the count of the places of the file of them of 0x18 and of 0x10 places",
+				"the places of a picture of the password of the index and of the LZSS engine behind it",
+				"cp932 names and placement validation"
+			],
+			"unsupported": [
+				"creating an archive",
+				"the walk of the LZSS engine of the scheme of the picture (the ARC/Tactics/2 picture)"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture whose words of the index stand of the walk of the places of the file of the count of the places of the picture",
+				"the walk of the LZSS engine of the scheme of the picture"
+			]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/ARC2",
 				"class": "Arc2Opener",
 				"source": "ArcFormats/CsWare/ArcARC2.cs"

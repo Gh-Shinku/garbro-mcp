@@ -263,6 +263,16 @@ like.
   code (`dword_6FF464`, `dword_703E68`, `dword_70986C`, `sub_408C80`), so a port would have to reproduce
   the updates exactly and has nothing to check them against but the reference itself. That is a staged
   port of the kind the TLG6 and JBP codecs took.
+- `ARC/Tactics/2` (`ArcFormats/Tactics/ArcTactics.cs`, `Arc2Opener`) reads a flat list of pictures at
+  `0x10` (the count of the places of a picture, the count of them as they stand, the count of the places of
+  its name, then the name and the places of the picture) and then **refuses the picture itself**:
+  `TryOpen` stands of `QueryScheme()`, which the reference fills from its format database
+  (`SchemeMap`/`KnownSchemes`, keyed on the title) or from `Properties.Settings.Default.TacticsArcPassword`,
+  and neither stands in the reference tree. Every picture of it stands of the places of the file `^` the
+  places of that password and of the engine's own LZ walk behind them (`UnpackCustomLzss`), so a headless
+  port could list the pictures of a file and never read one of them. The walk of the pictures of the plain
+  `ArcOpener` (`ARC/Tactics`) **is** ported, as `tactics-arc`; the custom LZ walk would be a staged port of
+  the kind TLG6 and JBP took, and would still stand of no picture to check it against without the password.
 - `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are whose index and entries are
   transformed by one of two schemes the reference tries in turn. It would have to carry `Primel.SHA256`,
   the three `Primel1/2/3Encyption` ciphers, `GameRes.Cryptography.RC6`, AES in CFB mode with zero
