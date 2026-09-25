@@ -341,6 +341,7 @@ import { g2PakFormat } from "./g2/pak.js";
 import { g2PgxImageFormat } from "./g2/pgx-image.js";
 import { hiddenJpegImageFormat } from "./gaia/jpeg-image.js";
 import { gameresBmpImageFormat } from "./gameres/bmp-image.js";
+import { gameresTgaImageFormat } from "./gameres/tga-image.js";
 import { gameresJpegImageFormat } from "./gameres/jpeg-image.js";
 import { gameresMp3AudioFormat } from "./gameres/mp3-audio.js";
 import { gameresWavAudioFormat } from "./gameres/wav-audio.js";
@@ -2262,6 +2263,7 @@ export function createDefaultRegistry(
 		uranNclImageFormat,
 		powerdNclImageFormat,
 		gameresBmpImageFormat,
+		gameresTgaImageFormat,
 		triangleTriImageFormat,
 		melodyMgoImageFormat,
 		pochetteGdtImageFormat,

@@ -20124,5 +20124,38 @@ export const formatSupportCatalog = {
 				"the runs of the second way that end a block and carry its places",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "TGA",
+				class: "TgaFormat",
+				source: "GameRes/ImageTGA.cs",
+			},
+			localId: "gameres-tga-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, and the ones it turns away",
+				"a picture of its own colours, of a colour map of 24 or 32 bit colours, and in greys",
+				"a picture whose places stand as they are",
+				"a picture whose places stand as runs of the bits",
+				"a picture of 8, 15, 16, 24 or 32 bits, with the alpha the descriptor names",
+				"a picture whose rows stand bottom up, turned about before it is handed over",
+				"the colour map of a picture, blue first",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"creating a picture",
+				"the ways standing of Huffman, delta and runlength coding, which the reference refuses to draw",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a run whose places stand short of the file",
+				"a colour map of a depth the reference does not know",
+			],
+		},
 	],
 } as const;
