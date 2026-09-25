@@ -201,6 +201,10 @@ further than the reference's own list of them.
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) and `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, whose entries
   open through an `ISA` archive) depend on external readers in the same way.
 - `LAY/MAGES` (`ArcFormats/NitroPlus/ArcLAY.cs`) reads a companion PNG for every entry.
+
+- `UNITY/FS` (`ArcFormats/Unity/ArcUnityFS.cs`, class `UnityFSOpener`) needs two decoders this project does
+  not carry: the index of the container is an **LZMA** stream where its flags say so (`UnpackLzma`), and
+  every entry behind the index is an **LZ4** block (`Lz4Compressor.DecompressBlock`).
 - `CRXD` (`ArcFormats/Circus/ImageCRXD.cs`, class `CrxdFormat`, which stands on the `CrxFormat` of the same
   engine, now ported as `circus-crx-image`) is a **differential** picture: its head names the picture it
   stands on by name and by offset in the archive the picture came from (`BaseOffset` at 8, `BaseFileName` as
@@ -241,6 +245,12 @@ further than the reference's own list of them.
 - `S5I` (`ArcFormats/rUGP/ImageS5I.cs`) reads one object of a `CRioArchive`, whose walk lives in the
   fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs` and `LoadRio*` helpers that this project has not
   ported.
+
+- `RIP` (`ArcFormats/rUGP/ImageRIP.cs`, class `RipFormat`, extensions `rip` and `sia`) is the picture of the
+  same engine and stands in the same place as `S5I`: its own signature is nothing, because `ReadMetaData`
+  first asks whether the file carries `CRioArchive.ObjectSignature` and then builds a `CRioArchive` to read
+  a `CRip` or `CRip007` object out of it. Without the `RIO` walk there is no object to read at all, so this
+  one stands behind that port rather than behind a decoder of its own.
 - `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
   reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
   stock build does open these containers - but a first port of it stands withdrawn. The container is a
@@ -350,6 +360,30 @@ the first forty of them.
   itself is a single file. What holds it back is the fixture: the reference carries no writer, so
   checking it needs a matching encoder for the tree shape, which is a larger piece of work than the
   reader.
+
+- `PT1` (`ArcFormats/Ffa/ImagePT1.cs`, class `Pt1Format`, 642 lines) carries four versions of its walk. The
+  two oldest are LZSS walks over a frame of their own (`PopulateLzssFrame`, with the picture of the version
+  naming the places of the frame), which this project could carry on its own. The two newer ones walk a bit
+  stream whose `ReadNext` **re-reads** the letters of its reservoir wherever the deficit it fills is not a
+  whole number of bytes, so a fixture needs a writer that mirrors that reservoir letter for letter before
+  the walk can be checked. A staged port of the two LZSS versions is the way in.
+- `IMG` (`ArcFormats/ScrPlayer/ImageIMG.cs`, class `ImgFormat`) and `IMG2` (`ArcFormats/ScrPlayer/ImageI.cs`,
+  class `Img2Format`) are the pictures of the ScrPlayer engine. Neither stands on anything outside the
+  reference tree, but each walks its places through a table of its own that ships beside it: the first
+  reads `ImgControlTable1`, `ImgControlTable2`, `ImgControlTable32` and `ImgDeltaTable2`, and the second
+  reads `IControlTable1`, `IControlTable2`, `IControlTable32`, `IColorBitsTable1` and `IColorBitsTable2`.
+  Those nine files are some thirty six kilobytes of tables, which a port extracts the way this project
+  extracted the tables of the HyperWorks and Nekotaro pictures; what stands between them and a port is the
+  size of the two readers together rather than a missing input.
+- `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
+  `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
+  `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
+  the unit is that pair rather than a missing input.
+- `NOA` (`ArcFormats/Entis/ArcNOA.cs`, class `NoaOpener`, 616 lines) is the archive of the same engine. Its
+  index and its own `ERISADecodeContext` are portable, but every entry it lists is an `ERI`, `EMI`, `MIO`,
+  `EMS` or `TXT` file of that engine, so listing an archive of it without the whole Entis stack
+  (`EriReader.cs` of 2844 lines, `MioDecoder.cs` of 968, `ErisaMatrix.cs` of 488, `ErisaNemesis.cs` of 338)
+  names files that cannot be read. It is the last port of that engine.
 - `PIC/NP` (`Legacy/Paprika/ImageNP.cs`, class `NpFormat`, 412 lines) has the same shape as `GPH`: a plain
   head (a word of its own, a width and a height, twenty four bits a place) and a bespoke walk - an
   `UnpackBits` run of literal places and a block coded LZ with two tables built from the stream - and no
