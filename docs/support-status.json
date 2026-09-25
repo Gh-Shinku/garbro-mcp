@@ -21305,6 +21305,32 @@
 				"real-game GARbro differential output",
 				"the places of the file of the walk of the cipher of the engine of a key of no places of the file of the engine itself"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "G",
+				"class": "GFormat",
+				"source": "Legacy/HyperWorks/ImageG.cs"
+			},
+			"localId": "hyperworks-g-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine, of the first word 0x7D00 or of the letters .G of the name of the file of it",
+				"the table of the colours of a picture of the engine, of 42 places of the file of it",
+				"the walk of the places of the picture of the engine: the colours of the table of the engine and the runs of the places of the file of it",
+				"the picture of the engine of the places of the file of a BMP of it, of eight places of a colour to a place of it"
+			],
+			"unsupported": [
+				"writing a picture of the engine",
+				"the places of a picture of the engine of a run before the walk of the picture of it",
+				"the places of a picture of the engine of no places of the file of the walk of it"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
 		}
 	]
 }
