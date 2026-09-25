@@ -578,6 +578,7 @@ import {
 } from "./mina/pak.js";
 import { minkDatImageFormat } from "./mink/dat-image.js";
 import { fcImageFormat } from "./mink/fc-image.js";
+import { fdImageFormat } from "./mink/fd-image.js";
 import { gdfImageFormat } from "./mink/gdf-image.js";
 import { minkGrpFormat } from "./mink/grp.js";
 import { miscBinFormat } from "./misc/bin.js";
@@ -2342,6 +2343,7 @@ export function createDefaultRegistry(
 		qlieAbmpImageFormat,
 		minkDatImageFormat,
 		fcImageFormat,
+		fdImageFormat,
 		leafBjrImageFormat,
 		vnEngineZawImageFormat,
 		propellerMgrImageFormat,
