@@ -526,6 +526,7 @@ import { frmImageFormat } from "./logg/frm-image.js";
 import { lucifenLpkFormat } from "./lucifen/lpk.js";
 import { lunaPacFormat } from "./luna-soft/pac.js";
 import { lunePackFormat } from "./lune/pack.js";
+import { pictImageFormat } from "./macintosh/pict-image.js";
 import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
 import { maiFormat } from "./mai/arc.js";
@@ -1181,6 +1182,7 @@ export * from "./logg/index.js";
 export * from "./lucifen/index.js";
 export * from "./luna-soft/index.js";
 export * from "./lune/index.js";
+export * from "./macintosh/index.js";
 export * from "./macromedia/index.js";
 export * from "./mai/index.js";
 export * from "./maika/index.js";
@@ -2368,6 +2370,7 @@ export function createDefaultRegistry(
 		studioJikkenshitsuSpeedImageFormat,
 		studioJikkenshitsuGrcImageFormat,
 		macromediaSndAudioFormat,
+		pictImageFormat,
 		gsPackPicImageFormat,
 		rinaRadImageFormat,
 		yuRisYcgImageFormat,
