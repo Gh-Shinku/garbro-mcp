@@ -24,3 +24,4 @@ export * from "./tlg6-line.js";
 export * from "./isaac64.js";
 export * from "./fast-mersenne-twister.js";
 export * from "./primel-sha256.js";
+export * from "./rc6.js";
