@@ -21590,17 +21590,14 @@
 				"the code walk from the root down, a bit at a time",
 				"the runs of literal places and of places of nothing, with the counts of the walk",
 				"the average sampling of the picture, a place of a colour at a time",
-				"the pictures of eight, twenty four and thirty two places to a colour"
+				"the pictures of eight, twenty four and thirty two places to a colour",
+				"the second walk of the engine (version 2): its two trees, the places of its blocks of rows, the walk of a block of eight by eight places of the colour of it, its walk of the alpha of it and its pictures of three and four places to a colour"
 			],
 			"unsupported": [
 				"creating a picture",
-				"the second walk of the engine (version 2): its two weight tables, the offsets of its blocks of rows, its walk of a block and its alpha walk",
 				"the versions behind the second one"
 			],
-			"remainingVerification": [
-				"the second walk of the engine",
-				"real-game GARbro differential output"
-			]
+			"remainingVerification": ["real-game GARbro differential output"]
 		}
 	]
 }

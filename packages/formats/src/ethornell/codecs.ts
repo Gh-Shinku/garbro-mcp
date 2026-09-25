@@ -10,6 +10,16 @@ export class MsbBitReader {
 		this.#byteOffset = offset;
 	}
 
+	/** The place of the stream behind the letters the walk took, as `BitStream.Input.Position` reports it. */
+	get byteOffset(): number {
+		return this.#byteOffset;
+	}
+
+	/** The letters of the byte the walk stands in that are still to be read, `BitStream.CacheSize & 7`. */
+	get bitsInByte(): number {
+		return 0 === this.#bitOffset ? 0 : 8 - this.#bitOffset;
+	}
+
 	readBits(count: number): number {
 		let value = 0;
 		for (let index = 0; index < count; index += 1) {

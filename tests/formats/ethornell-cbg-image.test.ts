@@ -39,6 +39,11 @@ function varint(value: number): number[] {
 	}
 }
 
+/** The counts of a run of weights, a letter of its own each. */
+function varints(values: readonly number[]): number[] {
+	return values.flatMap((value) => varint(value));
+}
+
 /** The weights of a tree of a fixture: the leaves of the alphabet carry one and the rest none. */
 function weightsOf(leaves: number): number[] {
 	const weights: number[] = new Array(256).fill(0);
@@ -139,6 +144,135 @@ function buildCbg(spec: CbgSpec): Buffer {
 		stored[at] = ((payload[at] ?? 0) + updateKey(state)) & 0xff;
 	}
 	return Buffer.concat([header, stored, Buffer.from(coded)]);
+}
+
+interface CbgSecondSpec {
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	key?: number;
+	/** The count of the letters of a colour of a block and the places it carries, a block of a plane each. */
+	deltas: { count: number; value: number }[];
+	/** One coded place of the first plane, as the second tree of the reference carries it. */
+	coefficient?: { value: number };
+	/** The alpha places of the padded picture, in order. */
+	alpha?: number[];
+}
+
+/**
+ * A picture of the second walk of the engine: the table of the places of the colour stands in the walked
+ * stream of the head, and the two trees, the places of the blocks of rows and the blocks themselves stand
+ * behind it in the clear. The first tree carries sixteen leaves of one weight each (so a count of letters
+ * is its own four letters) and the second carries the leaves 0 and 0x12, whose codes are one letter each.
+ */
+function buildCbgSecondWalk(spec: CbgSecondSpec): Buffer {
+	const bits: number[] = [];
+	for (const delta of spec.deltas) {
+		const code = delta.count.toString(2).padStart(4, "0");
+		for (const letter of code) bits.push("1" === letter ? 1 : 0);
+		for (let i = delta.count - 1; i >= 0; i -= 1) {
+			bits.push((delta.value >> i) & 1);
+		}
+	}
+	// The reference drops the letters of the byte its bit walk stands in before it reads the places of
+	// the blocks, so the letters of the second tree begin at a byte.
+	while (0 !== bits.length % 8) bits.push(0);
+	const planes = spec.deltas.length / 3;
+	for (let plane = 0; plane < planes; plane += 1) {
+		if (0 === plane && spec.coefficient) {
+			// The leaf 0x12 of the second tree: one letter, then the letters of its place.
+			bits.push(1);
+			const count = 0x12 >> 4;
+			for (let i = count - 1; i >= 0; i -= 1) {
+				bits.push((spec.coefficient.value >> i) & 1);
+			}
+		}
+		// The leaf 0 of the second tree stops the walk of a block.
+		bits.push(0);
+	}
+	const block: number[] = [...varint(spec.deltas.length * 64)];
+	for (let at = 0; at < bits.length; at += 8) {
+		let value = 0;
+		for (let i = 0; i < 8; i += 1) value = (value << 1) | (bits[at + i] ?? 0);
+		block.push(value);
+	}
+	const weights1: number[] = new Array(16).fill(1);
+	const weights2: number[] = new Array(0xb0).fill(0);
+	weights2[0] = 1;
+	weights2[0x12] = 1;
+	const stream: number[] = [...varints(weights1), ...varints(weights2)];
+	const width8 = (spec.width + 7) & -8;
+	const padSkip = ((width8 >> 3) + 7) >> 3;
+	const blocks = ((spec.height + 7) & -8) / 8;
+	const alpha: number[] = [];
+	if (spec.alpha) {
+		// The mark of the alpha stream, then a control letter of nothing and the eight places it covers.
+		alpha.push(1, 0, 0, 0);
+		for (let at = 0; at < spec.alpha.length; at += 8) {
+			alpha.push(0);
+			for (let i = 0; i < 8 && at + i < spec.alpha.length; i += 1) {
+				alpha.push(spec.alpha[at + i] ?? 0);
+			}
+		}
+	}
+	const blockData: number[] = [
+		...new Array(padSkip).fill(0),
+		...block,
+		...alpha,
+	];
+	const words = blocks + 1;
+	const inputBase = stream.length + words * 4;
+	const offsets: number[] = [inputBase, inputBase + padSkip + block.length];
+	const payload: number[] = new Array(0x80).fill(0x10);
+	let sum = 0;
+	let xor = 0;
+	for (const value of payload) {
+		sum = (sum + value) & 0xff;
+		xor ^= value;
+	}
+	const key = spec.key ?? 0x12345678;
+	const header = Buffer.alloc(0x30, 0);
+	header.write("CompressedBG___", 0, "latin1");
+	header.writeUInt16LE(spec.width, 0x10);
+	header.writeUInt16LE(spec.height, 0x12);
+	header.writeInt32LE(spec.bitsPerPixel, 0x14);
+	header.writeUInt32LE(key, 0x24);
+	header.writeInt32LE(0x80, 0x28);
+	header[0x2c] = sum;
+	header[0x2d] = xor;
+	header.writeUInt16LE(2, 0x2e);
+	const state = { key, magic: 0 };
+	const stored = Buffer.from(
+		payload.map((value) => (value + updateKey(state)) & 0xff),
+	);
+	const tail: number[] = [...stream];
+	for (const offset of offsets) {
+		tail.push(
+			offset & 0xff,
+			(offset >> 8) & 0xff,
+			(offset >> 16) & 0xff,
+			(offset >> 24) & 0xff,
+		);
+	}
+	tail.push(...blockData);
+	return Buffer.concat([header, stored, Buffer.from(tail)]);
+}
+
+/** The alpha places of a padded picture, every place of a row of the picture in its own column. */
+function paddedAlpha(
+	width: number,
+	height: number,
+	values: Map<string, number>,
+): number[] {
+	const width8 = (width + 7) & -8;
+	const height8 = (height + 7) & -8;
+	const out: number[] = [];
+	for (let y = 0; y < height8; y += 1) {
+		for (let x = 0; x < width8; x += 1) {
+			out.push(values.get(`${x},${y}`) ?? 0);
+		}
+	}
+	return out;
 }
 
 async function pictureOf(archive: Buffer): Promise<Buffer> {
@@ -289,9 +423,8 @@ describe("Ethornell compressed picture", () => {
 		});
 	});
 
-	it("refuses the second walk and the versions behind it", async () => {
-		// The second walk reads its own weights and walks the places of the colour of a block of the
-		// picture, which this port does not carry yet.
+	it("refuses the heads the walk of the engine cannot read", async () => {
+		// A head of the second walk whose stored stream does not hold the places it declares.
 		const second = buildCbg({
 			width: 2,
 			height: 2,
@@ -306,7 +439,7 @@ describe("Ethornell compressed picture", () => {
 			await ethornellCbgImageFormat.detect(new BufferByteSource(second)),
 		).toBe(true);
 		await expect(pictureOf(second)).rejects.toMatchObject({
-			code: "UNSUPPORTED_FEATURE",
+			code: "INVALID_ARCHIVE",
 		});
 		// The reference refuses a shorter encoded stream of the second walk before it walks it.
 		const shortSecond = buildCbg({
@@ -336,6 +469,123 @@ describe("Ethornell compressed picture", () => {
 		await expect(pictureOf(third)).rejects.toMatchObject({
 			code: "UNSUPPORTED_FEATURE",
 		});
+	});
+
+	it("reads a picture of the second walk", async () => {
+		const bmp = await pictureOf(
+			buildCbgSecondWalk({
+				width: 2,
+				height: 2,
+				bitsPerPixel: 24,
+				deltas: [
+					{ count: 3, value: 4 },
+					{ count: 4, value: 10 },
+					{ count: 2, value: 0 },
+				],
+			}),
+		);
+		const image = readBmpImage(bmp);
+		expect(image?.width).toBe(2);
+		expect(image?.height).toBe(2);
+		// The places of the colour of the three planes stand as the walk of the engine laid them down:
+		// 4, 4 + 10 and 4 + 10 - 3, each turned by the table of the head and then read out of the three
+		// channels. The numbers stand from an independent transcription of the walk.
+		expect([...(image?.pixels ?? [])]).toEqual([
+			186, 111, 167, 186, 111, 167, 186, 111, 167, 186, 111, 167,
+		]);
+	});
+
+	it("reads a picture of the second walk of places below nothing", async () => {
+		const bmp = await pictureOf(
+			buildCbgSecondWalk({
+				width: 2,
+				height: 2,
+				bitsPerPixel: 24,
+				deltas: [
+					{ count: 3, value: 0 },
+					{ count: 3, value: 4 },
+					{ count: 4, value: 10 },
+				],
+			}),
+		);
+		// The counts of the letters carry the places of the walk of the colour: a count of three with a
+		// high letter of nothing stands for -7, and the walk lays 4 on top of it.
+		expect([...(readBmpImage(bmp)?.pixels ?? [])]).toEqual([
+			103, 106, 134, 103, 106, 134, 103, 106, 134, 103, 106, 134,
+		]);
+	});
+
+	it("reads a coded place of the colour of the second walk", async () => {
+		// The second tree carries one coded place of the colour of the first plane, on top of the places of
+		// the walk of the colour.
+		const bmp = await pictureOf(
+			buildCbgSecondWalk({
+				width: 2,
+				height: 2,
+				bitsPerPixel: 24,
+				deltas: [
+					{ count: 3, value: 4 },
+					{ count: 4, value: 10 },
+					{ count: 2, value: 0 },
+				],
+				coefficient: { value: 1 },
+			}),
+		);
+		expect([...(readBmpImage(bmp)?.pixels ?? [])]).toEqual([
+			188, 113, 169, 188, 113, 169, 187, 112, 168, 187, 112, 168,
+		]);
+	});
+
+	it("reads the alpha places of the second walk", async () => {
+		const bmp = await pictureOf(
+			buildCbgSecondWalk({
+				width: 2,
+				height: 2,
+				bitsPerPixel: 32,
+				deltas: [
+					{ count: 3, value: 4 },
+					{ count: 4, value: 10 },
+					{ count: 2, value: 0 },
+				],
+				alpha: paddedAlpha(
+					2,
+					2,
+					new Map([
+						["0,0", 0xab],
+						["1,0", 0xcd],
+						["0,1", 0xef],
+						["1,1", 0x12],
+					]),
+				),
+			}),
+		);
+		const image = readBmpImage(bmp);
+		expect(image?.bitsPerPixel).toBe(32);
+		// The places of the colour stand as they do without an alpha walk, and the fourth place of a
+		// picture carries the place the alpha walk laid down.
+		expect([...(image?.pixels ?? [])]).toEqual([
+			186, 111, 167, 0xab, 186, 111, 167, 0xcd, 186, 111, 167, 0xef, 186, 111,
+			167, 0x12,
+		]);
+	});
+
+	it("refuses a picture of the second walk of no places of the file", async () => {
+		// The places of the blocks of the engine reach past the file itself.
+		const beyond = buildCbgSecondWalk({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 24,
+			deltas: [
+				{ count: 3, value: 4 },
+				{ count: 4, value: 10 },
+				{ count: 2, value: 0 },
+			],
+		});
+		await expect(pictureOf(beyond)).resolves.toBeInstanceOf(Buffer);
+		const truncated = beyond.subarray(0, 0x30 + 0x80 + 0x20);
+		await expect(pictureOf(Buffer.from(truncated))).rejects.toThrow(
+			GarbroError,
+		);
 	});
 
 	it("refuses a head the reference cannot read", async () => {
