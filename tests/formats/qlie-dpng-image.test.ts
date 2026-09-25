@@ -2,10 +2,8 @@
 // the fixture are graphics of the places this test asks for, so the places of the picture are the ones the
 // fixture names rather than a recording of what the composition did.
 import { Buffer } from "node:buffer";
-import { deflateSync } from "node:zlib";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
-import { crc32 } from "@garbro-mcp/codecs";
 import { qlieDpngImageFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import {
@@ -13,40 +11,7 @@ import {
 	readDpngLayout,
 	readDpngTiles,
 } from "../../packages/formats/src/qlie/dpng-image.js";
-import { PNG_SIGNATURE } from "../../packages/formats/src/shared/png.js";
-
-/** One chunk of a portable network graphic: its count, its kind, the places of it and its own word. */
-function chunk(kind: string, body: Buffer): Buffer {
-	const length = Buffer.alloc(4, 0);
-	length.writeUInt32BE(body.length, 0);
-	const named = Buffer.concat([Buffer.from(kind, "latin1"), body]);
-	const crc = Buffer.alloc(4, 0);
-	crc.writeUInt32BE(crc32(named), 0);
-	return Buffer.concat([length, named, crc]);
-}
-
-/** A portable network graphic of the rows of places this test asks for, of no walk of its own. */
-function pngFile(input: {
-	width: number;
-	height: number;
-	colourType: number;
-	rows: readonly (readonly number[])[];
-}): Buffer {
-	const head = Buffer.alloc(13, 0);
-	head.writeUInt32BE(input.width, 0);
-	head.writeUInt32BE(input.height, 4);
-	head[8] = 8;
-	head[9] = input.colourType;
-	const places: Buffer[] = [];
-	for (const row of input.rows) places.push(Buffer.from([0, ...row]));
-	const body = deflateSync(Buffer.concat(places));
-	return Buffer.concat([
-		PNG_SIGNATURE,
-		chunk("IHDR", head),
-		chunk("IDAT", body),
-		chunk("IEND", Buffer.alloc(0)),
-	]);
-}
+import { pngFile } from "../helpers/png.js";
 
 /** A graph of four places of two by two places, of the places of its own. */
 function tileA(): Buffer {
