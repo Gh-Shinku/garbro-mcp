@@ -220,6 +220,7 @@ import { gpImageFormat } from "./eushully/gp-image.js";
 import { gsaImageFormat } from "./bishop/gsa-image.js";
 import { miaImageFormat } from "./miami/mia-image.js";
 import { gbcImageFormat } from "./primel/gbc-image.js";
+import { primelPcfFormat } from "./primel/pcf-archive.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1453,6 +1454,7 @@ export function createDefaultRegistry(
 		gsaImageFormat,
 		miaImageFormat,
 		gbcImageFormat,
+		primelPcfFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

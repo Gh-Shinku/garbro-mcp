@@ -354,39 +354,6 @@ the first forty of them.
   port could list the pictures of a file and never read one of them. The walk of the pictures of the plain
   `ArcOpener` (`ARC/Tactics`) **is** ported, as `tactics-arc`; the custom LZ walk would be a staged port of
   the kind TLG6 and JBP took, and would still stand of no picture to check it against without the password.
-- `PCF` (`ArcFormats/Primel/ArcPCF.cs`, 259 lines) is a Primel archive whose index and entries are
-  transformed by one of two schemes the reference tries in turn. Two of its pieces have landed:
-  `packages/codecs/src/primel-sha256.ts` is the `Primel.SHA256` its keys stand of - a copy of the walk
-  **whose round is not the one of the standard**, which that file writes out - and
-  `packages/codecs/src/rc6.ts` is `GameRes.Cryptography.RC6`, the cipher of the scheme of `0x80000`, which
-  the published vectors of the cipher hold. All four packed streams the flags select between have landed
-  in `packages/codecs/src/primel-streams.ts`: the walks of `LzssPackedStream`, `RlePackedStream` and
-  `MtfPackedStream` - of which the first two read the count of the places they turn out from their own head
-  and the third is handed one, since the walk of the reference never stops on its own - and the range walk of
-  `RangePackedStream`, of twelve places of precision, whose counts the engine has to bring to the four
-  thousand and ninety six places of the range between them, since the walk reads a place of the range as the
-  place of its run over that count rather than over the sum of the counts of the table. The three ciphers the flags name have landed as well, in
-  `packages/codecs/src/primel-cipher.ts` (of their tables in `primel-cipher-tables.ts`): `Primel1Encyption`,
-  `Primel2Encyption` and `Primel3Encyption`, of one block of sixteen places, of a key schedule that runs the
-  words of the key through a table of the places of a byte of its own, and of a chaining place that feeds
-  back its own input - so the engine reads an archive of the direction a cipher text of it stands in, and the
-  walks are not involutions. The AES of the last scheme has landed as well, in
-  `packages/codecs/src/aes.ts`. The reference has no AES of its own - it hands the key and the chaining
-  place to the platform's `Rijndael` - so the block and the walk stand here of the standard and are held to
-  the vectors of the standard: the appendix of FIPS-197 for the block and the appendix of SP 800-38A for the
-  walk. The walk is the **byte wise** CFB, of the default feedback size of the platform rather than of the
-  sixteen places of the block, and its chaining place is the cipher text the walk turns out. The reference
-  stands of `PaddingMode.Zeros` as well, which on a stream of that platform drops the zero places of the end
-  of a run; this port leaves them where they stand, since the engine's own readers stop at the count of the
-  places of an entry. What remains of the archive is `ArcPCF.cs` itself, 259 lines, of the two schemes of it
-  (the older over the SHA-256 of the engine, the newer over the SHA-256 of the standard), its header, its
-  index and the walk of its entries.
-  
-  The fixtures of the four packed streams and of the three ciphers stand of the terms of those walks rather
-  than of a stream out of an archive: the streams turn a run of places out of a head written for them, and
-  the ciphers of a second transcription of the same source, the reference carrying no inverse of either. A
-  payload out of an archive of that engine is therefore still unverified. That is a staged port of the kind TLG6 and JBP took, not a single one.
-
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
