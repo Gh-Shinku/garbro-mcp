@@ -372,7 +372,11 @@ the first forty of them.
   `CPZ7`) is the newer archive of the CVNS engine, and its unit is four files rather than one: the opener
   itself (776 lines), the head (`CpzHeader.cs`, 175), the walk of its entries (`Cpz5Decoder` and
   `ArchiveKey`, in the opener), a Huffman reader of its own (`HuffmanDecoder.cs`, 108) and a **custom MD5**
-  (`CmvsMD5.cs`, 194) whose state feeds the keys of every step. Every index is encrypted end to end: the
+  (`CmvsMD5.cs`, 194), whose state feeds the keys of every step - that piece is now ported, as
+  `packages/codecs/src/cmvs-md5.ts`: the round is the round of RFC 1321 over the block the engine shapes
+  (`w0 w1 w2 w3 80 … 80 00`, of its own initial state), and the seven keys of the engine differ in that
+  state and in the mapping of the four words the round leaves behind alone, of which the `mirai` key is the
+  state of the standard and is therefore held to `node:crypto` by the test of the family. Every index is encrypted end to end: the
   head is checked against an MD5 of its own, the seventh layout unpacks its index key through the Huffman
   reader, and the index itself then goes through a mix over a twenty four word secret, the walk of the
   `Cpz5Decoder` (twice), a directory walk and an entry walk. None of that needs an input this project does

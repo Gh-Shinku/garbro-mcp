@@ -25,3 +25,4 @@ export * from "./isaac64.js";
 export * from "./fast-mersenne-twister.js";
 export * from "./primel-sha256.js";
 export * from "./rc6.js";
+export * from "./cmvs-md5.js";
