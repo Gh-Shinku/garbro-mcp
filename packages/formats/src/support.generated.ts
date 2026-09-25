@@ -16179,6 +16179,40 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "FPK/MOONHIR",
+				class: "FpkOpener",
+				source: "ArcFormats/Moonhir/ArcFPK.cs",
+			},
+			localId: "moonhir-fpk-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the FPK word with its 0100 mark and the head of the index",
+				"the records of twenty four bytes, with the word that says an entry is keyed",
+				"the pictures of the archive typed by their name, and left untyped in a scr archive",
+				"the key found behind the end of the first keyed entry, out of the cipher's own arithmetic",
+				"the cipher of an entry, walked from its last word back to its first",
+				"the length a keyed entry names behind its own end",
+				"the walk of a picture: a byte, a run, a copy and the longer forms of the fourth way",
+				"the stretch a picture holds no room for, stepped over",
+			],
+			unsupported: [
+				"archive creation",
+				"an entry keyed with a key the reference does not carry, which its own table holds only one of",
+				"a picture larger than two hundred and fifty six million bytes",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real archive, which would show which of its entries are keyed and how its pictures are packed",
+				"the longer forms of the fourth way of a picture, which a real file would exercise",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BMX",
 				class: "BmxOpener",
 				source: "ArcFormats/Tanaka/ArcBMX.cs",
