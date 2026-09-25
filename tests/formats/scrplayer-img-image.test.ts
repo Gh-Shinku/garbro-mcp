@@ -22,19 +22,19 @@ import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 const RESOURCE_WORDS: readonly (readonly [string, string])[] = [
 	[
 		"control1",
-		"513955688b60e3aa7cd64af5a0ee7f5fa1a2a72deac0b9af26a8e8ac21e6e4a2",
+		"513955688b60e3aa793e07831fd7b18bdb328170c631ea68ec54d4b8c5b89193",
 	],
 	[
 		"control2",
-		"147c3d20074c46f6b9bbed0c2d5a3d1a2ff45dd1d6a2e0ba0c9f0c2f6d4e5d30",
+		"147c3d20074c46f694796b2c951fb1bb360005d7bdb16a6c9b56381257a2c252",
 	],
 	[
 		"control32",
-		"58aeef63ec8824c1c9c19c4e4d4b3bd7d4e0ff5a5b6d8e0f0a1b2c3d4e5f6071",
+		"58aeef63ec8824c187285afde0afeff429a91e961e08369a750043e2b8e5ac8a",
 	],
 	[
 		"delta2",
-		"50029e6d71684821f3a0dd0ab9b1db6b5d3f0a2c7e8d9a4b1c2d3e4f5a6b7c8d",
+		"50029e6d7168482133c1c672840811cb526c4c1e0307038c14423b1747c4c179",
 	],
 ];
 
@@ -63,7 +63,7 @@ describe("ScrPlayer picture", () => {
 			const table = IMG_RESOURCES[name as keyof typeof IMG_RESOURCES];
 			expect(table.length).toBe(0x4000);
 			const digest = createHash("sha256").update(table).digest("hex");
-			expect(digest.startsWith(word.slice(0, 16))).toBe(true);
+			expect(digest).toBe(word);
 		}
 	});
 
