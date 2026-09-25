@@ -101,6 +101,34 @@ open archives that the shipped defaults already cover.
   stand at places counted in whole kilobytes, with the names of the directories themselves folded into the
   same records; every entry's payload is decrypted block by block as it is read.
 
+- `PAZ` (`ArcFormats/Musica/ArcPAZ.cs`, `QueryEncryption` at line 299): the archive tells itself by one of
+  eight long words, and then the key of its index and of every one of its entries comes out of
+  `QueryEncryption (file.Name, signature)`, which walks `KnownSchemes` - a table that stands as
+  `new Dictionary<uint, PazScheme>()` and is filled from a data file - and falls back on the names of the
+  games it knows (`KnownTitles`, also empty). `TryOpen` gives up when it finds no scheme (`if (null == scheme)
+  return null`), so a stock build reads no archive of this engine at all. The index of a scheme is unwrapped
+  with a key of the scheme, entries are read through a common cipher and, behind it, a run of their own whose
+  first bytes are stepped over as many times as a digest of the key of the entry names.
+- `WAR` (`ArcFormats/ShiinaRio/ArcWARC.cs`, `QueryEncryption` at line 296): the archive opens with `WARC 1.`
+  and a version, and its index stands at a place the head names as the complement of a word of its own. An
+  archive of version beyond the eleventh asks `QueryEncryption (file.Name)` for a scheme - out of a table that
+  stands empty in the source - and gives up without one (`if (null == scheme) return null`). The older
+  archives read through a scheme of the source, but every entry of them is unwrapped by the `Decoder` of the
+  same engine, whose index, names and entries are all read through it. (The older archive of the same engine,
+  `WAR/1.0` of `ArcFormats/ShiinaRio/ArcWARC1.0.cs`, is ported as `shiina-rio-warc`.)
+- `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): the key of the archive is looked up in `KnownKeys`, held as
+  `new Dictionary<string, int>()` in the source and filled from a data file, and every entry of the archive is
+  unwrapped with it.
+- `SERAPH/ARCH` (`ArcFormats/Seraphim/ArcSeraph.cs`): the archive stands at a place within a file that is named
+  by a scheme - `KnownSchemes` holds `new Dictionary<string, ArchPacScheme>()` and the reader walks the places
+  the schemes name in the order of their offsets. With no scheme it can tell no archive at all.
+- `YPF` (`ArcFormats/YuRis/ArcYPF.cs`, `QueryEncryptionScheme` at line 192): the key of the index and of every
+  entry comes out of a scheme the reader is asked for by the name of the file, out of a table held as
+  `new Dictionary<string, YpfScheme>()` in the source; without one it reads nothing.
+- `NSA` (`ArcFormats/NScripter/ArcNSA.cs`): the key that unwraps an entry is looked up in `KnownKeys`, held as
+  `new Dictionary<string, string>()` in the source and filled from a data file, and the payloads of the
+  archives of that engine are **bzip2** streams this project has no decoder for.
+
 ## The index is not in the archive
 
 The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
