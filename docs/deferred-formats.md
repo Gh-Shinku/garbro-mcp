@@ -139,6 +139,12 @@ further than the reference's own list of them.
   splits one such picture into its frames and layers, so it stands on the same walk and is not a
   candidate of its own.
 
+- `WEBP` (`Experimental/WebP/ImageWEBP.cs`, a second `WebPFormat` beside the one this project ports from
+  `ArcFormats/WebP/ImageWEBP.cs`) keeps the same tag and the same class name and decodes nothing itself: it
+  reads the whole file and hands the bytes to `libwebp.dll` through `WebPDecodeBGRAInto`, which it loads with
+  `LoadLibraryEx`. A port would have to carry a WebP decoder of its own, which is what the other file beside
+  it does - and what this project reads.
+
 ## The payload is a .NET object graph
 
 - `BYTES/UNITY` (`ArcFormats/Unity/ArcSpVM.cs`) reads its entries through `BinaryFormatter` with a binder
