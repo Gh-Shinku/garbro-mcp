@@ -20495,6 +20495,33 @@
 				"a picture of sixteen places to a place behind a mask",
 				"a picture of a kind of its own of a byte order the other way round"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "PL4",
+				"class": "Pl4Format",
+				"source": "Legacy/Pearl/ImagePL4.cs"
+			},
+			"localId": "pearl-pl4-image",
+			"verification": "synthetic-fixtures",
+			"status": "partial",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture and the sixteen colours of its map",
+				"the walks of the first kind, of places standing as they stand",
+				"the walks of the first kind, of runs of the places of the picture",
+				"the walks of the second kind, of places standing as they stand",
+				"the walks of the second kind, of runs of the places of the picture"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a run of the walks of the first kind standing over the bottom of the picture",
+				"a run of the walks of the second kind of more than one row"
+			]
 		}
 	]
 }
