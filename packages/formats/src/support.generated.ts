@@ -17547,6 +17547,33 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "RMSK/SILKY'S",
+				class: "RmskFormat",
+				source: "ArcFormats/Silky/ImageMSK.cs",
+			},
+			localId: "silky-rmsk-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the Rmsk head: its size, its place on a larger canvas and the byte that names the way",
+				"the row walk, from the last row up, with the picture's own flip",
+				"the column walk, from the last column down",
+				"both place tables and all six lengths a copy may name",
+				"copies made byte by byte, so one that stands behind its own cursor reads what it has written",
+				"the grey bitmap the reference hands over",
+			],
+			unsupported: ["picture creation"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real mask, which would show which of the two ways and which of the place tables a game reaches for",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "UK",
 				class: "UkOpener",
