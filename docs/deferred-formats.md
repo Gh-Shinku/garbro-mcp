@@ -344,13 +344,6 @@ the first forty of them.
   one the differences themselves.
 
 
-- `GRP/RG` (`Legacy/Bom/ImageGRP.cs`, 418 lines) is a BOM picture whose header and stored pictures are
-  plain, but whose packed pictures are an LZ of its own: a sliding frame of four thousand bytes filled
-  with spaces, a run length and a distance, and both of those read through two **adaptive Huffman trees**
-  whose weights and links are rebuilt for every symbol. The file holds the trees as machine generated
-  code (`dword_6FF464`, `dword_703E68`, `dword_70986C`, `sub_408C80`), so a port would have to reproduce
-  the updates exactly and has nothing to check them against but the reference itself. That is a staged
-  port of the kind the TLG6 and JBP codecs took.
 - `ARC/Tactics/2` (`ArcFormats/Tactics/ArcTactics.cs`, `Arc2Opener`) reads a flat list of pictures at
   `0x10` (the count of the places of a picture, the count of them as they stand, the count of the places of
   its name, then the name and the places of the picture) and then **refuses the picture itself**:

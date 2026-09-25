@@ -21724,6 +21724,39 @@
 			],
 			"unsupported": ["archive creation", "image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GRP/RG",
+				"class": "GrpFormat",
+				"source": "Legacy/Bom/ImageGRP.cs"
+			},
+			"localId": "bom-grp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the mark, the kind of it, the word whose top place must be set, the box, the places of a row and the place of the walk",
+				"the kinds of one to five, of thirty two places of a colour down to four",
+				"a picture of its places as they stand, of a word whose top place is set",
+				"the walk of the places of a picture: the control words of the frame of four thousand places, the places of their own and the runs of three to sixty four places",
+				"the place a run reaches back to, of a place of its own and of one up to six places behind it",
+				"the adaptive Huffman tree of 318 leaves: the weights, the links and the parents the reference fills itself, the code of a place, the update behind every place and the rebuild of the tree at the top of the weights",
+				"the run of the places behind the walk: a place equal to the one in front of it, the counts of the places behind that and the place handed over at the end",
+				"the bitmap of a picture of three, of two and of eight places a colour"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"the kinds of four and of eight places a colour as the reference names them, since a picture of four places a colour stands of packed places"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the rebuild of the tree, which the fixtures of the walk do not reach: it stands of the root reaching the top of the weights, of some thousands of places"
+			]
 		}
 	]
 }
