@@ -21439,5 +21439,33 @@ export const formatSupportCatalog = {
 			unsupported: ["writing a picture of the engine"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "PACK/QLIE",
+				class: "PackOpener",
+				source: "ArcFormats/Qlie/ArcQLIE.cs",
+			},
+			localId: "qlie-pack-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of the index of the engine at the end of the archive of it, of the four walks of the version of it",
+				"the entries of the engine of the index of them, of the places of the file of the walk of the engine of the two places of a letter of them",
+				"the walk of the places of the file of the name and of the entry of the engine of the first and second kinds of it",
+				"the places of the file of the walk of the engine of the third kind of it, of the walk of the second kind of the entries of it of no places of the file of a key file of the game",
+				"the places of the file of the name of the walk of the engine of the two places of a letter and of the two walks of the entry of it of the third kind of the two places of a letter",
+				"the places of the file of the walk of the engine of a packed entry, of the walk of the places of the file of the PackFile of the engine itself and of the places of the file of the entry of the engine of no places of the file of the mark of it",
+				"the three walks of the engine of the places of the file of the head of the archive of the version 1.0 of it",
+			],
+			unsupported: [
+				"creating an archive",
+				"the places of the file of a key file of the game (key.fkey) and of the places of the file of the key of the engine itself (GameKeyData)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
 	],
 } as const;
