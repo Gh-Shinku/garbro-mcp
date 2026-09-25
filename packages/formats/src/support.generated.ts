@@ -20372,5 +20372,36 @@ export const formatSupportCatalog = {
 				"a picture of more than one line to a colour",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "ABC",
+				class: "AbcFormat",
+				source: "Legacy/Sarang/ImageABC.cs",
+			},
+			localId: "sarang-abc-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, of the count of the places behind its walks and of the word the walks of it stand of",
+				"the walks of the engine standing of the places of the file itself",
+				"the walks of the engine standing of the places of the walks before them",
+				"the walks of the picture standing of the places of it, of a buffer of a hundred of them",
+				"a bitmap behind the walks, handed over of the reader of a bitmap",
+				"a texture behind the walks, handed over of the reader of a texture",
+			],
+			unsupported: [
+				"creating a picture",
+				"a picture whose walks name more places than a hundred of them (the reference would stand beyond the end of its buffer of them)",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of the engine whose walks stand of more than one place of the picture at a time, behind the places of the walks of it",
+				"a texture behind the walks standing of the word of the walks of the engine itself (the word stands of the places `DD)` and not of the places of `DDS `)",
+			],
+		},
 	],
 } as const;
