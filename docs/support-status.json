@@ -21167,6 +21167,83 @@
 				"a picture of the run of the second kind of the walk of the places of the file of more than 0x20 places of the picture",
 				"a picture of the run of the places of the picture of the second kind of the walk of the places of the file (of the word behind the count)"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "DRG",
+				"class": "DrgFormat",
+				"source": "ArcFormats/Ikura/ImageDRG.cs"
+			},
+			"localId": "ikura-drg-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the three marks of the engine, of the places of a colour of a place of the picture",
+				"the walks of the places of the picture standing of the places of the file themselves, of the pixel before the place of the walk, of the places of the picture a count of pixels before it, and of the places of the picture of the word behind the count",
+				"the places of a picture of sixteen and of twenty four places of a colour to a place of it, of the places of the file of a row of four places of them",
+				"the bitmap the reference hands over, of the rows of the picture from the top of it down"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of the walk of the places of the file standing of the places of the file of a run of more than 0x100 places of the picture"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GGD",
+				"class": "DrgIndexedFormat",
+				"source": "ArcFormats/Ikura/ImageDRG.cs"
+			},
+			"localId": "ikura-ggd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of the indexed picture of the engine, of the places of the file of the head of the picture of it",
+				"the table of the colours of the picture, of four places of the file to a place of a colour of it",
+				"the walk of the places of the picture, of the walk of the places of the file of the engine itself",
+				"the places of the picture of the head of it standing of the places of the picture the other way up, recorded in the entry of the picture",
+				"the bitmap the reference hands over, of the rows of the picture from the top of it down"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of a walk of the places of the file standing of the places of the file of a frame of them of more than 0x1000 of them"
+			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GG2",
+				"class": "Gga0Format",
+				"source": "ArcFormats/Ikura/ImageDRG.cs"
+			},
+			"localId": "ikura-gga0-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of the picture of the engine, of the mark GGA00000 and the places of the file of the walk of it",
+				"the walks of the places of the picture standing of the places of the file themselves, of the pixel before the place of the walk, and of the places of the picture a count of pixels before it",
+				"the places of the picture of the row above the place of the walk, of the places of the picture one pixel to either side of it",
+				"the places of the file of the kind of the walk of the picture, recorded in the entry of it",
+				"the bitmap the reference hands over, of the rows of the picture from the top of it down"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of the walk standing of the count of the places of the file of two places of them (of the places of the picture of more than 0x100 of them)"
+			]
 		}
 	]
 }

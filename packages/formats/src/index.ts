@@ -410,6 +410,11 @@ import { wbmImageFormat } from "./hypatia/wbm-image.js";
 import { hyperworksPakFormat } from "./hyperworks/pak.js";
 import { ibmImageFormat } from "./ice/ibm-image.js";
 import { isdScriptFormat } from "./ice/isd-script.js";
+import {
+	drgImageFormat,
+	gga0ImageFormat,
+	ggdIndexedImageFormat,
+} from "./ikura/drg-image.js";
 import { ikuraDoImageFormat } from "./ikura/do-image.js";
 import { DrsFormat } from "./ikura/drs.js";
 import { ganFormat } from "./ikura/gan.js";
@@ -2389,6 +2394,9 @@ export function createDefaultRegistry(
 		ethornellBgiImageFormat,
 		cswareB5ImageFormat,
 		ikuraDoImageFormat,
+		drgImageFormat,
+		ggdIndexedImageFormat,
+		gga0ImageFormat,
 		sas5IarImageFormat,
 		akatomboFbImageFormat,
 		ikuraGgsImageFormat,
