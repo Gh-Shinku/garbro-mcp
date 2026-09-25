@@ -21467,5 +21467,31 @@ export const formatSupportCatalog = {
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GCMP",
+				class: "GCmpFormat",
+				source: "Legacy/Nekotaro/ImageGCmp.cs",
+			},
+			localId: "nekotaro-gcmp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture of the engine, of the three kinds of the places of the file of a colour of a place of the picture of it (of 24, 8 and 1 of them) and of the places of the file of the walk of the engine of the places of the file of the picture of the engine itself",
+				"the walk of the places of the file of a picture of the twenty four places of a colour of the engine, of the frame of 128 places of the file of the colour of it",
+				"the walk of the places of the file of a picture of the engine of the chunk of it and of the places of the file of the count of the walk of the engine of the three kinds of it (of the eight places of a colour of the engine and of one of them)",
+				"the table of the colours of the engine of the places of the file of the engine itself (of the DefaultPalette of the reference)",
+				"the places of the file of the picture of the engine, handed over as the places of the file of a BMP of it of the four places of the file of the picture of the engine itself",
+			],
+			unsupported: [
+				"writing a picture of the engine",
+				"the places of the file of the table of the colours of the picture of the engine at the side of it (SYSTEM.LZS and the NSC archive of the game)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
 	],
 } as const;

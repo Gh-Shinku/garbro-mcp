@@ -203,6 +203,7 @@ import { clsImageFormat } from "./lambda/cls-image.js";
 import { rmskImageFormat } from "./silky/rmsk-image.js";
 import { czImageFormat } from "./key/cz-image.js";
 import { ncgImageFormat } from "./nekotaro/ncg-image.js";
+import { gcmpImageFormat } from "./nekotaro/gcmp-image.js";
 import { pmsImageFormat } from "./alicesoft/pms-image.js";
 import { mgpkFormat } from "./manga-gamer/mgpk.js";
 import { kgImageFormat } from "./abogado/kg-image.js";
@@ -1420,6 +1421,7 @@ export function createDefaultRegistry(
 		rmskImageFormat,
 		czImageFormat,
 		ncgImageFormat,
+		gcmpImageFormat,
 		pmsImageFormat,
 		mgpkFormat,
 		kgImageFormat,
