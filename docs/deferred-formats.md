@@ -231,6 +231,21 @@ further than the reference's own list of them.
   `abstract class GenericScriptFormat` with `TextScriptFormat` and `BinScriptFormat` beside them. They
   carry no layout of their own, because each engine subclasses them; registering them here would mean
   reading every file of those extensions as one unnamed script.
+- `SCW` (`ArcFormats/GsPack/ArcGsPack.cs`, `GsScriptFormat`) and `DAT/GENERIC`
+  (`ArcFormats/ArcCommon.cs`, `DataFileFormat`) stand on `GenericScriptFormat` as well and carry no walk
+  of the file of their own: the classes stand of the walk of the engine of the scripts of the reference,
+  of the marks `SCW `, `Scw5` and `Scw4` of the first of them and of no mark of the second of them (of
+  the description "Unidentified data file" of it). The archives of the GsPack engine stand in this project
+  as `gspack`; the scripts of it stand of no walk of them here.
+
+- `TIFF` (`GameRes/ImageTIFF.cs`, `TifFormat`) parses its own tags - the class `Parser` walks the image
+  file directory of the file, its types and its counts - and then **hands the pixels to WPF**:
+  `Read` stands of `TiffBitmapDecoder` and `Write` of `TiffBitmapEncoder`, of no walk of the places of the
+  picture of the reference at all. A port would have to write the walk of the places of a picture of the
+  marks of the file (of the counts of the places of a colour of one, of four, of eight, of sixteen, of
+  twenty four and of thirty two of them, of the walks of the places of the file of its own, of the packs
+  of the places of the file of it and of the deflate walk of it) with no walk of the reference to stand of
+  it, so the file stands of no port of it here.
 
 ## Screened, with the reason for the delay recorded
 
