@@ -9189,6 +9189,40 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "GRD/TMR-HIRO",
+				class: "GrdFormat",
+				source: "ArcFormats/Tmr-Hiro/ImageGRD.cs",
+			},
+			localId: "tmr-hiro-grd-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head the picture is told by, whose four channel lengths add up to the whole file",
+				"the two version bytes and the pack way the second of them names",
+				"the depth, the twenty four and thirty two bit pictures only",
+				"where the picture stands inside the screen it was drawn on",
+				"the four channels, alpha first when it carries one, each in its own byte",
+				"the rows of a channel taken from its last one up",
+				"a channel packed as a run of its own",
+				"a channel packed as a tree of its own, read from the lowest bit of a byte up",
+				"a channel whose bytes stand behind a walk of their own, with a copy that reaches into itself",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"picture creation",
+				"depths other than twenty four and thirty two bits, which the reference itself turns away",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a real picture of each of the three packings, which the fixtures stand in for",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "PFS",
 				class: "PfsOpener",

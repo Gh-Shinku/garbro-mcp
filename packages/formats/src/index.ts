@@ -194,6 +194,7 @@ import { kgImageFormat } from "./abogado/kg-image.js";
 import { graFormat, mblFormat } from "./marble/mbl-archive.js";
 import { moonhirFpkFormat } from "./moonhir/fpk-archive.js";
 import { lagImageFormat } from "./strikes/lag-image.js";
+import { tmrHiroGrdImageFormat } from "./tmr-hiro/grd-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1356,6 +1357,7 @@ export function createDefaultRegistry(
 		graFormat,
 		moonhirFpkFormat,
 		lagImageFormat,
+		tmrHiroGrdImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
