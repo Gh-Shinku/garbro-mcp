@@ -289,6 +289,7 @@ import { pkkFormat } from "./electriciteit/pkk.js";
 import { ai5DatFormat } from "./elf/ai5dat.js";
 import { ai5G24ImageFormat, ai5Msk16ImageFormat } from "./elf/g24-image.js";
 import { elfGccImageFormat } from "./elf/gcc-image.js";
+import { elfGphImageFormat } from "./elf/gph-image.js";
 import { ai5Gp8ImageFormat, ai5MskImageFormat } from "./elf/gp8-image.js";
 import { hedFormat } from "./elf/hed.js";
 import { ai5HipImageFormat, ai5HizImageFormat } from "./elf/hiz-image.js";
@@ -2355,6 +2356,7 @@ export function createDefaultRegistry(
 		ai5G24ImageFormat,
 		ai5Msk16ImageFormat,
 		elfGccImageFormat,
+		elfGphImageFormat,
 		ai5HizImageFormat,
 		ai5HipImageFormat,
 		seraphimCfImageFormat,

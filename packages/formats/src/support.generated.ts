@@ -21618,5 +21618,32 @@ export const formatSupportCatalog = {
 			unsupported: ["audio creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GPH",
+				class: "GphFormat",
+				source: "ArcFormats/elf/ImageGPH.cs",
+			},
+			localId: "elf-gph-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection",
+				"listing",
+				"extraction",
+				"the head of a picture: the count of the frames and the place of the first of them",
+				"the frame: its flags, the palette of the frame, the box of the picture and the count of the places of it",
+				"the sixteen colours of the engine, for a frame that carries no palette of its own",
+				"the two trees of the engine, read out of the stream of the frame: the tokens and the places of the window",
+				"the walk of the places, the window of 0x1400 bytes and the offset table of the frame",
+				"the four bit places of a picture, packed the way the format packs them",
+			],
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture whose stride stands above sixteen, where the offset table walks the places of the frame rather than counting them",
+			],
+		},
 	],
 } as const;
