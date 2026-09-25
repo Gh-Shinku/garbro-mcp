@@ -19111,6 +19111,37 @@
 		},
 		{
 			"reference": {
+				"type": "audio",
+				"tag": "MV2",
+				"class": "Mv2Audio",
+				"source": "ArcFormats/Cmvs/AudioMV2.cs"
+			},
+			"localId": "cmvs-mv2-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the MV2X word and the eighteen byte head",
+				"the engine's own bit reader, reading a word from its lowest bit up",
+				"the runs of coefficients, written as a count of one bits ended by a nothing",
+				"a run of no width, which steps over as many coefficients as its three bits name",
+				"the signed coefficients, of their own width, behind the table's own scale",
+				"the two filters of the walk, and the ring the first of them gathers into",
+				"the samples of both channels, interleaved inside a frame",
+				"the wave file the reference wraps around them"
+			],
+			"unsupported": ["sound creation"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real file, which would show how a real run's coefficients and scales are laid out",
+				"the filter chain is pinned against a mirror of the same reference source rather than against decoded output of a real sound",
+				"the ring the first filter gathers into is masked here where the reference writes past its own place"
+			]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "PX",
 				"class": "PxFormat",
