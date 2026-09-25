@@ -20247,6 +20247,36 @@
 				"a head naming a length other than the length of the places behind it",
 				"a run of the first kind whose places stand short of the packed picture"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GBP",
+				"class": "GbpFormat",
+				"source": "ArcFormats/Sviu/ImageGBP.cs"
+			},
+			"localId": "sviu-gbp-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, taken back out of the key the file carries at its own end",
+				"the lengths of the places of every colour, standing in front of them",
+				"the places of a colour carried one after another",
+				"a place of a colour standing as it stands, and a run of the places behind it",
+				"the walks of the engine's own reader, of a frame of 0x1000 from 0xFEE",
+				"a picture standing of blocks of eight places by eight",
+				"the alpha of a picture of four places to a pixel, standing in runs of its own",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": ["creating a picture"],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture standing of blocks with four places to a pixel",
+				"the places of the block data standing short of the picture"
+			]
 		}
 	]
 }

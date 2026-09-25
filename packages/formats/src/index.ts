@@ -804,6 +804,7 @@ import { succubusArcFormat } from "./succubus/arc.js";
 import { succubusGhImageFormat } from "./succubus/gh-image.js";
 import { supernekoxGpc7Format } from "./supernekox/gpc.js";
 import { sviuJbpImageFormat } from "./sviu/jbp-image.js";
+import { gbpImageFormat } from "./sviu/gbp-image.js";
 import { kogAudioFormat } from "./sviu/kog-audio.js";
 import { dbmImageFormat } from "./sysd/dbm-image.js";
 import { dpkFormat } from "./sysd/dpk.js";
@@ -1383,6 +1384,7 @@ export function createDefaultRegistry(
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
+		gbpImageFormat,
 		ugosDetBmpImageFormat,
 		ugoTxtFormat,
 		sas5IarFormat,
