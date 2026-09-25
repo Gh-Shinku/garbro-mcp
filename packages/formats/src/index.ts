@@ -202,6 +202,7 @@ import { mi4ImageFormat } from "./shiina-rio/mi4-image.js";
 import { gpImageFormat } from "./eushully/gp-image.js";
 import { gsaImageFormat } from "./bishop/gsa-image.js";
 import { miaImageFormat } from "./miami/mia-image.js";
+import { gbcImageFormat } from "./primel/gbc-image.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1014,6 +1015,7 @@ export * from "./bef/index.js";
 export * from "./bellda/index.js";
 export * from "./bishop/index.js";
 export * from "./miami/index.js";
+export * from "./primel/index.js";
 export * from "./black-butterfly/index.js";
 export * from "./black-cyc/index.js";
 export * from "./black-rainbow/index.js";
@@ -1374,6 +1376,7 @@ export function createDefaultRegistry(
 		gpImageFormat,
 		gsaImageFormat,
 		miaImageFormat,
+		gbcImageFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,

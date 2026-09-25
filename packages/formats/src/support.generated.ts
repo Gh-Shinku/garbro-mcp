@@ -20095,5 +20095,34 @@ export const formatSupportCatalog = {
 				"the groups standing as the places of another one, out of the four places behind the walk and out of the group behind it turned about",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "GBC",
+				class: "GbcFormat",
+				source: "ArcFormats/Primel/ImageGBC.cs",
+			},
+			localId: "primel-gbc-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, and the ones it turns away",
+				"the first way of a picture, whose places are carried along the zigzag order of a block",
+				"the second way of a picture, whose places are named one by one",
+				"the block of a picture, eight places by eight, and the places of a pixel below eight",
+				"the bitmap the reference hands over",
+			],
+			unsupported: [
+				"creating a picture",
+				"the places of the second way standing over, which carry the places of a block",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the runs of the second way that end a block and carry its places",
+			],
+		},
 	],
 } as const;
