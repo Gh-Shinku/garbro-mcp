@@ -894,6 +894,7 @@ import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
 import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 import { tobeWbiImageFormat } from "./tobe/wbi-image.js";
 import { tcd1Format } from "./topcat/tcd1.js";
+import { yskFormat } from "./gplay/ysk.js";
 import { spdImageFormat } from "./topcat/spd-image.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
 import { iafImageFormat } from "./triangle/iaf-image.js";
@@ -1127,6 +1128,7 @@ export * from "./ffa/index.js";
 export * from "./flying-shine/index.js";
 export * from "./force/index.js";
 export * from "./foster/index.js";
+export * from "./gplay/index.js";
 export * from "./frontwing/index.js";
 export * from "./g2/index.js";
 export * from "./gaia/index.js";
@@ -1619,6 +1621,7 @@ export function createDefaultRegistry(
 		ovkFormat,
 		propellerMpkFormat,
 		tcd1Format,
+		yskFormat,
 		spdImageFormat,
 		odioFormat,
 		nfsFormat,

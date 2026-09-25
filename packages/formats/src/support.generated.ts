@@ -21249,5 +21249,33 @@ export const formatSupportCatalog = {
 				"a picture of the places of the file of the walk of the places of the picture itself of the places of the file of the table of the colours of it",
 			],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "YSK",
+				class: "YskOpener",
+				source: "Legacy/GPlay/ArcYSK.cs",
+			},
+			localId: "gplay-ysk-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the index of the archive, of the names of the entries of it and of the places of the file of the entries of it",
+				"the places of the file of the digits of the version of the head of the archive",
+				"the places of the file of an entry of the archive standing of no walk of the cipher of the engine",
+				"the places of the file of the kind of the places of a colour of a place of the picture of the BMP of the engine",
+			],
+			unsupported: [
+				"creating an archive",
+				"the places of the file of the cipher of the engine: the text of the engine of no mark at the front of it, the places of the file of a picture of the engine, and the places of the file of the BMP of the engine behind the places 0x493AA of it",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the walk of the places of the file of a block of the cipher of the engine: the places of the file of the block 0x1122334455667788 stand of 0x3FA4D9DC3C863E03 of this port and of 0xD09828A88801A6BA of an independent walk of the same reference",
+			],
+		},
 	],
 } as const;
