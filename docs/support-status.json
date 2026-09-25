@@ -19904,6 +19904,38 @@
 				"a plain archive from a real game, which would show whether the engine ever writes one and how its names read",
 				"a keyed archive, which needs a key the reference does not carry"
 			]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "CSAF",
+				"class": "CsafOpener",
+				"source": "ArcFormats/FamilyAdvSystem/ArcCSAF.cs"
+			},
+			"localId": "family-adv-system-csaf-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the head, and the shape the low half of its flags has to keep",
+				"the index, which stands in whole pages with the names behind it",
+				"the digest the head keeps of its own index, checked once the names stand plain",
+				"the names, held as text of two bytes to a character and ended by a pair of nothing bytes",
+				"the places of the entries, counted in whole pages",
+				"the key the reference falls back to, and the key of every page derived from it",
+				"the pages of a wrapped archive, unwrapped one at a time as an entry is read",
+				"the kind of every name, told from its extension"
+			],
+			"unsupported": [
+				"archive creation",
+				"the phrase a game title of the reference's own scheme may name instead of the one it falls back to"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a wrapped archive of a game whose phrase is not the one the reference falls back to"
+			]
 		}
 	]
 }

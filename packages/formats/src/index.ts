@@ -195,6 +195,7 @@ import { graFormat, mblFormat } from "./marble/mbl-archive.js";
 import { moonhirFpkFormat } from "./moonhir/fpk-archive.js";
 import { lagImageFormat } from "./strikes/lag-image.js";
 import { tmrHiroGrdImageFormat } from "./tmr-hiro/grd-image.js";
+import { csafArchiveFormat } from "./family-adv-system/csaf-archive.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
@@ -1290,6 +1291,7 @@ export * from "./tiare/index.js";
 export * from "./tigerman/index.js";
 export * from "./tinkerbell/index.js";
 export * from "./tmr-hiro/index.js";
+export * from "./family-adv-system/index.js";
 export * from "./tobe/index.js";
 export * from "./topcat/index.js";
 export * from "./triangle/index.js";
@@ -1358,6 +1360,7 @@ export function createDefaultRegistry(
 		moonhirFpkFormat,
 		lagImageFormat,
 		tmrHiroGrdImageFormat,
+		csafArchiveFormat,
 		cmvsPsbImageFormat,
 		cmvsPb3ImageFormat,
 		sviuJbpImageFormat,
