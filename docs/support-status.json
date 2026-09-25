@@ -14951,6 +14951,40 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "WIP",
+				"class": "WipFormat",
+				"source": "ArcFormats/Will/ImageWIP.cs"
+			},
+			"localId": "will-wip-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the WIPF head, its frame count, depth, size and the place the picture stands at",
+				"the two depths this engine stores, eight and twenty four bits",
+				"the place of the run behind the records of the frames",
+				"the colour map a picture of eight bits keeps in front of its run",
+				"the run: control bits from the lowest up, literals and copies out of a kilobyte window",
+				"the three planes of a picture of twenty four bits, drawn together",
+				"the pixels of a picture of eight bits through its colour map",
+				"the bitmap the reference hands over"
+			],
+			"unsupported": [
+				"picture creation",
+				"the mask the reference composites a picture with when its own ApplyMask option is turned on, which is off by default",
+				"the frames behind the one the reference unpacks, which the container of this engine lists instead"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a real picture and its mask, which would show how the two are laid over one another",
+				"a picture of more than one frame, which the run the reference reads only covers the first of"
+			]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "BIN/Xuse",
 				"class": "BinOpener",
