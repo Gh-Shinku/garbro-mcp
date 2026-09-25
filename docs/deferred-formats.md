@@ -371,13 +371,18 @@ the first forty of them.
   state of the standard and is therefore held to `node:crypto` by the test of the family. Every index is encrypted end to end: the
   head is checked against an MD5 of its own, the seventh layout unpacks its index key through the Huffman
   reader, and the index itself then goes through a mix over a twenty four word secret, the walk of the
-  `Cpz5Decoder` (twice), a directory walk and an entry walk. None of that needs an input this project does
-  not have - the `ArchiveKey` of the newer versions comes from a key file that a stock build replaces with
-  zeros - so what holds the port back is the **fixture**: every one of those steps is a decoder, so a
-  fixture index has to be written *through* them, and while the mixes and the dword walks are invertible,
-  the inverse of the `Cpz5Decoder` is a compressor this project would have to write first. That is a
-  bigger piece of work than the port itself, which is why the two older archives of the same engine
-  (`cmvs-cpz1` and `cmvs-cpz2`) are ported and this one is not.
+  `Cpz5Decoder` (twice), a directory walk and an entry walk.
+  
+  The walk of `Cpz5Decoder` and `ArchiveKey` has landed as `packages/codecs/src/cmvs-decoder.ts`: the table
+  of the places of a byte of the walk (two swaps a turn over two hundred and fifty six turns, of a key that
+  walks a turn of its own), the walk of a run of that table, and the walk of the places of an entry over the
+  secret of the scheme, the digest of the head of the archive and a seed - **both directions of it**, which
+  the reference carries as `Encode` and `EncryptEntry` beside `Decode` and `DecryptEntry`. An earlier note
+  here said the inverse of that walk was a compressor the port would have to write first; the reference
+  carries it, so a fixture can be written *through* it, and the note was wrong. What remains is the opener
+  itself (776 lines: the mark `CPZ5`/`CPZ6`/`CPZ7`, `UnpackIndexKey`, `UnpackLzss`, the directory and entry
+  walks), the head (`CpzHeader.cs`, 175) and the key file (`ArchiveKey`), of which a stock build stands of
+  zeros.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
   its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
   tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven

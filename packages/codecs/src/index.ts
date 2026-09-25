@@ -31,3 +31,4 @@ export * from "./primel-cipher-tables.js";
 export * from "./primel-cipher.js";
 export * from "./aes.js";
 export * from "./cmvs-huffman.js";
+export * from "./cmvs-decoder.js";
