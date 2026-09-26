@@ -36,6 +36,11 @@ import {
 import { Readable } from "node:stream";
 import { inflateRawSync } from "node:zlib";
 import {
+	LZX_MAX_WINDOW_BITS,
+	LZX_MIN_WINDOW_BITS,
+	decompressLzx,
+} from "@garbro-mcp/codecs";
+import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
@@ -53,6 +58,8 @@ const MSZIP_SIGNATURE = Buffer.from("CK", "latin1");
 /** The kinds of compression a folder may name. */
 const COMPRESSION_NONE = 0;
 const COMPRESSION_MSZIP = 1;
+/** The folder kind whose blocks are one running stream of LZX. */
+const COMPRESSION_LZX = 3;
 /** The window a block of MSZIP may reach back into: the bytes the blocks before it unfolded to. */
 const MSZIP_WINDOW = 0x8000;
 /** The head flags that name the cabinets on either side of this one and the room reserved for another program. */
@@ -184,19 +191,25 @@ export function unfoldCabFolder(
 	data: Buffer,
 	folder: CabLayout["folders"][number],
 ): Buffer {
+	const kind = folder.compression;
 	if (
-		COMPRESSION_NONE !== folder.compression &&
-		COMPRESSION_MSZIP !== folder.compression
+		COMPRESSION_NONE !== kind &&
+		COMPRESSION_MSZIP !== kind &&
+		COMPRESSION_LZX !== kind
 	) {
 		throw unsupportedArchive(
-			"The folder of the cabinet stands of a kind of compression this reader does not read",
+			`The folder of the cabinet stands of the kind of compression ${kind}, which this reader does not read`,
 		);
 	}
 	if (folder.start >= data.length) {
 		throw invalidArchive("The blocks of the folder stand outside the cabinet");
 	}
-	const parts: Buffer[] = [];
-	let history: Buffer = Buffer.alloc(0);
+	// The blocks of the folder are walked once, because the stream of LZX stands of all of them together and
+	// the length it unfolds to is the sum of the lengths the blocks name.
+	const blocks: Buffer[] = [];
+	/** The length every block names for the bytes it unfolds to. */
+	const unfoldedLengths: number[] = [];
+	let unfoldedLength = 0;
 	let at = folder.start;
 	for (let index = 0; index < folder.blocks; index += 1) {
 		if (at + BLOCK_HEAD_SIZE > data.length) {
@@ -212,9 +225,44 @@ export function unfoldCabFolder(
 				"The blocks of the folder stand short of the cabinet",
 			);
 		}
-		const block = data.subarray(at, at + size);
+		blocks.push(data.subarray(at, at + size));
+		unfoldedLengths.push(unfolded);
+		unfoldedLength += unfolded;
 		at += size;
-		if (COMPRESSION_NONE === folder.compression) {
+	}
+	if (COMPRESSION_LZX === kind) {
+		// The word of the folder carries the count of bits of the window in its high byte; the walk of the
+		// compression reads windows of fifteen to twenty one bits, which is what the format allows.
+		if (
+			folder.parameter < LZX_MIN_WINDOW_BITS ||
+			folder.parameter > LZX_MAX_WINDOW_BITS
+		) {
+			throw invalidArchive(
+				`The folder names a window of ${folder.parameter} bits, which the compression does not read`,
+			);
+		}
+		try {
+			return decompressLzx(
+				Buffer.concat(blocks),
+				unfoldedLength,
+				folder.parameter,
+			).output;
+		} catch (error) {
+			throw invalidArchive(
+				`The blocks of the folder stand of no stream of LZX: ${(error as Error).message}`,
+			);
+		}
+	}
+	const parts: Buffer[] = [];
+	let history: Buffer = Buffer.alloc(0);
+	for (const [index, block] of blocks.entries()) {
+		if (COMPRESSION_NONE === kind) {
+			const named = unfoldedLengths[index] ?? 0;
+			if (0 !== named && named !== block.length) {
+				throw invalidArchive(
+					"A block of the folder unfolds to a length it does not name",
+				);
+			}
 			parts.push(Buffer.from(block));
 			continue;
 		}
@@ -234,7 +282,8 @@ export function unfoldCabFolder(
 				"The block of the folder stands of no deflate stream",
 			);
 		}
-		if (0 !== unfolded && unfolded !== unfoldedBlock.length) {
+		const named = unfoldedLengths[index] ?? 0;
+		if (0 !== named && named !== unfoldedBlock.length) {
 			throw invalidArchive(
 				"A block of the folder unfolds to a length it does not name",
 			);

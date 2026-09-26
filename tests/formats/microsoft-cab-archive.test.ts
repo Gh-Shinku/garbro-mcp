@@ -14,6 +14,7 @@ import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { readCabLayout } from "../../packages/formats/src/microsoft/cab-archive.js";
 import { expectArchive } from "../helpers/archive.js";
+import { literalStream } from "../helpers/lzx.js";
 
 const HEAD_SIZE = 36;
 const FOLDER_RECORD_SIZE = 8;
@@ -22,6 +23,7 @@ const BLOCK_SIZE = 0x8000;
 const COMPRESSION_NONE = 0;
 const COMPRESSION_MSZIP = 1;
 const COMPRESSION_LZX = 3;
+const COMPRESSION_QUANTUM = 2;
 const MSZIP_SIGNATURE = Buffer.from("CK", "latin1");
 const CONTINUED = 0xffffffff;
 
@@ -341,7 +343,7 @@ describe("Microsoft cabinet archive", () => {
 	it("turns away a folder of a compression this reader does not read", async () => {
 		const data = repeatingPlaces(31, 0x1000);
 		const cabinet = buildCab({
-			folders: [{ compression: COMPRESSION_LZX }],
+			folders: [{ compression: COMPRESSION_QUANTUM }],
 			files: [{ name: "pressed.bin", data }],
 		});
 		// The cabinet is still read and its file is still listed; it is the extraction that is turned away.
@@ -369,6 +371,19 @@ describe("Microsoft cabinet archive", () => {
 			compression: COMPRESSION_LZX,
 			parameter: 0x0f,
 		});
+		// A folder of LZX that names a window the compression does not read is turned away as well.
+		const narrow = buildCab({
+			folders: [{ compression: 0x0100 | COMPRESSION_LZX }],
+			files: [{ name: "pressed.bin", data }],
+		});
+		const narrowArchive = await microsoftCabArchiveFormat.open(
+			new BufferByteSource(narrow),
+			"sample.cab",
+		);
+		await expect(narrowArchive.openEntry("0")).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
+		await narrowArchive.close();
 		// A parameter set over no compression at all leaves the folder one of no compression.
 		const plain = buildCab({
 			folders: [{ compression: 0x0100 | COMPRESSION_NONE }],
@@ -387,6 +402,39 @@ describe("Microsoft cabinet archive", () => {
 		});
 	});
 
+	it("unfolds the stream of LZX a folder of a cabinet stands of", async () => {
+		// The stream of the folder is built by the writer of the tests of that compression: a block of
+		// literals. The folder holds the stream and names the bytes it unfolds to, as a real folder does:
+		// the bytes the stream stands of are longer than the bytes it unfolds to.
+		const text = "the stream of LZX of a folder of a cabinet";
+		const stream = literalStream(text);
+		const cabinet = buildCab({
+			folders: [
+				{ compression: 0x0f00 | COMPRESSION_LZX, blockSize: stream.length },
+			],
+			files: [
+				{
+					name: "one.txt",
+					data: stream,
+					declared: text.length,
+				},
+			],
+		});
+		// The block names the length the stream unfolds to, which the writer of the cabinet cannot know.
+		const blockAt =
+			HEAD_SIZE +
+			FOLDER_RECORD_SIZE +
+			FILE_RECORD_SIZE +
+			stringLength("one.txt");
+		cabinet.writeUInt16LE(text.length, blockAt + 6);
+		const archive = await microsoftCabArchiveFormat.open(
+			new BufferByteSource(cabinet),
+			"sample.cab",
+		);
+		const content = await consumeBuffer(await archive.openEntry("0"));
+		expect(content.toString("latin1")).toBe(text);
+		await archive.close();
+	});
 	it("turns away a block that stands of no words of its own", async () => {
 		const data = repeatingPlaces(37, 0x800);
 		const cabinet = buildCab({

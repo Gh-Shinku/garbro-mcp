@@ -109,9 +109,13 @@ export function writeLiteralBlock(
 	writer.bits(1, 3);
 	writer.bits(symbols.length >>> 8, 16);
 	writer.bits(symbols.length & 0xff, 8);
-	// The main tree: the four places the writer stands of, two bits each, and no match at all.
+	// The main tree: every place the writer stands of takes a code of the shortest length that holds them
+	// all, which is a prefix code for any set of symbols (Kraft's sum stands at or below one), and no symbol
+	// of a match stands of a code at all.
+	const places = [...new Set(symbols)];
+	const width = Math.max(1, Math.ceil(Math.log2(Math.max(2, places.length))));
 	const main: number[] = new Array(NUM_CHARS + SLOTS_FOR_15 * 8).fill(0);
-	for (const symbol of new Set(symbols)) main[symbol] = 2;
+	for (const symbol of places) main[symbol] = width;
 	writeTreeLengths(writer, main.slice(0, NUM_CHARS));
 	writeTreeLengths(writer, main.slice(NUM_CHARS));
 	writeTreeLengths(writer, new Array(LENGTH_SYMBOLS).fill(0));

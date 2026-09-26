@@ -61,9 +61,22 @@ bytes and the length of the bytes they unfold to, and then those bytes.
   whole deflate stream, and **the window of that stream stands at the bytes the blocks before it unfolded
   to**, so the reader is handed the last thirty two thousand bytes of everything the folder has unfolded so
   far as the dictionary of the block it is reading. The first block of a folder is handed no dictionary.
-* A folder of compression `2` or `3` is listed but not unfolded: extraction is refused with
-  `UNSUPPORTED_FEATURE`, which is how this project treats a payload it does not read. The reference reads
-  both through its library; a note of this project's deferred list says what stands behind them.
+* A folder of compression `3` holds one running stream of **LZX** over all of its blocks. The stream is
+  read here by `packages/codecs/src/lzx.ts`, which is written from the published documents of that
+  compression — the reference leaves it to its library as well, and GARbro carries no walk of it anywhere
+  in its tree. Three things of that walk are worth naming, because a reader that misses them hands over
+  bytes other than the ones the cabinet holds: the lengths of every tree are named as differences from the
+  lengths the block before it left, wrapped at seventeen; a match names one of three places the last matches
+  used, which are held in the order a match of each kind puts them in; and **every frame of thirty two
+  thousand bytes stands on a word boundary of its own**, so the bits the frame behind left half read are
+  stepped over before the frame ahead of it is walked. The last of the three is what a reader is most likely
+  to miss, and it is the one that made this reader part from the system's tool at exactly thirty two
+  thousand and seven hundred and sixty eight bytes of every cabinet tried, until it was found.
+* A folder of compression `2` (Quantum) is listed but not unfolded: extraction is refused with
+  `UNSUPPORTED_FEATURE`, which is how this project treats a payload it does not read. The reference reads it
+  through its library; a note of this project's deferred list says what stands behind it.
+* A folder of LZX whose word names a window outside the fifteen to twenty one bits the compression reads is
+  turned away as an invalid cabinet.
 
 The port turns a block away when it is missing its `CK` letters, when its bytes are no deflate stream, when
 it unfolds to a length other than the one it names, or when it reaches past the end of the cabinet. The
@@ -112,8 +125,20 @@ bytes of `appraiser.sdb` (SHA-256 `ce818b58d46818ce1f91b3297ea5feb060ec29fe7694a
 cross-check is what found the file table walk this note describes: the first version of the reader assumed
 a run of records behind a run of names, and read the names of the real cabinet as rubbish.
 
-Two cabinets of LZX of Windows were walked with the port's own reading of the head as well, since they are
-the cabinets a reader of that compression would have to be checked against:
+**The two cabinets of LZX of Windows were unfolded with this port as well, and every byte of them stands as
+the system's own tool writes it.** `C:\Windows\Logs\CBS\CbsPersist_20260918195836.cab` holds one folder
+of four hundred and ninety three blocks and one file of 16 151 848 bytes; the bytes this port hands over are
+equal to the bytes `expand.exe` writes out of the same cabinet, all 16 151 848 of them (SHA-256
+`3c25fb18e9e8e6969d19894293867e443e56a2699219d45c296447af55c4c951`).
+`C:\Windows\servicing\FodMetadata\FoDMetadata_Client.cab` holds one folder of a hundred and twenty
+blocks and 455 files, and **every one of the 455 comes out of this port equal to the file the system tool
+writes for it**. What was walked alongside them is a stream of LZX built by the writer of
+`tests/helpers/lzx.ts` and the six tests of `tests/codecs/lzx.test.ts`: a block of literals, an uncompressed
+block with the places behind it, a stream of more than one frame, the walk of Intel calls, the window places
+of the format, and a block of a kind the compression does not name.
+
+The two cabinets were walked with the port's own reading of the head as well, since they are the cabinets a
+reader of that compression would have to be checked against:
 `C:\Windows\servicing\FodMetadata\FoDMetadata_Client.cab` (500 948 bytes, one folder of one hundred and
 twenty blocks reading `0x0f03`, and 455 files, the first of them `Accessibility.Braille~~1.0.mum` of 8 676
 bytes) and `C:\Windows\Logs\CBS\CbsPersist_20260918195836.cab` (231 602 bytes, one folder of four
@@ -122,5 +147,4 @@ table of folders of the first stands sixty bytes in, behind the twenty bytes of 
 the walk of its blocks from the place it names ends **exactly** at the end of the cabinet; the blocks of the
 second unfold to 16 151 848 bytes, which is exactly what `expand.exe` writes out of it, while the single
 file of it declares 16 151 336 bytes — five hundred and twelve fewer than the blocks of its folder hold.
-The port hands the declared length of the file over, as the reference's own library would, and the reading
-of the whole folder is what a reader of LZX would be checked against.
+The port hands the declared length of the file over, as the reference's own library would.
