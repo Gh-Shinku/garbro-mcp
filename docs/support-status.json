@@ -20271,6 +20271,36 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "TCD",
+				"class": "TcdOpener",
+				"source": "ArcFormats/TopCat/ArcTCD3.cs"
+			},
+			"localId": "topcat-tcd3",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the two words of the head of a file (`TCD2` and `TCD3`), of the extensions `tcd`, and the count of the places of the files of the engine behind them",
+				"the table of the sections at 8, of words of 0x20 places of the file each: four sections for the second shape and five for the third",
+				"the words of a section of the second shape (the count of the places of the section, the count of the files, the count of the directories, the place of the tables, the count of the places of a name of a directory and the count of the places of a name of a file) and of the third shape (the count of the places of the section, the place of the tables, the count of the directories, the count of the places of a name of a directory, the count of the files and the count of the places of a name of a file)",
+				"the cipher of a section, which stands of the last place of the field of the first name of the table of directories, which every place of both tables of names stands of",
+				"the table of the directories of a section (the count of the files of a directory, the place of its first name in the table of names and the row of its first file in the table of the places), the table of the names of a section and the table of the places of the files, of a count of one more than the count of the files",
+				"the names of the second shape, which stand of each other of a place of no name between them, and of the third shape, which stand of fields of a count of their own",
+				"the places of a file of a name the walk of the engine stands of: the walk of the LZ of the engine and its turn of every place for the names `tct` and `tsf`, the check words of the pages of an Ogg stream for the name `ogg`, and the places of the file as they stand for every other name",
+				"the check word of a page of an Ogg stream of `Crc32Normal` (`ArcFormats/Crc32.cs`): the polynomial 0x04C11DB7 read from the high places of the word down, of no place of the file behind it, which is the walk the specification of an Ogg stream stands of as well and not the walk of `codecs/crc32.ts`"
+			],
+			"unsupported": [
+				"archive creation",
+				"the keys of the table of the reference (`TcdOpener.KnownKeys`), of which the places of a picture of the engine of the cipher of its own stand",
+				"the kinds of the names of the files of the engine other than a picture of the name `spd`"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"an archive of a real game of the engine"
+			]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "BMX/TRIANGLE",
 				"class": "BmxOpener",
 				"source": "ArcFormats/Triangle/ArcBMX.cs"

@@ -940,6 +940,7 @@ import { tmrHiroPacFormat } from "./tmr-hiro/pac.js";
 import { tmrHiroAudioFormat } from "./tmr-hiro/wav-audio.js";
 import { tobeWbiImageFormat } from "./tobe/wbi-image.js";
 import { tcd1Format } from "./topcat/tcd1.js";
+import { topcatTcd3Format } from "./topcat/tcd3.js";
 import { yskFormat } from "./gplay/ysk.js";
 import { spdImageFormat } from "./topcat/spd-image.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
@@ -1679,6 +1680,7 @@ export function createDefaultRegistry(
 			ovkFormat,
 			propellerMpkFormat,
 			tcd1Format,
+			topcatTcd3Format,
 			yskFormat,
 			spdImageFormat,
 			odioFormat,
