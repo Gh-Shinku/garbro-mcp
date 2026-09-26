@@ -4861,8 +4861,18 @@ export const formatSupportCatalog = {
 			localId: "crowd-cwp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract", "the head of a picture"],
-			unsupported: ["archive creation", "image encoding", "picture decoding"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture",
+				"the words of a portable network graphic stood around the places of the picture, read with the reader of the PNG interchange format of this project and handed out as a bitmap",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"a picture whose head of the file or places of the file do not agree with their own check words, where the platform decoder of the reference stops at the places of the picture before it reads that far",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

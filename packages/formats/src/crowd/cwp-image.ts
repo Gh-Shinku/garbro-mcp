@@ -5,7 +5,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -27,8 +29,12 @@ const PLACES_SIZE = 0x15;
 const DATA_WORD_FIELD = 0x25;
 const DATA_OFFSET = 0x19;
 /** The words that stand at the end of a portable network graphic. */
+// The chunk that ends the picture: its count of the places, which is nought, the word `IEND` and the check
+// word of both. The reference writes the count of the places with three bytes instead of four, which leaves
+// the stream one byte short of a chunk; the decoder of the platform stops at the places of the picture
+// before it reads that far, so the reference works, and this port stands the four bytes where they belong.
 const PNG_FOOTER: Buffer = Buffer.from([
-	0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+	0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ]);
 const OUTPUT_PLACES = 32;
 const HIGHEST_BITS = 16;
@@ -143,7 +149,7 @@ export const crowdCwpImageFormat: ArchiveFormat = defineFixedArchive({
 			entries: [
 				createFixedEntry({
 					id: 0,
-					path: changeExtension(fileName, "png"),
+					path: changeExtension(fileName, "bmp"),
 					offset: BigInt(layout.dataOffset),
 					size: source.size - BigInt(layout.dataOffset),
 					compressed: false,
@@ -157,7 +163,7 @@ export const crowdCwpImageFormat: ArchiveFormat = defineFixedArchive({
 				}),
 			],
 			metadata: {
-				image: "png",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				bitsPerPixel: layout.bitsPerPixel,
@@ -168,6 +174,16 @@ export const crowdCwpImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = await readStored(source);
 		const layout = readCwpLayout(stored, Number(source.size));
 		if (!layout) throw invalidPicture("Not a Crowd picture");
-		return Readable.from([standCwpAsPng(stored, layout)]);
+		// `CwpFormat.Read` hands the rebuilt stream to the platform's PNG decoder and this port reads it with
+		// its own reader of that format, handing out a bitmap named `.bmp`.
+		const picture = await readPngImage(standCwpAsPng(stored, layout));
+		if (!picture) {
+			throw invalidPicture(
+				"The picture behind the head stands of no picture of its own",
+			);
+		}
+		return Readable.from([
+			writeBmp32(picture.width, picture.height, picture.pixels),
+		]);
 	},
 });
