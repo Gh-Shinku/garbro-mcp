@@ -11,6 +11,8 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp32 } from "../shared/bmp.js";
+import { readPngImage, type PngImage } from "../shared/png-image.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -40,6 +42,8 @@ interface ChrEntry {
 	offsetX: number;
 	offsetY: number;
 	virtual: boolean;
+	/** The frame a blended stand-in lays over the sheet, which stands of no payload of its own. */
+	source?: number;
 }
 
 function baseNameWithoutExtension(sourcePath: string): string {
@@ -59,9 +63,11 @@ export function wrapPalettePng(
 	injectOffsets: boolean,
 ): Buffer {
 	if (!injectOffsets) return Buffer.concat([PNG_SIGNATURE, body, PNG_FOOTER]);
-	// The reference copies the leading chunk verbatim before writing the oFFs chunk.
+	// `CharOpener.OpenEntry` copies the leading chunk - its length word, its name, its own bytes and its
+	// check word alike - before it writes the oFFs chunk: the count it reads is the count of the own bytes
+	// of the chunk, so the whole chunk stands of twelve bytes more than that count.
 	const chunkLength = body.length >= 4 ? body.readInt32BE(0) : -1;
-	const headSize = chunkLength + 8;
+	const headSize = chunkLength + 12;
 	if (chunkLength < 0 || headSize > body.length)
 		return Buffer.concat([PNG_SIGNATURE, body, PNG_FOOTER]);
 	const chunk = Buffer.alloc(4 + 4 + 4 + 4 + 1 + 4);
@@ -138,19 +144,113 @@ async function readChrEntries(
 				offsetY: header.readInt16LE(2),
 				virtual: false,
 			});
-			// The reference lists a blended stand-in for every frame.
+			// The reference lists a blended stand-in for every frame: the sheet itself with the frame laid
+			// over it at the place the frame names.
 			entries.push({
-				name: `${baseName}#blend#${name}.png`,
+				name: `${baseName}#blend#${name}.bmp`,
 				offset: 0n,
 				size: 0n,
-				offsetX: 0,
-				offsetY: 0,
+				offsetX: header.readInt16LE(0),
+				offsetY: header.readInt16LE(2),
 				virtual: true,
+				// The frame behind this stand-in is the entry that was just listed.
+				source: entries.length - 1,
 			});
 		}
 		cursor += size;
 	}
 	return entries;
+}
+
+/** A picture of the archive: the entry at the given place, rebuilt as the PNG the reference stands around it. */
+async function readChrPicture(
+	source: ByteSource,
+	sourcePath: string,
+	id: number,
+	offsetX: number,
+	offsetY: number,
+	inject: boolean,
+): Promise<PngImage> {
+	const entries = await readChrEntries(source, sourcePath);
+	const entry = entries?.[id];
+	if (!entry) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"A blended stand-in names no frame",
+		);
+	}
+	const body = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.size)),
+	);
+	const picture = await readPngImage(
+		wrapPalettePng(body, offsetX, offsetY, inject),
+	);
+	if (!picture) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"A picture of the archive stands of no picture of its own",
+		);
+	}
+	return picture;
+}
+
+/**
+ * `CharOpener.BlendEntry`: the sheet with the frame drawn over it at the place that frame names. The
+ * reference draws both into a premultiplied surface through the rendering stack of its platform, which
+ * covers the places of the sheet with the places of the frame as the alpha of the frame asks; this port
+ * lays the places of the frame over the places of the sheet the same way, both of them with straight alpha,
+ * and hands out a bitmap of the size of the sheet.
+ */
+function blendChrPictures(
+	sheet: PngImage,
+	overlay: PngImage,
+	offsetX: number,
+	offsetY: number,
+): Buffer {
+	const width = sheet.width;
+	const height = sheet.height;
+	const output: Buffer = Buffer.alloc(width * height * 4, 0x00);
+	for (let at = 0; at < width * height; at += 1) {
+		const from = at * (sheet.bitsPerPixel / 8);
+		output[at * 4] = sheet.pixels[from] ?? 0;
+		output[at * 4 + 1] = sheet.pixels[from + 1] ?? 0;
+		output[at * 4 + 2] = sheet.pixels[from + 2] ?? 0;
+		output[at * 4 + 3] =
+			32 === sheet.bitsPerPixel ? (sheet.pixels[from + 3] ?? 0) : 0xff;
+	}
+	for (let y = 0; y < overlay.height; y += 1) {
+		const toY = y + offsetY;
+		if (toY < 0 || toY >= height) continue;
+		for (let x = 0; x < overlay.width; x += 1) {
+			const toX = x + offsetX;
+			if (toX < 0 || toX >= width) continue;
+			const from = (y * overlay.width + x) * (overlay.bitsPerPixel / 8);
+			const alpha =
+				32 === overlay.bitsPerPixel ? (overlay.pixels[from + 3] ?? 0) : 0xff;
+			if (0 === alpha) continue;
+			const dst = (toY * width + toX) * 4;
+			if (255 === alpha) {
+				output[dst] = overlay.pixels[from] ?? 0;
+				output[dst + 1] = overlay.pixels[from + 1] ?? 0;
+				output[dst + 2] = overlay.pixels[from + 2] ?? 0;
+				output[dst + 3] = 0xff;
+				continue;
+			}
+			const behind = output[dst + 3] ?? 0;
+			const inverse = 255 - alpha;
+			const outAlpha = alpha + Math.trunc((behind * inverse) / 255);
+			for (let channel = 0; channel < 3; channel += 1) {
+				const top = (overlay.pixels[from + channel] ?? 0) * alpha;
+				const bottom = ((output[dst + channel] ?? 0) * behind * inverse) / 255;
+				output[dst + channel] =
+					0 === outAlpha
+						? 0
+						: Math.min(255, Math.round((top + bottom) / outAlpha));
+			}
+			output[dst + 3] = outAlpha;
+		}
+	}
+	return writeBmp32(width, height, output);
 }
 
 export const paletteChrDescriptor: FormatDescriptor = {
@@ -197,6 +297,7 @@ export const paletteChrFormat: ArchiveFormat = defineFixedArchive({
 					offsetX: entry.offsetX,
 					offsetY: entry.offsetY,
 					virtual: entry.virtual,
+					...(undefined === entry.source ? {} : { source: entry.source }),
 				},
 			}),
 			// Extracted streams carry a rebuilt PNG signature and footer.
@@ -207,16 +308,44 @@ export const paletteChrFormat: ArchiveFormat = defineFixedArchive({
 			metadata: { entryCount: fixed.length },
 		};
 	},
-	async openEntry(source: ByteSource, entry: FixedEntry) {
+	async openEntry(source: ByteSource, entry: FixedEntry, sourcePath: string) {
 		const meta = entry.metadata as
-			| { offsetX?: number; offsetY?: number; virtual?: boolean }
+			| {
+					offsetX?: number;
+					offsetY?: number;
+					virtual?: boolean;
+					source?: number;
+			  }
 			| undefined;
-		if (meta?.virtual) return Readable.from([Buffer.alloc(0)]);
+		const offsetX = meta?.offsetX ?? 0;
+		const offsetY = meta?.offsetY ?? 0;
+		if (meta?.virtual) {
+			// `CharOpener.BlendEntry`: the first entry of the archive is the sheet, and the frame a blended
+			// stand-in names is drawn over it at the place that frame carries. The reference draws both into
+			// a premultiplied surface through the rendering stack of its platform and hands the result out.
+			// This port reads both pictures with its own reader of the PNG interchange format and lays the
+			// frame over the sheet as that reader gives them, both with straight alpha.
+			if (undefined === meta.source)
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					"A blended stand-in names no frame",
+				);
+			const sheet = await readChrPicture(source, sourcePath, 0, 0, 0, false);
+			const overlay = await readChrPicture(
+				source,
+				sourcePath,
+				meta.source,
+				offsetX,
+				offsetY,
+				offsetX !== 0 || offsetY !== 0,
+			);
+			return Readable.from([
+				blendChrPictures(sheet, overlay, offsetX, offsetY),
+			]);
+		}
 		const body = Buffer.from(
 			await source.readAt(entry.offset, Number(entry.size)),
 		);
-		const offsetX = meta?.offsetX ?? 0;
-		const offsetY = meta?.offsetY ?? 0;
 		// The first entry is the sprite sheet itself and never carries a frame offset.
 		const inject = Number(entry.id) !== 0 && (offsetX !== 0 || offsetY !== 0);
 		return Readable.from([wrapPalettePng(body, offsetX, offsetY, inject)]);

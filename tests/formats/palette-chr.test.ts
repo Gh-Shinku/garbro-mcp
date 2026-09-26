@@ -3,6 +3,11 @@ import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
 import { paletteChrFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
+import { pngFile } from "../helpers/png.js";
+import {
+	readBmpImage,
+	writeBmp32,
+} from "../../packages/formats/src/shared/bmp.js";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 
 const PNG_SIGNATURE = Buffer.from([
@@ -22,15 +27,28 @@ interface Frame {
 	offsetY?: number;
 }
 
-/** A PNG body: an IHDR chunk followed by opaque trailing bytes. */
+/** The chunks of a picture of the fixture, without the words a PNG carries around them. */
+function pngChunks(file: Buffer): Buffer {
+	return file.subarray(8, file.length - 12);
+}
+
+/** One place of four samples, as the picture of a PNG carries it. */
+function onePlaces(samples: number[]): Buffer {
+	return pngChunks(
+		pngFile({ width: 1, height: 1, colourType: 6, rows: [samples] }),
+	);
+}
+
+/** A PNG body: an IHDR chunk, check word and all, followed by opaque trailing bytes. */
 function pngBody(tail: Buffer): Buffer {
-	const chunk = Buffer.alloc(4 + 13 + 4);
+	const chunk = Buffer.alloc(4 + 4 + 13 + 4);
 	chunk.writeUInt32BE(13, 0);
 	chunk.write("IHDR", 4, "latin1");
 	chunk.writeUInt32BE(1, 8);
 	chunk.writeUInt32BE(1, 12);
 	chunk.writeUInt8(8, 16);
 	chunk.writeUInt8(6, 17);
+	chunk.writeUInt32BE(crc32(chunk.subarray(4, 21)), 21);
 	return Buffer.concat([chunk, tail]);
 }
 
@@ -76,8 +94,8 @@ describe("Palette CHR archive", () => {
 	});
 
 	it("lists a blended stand-in for every frame", async () => {
-		const body = pngBody(Buffer.from("base"));
-		const frame = pngBody(Buffer.from("frame"));
+		const body = onePlaces([30, 20, 10, 255]);
+		const frame = onePlaces([50, 100, 200, 128]);
 		await expectArchive({
 			format: paletteChrFormat,
 			sourcePath: "chara.chr",
@@ -93,10 +111,56 @@ describe("Palette CHR archive", () => {
 					size: frame.length,
 					content: Buffer.concat([PNG_SIGNATURE, frame, PNG_FOOTER]),
 				},
-				{ path: "chara#blend#a.png", size: 0, content: Buffer.alloc(0) },
+				{
+					// The stand-in stands of the sheet with the frame laid over it at the place the frame
+					// names, which the frame of this fixture names as nothing: the frame covers the whole of
+					// the sheet, half of it standing through.
+					path: "chara#blend#a.bmp",
+					size: 0,
+					content: writeBmp32(1, 1, Buffer.from([105, 60, 40, 255])),
+				},
 			],
 			metadata: { entryCount: 3 },
 		});
+	});
+
+	it("lays the frame of a blended stand-in over the sheet", async () => {
+		// `CharOpener.BlendEntry` draws the frame over the first entry of the archive at the place the frame
+		// names. The pictures of this fixture stand of real chunks, so the reader of the picture of this
+		// project walks them: the sheet is two places square and the frame is one place.
+		const sheet = pngChunks(
+			pngFile({
+				width: 2,
+				height: 2,
+				colourType: 6,
+				rows: [
+					[30, 20, 10, 255, 60, 50, 40, 255],
+					[90, 80, 70, 255, 120, 110, 100, 255],
+				],
+			}),
+		);
+		const frame = onePlaces([50, 100, 200, 128]);
+		const data = buildChr(sheet, [
+			{ name: "a", payload: frame, offsetX: 1, offsetY: 1 },
+		]);
+		const handle = await paletteChrFormat.open(
+			new BufferByteSource(data),
+			"chara.chr",
+		);
+		const blend = handle.entries.find((entry) =>
+			entry.path.includes("#blend#"),
+		);
+		if (!blend) throw new Error("no blended stand-in");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(blend.id)),
+		);
+		if (!image) throw new Error("the stand-in is not a bitmap");
+		expect([image.width, image.height]).toEqual([2, 2]);
+		// The sheet's own places stand as they are; the place the frame covers stands of the frame's colour
+		// laid over the sheet's, which is a half of the frame and half of the place behind it.
+		expect([...image.pixels]).toEqual([
+			10, 20, 30, 255, 40, 50, 60, 255, 70, 80, 90, 255, 150, 105, 85, 255,
+		]);
 	});
 
 	it("injects a frame offset chunk", async () => {
@@ -116,8 +180,9 @@ describe("Palette CHR archive", () => {
 				await archive.openEntry(entry?.id ?? ""),
 			);
 			expect(data.subarray(0, 8)).toEqual(PNG_SIGNATURE);
-			// The oFFs chunk follows the copied IHDR chunk.
-			const chunk = data.subarray(8 + 21, 8 + 21 + 21);
+			// The oFFs chunk follows the copied IHDR chunk, which stands of its length word, its name, its
+			// own thirteen bytes and its check word: twenty five bytes together.
+			const chunk = data.subarray(8 + 25, 8 + 25 + 21);
 			expect(chunk.readUInt32BE(0)).toBe(9);
 			expect(chunk.subarray(4, 8).toString("latin1")).toBe("oFFs");
 			expect(chunk.readInt32BE(8)).toBe(0x12);
@@ -180,7 +245,7 @@ describe("Palette CHR archive", () => {
 			expect(archive.entries.map((entry) => entry.path)).toEqual([
 				"chara#0.png",
 				"chara#あ.png",
-				"chara#blend#あ.png",
+				"chara#blend#あ.bmp",
 			]);
 		} finally {
 			await archive.close();

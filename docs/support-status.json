@@ -14954,9 +14954,13 @@
 				"image typing",
 				"blend stand-in entries",
 				"png stream reassembly",
-				"frame offset chunk"
+				"frame offset chunk",
+				"blended stand-ins: both pictures read with the reader of the PNG interchange format of this project and the frame laid over the sheet with its own alpha, handed out as a bitmap"
 			],
-			"unsupported": ["archive creation", "image decoding", "png blending"],
+			"unsupported": [
+				"archive creation",
+				"a picture whose bytes are in no format the reader of this project knows, where the reference hands the stream to the decoder of its platform"
+			],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
