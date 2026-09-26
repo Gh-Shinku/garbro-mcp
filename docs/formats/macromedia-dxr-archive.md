@@ -56,6 +56,37 @@ the map of the counts of them, at the count of the places of every one of them:
 | 0xc | the counts of the walk of the engine of the count of the places of the picture of the engine |
 | 0xe | the count of the walk of the engine that stands behind the count of the places of the picture of the engine |
 
+## The keys of the picture of the engine and the counts of the places of the movie
+
+Behind the map of the places of the picture of the engine the reference reads two counts of the walk of the
+engine of the places of the picture of the engine, at the places the map names:
+
+* The keys of the picture of the engine (`KEY*`): the count of the places of a count of them, two counts of no
+  place, the counts of the places of the picture of the engine of the count of the walk of the engine, and the
+  count of the keys the movie stands of. The reference then stands of the **whole** of the table of the keys,
+  of the count of the counts of the places of the picture of the engine it read at the head of the count of the
+  walk of the engine, and not of the count the movie stands of: every count of the places of the picture of the
+  engine stands of the count of the places of the picture of the engine it stands of, of the counts of the
+  places of the picture of the engine of the count of the walk of the engine it stands of, and of the counts
+  of the walk of the engine of the picture of the engine itself.
+* The counts of the places of the movie of the engine (`VWCF`, of the older counts of the engine `DRCF`): the
+  counts of the places of the picture of the engine of the movie of the engine at fixed places of the count of
+  the walk of the engine, whatever the counts of the walk of the engine of the places of the head of the movie
+  of the engine - the reference stands of the counts of the engine of the walk of the engine itself
+  (`reader = reader.CloneUnless (ByteOrder.BigEndian)`), so a movie of the counts of the walk of the engine of
+  the counts of the places of the picture of the engine of the engine itself stands of the counts of them just
+  as one of the counts of the engine itself. The count of the places of the picture of the engine that stands
+  of the picture of the engine of the movie of the engine stands at the count of the places of the picture of
+  the engine of the count of the walk of the engine of the version of the movie of the engine: of the counts
+  of the engine behind one thousand two hundred at `0x4E`, and of the counts of the engine itself at `0x46`.
+
+The counts of the walk of the engine of the places of the picture of the engine of the movie of the engine
+stand of the counts of them, at the places of the picture of the engine of the counts of the places of the
+picture of the engine of the map of the counts of them (`GetChunkReader`), and no counts of the walk of the
+engine of the places of the picture of the engine stand of the counts of the walk of the engine of the counts
+of the engine itself: a count of the places of the picture of the engine that stands behind the end of the
+movie of the engine stands of no counts of them at all.
+
 ## The counts of the walk of the engine the reference lists
 
 The reference lists every count of the places of the picture of the engine of the counts of the walk of the
@@ -115,6 +146,20 @@ picture of the engine of the movie, and then the text of it.
   engine (`STXT`),
 * a movie of the counts of the walk of the engine of the counts of the places of the picture of the engine of
   the engine itself (`RIFX`),
+* the keys of the picture of the engine: the counts of the places of the picture of the engine of the count
+  of the walk of the engine, the count of the keys the movie of the engine stands of, and the whole of the
+  table of them,
+* the counts of the places of the movie of the engine: the counts of the places of the picture of the engine
+  of the movie of the engine, of both orders of the words of the head of the movie of the engine (which stand
+  of the counts of the engine of the walk of the engine itself every time), and the count of the places of the
+  picture of the engine of the count of the walk of the engine of the version of the movie of the engine, in
+  front of one thousand two hundred and behind it,
+* the counts of the places of the picture of the engine of the movie of the engine handed out of the counts
+  of the walk of the engine of the places of the picture of the engine of the movie of the engine,
+* the counts of the walk of the engine of the places of the picture of the engine of a movie of the engine
+  that stand behind the counts of the walk of the engine of the places of the picture of the engine of the
+  movie of the engine, of the keys of the picture of the engine and of the counts of the places of the movie
+  of the engine alike,
 * the refusals: a word of another picture of the engine, a word of the kind of the walk of the engine the
   reference does not know, a movie of no counts of the places of the picture of the engine at all, a count of
   the places of the head of the map of the counts of them that stands of no counts of them, a count of the
@@ -126,4 +171,6 @@ picture of the engine of the movie, and then the text of it.
 - `GARbro/ArcFormats/Macromedia/ArcDXR.cs` — `DxrOpener.TryOpen`, `DxrOpener.OpenEntry`,
   `DxrOpener.OpenChunkStream`, `DxrOpener.RawChunks`
 - `GARbro/ArcFormats/Macromedia/DirectorFile.cs` — `DirectorFile.Deserialize`, `DirectorFile.ReadMMap`,
-  `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `Reader`
+  `DirectorFile.ReadKeyTable`, `DirectorFile.ReadConfig`, `DirectorFile.GetChunkReader`,
+  `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `KeyTable.Deserialize`,
+  `KeyTableEntry.Deserialize`, `DirectorConfig.Deserialize`, `Reader.CloneUnless`

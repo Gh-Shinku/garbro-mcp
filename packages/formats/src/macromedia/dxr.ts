@@ -55,6 +55,13 @@ const HEAD_SIZE = 8;
 const MAP_HEAD_SIZE = 0x18;
 const MAP_ENTRY_SIZE = 0x14;
 const ENTRY_LIMIT = 0x100000;
+const KEY_CHUNK = "KEY*";
+const CONFIG_CHUNK = "VWCF";
+const CONFIG_CHUNK_OLD = "DRCF";
+const CONFIG_VERSION_OFFSET = 0x24;
+const CONFIG_PALETTE_OFFSET_OLD = 0x46;
+const CONFIG_PALETTE_OFFSET_NEW = 0x4e;
+const CONFIG_VERSION_NEW = 1200;
 
 function invalidMovie(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
@@ -245,6 +252,143 @@ export function readDirectorMap(
 	};
 }
 
+/** The counts of the places of the picture of the engine of a count of the walk of the engine of them. */
+export interface DirectorKeyEntry {
+	id: number;
+	castId: number;
+	fourCC: string;
+}
+
+/**
+ * The counts of the keys of the picture of the engine of a movie of the engine (`KeyTable`): the counts of
+ * the places of every count of them and of the counts of the places of the picture of the engine it stands of.
+ *
+ * The reference names the counts of the places of a count of the keys and the count of the keys the movie
+ * stands of, and then stands of the *whole* of the table: the count of the keys the movie stands of is read
+ * and stands of no place.
+ */
+export function readDirectorKeyTable(reader: DirectorReader):
+	| {
+			entrySize: number;
+			totalCount: number;
+			usedCount: number;
+			table: DirectorKeyEntry[];
+	  }
+	| undefined {
+	const entrySize = reader.readU16();
+	if (undefined === entrySize || !reader.skip(2)) return undefined;
+	const totalCount = reader.readI32();
+	const usedCount = reader.readI32();
+	if (undefined === totalCount || undefined === usedCount) return undefined;
+	if (totalCount < 0 || totalCount > ENTRY_LIMIT) return undefined;
+	const table: DirectorKeyEntry[] = [];
+	for (let at = 0; at < totalCount; at += 1) {
+		const id = reader.readI32();
+		const castId = reader.readI32();
+		const fourCC = reader.readFourCC();
+		if (undefined === id || undefined === castId || undefined === fourCC)
+			return undefined;
+		table.push({ id, castId, fourCC });
+	}
+	return { entrySize, totalCount, usedCount, table };
+}
+
+/** The counts of the places of the picture of the engine of the movie of the engine (`DirectorConfig`). */
+export interface DirectorConfig {
+	fileVersion: number;
+	version: number;
+	stageTop: number;
+	stageLeft: number;
+	stageBottom: number;
+	stageRight: number;
+	minMember: number;
+	maxMember: number;
+	stageColor: number;
+	bitDepth: number;
+	frameRate: number;
+	platform: number;
+	protection: number;
+	checkSum: number;
+	defaultPalette: number;
+}
+
+/**
+ * The counts of the places of the picture of the engine of a movie of the engine (`DirectorConfig`): the
+ * counts of the places of the picture of the engine of the movie of the engine, of every word of the head of
+ * it and of the counts of the places of the picture of the engine itself.
+ */
+export function readDirectorConfig(
+	reader: DirectorReader,
+): DirectorConfig | undefined {
+	const base = reader.position;
+	// The reference stands of the counts of the places of the picture of the engine of the movie of the
+	// engine of the counts of the engine itself (`reader = reader.CloneUnless (ByteOrder.BigEndian)`), every
+	// time the counts of the places of the picture of the engine of the movie of the engine of its own.
+	const config = reader.clone(false);
+	config.position = base + CONFIG_VERSION_OFFSET;
+	const version = config.readU16();
+	config.position = base;
+	const length = config.readI16();
+	const fileVersion = config.readI16();
+	const stageTop = config.readI16();
+	const stageLeft = config.readI16();
+	const stageBottom = config.readI16();
+	const stageRight = config.readI16();
+	const minMember = config.readI16();
+	const maxMember = config.readI16();
+	if (!config.skip(0x0a)) return undefined;
+	const stageColor = config.readU16();
+	const bitDepth = config.readU16();
+	if (!config.skip(0x18)) return undefined;
+	const frameRate = config.readU16();
+	const platform = config.readI16();
+	const protection = config.readI16();
+	if (!config.skip(4)) return undefined;
+	const checkSum = config.readU32();
+	const values = [
+		version,
+		length,
+		fileVersion,
+		stageTop,
+		stageLeft,
+		stageBottom,
+		stageRight,
+		minMember,
+		maxMember,
+		stageColor,
+		bitDepth,
+		frameRate,
+		platform,
+		protection,
+		checkSum,
+	];
+	if (values.some((value) => undefined === value)) return undefined;
+	config.position =
+		base +
+		((version ?? 0) > CONFIG_VERSION_NEW
+			? CONFIG_PALETTE_OFFSET_NEW
+			: CONFIG_PALETTE_OFFSET_OLD);
+	const defaultPalette = config.readU16();
+	if (undefined === defaultPalette) return undefined;
+	return {
+		version: version ?? 0,
+		fileVersion: fileVersion ?? 0,
+		stageTop: stageTop ?? 0,
+		stageLeft: stageLeft ?? 0,
+		stageBottom: stageBottom ?? 0,
+		stageRight: stageRight ?? 0,
+		minMember: minMember ?? 0,
+		maxMember: maxMember ?? 0,
+		stageColor: stageColor ?? 0,
+		bitDepth: bitDepth ?? 0,
+		frameRate: frameRate ?? 0,
+		platform: platform ?? 0,
+		protection: protection ?? 0,
+		checkSum: checkSum ?? 0,
+		defaultPalette,
+	};
+}
+
 /** The counts of a movie of the engine: the word of the walk of the engine of it and the counts of them. */
 export interface DirectorMovie {
 	codec: string;
@@ -252,6 +396,13 @@ export interface DirectorMovie {
 	directory: DirectorEntry[];
 	/** The counts of the walk of the engine of the places of the picture of the engine, where they stand. */
 	burned: boolean;
+	keyTable?: {
+		entrySize: number;
+		totalCount: number;
+		usedCount: number;
+		table: DirectorKeyEntry[];
+	};
+	config?: DirectorConfig;
 }
 
 /** The counts of the places of the picture of the engine of a movie of the engine of the walk of the engine. */
@@ -295,7 +446,31 @@ export function readDirectorMovie(data: Buffer): DirectorMovie | undefined {
 	reader.position = mapPosition + 8;
 	const map = readDirectorMap(reader);
 	if (!map) return undefined;
-	return { codec, littleEndian, directory: map.directory, burned: false };
+	const movie: DirectorMovie = {
+		codec,
+		littleEndian,
+		directory: map.directory,
+		burned: false,
+	};
+	// The counts of the places of the picture of the engine of the movie of the engine stand of the counts of
+	// the walk of the engine of the places of the picture of the engine of the map of the places of the
+	// picture of the engine: the keys of the picture of the engine and the counts of the places of the movie
+	// of the engine of it stand at the places the map of the counts of them names.
+	const keyChunk = map.directory.find((entry) => KEY_CHUNK === entry.fourCC);
+	if (keyChunk) {
+		reader.position = keyChunk.offset;
+		const keyTable = readDirectorKeyTable(reader);
+		if (keyTable) movie.keyTable = keyTable;
+	}
+	const configChunk =
+		map.directory.find((entry) => CONFIG_CHUNK === entry.fourCC) ??
+		map.directory.find((entry) => CONFIG_CHUNK_OLD === entry.fourCC);
+	if (configChunk) {
+		reader.position = configChunk.offset;
+		const config = readDirectorConfig(reader);
+		if (config) movie.config = config;
+	}
+	return movie;
 }
 
 /** The places of a picture of the engine of the count of the walk of the engine of the engine itself. */
@@ -378,14 +553,21 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 				}),
 			);
 		}
-		return {
-			entries,
-			metadata: {
-				codec: movie.codec,
-				littleEndian: movie.littleEndian,
-				chunks: movie.directory.length,
-			},
+		const metadata: Record<string, unknown> = {
+			codec: movie.codec,
+			littleEndian: movie.littleEndian,
+			chunks: movie.directory.length,
 		};
+		if (movie.config) {
+			metadata.version = movie.config.version;
+			metadata.frameRate = movie.config.frameRate;
+			metadata.platform = movie.config.platform;
+			metadata.bitDepth = movie.config.bitDepth;
+			metadata.stageWidth = movie.config.stageRight - movie.config.stageLeft;
+			metadata.stageHeight = movie.config.stageBottom - movie.config.stageTop;
+		}
+		if (movie.keyTable) metadata.keys = movie.keyTable.table.length;
+		return { entries, metadata };
 	},
 	async openEntry(source: ByteSource, entry) {
 		const data = await readStored(source);

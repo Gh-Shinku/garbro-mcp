@@ -364,12 +364,12 @@ the first forty of them.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`): **the head and the map of the places of the
   picture of the engine stand ported now**, as `macromedia-dxr-archive`: the words of the head, the counts of
   the walk of the engine of the places of the picture of the engine (`imap` and `mmap`) and the list of the
-  counts of the walk of the engine of the engine itself, of the counts of the places of a text of a movie. What
-  stands behind it is the rest of the shape the reference reads: the keys of the picture of the engine
-  (`KEY*`), the counts of the walk of the engine of the places of the picture of the engine (`VWCF`, `DRCF`),
-  the counts of the places of the picture of the engine of the counts of the walk of the engine (`MCsL`,
-  `CAS*`), the pictures and the sounds of the counts of the places of the picture of the engine, and the
-  counts of the walk of the engine of the engine itself (`FGDC`, `FGDM`). The whole of it is written through
+  counts of the walk of the engine of the engine itself, of the counts of the places of a text of a movie. **The keys of
+  the picture of the engine (`KEY*`) and the counts of the places of the movie of the engine (`VWCF`, `DRCF`)
+  stand ported too**. What stands behind them is the rest of the shape the reference reads: the counts of the
+  places of the picture of the engine of the counts of the walk of the engine (`MCsL`, `CAS*`), the pictures
+  and the sounds of the counts of the places of the picture of the engine, and the counts of the walk of the
+  engine of the engine itself (`FGDC`, `FGDM`). The whole of it is written through
   the table driven deserializer of `DirectorFile.cs`, which the port stands of for the head and the map alone.
 - `HCA` (`ArcFormats/Cri/AudioHCA.cs`, class `HcaAudio`, 1213 lines) is the audio of the Cri engine and is
   the same shape on a larger scale: a big endian container, a table of scale factors built from a type of
