@@ -18,12 +18,20 @@ number of colours to a pixel, and the depth is their product. A segment's own le
 body, and a walk that runs into the end of the file, or into a marker that is not a segment at all, stops
 without a picture.
 
-The picture is handed out **as it stands**, because the project carries no decoder for it — the same deviation
-the other pass-through ports of this project take, and the bytes handed out are exactly the bytes the
-reference would decode. Writing the format is not ported, though the reference can write one through the
-encoder of its framework. The entry is named after the file with a `jpg` extension.
+The picture is decoded, as the reference decodes it: the reference hands the stream to the platform decoder
+of the Windows imaging stack (`JpegBitmapDecoder`), and this port hands it to its own reader of the format
+(`packages/formats/src/shared/jpeg-image.ts`), which follows the baseline sequential profile of ITU-T T.81.
+The entry is named `image.bmp` and holds a bitmap of the places that reader returns.
+
+The platform decoder widens a twice-as-coarse chroma inside its colour conversion, while the reader of this
+project widens it in the colour space of the stream, so the two pictures differ by a few places at the edge
+of a colour change; a stream of one grey component, or one whose components each sample the picture, agrees
+to within the rounding of the colour conversion. A progressive stream, a stream of four places a colour, of
+twelve bits a sample or of arithmetic coding is turned away as an unsupported feature. Writing the format is
+not ported, though the reference can write one through the encoder of its framework.
 
 The tests cover finding a picture behind the word of the format, finding one through the word of nothing when
 the segment a camera writes first is absent, stepping over a segment that is not a frame, declining a file
 that does not walk as a picture, the depth as the product of the bits and the colours — beside a grey picture
-of eight bits — the picture handed out as it stands, and a file that is not a picture.
+of eight bits — the picture decoded into a bitmap (a grey stream exactly as the Python imaging library decodes it, and a
+stream of three components within two places of the same), and a file that is not a picture.

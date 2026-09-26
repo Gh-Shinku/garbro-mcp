@@ -7797,9 +7797,20 @@
 			"localId": "gameres-jpeg-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
-			"unsupported": ["archive creation", "image writing"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"supported": [
+				"detect",
+				"list",
+				"the picture decoded into a bitmap through `packages/formats/src/shared/jpeg-image.ts` (a baseline sequential stream)"
+			],
+			"unsupported": [
+				"archive creation",
+				"image writing",
+				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the platform decoder of the reference against this reader at the edge of a colour change"
+			]
 		},
 		{
 			"reference": {

@@ -2,6 +2,13 @@ import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import { gameresJpegImageFormat } from "../../packages/formats/src/gameres/jpeg-image.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import {
+	COLOUR_JPEG,
+	COLOUR_PIXELS,
+	GREY_JPEG,
+	GREY_PIXELS,
+} from "../helpers/jpeg.js";
 
 interface JpegParts {
 	width: number;
@@ -113,7 +120,7 @@ describe("JPEG image file format", () => {
 			sourceOf(picture),
 			"dir/cg.jpeg",
 		);
-		expect(handle.entries[0]?.path).toBe("cg.jpg");
+		expect(handle.entries[0]?.path).toBe("image.bmp");
 		expect(handle.entries[0]?.metadata).toMatchObject({
 			type: "image",
 			width: 0x0140,
@@ -132,8 +139,25 @@ describe("JPEG image file format", () => {
 		});
 	});
 
-	it("hands the picture out as it stands", async () => {
-		expect(await extract(picture)).toEqual(picture);
+	it("decodes the picture into a bitmap", async () => {
+		// The reference reads the picture through the platform decoder of the Windows imaging stack; this port
+		// reads it with its own reader and hands a bitmap over. The grey picture is flat, so its places are
+		// exactly the places the Python imaging library decodes from the same stream.
+		const grey = readBmpImage(await extract(GREY_JPEG));
+		if (!grey) throw new Error("no bitmap");
+		expect(grey).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...grey.pixels]).toEqual([...GREY_PIXELS]);
+		const colour = readBmpImage(await extract(COLOUR_JPEG));
+		if (!colour) throw new Error("no bitmap");
+		expect(colour).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		let worst = 0;
+		for (let at = 0; at < COLOUR_PIXELS.length; at += 1) {
+			worst = Math.max(
+				worst,
+				Math.abs((COLOUR_PIXELS[at] ?? 0) - (colour.pixels[at] ?? 0)),
+			);
+		}
+		expect(worst).toBeLessThanOrEqual(2);
 	});
 
 	it("refuses a file that is not a picture", async () => {
