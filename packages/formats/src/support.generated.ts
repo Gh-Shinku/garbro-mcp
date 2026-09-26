@@ -6377,14 +6377,18 @@ export const formatSupportCatalog = {
 				"extraction of plain entries",
 				"the Nemesis walk of the engine",
 				"the BSHF cipher of the engine (`packages/codecs/src/erisa-bshf.ts`)",
+				"the password from the `IDR_COTOMI` resource of an executable beside the archive (`packages/formats/src/entis/noa-keys.ts`)",
+				"the resource tree of a Windows executable (`packages/formats/src/shared/exe.ts`)",
 			],
 			unsupported: [
 				"archive creation",
-				"the places of a count of the walk of the picture of the counts of the walk of the engine of a count of the walk of the picture of its own (`0x40000000` and the counts of the walk of the engine of the kinds of the walk of the engine of the counts of a colour of the engine), which the reference stands of the counts of the walk of the engine of the name of the count of the walk of the engine of the count of the walk of the picture itself",
+				"the encryption kinds `0x20000000`, `0xc0000010` and `0xa0000010`, which the reference does not implement either",
+				"a key from the settings or from a table of game keys, neither of which has a place in this port",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
-				"a real archive of the engine with a password, which no source in the tree supplies",
+				"a real executable of the engine whose `IDR_COTOMI` resource stands as a `Nemesis` stream rather than the bytes as they stand",
+				"a real archive of the engine, encrypted with the kind `0x40000000`",
 			],
 		},
 		{

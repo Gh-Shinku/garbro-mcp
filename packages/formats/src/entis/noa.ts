@@ -7,13 +7,14 @@
 // of its own and of the places of the count of the walk of the engine behind them.
 
 import { GarbroError, decodeCp932 } from "@garbro-mcp/core";
-import { ErisaNemesisDecodeContext } from "@garbro-mcp/codecs";
+import { ErisaNemesisDecodeContext, decodeBshf } from "@garbro-mcp/codecs";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { extractNoaPassword } from "./noa-keys.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -246,7 +247,7 @@ export const entisNoaFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry(source: ByteSource, entry: FixedEntry) {
+	async openEntry(source: ByteSource, entry: FixedEntry, sourcePath: string) {
 		// `NoaOpener.OpenEntry`: the counts of the walk of the engine of the places of the count of the walk
 		// of the engine of the file stand behind the head of the count of the walk of it.
 		if (entry.offset + BigInt(ENTRY_HEAD) > source.size) {
@@ -289,6 +290,29 @@ export const entisNoaFormat: ArchiveFormat = defineFixedArchive({
 			const out = new Uint8Array(outputLength);
 			const decoded = decoder.decodeNemesisCodeBytes(out, 0, outputLength);
 			return Readable.from([Buffer.from(out.subarray(0, decoded))]);
+		}
+		if (NOA_ENCRYPTION_BSHF === encryption) {
+			// `DecodeBSHF`: the password comes from the engine's own executable beside the archive, and one that
+			// stands nowhere leaves the entry turned away, where the reference would hand the bytes over as they
+			// stand.
+			const password = await extractNoaPassword(
+				sourcePath,
+				sourcePath.replace(/^.*[/\\]/, ""),
+			);
+			if (undefined === password) {
+				throw unsupportedArchive(
+					"The password of the entries of the archive stands nowhere beside it",
+				);
+			}
+			if (size > BigInt(ENTRY_LIMIT)) {
+				throw invalidArchive("Invalid Entis GLS entry size");
+			}
+			// The cipher reads thirty two bytes at a time and the entry holds four bytes behind the bytes it
+			// names, which are there to complete the last block.
+			const input = Buffer.from(
+				await source.readAt(entry.offset + BigInt(ENTRY_HEAD), Number(size)),
+			);
+			return Readable.from([decodeBshf(input, password, Number(size) - 4)]);
 		}
 		throw unsupportedArchive(
 			"The places of the count of the walk of the engine stand of the counts of the walk of the engine of a count of the walk of it of its own",

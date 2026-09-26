@@ -170,3 +170,224 @@ export async function findExecutableAddressOffset(
 	}
 	return undefined;
 }
+
+// The resource tree of a Windows executable, read from the layout of the file rather than from the platform:
+// GARbro's `ExeFile.ResourceAccessor` asks Windows for a resource (`LoadLibraryEx`, `FindResource`,
+// `LoadResource`), so the reader below is written from the format of a portable executable rather than ported
+// from the reference. A resource stands three levels down: its kind, its name and its language, and the leaf
+// of that walk names the bytes of the resource and where they lie.
+
+/** One resource of an executable: its kind, its name, its language and its bytes. */
+export interface ExecutableResource {
+	/** The kind of the resource: a name, or the number of a numbered kind such as `RCDATA`. */
+	type: string | number;
+	/** The name of the resource: a name, or a number. */
+	name: string | number;
+	language: number;
+	data: Buffer;
+}
+
+/** The magic of the optional header stands at its own start: the field that says which kind of image it is. */
+const PE_OPTIONAL_MAGIC_32 = 0x010b;
+const PE_OPTIONAL_MAGIC_64 = 0x020b;
+/** Where the data directories start inside the optional header, for a 32 bit and a 64 bit image. */
+const PE_DIRECTORIES_32 = 0x60;
+const PE_DIRECTORIES_64 = 0x70;
+/** The resource table is the third entry of the data directories. */
+const PE_RESOURCE_DIRECTORY = 2;
+const PE_DIRECTORY_ENTRY_SIZE = 8;
+const COFF_SECTION_COUNT_OFFSET = 6;
+const COFF_OPTIONAL_SIZE_OFFSET = 0x14;
+const PE_OPTIONAL_OFFSET = 0x18;
+const RESOURCE_HEADER_SIZE = 0x10;
+const RESOURCE_ENTRY_SIZE = 8;
+const RESOURCE_DATA_SIZE = 0x10;
+const RESOURCE_STRING_LENGTH = 2;
+const RESOURCE_NAMED_AT = 0x0c;
+const RESOURCE_ID_AT = 0x0e;
+const RESOURCE_HIGH_BIT = 0x80000000;
+const RESOURCE_OFFSET_MASK = 0x7fffffff;
+const RESOURCE_LEVELS = 2;
+/** The most resources one executable may carry here, and the most bytes one of them may hold. */
+const RESOURCE_COUNT_LIMIT = 0x1000;
+const RESOURCE_SIZE_LIMIT = 0x1000000;
+
+/** Whether the two bytes of a stream are the start of a Windows executable. */
+function isExecutable(data: Buffer): boolean {
+	return (
+		data.length >= DOS_HEADER_SIZE &&
+		data.subarray(0, MZ_SIGNATURE.length).equals(MZ_SIGNATURE)
+	);
+}
+
+/** The place of the section table of a 32 or 64 bit image, or undefined when the head is not one. */
+function readSectionTable(data: Buffer):
+	| {
+			tableAt: number;
+			count: number;
+			directoriesAt: number;
+	  }
+	| undefined {
+	if (!isExecutable(data)) return undefined;
+	const peAt = data.readUInt32LE(HEADER_POINTER_OFFSET);
+	if (peAt + PE_OPTIONAL_OFFSET + 2 > data.length) return undefined;
+	if (!data.subarray(peAt, peAt + PE_SIGNATURE.length).equals(PE_SIGNATURE)) {
+		return undefined;
+	}
+	const count = data.readUInt16LE(peAt + COFF_SECTION_COUNT_OFFSET);
+	const optionalSize = data.readUInt16LE(peAt + COFF_OPTIONAL_SIZE_OFFSET);
+	const optionalAt = peAt + PE_OPTIONAL_OFFSET;
+	const magic = data.readUInt16LE(optionalAt);
+	const directoriesAt =
+		PE_OPTIONAL_MAGIC_32 === magic
+			? optionalAt + PE_DIRECTORIES_32
+			: PE_OPTIONAL_MAGIC_64 === magic
+				? optionalAt + PE_DIRECTORIES_64
+				: 0;
+	if (0 === directoriesAt) return undefined;
+	return { tableAt: optionalAt + optionalSize, count, directoriesAt };
+}
+
+/** The place, in the file, of the bytes a place in the image names. */
+function imageToFile(
+	data: Buffer,
+	tableAt: number,
+	count: number,
+	rva: number,
+): number | undefined {
+	for (let index = 0; index < count; index += 1) {
+		const at = tableAt + index * SECTION_TABLE_ENTRY_SIZE;
+		if (at + SECTION_TABLE_ENTRY_SIZE > data.length) return undefined;
+		const virtualAddress = data.readUInt32LE(at + SECTION_VIRTUAL_ADDRESS);
+		const virtualSize = data.readUInt32LE(at + 8);
+		const rawSize = data.readUInt32LE(at + SECTION_RAW_SIZE);
+		const span = Math.max(virtualSize, rawSize);
+		if (rva < virtualAddress || rva >= virtualAddress + span) continue;
+		const pointer = data.readUInt32LE(at + SECTION_RAW_POINTER);
+		return pointer + (rva - virtualAddress);
+	}
+	return undefined;
+}
+
+/** One label of the resource tree: a name, or the number of a named entry. */
+function readResourceLabel(
+	data: Buffer,
+	base: number,
+	field: number,
+): string | number {
+	if (0 === (field & RESOURCE_HIGH_BIT)) return field;
+	const at = base + (field & RESOURCE_OFFSET_MASK);
+	if (at + RESOURCE_STRING_LENGTH > data.length) return "";
+	const length = data.readUInt16LE(at);
+	if (at + RESOURCE_STRING_LENGTH + length * 2 > data.length) return "";
+	return data
+		.subarray(
+			at + RESOURCE_STRING_LENGTH,
+			at + RESOURCE_STRING_LENGTH + length * 2,
+		)
+		.toString("utf16le");
+}
+
+/**
+ * Reads the resource tree of a Windows executable, or undefined when the stream is not one or carries no
+ * resource table. A walk deeper than the three levels a resource has is left alone, and a table with more
+ * entries than the limit, or a resource longer than it, ends the read.
+ */
+export function readExecutableResources(
+	data: Buffer,
+): ExecutableResource[] | undefined {
+	const head = readSectionTable(data);
+	if (!head) return undefined;
+	const directoryAt =
+		head.directoriesAt + PE_RESOURCE_DIRECTORY * PE_DIRECTORY_ENTRY_SIZE;
+	if (directoryAt + PE_DIRECTORY_ENTRY_SIZE > data.length) return undefined;
+	const rva = data.readUInt32LE(directoryAt);
+	if (0 === rva) return undefined;
+	const base = imageToFile(data, head.tableAt, head.count, rva);
+	if (undefined === base) return undefined;
+	const resources: ExecutableResource[] = [];
+	const walk = (at: number, depth: number, path: (string | number)[]): void => {
+		if (at + RESOURCE_HEADER_SIZE > data.length) return;
+		const named = data.readUInt16LE(at + RESOURCE_NAMED_AT);
+		const numbered = data.readUInt16LE(at + RESOURCE_ID_AT);
+		const entries = named + numbered;
+		if (entries > RESOURCE_COUNT_LIMIT) return;
+		for (let index = 0; index < entries; index += 1) {
+			const entryAt = at + RESOURCE_HEADER_SIZE + index * RESOURCE_ENTRY_SIZE;
+			if (entryAt + RESOURCE_ENTRY_SIZE > data.length) return;
+			const label = readResourceLabel(data, base, data.readUInt32LE(entryAt));
+			const field = data.readUInt32LE(entryAt + 4);
+			const next = base + (field & RESOURCE_OFFSET_MASK);
+			if (0 !== (field & RESOURCE_HIGH_BIT)) {
+				if (depth < RESOURCE_LEVELS) {
+					walk(next, depth + 1, [...path, label]);
+				}
+				continue;
+			}
+			if (
+				RESOURCE_LEVELS !== depth ||
+				next + RESOURCE_DATA_SIZE > data.length
+			) {
+				continue;
+			}
+			const dataRva = data.readUInt32LE(next);
+			const size = data.readUInt32LE(next + 4);
+			if (size > RESOURCE_SIZE_LIMIT) continue;
+			const dataAt = imageToFile(data, head.tableAt, head.count, dataRva);
+			if (undefined === dataAt || dataAt + size > data.length) continue;
+			resources.push({
+				type: path[0] ?? 0,
+				name: path[1] ?? 0,
+				language: "number" === typeof label ? label : 0,
+				data: data.subarray(dataAt, dataAt + size),
+			});
+		}
+	};
+	walk(base, 0, []);
+	return resources;
+}
+
+/**
+ * The label of a resource, as the reference writes one: its own `ResourceNameToString` writes a numbered
+ * entry as `#` and the number, so a caller that reads its own listing back names the number that way. A name
+ * that stands for itself is taken as it is.
+ */
+export function parseResourceLabel(label: string | number): string | number {
+	if ("number" === typeof label) return label;
+	if (!label.startsWith("#")) return label;
+	const value = Number.parseInt(label.slice(1), 10);
+	return Number.isNaN(value) ? label : value;
+}
+
+/** Whether two resource labels name the same entry; names stand against each other without their case. */
+function sameResourceLabel(
+	left: string | number,
+	right: string | number,
+): boolean {
+	if ("number" === typeof left || "number" === typeof right)
+		return left === right;
+	return left.toLowerCase() === right.toLowerCase();
+}
+
+/**
+ * The bytes of one resource of an executable. `name` and `type` may each be a name or a number, and a number
+ * written as `#10` stands for the number, which is how the reference writes one. A kind given as nothing
+ * stands for any kind, and the first match wins, which is the language Windows would pick last.
+ */
+export function findExecutableResource(
+	data: Buffer,
+	query: { name?: string | number; type?: string | number },
+): Buffer | undefined {
+	const resources = readExecutableResources(data);
+	if (!resources) return undefined;
+	const name =
+		undefined === query.name ? undefined : parseResourceLabel(query.name);
+	const type =
+		undefined === query.type ? undefined : parseResourceLabel(query.type);
+	for (const resource of resources) {
+		if (undefined !== type && !sameResourceLabel(resource.type, type)) continue;
+		if (undefined !== name && !sameResourceLabel(resource.name, name)) continue;
+		return resource.data;
+	}
+	return undefined;
+}

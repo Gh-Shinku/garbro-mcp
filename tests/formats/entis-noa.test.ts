@@ -5,9 +5,23 @@
 // the engine behind them).
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { entisNoaFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
+import {
+	extractNoaPassword,
+	findNoaKey,
+	readNoaKeyResource,
+} from "../../packages/formats/src/entis/noa-keys.js";
+import {
+	findExecutableResource,
+	readExecutableResources,
+} from "../../packages/formats/src/shared/exe.js";
+import { withCompanionFiles } from "../helpers/companion.js";
 
 const HEAD = 0x40;
 const DIR_ENTRY_HEAD = 0x10;
@@ -253,7 +267,9 @@ describe("Entis GLS archive", () => {
 			// the counts of the walk of the engine of the places of the count of the walk of the engine of the
 			// count of the walk of the picture itself: the places of the count of the walk of the picture stand
 			// of the places of the count of the walk of the engine of the count of the walk of the engine at
-			// most.
+			// most. The entry of the kind `BSHFCrypt` needs a password, which the reference takes from the
+			// executable of the engine beside the archive; none stands beside the name this test gives, so the
+			// entry is turned away.
 			const packed = archive.entries[0];
 			const crypt = archive.entries[1];
 			if (!packed || !crypt) throw new Error("missing entry");
@@ -331,6 +347,205 @@ describe("Entis GLS archive", () => {
 		empty.writeInt32LE(0, HEAD + DIR_ENTRY_HEAD);
 		expect(await entisNoaFormat.detect(sourceOf(empty), "empty.noa")).toBe(
 			false,
+		);
+	});
+});
+
+/** The document the engine keeps in the resource of its executable. */
+function cotomiDocument(
+	entries: readonly { path: string; key: string }[],
+): Buffer {
+	return Buffer.from(
+		`<?xml version="1.0" encoding="utf-8"?>\n<archives>\n${entries
+			.map((entry) => `<archive path="${entry.path}" key="${entry.key}"/>`)
+			.join("\n")}\n</archives>\n`,
+		"utf8",
+	);
+}
+
+/**
+ * A minimal 32 bit image with one `.rsrc` section that carries the document above as the resource numbered
+ * ten, named `IDR_COTOMI`, in the language 0x409. The resource tree stands three levels down, each level a
+ * directory of entries that either lead to the level below or name the bytes of the resource.
+ */
+function executableWithDocument(document: Buffer): Buffer {
+	const string = Buffer.alloc(2 + "IDR_COTOMI".length * 2);
+	string.writeUInt16LE("IDR_COTOMI".length, 0);
+	string.write("IDR_COTOMI", 2, "utf16le");
+	const tree = Buffer.alloc(0x88 + document.length);
+	tree.writeUInt16LE(0, 0x0c);
+	tree.writeUInt16LE(1, 0x0e);
+	tree.writeUInt32LE(10, 0x10);
+	tree.writeUInt32LE((0x80000000 | 0x20) >>> 0, 0x14);
+	tree.writeUInt16LE(1, 0x20 + 0x0c);
+	tree.writeUInt16LE(0, 0x20 + 0x0e);
+	tree.writeUInt32LE((0x80000000 | 0x70) >>> 0, 0x30);
+	tree.writeUInt32LE((0x80000000 | 0x40) >>> 0, 0x34);
+	tree.writeUInt16LE(0, 0x40 + 0x0c);
+	tree.writeUInt16LE(1, 0x40 + 0x0e);
+	tree.writeUInt32LE(0x409, 0x50);
+	tree.writeUInt32LE(0x60, 0x54);
+	tree.writeUInt32LE(0x1000 + 0x88, 0x60);
+	tree.writeUInt32LE(document.length, 0x64);
+	string.copy(tree, 0x70);
+	document.copy(tree, 0x88);
+
+	const headers = Buffer.alloc(0x200);
+	headers.write("MZ", 0, "ascii");
+	headers.writeUInt32LE(0x40, 0x3c);
+	headers.write("PE\0\0", 0x40, "binary");
+	headers.writeUInt16LE(1, 0x40 + 6);
+	headers.writeUInt16LE(0xe0, 0x40 + 0x14);
+	const optional = 0x40 + 0x18;
+	headers.writeUInt16LE(0x010b, optional);
+	headers.writeUInt32LE(0x200, optional + 0x3c);
+	headers.writeUInt32LE(0x1000, optional + 0x60 + 0x10);
+	headers.writeUInt32LE(tree.length, optional + 0x60 + 0x14);
+	const section = optional + 0xe0;
+	headers.write(".rsrc", section, "latin1");
+	headers.writeUInt32LE(tree.length, section + 8);
+	headers.writeUInt32LE(0x1000, section + 0x0c);
+	headers.writeUInt32LE(tree.length, section + 0x10);
+	headers.writeUInt32LE(0x200, section + 0x14);
+	return Buffer.concat([headers, tree]);
+}
+
+describe("Entis GLS archive keys", () => {
+	const document = cotomiDocument([
+		{ path: "archive.noa", key: "first" },
+		{ path: "sub\\CG01.NOA", key: "second" },
+	]);
+
+	it("reads the resource tree of an executable", () => {
+		const exe = executableWithDocument(document);
+		const resources = readExecutableResources(exe);
+		expect(
+			resources?.map((resource) => [resource.type, resource.name]),
+		).toEqual([[10, "IDR_COTOMI"]]);
+		expect(resources?.[0]?.language).toBe(0x409);
+		expect(resources?.[0]?.data.toString("utf8")).toBe(
+			document.toString("utf8"),
+		);
+		// The reference asks for the pair in this order — the name of the resource and the kind of it, the
+		// kind written the way its own listing writes a numbered one.
+		expect(
+			findExecutableResource(exe, {
+				name: "IDR_COTOMI",
+				type: "#10",
+			})?.toString("utf8"),
+		).toBe(document.toString("utf8"));
+		expect(findExecutableResource(exe, { name: "OTHER" })).toBeUndefined();
+		expect(
+			findExecutableResource(Buffer.alloc(0x40), { name: 1 }),
+		).toBeUndefined();
+		expect(
+			readExecutableResources(Buffer.from("not an executable", "latin1")),
+		).toBeUndefined();
+	});
+
+	it("finds the password of an archive in the document", () => {
+		const text = document.toString("utf8");
+		expect(findNoaKey(text, "archive.noa")).toBe("first");
+		// The reference compares the file name of the path without its case, so a path with a directory in
+		// front of it and a name of another case names the same archive.
+		expect(findNoaKey(text, "dir/CG01.noa")).toBe("second");
+		expect(findNoaKey(text, "cg01.noa")).toBe("second");
+		expect(findNoaKey(text, "other.noa")).toBeUndefined();
+	});
+
+	it("reads the password out of the executable behind the archive", async () => {
+		const exe = executableWithDocument(document);
+		expect(readNoaKeyResource(exe, "archive.noa")).toBe("first");
+		expect(readNoaKeyResource(exe, "nothing.noa")).toBeUndefined();
+		expect(
+			readNoaKeyResource(Buffer.alloc(0x200), "archive.noa"),
+		).toBeUndefined();
+		await withCompanionFiles(
+			"CG01.noa",
+			{ "CG01.noa": Buffer.alloc(0x40), "game.exe": exe },
+			async (mainPath) => {
+				expect(await extractNoaPassword(mainPath, "CG01.noa")).toBe("second");
+				expect(await extractNoaPassword(mainPath, "other.noa")).toBeUndefined();
+			},
+		);
+	});
+
+	it("decodes the places of an entry of the kind BSHFCrypt with that password", async () => {
+		// The cipher turns a block of no bits into a block of no bits under any password, so the places of the
+		// entry are the places of nothing, of the count of the entry less the four bytes behind them.
+		const { file } = buildNoa({
+			signature: "VIST\x1a",
+			records: [
+				{
+					name: "crypt.bin",
+					data: Buffer.alloc(32, 0),
+					encryption: BSHF,
+					recorded: 28,
+				},
+			],
+		});
+		await withCompanionFiles(
+			"CG01.noa",
+			{
+				"CG01.noa": file,
+				"game.exe": executableWithDocument(
+					cotomiDocument([{ path: "CG01.noa", key: "the key of the game" }]),
+				),
+			},
+			async (mainPath) => {
+				const source = await FileByteSource.open(mainPath);
+				try {
+					const archive = await entisNoaFormat.open(source, mainPath);
+					try {
+						const entry = archive.entries[0];
+						if (!entry) throw new Error("missing entry");
+						const decoded = await consumeBuffer(
+							await archive.openEntry(entry.id),
+						);
+						expect(decoded.length).toBe(28);
+						expect([...decoded].every((byte) => 0 === byte)).toBe(true);
+					} finally {
+						await archive.close();
+					}
+				} finally {
+					await source.close();
+				}
+			},
+		);
+	});
+
+	it("turns an encrypted entry away when no password stands beside the archive", async () => {
+		const { file } = buildNoa({
+			signature: "VIST\x1a",
+			records: [
+				{
+					name: "crypt.bin",
+					data: Buffer.alloc(32, 0),
+					encryption: BSHF,
+					recorded: 28,
+				},
+			],
+		});
+		await withCompanionFiles(
+			"CG01.noa",
+			{ "CG01.noa": file },
+			async (mainPath) => {
+				const source = await FileByteSource.open(mainPath);
+				try {
+					const archive = await entisNoaFormat.open(source, mainPath);
+					try {
+						const entry = archive.entries[0];
+						if (!entry) throw new Error("missing entry");
+						await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
+							code: "UNSUPPORTED_FEATURE",
+						});
+					} finally {
+						await archive.close();
+					}
+				} finally {
+					await source.close();
+				}
+			},
 		);
 	});
 });

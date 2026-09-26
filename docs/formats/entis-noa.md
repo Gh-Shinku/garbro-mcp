@@ -67,9 +67,30 @@ ported as `ErisaNemesisDecodeContext` in `packages/codecs/src/erisa-nemesis.ts`:
 probability model, follows a chain of sub-models keyed on the last four symbols, and copies a phrase out of a
 64 KiB ring buffer when the model escapes.
 
-The remaining encryption kinds (`0x40000000`, `0x20000000`, `0xc0000010`, `0xa0000010`) need a password that
-the reference takes from a `IDR_COTOMI` resource of a neighbouring executable or from its own settings. This
-port has no such source, so those entries are still refused.
+The remaining encryption kinds (`0x40000000`, `0x20000000`, `0xc0000010`, `0xa0000010`) need a password. The
+reference takes one from its own settings, from a table of game keys that stands empty in the tree, or from a
+`IDR_COTOMI` resource of an executable of the game beside the archive. The last of the three is read here: see
+the section on the password below. The other kinds stand refused, as they do in the reference, which reports
+them as not implemented and hands the bytes over as they stand.
+
+## The password
+
+The engine keeps an XML document in a resource named `IDR_COTOMI` of the executable of the game: one entry for
+every archive of the game, naming the archive and its password. The password of an archive is looked for in the
+document of each executable of the directory above the archive and of the archive's own directory, in that
+order, which is the order the reference walks them in. The document is read as a `Nemesis` stream, and the
+entries are read by scanning the tags of the document for `archive` tags that carry both a path and a key,
+comparing the path against the file name of the archive without its case. Nothing is found for an archive that
+no document names, and the entry is then turned away.
+
+## The resource of an executable
+
+`packages/formats/src/shared/exe.ts` reads the resource tree of a portable executable from the layout of the
+file: the resource table of the data directories, the section that holds it, and the three levels of the tree —
+a kind, a name and a language — where each entry either leads to the level below or names the bytes of the
+resource. A kind or a name is either a name or a number, and the search reads the first match, which is the
+language Windows would reach last. The reader is written from the format rather than ported, because the
+reference asks the platform for the resource and carries no walk of its own.
 
 ## The BSHF cipher
 
@@ -94,11 +115,23 @@ calls as a caller asks for, and a stream whose last block stands short.
 
 ## Deviations
 
-* Password-encrypted entries are listed but refused at extraction with `UNSUPPORTED_FEATURE`. The reference
-  decodes the kind `0x40000000` through `DecodeBSHF` once it has a password, which it reads from a
-  `IDR_COTOMI` resource of a neighbouring executable or from its own settings; the cipher is ported here (see
-  below) but this port has no password source, and the reference's own table of game keys stands empty in the
-  tree, so the cipher stands unwired.
+* Only the kind `0x40000000` is decoded: the reference's `DecodeBSHF`. The kinds `0x20000000`,
+  `0xc0000010` and `0xa0000010` do not stand implemented in the reference either, which hands their bytes over
+  as they stand; this port turns them away.
+* The reference reads a key from its own settings (a pass phrase the user keeps) and from a table of game keys
+  that stands empty in the tree; neither has a place in this port, so a key comes only from the executable of
+  the game that stands beside the archive.
+* The reference asks Windows for the resource of that executable (`LoadLibraryEx` and `FindResource`), and
+  this port walks the resource tree of the file itself (`packages/formats/src/shared/exe.ts`). That walk reads
+  the reference's own pair `("IDR_COTOMI", "#10")` the way it was meant: the second of the two is the kind of
+  the resource, and the reference writes a numbered kind as `#` and its number, which Windows reads as a name
+  of its own and so finds nothing.
+* The reference reads that resource as a `Nemesis` stream and nothing else; this port reads it as one where
+  that works and as the bytes it holds where it does not, which is what the fixture of the tests needs, no
+  encoder of a `Nemesis` stream standing anywhere.
+* The reference reads the executables of the directory above the archive and then of the archive's own
+  directory; this port walks the same two directories in the same order and walks one of them once where a
+  path names no directory of its own.
 * The reference hands an encrypted entry out **as it stands** when it finds no password; this port turns such
   an entry away instead, because the bytes it would hand over are not the bytes the entry names.
 * The `Nemesis` walk is the reference's, but its fixture stands of the counts of the walk of the engine of the
@@ -127,7 +160,16 @@ calls as a caller asks for, and a stream whose last block stands short.
 * the detection negatives: another file word, another identifier and an index with no entries,
 * the placement clamp plus the empty stream of an entry of four bytes or fewer,
 * a packed entry, which decodes through the `Nemesis` walk into at most the recorded size, twice the same,
-* the refusal of a password-encrypted entry.
+* the refusal of a password-encrypted entry when no password stands beside the archive,
+* the resource tree of an executable built in the test: the kind, the name and the language of the resource,
+  the bytes it holds, and the pair the reference asks for (`("IDR_COTOMI", "#10")`) beside a name that stands
+  nowhere and a file that is no executable,
+* the scan of the document for the entry of an archive: the file name of a path, the case of it, and a name no
+  entry carries,
+* the password read out of the executable behind the archive, and the absence of one for an archive no entry
+  names,
+* the places of an entry of the kind `BSHFCrypt`, decoded with that password (a block of no bits, which the
+  cipher leaves as it stands under any password).
 
 `tests/codecs/erisa-nemesis.test.ts` pins the walk itself: an empty stream stands of the counts of the walk
 of the engine of the places of the count of the walk of the engine of the reference (ones, and then zero
@@ -138,4 +180,8 @@ of the walk of the engine at most.
 
 ## References
 
-- `GARbro/ArcFormats/Entis/ArcNOA.cs` — `NoaOpener.TryOpen`, `NoaOpener.OpenEntry`, `IndexReader.ParseDirEntry`
+- `GARbro/ArcFormats/Entis/ArcNOA.cs` — `NoaOpener.TryOpen`, `NoaOpener.OpenEntry`, `IndexReader.ParseDirEntry`,
+  `NoaOpener.GetArcPassword`, `NoaOpener.ExtractNoaPassword`, `NoaOpener.XmlFindArchiveKey`, `NoaOpener.DecodeBSHF`
+- `GARbro/ArcFormats/ExeFile.cs` — `ExeFile.ResourceAccessor` (the platform resource lookup the port replaces)
+- `packages/formats/src/entis/noa-keys.ts`, `packages/formats/src/shared/exe.ts`,
+  `packages/codecs/src/erisa-bshf.ts`
