@@ -766,6 +766,7 @@ import { rpmZenosFormat } from "./rpm/zenos.js";
 import { radFormat } from "./rsystem/rad.js";
 import { rsystemRsgImageFormat } from "./rsystem/rsg-image.js";
 import { rugpRhaAudioFormat } from "./rugp/rha-audio.js";
+import { rioFormat } from "./rugp/rio-archive.js";
 import { ykFormat } from "./rune/yk.js";
 import {
 	saikiBmxImageFormat,
@@ -2432,6 +2433,7 @@ export function createDefaultRegistry(
 		gameresMp3AudioFormat,
 		gameresWavAudioFormat,
 		rugpRhaAudioFormat,
+		rioFormat,
 		studioJikkenshitsuGrdImageFormat,
 		studioJikkenshitsuSpeedImageFormat,
 		studioJikkenshitsuGrcImageFormat,

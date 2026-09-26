@@ -21987,5 +21987,37 @@ export const formatSupportCatalog = {
 			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "archive",
+				tag: "RIO",
+				class: "RioOpener",
+				source: "ArcFormats/rUGP/ArcRIO.cs",
+			},
+			localId: "rugp-rio-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the mark of the engine at the head of a file, and the `.ici` payload beside a file of no mark",
+				"the key of an `.ici` payload, of the walk of its own and of the three column walks behind it",
+				"the index of a game named by an `.ici` payload, of the count of the places of its head",
+				"the graph of an archive: its root, the list of its classes, one node of it, one reference of it, and the object of a node",
+				"the classes of the graph of the engine (CObjectArcMan, CrelicUnitedGameProject, CStdb, CObjectOcean, CBoxOcean)",
+				"the nodes of the classes the engine reads (CRip, CRip007, CS5i, CIcon, CRsa, CVmFunc, CWaveAudio, CrelicHicompAudio)",
+				"the paths of the nodes of the graph, of the names of the nodes of them",
+				"the box of the menu of a game, which the walk of the graph stands of where the listing stands of no node",
+				"the kinds of the classes of the engine, and the places of an entry",
+			],
+			unsupported: [
+				"archive creation",
+				"the message classes of a type, the anonymous references of the graph, and the map of the names of a class list",
+				"the pictures and the sounds behind the classes of the engine, which stand of the formats of their own",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an archive whose graph stands of an `.ici` payload and of the index it names",
+				"the second kind of archive, whose places stand of the count of the places of the head of the graph",
+			],
+		},
 	],
 } as const;

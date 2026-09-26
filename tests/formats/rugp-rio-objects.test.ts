@@ -43,7 +43,7 @@ function runtimeClass(name: string, schema = 0x10): Buffer {
  * A manifest of the fifth version of the engine: the places of the least of the walks of `CObjectArcMan`, of
  * no archive behind it.
  */
-function manifestRun(input?: { title?: string; archive?: boolean }): Buffer {
+function manifestBody(input?: { title?: string; archive?: boolean }): Buffer {
 	const body: Buffer[] = [];
 	const i32 = (value: number) => {
 		const out = Buffer.alloc(4, 0x00);
@@ -72,13 +72,22 @@ function manifestRun(input?: { title?: string; archive?: boolean }): Buffer {
 		// place stands unported, and this one leaves it as it stands.
 		body.push(Buffer.from([0]));
 	}
+	return Buffer.concat(body);
+}
+
+/** The head of a manifest of the engine, of the class of it and the list of the nodes behind it. */
+function manifestHead(nodes: number): Buffer {
 	return Buffer.concat([
 		Buffer.from("cd326e59", "hex"),
 		Buffer.from([0x10, 0x00]),
 		runtimeClass("CObjectArcMan"),
-		rioCount(0),
-		...body,
+		rioCount(nodes),
 	]);
+}
+
+/** A manifest of a game of no node of its own. */
+function manifestRun(input?: { title?: string; archive?: boolean }): Buffer {
+	return Buffer.concat([manifestHead(0), manifestBody(input)]);
 }
 
 describe("rUGP object graph", () => {
@@ -118,18 +127,36 @@ describe("rUGP object graph", () => {
 		expect(() => createRioObject("CNothing")).toThrow(/stands unported/);
 	});
 
-	it("turns away a class list of an archive that stands unencrypted", () => {
-		// The reference reads the name of every node of such a list and hands it to a map it never filled
-		// (`FindObject`), so a list of any node at all is refused rather than walked of no names.
+	it("walks a class list of an archive that stands unencrypted", () => {
+		// The walk of such a list reads the name of every node of it, stands a node of that name and walks the
+		// node: the branch of the reference that asks its own map for a node of the name (`FindObject`) stands
+		// behind a walk that never hands back a node of nothing, so it is unreachable rather than unported.
+		// The node of a graph: the flags of it, the count of the places of the class behind it, the class
+		// itself, and then the places of the node — of the count of the places of a picture of a game.
+		const node = Buffer.concat([
+			Buffer.from([0x08, 0x00]),
+			Buffer.from([0x00, 0x00]),
+			runtimeClass("CS5i"),
+			Buffer.from([0x00, 0x01, 0x00, 0x00]),
+			Buffer.from([0x00, 0x02, 0x00, 0x00]),
+			rioCount(0), // the class list of the node itself
+		]);
 		const run = Buffer.concat([
-			Buffer.from("cd326e59", "hex"),
-			Buffer.from([0x10, 0x00]),
-			runtimeClass("CObjectArcMan"),
-			rioCount(1),
-			rioStr("a node of no object"),
+			manifestHead(1),
+			rioStr("a picture of the game"),
+			node,
+			manifestBody(),
 		]);
 		const archive = new RioArchive(new RioStream(run));
-		expect(() => archive.deserializeRoot()).toThrow(/stands unencrypted/);
+		const manifest = archive.deserializeRoot() as RioObjectArcMan;
+		expect(manifest.version).toBe(5);
+		const nodes = archive.loadNodes();
+		expect(nodes).toHaveLength(1);
+		expect(nodes[0]?.name).toBe("a picture of the game");
+		expect(nodes[0]?.className).toBe("CS5i");
+		expect(nodes[0]?.offset).toBe(0x100);
+		expect(nodes[0]?.size).toBe(0x200);
+		expect(nodes[0]?.getPathName()).toBe("a picture of the game");
 	});
 
 	it("holds the walk of the graph to the places of the stream", () => {

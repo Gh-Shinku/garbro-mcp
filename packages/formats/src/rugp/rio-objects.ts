@@ -533,6 +533,13 @@ export class RioArchive extends RioClassReader {
 		return object;
 	}
 
+	/** `LoadArray.OfType<COceanNode>()`: the nodes of the graph behind the root of it. */
+	loadNodes(): RioOceanNode[] {
+		return this.loadArray.filter(
+			(one): one is RioOceanNode => one instanceof RioOceanNode,
+		);
+	}
+
 	/** `ReadObject`: the object of one node of the graph, of the places and the class of it. */
 	readObject(node: RioOceanNode): RioObject {
 		this.#field60 = false;
@@ -584,14 +591,15 @@ export class RioArchive extends RioClassReader {
 					node.parent = root;
 				} else {
 					// The walk of a class list of an archive that does not stand encrypted reads the name of
-					// every node and hands it to the map of the reference, which is never filled: the port
-					// refuses it rather than walk a graph of no names. The name of the node stands read here
-					// so that the refusal names the place the walk of the reference stands at.
-					void this.readString();
-					throw new GarbroError(
-						"UNSUPPORTED_FEATURE",
-						"rUGP class list of an archive that stands unencrypted",
-					);
+					// every node of it, stands a node of that name and walks it. The branch of the reference
+					// that asks its own map for a node of the name (`FindObject`) stands behind a walk that
+					// never hands back a node of nothing, and is therefore unreachable rather than unported:
+					// the note at the head of this module said the class list of such an archive could not be
+					// walked at all, which the reference does not bear out.
+					const node = new RioOceanNode(this.readString());
+					this.#mapObjectEntry(node);
+					this.deserializeNode(node, true);
+					node.parent = root;
 				}
 			}
 		} finally {
