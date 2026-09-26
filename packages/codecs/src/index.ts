@@ -36,3 +36,4 @@ export * from "./lz4.js";
 export * from "./erisa-huffman.js";
 export * from "./erisa-context.js";
 export * from "./erisa-gamma-table.js";
+export * from "./erisa-prob-model.js";
