@@ -33,34 +33,50 @@ Behind the run stands a palette of three bytes a colour, at the place the head n
 **indices** into it: every channel of a colour is added and divided by three, so what comes out is the grey of
 that colour rather than the index itself.
 
-## What this port does that the reference cannot
+## The picture
 
-The reference **composites** the alpha run into the picture it decodes from the JPEG run, and hands one
-picture back. Decoding JPEG is not something this project does, so this port keeps the two runs apart and
-lists them as two entries:
+The reference decodes the keyed JPEG with the platform's decoder, lays the alpha channel over the fourth byte
+of every pixel and hands one picture back. This port decodes the JPEG with its own reader of the JPEG
+interchange format and lays the channel over it the same way, so a picture of this engine is one bitmap with
+four bytes a pixel.
 
-* the **picture** - the keyed JPEG handed over as it stands, for a caller that can decode it;
-* the **alpha run** - its own picture of one grey byte a pixel, written as a bitmap.
+The channel comes from one of two walks, of the count of the places the head names:
 
-That is a deviation of shape rather than of reading: the same bytes are keyed, the same run is unpacked and
-the same palette is laid over it.
+* where that count stands above nothing, the run is a **zlib stream** of that many bytes of alpha. The
+  reference reads it into a buffer of that count, so a stream that stands short of the count leaves the
+  places behind it at nought; this port does the same;
+* where the head names no count, the run is the alpha run of its own, walked and paletted as above.
+
+The frame of the JPEG is read with the row length of the head of the picture, exactly as the reference does
+through `CopyPixels`, so a frame larger than the head keeps the places of the picture itself alone. A frame
+smaller than the head, and a channel that holds fewer places than the picture, are refused: the reference
+would walk past the buffers it read them into.
 
 ## Deviations from the reference
 
-* The reference decodes JPEG and composites; this port does neither, as above.
-* A run that reaches past the file, a version below nothing, a picture of no size, and an alpha run whose
-  marks are not ones the engine writes are all refused. The reference reads through the end of its own view
-  in places.
+* The reference hands the JPEG to the platform's decoder, which reads every format the platform knows; this
+  port reads the JPEG interchange format itself and refuses a run that is in no such format.
+* A frame of fewer than four bytes a pixel, whose fourth byte the reference takes from the decoded surface
+  before the alpha channel is laid over it, gains an opaque fourth byte here, since the reader of this project
+  hands out four bytes a pixel for every JPEG.
+* A run that reaches past the file, a version below nothing, a picture of no size, a picture whose own header
+  the frame of the JPEG cannot fill, an alpha run whose marks are not ones the engine writes, and a head that
+  names fewer places of the alpha than the picture holds are all refused. The reference reads through the end
+  of its own view in places.
 * Every read is bounded to the file.
 
 ## Verification
 
-Seven tests: the head read back field by field; the key, checked byte by byte against the key the engine
+Nine tests: the head read back field by field; the key, checked byte by byte against the key the engine
 fixes - both for a run longer than it, where the bytes behind it must stand as they are, and for a run
 shorter than it, which is keyed through its whole length; the alpha run unpacked for each of its five marks
 at once, with one byte of the fixture whose palette colour is not itself, so the grey of that colour comes
-out rather than the index; both entries listed and extracted, the picture byte for byte and the alpha run as
-a bitmap of the size and the greys expected; the refusals; and the word of the picture.
+out rather than the index; the picture of one member, with the alpha channel of the run of its own laid over
+its places; the same with the channel of a zlib stream, including a stream that stands short of the count of
+the head, whose places behind it must stand at nought; the refusals, of a run of no JPEG and of a head that
+names fewer places of the alpha than the picture holds; and the word of the picture.
 
-What stands on the reference alone: the JPEG itself is never decoded here, so nothing checks that the run is
-a picture at all, and no real picture is on hand to compare against GARbro's output.
+The JPEG of the fixture is the recorded stream of eight places square that the other rows of this project use
+as their oracle, so the places of the picture are the ones that stream decodes to, widened to four bytes a
+pixel. What stands on the reference alone: no real picture of this engine is on hand to compare against
+GARbro's output.

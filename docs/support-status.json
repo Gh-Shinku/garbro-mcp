@@ -1232,12 +1232,12 @@
 				"the head of the picture and the two runs it names",
 				"the key over the first sixteen bytes of either run",
 				"the alpha run: its five marks, its palette and the greys it stands for",
-				"the picture handed over as the keyed JPEG it holds"
+				"the picture: the JPEG run decoded with the reader of the JPEG interchange format of this project and the alpha channel of the run of its own or of its zlib stream laid over the fourth byte of every place"
 			],
 			"unsupported": [
 				"create",
-				"decoding the JPEG run and compositing the alpha into it, which needs a JPEG decoder this project does not carry",
-				"a version above one, whose alpha packing this port does not unpack"
+				"a JPEG run that is in no picture format the reader of this project knows, where the reference hands it to the decoder of the platform",
+				"a head that names fewer places of the alpha than the picture holds"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",

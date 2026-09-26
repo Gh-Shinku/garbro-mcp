@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { deflateSync } from "node:zlib";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
@@ -9,6 +10,7 @@ import {
 	readAjpMask,
 } from "../../packages/formats/src/alicesoft/ajp-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 
 const MARK = Buffer.from("AJP", "latin1");
 const HEADER_SIZE = 0x24;
@@ -29,10 +31,6 @@ const MASK_PALETTE_SIZE = 0x300;
 const MASK_RUN = Buffer.from([
 	0x07, 0xf8, 0x09, 0xfd, 0x00, 0x0b, 0xfc, 0x00, 0xaa, 0xbb,
 ]);
-/** What that run stands for, before its palette is laid over it. */
-const MASK_PIXELS = [
-	0x07, 0x09, 0x0b, 0x0b, 0x0b, 0x0b, 0xaa, 0xbb, 0xaa, 0xbb, 0xaa, 0xbb,
-];
 
 function buildMask(): Buffer {
 	const dataAt = MASK_HEADER_SIZE;
@@ -75,8 +73,47 @@ function buildAjp(): Buffer {
 	head.writeUInt32LE(ALPHA_OFFSET, 0x1c);
 	head.writeUInt32LE(mask.length, 0x20);
 	const unpacked = Buffer.alloc(4, 0x00);
-	unpacked.writeUInt32LE(MASK_PIXELS.length, 0);
 	return Buffer.concat([head, unpacked, jpegRun(), mask]);
+}
+
+/** The key of a run: the first sixteen bytes exclusive-ored with the key of the engine, the rest as it is. */
+function keyRun(data: Buffer): Buffer {
+	const out = Buffer.from(data);
+	for (let at = 0; at < KEY.length && at < out.length; at += 1) {
+		out[at] = (out[at] ?? 0) ^ (KEY[at] ?? 0);
+	}
+	return out;
+}
+
+/**
+ * A picture of this engine: the keyed run of a JPEG of eight places square, and the run of its alpha
+ * channel. The head names the count of the places the alpha unfolds to, of the walks that stand of a zlib
+ * stream, and stands of nought where the channel is a run of its own.
+ */
+function buildJpegAjp(input: {
+	width: number;
+	height: number;
+	alpha: Buffer;
+	unpacked: number;
+}): Buffer {
+	const alphaAt = IMAGE_OFFSET + GREY_JPEG.length;
+	const head = Buffer.alloc(HEADER_SIZE, 0x00);
+	MARK.copy(head, 0);
+	head.writeInt32LE(1, 4);
+	head.writeUInt32LE(input.width, 0x0c);
+	head.writeUInt32LE(input.height, 0x10);
+	head.writeUInt32LE(IMAGE_OFFSET, 0x14);
+	head.writeUInt32LE(GREY_JPEG.length, 0x18);
+	head.writeUInt32LE(alphaAt, 0x1c);
+	head.writeUInt32LE(input.alpha.length, 0x20);
+	const unpacked = Buffer.alloc(4, 0x00);
+	unpacked.writeUInt32LE(input.unpacked, 0);
+	return Buffer.concat([
+		head,
+		unpacked,
+		keyRun(GREY_JPEG),
+		keyRun(input.alpha),
+	]);
 }
 
 async function open(data: Buffer) {
@@ -96,7 +133,7 @@ describe("AliceSoft JPEG image format", () => {
 			imageOffset: IMAGE_OFFSET,
 			imageSize: IMAGE_SIZE,
 			alphaOffset: ALPHA_OFFSET,
-			alphaUnpacked: MASK_PIXELS.length,
+			alphaUnpacked: 0,
 		});
 	});
 
@@ -127,24 +164,123 @@ describe("AliceSoft JPEG image format", () => {
 		]);
 	});
 
-	it("offers the picture and its alpha run, each as it stands", async () => {
-		const handle = await open(buildAjp());
-		expect(handle.entries.map((entry) => entry.path)).toEqual([
-			"picture.jpg",
-			"picture.alpha.bmp",
-		]);
-		const picture = handle.entries[0];
-		const alpha = handle.entries[1];
-		if (!picture || !alpha) throw new Error("no entry");
-		const jpeg = await consumeBuffer(await handle.openEntry(picture.id));
-		expect(jpeg).toEqual(decryptAjpRun(buildAjp(), IMAGE_OFFSET, IMAGE_SIZE));
-		const mask = readBmpImage(
-			await consumeBuffer(await handle.openEntry(alpha.id)),
+	it("lays the alpha channel of the run of its own over the places of the picture", async () => {
+		// `AjpFormat.Read` decodes the run of the JPEG with the decoder of the platform and lays the run of
+		// the alpha channel, walked by `ReadMask`, over the fourth byte of every pixel. The head of this
+		// fixture names no count of the places of the alpha, which is what picks that walk.
+		const handle = await open(
+			buildJpegAjp({
+				width: MASK_WIDTH,
+				height: MASK_HEIGHT,
+				alpha: buildMask(),
+				unpacked: 0,
+			}),
 		);
-		expect(mask).toMatchObject({ width: MASK_WIDTH, height: MASK_HEIGHT });
-		expect([...(mask?.pixels ?? [])]).toEqual([
-			0x07, 0x09, 6, 6, 6, 6, 0xaa, 0xbb, 0xaa, 0xbb, 0xaa, 0xbb,
-		]);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		expect(handle.entries.map((one) => one.path)).toEqual(["picture.bmp"]);
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		if (!image) throw new Error("no bitmap");
+		// The head of the picture is four places wide and three tall while the frame of the JPEG is eight
+		// square, so the places of the picture itself are the first of every row of the frame.
+		expect([image.width, image.height]).toEqual([MASK_WIDTH, MASK_HEIGHT]);
+		const mask = [0x07, 0x09, 6, 6, 6, 6, 0xaa, 0xbb, 0xaa, 0xbb, 0xaa, 0xbb];
+		const expected: number[] = [];
+		for (let y = 0; y < MASK_HEIGHT; y += 1) {
+			for (let x = 0; x < MASK_WIDTH; x += 1) {
+				const src = (y * 8 + x) * 4;
+				expected.push(
+					GREY_PIXELS[src] ?? 0,
+					GREY_PIXELS[src + 1] ?? 0,
+					GREY_PIXELS[src + 2] ?? 0,
+					mask[y * MASK_WIDTH + x] ?? 0,
+				);
+			}
+		}
+		expect([...image.pixels]).toEqual(expected);
+	});
+
+	it("lays the alpha channel of a zlib stream over the places of the picture", async () => {
+		const alpha = Buffer.alloc(64);
+		for (let at = 0; at < 64; at += 1) alpha[at] = at + 1;
+		const handle = await open(
+			buildJpegAjp({
+				width: 8,
+				height: 8,
+				alpha: deflateSync(alpha),
+				unpacked: 64,
+			}),
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		if (!image) throw new Error("no bitmap");
+		const expected = Buffer.from(GREY_PIXELS);
+		for (let at = 0; at < 64; at += 1) expected[at * 4 + 3] = at + 1;
+		expect([...image.pixels]).toEqual([...expected]);
+		// A stream that stands short of the count of the places the head names leaves the places behind it
+		// at nought, which is what the reference's own read of the stream does.
+		const short = Buffer.alloc(4, 0x77);
+		const shortHandle = await open(
+			buildJpegAjp({
+				width: 8,
+				height: 8,
+				alpha: deflateSync(short),
+				unpacked: 64,
+			}),
+		);
+		const shortEntry = shortHandle.entries[0];
+		if (!shortEntry) throw new Error("no entry");
+		const shortImage = readBmpImage(
+			await consumeBuffer(await shortHandle.openEntry(shortEntry.id)),
+		);
+		if (!shortImage) throw new Error("no bitmap");
+		const padded = Buffer.from(GREY_PIXELS);
+		for (let at = 0; at < 64; at += 1)
+			padded[at * 4 + 3] = at < 4 ? 0x77 : 0x00;
+		expect([...shortImage.pixels]).toEqual([...padded]);
+		// A head that names fewer places of the alpha than the picture holds stands turned away, where the
+		// reference would walk past the buffer it read the channel into.
+		await expect(
+			open(
+				buildJpegAjp({
+					width: 8,
+					height: 8,
+					alpha: deflateSync(short),
+					unpacked: 4,
+				}),
+			).then((handle) => {
+				const first = handle.entries[0];
+				if (!first) throw new Error("no entry");
+				return handle.openEntry(first.id);
+			}),
+		).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
+	});
+
+	it("turns away a run whose places are in no picture format it reads", async () => {
+		const handle = await open(
+			buildJpegAjp({
+				width: 8,
+				height: 8,
+				alpha: deflateSync(Buffer.alloc(64, 0x11)),
+				unpacked: 64,
+			}),
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		// The run of the fixture stands of no walks of a JPEG of its own once the key is off it.
+		const stray = buildAjp();
+		const strayHandle = await open(stray);
+		const strayEntry = strayHandle.entries[0];
+		if (!strayEntry) throw new Error("no entry");
+		await expect(strayHandle.openEntry(strayEntry.id)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
+		void handle;
 	});
 
 	it("turns away a picture whose own fields stand outside the file", () => {

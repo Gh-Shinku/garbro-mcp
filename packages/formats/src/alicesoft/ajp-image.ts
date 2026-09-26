@@ -2,9 +2,11 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 //
 // The picture of this engine is a keyed JPEG with a run of its own for its alpha channel. The reference
-// composites that run into the decoded picture, which needs a JPEG decoder this project does not carry, so
-// this port hands the keyed JPEG over as it stands and offers the alpha run as a picture of its own.
+// decodes the JPEG with the decoder of the platform and lays the alpha channel over it, either out of a zlib
+// stream or out of a run of its own; this port decodes the JPEG with its own reader of that format and lays
+// the channel over it in the same way.
 
+import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -12,7 +14,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { writeBmp8 } from "../shared/bmp.js";
+import { writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import { changeExtension } from "../shared/companion.js";
 import { copyOverlapped } from "../shared/copy.js";
 import {
@@ -223,6 +227,28 @@ export function readAjpMask(input: Buffer): AjpMask | undefined {
 	return { width, height, pixels };
 }
 
+/**
+ * The alpha channel of the picture: the zlib stream the head stands of a count of the places of, or the run
+ * of its own where the head names none. `ReadMask` lays the palette of the run over the bytes it stands for.
+ */
+async function readAjpAlpha(
+	stored: Buffer,
+	layout: AjpLayout,
+): Promise<Buffer> {
+	const run = decryptAjpRun(stored, layout.alphaOffset, layout.alphaSize);
+	if (0 !== layout.alphaUnpacked) {
+		// The reference reads the stream into a buffer of the count of the places the head names, so a
+		// stream that stands short of that count leaves the places behind it at nought.
+		const unpacked = await inflateZlibBuffer(run);
+		const alpha = Buffer.alloc(layout.alphaUnpacked);
+		unpacked.copy(alpha, 0, 0, Math.min(unpacked.length, alpha.length));
+		return alpha;
+	}
+	const mask = readAjpMask(run);
+	if (!mask) throw invalid("The picture's alpha run is not one");
+	return mask.pixels;
+}
+
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
@@ -259,11 +285,12 @@ export const alicesoftAjpImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readAjpLayout(await readStored(source));
 		if (!layout) throw invalid("Not an AliceSoft JPEG picture");
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
+		// `AjpFormat.Read` hands out one picture: the JPEG with the alpha channel of the run laid over it.
 		const entries: FixedEntry[] = [
 			{
 				...createFixedEntry({
 					id: 0,
-					path: changeExtension(fileName, "jpg"),
+					path: changeExtension(fileName, "bmp"),
 					offset: BigInt(layout.imageOffset),
 					size: BigInt(layout.imageSize),
 					compressed: true,
@@ -271,52 +298,64 @@ export const alicesoftAjpImageFormat: ArchiveFormat = defineFixedArchive({
 						type: "image",
 						width: layout.width,
 						height: layout.height,
-						bitsPerPixel: layout.bitsPerPixel,
+						bitsPerPixel: 32,
 					},
 				}),
 				sizeKnown: false,
 			},
 		];
-		if (0 !== layout.alphaOffset && 0 !== layout.alphaSize) {
-			entries.push({
-				...createFixedEntry({
-					id: 1,
-					path: changeExtension(fileName, "alpha.bmp"),
-					offset: BigInt(layout.alphaOffset),
-					size: BigInt(layout.alphaSize),
-					compressed: true,
-					metadata: { type: "image", bitsPerPixel: 8 },
-				}),
-				sizeKnown: false,
-			});
-		}
 		return {
 			entries,
 			metadata: {
 				version: layout.version,
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				alphaUnpacked: layout.alphaUnpacked,
 			},
 		};
 	},
-	async openEntry(source: ByteSource, entry) {
+	async openEntry(source: ByteSource, _entry) {
 		const stored = await readStored(source);
 		const layout = readAjpLayout(stored);
 		if (!layout) throw invalid("Not an AliceSoft JPEG picture");
-		if (1 === Number(entry.id)) {
-			// The alpha run is a picture of its own: one grey byte a pixel.
-			const mask = readAjpMask(
-				decryptAjpRun(stored, layout.alphaOffset, layout.alphaSize),
-			);
-			if (!mask) throw invalid("The picture's alpha run is not one");
-			return Readable.from([
-				writeBmp8(mask.width, mask.height, mask.pixels, false),
-			]);
+		// `AjpFormat.Read`: the first sixteen bytes of the run of the JPEG are exclusive-ored with a key, and
+		// the reference hands the run to the decoder of the platform. This port reads it with its own reader
+		// of the JPEG interchange format and walks the frame with the row length of the head of the picture,
+		// exactly as the reference does through `CopyPixels`.
+		const keyed = decryptAjpRun(stored, layout.imageOffset, layout.imageSize);
+		if (!readJpegHeaderFields(keyed)) {
+			throw invalid("The places of the picture stand of no walks of a JPEG");
 		}
-		// The picture itself is a keyed JPEG, handed over as it stands.
-		return Readable.from([
-			decryptAjpRun(stored, layout.imageOffset, layout.imageSize),
-		]);
+		const image = readJpegImage(keyed);
+		const width = layout.width;
+		const height = layout.height;
+		if (image.width < width || image.height < height) {
+			throw invalid("The places of the picture stand short of the head of it");
+		}
+		const stride = image.width * 4;
+		const pixels = Buffer.alloc(width * height * 4);
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const src = y * stride + x * 4;
+				const dst = (y * width + x) * 4;
+				pixels[dst] = image.pixels[src] ?? 0;
+				pixels[dst + 1] = image.pixels[src + 1] ?? 0;
+				pixels[dst + 2] = image.pixels[src + 2] ?? 0;
+				// A frame of fewer than four bytes a pixel gains an opaque fourth one first, which the
+				// alpha channel then stands over where the picture carries one.
+				pixels[dst + 3] = 0xff;
+			}
+		}
+		if (0 !== layout.alphaOffset && 0 !== layout.alphaSize) {
+			const alpha = await readAjpAlpha(stored, layout);
+			if (alpha.length < width * height) {
+				throw invalid("The alpha run stands short of the picture");
+			}
+			for (let at = 0; at < width * height; at += 1) {
+				pixels[at * 4 + 3] = alpha[at] ?? 0;
+			}
+		}
+		return Readable.from([writeBmp32(width, height, pixels)]);
 	},
 });
