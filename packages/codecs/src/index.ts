@@ -40,3 +40,4 @@ export * from "./erisa-prob-model.js";
 export * from "./erisa-matrix.js";
 export * from "./erisa-nemesis.js";
 export * from "./erisa-bshf.js";
+export * from "./lzx.js";
