@@ -554,6 +554,7 @@ import { lunePackFormat } from "./lune/pack.js";
 import { pictImageFormat } from "./macintosh/pict-image.js";
 import { edimAudioFormat } from "./macromedia/edim-audio.js";
 import { macromediaSndAudioFormat } from "./macromedia/snd-audio.js";
+import { macromediaDxrArchiveFormat } from "./macromedia/dxr.js";
 import { swfArchiveFormat } from "./macromedia/swf.js";
 import { maiFormat } from "./mai/arc.js";
 import {
@@ -2460,6 +2461,7 @@ export function createDefaultRegistry(
 		studioJikkenshitsuGrdImageFormat,
 		studioJikkenshitsuSpeedImageFormat,
 		studioJikkenshitsuGrcImageFormat,
+		macromediaDxrArchiveFormat,
 		swfArchiveFormat,
 		macromediaSndAudioFormat,
 		pictImageFormat,

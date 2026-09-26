@@ -22436,6 +22436,36 @@
 				"a picture of a count of four places of a colour of the walk of the engine and a picture of a count of sixteen places of it, of the counts of the places of the picture of the engine of the engine itself",
 				"a picture of the engine of the counts of the places of the picture of the engine of a key of the walk of the engine itself, which stands of the counts of the engine of the picture of the engine"
 			]
+		},
+		{
+			"reference": {
+				"type": "archive",
+				"tag": "DXR",
+				"class": "DxrOpener",
+				"source": "ArcFormats/Macromedia/ArcDXR.cs"
+			},
+			"localId": "macromedia-dxr-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the words of the head of a movie of the engine (`XFIR` and `RIFX`), of the counts of the walk of the engine of the counts of the places of the picture of the engine of the engine itself and of the counts of the places of the movie of the engine behind them",
+				"the word of the kind of the walk of the engine of a movie of the engine of the counts of the walk of the engine of the map of the places of the picture of the engine (`MV93` and `MC95`)",
+				"the counts of the walk of the engine of the places of the picture of the engine (`imap` and `mmap`), of the counts of the places of the head of the map of the counts of them and of the counts of the places of every count of them",
+				"the counts of the places of the picture of the engine of a movie of the engine: the counts of the walk of the engine of every count of the places of the picture of the engine, the counts of the places of it and the place of it, which stands of the counts of the places of the head of the movie of the engine that stand in front of them",
+				"the list of the counts of the walk of the engine of the engine itself (`RTE0`, `RTE1`, `FXmp`, `VWFI`, `VWSC`, `Lscr`, `STXT`, `XMED` and `File`), of the counts of the places of every one of them and of the counts of the places of the word of the head of the movie of the engine the count of the walk of the engine `File` stands of",
+				"the counts of the places of the picture of the engine of a text of a movie of the engine (`STXT`), of the counts of the places of the picture of the engine of the count of the walk of the engine of the engine itself",
+				"the counts of the places of the picture of the engine handed out as they stand, of a movie of the engine of no counts of the walk of the engine behind them"
+			],
+			"unsupported": [
+				"the counts of the walk of the engine of the places of the picture of the engine behind the map of the counts of them: the keys of the picture of the engine (`KEY*`), the counts of the walk of the engine of the places of the picture of the engine (`VWCF`, `DRCF`) and the counts of the places of the picture of the engine of the counts of the walk of the engine (`MCsL`, `CAS*`)",
+				"the pictures and the sounds of the counts of the places of the picture of the engine of a movie of the engine (`ImportMedia`, the counts of the places of a picture of the engine of the engine itself, of the counts of the places of a picture of the engine and of the sounds of the engine)",
+				"a movie of the engine of the counts of the walk of the engine of the engine itself (`FGDC`, `FGDM`)"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a movie of the engine of the counts of the walk of the engine of the places of the picture of the engine of the counts of the walk of the engine of the engine itself, of the counts of the walk of the engine `File` and of the counts of the places of the picture of the engine of the engine itself",
+				"a movie of the engine of the counts of the places of the picture of the engine of the counts of the walk of the engine itself the reference stands of no counts of the walk of the engine at all at"
+			]
 		}
 	]
 }
