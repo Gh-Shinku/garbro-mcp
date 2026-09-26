@@ -6,12 +6,13 @@
 // picture of the engine alone: the fixture stands of an encoder of the counts of the walk of the engine
 // itself (the walk of the tree of the counts of it of the port, of the places of the names of the tree and
 // of the places of the count of no name of it), which stands of the walk of the places of the tree of a
-// sound the walk of the port stands of. A sound of the kinds of the walks of a picture of the engine stands
-// refused.
+// sound the walk of the port stands of. A sound of the kind `LOT_ERI` stands of the walks of a picture of
+// the engine (`MioDecoder.DecodeSoundDCT`), whose counts stand of the fixture of the bits of the walk of
+// the counts of it (`dctPlaces`) and of the counts of the walk of the engine itself.
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
-import { entisMioAudioFormat } from "@garbro-mcp/formats";
+import { MioDecoder, entisMioAudioFormat } from "@garbro-mcp/formats";
 import { ErisaHuffmanTree } from "@garbro-mcp/codecs";
 import { describe, expect, it } from "vitest";
 import { readWave } from "../../packages/formats/src/shared/wav.js";
@@ -39,6 +40,8 @@ function soundInfoSection(input: {
 	channels?: number;
 	sampleRate?: number;
 	bitsPerSample?: number;
+	subbandDegree?: number;
+	lappedDegree?: number;
 }): Buffer {
 	const body = Buffer.alloc(0x28, 0x00);
 	body.writeInt32LE(0x00020100, 0);
@@ -47,9 +50,9 @@ function soundInfoSection(input: {
 	body.writeInt32LE(input.channels ?? 1, 0x0c);
 	body.writeUInt32LE(input.sampleRate ?? 22050, 0x10);
 	body.writeUInt32LE(0, 0x14);
-	body.writeInt32LE(8, 0x18);
+	body.writeInt32LE(input.subbandDegree ?? 8, 0x18);
 	body.writeUInt32LE(0, 0x1c);
-	body.writeUInt32LE(1, 0x20);
+	body.writeUInt32LE(input.lappedDegree ?? 1, 0x20);
 	body.writeUInt32LE(input.bitsPerSample ?? 8, 0x24);
 	return section(SOUND_INFO_SECTION, body);
 }
@@ -122,7 +125,7 @@ function countPlaces(count: number): number[] {
  * it itself (the places of the names of the tree, of the places of the count of no name of it and of the
  * counts of the walks of them).
  */
-function encodeErina(places: readonly number[]): Buffer {
+function encodeErinaBits(places: readonly number[]): number[] {
 	// The walk of the engine stands of the tree of the counts of the walk of the engine of the name of the
 	// count of the count in front of it: every name of the walk of the engine stands of a tree of its own.
 	const trees: ErisaHuffmanTree[] = [];
@@ -157,6 +160,11 @@ function encodeErina(places: readonly number[]): Buffer {
 		tree.addNewEntry(symbol);
 		tree = next ?? tree;
 	}
+	return bits;
+}
+
+/** The places of a count of the walk of the engine of the port, of the places of the walk of it. */
+function bitsToBuffer(bits: readonly number[]): Buffer {
 	const out = Buffer.alloc(Math.ceil(bits.length / 8), 0x00);
 	for (const [at, bit] of bits.entries()) {
 		if (0 !== bit) {
@@ -165,6 +173,81 @@ function encodeErina(places: readonly number[]): Buffer {
 		}
 	}
 	return out;
+}
+
+/** The places of the walk of the engine of a count of the walk of a sound of the engine. */
+function encodeErina(places: readonly number[]): Buffer {
+	return bitsToBuffer(encodeErinaBits(places));
+}
+
+/**
+ * The places of a count of the walk of the engine of a picture of the engine (`DecodeSoundDCT`): the count
+ * of the walk of the engine at the head of it (no count of the walk of it), the counts of the walk of the
+ * engine of every count of the walk of a picture, the count of the walk of the engine at the end of it and
+ * the places of the walk of the engine itself.
+ */
+function dctPlaces(input: {
+	channels: number;
+	weightCodes: readonly number[];
+	coefficients: readonly number[];
+	places: readonly number[];
+}): Buffer {
+	const bits: number[] = [];
+	const word = (value: number, count: number): void => {
+		for (let at = count - 1; at >= 0; at -= 1) bits.push((value >>> at) & 1);
+	};
+	bits.push(0);
+	for (let channel = 0; channel < input.channels; channel += 1) {
+		// The count of the walk of the engine stands of no count of the walk of the places of a count of
+		// the walk of the engine: one count of the walk of it of every count of a colour.
+		word(0, 2);
+		word(input.weightCodes[channel * 2] ?? 0, 32);
+		word(input.coefficients[channel * 2] ?? 0, 16);
+	}
+	for (let channel = 0; channel < input.channels; channel += 1) {
+		word(input.weightCodes[channel * 2 + 1] ?? 0, 32);
+		word(input.coefficients[channel * 2 + 1] ?? 0, 16);
+	}
+	bits.push(0);
+	bits.push(...encodeErinaBits(input.places));
+	return bitsToBuffer(bits);
+}
+
+/** The places of the walk of the engine of a sound of the kind `LOT_ERI`, of the counts of the walk of it. */
+function lotSound(input: {
+	channels?: number;
+	sampleCount: number;
+	places: readonly number[];
+	weightCode?: number;
+	coefficient?: number;
+	transformation?: number;
+	subbandDegree?: number;
+	lappedDegree?: number;
+	bitsPerSample?: number;
+}): Buffer {
+	const channels = input.channels ?? 1;
+	const weightCode = input.weightCode ?? 0;
+	const coefficient = input.coefficient ?? 0x1000;
+	return buildSound({
+		info: soundInfoSection({
+			transformation: input.transformation ?? 0x00000005,
+			channels,
+			bitsPerSample: input.bitsPerSample ?? 16,
+			subbandDegree: input.subbandDegree ?? 8,
+			lappedDegree: input.lappedDegree ?? 1,
+		}),
+		streams: [
+			soundStreamSection({
+				sampleCount: input.sampleCount,
+				places: dctPlaces({
+					channels,
+					weightCodes: Array.from({ length: channels * 2 }, () => weightCode),
+					coefficients: Array.from({ length: channels * 2 }, () => coefficient),
+					places: input.places,
+				}),
+			}),
+		],
+	});
 }
 
 async function soundOf(data: Buffer) {
@@ -325,14 +408,163 @@ describe("Entis sound", () => {
 		]).toEqual(expected);
 	});
 
-	it("stands of the counts of the walk of the engine of the places of a sound of a kind of its own", async () => {
-		// A sound of the kind `LOT_ERI` stands of the walks of a picture of the engine, which this port holds
-		// no walk of: the sound stands of this engine, and the places of it stand refused.
-		const data = buildSound({
-			info: soundInfoSection({ transformation: 0x00000005, bitsPerSample: 16 }),
-			streams: [
-				soundStreamSection({ sampleCount: 4, places: Buffer.alloc(4, 0x00) }),
-			],
+	it("stands of the counts of the walk of the places of a sound of the kind of a picture of the engine", async () => {
+		// The places of the walk of a picture of the engine stand of the counts of the walk of the engine of
+		// the counts of the walk of the count of the sound: the counts of the walk of the count of one count
+		// at all stand of the counts of the walk of the engine of every count of the walk of it of its own.
+		const places = new Array(0x200).fill(1);
+		const data = lotSound({ sampleCount: 2, places, coefficient: 0x10 });
+		const first = await soundOf(data);
+		if (!first.read) throw new Error("no wave file of the walk");
+		expect(first.read.format).toMatchObject({
+			channels: 1,
+			sampleRate: 22050,
+			blockAlign: 2,
+			bitsPerSample: 16,
+		});
+		expect(first.read.dataSize).toBe(4);
+		// The places of the count of the walk of the engine of the count of the walk of the sound of the
+		// engine stand of the counts of the walk of the engine of the count of the walk of the reference, of
+		// the count of the walk of the engine of the count of no sign at all of the places of the walk of it.
+		expect([
+			...first.wave.subarray(first.read.dataOffset, first.read.dataOffset + 4),
+		]).toEqual([14, 10, 103, 243]);
+		// The counts of the walk of the engine of a count of the walk of a sound stand of the counts of the
+		// walk of the engine of the counts of the walk of it itself: the places of the walk of the engine of
+		// two counts of the walk of the engine stand of the counts of the walk of the engine of the count of
+		// the walk of the sound of the counts of the walk of it.
+		const second = await soundOf(data);
+		expect([
+			...second.wave.subarray(
+				second.read?.dataOffset ?? 0,
+				(second.read?.dataOffset ?? 0) + 4,
+			),
+		]).toEqual([14, 10, 103, 243]);
+	});
+
+	it("stands of the counts of the walk of the engine of the places of a sound of two counts of a colour", async () => {
+		// The counts of the walk of the engine of a sound of two counts of a colour stand of the counts of the
+		// walk of the engine of every count of a colour of its own, one behind the other.
+		const places = new Array(0x400).fill(1);
+		const { wave, read } = await soundOf(
+			lotSound({ channels: 2, sampleCount: 2, places, coefficient: 0x10 }),
+		);
+		if (!read) throw new Error("no wave file of the walk");
+		expect(read.format).toMatchObject({
+			channels: 2,
+			blockAlign: 4,
+			bitsPerSample: 16,
+		});
+		expect(read.dataSize).toBe(8);
+		expect([...wave.subarray(read.dataOffset, read.dataOffset + 8)]).toEqual([
+			14, 10, 14, 10, 103, 243, 103, 243,
+		]);
+	});
+
+	it("stands of the counts of the walk of the engine of the counts of the walk of a sound over each other", async () => {
+		// The walk of the places of a picture of the engine stands of the counts of a picture of the engine
+		// itself, of the counts of the walk of the engine of the counts of the walk of the count: a sound of
+		// the counts of the walk of the engine of two counts of a picture of the engine stands of the counts
+		// of the walk of the engine of the places of the count of the sound, of the count of the walk of the
+		// engine of the places of the sound itself behind it.
+		const count = 0x200;
+		const single = await soundOf(
+			lotSound({
+				sampleCount: 2,
+				places: new Array(count).fill(1),
+				coefficient: 0x10,
+			}),
+		);
+		const double = await soundOf(
+			lotSound({
+				sampleCount: 2,
+				places: new Array(count).fill(2),
+				coefficient: 0x10,
+			}),
+		);
+		if (!single.read || !double.read)
+			throw new Error("no wave file of the walk");
+		const samples = (
+			wave: Buffer,
+			read: { dataOffset: number; dataSize: number },
+		): number[] => {
+			const view = new DataView(
+				wave.buffer,
+				wave.byteOffset + read.dataOffset,
+				read.dataSize,
+			);
+			const out: number[] = [];
+			for (let at = 0; at < read.dataSize / 2; at += 1) {
+				out.push(view.getInt16(at * 2, true));
+			}
+			return out;
+		};
+		const one = samples(single.wave, single.read);
+		const two = samples(double.wave, double.read);
+		expect(one.length).toBe(2);
+		// The counts of the walk of the engine of the places of the count of the walk of a picture of the
+		// engine stand of the counts of the walk of the engine of the places of the count of the walk of the
+		// sound of the engine itself: the places of the walk of the engine of two counts of a picture of the
+		// engine stand of the places of the count of the walk of the engine of the sound, of the counts of
+		// the walk of the engine of the count of the walk of it over each other.
+		expect(one.some((value) => 0 !== value)).toBe(true);
+		for (const [at, value] of two.entries()) {
+			expect(Math.abs(value - 2 * (one[at] ?? 0))).toBeLessThanOrEqual(2);
+		}
+	});
+
+	it("stands of the counts of the walk of the engine of a count of the walk of a sound of the engine", () => {
+		// The counts of the walk of the engine of a count of the walk of a sound stand of the counts of the
+		// walk of the count of the walk of it itself: the counts of the walk of the engine of the count of no
+		// sign at all of the count of the walk of it stand of the counts of the walk of the engine of every
+		// count of the walk of a picture of the engine. The counts of the walk of the engine of the counts of
+		// the walk of the engine of the count of the walk of the sound stand of the counts of the walk of the
+		// engine of the count of the walk of the engine of the reference outside this port.
+		const decoder = new MioDecoder({
+			version: 0x00020100,
+			transformation: 0x00000005,
+			architecture: -4,
+			channelCount: 1,
+			samplesPerSec: 22050,
+			blocksetCount: 0,
+			subbandDegree: 8,
+			allSampleCount: 0,
+			lappedDegree: 1,
+			bitsPerSample: 16,
+		});
+		decoder.initializeWithDegree(8);
+		const quantized = new Int32Array(0x100).fill(1);
+		const dst = new Float32Array(0x100);
+		decoder.iQuantumize(dst, 0, quantized, 0, 0x100, 0, 1024);
+		expect(dst[0] ?? 0).toBeCloseTo(0.5, 4);
+		expect(dst[66] ?? 0).toBeCloseTo(0.5, 4);
+		expect(dst[98] ?? 0).toBeCloseTo(0.5105782856768404, 4);
+		expect(dst[130] ?? 0).toBeCloseTo(0.7718552597026428, 4);
+		expect(dst[254] ?? 0).toBeCloseTo(90.50966799187809, 4);
+		expect(dst[255] ?? 0).toBeCloseTo(0.08838834764831845, 4);
+		// The counts of the walk of the engine of the places of the count of the walk of a picture of the
+		// engine stand of the counts of the walk of the engine of the count of the walk of the count of the
+		// count of the walk of the engine behind the places of the walk of the engine of it: the count of the
+		// walk of the engine of the places of the count of the walk of the engine of the count of the walk of
+		// the engine of the count of the walk of the sound stand of the counts of the walk of the engine of
+		// the count of the walk of it of its own.
+		const odd = new Float32Array(0x100);
+		decoder.iQuantumize(odd, 0, quantized, 0, 0x100, 0x40000000, 1024);
+		expect(odd[15] ?? 0).toBeCloseTo(0.5 / 1.5, 4);
+		expect(odd[31] ?? 0).toBeCloseTo(0.5 / 1.5, 4);
+		expect(odd[254] ?? 0).toBeCloseTo(90.50966799187809, 4);
+		expect(odd[255] ?? 0).toBeCloseTo(0.08838834764831845, 4);
+	});
+
+	it("stands of the counts of the walk of the engine of the places of a sound of two counts of a colour of the walk of a picture of it", async () => {
+		// A sound of the counts of the walk of the engine of the kind `LOT_ERI_MSS` of two counts of a colour
+		// stands of the counts of the walk of the engine of the places of a colour behind the places of the
+		// walk of the engine itself: the sound stands of this engine, and the places of it stand refused.
+		const data = lotSound({
+			channels: 2,
+			sampleCount: 2,
+			places: new Array(0x400).fill(1),
+			transformation: 0x00000105,
 		});
 		const source = new BufferByteSource(data);
 		expect(await entisMioAudioFormat.detect(source, "sound.mio")).toBe(true);
@@ -344,6 +576,83 @@ describe("Entis sound", () => {
 				code: "UNSUPPORTED_FEATURE",
 			});
 			await expect(archive.openEntry(entry.id)).rejects.toThrow(GarbroError);
+		} finally {
+			await archive.close();
+		}
+		// A sound of the kind `LOT_ERI_MSS` of one count of a colour stands of the counts of the walk of a
+		// picture of the engine alone, of the count of the walk of the engine of the walk of it.
+		const mono = await soundOf(
+			lotSound({
+				sampleCount: 2,
+				places: new Array(0x200).fill(1),
+				coefficient: 0x10,
+				transformation: 0x00000105,
+			}),
+		);
+		if (!mono.read) throw new Error("no wave file of the walk");
+		expect(mono.read.format).toMatchObject({ channels: 1, bitsPerSample: 16 });
+		expect(mono.read.dataSize).toBe(4);
+		expect([
+			...mono.wave.subarray(mono.read.dataOffset, mono.read.dataOffset + 4),
+		]).toEqual([14, 10, 103, 243]);
+	});
+
+	it("turns away a sound of the walks of a picture of the engine of counts of its own", async () => {
+		// The reference stands of the counts of the walk of a picture of the engine of a count of the walk of
+		// the engine of eight places of a count of it and of the count of the walk of the engine of the
+		// places of the count of the walk of it alone: a sound of the counts of the walk of it of no count
+		// stands of no sound of this engine.
+		for (const info of [
+			soundInfoSection({
+				transformation: 0x00000005,
+				bitsPerSample: 8,
+			}),
+			soundInfoSection({
+				transformation: 0x00000005,
+				bitsPerSample: 16,
+				subbandDegree: 4,
+			}),
+			soundInfoSection({
+				transformation: 0x00000005,
+				bitsPerSample: 16,
+				lappedDegree: 2,
+			}),
+			soundInfoSection({
+				transformation: 0x00000005,
+				bitsPerSample: 16,
+				architecture: -8,
+			}),
+		]) {
+			const data = buildSound({
+				info,
+				streams: [
+					soundStreamSection({ sampleCount: 2, places: Buffer.alloc(8, 0x00) }),
+				],
+			});
+			expect(
+				await entisMioAudioFormat.detect(
+					new BufferByteSource(data),
+					"sound.mio",
+				),
+			).toBe(false);
+		}
+		// The reference stands of the counts of the walk of a picture of the engine of the counts of the
+		// walk of the engine itself (`RunlengthGamma`) as of the walk of the places of the walk of the
+		// engine of no walk of its own at all: the sound stands detected, and the places of it stand refused.
+		const data = lotSound({
+			sampleCount: 2,
+			places: new Array(0x200).fill(1),
+		});
+		data.writeInt32LE(-1, FIRST_SECTION_END + 0x18);
+		const source = new BufferByteSource(data);
+		expect(await entisMioAudioFormat.detect(source, "sound.mio")).toBe(true);
+		const archive = await entisMioAudioFormat.open(source, "sound.mio");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
+				code: "UNSUPPORTED_FEATURE",
+			});
 		} finally {
 			await archive.close();
 		}

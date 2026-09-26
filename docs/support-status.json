@@ -7224,16 +7224,21 @@
 				"a sound of the kind `Lossless_ERI` of the counts of a picture of the engine of the kind `RunlengthHuffman`, of eight places of a count of the walk of it",
 				"the places of a sound of the kinds of the walk of the counts of the engine (`DecodeSoundPCM8` and `DecodeSoundPCM16`), of the counts of the walk of the engine over each other",
 				"the places of a sound of one count of a colour and of two counts of a colour, of the counts of the walk of the engine of every count of a colour",
+				"a sound of the kind `LOT_ERI` of the walks of a picture of the engine (`DecodeSoundDCT`: the counts of the walk of the counts of a picture of the engine, the counts of the walk of the engine of the counts of it and the counts of the walk of the engine of the places of the count of the walk of the engine of its own), of one count of a colour and of two counts of a colour",
+				"the counts of the walk of the engine of a count of the walk of a sound (`IQuantumize`), of the counts of the walk of the engine of the count of the walk of the count of the walk of a picture of the engine, of the counts of a colour and of the counts of the walk of the engine of the count of the walk of the sound itself",
+				"a sound of the kind `LOT_ERI_MSS` of one count of a colour, which the reference stands of the walks of the count of `LOT_ERI` as well",
 				"the places of a sound of the walk of the engine handed out as a wave file of the project"
 			],
 			"unsupported": [
 				"sound creation",
-				"the places of a sound of the kinds of the walks of a picture of the engine (`LOT_ERI` and `LOT_ERI_MSS`, of the walks of the counts of a picture, of the places of a colour and of the places of a block of `MioDecoder`)",
-				"the places of a sound of the walk of the `Nemesis` of the engine, which the reference holds no walk of as well"
+				"the places of a sound of the kinds of the walks of a picture of the engine of two counts of a colour (`LOT_ERI_MSS`, of the walks of `MioDecoder.DecodeSoundDCT_MSS`)",
+				"the places of a sound of the walk of the `Nemesis` of the engine, which the reference holds no walk of as well",
+				"the places of a sound of the kind `LOT_ERI` of the counts of the walk of the engine of the counts of the gamma (`RunlengthGamma`), which the reference stands of no walk of the engine of its own at all"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the places of a sound of the kinds of the walks of a picture of the engine (the walks of the engine to come)"
+				"the places of a sound of the walks of a picture of the engine beyond the places of the walk of the engine of the count of the walk of the sound of the counts of the walk of the engine of the count of no name at all (the walk of the counts of the gamma of the count of the walk of the engine stands of no count of the walk of the engine of the fixture)",
+				"the places of a sound of the kinds of the walks of a picture of the engine of two counts of a colour (`LOT_ERI_MSS`)"
 			]
 		},
 		{

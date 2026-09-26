@@ -17,7 +17,16 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { ErisaHuffmanDecodeContext } from "@garbro-mcp/codecs";
+import {
+	type EriSinCos,
+	ErisaHuffmanDecodeContext,
+	createRevolveParameter,
+	fastIdct,
+	fastIlot,
+	fastIplot,
+	oddGivensInverseMatrix,
+	roundR32ToWordArray,
+} from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -52,6 +61,15 @@ const BITS_PER_SAMPLE_16 = 16;
 const CHANNEL_LIMIT = 2;
 /** The flag of the count of the walk of a sound of the engine: the walk of the counts of it begins. */
 const MIO_LEAD_BLOCK = 0x01;
+/** The counts of the walk of the picture of the engine of a sound of the counts of the walk of it. */
+const ARCHITECTURE_RUN_LENGTH_GAMMA = -1;
+const MIN_SUBBAND_DEGREE = 8;
+const MAX_SUBBAND_DEGREE = 12;
+const LAPPED_DEGREE = 1;
+/** The counts of the walk of the counts of a picture of the engine. */
+const DIVISION_BITS = 2;
+const CODE_MARGIN = 10;
+const WORD_PLACES = 2;
 
 function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
@@ -167,7 +185,24 @@ export function readMioLayout(data: Buffer): MioLayout | undefined {
 		TRANSFORMATION_LOT_ERI === info.transformation ||
 		TRANSFORMATION_LOT_ERI_MSS === info.transformation
 	) {
+		// `MioDecoder.Initialize`: a sound of the walk of the picture of the engine stands of the counts of
+		// the walk of the engine of the two ways of it, of the places of the walk of the counts of a count
+		// of the engine itself, of the counts of a walk of the picture of the engine.
+		if (
+			ARCHITECTURE_RUN_LENGTH_GAMMA !== info.architecture &&
+			ARCHITECTURE_RUN_LENGTH_HUFFMAN !== info.architecture &&
+			ARCHITECTURE_NEMESIS !== info.architecture
+		) {
+			return undefined;
+		}
 		if (BITS_PER_SAMPLE_16 !== info.bitsPerSample) return undefined;
+		if (
+			info.subbandDegree < MIN_SUBBAND_DEGREE ||
+			info.subbandDegree > MAX_SUBBAND_DEGREE
+		) {
+			return undefined;
+		}
+		if (LAPPED_DEGREE !== info.lappedDegree) return undefined;
 	} else {
 		return undefined;
 	}
@@ -215,12 +250,488 @@ function findSection(
 	return undefined;
 }
 
+/** The widths of the places of the walk of the counts of a picture of the engine, of the count of it. */
+const FREQ_WIDTH = [-6, -6, -5, -4, -3, -2, -1];
+const FREQ_POINTS = 7;
+const WEIGHT_BITS = 5;
+const WEIGHT_MASK = 0x1f;
+const WEIGHT_MIDDLE = 15;
+const WEIGHT_ODD_SHIFT = 30;
+const WEIGHT_ODD_MASK = 0x03;
+const WEIGHT_STEP = 16;
+
 /** `MioDecoder`: the places of a sound of the engine, of the counts of the walk of the engine. */
 export class MioDecoder {
 	info: MioInfoHeader;
+	/** The count of the places of the walk of the block of the engine of the walk of the places of it. */
+	degree: number;
+	places: number;
+	revolve: EriSinCos[];
+	frequencyPoints: number[];
+	weightTable: Float32Array;
+	/** The places of the walks of a picture of the engine, of the counts of a count of the walk of it. */
+	matrixBuf: Float32Array;
+	internalBuf: Float32Array;
+	workBuf: Float32Array;
+	lastDctBuf: Float32Array;
+	buffer1: Int32Array;
+	buffer2: Int32Array;
+	weightCodes: Int32Array;
+	coefficients: Int32Array;
+	nextWeight: number;
+	nextCoefficient: number;
+	nextSource: number;
+	lastDctAt: number;
 
 	constructor(info: MioInfoHeader) {
 		this.info = info;
+		this.degree = 0;
+		this.places = 0;
+		this.revolve = [];
+		this.frequencyPoints = [];
+		this.weightTable = new Float32Array(0);
+		this.matrixBuf = new Float32Array(0);
+		this.internalBuf = new Float32Array(0);
+		this.workBuf = new Float32Array(0);
+		this.lastDctBuf = new Float32Array(0);
+		this.buffer1 = new Int32Array(0);
+		this.buffer2 = new Int32Array(0);
+		this.weightCodes = new Int32Array(0);
+		this.coefficients = new Int32Array(0);
+		this.nextWeight = 0;
+		this.nextCoefficient = 0;
+		this.nextSource = 0;
+		this.lastDctAt = 0;
+	}
+
+	/** `InitializeWithDegree`: the counts of the walks of the counts of a picture of the engine. */
+	initializeWithDegree(degree: number): void {
+		this.degree = degree;
+		this.places = 1 << degree;
+		this.revolve = createRevolveParameter(degree);
+		this.frequencyPoints = [];
+		let counted = 0;
+		for (let at = 0; at < FREQ_POINTS; at += 1) {
+			const width = 1 << (degree + (FREQ_WIDTH[at] ?? 0));
+			this.frequencyPoints.push(counted + Math.trunc(width / 2));
+			counted += width;
+		}
+		this.weightTable = new Float32Array(this.places);
+	}
+
+	/** `IQuantumize`: the counts of the walk of a count of the engine, of the counts of the walk of it. */
+	iQuantumize(
+		dst: Float32Array,
+		at: number,
+		quantized: Int32Array,
+		from: number,
+		degree: number,
+		weightCode: number,
+		coefficient: number,
+	): void {
+		const scale = Math.sqrt(2 / degree);
+		const counted = scale * coefficient;
+		const ratios: number[] = [];
+		for (let place = 0; place < FREQ_POINTS - 1; place += 1) {
+			// The counts of the walk of the engine stand of the counts of the walk of the count of the
+			// engine of the two ways of it: the highest place of the count of the walk of the engine stands
+			// of a count of its own, and the places of the walk of the engine stand of the counts of the
+			// walk of the engine of the two ways of it of the count of the walk of it.
+			const code =
+				((weightCode >>> (place * WEIGHT_BITS)) & WEIGHT_MASK) - WEIGHT_MIDDLE;
+			ratios.push(1 / 2 ** (code * 0.5));
+		}
+		ratios.push(1);
+		const table = this.weightTable;
+		const first = this.frequencyPoints[0] ?? 0;
+		for (let place = 0; place < first && place < table.length; place += 1) {
+			table[place] = ratios[0] ?? 1;
+		}
+		let place = first;
+		for (let point = 1; point < FREQ_POINTS; point += 1) {
+			const before = ratios[point - 1] ?? 1;
+			const limit = this.frequencyPoints[point] ?? place;
+			const step = (ratios[point] ?? 1) - before;
+			const width = limit - (this.frequencyPoints[point - 1] ?? 0);
+			const grade = 0 === width ? 0 : step / width;
+			while (place < limit) {
+				table[place] =
+					grade * (place - (this.frequencyPoints[point - 1] ?? 0)) + before;
+				place += 1;
+			}
+		}
+		while (place < degree) {
+			table[place] = ratios[FREQ_POINTS - 1] ?? 1;
+			place += 1;
+		}
+		const odd = (((weightCode >>> WEIGHT_ODD_SHIFT) & WEIGHT_ODD_MASK) + 2) / 2;
+		for (let step = 15; step < degree; step += WEIGHT_STEP) {
+			table[step] = (table[step] ?? 0) * odd;
+		}
+		table[degree - 1] = coefficient;
+		for (let step = 0; step < degree; step += 1) {
+			table[step] = 1 / (table[step] ?? 1);
+		}
+		for (let step = 0; step < degree; step += 1) {
+			dst[at + step] =
+				counted * (table[step] ?? 0) * (quantized[from + step] ?? 0);
+		}
+	}
+
+	/** `DecodeLeadBlock`: the places of the first count of the walk of a block of the engine. */
+	decodeLeadBlock(weightCode: number, coefficient: number): void {
+		const half = Math.trunc(this.places / 2);
+		for (let place = 0; place < half; place += 1) {
+			this.buffer1[place * 2] = 0;
+			this.buffer1[place * 2 + 1] = this.buffer2[this.nextSource + place] ?? 0;
+		}
+		this.nextSource += half;
+		this.iQuantumize(
+			this.lastDctBuf,
+			this.lastDctAt,
+			this.buffer1,
+			0,
+			this.places,
+			weightCode,
+			coefficient,
+		);
+		oddGivensInverseMatrix(
+			this.lastDctBuf,
+			this.lastDctAt,
+			this.revolve,
+			this.degree,
+		);
+		for (let place = 0; place < this.places; place += 2) {
+			this.lastDctBuf[this.lastDctAt + place] =
+				this.lastDctBuf[this.lastDctAt + place + 1] ?? 0;
+		}
+		fastIplot(this.lastDctBuf, this.lastDctAt, this.degree);
+	}
+
+	/** `DecodeInternalBlock`: the places of a count of the walk of a block of the engine. */
+	decodeInternalBlock(
+		dst: Uint8Array,
+		at: number,
+		samples: number,
+		weightCode: number,
+		coefficient: number,
+	): void {
+		this.iQuantumize(
+			this.matrixBuf,
+			0,
+			this.buffer2,
+			this.nextSource,
+			this.places,
+			weightCode,
+			coefficient,
+		);
+		this.nextSource += this.places;
+		oddGivensInverseMatrix(this.matrixBuf, 0, this.revolve, this.degree);
+		fastIplot(this.matrixBuf, 0, this.degree);
+		fastIlot(
+			this.workBuf,
+			this.lastDctBuf,
+			this.lastDctAt,
+			this.matrixBuf,
+			0,
+			this.degree,
+		);
+		for (let place = 0; place < this.places; place += 1) {
+			this.lastDctBuf[this.lastDctAt + place] = this.matrixBuf[place] ?? 0;
+			this.matrixBuf[place] = this.workBuf[place] ?? 0;
+		}
+		fastIdct(
+			this.internalBuf,
+			0,
+			this.matrixBuf,
+			0,
+			1,
+			this.workBuf,
+			this.degree,
+		);
+		if (0 !== samples) {
+			roundR32ToWordArray(
+				dst,
+				at,
+				this.info.channelCount,
+				this.internalBuf,
+				samples,
+			);
+		}
+	}
+
+	/** `DecodePostBlock`: the places of the last count of the walk of a block of the engine. */
+	decodePostBlock(
+		dst: Uint8Array,
+		at: number,
+		samples: number,
+		weightCode: number,
+		coefficient: number,
+	): void {
+		const half = Math.trunc(this.places / 2);
+		for (let place = 0; place < half; place += 1) {
+			this.buffer1[place * 2] = 0;
+			this.buffer1[place * 2 + 1] = this.buffer2[this.nextSource + place] ?? 0;
+		}
+		this.nextSource += half;
+		this.iQuantumize(
+			this.matrixBuf,
+			0,
+			this.buffer1,
+			0,
+			this.places,
+			weightCode,
+			coefficient,
+		);
+		oddGivensInverseMatrix(this.matrixBuf, 0, this.revolve, this.degree);
+		for (let place = 0; place < this.places; place += 2) {
+			this.matrixBuf[place] = -(this.matrixBuf[place + 1] ?? 0);
+		}
+		fastIplot(this.matrixBuf, 0, this.degree);
+		fastIlot(
+			this.workBuf,
+			this.lastDctBuf,
+			this.lastDctAt,
+			this.matrixBuf,
+			0,
+			this.degree,
+		);
+		for (let place = 0; place < this.places; place += 1) {
+			this.matrixBuf[place] = this.workBuf[place] ?? 0;
+		}
+		fastIdct(
+			this.internalBuf,
+			0,
+			this.matrixBuf,
+			0,
+			1,
+			this.workBuf,
+			this.degree,
+		);
+		if (0 !== samples) {
+			roundR32ToWordArray(
+				dst,
+				at,
+				this.info.channelCount,
+				this.internalBuf,
+				samples,
+			);
+		}
+	}
+
+	/** `DecodeSoundDCT`: the places of a sound of the engine, of the walk of the picture of it. */
+	decodeSoundDct(chunk: MioChunk, places: Buffer): Uint8Array {
+		const info = this.info;
+		const degreeWidth = 1 << info.subbandDegree;
+		const subbandCount = Math.trunc(
+			(chunk.sampleCount + degreeWidth - 1) / degreeWidth,
+		);
+		const sampleCount = subbandCount * degreeWidth;
+		const channelCount = info.channelCount;
+		const allSampleCount = sampleCount * channelCount;
+		const allSubbandCount = subbandCount * channelCount;
+		const blockSize = channelCount * degreeWidth;
+		// The reference stands of the counts of the walk of the count of the engine of the places of a
+		// count of the walk of it alone: this port stands of the places of the walk of the engine of the
+		// count of the walk of it and of the count of the places of the walk of the engine behind it, of
+		// no count of a walk of the engine.
+		const codeCount = allSubbandCount * CODE_MARGIN + channelCount;
+		this.matrixBuf = new Float32Array(blockSize);
+		this.internalBuf = new Float32Array(blockSize);
+		this.workBuf = new Float32Array(degreeWidth);
+		this.lastDctBuf = new Float32Array(blockSize * info.lappedDegree);
+		this.buffer1 = new Int32Array(blockSize);
+		this.buffer2 = new Int32Array(allSampleCount);
+		this.weightCodes = new Int32Array(codeCount);
+		this.coefficients = new Int32Array(codeCount);
+		const divisionTable = new Uint8Array(allSubbandCount);
+		if (ARCHITECTURE_RUN_LENGTH_HUFFMAN !== info.architecture) {
+			throw unsupportedSound(
+				"The places of a sound of the engine stand of the walk of the counts of it of no walk of the engine",
+			);
+		}
+		const context = new ErisaHuffmanDecodeContext(0x10000);
+		context.attachInputFile(places);
+		context.flushBuffer();
+		if (0 !== context.getABit()) {
+			throw invalidSound(
+				"The walk of the counts of the sound of the engine stands of no count of it",
+			);
+		}
+		let nextDivision = 0;
+		this.nextWeight = 0;
+		this.nextCoefficient = 0;
+		const lastDivision = new Int32Array(channelCount).fill(-1);
+		for (let subband = 0; subband < subbandCount; subband += 1) {
+			for (let channel = 0; channel < channelCount; channel += 1) {
+				const division = context.getNBits(DIVISION_BITS);
+				divisionTable[nextDivision] = division;
+				nextDivision += 1;
+				if (division !== (lastDivision[channel] ?? -1)) {
+					if (0 !== subband) {
+						this.weightCodes[this.nextWeight] = context.getNBits(32);
+						this.nextWeight += 1;
+						this.coefficients[this.nextCoefficient] = context.getNBits(16);
+						this.nextCoefficient += 1;
+					}
+					lastDivision[channel] = division;
+				}
+				const divisionCount = 1 << division;
+				for (let place = 0; place < divisionCount; place += 1) {
+					this.weightCodes[this.nextWeight] = context.getNBits(32);
+					this.nextWeight += 1;
+					this.coefficients[this.nextCoefficient] = context.getNBits(16);
+					this.nextCoefficient += 1;
+				}
+			}
+		}
+		if (subbandCount > 0) {
+			for (let channel = 0; channel < channelCount; channel += 1) {
+				this.weightCodes[this.nextWeight] = context.getNBits(32);
+				this.nextWeight += 1;
+				this.coefficients[this.nextCoefficient] = context.getNBits(16);
+				this.nextCoefficient += 1;
+			}
+		}
+		if (0 !== context.getABit()) {
+			throw invalidSound(
+				"The walk of the counts of the sound of the engine stands of no count of it",
+			);
+		}
+		if (0 !== (chunk.flags & MIO_LEAD_BLOCK)) {
+			context.prepareToDecodeErinaCode();
+		}
+		const decoded = new Uint8Array(allSampleCount * WORD_PLACES);
+		if (
+			context.decodeBytes(decoded, allSampleCount * WORD_PLACES) <
+			allSampleCount * WORD_PLACES
+		) {
+			throw invalidSound(
+				"The count of the walk of the sound stands short of its places",
+			);
+		}
+		// The places of the walk of the engine stand of the counts of the place of the walk of the count
+		// above and of the count of the place of the walk of the engine behind it of every count of the
+		// walk of the engine of a count of the sound of the engine.
+		let high = 0;
+		let low = allSampleCount;
+		for (let place = 0; place < degreeWidth; place += 1) {
+			let quantumized = place;
+			for (let subband = 0; subband < allSubbandCount; subband += 1) {
+				const lowPlace = ((decoded[low] ?? 0) << 24) >> 24;
+				const highPlace =
+					(((decoded[high] ?? 0) << 24) >> 24) ^ (lowPlace >> 8);
+				this.buffer2[quantumized] = (lowPlace & 0xff) | (highPlace << 8);
+				quantumized += degreeWidth;
+				low += 1;
+				high += 1;
+			}
+		}
+		const out = new Uint8Array(chunk.sampleCount * channelCount * WORD_PLACES);
+		const rest = new Int32Array(channelCount);
+		const dest = new Int32Array(channelCount);
+		for (let channel = 0; channel < channelCount; channel += 1) {
+			rest[channel] = chunk.sampleCount;
+			dest[channel] = channel * WORD_PLACES;
+		}
+		nextDivision = 0;
+		this.nextWeight = 0;
+		this.nextCoefficient = 0;
+		this.nextSource = 0;
+		lastDivision.fill(-1);
+		let currentDivision = -1;
+		for (let subband = 0; subband < subbandCount; subband += 1) {
+			for (let channel = 0; channel < channelCount; channel += 1) {
+				const division = divisionTable[nextDivision] ?? 0;
+				nextDivision += 1;
+				const divisionCount = 1 << division;
+				this.lastDctAt = degreeWidth * info.lappedDegree * channel;
+				let lead = false;
+				if ((lastDivision[channel] ?? -1) !== division) {
+					if (0 !== subband) {
+						if (currentDivision !== (lastDivision[channel] ?? -1)) {
+							this.initializeWithDegree(
+								info.subbandDegree - (lastDivision[channel] ?? 0),
+							);
+							currentDivision = lastDivision[channel] ?? 0;
+						}
+						const samples = Math.min(rest[channel] ?? 0, this.places);
+						this.decodePostBlock(
+							out,
+							dest[channel] ?? 0,
+							samples,
+							this.weightCodes[this.nextWeight] ?? 0,
+							this.coefficients[this.nextCoefficient] ?? 0,
+						);
+						this.advanceBlock(channel, samples, rest, dest, channelCount);
+					}
+					lastDivision[channel] = division;
+					lead = true;
+				}
+				if (currentDivision !== division) {
+					this.initializeWithDegree(info.subbandDegree - division);
+					currentDivision = division;
+				}
+				for (let place = 0; place < divisionCount; place += 1) {
+					if (lead) {
+						this.decodeLeadBlock(
+							this.weightCodes[this.nextWeight] ?? 0,
+							this.coefficients[this.nextCoefficient] ?? 0,
+						);
+						this.nextWeight += 1;
+						this.nextCoefficient += 1;
+						lead = false;
+					} else {
+						const samples = Math.min(rest[channel] ?? 0, this.places);
+						this.decodeInternalBlock(
+							out,
+							dest[channel] ?? 0,
+							samples,
+							this.weightCodes[this.nextWeight] ?? 0,
+							this.coefficients[this.nextCoefficient] ?? 0,
+						);
+						this.nextWeight += 1;
+						this.nextCoefficient += 1;
+						this.advanceBlock(channel, samples, rest, dest, channelCount);
+					}
+				}
+			}
+		}
+		if (subbandCount > 0) {
+			for (let channel = 0; channel < channelCount; channel += 1) {
+				this.lastDctAt = degreeWidth * info.lappedDegree * channel;
+				if (currentDivision !== (lastDivision[channel] ?? -1)) {
+					this.initializeWithDegree(
+						info.subbandDegree - (lastDivision[channel] ?? 0),
+					);
+					currentDivision = lastDivision[channel] ?? 0;
+				}
+				const samples = Math.min(rest[channel] ?? 0, this.places);
+				this.decodePostBlock(
+					out,
+					dest[channel] ?? 0,
+					samples,
+					this.weightCodes[this.nextWeight] ?? 0,
+					this.coefficients[this.nextCoefficient] ?? 0,
+				);
+				this.advanceBlock(channel, samples, rest, dest, channelCount);
+			}
+		}
+		return out;
+	}
+
+	/** The counts of the walk of the engine of a count of a picture of the engine, behind the walk of it. */
+	private advanceBlock(
+		channel: number,
+		samples: number,
+		rest: Int32Array,
+		dest: Int32Array,
+		channelCount: number,
+	): void {
+		this.nextWeight += 1;
+		this.nextCoefficient += 1;
+		rest[channel] = (rest[channel] ?? 0) - samples;
+		dest[channel] = (dest[channel] ?? 0) + samples * channelCount * WORD_PLACES;
 	}
 
 	/** `DecodeSound`: the places of a sound of the engine, of a count of the walk of it. */
@@ -230,8 +741,15 @@ export class MioDecoder {
 				? this.decodeSoundPcm8(chunk, places)
 				: this.decodeSoundPcm16(chunk, places);
 		}
+		if (
+			TRANSFORMATION_LOT_ERI === this.info.transformation ||
+			(TRANSFORMATION_LOT_ERI_MSS === this.info.transformation &&
+				CHANNEL_LIMIT !== this.info.channelCount)
+		) {
+			return this.decodeSoundDct(chunk, places);
+		}
 		throw unsupportedSound(
-			"The places of a sound of the engine stand of the walks of a picture of the engine",
+			"The places of a sound of the engine stand of the walks of a picture of the engine of the two counts of it",
 		);
 	}
 
@@ -316,11 +834,11 @@ export class MioDecoder {
 /** The places of a sound of the engine, of every count of the walk of it, one behind the other. */
 export function decodeMioSound(data: Buffer, layout: MioLayout): Buffer {
 	if (
-		TRANSFORMATION_LOT_ERI === layout.info.transformation ||
-		TRANSFORMATION_LOT_ERI_MSS === layout.info.transformation
+		TRANSFORMATION_LOT_ERI_MSS === layout.info.transformation &&
+		CHANNEL_LIMIT === layout.info.channelCount
 	) {
 		throw unsupportedSound(
-			"The places of a sound of the engine stand of the walks of a picture of the engine",
+			"The places of a sound of the engine stand of the walks of a picture of the engine of the two counts of it",
 		);
 	}
 	if (ARCHITECTURE_NEMESIS === layout.info.architecture) {
