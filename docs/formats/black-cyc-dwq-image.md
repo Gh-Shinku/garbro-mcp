@@ -47,9 +47,12 @@ handed over at 32 bits per place with that alpha.
 
 ## Deviations
 
-* **Kind 5 (JPEG).** The project has no JPEG reader, so the places are handed over as they stand.
-* **Kind 7 (JPEG and mask).** Refused with `UNSUPPORTED_FEATURE`: the mask cannot be applied without a
-  reader for the picture behind it.
+* **Kinds 5 and 7 (a JPEG, with a mask in the second of them).** The reference hands the run of either kind
+  to the platform's JPEG decoder. This port decodes it with its own reader of the JPEG interchange format and
+  hands out a bitmap; a run that is in no such format is refused with `INVALID_ARCHIVE`, where the platform
+  decoder of the reference reads every format the platform knows. The frame is read with the row length of the
+  header of the picture, so a frame larger than the header keeps the places of the picture itself alone, and a
+  frame smaller than the header is refused.
 * **A run of no places.** A count byte of nought would leave the reference reading for ever; the port
   refuses it, and a run that reaches beyond its row, with `INVALID_ARCHIVE`.
 * **The mask of kinds 0, 5 and 8.** Those kinds take the count of their places as the file length less

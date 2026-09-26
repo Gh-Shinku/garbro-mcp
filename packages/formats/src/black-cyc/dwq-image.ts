@@ -9,6 +9,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import { readPngImage } from "../shared/png-image.js";
 import {
 	readBmpMetaData,
@@ -266,16 +268,15 @@ function readPackedPixels(
 }
 
 /** The places of a picture of a bitmap handed over as a bitmap of this project. */
-function pictureOf(
-	places: {
-		pixels: Buffer;
-		bitsPerPixel: number;
-		stride: number;
-		palette: Buffer;
-	},
-	width: number,
-	height: number,
-): Buffer {
+/** The places of a picture of this engine as the walks below them unfold them. */
+interface DwqPlaces {
+	pixels: Buffer;
+	bitsPerPixel: number;
+	stride: number;
+	palette: Buffer;
+}
+
+function pictureOf(places: DwqPlaces, width: number, height: number): Buffer {
 	if (8 === places.bitsPerPixel) {
 		return writeBmp8Palette(width, height, places.pixels, places.palette);
 	}
@@ -311,16 +312,7 @@ function unpadded(
 }
 
 /** The places of a picture of every one of them standing of four places, of the colours of it. */
-function toBgra(
-	places: {
-		pixels: Buffer;
-		bitsPerPixel: number;
-		stride: number;
-		palette: Buffer;
-	},
-	width: number,
-	height: number,
-): Buffer {
+function toBgra(places: DwqPlaces, width: number, height: number): Buffer {
 	const pixels: Buffer = Buffer.alloc(width * 4 * height, 0x00);
 	for (let row = 0; row < height; row += 1) {
 		let source = row * places.stride;
@@ -367,26 +359,46 @@ export async function unpackDwqPicture(
 	if (0 === width || 0 === height)
 		throw invalidPicture("The picture stands of no places of its own");
 	const body = data.subarray(HEAD_SIZE, HEAD_SIZE + layout.packedSize);
-	let places: {
-		pixels: Buffer;
-		bitsPerPixel: number;
-		stride: number;
-		palette: Buffer;
-	};
+	let places: DwqPlaces | undefined;
 	let picture: Buffer;
-	if (7 === layout.packType) {
-		// The mask of a picture of this kind stands behind the places of a picture of the kind the
-		// project reads of the pictures of the reference alone.
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"A picture of a mask stands of a reader this project has none of",
-		);
-	}
-	if (5 === layout.packType) {
-		// A picture of this kind hands the places of it over as they stand.
-		return body;
-	}
-	if (8 === layout.packType) {
+	if (5 === layout.packType || 7 === layout.packType) {
+		// `DwqFormat.Read` hands the run of these two kinds of picture to the decoder of the platform and
+		// returns where the header names no mask; a picture of the kind with a mask has the channel of the
+		// mask laid over the places of that picture. This port reads the run with its own reader of the JPEG
+		// interchange format and walks the frame with the row length of the header of the picture, so a frame
+		// larger than the header keeps the places of the picture itself alone, as it does in the other
+		// readers of this project.
+		if (!readJpegHeaderFields(body)) {
+			throw invalidPicture(
+				"The places of the picture stand of no walks of a JPEG",
+			);
+		}
+		const jpeg = readJpegImage(body);
+		if (jpeg.width < width || jpeg.height < height) {
+			throw invalidPicture(
+				"The places of the picture stand short of the head of it",
+			);
+		}
+		const frameStride = jpeg.width * 4;
+		const frame: Buffer = Buffer.alloc(width * height * 4, 0x00);
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const src = y * frameStride + x * 4;
+				const dst = (y * width + x) * 4;
+				frame[dst] = jpeg.pixels[src] ?? 0;
+				frame[dst + 1] = jpeg.pixels[src + 1] ?? 0;
+				frame[dst + 2] = jpeg.pixels[src + 2] ?? 0;
+				frame[dst + 3] = 0xff;
+			}
+		}
+		if (5 === layout.packType) return writeBmp32(width, height, frame);
+		places = {
+			pixels: frame,
+			bitsPerPixel: 32,
+			stride: width * 4,
+			palette: Buffer.alloc(0),
+		};
+	} else if (8 === layout.packType) {
 		const image = await readPngImage(body);
 		if (!image)
 			throw invalidPicture(
@@ -403,10 +415,11 @@ export async function unpackDwqPicture(
 		}
 		return writeBmp32(width, height, pixels);
 	}
-	if (0 === layout.packType || 2 === layout.packType) {
-		places = readPlainPixels(body, width, height);
-	} else {
-		places = readPackedPixels(body, width, height);
+	if (!places) {
+		places =
+			0 === layout.packType || 2 === layout.packType
+				? readPlainPixels(body, width, height)
+				: readPackedPixels(body, width, height);
 	}
 	if (!layout.hasAlpha) return pictureOf(places, width, height);
 
@@ -477,7 +490,7 @@ export const blackCycDwqImageFormat: ArchiveFormat = defineFixedArchive({
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: 5 === layout.packType ? "image.jpg" : "image.bmp",
+				path: "image.bmp",
 				offset: 0n,
 				size: source.size,
 				compressed: 1 === layout.packType || 3 === layout.packType,
@@ -495,7 +508,7 @@ export const blackCycDwqImageFormat: ArchiveFormat = defineFixedArchive({
 		return {
 			entries: [entry],
 			metadata: {
-				image: 5 === layout.packType ? "jpg" : "bmp",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				bitsPerPixel: layout.bitsPerPixel,

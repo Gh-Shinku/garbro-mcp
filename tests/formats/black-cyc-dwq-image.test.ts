@@ -12,6 +12,7 @@ import {
 	writeBmp32,
 } from "../../packages/formats/src/shared/bmp.js";
 import { PNG_SIGNATURE } from "../../packages/formats/src/shared/png.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 
 const HEAD_SIZE = 0x40;
 const BMP_HEAD_SIZE = 0x36;
@@ -284,11 +285,12 @@ describe("Black Cyc image", () => {
 		expect([...image.pixels]).toEqual([3, 2, 1, 0xff, 6, 5, 4, 0xff]);
 	});
 
-	it("hands a picture of a kind this project reads none of over as it stands", async () => {
-		const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]);
+	it("reads a picture of the runs of a JPEG of its own", async () => {
+		// `DwqFormat.Read` hands the run of a picture of this kind to the decoder of the platform and
+		// returns there straight away, since the header of this kind names no mask.
 		const data = dwqFile(
-			head({ packType: 5, baseType: "JPEG", width: 2, height: 1 }),
-			jpeg,
+			head({ packType: 5, baseType: "JPEG", width: 8, height: 8 }),
+			GREY_JPEG,
 		);
 		const handle = await blackCycDwqImageFormat.open(
 			new BufferByteSource(data),
@@ -296,22 +298,71 @@ describe("Black Cyc image", () => {
 		);
 		const entry = handle.entries[0];
 		if (!entry) throw new Error("no entry");
-		expect(entry.path).toBe("image.jpg");
-		const bytes = await consumeBuffer(await handle.openEntry(entry.id));
-		expect([...bytes]).toEqual([...jpeg]);
-		await expect(
-			blackCycDwqImageFormat
-				.open(
-					new BufferByteSource(
-						dwqFile(
-							head({ packType: 7, width: 2, height: 1, packedSize: 4 }),
-							jpeg,
+		expect(entry.path).toBe("image.bmp");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([8, 8]);
+		expect([...image.pixels]).toEqual([...GREY_PIXELS]);
+	});
+
+	it("lays the mask behind a JPEG of its own over the places of it", async () => {
+		// The picture of the kind with a mask has the channel of that mask, read with the head of the
+		// picture, laid over the places of the decoded JPEG.
+		const mask = Buffer.concat([
+			bmp8Head(2, 1, 2),
+			bmp8Palette([
+				[0, 0, 0],
+				[0x30, 0x60, 0x90],
+			]),
+			Buffer.from([1, 1]),
+		]);
+		const image = await pictureOf(
+			dwqFile(
+				head({
+					packType: 7,
+					baseType: "JPEG",
+					width: 2,
+					height: 1,
+					packedSize: GREY_JPEG.length,
+				}),
+				GREY_JPEG,
+				mask,
+			),
+		);
+		expect(image.bitsPerPixel).toBe(32);
+		// The places of the picture are the first of every row of the frame of the JPEG, of the two wide
+		// and one tall head of the picture, and the colour of the mask stands for 0x60 of alpha.
+		expect([...image.pixels]).toEqual([
+			GREY_PIXELS[0] ?? 0,
+			GREY_PIXELS[1] ?? 0,
+			GREY_PIXELS[2] ?? 0,
+			0x60,
+			GREY_PIXELS[4] ?? 0,
+			GREY_PIXELS[5] ?? 0,
+			GREY_PIXELS[6] ?? 0,
+			0x60,
+		]);
+	});
+
+	it("turns away a picture of a kind whose run is in no picture format it reads", async () => {
+		const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]);
+		for (const packType of [5, 7]) {
+			await expect(
+				blackCycDwqImageFormat
+					.open(
+						new BufferByteSource(
+							dwqFile(
+								head({ packType, width: 2, height: 1, packedSize: 4 }),
+								jpeg,
+							),
 						),
-					),
-					"cg.dwq",
-				)
-				.then((opened) => opened.openEntry(opened.entries[0]?.id ?? "")),
-		).rejects.toMatchObject({ code: "UNSUPPORTED_FEATURE" });
+						"cg.dwq",
+					)
+					.then((opened) => opened.openEntry(opened.entries[0]?.id ?? "")),
+			).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
+		}
 	});
 
 	it("tells a picture of the engine by the header of it", async () => {
