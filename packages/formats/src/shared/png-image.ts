@@ -1,6 +1,8 @@
 // The picture behind a PNG file, of the kinds the pictures of these engines stand of. The reference hands
 // the places of a PNG file to the decoder of its own system; the port reads them itself, which is written
-// out in the notes of the formats that lean on it.
+// out in the notes of the formats that lean on it. A picture whose head names an interlace stands of seven
+// walks over its places, each walk carrying the places of every eighth, fourth or second row and column of
+// it; the walk of the places of every other picture is one run of rows.
 
 import { GarbroError } from "@garbro-mcp/core";
 import { crc32, inflateZlibBuffer } from "@garbro-mcp/codecs";
@@ -12,6 +14,20 @@ const CHUNK_CRC_SIZE = 4;
 const IHDR_HEAD_SIZE = 13;
 const PLTE_ENTRY_SIZE = 3;
 const INTERLACE_NONE = 0;
+const INTERLACE_ADAM7 = 1;
+/**
+ * The seven walks of an interlaced picture: the first column and row of each walk and the distances between
+ * the columns and the rows behind them.
+ */
+const INTERLACE_PASSES = [
+	[0, 0, 8, 8],
+	[4, 0, 8, 8],
+	[0, 4, 4, 8],
+	[2, 0, 4, 4],
+	[0, 2, 2, 4],
+	[1, 0, 2, 2],
+	[0, 1, 1, 2],
+] as const;
 const COLOUR_GREY = 0;
 const COLOUR_RGB = 2;
 const COLOUR_PALETTE = 3;
@@ -58,6 +74,8 @@ interface PngFields {
 	colourType: number;
 	palette: Buffer;
 	places: Buffer[];
+	/** Zero for a picture whose places stand of one run of rows, one for the seven walks of Adam7. */
+	interlace: number;
 }
 
 /** The head of a PNG file and the places of it, with every chunk of it held to its own word. */
@@ -77,6 +95,7 @@ function readPngFields(data: Buffer): PngFields {
 	let bitDepth = 0;
 	let colourType = 0;
 	let seen = false;
+	let interlace = 0;
 	let palette: Buffer = Buffer.alloc(0);
 	const places: Buffer[] = [];
 	while (at + CHUNK_HEAD_SIZE <= data.length) {
@@ -105,10 +124,10 @@ function readPngFields(data: Buffer): PngFields {
 					"The picture stands of a kind this project does not read",
 				);
 			}
-			if (INTERLACE_NONE !== (body[12] ?? 1)) {
-				throw new GarbroError(
-					"UNSUPPORTED_FEATURE",
-					"A picture standing of places in more than one pass is not read",
+			interlace = body[12] ?? 0;
+			if (INTERLACE_NONE !== interlace && INTERLACE_ADAM7 !== interlace) {
+				throw invalidPicture(
+					"The picture stands of places a kind of head does not name",
 				);
 			}
 		} else if ("PLTE" === type) {
@@ -138,7 +157,7 @@ function readPngFields(data: Buffer): PngFields {
 	if (width * height > LIMIT) {
 		throw invalidPicture("The picture stands of more places than it may");
 	}
-	return { width, height, bitDepth, colourType, palette, places };
+	return { width, height, bitDepth, colourType, palette, places, interlace };
 }
 
 /** The places of one row of a picture, put back together out of the places of the row before it. */
@@ -178,7 +197,9 @@ function unfilterRow(row: Buffer, previous: Buffer, placeSize: number): void {
 /** The places of a row of a picture, of the places of the row at the depth they stand of. */
 function expandRow(
 	data: Buffer,
-	width: number,
+	count: number,
+	first: number,
+	step: number,
 	fields: PngFields,
 	output: Buffer,
 	row: number,
@@ -188,7 +209,7 @@ function expandRow(
 	const palette = fields.palette;
 	const alpha = COLOUR_GREY_ALPHA === colourType || COLOUR_RGBA === colourType;
 	const placeSize = alpha ? PLACE_SIZE_RGBA : PLACE_SIZE_RGB;
-	let at = row * stride;
+	let at = row * stride + first * placeSize;
 	// A place of a pixel standing of fewer places than a byte holds several of them, and the first of them
 	// stands in the highest places of the byte.
 	const packed = bitDepth < BYTE_BITS;
@@ -205,11 +226,11 @@ function expandRow(
 		}
 		return data[index] ?? 0;
 	};
-	for (let column = 0; column < width; column += 1) {
+	for (let index = 0; index < count; index += 1) {
 		const channels = CHANNEL_COUNTS.get(colourType) ?? 1;
 		const values: number[] = [];
 		for (let channel = 0; channel < channels; channel += 1) {
-			values.push(read(column * channels + channel));
+			values.push(read(index * channels + channel));
 		}
 		if (COLOUR_PALETTE === colourType) {
 			// The colours of a picture stand of the places of the file, of the blue of a colour first, as
@@ -233,7 +254,7 @@ function expandRow(
 			output[at + 2] = values[0] ?? 0;
 			if (alpha) output[at + 3] = values[3] ?? 0;
 		}
-		at += placeSize;
+		at += step * placeSize;
 	}
 }
 
@@ -266,17 +287,58 @@ export async function readPngImage(
 	const placeSize = alpha ? PLACE_SIZE_RGBA : PLACE_SIZE_RGB;
 	const stride = width * placeSize;
 	const pixels: Buffer = Buffer.alloc(stride * height, 0x00);
+	const placeSizeOfPixel = Math.max(
+		1,
+		Math.ceil((channels * bitDepth) / BYTE_BITS),
+	);
+	if (INTERLACE_ADAM7 === fields.interlace) {
+		// An interlaced picture stands of seven walks over the places of it: each walk carries the places of
+		// every eighth, fourth or second row and column, and every walk has its own rows of places, each of
+		// them behind a kind of filter of its own. A walk whose first column or first row stands behind the
+		// picture carries nothing at all.
+		let at = 0;
+		for (const [
+			firstColumn,
+			firstRow,
+			columnStep,
+			rowStep,
+		] of INTERLACE_PASSES) {
+			if (width <= firstColumn || height <= firstRow) continue;
+			const passWidth = Math.ceil((width - firstColumn) / columnStep);
+			const passHeight = Math.ceil((height - firstRow) / rowStep);
+			const passRowBytes = Math.ceil(
+				(passWidth * channels * bitDepth) / BYTE_BITS,
+			);
+			const previous: Buffer = Buffer.alloc(passRowBytes, 0x00);
+			for (let row = 0; row < passHeight; row += 1) {
+				if (at + passRowBytes + 1 > raw.length) {
+					throw invalidPicture("The places of the picture stand short of it");
+				}
+				const line = Buffer.from(raw.subarray(at, at + passRowBytes + 1));
+				at += passRowBytes + 1;
+				unfilterRow(line, previous, placeSizeOfPixel);
+				line.subarray(1).copy(previous, 0);
+				expandRow(
+					line.subarray(1),
+					passWidth,
+					firstColumn,
+					columnStep,
+					fields,
+					pixels,
+					firstRow + row * rowStep,
+					stride,
+				);
+			}
+		}
+		return { width, height, bitsPerPixel: alpha ? 32 : 24, pixels };
+	}
 	const previous: Buffer = Buffer.alloc(rowBytes, 0x00);
 	for (let row = 0; row < height; row += 1) {
 		const start = row * (rowBytes + 1);
 		const line = Buffer.from(raw.subarray(start, start + rowBytes + 1));
-		unfilterRow(
-			line,
-			previous,
-			Math.max(1, Math.ceil((channels * bitDepth) / BYTE_BITS)),
-		);
+		unfilterRow(line, previous, placeSizeOfPixel);
 		line.subarray(1).copy(previous, 0);
-		expandRow(line.subarray(1), width, fields, pixels, row, stride);
+		expandRow(line.subarray(1), width, 0, 1, fields, pixels, row, stride);
 	}
 	return { width, height, bitsPerPixel: alpha ? 32 : 24, pixels };
 }

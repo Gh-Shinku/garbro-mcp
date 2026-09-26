@@ -195,24 +195,26 @@ describe("PNG picture reader", () => {
 			colour: 0,
 			rows: [row(0, [0x10])],
 		});
-		// A word of a chunk that stands of another picture, a picture standing of its places in more than
-		// one pass, a file standing short of its own places, and a file that stands of no PNG picture.
+		// A word of a chunk that stands of another picture, a file standing short of its own places, and a
+		// file that stands of no PNG picture.
 		const wrongWord = Buffer.from(good);
 		wrongWord[wrongWord.length - 5] =
 			(wrongWord[wrongWord.length - 5] ?? 0) ^ 0x5a;
 		await expect(readPngImage(wrongWord)).rejects.toThrow(GarbroError);
-		await expect(
-			readPngImage(
-				pngFile({
-					width: 1,
-					height: 1,
-					depth: 8,
-					colour: 0,
-					rows: [row(0, [0x10])],
-					interlace: 1,
-				}),
-			),
-		).rejects.toThrow(/pass/);
+		// A picture of one place stands of one walk, whether its head names an interlace or not.
+		const interlaced = await readPngImage(
+			pngFile({
+				width: 1,
+				height: 1,
+				depth: 8,
+				colour: 0,
+				rows: [row(0, [0x10])],
+				interlace: 1,
+			}),
+		);
+		if (!interlaced) throw new Error("the port handed over no picture");
+		expect(interlaced).toMatchObject({ width: 1, height: 1 });
+		expect([...interlaced.pixels]).toEqual([0x10, 0x10, 0x10]);
 		await expect(
 			readPngImage(
 				Buffer.concat([

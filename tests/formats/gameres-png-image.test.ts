@@ -10,6 +10,7 @@ import {
 } from "../../packages/formats/src/shared/png.js";
 import { readPngOffsets } from "../../packages/formats/src/gameres/png-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile as interlacedPngFile } from "../helpers/png.js";
 
 /** A chunk of a portable network graphic, of the count of its places and the words of it. */
 function chunk(kind: string, body: Buffer): Buffer {
@@ -198,18 +199,63 @@ describe("Portable Network Graphics image", () => {
 		expect([...image.pixels]).toEqual([30, 20, 10, 60, 50, 40]);
 	});
 
-	it("refuses a picture standing of the places of another picture", async () => {
-		const data = pngFile({
-			width: 1,
-			height: 1,
-			interlace: 1,
-			rows: [rgbRow([[1, 2, 3]])],
-		});
-		await expect(
-			gameresPngImageFormat
-				.open(new BufferByteSource(data), "cg.png")
-				.then((handle) => handle.openEntry(handle.entries[0]?.id ?? "")),
-		).rejects.toMatchObject({ code: "UNSUPPORTED_FEATURE" });
+	it("reads an interlaced picture, whose places stand of seven walks", async () => {
+		// Four places square, so that every walk of the interlace carries places of its own: the first walk
+		// carries one place, the second none, the third none, the fourth one, the fifth two, the sixth four
+		// and the seventh eight. The places of the picture are the places the fixture names.
+		const places = [
+			[
+				[1, 2, 3],
+				[4, 5, 6],
+				[7, 8, 9],
+				[10, 11, 12],
+			],
+			[
+				[13, 14, 15],
+				[16, 17, 18],
+				[19, 20, 21],
+				[22, 23, 24],
+			],
+			[
+				[25, 26, 27],
+				[28, 29, 30],
+				[31, 32, 33],
+				[34, 35, 36],
+			],
+			[
+				[37, 38, 39],
+				[40, 41, 42],
+				[43, 44, 45],
+				[46, 47, 48],
+			],
+		];
+		const image = await pictureOf(
+			interlacedPngFile({
+				width: 4,
+				height: 4,
+				colourType: 2,
+				interlace: 1,
+				rows: places.map((row) => row.flat()),
+			}),
+		);
+		expect(image).toMatchObject({ width: 4, height: 4, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual(
+			places
+				.flat()
+				.flatMap((place) => [place[2] ?? 0, place[1] ?? 0, place[0] ?? 0]),
+		);
+	});
+
+	it("reads an interlaced picture of one place, whose one walk carries it", async () => {
+		const image = await pictureOf(
+			pngFile({
+				width: 1,
+				height: 1,
+				interlace: 1,
+				rows: [rgbRow([[1, 2, 3]])],
+			}),
+		);
+		expect([...image.pixels]).toEqual([3, 2, 1]);
 	});
 
 	it("tells a picture by the head of it", async () => {

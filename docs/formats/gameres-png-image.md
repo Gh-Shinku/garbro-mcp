@@ -25,14 +25,20 @@ which stands of the five walks of the places of a picture of the kinds of the re
 a picture of four places to a byte, and which hands a picture over of the blue of a colour first. The port
 hands the places of the picture over as a bitmap of that count of places.
 
+A picture whose head names an interlace of one stands of the **seven walks of Adam7**: each walk carries the
+places of every eighth, fourth or second row and column of the picture, and each walk has its own rows of
+places, every row behind a kind of filter of its own. The reader walks the seven of them and lays the places
+of each into the picture at the row and the column it names. `tests/formats/gameres-png-image.test.ts` covers
+a picture of four places square, whose seven walks carry one, none, none, one, two, four and eight places of
+their own, against the places the fixture names, beside a picture of one place; the same fixture was read by
+hand with the Python imaging library, which reports an interlace and the same places.
+
 ## Deviations
 
 * **A picture standing of the places of another picture** (the walk of two places of a picture of seven
   places to a byte). Refused with `UNSUPPORTED_FEATURE`; the reference stands of the reader of the pictures
   of a system of its own, which reads them.
-* **An interlaced picture** (`interlace` of one, the seven walks of Adam7). Refused with
-  `UNSUPPORTED_FEATURE`; the reference hands the file to the decoder of its platform, which reads one. The
-  reader of this project walks the places of a picture as one run of rows, which is the walk of every
-  picture whose head names no interlace.
+* **A picture standing of places a kind of head does not name** (`interlace` of two or more). Refused with
+  `INVALID_ARCHIVE`, which the reference's platform decoder does as well: the format names nought and one.
 * **Writing a picture.** The reference writes a portable network graphic and the chunk of the place of a
   picture in it; the port reads alone.

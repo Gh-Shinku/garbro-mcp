@@ -5841,11 +5841,13 @@ export const formatSupportCatalog = {
 			localId: "dogenzaka-rc4-png-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -7852,12 +7854,12 @@ export const formatSupportCatalog = {
 				"the head of a picture, of the count of the places of a place of the file and of the colours of it",
 				"the place of the picture in the picture it stands of, of the places of the file",
 				"the places of a picture of one colour, of the colours of it, of a colour map and of the alpha behind them",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"creating a picture",
 				"writing the places of a picture",
 				"a picture standing of the places of another picture",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -11627,11 +11629,9 @@ export const formatSupportCatalog = {
 				"prefix deobfuscation",
 				"png header metadata",
 				"pass-through output",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
-			unsupported: [
-				"image encoding",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -16050,12 +16050,12 @@ export const formatSupportCatalog = {
 				"the join of the colours of the JPEG with the brightness of the graphic as the alpha",
 				"the JPEG of the picture, read by `packages/formats/src/shared/jpeg-image.ts`: baseline sequential streams of one or three components",
 				"the graphic of the alpha, read by `packages/formats/src/shared/png-image.ts`",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"a JPEG of the four places a colour of the press, of twelve bits a sample or of arithmetic coding",
 				"the platform decoders the reference hands both streams to",
 				"archive creation",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -16084,12 +16084,12 @@ export const formatSupportCatalog = {
 				"the composition of the tiles into a picture of four places a place, of the places of a graphic overwriting the ones it stands on",
 				"the places of a tile held to the picture it stands past",
 				"the bitmap of the picture",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
 				"the places of a display of the reference, which premultiplies the colours of a graphic by its alpha",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -18011,11 +18011,11 @@ export const formatSupportCatalog = {
 				"the three kinds of picture the stream unwraps to",
 				"the header fields read off the unwrapped picture",
 				"each kind of picture decoded into a bitmap through `packages/formats/src/shared/png-image.ts`, `packages/formats/src/directdraw/dds-image.ts` and `packages/formats/src/shared/jpeg-image.ts`",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"image creation",
 				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -20873,12 +20873,12 @@ export const formatSupportCatalog = {
 				"extraction",
 				"the key of the engine",
 				"the picture decoded into a bitmap through `packages/formats/src/shared/png-image.ts` and `packages/formats/src/shared/jpeg-image.ts`",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"archive creation",
 				"image writing",
 				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -21091,12 +21091,12 @@ export const formatSupportCatalog = {
 				"extract",
 				"places that stand as a portable network graphic and places that stand as a JPEG",
 				"the head of a picture of either kind",
+				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
 				"the bottom-up standing of the second way, which the reference works on its own frame",
-				"an interlaced picture (`interlace` of one, the seven walks of Adam7) is turned away, which `packages/formats/src/shared/png-image.ts` notes",
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
