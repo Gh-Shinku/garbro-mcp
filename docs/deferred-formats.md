@@ -360,8 +360,15 @@ the first forty of them.
   and neither stands in the reference tree. Every picture of it stands of the places of the file `^` the
   places of that password and of the engine's own LZ walk behind them (`UnpackCustomLzss`), so a headless
   port could list the pictures of a file and never read one of them. The walk of the pictures of the plain
-  `ArcOpener` (`ARC/Tactics`) **is** ported, as `tactics-arc`; the custom LZ walk would be a staged port of
-  the kind TLG6 and JBP took, and would still stand of no picture to check it against without the password.
+  `ArcOpener` (`ARC/Tactics`) **is** ported, as `tactics-arc`, and **the flat list of `Arc2Opener` stands
+  ported now as well**, as `tactics-arc2`: the words of a record of 0x14 places of the file, the name behind
+  them, the word of the end of the list, the refusals the reference stands of, and a departure that is
+  written down in `docs/formats/tactics-arc2.md` - this port lists such an archive where the reference holds
+  no scheme for it and refuses the whole file, and it refuses every picture of it where the places of one are
+  asked for, which is where the password of the game would be needed. The custom LZ walk
+  (`UnpackCustomLzss`) would be a staged port of the kind TLG6 and JBP took, and would still stand of no
+  picture to check it against without the password, so it stands unported rather than carried as a walk
+  nothing could call.
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
