@@ -29,7 +29,13 @@ The port walks all three, so a cabinet of a set is read like any other.
 ## Folders and files
 
 Every folder record names the place of its first block of data, the count of its blocks, and how they are
-compressed: `0` for the bytes as they stand, `1` for the deflate of MSZIP, `2` for Quantum and `3` for LZX.
+compressed. The kind of the compression stands in the **low byte** of the last word: `0` for the bytes as
+they stand, `1` for the deflate of MSZIP, `2` for Quantum and `3` for LZX. The **high byte** of that word
+carries a parameter of the compression, which the port reports as `parameter` and does not use: it reads
+nought in the cabinet of MSZIP checked here, and fifteen and twenty one in the two cabinets of LZX of
+Windows that were checked, which stands with a window of thirty two thousand and of two million bytes. The
+port therefore tells the kind from the parameter rather than comparing the whole word, so that a folder
+whose word reads `0x0100` is a folder of no compression.
 
 Every file record holds the length of the file before it is unfolded, the place of its bytes inside its
 folder, the number of its folder and three words of date and attributes, and **its name stands behind its
@@ -105,3 +111,16 @@ bytes of `appraiser.sdb` (SHA-256 `ce818b58d46818ce1f91b3297ea5feb060ec29fe7694a
 (`d02f98adb13d888f74cd1dd22d8e2cef68a2af263c2ac9cad3736c644d685ce7`) — every one of them equal. That
 cross-check is what found the file table walk this note describes: the first version of the reader assumed
 a run of records behind a run of names, and read the names of the real cabinet as rubbish.
+
+Two cabinets of LZX of Windows were walked with the port's own reading of the head as well, since they are
+the cabinets a reader of that compression would have to be checked against:
+`C:\Windows\servicing\FodMetadata\FoDMetadata_Client.cab` (500 948 bytes, one folder of one hundred and
+twenty blocks reading `0x0f03`, and 455 files, the first of them `Accessibility.Braille~~1.0.mum` of 8 676
+bytes) and `C:\Windows\Logs\CBS\CbsPersist_20260918195836.cab` (231 602 bytes, one folder of four
+hundred and ninety three blocks reading `0x1503`, and one file, `CbsPersist_20260918195836.log`). The
+table of folders of the first stands sixty bytes in, behind the twenty bytes of room the head reserves, and
+the walk of its blocks from the place it names ends **exactly** at the end of the cabinet; the blocks of the
+second unfold to 16 151 848 bytes, which is exactly what `expand.exe` writes out of it, while the single
+file of it declares 16 151 336 bytes — five hundred and twelve fewer than the blocks of its folder hold.
+The port hands the declared length of the file over, as the reference's own library would, and the reading
+of the whole folder is what a reader of LZX would be checked against.

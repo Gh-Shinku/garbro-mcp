@@ -12,6 +12,7 @@ import { microsoftCabArchiveFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { readCabLayout } from "../../packages/formats/src/microsoft/cab-archive.js";
 import { expectArchive } from "../helpers/archive.js";
 
 const HEAD_SIZE = 36;
@@ -357,6 +358,33 @@ describe("Microsoft cabinet archive", () => {
 			code: "UNSUPPORTED_FEATURE",
 		});
 		await archive.close();
+		// The word of the folder names its kind in its low byte and its own parameter in the high one, as a
+		// cabinet of Windows writes it (a folder of LZX of the cabinets checked reads 0x0f03 and 0x1503).
+		const worded = buildCab({
+			folders: [{ compression: 0x0f00 | COMPRESSION_LZX }],
+			files: [{ name: "pressed.bin", data }],
+		});
+		const layout = readCabLayout(worded);
+		expect(layout?.folders[0]).toMatchObject({
+			compression: COMPRESSION_LZX,
+			parameter: 0x0f,
+		});
+		// A parameter set over no compression at all leaves the folder one of no compression.
+		const plain = buildCab({
+			folders: [{ compression: 0x0100 | COMPRESSION_NONE }],
+			files: [{ name: "one.bin", data: Buffer.from("plain", "latin1") }],
+		});
+		await expectArchive({
+			format: microsoftCabArchiveFormat,
+			archive: plain,
+			entries: [
+				{
+					path: "one.bin",
+					size: 5,
+					content: Buffer.from("plain", "latin1"),
+				},
+			],
+		});
 	});
 
 	it("turns away a block that stands of no words of its own", async () => {

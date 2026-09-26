@@ -71,7 +71,18 @@ export interface CabLayout {
 	versionMinor: number;
 	/** The number of this cabinet within the set it belongs to, nought for the first. */
 	cabinet: number;
-	folders: { start: number; blocks: number; compression: number }[];
+	folders: {
+		start: number;
+		blocks: number;
+		/** The kind of compression: nought for none, one for MSZIP, two for Quantum, three for LZX. */
+		compression: number;
+		/**
+		 * The parameter the word of the folder carries in its high byte. It reads nought for MSZIP in the
+		 * cabinets checked here and fifteen and twenty one for the two cabinets of LZX of Windows that were
+		 * checked, which stands with the window of that compression; this reader does not use it.
+		 */
+		parameter: number;
+	}[];
 	files: {
 		/** The length of the file before it is unfolded, or `0xffffffff` for one that continues. */
 		length: number;
@@ -136,10 +147,14 @@ export function readCabLayout(data: Buffer): CabLayout | undefined {
 	const folders: CabLayout["folders"] = [];
 	for (let index = 0; index < folderCount; index += 1) {
 		const record = at + index * FOLDER_RECORD_SIZE;
+		// The word of a folder names the kind of its compression in its low byte and carries a parameter of
+		// that compression in its high byte, so the kind stands apart from the parameter here.
+		const word = data.readUInt16LE(record + 6);
 		folders.push({
 			start: data.readUInt32LE(record),
 			blocks: data.readUInt16LE(record + 4),
-			compression: data.readUInt16LE(record + 6),
+			compression: word & 0x000f,
+			parameter: word >> 8,
 		});
 	}
 	if (filesAt >= data.length) return undefined;

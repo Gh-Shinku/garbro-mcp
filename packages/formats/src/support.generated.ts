@@ -3836,15 +3836,21 @@ export const formatSupportCatalog = {
 			localId: "cat-system-hg3-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the head of a picture, the table of its sections, a plain picture of two zlib streams, and a picture behind a JPEG with its alpha channel and the swap of its colours",
+			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"JPEG and WebP sections",
+				"the WebP section, which the reference itself does not decode",
+				"a JPEG section whose bytes are in no format the reader of this project knows",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
-				"JPEG and WebP sections",
+				"a picture behind a JPEG whose frame is smaller or larger than the head of the picture",
 			],
 		},
 		{
@@ -12878,7 +12884,7 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the cabinet head and its optional reserved room and neighbour names",
-				"the folder table walk",
+				"the folder table walk, with the kind of a compression told from the parameter of its word",
 				"the file table walk, whose names stand behind their own records",
 				"folders of no compression",
 				"folders of MSZIP with the window of the blocks before them",

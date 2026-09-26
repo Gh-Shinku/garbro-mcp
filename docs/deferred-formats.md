@@ -234,7 +234,12 @@ further than the reference's own list of them.
   as the system's `expand.exe` writes them). What stays unread is all that stands of no specification this
   project aligns with: **the LZX and Quantum compressions**, whose walks are large works of their own with
   no reference walk to compare against (a folder of either is listed and refused at extraction), and the
-  joining of the parts of a file that continues across the cabinets of a set. (The other `CabOpener` of the
+  joining of the parts of a file that continues across the cabinets of a set. Two cabinets of LZX of Windows
+  of the machine this was written on were walked with the reader of the head of the format, so a reader of
+  that compression has real cabinets to be checked against, together with the `expand.exe` of the system as
+  an outside reading: `C:\Windows\servicing\FodMetadata\FoDMetadata_Client.cab` (455 files) and
+  `C:\Windows\Logs\CBS\CbsPersist_20260918195836.cab` (one file of 16 151 336 bytes, whose blocks unfold
+  to 16 151 848 — the bytes the system tool writes out). (The other `CabOpener` of the
   tree, `ArcFormats/EntExec/ArcCAB.cs`, is a walk of the engine and **is** ported, as `entexec-cab`.)
 - `WMA` (`ArcFormats/AudioWMA.cs`) hands its stream to NAudio. (`AIFF` stood beside it and is now read: the
   walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
