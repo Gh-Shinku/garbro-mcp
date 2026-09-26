@@ -50,6 +50,14 @@ left out:
 * a **run length** bitmap is refused with `INVALID_ARCHIVE` where the framework the reference hands it to would
   decode it, since the shared reader here knows only the two uncompressed layouts.
 
+The third reader in front of the reference's own walk is `BmpDepthFixer`, which the Hyperspace engine stands
+for: a picture whose head names **two** places of the file a place while the places behind it stand of **three**,
+and of as many places as the file holds and no more, is read as a picture of three places of the file a place.
+The head of a picture of two places of the file a place whose row of places stands of as many places as a row of
+three would changed the depth of it stands of, such as a picture of twelve places of the file a place, is read
+that way; a picture of any other width stands as its head says. This port tries the readers in the order the
+reference composes them: `BitmapWithAlpha` first and `BmpDepthFixer` behind it.
+
 The other reader of the framework, `BitmapWithAlpha`, is always in front of the reference's own walk, and this
 port carries it as well. It takes two shapes, both of them of a bitmap whose head declares a count of the places
 of its file that does not stand of the places of the picture the usual way:

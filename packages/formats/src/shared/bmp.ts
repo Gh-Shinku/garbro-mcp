@@ -429,6 +429,16 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 		dataOffset,
 	});
 	if (alpha) return alpha;
+	// `BmpDepthFixer`, the reader the Hyperspace engine stands for: a picture whose depth was simply changed
+	// from three places of the file a place to two, while its places still stand of three.
+	const fixed = readDepthFixedBitmap(
+		bmp,
+		width,
+		height,
+		bitsPerPixel,
+		dataOffset,
+	);
+	if (fixed) return fixed;
 	const rowBytes = Math.ceil((width * bitsPerPixel) / 8);
 	const stride = (rowBytes + 3) & ~3;
 	const imageSize = stride * height;
@@ -574,6 +584,37 @@ function readBmpWithAppendedAlpha(
 		}
 	}
 	return { width, height, bitsPerPixel: 32, palette: Buffer.alloc(0), pixels };
+}
+
+/**
+ * `BmpDepthFixer`, the reader of bitmaps the Hyperspace engine stands for: a picture whose head names **two**
+ * places of the file a place while the places of the picture behind it stand of **three**, and of as many places
+ * as the file holds and no more. The places are read as they stand, of three places a place, with the rows of
+ * the picture the way the file stores them.
+ */
+function readDepthFixedBitmap(
+	bmp: Buffer,
+	width: number,
+	height: number,
+	bitsPerPixel: number,
+	dataOffset: number,
+): BmpImage | undefined {
+	if (16 !== bitsPerPixel) return undefined;
+	const stride = (width * 3 + 3) & ~3;
+	const total = stride * height;
+	if (dataOffset + total !== bmp.length) return undefined;
+	const pixels: Buffer = Buffer.alloc(width * 3 * height, 0x00);
+	const bottomUp = bmp.readInt32LE(22) > 0;
+	for (let row = 0; row < height; row += 1) {
+		const stored = bottomUp ? height - 1 - row : row;
+		bmp.copy(
+			pixels,
+			row * width * 3,
+			dataOffset + stored * stride,
+			dataOffset + stored * stride + width * 3,
+		);
+	}
+	return { width, height, bitsPerPixel: 24, palette: Buffer.alloc(0), pixels };
 }
 
 /**

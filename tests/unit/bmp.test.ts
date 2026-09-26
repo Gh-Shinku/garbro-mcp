@@ -182,29 +182,55 @@ describe("bitmap reader", () => {
 describe("bitmap expansion", () => {
 	it("widens the channels of a sixteen bit bitmap by repeating their high bits", () => {
 		// The widest red a five bit channel holds, which thirty one widened by its own high bits fills out.
+		// A picture two places wide, so that the head of the picture cannot be read as one of three places of
+		// the file a place by `BmpDepthFixer` of the reference, which this port carries as well.
 		const red = readBmpImage(
-			writeBmp16(1, 1, Buffer.from([0x00, 0x7c]), false, RGB555_MASKS),
+			writeBmp16(
+				2,
+				1,
+				Buffer.from([0x00, 0x7c, 0x00, 0x00]),
+				false,
+				RGB555_MASKS,
+			),
 		);
 		expect(red && toBgra32(red)?.subarray(0, 4)).toEqual(
 			Buffer.from([0x00, 0x00, 0xff, 0x00]),
 		);
 		// Twenty of thirty one is a hundred and sixty five of two hundred and fifty five.
 		const middle = readBmpImage(
-			writeBmp16(1, 1, Buffer.from([0x00, 0x50]), false, RGB555_MASKS),
+			writeBmp16(
+				2,
+				1,
+				Buffer.from([0x00, 0x50, 0x00, 0x00]),
+				false,
+				RGB555_MASKS,
+			),
 		);
 		expect(middle && toBgra32(middle)?.subarray(0, 4)).toEqual(
 			Buffer.from([0x00, 0x00, 0xa5, 0x00]),
 		);
 		// The low five bits are the blue channel, which comes first in the pixels of a bitmap.
 		const blue = readBmpImage(
-			writeBmp16(1, 1, Buffer.from([0x1f, 0x00]), false, RGB555_MASKS),
+			writeBmp16(
+				2,
+				1,
+				Buffer.from([0x1f, 0x00, 0x00, 0x00]),
+				false,
+				RGB555_MASKS,
+			),
 		);
 		expect(blue && toBgra32(blue)?.subarray(0, 4)).toEqual(
 			Buffer.from([0xff, 0x00, 0x00, 0x00]),
 		);
 		// The six green bits of the other layout widen the same way.
 		const green = readBmpImage(
-			writeBmp16(1, 1, Buffer.from([0xe0, 0x07]), false, RGB565_MASKS),
+			writeBmp16(
+				2,
+				1,
+				Buffer.from([0xe0, 0x07, 0x00, 0x00]),
+				false,
+				RGB565_MASKS,
+			),
 		);
 		expect(green && toBgra32(green)?.subarray(0, 4)).toEqual(
 			Buffer.from([0x00, 0xff, 0x00, 0x00]),

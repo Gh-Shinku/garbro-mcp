@@ -148,9 +148,13 @@ describe("Windows bitmap", () => {
 				pixels: [1, 2, 3],
 			},
 			{
-				file: writeBmp16(1, 1, Buffer.from([0x1f, 0x00])),
+				// A picture two places wide, of which a row of two places of the file a place stands of
+				// places few enough that the head of the picture cannot be read as one of three places of the
+				// file a place as well, which is what `BmpDepthFixer` of the reference reads where the two
+				// counts stand of one another.
+				file: writeBmp16(2, 1, Buffer.from([0x1f, 0x00, 0x00, 0x00])),
 				depth: 16,
-				pixels: [0x1f, 0x00],
+				pixels: [0x1f, 0x00, 0x00, 0x00],
 			},
 			{
 				file: writeBmp1(
@@ -252,6 +256,31 @@ describe("Windows bitmap", () => {
 		expect(two).toMatchObject({ width: 2, height: 2, bitsPerPixel: 32 });
 		expect([...(two?.pixels ?? [])]).toEqual([
 			0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0,
+		]);
+	});
+
+	it("reads a bitmap whose depth was changed from three places of the file to two", async () => {
+		// `BmpDepthFixer`, the reader the Hyperspace engine stands for: the head names two places of the file a
+		// place while the places behind it stand of three, and the file holds as many places as those places
+		// stand of and no more.
+		const header: Buffer = Buffer.alloc(54, 0x00);
+		header.write("BM", 0, "latin1");
+		header.writeUInt32LE(54 + 16, 2);
+		header.writeUInt32LE(54, 10);
+		header.writeUInt32LE(40, 14);
+		header.writeInt32LE(2, 18);
+		header.writeInt32LE(2, 22);
+		header.writeUInt16LE(1, 26);
+		header.writeUInt16LE(16, 28);
+		const picture = Buffer.concat([
+			header,
+			Buffer.from([1, 2, 3, 4, 5, 6, 0, 0]),
+			Buffer.from([7, 8, 9, 10, 11, 12, 0, 0]),
+		]);
+		const image = readBmpImage(await extract(picture));
+		expect(image).toMatchObject({ width: 2, height: 2, bitsPerPixel: 24 });
+		expect([...(image?.pixels ?? [])]).toEqual([
+			7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6,
 		]);
 	});
 
