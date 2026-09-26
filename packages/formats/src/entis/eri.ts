@@ -3,6 +3,7 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { EriReader } from "./eri-reader.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -18,6 +19,12 @@ import {
 	sourceExtension,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import {
+	writeBmp24,
+	writeBmp32,
+	writeBmp8,
+	writeBmp8Palette,
+} from "../shared/bmp.js";
 
 const SIGNATURE = Buffer.from("Enti", "ascii");
 /** The identifier word sits after the signature and must read as one of the supported versions. */
@@ -441,6 +448,7 @@ async function readEriPicture(source: ByteSource): Promise<
 			fileHeader: EriFileHeader | undefined;
 			imageInfo: EriImageInfo | undefined;
 			description: string | undefined;
+			streamPos: bigint;
 	  }
 	| undefined
 > {
@@ -473,7 +481,58 @@ async function readEriPicture(source: ByteSource): Promise<
 	const block = Buffer.from(
 		await source.readAt(BigInt(HEADER_SIZE + SECTION_HEADER_SIZE), bodySize),
 	);
-	return readEriMetadata(block);
+	const metadata = readEriMetadata(block);
+	return { ...metadata, streamPos: BigInt(FIRST_SECTION_END + bodySize) };
+}
+
+/** The counts of a colour of the picture, of the count of the walk of the places of it. */
+const PALETTE_SECTION = "Palette ";
+const PALETTE_LIMIT = 0x400;
+
+/**
+ * `EriFormat.ReadImageData`: the places of the walk of the picture of the engine, of the sections of the
+ * head of it behind the places of the walk of the engine (`Stream  `) and of the counts of a colour of the
+ * picture (`Palette `) in front of them.
+ */
+async function readEriFrame(
+	source: ByteSource,
+	streamPos: bigint,
+	bpp: number,
+): Promise<{ data: Buffer; palette: Uint8Array | undefined } | undefined> {
+	let offset = streamPos;
+	let palette: Uint8Array | undefined;
+	for (;;) {
+		if (offset + BigInt(SECTION_HEADER_SIZE) > source.size) return undefined;
+		const record = Buffer.from(
+			await source.readAt(offset, SECTION_HEADER_SIZE),
+		);
+		const id = record.toString("latin1", 0, 8);
+		const length = record.readBigInt64LE(8);
+		offset += BigInt(SECTION_HEADER_SIZE);
+		if (length < 0n || length > 0x7fffffffn) return undefined;
+		const bodyAt = offset;
+		if (id === STREAM_SECTION) continue;
+		if (id === "ImageFrm") {
+			if (bodyAt + length > source.size) return undefined;
+			// The reference stands of the places of the picture of the count of the walk of the engine
+			// behind the places of the count of the walk of it: the places of the picture stand of the
+			// counts of the walk of the engine of the count of the walk of the picture itself.
+			return {
+				data: Buffer.from(
+					await source.readAt(bodyAt, Number(source.size - bodyAt)),
+				),
+				palette,
+			};
+		}
+		if (id === PALETTE_SECTION && bpp <= 8 && length <= BigInt(PALETTE_LIMIT)) {
+			const colors = Number(length) / 4;
+			if (colors <= 0 || colors > 0x100 || Number(length) % 4 !== 0) {
+				return undefined;
+			}
+			palette = new Uint8Array(await source.readAt(bodyAt, Number(length)));
+		}
+		offset = bodyAt + length;
+	}
 }
 
 export const entisEriImageDescriptor: FormatDescriptor = {
@@ -567,10 +626,78 @@ export const entisEriImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry() {
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"The places of an Entis picture stand of the walk of the engine to come",
+	async openEntry(source: ByteSource) {
+		const picture = await readEriPicture(source);
+		if (!picture?.imageInfo) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Entis picture layout");
+		}
+		const info = picture.imageInfo;
+		const frame = await readEriFrame(source, picture.streamPos, info.bpp);
+		if (!frame) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Entis picture layout");
+		}
+		const reader = new EriReader({
+			info: {
+				version: info.version,
+				transformation: info.transformation,
+				architecture: info.architecture,
+				formatType: info.formatType,
+				width: info.width,
+				height: info.height,
+				verticalFlip: info.verticalFlip,
+				bpp: info.bpp,
+				blockingDegree: info.blockingDegree,
+			},
+			data: frame.data,
+			...(frame.palette !== undefined ? { palette: frame.palette } : {}),
+		});
+		const decoded = reader.decodeImage();
+		// The places of the picture stand of the places of a line of the counts of the walk of the engine
+		// itself: the bitmap stands of the places of the count of the walk of the engine of every line of
+		// it, of no place of the walk of the count of the walk of the engine at all.
+		const packed = packEriRows(
+			decoded.pixels,
+			decoded.stride,
+			((decoded.width * decoded.bpp + 31) >> 5) * 4,
+			decoded.height,
 		);
+		const buffer = Buffer.from(packed);
+		const bottomUp = decoded.bottomUp;
+		if (decoded.bpp <= 8) {
+			return Readable.from([
+				decoded.palette !== undefined
+					? writeBmp8Palette(
+							decoded.width,
+							decoded.height,
+							buffer,
+							Buffer.from(decoded.palette),
+							bottomUp,
+						)
+					: writeBmp8(decoded.width, decoded.height, buffer, bottomUp),
+			]);
+		}
+		if (24 === decoded.bpp) {
+			return Readable.from([
+				writeBmp24(decoded.width, decoded.height, buffer, bottomUp),
+			]);
+		}
+		return Readable.from([
+			writeBmp32(decoded.width, decoded.height, buffer, bottomUp),
+		]);
 	},
 });
+
+/** The places of a picture of the engine of the count of the places of a line of it. */
+function packEriRows(
+	pixels: Uint8Array,
+	stride: number,
+	rowBytes: number,
+	height: number,
+): Uint8Array {
+	const packed = new Uint8Array(rowBytes * height);
+	for (let y = 0; y < height; y += 1) {
+		const from = y * stride;
+		packed.set(pixels.subarray(from, from + rowBytes), y * rowBytes);
+	}
+	return packed;
+}

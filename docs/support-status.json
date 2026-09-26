@@ -7197,15 +7197,27 @@
 				"the `FileHdr ` section: the count of the kind of the file, the counts of the frames of it and the count of the time of them",
 				"the `ImageInf` section: the kind of the walk of the places of the picture, the kind of the places of a colour of it, the counts of the picture, the counts of the places of a colour of it and the counts of the walk of the places of it",
 				"the `descript` section, of the places of a mark of a name of the two ways of the engine in front of them",
-				"a picture of the engine of no place of a frame at all, of the count of the frames of it of nothing"
+				"a picture of the engine of no place of a frame at all, of the count of the frames of it of nothing",
+				"the walk of the places of the picture of the kind `Lossless_ERI` (`EriReader`, of the places of the walk of the engine of a count of a block of the picture): the count of the kind of the walk of it, the count of the shapes of the places of the count of the walk of the engine and the count of the places of a colour of it",
+				"the places of the count of the walk of the picture (`ImageFrm`) behind the places of the count of the walk of the engine of it, of the count of the places of a colour of the picture (`Palette `) in front of them",
+				"the counts of the walk of the engine of the places of a count of a block of the picture (`DecodeBytes`, of the kinds `RunlengthHuffman`, `RunlengthGamma` and `Nemesis`)",
+				"the counts of the walk of the engine of the count of the walk of the places of a count of a block (`PerformOperation`: the counts of the walk of the engine of the count of the walk of the picture itself, of the counts of a colour of the block, of the counts of the walk of the engine of the places of the picture of the count of the walk of the engine behind them and of the count of the walk of the engine of the picture in front of them)",
+				"the places of a picture of one count of a colour, of three counts of a colour and of four counts of a colour (`RestoreGray8`, `RestoreRGB24`, `RestoreRGBA32`), of the counts of the walk of the engine of the place of the count of the walk of the picture of its own",
+				"the counts of the places of a colour of the picture (`fEncodeType & 1`) of the counts of the walk of the engine of the count of a block of the picture of its own (`GetHuffmanCode`, of the tree of the counts of the walk of the engine of the kind `0x00020200` of the head of the picture)",
+				"the places of a picture of the engine handed out as a bitmap of the project, of the counts of a colour of the picture of the places of a count of a colour of eight places of the count"
 			],
 			"unsupported": [
 				"picture creation",
-				"the places of the picture itself: the walks of the engine (`EriReader.cs`), of the count of the kind of the places of the walk of it, of the places of a colour of it and of the places of a block of it"
+				"the kinds of the counts of a picture of the engine of the two ways of it (`DCT_ERI`, `LOT_ERI`) and the counts of the walk of the engine of the kind `ArithmeticCode`, which the reference holds no walk of the places of the picture of as well",
+				"the kinds 2 and 4 of the walk of the places of the picture, which the reference holds no walk of the places of the picture of as well",
+				"the places of a picture of the kind `Lossless_EMI` and of the count of the walk of the engine of sixteen places of a colour",
+				"the places of a picture of the count of the walk of the picture of the picture in front of it (`RestoreDelta*`, of the counts of a picture of a picture of the frames of its own)",
+				"the counts of the walk of the engine of the count of the walk of the engine of a count of a block of the picture of the count of the walk of the engine of sixteen places of a count and up (the reference stands of no count of the walk of the engine of its own)"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the places of a picture of the kind `Lossless_EMI`/`Lossless_ERI` (the walks of the engine to come)"
+				"the places of a picture of the counts of the walk of the engine of the kind `RunlengthGamma` and of the kind `Nemesis` (the fixture stands of the counts of the walk of the engine of the kind `RunlengthHuffman` alone)",
+				"the places of a picture of the counts of the walk of the engine of a picture of the engine in three counts of a colour and up of the count of a block of the picture of their own (the fixture stands of the places of the count of the walk of the engine of the counts of a colour of the port itself)"
 			]
 		},
 		{
