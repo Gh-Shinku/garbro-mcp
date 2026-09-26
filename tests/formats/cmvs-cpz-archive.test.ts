@@ -288,6 +288,8 @@ function buildArchive(options?: {
 	breakRecord?: boolean;
 	/** The key of an archive of the layouts above the sixth, which stands of a `start.ps3` beside it. */
 	archiveKey?: CpzArchiveKey;
+	/** The run of the key behind the index of the seventh layout, packed with the tree of the engine. */
+	indexKey?: Buffer;
 }): {
 	archive: Buffer;
 	plans: readonly Plan[];
@@ -297,6 +299,10 @@ function buildArchive(options?: {
 	const places = layoutOf(version);
 	const layout = version < 6 ? 0 : 1;
 	const archiveKey = options?.archiveKey ?? ZERO_KEY;
+	// The key behind the index of the seventh layout, where the case stands of one: the count of its places
+	// stands in the head, and the places of the archives of the engine stand behind it.
+	const keyPad =
+		version >= 7 && options?.indexKey ? keyBlock(options.indexKey) : undefined;
 	// The head of the layouts above the fifth carries the key of its entries of its own, of the walk of that
 	// key: the places of the field stand of a turn of the value the walk leaves behind.
 	const headEntryKey =
@@ -418,10 +424,10 @@ function buildArchive(options?: {
 			version,
 		),
 	);
-	const index = Buffer.concat([dirTable, ...records]);
+	const table = Buffer.concat([dirTable, ...records]);
 	if (options?.breakRecord === true) {
 		// A record of a count of nothing is not a record of this engine at all.
-		index.writeInt32LE(0, dirEntriesSize);
+		table.writeInt32LE(0, dirEntriesSize);
 	}
 	// The inverses of the walks of the index, in the order the walk of it reads them backwards: the runs of
 	// the entries of every directory, the table of the directories, and then the first mix of the whole index.
@@ -440,14 +446,14 @@ function buildArchive(options?: {
 					0),
 		);
 		encryptEntriesWithKey(
-			index,
+			table,
 			from,
 			to - (runs[dir] ?? 0),
 			key,
 			CMVS_CPZ5_SCHEME.indexSeed,
 			archiveKey.indexEntryKey,
 		);
-		entryDecoder.encode(index, from, to - (runs[dir] ?? 0), ENTRY_DECODE_KEY);
+		entryDecoder.encode(table, from, to - (runs[dir] ?? 0), ENTRY_DECODE_KEY);
 	}
 	const dirKey = [0, 1, 2, 3].map(
 		(at) =>
@@ -455,22 +461,37 @@ function buildArchive(options?: {
 			((MASTER_KEY + (DIRECTORY_KEY_ADDEND[at] ?? 0)) >>> 0),
 	);
 	encryptDirectoryWithKey(
-		index,
+		table,
 		dirEntriesSize,
 		dirKey,
 		archiveKey.indexDirKey,
 	);
 	new Cpz5Decoder(CMVS_CPZ5_SCHEME, MASTER_KEY, digest[1] ?? 0).encode(
-		index,
+		table,
 		0,
 		dirEntriesSize,
 		DIRECTORY_DECODE_KEY,
 	);
 	encryptCpzIndexStage1(
-		index,
+		table,
 		(MASTER_KEY ^ STAGE_KEY_XOR) >>> 0,
 		CMVS_CPZ5_SCHEME,
 	);
+	// The places of the index stand behind the key of the seventh layout where the case stands of one: the
+	// reference takes the places of the table apart of the run it read of that key, the other way.
+	const index = keyPad
+		? Buffer.concat([
+				(() => {
+					const out = Buffer.from(table);
+					for (let at = 0; at < dirEntriesSize + fileEntriesSize; at += 1) {
+						out[at] =
+							(out[at] ?? 0) ^ (options?.indexKey?.[(at + 3) % 0x3ff] ?? 0);
+					}
+					return out;
+				})(),
+				keyPad,
+			])
+		: table;
 	// The head: the places of the fields of a version below the seventh, the digest of the index, and the sum
 	// of its own places.
 	const head = Buffer.alloc(places.headSize, 0x00);
@@ -505,8 +526,9 @@ function buildArchive(options?: {
 		// the sum of its head stands of that count.
 		// The places of that count stand of the fields of the head, which the sum of it stands of as well: the
 		// count itself is nothing here, and the field is the count taken apart.
-		head.writeInt32LE(HEAD_INDEX_KEY_XOR | 0, HEAD_INDEX_KEY_AT);
-		sumStart = ((HEAD_INDEX_KEY_XOR >>> 0) - HEAD_INIT_SUB) >>> 0;
+		const field = ((keyPad?.length ?? 0) ^ HEAD_INDEX_KEY_XOR) | 0;
+		head.writeInt32LE(field, HEAD_INDEX_KEY_AT);
+		sumStart = ((field >>> 0) - HEAD_INIT_SUB) >>> 0;
 	}
 	head.writeUInt32LE(sumOf(head, places.sumPlaces, sumStart), places.sumAt);
 	return {
@@ -565,6 +587,79 @@ describe("CVNS archive of the newer layouts", () => {
 		);
 	});
 });
+
+/** The two places of the key run of the test, and the key the packed run behind them stands of. */
+const KEY_RUN_PLACES = 512;
+const KEY_RUN_VALUES = [0x5a, 0xa5];
+const KEY_BLOCK_KEY = Buffer.from([0xd3, 0x7a, 0x11, 0xc9]);
+const KEY_BLOCK_HEAD = 0x18;
+const KEY_BLOCK_COUNT_AT = 0x10;
+const KEY_BLOCK_KEY_AT = 0x14;
+
+/** The key run of the test, of the two places its tree stands of rather than of a picture of its own. */
+function keyRun(places: number): Buffer {
+	return Buffer.from(
+		[...Array(places).keys()].map(
+			(at) => KEY_RUN_VALUES[(at * 7 + at) % KEY_RUN_VALUES.length] ?? 0,
+		),
+	);
+}
+
+/** Packs places lowest-first within a word of thirty two places, and the word from its lowest byte up. */
+function packWords(bits: readonly number[]): Buffer {
+	const words = Math.max(Math.ceil(bits.length / 32), 0);
+	const output = Buffer.alloc(words * 4);
+	bits.forEach((bit, index) => {
+		if (0 === bit) return;
+		const word = Math.floor(index / 32) * 4;
+		output.writeUInt32LE(
+			(output.readUInt32LE(word) | (1 << (index % 32))) >>> 0,
+			word,
+		);
+	});
+	return output;
+}
+
+/** The places of a leaf of a byte: a clear bit and the eight places of the place itself. */
+function leaf(value: number): number[] {
+	const bits: number[] = [0];
+	for (let place = 7; place >= 0; place -= 1) bits.push((value >>> place) & 1);
+	return bits;
+}
+
+/** The places of a place of two behind the tree: a set bit and the two places behind it. */
+function node(left: readonly number[], right: readonly number[]): number[] {
+	return [1, ...left, ...right];
+}
+
+/**
+ * The block of the key behind the index of the seventh layout: the count of the places the run unpacks to,
+ * the key of four places the packed run stands of, and the tree of the run behind both. The tree stands of
+ * the two places of the run alone, which is why every place of the run is one of the two of them.
+ */
+function keyBlock(run: Buffer): Buffer {
+	const codes = [
+		...node(leaf(KEY_RUN_VALUES[0] ?? 0), leaf(KEY_RUN_VALUES[1] ?? 0)),
+	];
+	for (const place of run) {
+		codes.push(place === (KEY_RUN_VALUES[0] ?? 0) ? 0 : 1);
+	}
+	const packed = packWords(codes);
+	const out = Buffer.alloc(KEY_BLOCK_HEAD + packed.length, 0x00);
+	out.writeInt32LE(run.length, KEY_BLOCK_COUNT_AT);
+	KEY_BLOCK_KEY.copy(out, KEY_BLOCK_KEY_AT);
+	// The packed run stands of the key of four places, the way the reference reads it.
+	for (let at = 0; at < packed.length; at += 1) {
+		out[KEY_BLOCK_HEAD + at] = (packed[at] ?? 0) ^ (KEY_BLOCK_KEY[at & 3] ?? 0);
+	}
+	// The first sixteen places of the block are the MD5 of the places behind them, which is what the head of
+	// the archive holds the key of its index to.
+	createHash("md5")
+		.update(out.subarray(KEY_BLOCK_COUNT_AT))
+		.digest()
+		.copy(out, 0, 0, 0x10);
+	return out;
+}
 
 /** The places of the `start.ps3` the test builds: its table, its bytecode, and the names behind both. */
 const PS3_TABLE_COUNT = 2;
@@ -703,6 +798,42 @@ describe("CVNS key of an archive", () => {
 				await expect(findCpzArchiveKey(mainPath)).resolves.toBeUndefined();
 			},
 		);
+	});
+
+	it("reads an archive of the seventh layout whose index stands of the key behind it", async () => {
+		// The seventh layout carries a run of its own behind the places of its index, packed with the tree of
+		// the engine: the places of the table stand of that run, and the count of the places of it stands in
+		// the head. The run of the test stands of two places alone, so the tree of it is a place of two.
+		const run = keyRun(KEY_RUN_PLACES);
+		const { archive, plans } = buildArchive({ version: 7, indexKey: run });
+		await expectArchive({
+			format: cpzFormat,
+			archive,
+			sourcePath: "sample.cpz",
+			entries: plans.map((plan) => ({
+				path: plan.dir === 0 ? plan.name : `sub/${plan.name}`,
+				size: plan.listed,
+				content: plan.plain,
+			})),
+			metadata: { entryCount: 3, version: 7 },
+		});
+		// An archive of that layout whose places do **not** stand of the run its head names is not an index of
+		// this engine at all, and the walk of it turns out nothing: the key stands of the places it was read of.
+		const other = buildArchive({
+			version: 7,
+			indexKey: keyRun(KEY_RUN_PLACES),
+		});
+		const moved = Buffer.from(other.archive);
+		// The run of the key stands at the head of the places behind the table, of the count of the name of
+		// the first entry of the archive: one place of it turned over is enough to part the walk from it.
+		const blockAt = 0x48 + 41 + 107;
+		moved[blockAt + 0x18] = ((moved[blockAt + 0x18] ?? 0) ^ 0x01) & 0xff;
+		await expectArchive({
+			format: cpzFormat,
+			archive: moved,
+			entries: [],
+			detected: false,
+		});
 	});
 
 	it("reads an archive of the seventh layout that stands of the key of its `start.ps3`", async () => {

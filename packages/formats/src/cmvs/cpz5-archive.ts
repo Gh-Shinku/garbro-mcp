@@ -304,6 +304,9 @@ async function walkCpzIndex(
 	const fileTableSize = header.dirEntriesSize + header.fileEntriesSize;
 	if (fileTableSize < 0 || fileTableSize > index.length) return undefined;
 	if (header.indexKeySize > INDEX_KEY_GATE) {
+		// The key behind the index stands within the places of the index it was read of; a head that names
+		// more of them than the index carries is turned away rather than read past its own places.
+		if (fileTableSize + header.indexKeySize > index.length) return undefined;
 		const key = unpackCpzIndexKey(index, fileTableSize, header.indexKeySize);
 		for (let at = 0; at < fileTableSize; at += 1) {
 			index[at] =

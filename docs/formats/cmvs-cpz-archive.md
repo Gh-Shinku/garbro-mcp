@@ -91,6 +91,24 @@ by the reference, which is what the fixtures of the test stand of. The places of
 the seventh layout are packed with the Huffman tree of the engine, and the run of them stands of the first
 three places of a word of the key of four within the head of it.
 
+## The key behind the index of the seventh layout
+
+The seventh layout carries a run of its own behind the places of its index, and the head names the count of
+the places of it: the places of the table stand of that run (`index[i] ^= run[(i + 3) % 0x3FF]`), which is
+why the count of it stands of a sum of its own in the head as well. The run itself is packed with the tree of
+the engine, behind a head of its own:
+
+| place | field |
+| --- | --- |
+| 0 | the MD5 of the places behind them (sixteen places) |
+| 0x10 | the count of the places the run unpacks to (`i32`) |
+| 0x14 | the key of four places the packed run stands of |
+| 0x18 | the packed run itself, of the tree of the engine |
+
+The packed run stands of the four places of the key, place by place, and the sixteen places at the head of
+the block are held to the MD5 of every place behind them: a block whose digest does not stand is not a block
+of this engine, and the head of the archive is not read of it at all.
+
 ## Payloads
 
 An entry whose places stand taken apart is read of the walk of `Cpz5Decoder.DecryptEntry` over the digest of
@@ -117,6 +135,8 @@ the reference does not look for one beside them at all.
 * An archive of the layouts above the sixth whose `start.ps3` does not stand beside it, or whose
   `start.ps3` does not name it, is read of a key of nothing: the walks of its index then turn out nothing
   that stands, and the port refuses it (`UNSUPPORTED_FEATURE`) rather than reading it wrongly.
+* A head of the seventh layout that names more places of the key behind its index than the index carries is
+  turned away rather than read past the places of it, where the reference would read of its own view.
 * An archive whose head and index digest stand of this engine and whose walk of the index does not is
   detected, and the refusal of it stands at the reading of it (`UNSUPPORTED_FEATURE`) rather than at the
   detection, where the reference throws `UnknownEncryptionScheme` of its own.
@@ -141,6 +161,11 @@ its window, which the reference carries one way alone. The archive carries three
 directories, of a room of the root and of a named room, of a run of places as they stand, of a run behind a
 `PS2A` head and of a run of a picture of its own. The head, the sum of it, the digest of the index and a walk
 of the index that does not stand are pinned beside it, of the refusal the last of them stands of as well.
+
+The key behind the index of the seventh layout is written in the test as well: the tree of the run stands of
+two places alone, so every place of the run is one of the two of them, and the sixteen places at the head of
+the block are the MD5 the head of the archive holds them to. An archive of that layout whose places do not
+stand of the run its head names is pinned beside it.
 
 The key of an archive is read of a `start.ps3` written in the test, of the table, the bytecode and the names
 of the reference, and the same file stands beside an archive of the **seventh** layout whose index stands of

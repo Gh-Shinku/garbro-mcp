@@ -21982,12 +21982,10 @@ export const formatSupportCatalog = {
 				"refusal of an archive whose index does not stand of the walk of this engine",
 				"the four words of the key of an archive, read out of a `start.ps3` beside it (FindArchiveKey) of the layouts above the sixth",
 				"the place the places behind the words of a run of the index stand of, of the count of the words the walk of it left",
+				"the run of the key behind the index of the seventh layout, read of the tree of the engine and of a digest of its own",
 			],
 			unsupported: ["archive creation"],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"an archive of a version above the fifth, of a key behind its index",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 	],
 } as const;
