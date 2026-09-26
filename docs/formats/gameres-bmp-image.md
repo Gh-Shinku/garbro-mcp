@@ -47,8 +47,14 @@ left out:
   whose rows stand the other way round in the file takes the rows of its companion the other way round as
   well; the reference walks the stored rows in either case, which is the same thing for such a picture and the
   other way round for one stored the right way up;
-* a **run length** bitmap is refused with `INVALID_ARCHIVE` where the framework the reference hands it to would
-  decode it, since the shared reader here knows only the two uncompressed layouts.
+* the two **run length** layouts are read here as well, where the reference hands such a picture to the framework
+  of its platform: a pair of places of the file whose first stands of a count of places and whose second of a
+  colour behind them, a count of nothing standing of one of four marks — nought ends the row of the picture, one
+  ends the picture, two moves the walk by two places of the file and any other count stands of that many places
+  of the colours themselves behind the pair, of an even count of places of the file. A picture of one place of a
+  colour of a place stands of a place of a colour a place and one of half a place of a place of a byte of two of
+  them, the first of the two in the high places of that byte. The walk stands of the rows of the picture from its
+  foot up, and the places it walks out are stored the way a bitmap of this port stores them.
 
 The third reader in front of the reference's own walk is `BmpDepthFixer`, which the Hyperspace engine stands
 for: a picture whose head names **two** places of the file a place while the places behind it stand of **three**,

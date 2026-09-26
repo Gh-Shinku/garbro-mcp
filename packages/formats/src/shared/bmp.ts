@@ -388,9 +388,18 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 	const bitsPerPixel = core ? bmp.readUInt16LE(24) : bmp.readUInt16LE(28);
 	if (!SUPPORTED_DEPTHS.has(bitsPerPixel)) return undefined;
 	const compression = core ? 0 : bmp.readUInt32LE(30);
-	if (compression !== 0 && compression !== 3) return undefined;
+	if (
+		compression !== 0 &&
+		compression !== 3 &&
+		compression !== 1 &&
+		compression !== 2
+	) {
+		return undefined;
+	}
 	if (compression === 3 && bitsPerPixel !== 16 && bitsPerPixel !== 32)
 		return undefined;
+	if (compression === 1 && bitsPerPixel !== 8) return undefined;
+	if (compression === 2 && bitsPerPixel !== 4) return undefined;
 	// A four byte entry to a colour for the full header and three for the older one, whose count is however
 	// many colours the depth allows.
 	let palette: Buffer = Buffer.alloc(0);
@@ -439,6 +448,16 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 		dataOffset,
 	);
 	if (fixed) return fixed;
+	if (1 === compression || 2 === compression) {
+		const indices = readRunLengthPixels(
+			bmp.subarray(dataOffset),
+			width,
+			height,
+			8 === bitsPerPixel,
+		);
+		if (!indices) return undefined;
+		return { width, height, bitsPerPixel, palette, pixels: indices };
+	}
 	const rowBytes = Math.ceil((width * bitsPerPixel) / 8);
 	const stride = (rowBytes + 3) & ~3;
 	const imageSize = stride * height;
@@ -496,6 +515,107 @@ export function writeBmpImage(image: BmpImage): Buffer {
 		default:
 			return writeBmp32(width, height, pixels);
 	}
+}
+
+/**
+ * The two walks of the runs of a bitmap of the framework the reference hands such a picture to: `Rle8` of a
+ * picture of one place of a colour of a place and `Rle4` of one of half a place, both of them of the rows of
+ * the picture from its foot up. Every count of the walk stands of a pair of places: a count above nothing
+ * stands of as many places of the colour behind the count, a count of nothing stands of one of four marks:
+ *
+ * * `0` behind a count of nothing ends the row of the picture;
+ * * `1` behind a count of nothing ends the picture;
+ * * `2` behind a count of nothing moves the walk by two places of the file, one place to the right and one
+ *   place up, which is what a picture of no places at all stands for;
+ * * any other count of places behind a count of nothing stands of as many places of the colours themselves,
+ *   which follow the walk, of a place of the file each, of a picture of a place of a colour a place, and of
+ *   a place of a byte each of two of them, of a picture of half a place.
+ *
+ * Every run of places of the colours themselves stands of an even count of places of the file, so a walk of
+ * an odd count leaves one place of the file behind it. The picture comes out the way its rows stand, of the
+ * foot of the picture up, which is the way a bitmap carries them.
+ */
+export function readRunLengthPixels(
+	data: Buffer,
+	width: number,
+	height: number,
+	onePlace: boolean,
+): Buffer | undefined {
+	const rowBytes = onePlace ? width : Math.ceil(width / 2);
+	const picture: Buffer = Buffer.alloc(rowBytes * height, 0x00);
+	let x = 0;
+	let y = 0;
+	let at = 0;
+	const place = (index: number): void => {
+		if (x < 0 || x >= width || y < 0 || y >= height) return;
+		if (onePlace) {
+			picture[y * rowBytes + x] = index & 0xff;
+		} else if (0 === (x & 1)) {
+			picture[y * rowBytes + (x >> 1)] =
+				((picture[y * rowBytes + (x >> 1)] ?? 0) & 0x0f) |
+				((index & 0x0f) << 4);
+		} else {
+			picture[y * rowBytes + (x >> 1)] =
+				((picture[y * rowBytes + (x >> 1)] ?? 0) & 0xf0) | (index & 0x0f);
+		}
+		x += 1;
+	};
+	while (at + 1 < data.length) {
+		const count = data[at] ?? 0;
+		const value = data[at + 1] ?? 0;
+		at += 2;
+		if (0 !== count) {
+			for (let index = 0; index < count; index += 1) {
+				if (onePlace) {
+					place(value);
+				} else if (0 === (index & 1)) {
+					// The first of the two places of a colour stands in the high places of the place.
+					place(value >> 4);
+				} else {
+					place(value & 0x0f);
+				}
+			}
+			continue;
+		}
+		if (0 === value) {
+			x = 0;
+			y += 1;
+			continue;
+		}
+		if (1 === value) break;
+		if (2 === value) {
+			if (at + 1 >= data.length) return undefined;
+			x += data[at] ?? 0;
+			y += data[at + 1] ?? 0;
+			at += 2;
+			continue;
+		}
+		const places = value;
+		const bytes = onePlace ? places : Math.ceil(places / 2);
+		if (at + bytes > data.length) return undefined;
+		for (let index = 0; index < places; index += 1) {
+			if (onePlace) {
+				place(data[at + index] ?? 0);
+			} else {
+				const byte = data[at + (index >> 1)] ?? 0;
+				place(0 === (index & 1) ? byte >> 4 : byte & 0x0f);
+			}
+		}
+		// The places of the colours themselves stand of an even count of places of the file.
+		at += bytes + (bytes % 2);
+	}
+	// The walk stands of the rows of the picture from its foot up, while a picture of this port stands the
+	// right way up.
+	const flipped: Buffer = Buffer.alloc(rowBytes * height, 0x00);
+	for (let row = 0; row < height; row += 1) {
+		picture.copy(
+			flipped,
+			row * rowBytes,
+			(height - 1 - row) * rowBytes,
+			(height - row) * rowBytes,
+		);
+	}
+	return flipped;
 }
 
 /**

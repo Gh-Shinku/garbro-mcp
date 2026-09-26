@@ -335,6 +335,67 @@ describe("Windows bitmap", () => {
 		expect(await gameresBmpImageFormat.detect(sourceOf(long))).toBe(true);
 	});
 
+	it("reads the two kinds of a bitmap whose places stand of runs", async () => {
+		// A bitmap of this kind stands of runs of the places of its colours rather than of the places of every
+		// one of them: a pair of places whose first stands of a count and whose second of a colour behind it,
+		// and a count of nothing behind which one of four marks stands: nought ends the row, one ends the
+		// picture, two moves the walk, and any other count stands of that many places of the colours
+		// themselves behind the pair. The walk stands of the rows of the picture from its foot up, which is
+		// the way such a picture carries them.
+		const head = (
+			width: number,
+			height: number,
+			depth: number,
+			compression: number,
+			colours: number,
+			body: Buffer,
+		): Buffer => {
+			const palette: Buffer = Buffer.alloc(colours * 4, 0x00);
+			palette[4] = 0x11;
+			const header: Buffer = Buffer.alloc(54, 0x00);
+			header.write("BM", 0, "latin1");
+			header.writeUInt32LE(54 + palette.length + body.length, 2);
+			header.writeUInt32LE(54 + palette.length, 10);
+			header.writeUInt32LE(40, 14);
+			header.writeInt32LE(width, 18);
+			header.writeInt32LE(height, 22);
+			header.writeUInt16LE(1, 26);
+			header.writeUInt16LE(depth, 28);
+			header.writeUInt32LE(compression, 30);
+			header.writeUInt32LE(body.length, 34);
+			header.writeUInt32LE(colours, 46);
+			return Buffer.concat([header, palette, body]);
+		};
+		// A picture of one place of a colour of a place: the foot of the picture stands of one run of places,
+		// its head of four places of the colours themselves, and the picture ends behind them.
+		const eight = head(
+			4,
+			2,
+			8,
+			1,
+			2,
+			Buffer.from([
+				0x04, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01,
+			]),
+		);
+		const one = readBmpImage(await extract(eight));
+		expect(one).toMatchObject({ width: 4, height: 2, bitsPerPixel: 8 });
+		expect([...(one?.pixels ?? [])]).toEqual([0, 0, 1, 1, 1, 1, 1, 1]);
+		// A picture of half a place of a colour of a place: a run of places of a colour stands of a place of
+		// the file of two of them, and the first of the two stands in the high places of the place.
+		const four = head(
+			4,
+			2,
+			4,
+			2,
+			2,
+			Buffer.from([0x04, 0x10, 0x00, 0x00, 0x00, 0x04, 0x01, 0x01, 0x00, 0x01]),
+		);
+		const half = readBmpImage(await extract(four));
+		expect(half).toMatchObject({ width: 4, height: 2, bitsPerPixel: 4 });
+		expect([...(half?.pixels ?? [])]).toEqual([0x01, 0x01, 0x10, 0x10]);
+	});
+
 	it("refuses a header it cannot read a bitmap out of", async () => {
 		// A header shorter than the forty bytes every bitmap this reader knows carries.
 		const shortHeader = writeBmp24(1, 1, Buffer.from([1, 2, 3]));
