@@ -7,6 +7,7 @@
 // of its own and of the places of the count of the walk of the engine behind them.
 
 import { GarbroError, decodeCp932 } from "@garbro-mcp/core";
+import { ErisaNemesisDecodeContext } from "@garbro-mcp/codecs";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -40,6 +41,8 @@ const ATTR_EXTRA_MASK = 0x70;
 /** The counts of the walk of the engine of the places of a count of the head of a count of the file. */
 const ENTRY_HEAD = 0x10;
 const ENTRY_STRIDE = 0x20;
+/** The counts of the places of the count of the walk of the engine of a count of the walk of it at most. */
+const ENTRY_LIMIT = 0x10000000;
 const SIZE_OFFSET = 8;
 /** The kinds of the walk of the counts of a count of the file (`EncType`). */
 export const NOA_ENCRYPTION_RAW = 0x00000000;
@@ -266,9 +269,26 @@ export const entisNoaFormat: ArchiveFormat = defineFixedArchive({
 			]);
 		}
 		if (NOA_ENCRYPTION_ERISA === encryption) {
-			throw unsupportedArchive(
-				"The places of the count of the walk of the engine stand of the counts of the walk of the engine of the `Nemesis` of it",
+			// `ErisaNemesisStream`: the counts of the walk of the engine of the places of the count of the walk
+			// of the engine stand of the counts of the walk of the engine of the `Nemesis` of the engine, of
+			// the counts of the walk of the engine of the places of the count of the walk of the engine of the
+			// file itself.
+			if (entry.size > ENTRY_LIMIT) {
+				throw invalidArchive("Invalid Entis GLS entry size");
+			}
+			const input = Buffer.from(
+				await source.readAt(
+					entry.offset + BigInt(ENTRY_HEAD),
+					Number(size) - 4,
+				),
 			);
+			const decoder = new ErisaNemesisDecodeContext();
+			decoder.attachInputFile(input);
+			decoder.prepareToDecodeErisaNCode();
+			const outputLength = Number(entry.size);
+			const out = new Uint8Array(outputLength);
+			const decoded = decoder.decodeNemesisCodeBytes(out, 0, outputLength);
+			return Readable.from([Buffer.from(out.subarray(0, decoded))]);
 		}
 		throw unsupportedArchive(
 			"The places of the count of the walk of the engine stand of the counts of the walk of the engine of a count of the walk of it of its own",

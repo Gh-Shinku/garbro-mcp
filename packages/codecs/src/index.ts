@@ -38,3 +38,4 @@ export * from "./erisa-context.js";
 export * from "./erisa-gamma-table.js";
 export * from "./erisa-prob-model.js";
 export * from "./erisa-matrix.js";
+export * from "./erisa-nemesis.js";

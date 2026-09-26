@@ -225,10 +225,11 @@ describe("Entis GLS archive", () => {
 
 	it("stands of the counts of the walk of the engine of the places of a count of the walk of the engine of its own", async () => {
 		// A count of the walk of the engine of the kind `ERISACode` stands of the counts of the walk of the
-		// engine of the count of the walk of the engine of the `Nemesis` of it, which stand unported here; a
-		// count of the walk of the engine of the counts of the walk of the engine of a count of the walk of
-		// it of its own stands refused as well (the reference stands of the places of the count of the walk
-		// of the engine of the counts of a colour of the engine of the counts of the walk of it).
+		// engine of the count of the walk of the engine of the `Nemesis` of it, of the counts of the walk of
+		// the engine of the places of the count of the walk of the engine of the count of the walk of the
+		// picture itself; a count of the walk of the engine of the counts of the walk of the engine of a
+		// count of the walk of it of its own stands refused (the reference stands of the places of the count
+		// of the walk of the engine of the counts of a colour of the engine of the counts of the walk of it).
 		const data = Buffer.from(
 			"the places of the count of the walk of the engine",
 		);
@@ -248,14 +249,25 @@ describe("Entis GLS archive", () => {
 				true,
 				true,
 			]);
-			for (const entry of archive.entries) {
-				const failure = await archive.openEntry(entry.id).then(
-					() => undefined,
-					(error: unknown) => error,
-				);
-				expect(failure).toBeInstanceOf(GarbroError);
-				expect(failure).toMatchObject({ code: "UNSUPPORTED_FEATURE" });
-			}
+			// The counts of the walk of the engine of the places of a count of the walk of the engine stand of
+			// the counts of the walk of the engine of the places of the count of the walk of the engine of the
+			// count of the walk of the picture itself: the places of the count of the walk of the picture stand
+			// of the places of the count of the walk of the engine of the count of the walk of the engine at
+			// most.
+			const packed = archive.entries[0];
+			const crypt = archive.entries[1];
+			if (!packed || !crypt) throw new Error("missing entry");
+			const decoded = await consumeBuffer(await archive.openEntry(packed.id));
+			expect(decoded.length).toBeLessThanOrEqual(Number(packed.size));
+			expect(await consumeBuffer(await archive.openEntry(packed.id))).toEqual(
+				decoded,
+			);
+			const failure = await archive.openEntry(crypt.id).then(
+				() => undefined,
+				(error: unknown) => error,
+			);
+			expect(failure).toBeInstanceOf(GarbroError);
+			expect(failure).toMatchObject({ code: "UNSUPPORTED_FEATURE" });
 		} finally {
 			await archive.close();
 		}

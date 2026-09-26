@@ -58,15 +58,34 @@ left, except for packed entries, whose recorded size is the length of the decode
 
 An entry that is neither packed nor encrypted is handed out as the bytes at its header offset plus `0x10`,
 of the size declared in that header. A size of four bytes or less yields an empty stream, as in the
-reference. Packed entries carry `EncType.ERISACode` (`0x80000010`) and would need the `Nemesis` decoder of
-the engine; the remaining encryption kinds need a password that the reference reads from a neighbouring
-executable or from its own settings.
+reference.
+
+A packed entry carries `EncType.ERISACode` (`0x80000010`). Its stream is the entry's bytes from header offset
+plus `0x10` up to four bytes before the declared size, and it decodes into at most the recorded size through
+the `Nemesis` walk of the engine (`ErisaNemesisStream` in `ArcFormats/Entis/ErisaNemesis.cs`). That walk is
+ported as `ErisaNemesisDecodeContext` in `packages/codecs/src/erisa-nemesis.ts`: it reads symbols from the
+probability model, follows a chain of sub-models keyed on the last four symbols, and copies a phrase out of a
+64 KiB ring buffer when the model escapes.
+
+The remaining encryption kinds (`0x40000000`, `0x20000000`, `0xc0000010`, `0xa0000010`) need a password that
+the reference takes from a `IDR_COTOMI` resource of a neighbouring executable or from its own settings. This
+port has no such source.
 
 ## Deviations
 
-* Packed entries (`ERISACode`) and password-encrypted entries are listed but refused at extraction with
-  `UNSUPPORTED_FEATURE`. The reference decodes the first through `ErisaNemesisStream` and the second through
-  `DecodeBSHF` once it has a password; this port has neither.
+* Password-encrypted entries are listed but refused at extraction with `UNSUPPORTED_FEATURE`. The reference
+  decodes them through `DecodeBSHF` once it has a password, which it reads from a neighbouring executable or
+  from its own settings; this port has neither a password source nor the `BSHF` cipher.
+* The `Nemesis` walk is the reference's, but its fixture stands of the counts of the walk of the engine of the
+  port itself: the reference holds no walk that stands of the places of the count of the walk of the engine
+  of a picture of the engine (its own encoder is elsewhere). The walk therefore stands pinned of the counts
+  of the walk of the engine of the places of the file of the engine, of the counts of the walk of the engine
+  of the model of the walk of the engine and of the counts of the walk of the engine of the two counts of the
+  places of the count of the walk of the engine, of no place of the count of the walk of the engine itself.
+* The reference stands of the counts of the walk of the engine of the counts of the walk of the engine of the
+  places of the count of the walk of the engine of the file of the engine at most: this port stands of a
+  count of the walk of the engine of sixty four places of a count of a colour of the places of the count of
+  the walk of the engine at most.
 * The reference reads entry names with a configurable code page (`NoaEncodingCP`) for newer archives and
   always with `cp932` for older ones. This port always uses `cp932`.
 * The reference grows its entry list without an explicit bound; this port caps the number of records in one
@@ -82,7 +101,15 @@ executable or from its own settings.
   directory whose entries carry the `dir/name` prefix,
 * the detection negatives: another file word, another identifier and an index with no entries,
 * the placement clamp plus the empty stream of an entry of four bytes or fewer,
-* the refusals: a packed entry and a password-encrypted entry.
+* a packed entry, which decodes through the `Nemesis` walk into at most the recorded size, twice the same,
+* the refusal of a password-encrypted entry.
+
+`tests/codecs/erisa-nemesis.test.ts` pins the walk itself: an empty stream stands of the counts of the walk
+of the engine of the places of the count of the walk of the engine of the reference (ones, and then zero
+valued symbols), a stream of ones stands of the counts of the walk of the engine of the places of the count
+of the walk of the engine behind them, and the counts of the walk of the engine of the model of the walk of
+the engine stand of the counts of the walk of the engine of the count of the walk of the engine of the count
+of the walk of the engine at most.
 
 ## References
 

@@ -559,7 +559,7 @@ export class ErisaProbDecodeContext extends ErisaRleDecodeContext {
 	}
 
 	/** `DecodeERISACodeIndex`: the place of a name of the model, of the counts of the walk of it. */
-	protected decodeErisaCodeIndex(model: ErisaProbModel): number {
+	decodeErisaCodeIndex(model: ErisaProbModel): number {
 		const acc = Math.floor(
 			(Math.imul(this.codeRegister, model.totalCount) >>> 0) /
 				this.augendRegister,

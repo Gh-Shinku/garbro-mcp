@@ -22289,16 +22289,17 @@ export const formatSupportCatalog = {
 				"the places of a count of the walk of the picture of the kind of the counts of the walk of the engine of no count of the walk of the engine at all (`EncType.Raw`), of the counts of the walk of the engine of the places of the count of the walk of the engine of the head of the count of the walk of the picture",
 				"a count of the walk of the picture of the counts of the walk of the engine of the kind of the counts of the walk of the count of the walk of the picture of its own (`0x10`)",
 				"the counts of the walk of the engine of the file of the counts of the walk of the engine of the places of the count of the walk of the engine of four places of them and behind it: the empty stream of the reference",
+				"the places of a count of the walk of the picture of the kind `ERISACode` (`0x80000010`), of the counts of the walk of the engine of the `Nemesis` of the engine (`ErisaNemesisStream` of `packages/codecs/src/erisa-nemesis.ts`), of the counts of the walk of the engine of the places of the count of the walk of the engine of the count of the walk of the picture itself",
 			],
 			unsupported: [
 				"archive creation",
-				"the places of a count of the walk of the picture of the kind `ERISACode` (`0x80000010`), which stand of the counts of the walk of the engine of the `Nemesis` of the engine",
 				"the places of a count of the walk of the picture of the counts of the walk of the engine of a count of the walk of the picture of its own (`0x40000000` and the counts of the walk of the engine of the kinds of the walk of the engine of the counts of a colour of the engine), which the reference stands of the counts of the walk of the engine of the name of the count of the walk of the engine of the count of the walk of the picture itself",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
 				"the counts of the walk of the engine of the places of the count of the walk of the picture of the kind of the counts of the walk of the count of the walk of the picture of its own (`0x00020200` of the places of the count of the walk of the engine of the counts of a picture of the engine, of the counts of the walk of the engine of the count of the walk of the engine)",
 				"the counts of the walk of the engine of the count of the walk of the picture of the count of the walk of the engine of the places of the count of the walk of the picture of its own beyond the counts of the walk of the engine of the count of the walk of the engine of the first count of the walk of the picture (the fixture stands of the counts of the walk of the engine of the count of the walk of the picture of the count of the walk of the engine of its own)",
+				"the counts of the walk of the engine of the `Nemesis` of the engine of the places of the count of the walk of the picture itself (the reference holds no walk that stands of the places of the count of the walk of the engine of a picture of the engine, so the walk stands pinned of the counts of the walk of the engine of the places of the file of the engine alone)",
 			],
 		},
 	],
