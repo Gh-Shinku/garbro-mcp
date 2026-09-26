@@ -37,9 +37,12 @@ nought) and a place of the colour map of eight places.
 
 ## Deviations
 
-* **A picture of a kind of its own (cJPG).** The project reads none of the pictures of that kind: the
-  places behind the key of the head stand handed over as they stand once the key is taken away from them,
-  and the entry of the format stands named as a picture of that kind.
+* **A picture of a kind of its own (cJPG).** The reference takes the key of the head away from the places
+  of the picture and hands the result to the platform's JPEG decoder; this port takes the key away and
+  reads the result with its own reader of the JPEG interchange format, handing out a bitmap in its place,
+  the way the other pictures of this format are handed out. A picture of a kind of its own whose places
+  are in no format that reader knows is refused with `INVALID_ARCHIVE`, where the reference hands the
+  stream to the platform decoder, which reads every format the platform knows.
 * **A kind of walk this project reads none of.** Refused with `UNSUPPORTED_FEATURE`.
 * **Places past the end of the file.** Refused with `INVALID_ARCHIVE`.
 * **A walk naming more places than its colour holds.** The port writes the places of the line alone; the

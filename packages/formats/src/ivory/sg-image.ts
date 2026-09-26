@@ -9,6 +9,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import { decryptIvory } from "./pk.js";
 import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import {
@@ -397,8 +399,9 @@ function unpackV3(data: Buffer, layout: SgLayout, channels: number): Buffer {
 }
 
 /**
- * `SgFormat.Read`: the picture of the file. A picture of a kind of its own stands behind a key and is
- * handed over as it stands, the project reading none of the pictures of that kind.
+ * `SgFormat.Read`: the picture of the file. A picture of a kind of its own stands behind a key and is read
+ * as the JPEG interchange format the reference hands to the platform's decoder; the other kinds stand of
+ * the walks of the engine of this project.
  */
 export function unpackSgPicture(data: Buffer, layout: SgLayout): Buffer {
 	if (0 === layout.width || 0 === layout.height) {
@@ -408,12 +411,23 @@ export function unpackSgPicture(data: Buffer, layout: SgLayout): Buffer {
 		if (layout.dataOffset + layout.dataSize > data.length) {
 			throw invalidPicture("The places of the picture stand short of the file");
 		}
-		return decryptIvory(
+		// `SgFormat.ReadJpeg` decrypts the picture and hands it to the platform's JPEG decoder. This port
+		// reads it with its own reader of that format, and where the bytes are in no such format the
+		// reference's decoder would fail as well; a stream of another picture format, which the platform
+		// decoder would read there, is refused here instead.
+		const picture = decryptIvory(
 			Buffer.from(
 				data.subarray(layout.dataOffset, layout.dataOffset + layout.dataSize),
 			),
 			layout.jpegKey,
 		);
+		if (!readJpegHeaderFields(picture)) {
+			throw invalidPicture(
+				"The places of the picture stand of no walks of the places of a picture",
+			);
+		}
+		const image = readJpegImage(picture);
+		return writeBmp32(image.width, image.height, image.pixels);
 	}
 	const places = unpackRgbPlaces(data, layout);
 	if ("indexed" === places.kind) return places.pixels;
@@ -466,7 +480,7 @@ export const ivorySgImageFormat: ArchiveFormat = defineFixedArchive({
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: jpeg ? "image.jpg" : "image.bmp",
+				path: "image.bmp",
 				offset: 0n,
 				size: source.size,
 				compressed: true,
@@ -484,7 +498,7 @@ export const ivorySgImageFormat: ArchiveFormat = defineFixedArchive({
 		return {
 			entries: [entry],
 			metadata: {
-				image: jpeg ? "jpg" : "bmp",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				bitsPerPixel: layout.bitsPerPixel,

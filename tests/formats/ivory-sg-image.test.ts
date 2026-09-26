@@ -3,7 +3,11 @@ import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { ivorySgImageFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { readSgLayout } from "../../packages/formats/src/ivory/sg-image.js";
-import { decryptIvory } from "../../packages/formats/src/ivory/pk.js";
+import {
+	ivoryKeySchedule,
+	permuteIvory,
+} from "../../packages/formats/src/ivory/pk.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BLOCK_SIZE = 0x24;
@@ -90,6 +94,26 @@ async function pictureOf(data: Buffer) {
 	);
 	if (!image) throw new Error("the port handed over no picture");
 	return image;
+}
+
+/**
+ * The other direction of `PakOpener.Decrypt`, written from the reference's own description: a word is
+ * exclusive-ored with its scheduled key word first and permuted afterwards, which is the order `Decrypt`
+ * undoes. The permutation swaps bit pairs, so it serves both directions; the exclusive-or does not, which
+ * is why this direction stands here.
+ */
+function encryptIvory(data: Buffer, seed: number): Buffer {
+	const schedule = ivoryKeySchedule(seed);
+	const words = Math.trunc(data.length / 4);
+	const xored = Buffer.from(data);
+	for (let index = 0; index < words; index += 1) {
+		const at = index * 4;
+		xored.writeUInt32LE(
+			(xored.readUInt32LE(at) ^ (schedule.key[index & 31] ?? 0)) >>> 0,
+			at,
+		);
+	}
+	return permuteIvory(xored, schedule);
 }
 
 describe("Ivory image", () => {
@@ -233,14 +257,16 @@ describe("Ivory image", () => {
 		expect([...image.pixels]).toEqual([0x11, 0x22, 0x33, 0x11, 0x22, 0x33]);
 	});
 
-	it("hands the picture of a kind of its own over, of the places behind the key of it", async () => {
-		const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4, 5, 6, 7, 8]);
+	it("reads the picture of a kind of its own, of the places behind the key of it", async () => {
+		// `SgFormat.ReadJpeg` decrypts the picture and hands it to the platform's JPEG decoder; this port
+		// decrypts it and reads it with its own reader of that format, so the fixture holds the picture in
+		// the state the key leaves it in before it is decrypted.
 		const data = sgFile({
 			kind: "cJPG",
-			width: 2,
-			height: 1,
+			width: 8,
+			height: 8,
 			jpegKey: 0x12345678,
-			body: jpeg,
+			body: encryptIvory(GREY_JPEG, 0x12345678),
 		});
 		const handle = await ivorySgImageFormat.open(
 			new BufferByteSource(data),
@@ -248,9 +274,32 @@ describe("Ivory image", () => {
 		);
 		const entry = handle.entries[0];
 		if (!entry) throw new Error("no entry");
-		expect(entry.path).toBe("image.jpg");
-		const bytes = await consumeBuffer(await handle.openEntry(entry.id));
-		expect([...bytes]).toEqual([...decryptIvory(jpeg, 0x12345678)]);
+		expect(entry.path).toBe("image.bmp");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([8, 8]);
+		expect([...image.pixels]).toEqual([...GREY_PIXELS]);
+		// A picture of a kind of its own whose places are in no picture format this port reads stands
+		// refused, where the platform decoder of the reference would fail as well.
+		const stray = await ivorySgImageFormat.open(
+			new BufferByteSource(
+				sgFile({
+					kind: "cJPG",
+					width: 2,
+					height: 1,
+					jpegKey: 0x12345678,
+					body: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4, 5, 6, 7, 8]),
+				}),
+			),
+			"cg.sg",
+		);
+		const strayEntry = stray.entries[0];
+		if (!strayEntry) throw new Error("no entry");
+		await expect(stray.openEntry(strayEntry.id)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
 	});
 
 	it("tells a picture of the engine by the head of it", async () => {
