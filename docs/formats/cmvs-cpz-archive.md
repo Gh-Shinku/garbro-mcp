@@ -78,6 +78,12 @@ ships, and of the master key:
 | `Cpz5Decoder.Decode` | the run of the entries of every directory, of the key `0x7E` |
 | `DecryptIndexEntry` | the run of the entries of a directory, of a seed that walks a turn of its own |
 
+The places **behind** the words of a run stand of the place the reference's own counter stands at where the
+walk of the words leaves it, which is the count of the words: a run of a count of words that is not a
+multiple of four therefore stands of another place of the key than a run that is. The port stood of the first
+place of the key for every such run until the fixture of the archive below caught it — the runs of the
+earlier tests stood of counts of words that are multiples of four, where the two stand of the same place.
+
 The key of a directory stands of the digest and of `(dirKey + {0x76A3BF29, 0, 0x10000000, 0})`, and the key
 of an entry of the archive of `(masterKey ^ entryKey) + dirCount`, of the count of the key of the walk of
 `Cpz5Decoder` and of the key of the entries the head names. Every one of those walks is carried **both ways**
@@ -93,13 +99,24 @@ the head and the key of the entry, and a payload that then begins with `PS2A` is
 tail. The places of a listing stand as they stand in the archive rather than as the count of the places the
 walk of a payload unpacks to, which is the count the reference stands of as well.
 
+## The key of an archive
+
+The layouts **above the sixth** add a key of their own to every walk of the index: the reference reads it out
+of a `start.ps3` beside the archive (`FindArchiveKey`), a payload of the engine of its own — the window walk
+of `PS2A` behind a table of four places a room, a run of bytecode, and the names of the archives a game ships
+of. The name of the archive is looked up among those names, the place of it within the names is looked up
+among the places of the bytecode (of a pattern of three places in front of it), and the four words behind
+that place are the four places of the key. The layouts **below** the seventh stand of a key of nothing, and
+the reference does not look for one beside them at all.
+
 ## Deviations
 
-* The key of an archive (`ArchiveKey`), which the reference reads out of a `start.ps3` beside the archive
-  (`FindArchiveKey`) — a payload of the engine whose tables name every archive a game ships — is held to
-  zero, which is the key of a stock build of the engine and of every layout below the seventh. An archive
-  whose index stands of such a key is **refused** rather than read wrongly: the walk of it turns out nothing
-  that stands, and the port names the scheme of it as the piece it does not carry.
+* The reference reads the four words behind the place of the pattern of the bytecode of a `start.ps3` without
+  holding that place to the head of the run; this port holds every one of them to the run it reads, so a run
+  too short for the pattern is turned away rather than read of the places in front of it.
+* An archive of the layouts above the sixth whose `start.ps3` does not stand beside it, or whose
+  `start.ps3` does not name it, is read of a key of nothing: the walks of its index then turn out nothing
+  that stands, and the port refuses it (`UNSUPPORTED_FEATURE`) rather than reading it wrongly.
 * An archive whose head and index digest stand of this engine and whose walk of the index does not is
   detected, and the refusal of it stands at the reading of it (`UNSUPPORTED_FEATURE`) rather than at the
   detection, where the reference throws `UnknownEncryptionScheme` of its own.
@@ -116,11 +133,21 @@ walk of a payload unpacks to, which is the count the reference stands of as well
 `tests/formats/cmvs-cpz-archive.test.ts` builds an archive of the fifth layout of the engine **through the
 inverses of its own walks**: the three mixes of the index, the two directions of the walk of `Cpz5Decoder`
 (both of them ported here), the walk of the places of an entry, and the head, whose sum is worked out in the
-test rather than read off the port. The places of a `PS2A` payload are put behind the inverse of the walk of
+test rather than read off the port. The two walks of the rooms of a directory and of the runs of its entries
+are written of the key of the archive where the reference carries only the direction **without** that key, so
+those two fixtures are transcriptions of the direction it does carry rather than an independent reading of
+it. The places of a `PS2A` payload are put behind the inverse of the walk of
 its window, which the reference carries one way alone. The archive carries three entries over two
 directories, of a room of the root and of a named room, of a run of places as they stand, of a run behind a
 `PS2A` head and of a run of a picture of its own. The head, the sum of it, the digest of the index and a walk
 of the index that does not stand are pinned beside it, of the refusal the last of them stands of as well.
+
+The key of an archive is read of a `start.ps3` written in the test, of the table, the bytecode and the names
+of the reference, and the same file stands beside an archive of the **seventh** layout whose index stands of
+it, of the places of the records of that layout four places on and of a head that names a count of nothing
+of the key behind its index. A `start.ps3` that does not stand beside the archive, one of another mark, one
+that does not name the archive, and one of a bytecode that does not stand of the pattern are pinned beside
+them.
 
 The walks themselves stand in `packages/formats/src/cmvs/cpz5-index.ts`, held to a second transcription of
 `ArcCPZ.cs` written apart from the port (a Python mirror, which is what caught the one place this port had

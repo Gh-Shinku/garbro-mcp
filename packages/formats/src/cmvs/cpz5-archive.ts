@@ -23,6 +23,7 @@
 
 import {
 	GarbroError,
+	decodeCp932,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
@@ -35,6 +36,7 @@ import {
 	type Cpz5Scheme,
 } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
+import { readCompanionFile } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -89,6 +91,17 @@ const RECORD_KEY_AT = 0x10;
 const RECORD_LONG_ADDEND = 4;
 /** The places each word of the key of a directory stands of, and those of the key of the index. */
 const DIRECTORY_KEY_ADDEND = [0x76a3bf29, 0, 0x10000000, 0];
+/** The places of a word of the engine, of the head of a `start.ps3`, of its table and of the names behind it. */
+const WORD_PLACES = 4;
+const KEY_HEAD = 0x30;
+const KEY_TABLE_COUNT_AT = 0x10;
+const KEY_TABLE_OFFSET_AT = 0x14;
+const KEY_TABLE_STRINGS_AT = 0x1c;
+/** The pattern of three places the bytecode of a `start.ps3` stands of in front of a name of an archive. */
+const KEY_PATTERN_BACK = 0x33;
+const KEY_PATTERN = [2, 0, 1];
+/** The places of the four words of the key behind the place of that pattern. */
+const KEY_PLACES_BACK = [0x0c, 0x18, 0x24, 0x30];
 /** The marks of the payloads the opener unpacks behind the walk of the entries. */
 const PS2_MARKER = Buffer.from("PS2A", "ascii");
 const PB3_MARKER = Buffer.from("PB3B", "ascii");
@@ -142,6 +155,101 @@ const ZERO_KEY: CpzArchiveKey = {
 	entryDataKey2: 0,
 };
 
+/**
+ * GARbro `CpzOpener.FindArchiveKey`: the key of an archive, read out of a `start.ps3` beside it. That file is
+ * a payload of the engine of its own: the window walk of `PS2A` behind a table of four places a room, a run of
+ * bytecode, and the names of the archives a game ships of. The name of the archive is looked up among those
+ * names, and then the place of it within the run of the names is looked up among the places of the bytecode,
+ * of a pattern of three places in front of it: the four places behind that place are the key.
+ *
+ * The reference reads the four places behind the place of the pattern without holding the place to the head
+ * of the run; this port holds every place of them to the run it reads, so a run too short for the pattern is
+ * turned away rather than read of the places in front of it.
+ */
+export async function findCpzArchiveKey(
+	sourcePath: string,
+): Promise<CpzArchiveKey | undefined> {
+	const start = await readCompanionFile(sourcePath, "start.ps3");
+	if (start === undefined) return undefined;
+	if (
+		start.length < PS2_MARKER.length ||
+		!start.subarray(0, PS2_MARKER.length).equals(PS2_MARKER)
+	) {
+		return undefined;
+	}
+	const data = unpackCpzPs2(start);
+	if (data.length < KEY_HEAD) return undefined;
+	const tableCount = data.readInt32LE(KEY_TABLE_COUNT_AT);
+	const tableEnd = KEY_HEAD + tableCount * WORD_PLACES;
+	const stringsOffset = tableEnd + data.readInt32LE(KEY_TABLE_OFFSET_AT);
+	const stringsSize = data.readInt32LE(KEY_TABLE_STRINGS_AT);
+	if (
+		tableEnd < KEY_HEAD ||
+		stringsOffset < KEY_HEAD ||
+		stringsOffset + stringsSize > data.length
+	) {
+		return undefined;
+	}
+	const wanted = fileNameOf(sourcePath);
+	const arcId = findArchiveName(data, stringsOffset, stringsSize, wanted);
+	if (arcId < 0) return undefined;
+	const id = Buffer.alloc(WORD_PLACES, 0x00);
+	id.writeUInt32LE(arcId >>> 0, 0);
+	for (let at = tableEnd; at + WORD_PLACES <= stringsOffset; at += 1) {
+		if (!data.subarray(at, at + WORD_PLACES).equals(id)) continue;
+		if (at < KEY_PATTERN_BACK) continue;
+		if (
+			data[at - KEY_PATTERN_BACK] !== (KEY_PATTERN[0] ?? 0) ||
+			data[at - KEY_PATTERN_BACK + 1] !== (KEY_PATTERN[1] ?? 0) ||
+			data[at - KEY_PATTERN_BACK + 2] !== (KEY_PATTERN[2] ?? 0)
+		) {
+			continue;
+		}
+		const behind = KEY_PLACES_BACK;
+		if (at < (behind[3] ?? 0)) continue;
+		return {
+			indexDirKey: data.readUInt32LE(at - (behind[0] ?? 0)),
+			indexEntryKey: data.readUInt32LE(at - (behind[1] ?? 0)),
+			entryDataKey1: data.readUInt32LE(at - (behind[2] ?? 0)),
+			entryDataKey2: data.readUInt32LE(at - (behind[3] ?? 0)),
+		};
+	}
+	return undefined;
+}
+
+/** The name of a file within a path of either separator, which the reference reads of `Path.GetFileName`. */
+function fileNameOf(path: string): string {
+	const at = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+	return at < 0 ? path : path.slice(at + 1);
+}
+
+/**
+ * The place of a name within the run of the names of a `start.ps3`: the run stands of names of no more than
+ * one place each, and the name of an archive stands of the name of the file alone, of either case, which is
+ * what the reference asks of its own file system.
+ */
+function findArchiveName(
+	data: Buffer,
+	stringsOffset: number,
+	stringsSize: number,
+	wanted: string,
+): number {
+	const end = stringsOffset + stringsSize;
+	let at = stringsOffset;
+	while (at < end) {
+		let terminator = data.indexOf(0, at);
+		if (terminator === -1 || terminator > end) terminator = end;
+		if (terminator !== at) {
+			const text = decodeCp932(data.subarray(at, terminator));
+			if (fileNameOf(text).toLowerCase() === wanted.toLowerCase()) {
+				return at - stringsOffset;
+			}
+		}
+		at = terminator + 1;
+	}
+	return -1;
+}
+
 /** The places an entry stands of at the reading of it: the key of the archive and the archive as a whole. */
 interface CpzEntryState {
 	readonly isEncrypted: boolean;
@@ -151,6 +259,8 @@ interface CpzEntryState {
 	/** The key of the entry within its directory, of the place of its record. */
 	readonly dataKey: number;
 	readonly digest: readonly number[];
+	/** The key of the archive, of a `start.ps3` beside it where it stands of one. */
+	readonly archiveKey: CpzArchiveKey;
 }
 
 interface CpzIndex {
@@ -188,6 +298,7 @@ async function openCpzIndex(
 async function walkCpzIndex(
 	source: ByteSource,
 	pass: { header: CpzHeader; index: Buffer },
+	archiveKey: CpzArchiveKey,
 ): Promise<CpzIndex | undefined> {
 	const { header, index } = pass;
 	const fileTableSize = header.dirEntriesSize + header.fileEntriesSize;
@@ -224,7 +335,7 @@ async function walkCpzIndex(
 		index,
 		header.dirEntriesSize,
 		key,
-		ZERO_KEY.indexDirKey,
+		archiveKey.indexDirKey,
 	);
 
 	const baseOffset = BigInt(header.indexOffset + header.indexSize);
@@ -264,7 +375,7 @@ async function walkCpzIndex(
 			curEntriesSize,
 			key,
 			SCHEME.indexSeed,
-			ZERO_KEY.indexEntryKey,
+			archiveKey.indexEntryKey,
 		);
 		const isRootDir = dirName === "root";
 		let recordAt = curOffset;
@@ -292,6 +403,7 @@ async function walkCpzIndex(
 				entryKey: header.entryKey,
 				dataKey,
 				digest,
+				archiveKey,
 			};
 			entries.push(
 				createFixedEntry({
@@ -320,9 +432,9 @@ const cpzEntryOpener: FixedEntryOpener = async (source, entry) => {
 	const state = entry.metadata?.cpz as CpzEntryState | undefined;
 	if (state?.isEncrypted === true) {
 		let key = ((state.masterKey ^ state.dataKey) + state.dirCount) >>> 0;
-		key = (key ^ ZERO_KEY.entryDataKey2) >>> 0;
+		key = (key ^ state.archiveKey.entryDataKey2) >>> 0;
 		key = (key - SCHEME.entrySubKey) >>> 0;
-		key = (key ^ (state.entryKey + ZERO_KEY.entryDataKey1)) >>> 0;
+		key = (key ^ (state.entryKey + state.archiveKey.entryDataKey1)) >>> 0;
 		const decoder = new Cpz5Decoder(
 			SCHEME,
 			state.digest[3] ?? 0,
@@ -355,9 +467,15 @@ export const cpzFormat: ArchiveFormat = defineFixedArchive({
 	async detect(source: ByteSource, _sourcePath: string): Promise<boolean> {
 		return (await openCpzIndex(source)) !== undefined;
 	},
-	async read(source: ByteSource, _sourcePath: string) {
+	async read(source: ByteSource, sourcePath: string) {
 		const pass = await openCpzIndex(source);
-		const index = pass ? await walkCpzIndex(source, pass) : undefined;
+		// The reference reads the key of an archive out of a `start.ps3` beside it for the layouts above the
+		// sixth alone; every layout below them, and every stock build, stands of a key of nothing.
+		const key =
+			pass !== undefined && pass.header.version > 6
+				? ((await findCpzArchiveKey(sourcePath)) ?? ZERO_KEY)
+				: ZERO_KEY;
+		const index = pass ? await walkCpzIndex(source, pass, key) : undefined;
 		if (!pass || !index) {
 			throw new GarbroError(
 				"UNSUPPORTED_FEATURE",

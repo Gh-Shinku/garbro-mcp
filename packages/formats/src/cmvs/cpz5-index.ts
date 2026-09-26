@@ -165,6 +165,10 @@ export function decryptCpzIndexDirectory(
 		data.writeUInt32LE(mixed, from);
 		seed = (seed + (INDEX_DIRECTORY_STEP ^ archiveKey)) >>> 0;
 	}
+	// The places behind the words stand of the place the count of the words left the walk at, the way the
+	// reference leaves its own counter behind: a run of a count of words that is not a multiple of four
+	// therefore stands of another place of the key than a run that is.
+	place = words;
 	for (let at = words * WORD_PLACES; at < length; at += 1) {
 		data[at] =
 			(((data[at] ?? 0) ^ ((key[place++ & 3] ?? 0) >>> 6)) + 0x37) & TAIL_BYTE;
@@ -188,6 +192,7 @@ export function encryptCpzIndexDirectory(
 		data.writeUInt32LE((mixed ^ (key[at & 3] ?? 0)) >>> 0, from);
 		seed = (seed + INDEX_DIRECTORY_STEP) >>> 0;
 	}
+	place = words;
 	for (let at = words * WORD_PLACES; at < length; at += 1) {
 		data[at] =
 			(((data[at] ?? 0) - 0x37) ^ ((key[place++ & 3] ?? 0) >>> 6)) & TAIL_BYTE;

@@ -101,6 +101,29 @@ describe("CVNS walk of the index", () => {
 		expect(words.toString("hex")).toBe("26721d45ddbd43d5");
 	});
 
+	it("stands the places behind the words of a run of the place the walk of them left", () => {
+		// A run of twenty two places stands of five words and of two places behind them, and the walk of the
+		// reference leaves its own counter at the count of the words: the two places behind them therefore
+		// stand of the second and the third word of the key rather than of the first and the second of them.
+		// A run of a count of words that is a multiple of four stands of the same place either way, which is
+		// what the runs of the other cases here hold; the places of this one are pinned rather than read of
+		// the port, off a second transcription of `ArcCPZ.cs`.
+		const plain = run(22);
+		const cipher = Buffer.from(plain);
+		encryptCpzIndexDirectory(cipher, 22, DIR_KEY);
+		expect(cipher.toString("hex")).toBe(
+			"04765c9d0d5023731926c2721684ed54272de8939581",
+		);
+		const back = Buffer.from(cipher);
+		decryptCpzIndexDirectory(back, 22, DIR_KEY, 0);
+		expect(back.equals(plain)).toBe(true);
+		const read = run(22, 1, 0);
+		decryptCpzIndexDirectory(read, 22, DIR_KEY, 0);
+		expect(read.toString("hex")).toBe(
+			"26721d45ddbd43d5ada98a06851551b7ff99b0811002",
+		);
+	});
+
 	it("stands of the key of the archive on the way in, and not on the way back", () => {
 		// The reference adds the key of the archive to the seed of this walk on the way in alone, so the two
 		// directions are each other's inverse for an archive whose key stands of nothing — the key of a stock
