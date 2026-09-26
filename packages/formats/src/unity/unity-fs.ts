@@ -12,8 +12,9 @@
 // Every bundle of the archive stands of a serialized asset of the engine (`asset-file.ts`), of the places
 // of a stream of the file of the archive: the objects of it stand of the places of the stream, of the names
 // the table of the asset stands of them. The reference reads the places of an object of the kind
-// `Texture2D` and of the kind `AudioClip` of a walk of its own; this port stands of the places of the
-// objects themselves and refuses those two kinds where their places are asked for.
+// `Texture2D` and of the kind `AudioClip` of a walk of its own; this port reads the places of a picture of
+// the kind `Texture2D` (`texture2d.ts`) and stands of the places of the objects of the other kinds
+// themselves, of the kind of the sound `AudioClip` turned away.
 
 import { GarbroError } from "@garbro-mcp/core";
 import type {
@@ -36,6 +37,7 @@ import {
 	readUnityObjectType,
 	readUnityObjectTypeName,
 } from "./asset-file.js";
+import { decodeUnityTexture2d, readUnityTexture2d } from "./texture2d.js";
 
 const MARK = Buffer.from("UnityFS\0", "latin1");
 const VERSION = 6;
@@ -336,6 +338,11 @@ export interface UnityFsItem {
 	kind: string;
 	encrypted: boolean;
 	typeName: string;
+	/** The places of the kind of the object, whose walk `readUnityTexture2d` stands of. */
+	typeVersion: string;
+	/** The shape of the asset the object stands in, of the walk of its places. */
+	assetFormat: number;
+	assetLittleEndian: boolean;
 }
 
 /** `AssetDeserializer.ReadTextAsset`: the places of a script of an asset. */
@@ -411,6 +418,9 @@ function readUnityBundleItems(
 				kind: script.kind,
 				encrypted: script.encrypted,
 				typeName,
+				typeVersion: asset.tree.version,
+				assetFormat: asset.format,
+				assetLittleEndian: asset.isLittleEndian,
 			});
 			continue;
 		}
@@ -421,6 +431,9 @@ function readUnityBundleItems(
 			kind: "Texture2D" === typeName ? "image" : typeName,
 			encrypted: false,
 			typeName,
+			typeVersion: asset.tree.version,
+			assetFormat: asset.format,
+			assetLittleEndian: asset.isLittleEndian,
 		});
 	}
 	return items;
@@ -428,9 +441,12 @@ function readUnityBundleItems(
 
 /** The places of the file of an entry of a bundle of the engine. */
 function itemOf(item: UnityFsItem, index: number): FixedEntry {
-	const path = unreadKind(item.typeName)
-		? item.name
-		: `${item.name}.${item.kind}`;
+	const path =
+		"Texture2D" === item.typeName
+			? `${item.name}.bmp`
+			: unreadKind(item.typeName)
+				? item.name
+				: `${item.name}.${item.kind}`;
 	return {
 		...createFixedEntry({
 			id: index,
@@ -447,6 +463,9 @@ function itemOf(item: UnityFsItem, index: number): FixedEntry {
 							: "file",
 				kind: item.kind,
 				unityType: item.typeName,
+				typeVersion: item.typeVersion,
+				assetFormat: item.assetFormat,
+				assetLittleEndian: item.assetLittleEndian,
 				encrypted: item.encrypted,
 			},
 		}),
@@ -456,6 +475,24 @@ function itemOf(item: UnityFsItem, index: number): FixedEntry {
 /** Whether the places of a kind of an object of the engine stand of no walk this project holds. */
 function unreadKind(typeName: string): boolean {
 	return "Texture2D" === typeName || "AudioClip" === typeName;
+}
+
+/**
+ * The places of a picture of an object of the kind `Texture2D`: the walk of the head of the object, and then
+ * the places of the picture itself, of the kind the head names. Of a kind this project does not read the walk
+ * stands of nothing, and the caller turns the object away.
+ */
+function decodeUnityTexture2dObject(
+	places: Buffer,
+	typeVersion: string,
+	assetFormat: number,
+	littleEndian: boolean,
+): Buffer | undefined {
+	const reader = new UnityReader(places);
+	reader.setup(assetFormat, littleEndian);
+	const picture = readUnityTexture2d(reader, typeVersion, assetFormat);
+	if (!picture) return undefined;
+	return decodeUnityTexture2d(picture);
 }
 
 async function readStored(source: ByteSource): Promise<Buffer> {
@@ -559,6 +596,19 @@ export const unityFsFormat: ArchiveFormat = defineFixedArchive({
 		const stream = unpackUnityFsSegments(data, index.segments);
 		const offset = Number(entry.offset);
 		const size = Number(entry.size);
-		return Readable.from([Buffer.from(stream.subarray(offset, offset + size))]);
+		const places = Buffer.from(stream.subarray(offset, offset + size));
+		if ("Texture2D" === entry.metadata?.unityType) {
+			const picture = decodeUnityTexture2dObject(
+				places,
+				String(entry.metadata?.typeVersion ?? ""),
+				Number(entry.metadata?.assetFormat ?? 0),
+				false !== entry.metadata?.assetLittleEndian,
+			);
+			if (picture) return Readable.from([picture]);
+			throw unsupportedArchive(
+				"The places of the picture of the engine stand of a walk this project does not hold",
+			);
+		}
+		return Readable.from([places]);
 	},
 });

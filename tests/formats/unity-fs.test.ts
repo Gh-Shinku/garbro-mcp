@@ -13,6 +13,7 @@ import {
 	readUnityAsset,
 	readUnityObjectTypeName,
 } from "../../packages/formats/src/unity/asset-file.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
 	readUnityFsHead,
 	readUnityFsIndex,
@@ -97,6 +98,24 @@ function serializedAsset(script: string): Buffer {
 			typeNode({ type: "string", name: "m_Script", size: -1, flags: 0 }),
 		],
 	});
+	return serializedAssetOf(
+		tree,
+		Buffer.concat([
+			le32(name.length),
+			Buffer.from(name, "utf8"),
+			le32(script.length),
+			Buffer.from(script, "latin1"),
+		]),
+		script.length + 16,
+	);
+}
+
+/** A serialized asset of the engine of the kind eleven, of one object of the kind the tree names. */
+function serializedAssetOf(
+	tree: Buffer,
+	body: Buffer,
+	size = body.length,
+): Buffer {
 	const head = Buffer.concat([
 		le32(0), // the count of the places of the head of the file
 		le32(0), // the count of the places of the file
@@ -124,7 +143,7 @@ function serializedAsset(script: string): Buffer {
 	const object = Buffer.concat([
 		le64(1), // the name of the object
 		le32(0), // the places of it within the walk of the file
-		le32(script.length + 16), // the count of the places of it
+		le32(size), // the count of the places of it
 		le32(49), // the kind of it, of the table of the head
 		le16(49),
 		le16(0),
@@ -132,16 +151,55 @@ function serializedAsset(script: string): Buffer {
 	const tail = Buffer.concat([le32(0), le32(0), cstring("")]);
 	const prefix = Buffer.concat([placed, object, tail]);
 	const dataOffset = prefix.length;
-	const body = Buffer.concat([
-		le32(name.length),
-		Buffer.from(name, "utf8"),
-		le32(script.length),
-		Buffer.from(script, "latin1"),
-	]);
 	const places = Buffer.alloc(prefix.length, 0x00);
 	prefix.copy(places);
 	places.writeInt32LE(dataOffset, 0x0c);
 	return Buffer.concat([places, body]);
+}
+
+/**
+ * A serialized asset of the engine of the kind eleven, of one object of the kind `Texture2D` of the places
+ * the walk of the head of a picture of the engine stands of.
+ */
+function serializedTexture(picture: {
+	name: string;
+	width: number;
+	height: number;
+	format: number;
+	data: Buffer;
+}): Buffer {
+	const tree = typeNode({
+		type: "Texture2D",
+		name: "Base",
+		children: [typeNode({ type: "string", name: "m_Name", size: -1 })],
+	});
+	const name = Buffer.from(picture.name, "latin1");
+	// The walk of the head of a picture stands of no place of filling here: the places of a file of the kind
+	// of asset of this fixture stand as they stand.
+	return serializedAssetOf(
+		tree,
+		Buffer.concat([
+			le32(name.length),
+			name,
+			le32(picture.width),
+			le32(picture.height),
+			le32(picture.data.length), // the count of the places of the picture
+			le32(picture.format),
+			le32(1), // the count of the walks of the picture
+			// The places a file of this kind stands of two flags of its own, of no count of them.
+			Buffer.from([0x00, 0x00]),
+			le32(1), // the count of the pictures of the object
+			le32(2), // the shape of the picture: two places
+			le32(0), // the way the places of the picture stand, of no count of them
+			le32(1), // the count of the places of the walk of the widths of the picture
+			le32(0), // the walk of the places of the picture, of four places of the file
+			le32(0), // the way the places of the picture stand beyond the picture
+			le32(1), // the places of the picture, of a count of one place
+			le32(0), // the places of the picture, of the kinds of the places of it
+			le32(picture.data.length),
+			picture.data,
+		]),
+	);
 }
 
 /** The places of a run of the places of a block of the format, of no place of a match at all. */
@@ -204,6 +262,13 @@ async function archiveOf(data: Buffer) {
 	const source = new BufferByteSource(data);
 	expect(await unityFsFormat.detect(source, "sample.unity3d")).toBe(true);
 	return unityFsFormat.open(source, "sample.unity3d");
+}
+
+/** The places of a picture of this project, of the places a walk of the engine stands of. */
+function readPicture(places: Buffer) {
+	const picture = readBmpImage(places);
+	if (!picture) throw new Error("the walk stood of no picture");
+	return picture;
 }
 
 describe("Unity asset archive", () => {
@@ -282,6 +347,128 @@ describe("Unity asset archive", () => {
 			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
 				Buffer.from("packed index", "latin1"),
 			);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture of an object of the kind Texture2D", async () => {
+		// The places of a picture of the kind `RGBA32` stand red, green, blue then the covering place, and
+		// the rows of a picture of the engine stand from its foot up.
+		const data = Buffer.from([
+			10, 20, 30, 255, 40, 50, 60, 255, 70, 80, 90, 255, 100, 110, 120, 255,
+		]);
+		const asset = serializedTexture({
+			name: "sample",
+			width: 2,
+			height: 2,
+			format: 4,
+			data,
+		});
+		const archive = await archiveOf(unityFsFile({ asset }));
+		try {
+			expect(archive.entries.map((entry) => entry.path)).toEqual([
+				"sample.bmp",
+			]);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			expect(entry.metadata).toMatchObject({
+				type: "image",
+				unityType: "Texture2D",
+				kind: "image",
+			});
+			const picture = readPicture(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect([picture.width, picture.height, picture.bitsPerPixel]).toEqual([
+				2, 2, 32,
+			]);
+			expect([...picture.pixels]).toEqual([
+				90, 80, 70, 255, 120, 110, 100, 255, 30, 20, 10, 255, 60, 50, 40, 255,
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture of the kind whose places stand as they stand", async () => {
+		const data = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		]);
+		const asset = serializedTexture({
+			name: "plain",
+			width: 2,
+			height: 2,
+			format: 14, // the places of the picture stand blue, green, red then the covering place
+			data,
+		});
+		const archive = await archiveOf(unityFsFile({ asset }));
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			const picture = readPicture(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect([...picture.pixels]).toEqual([
+				9, 10, 11, 12, 13, 14, 15, 16, 1, 2, 3, 4, 5, 6, 7, 8,
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reads a picture standing of the blocks of the kind DXT1", async () => {
+		// Two rows of blocks: the one of the file stands white, and the one behind it black, while the
+		// rows of a picture of the engine stand from its foot up.
+		const white = Buffer.from([0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+		const black = Buffer.from([0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00]);
+		const asset = serializedTexture({
+			name: "blocks",
+			width: 4,
+			height: 8,
+			format: 10,
+			data: Buffer.concat([white, black]),
+		});
+		const archive = await archiveOf(unityFsFile({ asset }));
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			const picture = readPicture(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect([picture.width, picture.height, picture.bitsPerPixel]).toEqual([
+				4, 8, 32,
+			]);
+			const rows: number[][] = [];
+			for (let row = 0; row < 8; row += 1) {
+				rows.push([...picture.pixels.subarray(row * 16, row * 16 + 16)]);
+			}
+			const blackRow = [0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255];
+			const whiteRow = Array(16).fill(0xff);
+			for (let row = 0; row < 4; row += 1) {
+				expect(rows[row]).toEqual(blackRow);
+				expect(rows[row + 4]).toEqual(whiteRow);
+			}
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("turns away a picture of a kind this project does not read", async () => {
+		const asset = serializedTexture({
+			name: "other",
+			width: 2,
+			height: 2,
+			format: 25, // the kind of the places of a picture of seven places
+			data: Buffer.alloc(16, 0x00),
+		});
+		const archive = await archiveOf(unityFsFile({ asset }));
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
+				code: "UNSUPPORTED_FEATURE",
+			});
 		} finally {
 			await archive.close();
 		}

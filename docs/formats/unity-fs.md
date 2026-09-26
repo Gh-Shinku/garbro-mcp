@@ -46,9 +46,38 @@ the walk of the object itself (the first place of the kind `string` named `m_Nam
 | --- | --- |
 | `AssetBundle` | the names of the objects of the asset alone, of no place of the file of the asset at all |
 | `TextAsset` | the places of the script of the object: the places of it behind the count of them, of a walk of the count of the places of the format where the flags of the kind of it name one |
-| `Texture2D` | the places of the object itself; the walk of the places of a picture of the engine stands of no walk of this project |
+| `Texture2D` | the head of the picture of the object and the places of the picture behind it, of the kinds of picture the walk of this project reads (`unity/texture2d.ts`) |
 | `AudioClip` | the reference reads the places of a sound of the engine of a walk of its own, of a table of the places of the sound of it: this port stands of no object of that kind at all |
 | every other kind | the places of the object itself, of the kind of it as the name of it |
+
+## The pictures of the objects of the kind `Texture2D`
+
+The head of a picture of the engine stands of the name of the picture, of the places of it, of the kind of
+the places of the picture, of the counts of the walks and of the pictures of it, and of the count of the
+places of the picture, which stand behind the head. The reference stands of three shapes of that head, of
+the places of the walk of the asset itself: the shape of the versions `2017.3.1f1`, `2019.3.0f1` and
+`2017.4.3f1`, the shape of the version `2021.1.3f1`, and the shape of every other walk. A walk of a file of
+an older kind stands of no count of the places of the picture, and the reference reads eight places of the
+file behind the head of such a picture where the count of the places of the picture stands at nought; this
+port stands of them as well.
+
+| kind of the places of a picture | the walk of it |
+| --- | --- |
+| one place of grey (`1`) | the places of the picture, one place of grey each, as a picture of grey |
+| four places of a colour of half a place (`2`) | every place of half a place of the file stands of two places of a colour, of the low places of it first |
+| three places of a colour (`3`) | the places of the picture, blue, green then red, as a bitmap of this project stands of them |
+| four places of a colour, the covering place last (`4`) | the places of the picture, of red and blue the other way round |
+| four places of a colour, the covering place first (`5`) | every place of four of the file stands the other way round |
+| a red place of sixteen places (`6`) | the high places of every place of the file, as a picture of grey of one place |
+| five places of a colour and six of green (`7`) | the places of the picture, as a picture of the places of a colour of two places of the file |
+| the blocks of the third kind (`10`) | the blocks of the format, of four places of a colour and a covering place each (`shared/dxt.ts`) |
+| the blocks of the fifth kind (`12`) | the blocks of the format, of four places of a colour and a covering place each (`shared/dxt.ts`) |
+| blue, green, red then the covering place (`14`) | the places of the picture, as a bitmap of this project stands of them |
+| every other kind | the walk stands of no picture: the object stands turned away (`UNSUPPORTED_FEATURE`) |
+
+The rows of a picture of the engine stand from its foot up, and the reference hands the places of a picture
+over of a walk that stands of them the other way round; this port turns the rows of every picture over as
+well, so that a bitmap of this project stands of the picture the right way up.
 
 ## Deviations
 
@@ -61,6 +90,12 @@ the walk of the object itself (the first place of the kind `string` named `m_Nam
   well, as the reference refuses it.
 * An object of the kind `AudioClip` stands of no place of the walk at all, where the reference stands of it
   where the sound of it stands in a stream of the file and turns it away where it does not.
+* A picture of the kind of the places of a colour of **seven places** (`25`), which the reference reads of a
+  walk of its own, stands turned away; so do the kinds of the places of a colour of **four places of a place**
+  (`13`) and the kinds of a fruit (`28`, `29`), which the reference turns away as well.
+* A picture of a **red place of sixteen places** (`6`) stands as a picture of grey of one place of the file,
+  of the high places of it, where the reference hands out a picture of grey of sixteen places: a bitmap of
+  this project stands of no such depth of a colour.
 * The names of the kinds of the walk of a newer asset stand of the file of the reference
   (`ArcFormats/Unity/strings.dat`, of a place of the walk of a name behind the places of the file itself),
   which this port carries as the run of the places of that file. A place of a name standing past the places
