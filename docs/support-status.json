@@ -7951,6 +7951,34 @@
 		},
 		{
 			"reference": {
+				"type": "archive",
+				"tag": "GPK/STACK",
+				"class": "GpkOpener",
+				"source": "ArcFormats/Stack/ArcGPK.cs"
+			},
+			"localId": "stack-gpk-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the index of the archive at the end of it, behind the two words `STKFile0PIDX` and `STKFile0PACKFILE` 16 places of the file apart and the count of the places of the index 12 places behind the first of them",
+				"the cipher of the index out of the resource `CODE` of the kind `CIPHERCODE` of an executable of the directory above the archive and then of the archive's own directory, in that order (`shared/exe.ts`), of the sixteen places behind the first four where the resource stands of twenty places",
+				"the walk of the cipher (`ByteStringEncryptedStream`: every place of the file exclusive-ored with a place of the cipher), the four places of the file behind it and the zlib stream of the index behind those",
+				"the records of the index: the count of the places of a name of two places, the name, six places of the file the reference stands of no use of, the places of the picture and the count of them, four places of the file the reference stands of no use of, the count of the unpacked places, the count of the places of the head of the picture and the places of that head",
+				"the word of the end of the index, of a count of the places of a name of nought",
+				"the places of a picture of the engine: the head of it in front of its places and then, where the places of it are packed, the zlib walk over the whole of the two, which is the order the reference stands of them"
+			],
+			"unsupported": [
+				"archive creation",
+				"an archive standing within another archive, of which the reference stands of no cipher at all and so refuses",
+				"the kinds of the names of the pictures of the engine, which the reference stands of the kinds of the resources of its own table of the places of a name and this port stands of the name `file`"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"an archive of a real game of the engine with the executable of that game beside it"
+			]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "ALP/GAMESYSTEM",
 				"class": "AlpFormat",

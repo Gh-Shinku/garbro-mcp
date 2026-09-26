@@ -866,6 +866,7 @@ import { sophiaNorFormat } from "./sophia/nor.js";
 import { spackFormat } from "./spack/dat.js";
 import { speedArcFormat } from "./speed/arc.js";
 import { flkDatFormat } from "./splush-wave/flk.js";
+import { stackGpkFormat } from "./stack/gpk-archive.js";
 import { splushWaveSwgImageFormat } from "./splush-wave/swg-image.js";
 import { plaFormat } from "./squadrad/pla.js";
 import { sdaSdFormat } from "./squadrad/sda.js";
@@ -1368,6 +1369,7 @@ export * from "./sophia/index.js";
 export * from "./spack/index.js";
 export * from "./speed/index.js";
 export * from "./splush-wave/index.js";
+export * from "./stack/index.js";
 export * from "./squadrad/index.js";
 export * from "./studio-ego/index.js";
 export * from "./studio-jikkenshitsu/index.js";
@@ -2476,6 +2478,7 @@ export function createDefaultRegistry(
 			pictImageFormat,
 			gsPackPicImageFormat,
 			gsPackScwScriptFormat,
+			stackGpkFormat,
 			rinaRadImageFormat,
 			yuRisYcgImageFormat,
 			shiinaRioChdImageFormat,
