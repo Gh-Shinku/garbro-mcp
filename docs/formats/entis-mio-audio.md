@@ -36,7 +36,7 @@ it and then the places of the count of the walk of the engine itself.
 | --- | --- |
 | `Lossless_ERI` (`0x03020000`) | the counts of a picture of the engine alone, of a count of no sign at all and of a count of the counts behind it (`codecs/erisa-context.ts`, of the counts of the walk of the engine of the kind `RunlengthHuffman`) |
 | `LOT_ERI` (`0x00000005`) | the walks of a picture of the engine itself (`MioDecoder.DecodeSoundDCT`, of the counts of the walk of the engine of the kind `RunlengthHuffman`) |
-| `LOT_ERI_MSS` (`0x00000105`) | the walks of a picture of the engine itself of two counts of a colour (`MioDecoder.DecodeSoundDCT_MSS`), which stand unported here; a sound of one count of a colour stands of the walks of the count of `LOT_ERI` |
+| `LOT_ERI_MSS` (`0x00000105`) | the walks of a picture of the engine itself of two counts of a colour (`MioDecoder.DecodeSoundDCT_MSS`); a sound of one count of a colour stands of the walks of the count of `LOT_ERI` |
 
 A sound of the kind `Lossless_ERI` stands of a sound of a count of the places of the walk of the engine of
 the kind `RunlengthHuffman` alone: every count of the walk of the engine stands of the counts of the walk of
@@ -77,11 +77,19 @@ the walk of the engine of the counts of the gamma at all (`context as HuffmanDec
 stands of no count of a walk of the engine of its own): the sound stands detected, and the places of it stand
 refused.
 
+A sound of the kind `LOT_ERI_MSS` of two counts of a colour stands of the counts of the walk of the engine of
+the two counts of a colour of every count of the walk of a picture of the engine: the counts of the walk of
+the engine of the count of the walk of a picture stand of the counts of the walk of the engine of the count
+of the walk of the engine of the two counts of a colour (`DecodeLeadBlock_MSS`, `DecodeInternalBlock_MSS`,
+`DecodePostBlock_MSS`), of the counts of the walk of the engine of the counts of the walk of the engine of a
+count of the walk of a picture of its own (`Erisa.Revolve2x2`, of the counts of the walk of the engine of the
+count of the walk of the engine of the count of the walk of the sound of the engine of two places of the
+count of the walk of the engine of it) and of the counts of the walk of the engine of the count of the walk
+of the engine of the count of the walk of the sound itself (of the counts of the walk of the engine of the
+count of the walk of the engine of every count of a colour of a count of the walk of the engine of its own).
+
 ## Deviations
 
-* The places of a sound of the kinds of the walks of a picture of the engine of the kind `LOT_ERI_MSS` of two
-  counts of a colour stand refused (`UNSUPPORTED_FEATURE`): the walks of `MioDecoder.DecodeSoundDCT_MSS`
-  behind them stand unported.
 * The counts of the walk of the engine of the places of the count of the walk of the engine of a count of the
   walk of a picture of the engine stand of the places of the walk of the engine of the count of the walk of
   the engine of the places of the count of the walk of the engine itself: the reference stands of the places
@@ -126,6 +134,14 @@ stand pinned, the places of a sound of the counts of the walk of the engine of t
 engine of the count of the sound over each other stand pinned (of the counts of the walk of the engine of the
 count of the walk of the sound of the counts of the walk of the engine of two counts of a picture of the
 engine) and a sound of the walk of the engine of no count of the walk of its own stands turned away.
+
+A sound of the kind `LOT_ERI_MSS` of two counts of a colour stands of the bits of the walk of the counts of
+the engine of its own (`dctPlaces`, of the counts of the walk of the engine of the count of the walk of the
+count of the walk of a picture of the engine): the places of it of no count of the walk of the engine of the
+count of the walk of a picture stand of the counts of the walk of the engine of the walk of the count of
+`LOT_ERI` of it (the counts of the walk of the engine of the count of the walk of the engine of no count at
+all), and the places of it of the counts of the walk of the engine of the count of the walk of a picture of
+their own stand of places of the walk of the engine of their own.
 
 The counts of the walk of the engine of the places of the count of the walk of the engine of the count of no
 name at all (the walk of the counts of the gamma of the count of the walk of the engine) stand of no count

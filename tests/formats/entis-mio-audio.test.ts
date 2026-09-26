@@ -23,6 +23,7 @@ const CHUNK_HEADER_SIZE = 0x08;
 const ERISA_HUFFMAN_ROOT = 0x200;
 const ERISA_HUFFMAN_NULL = 0x8000;
 const MIO_LEAD_BLOCK = 0x01;
+const CHANNELS = 2;
 const SOUND_INFO_SECTION = "SoundInf";
 const SOUND_STREAM_SECTION = "SoundStm";
 
@@ -191,22 +192,38 @@ function dctPlaces(input: {
 	weightCodes: readonly number[];
 	coefficients: readonly number[];
 	places: readonly number[];
+	mss?: boolean;
+	revolveCodes?: readonly number[];
 }): Buffer {
 	const bits: number[] = [];
 	const word = (value: number, count: number): void => {
 		for (let at = count - 1; at >= 0; at -= 1) bits.push((value >>> at) & 1);
 	};
 	bits.push(0);
-	for (let channel = 0; channel < input.channels; channel += 1) {
-		// The count of the walk of the engine stands of no count of the walk of the places of a count of
-		// the walk of the engine: one count of the walk of it of every count of a colour.
+	if (input.mss) {
+		// The counts of the walk of the engine of the counts of the walk of the engine of a count of the
+		// walk of a sound of the engine of two counts of a colour stand of the counts of the walk of the
+		// engine of no count of the walk of the engine of the places of a count of the walk of the engine
+		// itself: one count of the walk of the engine of a count of a colour.
 		word(0, 2);
-		word(input.weightCodes[channel * 2] ?? 0, 32);
-		word(input.coefficients[channel * 2] ?? 0, 16);
-	}
-	for (let channel = 0; channel < input.channels; channel += 1) {
-		word(input.weightCodes[channel * 2 + 1] ?? 0, 32);
-		word(input.coefficients[channel * 2 + 1] ?? 0, 16);
+		word(input.revolveCodes?.[0] ?? 0, 2);
+		word(input.weightCodes[0] ?? 0, 32);
+		word(input.coefficients[0] ?? 0, 16);
+		word(input.revolveCodes?.[1] ?? 0, 2);
+		word(input.weightCodes[1] ?? 0, 32);
+		word(input.coefficients[1] ?? 0, 16);
+	} else {
+		for (let channel = 0; channel < input.channels; channel += 1) {
+			// The count of the walk of the engine stands of no count of the walk of the places of a count of
+			// the walk of the engine: one count of the walk of it of every count of a colour.
+			word(0, 2);
+			word(input.weightCodes[channel * 2] ?? 0, 32);
+			word(input.coefficients[channel * 2] ?? 0, 16);
+		}
+		for (let channel = 0; channel < input.channels; channel += 1) {
+			word(input.weightCodes[channel * 2 + 1] ?? 0, 32);
+			word(input.coefficients[channel * 2 + 1] ?? 0, 16);
+		}
 	}
 	bits.push(0);
 	bits.push(...encodeErinaBits(input.places));
@@ -224,10 +241,18 @@ function lotSound(input: {
 	subbandDegree?: number;
 	lappedDegree?: number;
 	bitsPerSample?: number;
+	revolveCodes?: readonly number[];
 }): Buffer {
 	const channels = input.channels ?? 1;
 	const weightCode = input.weightCode ?? 0;
 	const coefficient = input.coefficient ?? 0x1000;
+	// The counts of the walk of the engine of a count of the walk of a sound of the engine of two counts of
+	// a colour stand of the counts of the walk of the engine of the count of the walk of the engine of no
+	// count of the walk of the engine of a picture of its own: the reference stands of a sound of one count
+	// of a colour of the counts of the walk of the engine of the count of the walk of `LOT_ERI` of it.
+	const mss =
+		0x00000105 === (input.transformation ?? 0x00000005) &&
+		CHANNELS === channels;
 	return buildSound({
 		info: soundInfoSection({
 			transformation: input.transformation ?? 0x00000005,
@@ -244,6 +269,8 @@ function lotSound(input: {
 					weightCodes: Array.from({ length: channels * 2 }, () => weightCode),
 					coefficients: Array.from({ length: channels * 2 }, () => coefficient),
 					places: input.places,
+					mss,
+					revolveCodes: input.revolveCodes ?? [],
 				}),
 			}),
 		],
@@ -557,28 +584,56 @@ describe("Entis sound", () => {
 	});
 
 	it("stands of the counts of the walk of the engine of the places of a sound of two counts of a colour of the walk of a picture of it", async () => {
-		// A sound of the counts of the walk of the engine of the kind `LOT_ERI_MSS` of two counts of a colour
-		// stands of the counts of the walk of the engine of the places of a colour behind the places of the
-		// walk of the engine itself: the sound stands of this engine, and the places of it stand refused.
-		const data = lotSound({
-			channels: 2,
-			sampleCount: 2,
-			places: new Array(0x400).fill(1),
-			transformation: 0x00000105,
-		});
-		const source = new BufferByteSource(data);
-		expect(await entisMioAudioFormat.detect(source, "sound.mio")).toBe(true);
-		const archive = await entisMioAudioFormat.open(source, "sound.mio");
-		try {
-			const entry = archive.entries[0];
-			if (!entry) throw new Error("no entry");
-			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
-				code: "UNSUPPORTED_FEATURE",
-			});
-			await expect(archive.openEntry(entry.id)).rejects.toThrow(GarbroError);
-		} finally {
-			await archive.close();
-		}
+		// A sound of the kind `LOT_ERI_MSS` stands of the counts of the walk of the engine of the two counts
+		// of a colour of a count of the walk of a picture of the engine (`DecodeSoundDCT_MSS`): the counts of
+		// the walk of the engine of the counts of the walk of the engine of the count of the walk of the
+		// picture of the engine itself stand of the counts of the walk of the engine of the count of the
+		// walk of the engine of the sound itself.
+		const places = new Array(0x400).fill(1);
+		const bytesOf = async (data: Buffer): Promise<number[]> => {
+			const { wave, read } = await soundOf(data);
+			if (!read) throw new Error("no wave file of the walk");
+			return [
+				...wave.subarray(read.dataOffset, read.dataOffset + read.dataSize),
+			];
+		};
+		const plain = await bytesOf(
+			lotSound({ channels: 2, sampleCount: 2, places, coefficient: 0x10 }),
+		);
+		// The counts of the walk of the engine of no count of the walk of the engine of a picture of the
+		// engine stand of the counts of the walk of the engine of the walk of the count of the kind
+		// `LOT_ERI` of it: the two counts of the walk of the engine stand of the same places of the walk of
+		// the engine of their own.
+		const mss = await bytesOf(
+			lotSound({
+				channels: 2,
+				sampleCount: 2,
+				places,
+				coefficient: 0x10,
+				transformation: 0x00000105,
+				revolveCodes: [0, 0],
+			}),
+		);
+		expect(mss).toEqual(plain);
+		// The counts of the walk of the engine of the count of the walk of the engine of the count of the
+		// walk of the sound of the engine of the counts of the walk of the engine of no count at all stand of
+		// the counts of the walk of the engine of the count of the walk of the engine of the count of the
+		// walk of the engine of the count of the walk of the engine of its own.
+		const turned = await bytesOf(
+			lotSound({
+				channels: 2,
+				sampleCount: 2,
+				places,
+				coefficient: 0x10,
+				transformation: 0x00000105,
+				revolveCodes: [1, 2],
+			}),
+		);
+		expect(turned).toHaveLength(8);
+		expect(turned).not.toEqual(plain);
+	});
+
+	it("stands of the counts of the walk of the engine of the places of a sound of one count of a colour of the walk of a picture of it", async () => {
 		// A sound of the kind `LOT_ERI_MSS` of one count of a colour stands of the counts of the walk of a
 		// picture of the engine alone, of the count of the walk of the engine of the walk of it.
 		const mono = await soundOf(
@@ -650,9 +705,12 @@ describe("Entis sound", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("no entry");
-			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
-				code: "UNSUPPORTED_FEATURE",
-			});
+			const failure = await archive.openEntry(entry.id).then(
+				() => undefined,
+				(error: unknown) => error,
+			);
+			expect(failure).toBeInstanceOf(GarbroError);
+			expect(failure).toMatchObject({ code: "UNSUPPORTED_FEATURE" });
 		} finally {
 			await archive.close();
 		}

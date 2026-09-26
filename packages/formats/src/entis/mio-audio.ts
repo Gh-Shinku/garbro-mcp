@@ -25,6 +25,7 @@ import {
 	fastIlot,
 	fastIplot,
 	oddGivensInverseMatrix,
+	revolve2x2,
 	roundR32ToWordArray,
 } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
@@ -68,6 +69,7 @@ const MAX_SUBBAND_DEGREE = 12;
 const LAPPED_DEGREE = 1;
 /** The counts of the walk of the counts of a picture of the engine. */
 const DIVISION_BITS = 2;
+const REVOLVE_BITS = 4;
 const CODE_MARGIN = 10;
 const WORD_PLACES = 2;
 
@@ -734,6 +736,408 @@ export class MioDecoder {
 		dest[channel] = (dest[channel] ?? 0) + samples * channelCount * WORD_PLACES;
 	}
 
+	/** `DecodeLeadBlock_MSS`: the places of the first count of a walk of a picture of two colours. */
+	decodeLeadBlockMss(
+		weightCode: number,
+		coefficient: number,
+		revCode: number,
+	): void {
+		const half = Math.trunc(this.places / 2);
+		for (let colour = 0; colour < 2; colour += 1) {
+			const at = colour * this.places;
+			for (let place = 0; place < half; place += 1) {
+				this.buffer1[place * 2] = 0;
+				this.buffer1[place * 2 + 1] =
+					this.buffer2[this.nextSource + place] ?? 0;
+			}
+			this.nextSource += half;
+			this.iQuantumize(
+				this.lastDctBuf,
+				at,
+				this.buffer1,
+				0,
+				this.places,
+				weightCode,
+				coefficient,
+			);
+		}
+		revolve2x2(
+			this.lastDctBuf,
+			0,
+			this.lastDctBuf,
+			this.places,
+			Math.fround(Math.sin((revCode * Math.PI) / 8)),
+			Math.fround(Math.cos((revCode * Math.PI) / 8)),
+			1,
+			this.places,
+		);
+		for (let colour = 0; colour < 2; colour += 1) {
+			const at = colour * this.places;
+			oddGivensInverseMatrix(this.lastDctBuf, at, this.revolve, this.degree);
+			for (let place = 0; place < this.places; place += 2) {
+				this.lastDctBuf[at + place] = this.lastDctBuf[at + place + 1] ?? 0;
+			}
+			fastIplot(this.lastDctBuf, at, this.degree);
+		}
+	}
+
+	/** `DecodeInternalBlock_MSS`: the places of a count of the walk of a picture of two colours. */
+	decodeInternalBlockMss(
+		dst: Uint8Array,
+		at: number,
+		samples: number,
+		weightCode: number,
+		coefficient: number,
+		revCode: number,
+	): void {
+		for (let colour = 0; colour < 2; colour += 1) {
+			this.iQuantumize(
+				this.matrixBuf,
+				colour * this.places,
+				this.buffer2,
+				this.nextSource,
+				this.places,
+				weightCode,
+				coefficient,
+			);
+			this.nextSource += this.places;
+		}
+		const first = (revCode >> 2) & 0x03;
+		const second = revCode & 0x03;
+		revolve2x2(
+			this.matrixBuf,
+			0,
+			this.matrixBuf,
+			this.places,
+			Math.fround(Math.sin((first * Math.PI) / 8)),
+			Math.fround(Math.cos((first * Math.PI) / 8)),
+			2,
+			Math.trunc(this.places / 2),
+		);
+		revolve2x2(
+			this.matrixBuf,
+			1,
+			this.matrixBuf,
+			this.places + 1,
+			Math.fround(Math.sin((second * Math.PI) / 8)),
+			Math.fround(Math.cos((second * Math.PI) / 8)),
+			2,
+			Math.trunc(this.places / 2),
+		);
+		for (let colour = 0; colour < 2; colour += 1) {
+			const from = colour * this.places;
+			const lapped = colour * this.places;
+			oddGivensInverseMatrix(this.matrixBuf, from, this.revolve, this.degree);
+			fastIplot(this.matrixBuf, from, this.degree);
+			fastIlot(
+				this.workBuf,
+				this.lastDctBuf,
+				lapped,
+				this.matrixBuf,
+				from,
+				this.degree,
+			);
+			for (let place = 0; place < this.places; place += 1) {
+				this.lastDctBuf[lapped + place] = this.matrixBuf[from + place] ?? 0;
+				this.matrixBuf[from + place] = this.workBuf[place] ?? 0;
+			}
+			fastIdct(
+				this.internalBuf,
+				0,
+				this.matrixBuf,
+				from,
+				1,
+				this.workBuf,
+				this.degree,
+			);
+			if (0 !== samples) {
+				roundR32ToWordArray(
+					dst,
+					at + colour * WORD_PLACES,
+					2,
+					this.internalBuf,
+					samples,
+				);
+			}
+		}
+	}
+
+	/** `DecodePostBlock_MSS`: the places of the last count of the walk of a picture of two colours. */
+	decodePostBlockMss(
+		dst: Uint8Array,
+		at: number,
+		samples: number,
+		weightCode: number,
+		coefficient: number,
+		revCode: number,
+	): void {
+		const half = Math.trunc(this.places / 2);
+		for (let colour = 0; colour < 2; colour += 1) {
+			for (let place = 0; place < half; place += 1) {
+				this.buffer1[place * 2] = 0;
+				this.buffer1[place * 2 + 1] =
+					this.buffer2[this.nextSource + place] ?? 0;
+			}
+			this.nextSource += half;
+			this.iQuantumize(
+				this.matrixBuf,
+				colour * this.places,
+				this.buffer1,
+				0,
+				this.places,
+				weightCode,
+				coefficient,
+			);
+		}
+		revolve2x2(
+			this.matrixBuf,
+			0,
+			this.matrixBuf,
+			this.places,
+			Math.fround(Math.sin((revCode * Math.PI) / 8)),
+			Math.fround(Math.cos((revCode * Math.PI) / 8)),
+			1,
+			this.places,
+		);
+		for (let colour = 0; colour < 2; colour += 1) {
+			const from = colour * this.places;
+			const lapped = colour * this.places;
+			oddGivensInverseMatrix(this.matrixBuf, from, this.revolve, this.degree);
+			for (let place = 0; place < this.places; place += 2) {
+				this.matrixBuf[from + place] = -(this.matrixBuf[from + place + 1] ?? 0);
+			}
+			fastIplot(this.matrixBuf, from, this.degree);
+			fastIlot(
+				this.workBuf,
+				this.lastDctBuf,
+				lapped,
+				this.matrixBuf,
+				from,
+				this.degree,
+			);
+			for (let place = 0; place < this.places; place += 1) {
+				this.matrixBuf[from + place] = this.workBuf[place] ?? 0;
+			}
+			fastIdct(
+				this.internalBuf,
+				0,
+				this.matrixBuf,
+				from,
+				1,
+				this.workBuf,
+				this.degree,
+			);
+			if (0 !== samples) {
+				roundR32ToWordArray(
+					dst,
+					at + colour * WORD_PLACES,
+					2,
+					this.internalBuf,
+					samples,
+				);
+			}
+		}
+	}
+
+	/** `DecodeSoundDCT_MSS`: the places of a sound of the engine of two counts of a colour. */
+	decodeSoundDctMss(chunk: MioChunk, places: Buffer): Uint8Array {
+		const info = this.info;
+		const degreeWidth = 1 << info.subbandDegree;
+		const subbandCount = Math.trunc(
+			(chunk.sampleCount + degreeWidth - 1) / degreeWidth,
+		);
+		const sampleCount = subbandCount * degreeWidth;
+		const channelCount = info.channelCount;
+		const allSampleCount = sampleCount * channelCount;
+		const blockSize = channelCount * degreeWidth;
+		const codeCount = subbandCount * CODE_MARGIN;
+		this.matrixBuf = new Float32Array(blockSize);
+		this.internalBuf = new Float32Array(blockSize);
+		this.workBuf = new Float32Array(degreeWidth);
+		this.lastDctBuf = new Float32Array(blockSize * info.lappedDegree);
+		this.buffer1 = new Int32Array(blockSize);
+		this.buffer2 = new Int32Array(allSampleCount);
+		this.weightCodes = new Int32Array(codeCount);
+		this.coefficients = new Int32Array(codeCount);
+		const revolveCodes = new Uint8Array(codeCount);
+		const divisionTable = new Uint8Array(subbandCount);
+		if (ARCHITECTURE_RUN_LENGTH_HUFFMAN !== info.architecture) {
+			throw unsupportedSound(
+				"The places of a sound of the engine stand of the walk of the counts of it of no walk of the engine",
+			);
+		}
+		const context = new ErisaHuffmanDecodeContext(0x10000);
+		context.attachInputFile(places);
+		context.flushBuffer();
+		if (0 !== context.getABit()) {
+			throw invalidSound(
+				"The walk of the counts of the sound of the engine stands of no count of it",
+			);
+		}
+		let nextDivision = 0;
+		let nextRevCode = 0;
+		this.nextWeight = 0;
+		this.nextCoefficient = 0;
+		let lastDivision = -1;
+		for (let subband = 0; subband < subbandCount; subband += 1) {
+			const division = context.getNBits(DIVISION_BITS);
+			divisionTable[nextDivision] = division;
+			nextDivision += 1;
+			let lead = false;
+			if (division !== lastDivision) {
+				if (0 !== subband) {
+					revolveCodes[nextRevCode] = context.getNBits(DIVISION_BITS);
+					nextRevCode += 1;
+					this.weightCodes[this.nextWeight] = context.getNBits(32);
+					this.nextWeight += 1;
+					this.coefficients[this.nextCoefficient] = context.getNBits(16);
+					this.nextCoefficient += 1;
+				}
+				lead = true;
+				lastDivision = division;
+			}
+			const divisionCount = 1 << division;
+			for (let place = 0; place < divisionCount; place += 1) {
+				if (lead) {
+					revolveCodes[nextRevCode] = context.getNBits(DIVISION_BITS);
+					lead = false;
+				} else {
+					// The counts of the walk of the engine of the counts of the walk of a picture of the
+					// engine of the count of the walk of the sound of the engine itself stand of the places
+					// of the walk of the engine of the count of the walk of the count of the walk of it.
+					revolveCodes[nextRevCode] = context.getNBits(REVOLVE_BITS);
+				}
+				nextRevCode += 1;
+				this.weightCodes[this.nextWeight] = context.getNBits(32);
+				this.nextWeight += 1;
+				this.coefficients[this.nextCoefficient] = context.getNBits(16);
+				this.nextCoefficient += 1;
+			}
+		}
+		if (subbandCount > 0) {
+			revolveCodes[nextRevCode] = context.getNBits(DIVISION_BITS);
+			nextRevCode += 1;
+			this.weightCodes[this.nextWeight] = context.getNBits(32);
+			this.nextWeight += 1;
+			this.coefficients[this.nextCoefficient] = context.getNBits(16);
+			this.nextCoefficient += 1;
+		}
+		if (0 !== context.getABit()) {
+			throw invalidSound(
+				"The walk of the counts of the sound of the engine stands of no count of it",
+			);
+		}
+		if (0 !== (chunk.flags & MIO_LEAD_BLOCK)) {
+			context.prepareToDecodeErinaCode();
+		}
+		const decoded = new Uint8Array(allSampleCount * WORD_PLACES);
+		if (
+			context.decodeBytes(decoded, allSampleCount * WORD_PLACES) <
+			allSampleCount * WORD_PLACES
+		) {
+			throw invalidSound(
+				"The count of the walk of the sound stands short of its places",
+			);
+		}
+		// The places of the walk of the engine stand of the counts of the two counts of a colour of a count
+		// of the walk of a picture of the engine, one behind the other.
+		let high = 0;
+		let low = allSampleCount;
+		for (let place = 0; place < degreeWidth * WORD_PLACES; place += 1) {
+			let quantumized = place;
+			for (let subband = 0; subband < subbandCount; subband += 1) {
+				const lowPlace = ((decoded[low] ?? 0) << 24) >> 24;
+				const highPlace =
+					(((decoded[high] ?? 0) << 24) >> 24) ^ (lowPlace >> 8);
+				this.buffer2[quantumized] = (lowPlace & 0xff) | (highPlace << 8);
+				quantumized += degreeWidth * WORD_PLACES;
+				low += 1;
+				high += 1;
+			}
+		}
+		const out = new Uint8Array(chunk.sampleCount * channelCount * WORD_PLACES);
+		let rest = chunk.sampleCount;
+		let dest = 0;
+		nextDivision = 0;
+		nextRevCode = 0;
+		this.nextWeight = 0;
+		this.nextCoefficient = 0;
+		this.nextSource = 0;
+		lastDivision = -1;
+		for (let subband = 0; subband < subbandCount; subband += 1) {
+			const division = divisionTable[nextDivision] ?? 0;
+			nextDivision += 1;
+			const divisionCount = 1 << division;
+			this.lastDctAt = 0;
+			let lead = false;
+			if (lastDivision !== division) {
+				if (0 !== subband) {
+					const samples = Math.min(rest, this.places);
+					this.decodePostBlockMss(
+						out,
+						dest,
+						samples,
+						this.weightCodes[this.nextWeight] ?? 0,
+						this.coefficients[this.nextCoefficient] ?? 0,
+						revolveCodes[nextRevCode] ?? 0,
+					);
+					nextRevCode += 1;
+					this.nextWeight += 1;
+					this.nextCoefficient += 1;
+					rest -= samples;
+					dest += samples * channelCount * WORD_PLACES;
+				}
+				this.initializeWithDegree(info.subbandDegree - division);
+				lastDivision = division;
+				lead = true;
+			}
+			for (let place = 0; place < divisionCount; place += 1) {
+				if (lead) {
+					this.decodeLeadBlockMss(
+						this.weightCodes[this.nextWeight] ?? 0,
+						this.coefficients[this.nextCoefficient] ?? 0,
+						revolveCodes[nextRevCode] ?? 0,
+					);
+					nextRevCode += 1;
+					this.nextWeight += 1;
+					this.nextCoefficient += 1;
+					lead = false;
+				} else {
+					const samples = Math.min(rest, this.places);
+					this.decodeInternalBlockMss(
+						out,
+						dest,
+						samples,
+						this.weightCodes[this.nextWeight] ?? 0,
+						this.coefficients[this.nextCoefficient] ?? 0,
+						revolveCodes[nextRevCode] ?? 0,
+					);
+					nextRevCode += 1;
+					this.nextWeight += 1;
+					this.nextCoefficient += 1;
+					rest -= samples;
+					dest += samples * channelCount * WORD_PLACES;
+				}
+			}
+		}
+		if (subbandCount > 0) {
+			const samples = Math.min(rest, this.places);
+			this.decodePostBlockMss(
+				out,
+				dest,
+				samples,
+				this.weightCodes[this.nextWeight] ?? 0,
+				this.coefficients[this.nextCoefficient] ?? 0,
+				revolveCodes[nextRevCode] ?? 0,
+			);
+			rest -= samples;
+		}
+		if (0 !== rest) {
+			this.initializeWithDegree(0);
+		}
+		return out;
+	}
+
 	/** `DecodeSound`: the places of a sound of the engine, of a count of the walk of it. */
 	decodeSound(chunk: MioChunk, places: Buffer): Uint8Array {
 		if (TRANSFORMATION_LOSSLESS_ERI === this.info.transformation) {
@@ -743,14 +1147,11 @@ export class MioDecoder {
 		}
 		if (
 			TRANSFORMATION_LOT_ERI === this.info.transformation ||
-			(TRANSFORMATION_LOT_ERI_MSS === this.info.transformation &&
-				CHANNEL_LIMIT !== this.info.channelCount)
+			CHANNEL_LIMIT !== this.info.channelCount
 		) {
 			return this.decodeSoundDct(chunk, places);
 		}
-		throw unsupportedSound(
-			"The places of a sound of the engine stand of the walks of a picture of the engine of the two counts of it",
-		);
+		return this.decodeSoundDctMss(chunk, places);
 	}
 
 	/** `DecodeSoundPCM8`: the places of a sound of eight places of a count of the walk of it. */
@@ -833,14 +1234,6 @@ export class MioDecoder {
 
 /** The places of a sound of the engine, of every count of the walk of it, one behind the other. */
 export function decodeMioSound(data: Buffer, layout: MioLayout): Buffer {
-	if (
-		TRANSFORMATION_LOT_ERI_MSS === layout.info.transformation &&
-		CHANNEL_LIMIT === layout.info.channelCount
-	) {
-		throw unsupportedSound(
-			"The places of a sound of the engine stand of the walks of a picture of the engine of the two counts of it",
-		);
-	}
 	if (ARCHITECTURE_NEMESIS === layout.info.architecture) {
 		throw unsupportedSound(
 			"The places of a sound of the engine stand of the walk of the Nemesis of it",
