@@ -221,6 +221,50 @@ the engine of the counts of the engine itself. A sound of a count of the places 
 of no counts of the walk of the engine at all stands of the counts of the places of the picture of the engine
 of the counts of the walk of the engine of the places of the picture of the engine as they stand.
 
+## The counts of the places of a picture of the engine
+
+A picture of the engine (`BITD`) stands of the counts of the places of the picture of the engine of the counts
+of the walk of the engine of the places of the picture of the engine of the counts of the walk of the engine
+itself, of the counts of the places of the picture of the engine of every count of the places of the picture of
+the engine (`(width * bpp + 7) / 8 + 1`, of the counts of the engine itself) and of the counts of the walk of
+the engine of the places of the picture of the engine of the counts of the places of the picture of the engine:
+
+* The counts of the places of the picture of the engine of every count of the places of the picture of the
+  engine stand of the counts of the walk of the engine of the places of the picture of the engine of the counts
+  of the engine itself: a count of the counts of the places of the picture of the engine of the count of the
+  walk of the engine stands of the counts of the places of the picture of the engine of the counts of them, and
+  a count of the engine behind the count of the counts of the places of the picture of the engine stands of a
+  count of the places of the picture of the engine of the counts of them.
+* The counts of the places of the picture of the engine of a count of the places of the picture of the engine
+  of more than eight places of a colour stand of the counts of the engine of the walk of the engine: the counts
+  of the places of the picture of the engine of the counts of them stand of the counts of the walk of the
+  engine of the places of the picture of the engine of every count of the places of the picture of the engine,
+  and the counts of the places of the picture of the engine of the counts of the engine of the walk of the
+  engine stand of the counts of the engine of the walk of the engine of the places of the picture of the
+  engine of the counts of them.
+* The counts of the places of the picture of the engine of the counts of the walk of the engine of the places
+  of the picture of the engine stand of the counts of the places of the picture of the engine of the engine
+  (`CLUT`), of the counts of the engine of the walk of the engine itself, of the counts of the places of the
+  picture of the engine of every count of them. A picture of the engine of no counts of them at all stands of
+  the counts of the places of the picture of the engine of the counts of the engine of the walk of the engine
+  of the counts of them of the engine: `0` of the counts of the engine of the walk of the engine itself, `-1`
+  of the counts of the walk of the engine of the places of the picture of the engine of the engine itself, `-2`
+  of the counts of the places of the picture of the engine of the counts of the engine itself, `-100` of the
+  counts of the engine of the walk of the engine of the places of the picture of the engine of the engine
+  itself, and `-101`, or a count of the walk of the engine the reference names no counts of them, of the counts
+  of the places of the picture of the engine of the engine itself.
+* The counts of the places of the picture of the engine of the engine of the counts of the walk of the engine
+  of the places of the picture of the engine (`ALFA`) stand of the counts of the walk of the engine of the
+  places of the picture of the engine of the engine itself, of every count of the places of the picture of the
+  engine.
+
+The counts of the places of the picture of the engine stand of a bitmap of the walk of the engine of this
+project: a picture of a count of the places of a colour of the counts of the engine behind eight places of a
+colour stands of the counts of the places of the picture of the engine of the engine, a picture of sixteen
+places of a colour of the counts of the engine of the counts of them, and every other picture of the counts of
+the engine of the walk of the engine itself.
+
+
 ## Deviations
 
 * The port reads the words of the head, the map of the places of the picture of the engine, the counts of the
@@ -304,6 +348,17 @@ of the counts of the walk of the engine of the places of the picture of the engi
   places of a count of them that stands of no counts of them, and a movie of the counts of the walk of the
   engine of the engine itself.
 
+* the counts of the places of a picture of the engine: the counts of the places of the picture of the engine
+  of a count of the places of the picture of the engine as they stand and of the counts of the walk of the
+  engine of the places of the picture of the engine of the counts of them, the counts of the places of the
+  picture of the engine of the engine of the counts of the walk of the engine of the counts of them of the
+  counts of the places of the picture of the engine of the counts of the engine of the walk of the engine
+  itself and of the counts of the engine of the walk of the engine of the counts of them, the counts of the
+  places of the picture of the engine of the counts of the engine of the walk of the engine of the places of
+  the picture of the engine of the counts of them, and the counts of the places of the picture of the engine
+  of the counts of the walk of the engine of the places of the picture of the engine that stand behind the
+  counts of the walk of the engine of the places of the picture of the engine,
+
 ## References
 
 - `GARbro/ArcFormats/Macromedia/ArcDXR.cs` — `DxrOpener.TryOpen`, `DxrOpener.OpenEntry`,
@@ -314,6 +369,9 @@ of the counts of the walk of the engine of the places of the picture of the engi
   `CastMember.Deserialize`, `CastInfo.Deserialize`, `ArcDXR.ImportMedia`, `ArcDXR.ImportBitmap`,
   `ArcDXR.ImportSound`, `ArcDXR.SanitizeName`, `BitmapEntry.DeserializeHeader`,
   `SoundEntry.DeserializeHeader`, `DxrOpener.OpenSound`, `WaveAudio.WriteRiffHeader`,
+  `DxrOpener.OpenImage`, `DxrOpener.ReadPalette`, `DxrOpener.ReadAlphaChannel`, `BitdDecoder`,
+  `BitdDecoder.UnpackScanLine`, `BitdDecoder.Unpack8bpp`, `BitdDecoder.UnpackChannels`,
+  `BitdDecoder.ApplyAlphaChannel`, `Palettes`,
   `DirectorFile.ReadKeyTable`, `DirectorFile.ReadConfig`, `DirectorFile.GetChunkReader`,
   `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `KeyTable.Deserialize`,
   `KeyTableEntry.Deserialize`, `DirectorConfig.Deserialize`, `Reader.CloneUnless`

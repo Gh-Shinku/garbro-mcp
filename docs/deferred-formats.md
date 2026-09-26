@@ -370,9 +370,13 @@ the first forty of them.
   places of the picture of the engine of the counts of the walk of the engine (`MCsL`, `CAS*`) and the pictures
   and sounds of the counts of the places of the picture of the engine (`ImportMedia`) stand ported too.** What
   stands behind them is the counts of the places of a picture of the engine of the counts of the walk of the
-  engine of the places of the picture of the engine of the engine itself (the walk of the counts of the places
-  of the picture of the engine of the engine itself and the counts of the walk of the engine of the places of
-  the picture of the engine of the engine itself). **The counts of the walk of the engine of the engine itself
+  engine of the places of the picture of the engine of the engine itself (`ediM`), which the reference stands of
+  through the counts of the places of the picture of the engine of the engine of the platform and this port
+  stands of as they stand. **The counts of the places of a picture of the engine (`BITD`) stand ported too**,
+  of the counts of the places of the picture of the engine of the counts of the engine of the walk of the
+  engine, of the counts of the places of the picture of the engine of the engine itself and of the counts of
+  the places of the picture of the engine of the engine of the counts of the walk of the engine of the places of
+  the picture of the engine.
   (`FGDC`, `FGDM`) and the counts of the places of a sound of the engine stand ported too.** The whole of it
   is written through the table driven deserializer of `DirectorFile.cs`, which the port stands of for the head
   and the map alone.

@@ -25,6 +25,14 @@ import type {
 import { Readable } from "node:stream";
 import { writeWave } from "../shared/wav.js";
 import {
+	directorBmp,
+	directorPicture,
+	readDirectorPalette,
+	unpackDirectorAlpha,
+	unpackDirectorBitmap,
+} from "./bitd.js";
+import { directorPalette as builtinDirectorPalette } from "./palettes.js";
+import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
@@ -709,6 +717,11 @@ export interface DirectorMediaEntry {
 	headerId?: number;
 	paletteId?: number;
 	alphaId?: number;
+	/** The counts of the places of a picture of the engine of the counts of the walk of the engine of them. */
+	bitmap?: DirectorBitmap;
+	/** The counts of the places of the picture of the engine of the counts of the engine of the walk of them. */
+	width?: number;
+	height?: number;
 }
 
 function sanitizeDirectorName(name: string | undefined, id: number): string {
@@ -798,6 +811,12 @@ function importDirectorBitmap(
 			size: chunk.size,
 			unpackedSize: chunk.unpackedSize,
 			packed: chunk.packed,
+			bitmap,
+			// The counts of the places of the picture of the engine of the counts of the walk of the engine
+			// stand of the counts of the walk of the engine of the places of the picture of the engine of the
+			// counts of the places of the picture of the engine of the counts of them.
+			width: bitmap.right - bitmap.left,
+			height: bitmap.bottom - bitmap.top,
 		};
 		if (bitmap.palette > 0) {
 			// The counts of the places of the picture of the engine of the places of the picture of the engine
@@ -1418,6 +1437,72 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 					"The counts of the places of a sound of the engine stand behind it",
 				);
 			return Readable.from([buildDirectorSound(format, bytes)]);
+		}
+		if (media?.bitmap && media.width && media.height) {
+			const bitsPerPixel = media.bitmap.bitDepth;
+			const width = media.width;
+			const height = media.height;
+			// The counts of the places of the picture of the engine of the counts of the walk of the engine of
+			// the places of the picture of the engine of the counts of them stand of the counts of the walk of
+			// the engine of the places of the picture of the engine of the counts of the engine of the walk of
+			// the engine itself where the counts of the walk of the engine of the places of the picture of the
+			// engine of the counts of the walk of the engine itself stand of counts of the places of the
+			// picture of the engine of the counts of the walk of the engine of the places of the picture of
+			// the engine.
+			let palette: Buffer | undefined;
+			if (media.paletteId !== undefined) {
+				const paletteChunk = movie.directory.find(
+					(candidate) => candidate.id === media.paletteId,
+				);
+				if (paletteChunk)
+					palette = readDirectorPalette(chunkBuffer(movie, paletteChunk));
+			} else if (bitsPerPixel <= 8) {
+				const builtin =
+					builtinDirectorPalette(media.bitmap.palette) ??
+					builtinDirectorPalette(-101);
+				if (builtin) {
+					palette = Buffer.alloc((builtin.length / 3) * 4);
+					for (let at = 0; at < builtin.length; at += 3) {
+						const entry = (at / 3) * 4;
+						palette[entry] = builtin[at + 2] ?? 0;
+						palette[entry + 1] = builtin[at + 1] ?? 0;
+						palette[entry + 2] = builtin[at] ?? 0;
+					}
+				}
+			}
+			let alpha: Buffer | undefined;
+			if (media.alphaId !== undefined) {
+				const alphaChunk = movie.directory.find(
+					(candidate) => candidate.id === media.alphaId,
+				);
+				if (alphaChunk)
+					alpha = unpackDirectorAlpha(
+						chunkBuffer(movie, alphaChunk),
+						width,
+						height,
+					);
+			}
+			const unpacked = unpackDirectorBitmap(bytes, {
+				width,
+				height,
+				bitsPerPixel,
+				depthType: media.bitmap.depthType,
+			});
+			if (!unpacked)
+				throw invalidMovie(
+					"The counts of the places of the picture of the engine stand behind it",
+				);
+			const picture = directorPicture(
+				{
+					width,
+					height,
+					bitsPerPixel,
+					pixels: unpacked.pixels,
+					...(alpha ? { alpha } : {}),
+				},
+				palette,
+			);
+			return Readable.from([directorBmp(picture, width, height)]);
 		}
 		if (entry.path.endsWith(`.${BITMAP_CHUNK}`) || entry.path.endsWith(".BITD"))
 			throw new GarbroError(

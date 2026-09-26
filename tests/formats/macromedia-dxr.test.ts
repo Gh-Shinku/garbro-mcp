@@ -8,6 +8,10 @@ import { Buffer } from "node:buffer";
 import { deflateSync, inflateSync } from "node:zlib";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	readBmpImage,
+	type BmpImage,
+} from "../../packages/formats/src/shared/bmp.js";
 import { DirectorReader } from "@garbro-mcp/formats";
 import {
 	macromediaDxrArchiveFormat,
@@ -355,14 +359,22 @@ function castList(input: { id: number; name: string; path: string }): Buffer {
 }
 
 /** The counts of the places of a picture of the engine of a count of the walk of the engine of them. */
-function bitmapData(input: { palette: number; bitDepth: number }): Buffer {
+function bitmapData(input: {
+	palette: number;
+	bitDepth: number;
+	top?: number;
+	left?: number;
+	bottom?: number;
+	right?: number;
+	depthType?: number;
+}): Buffer {
 	const data = Buffer.alloc(0x1c, 0);
-	data.writeUInt8(0, 0);
+	data.writeUInt8(input.depthType ?? 0, 0);
 	data.writeUInt8(0, 1);
-	data.writeInt16BE(0, 2);
-	data.writeInt16BE(0, 4);
-	data.writeInt16BE(0x40, 6);
-	data.writeInt16BE(0x40, 8);
+	data.writeInt16BE(input.top ?? 0, 2);
+	data.writeInt16BE(input.left ?? 0, 4);
+	data.writeInt16BE(input.bottom ?? 0x40, 6);
+	data.writeInt16BE(input.right ?? 0x40, 8);
 	data.writeUInt16BE(input.bitDepth, 0x16);
 	data.writeInt16BE(input.palette, 0x1a);
 	return data;
@@ -379,8 +391,14 @@ function castMemberOld(input: {
 	// engine itself: the counts of the walk of the engine of the places of the picture of the engine of the
 	// counts of them stand of the counts of the walk of the engine of the places of the picture of the engine
 	// where the counts of the places of the picture of the engine stand of counts of the engine itself.
-	const dataLength = input.specific.length + 1;
 	const withFlags = input.specific.length > 0;
+	// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+	// places of the picture of the engine stand of the counts of the walk of the engine of the counts of the
+	// engine itself: the counts of the places of the picture of the engine of the counts of them stand of the
+	// counts of the places of the picture of the engine of the count of the walk of the engine itself and of
+	// the counts of the walk of the engine of the places of the picture of the engine of the counts of the
+	// engine itself, where they stand.
+	const dataLength = input.specific.length + (withFlags ? 2 : 1);
 	const head = Buffer.alloc(withFlags ? 8 : 7, 0);
 	head.writeUInt16BE(dataLength, 0);
 	head.writeInt32BE(input.info.length, 2);
@@ -883,8 +901,11 @@ describe("Macromedia Director movie", () => {
 		// the places of the picture of the engine of them.
 		expect([...(await extract(data, "000009.jpg"))]).toEqual([5, 6]);
 		expect([...(await extract(data, "sound.snd"))]).toEqual([7, 8, 9]);
+		// The counts of the places of the picture of the engine stand of the counts of the walk of the engine
+		// of the places of the picture of the engine of the counts of them, which stand of the counts of the
+		// places of the picture of the engine of the counts of them.
 		await expect(extract(data, "one_two.BITD")).rejects.toMatchObject({
-			code: "UNSUPPORTED_FEATURE",
+			code: "INVALID_ARCHIVE",
 		});
 	});
 
@@ -978,6 +999,125 @@ describe("Macromedia Director movie", () => {
 			],
 		});
 		await expect(extract(short, "tune.snd")).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
+	});
+
+	it("stands of the counts of the places of a picture of the engine of the counts of the walk of the engine", async () => {
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine stand
+		// of the counts of the walk of the engine of the places of the picture of the engine of the counts of
+		// the walk of the engine itself, of every count of the places of the picture of the engine.
+		const picture = (
+			specific: Buffer,
+			body: Buffer,
+			extra?: { fourCC: string; body: Buffer },
+		): Buffer =>
+			dxrMovie({
+				chunks: [
+					{
+						fourCC: "KEY*",
+						body: keyChunk(
+							[
+								{ id: 3, castId: 2, fourCC: "BITD" },
+								...(extra ? [{ id: 4, castId: 2, fourCC: extra.fourCC }] : []),
+							],
+							true,
+							extra ? 2 : 1,
+						),
+					},
+					{ fourCC: "CAS*", body: castIndex([2]) },
+					{
+						fourCC: "CASt",
+						body: castMemberOld({
+							type: 1,
+							info: castInfo({ name: "art", source: "" }),
+							specific,
+						}),
+					},
+					{ fourCC: "BITD", body },
+					...(extra ? [{ fourCC: extra.fourCC, body: extra.body }] : []),
+				],
+			});
+		const read = async (data: Buffer): Promise<BmpImage> => {
+			const image = readBmpImage(await extract(data, "art.BITD"));
+			if (!image) throw new Error("no bitmap");
+			return image;
+		};
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the picture of the engine of the counts of the engine of the walk of the engine itself.
+		const grayscale = picture(
+			bitmapData({
+				palette: -2,
+				bitDepth: 8,
+				bottom: 2,
+				right: 4,
+			}),
+			Buffer.from([0, 1, 2, 3, 4, 5, 6, 7]),
+		);
+		const indexed = await read(grayscale);
+		expect(indexed).toMatchObject({ width: 4, height: 2, bitsPerPixel: 8 });
+		expect([...indexed.pixels]).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+		// The counts of the places of the picture of the engine of the engine of the counts of the places of
+		// the picture of the engine stand of the counts of the walk of the engine of the places of the picture
+		// of the engine of the counts of them.
+		expect([...indexed.palette.subarray(4, 8)]).toEqual([0xfe, 0xfe, 0xfe, 0]);
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine stand
+		// of the counts of the walk of the engine of the places of the picture of the engine of the counts of
+		// them where the counts of the places of the picture of the engine stand of no counts of the walk of
+		// the engine of the places of the picture of the engine at all.
+		const packed = picture(
+			bitmapData({ palette: -2, bitDepth: 8, bottom: 2, right: 4 }),
+			Buffer.from([0xfd, 0x11, 0x03, 0x22, 0x33, 0x44, 0x55]),
+		);
+		const rle = await read(packed);
+		expect([...rle.pixels]).toEqual([
+			0x11, 0x11, 0x11, 0x11, 0x22, 0x33, 0x44, 0x55,
+		]);
+		// The counts of the places of the picture of the engine of the counts of the engine of the walk of the
+		// engine stand of the counts of the engine of the walk of the engine itself.
+		const sixteen = picture(
+			bitmapData({
+				palette: 0,
+				bitDepth: 16,
+				bottom: 2,
+				right: 2,
+				depthType: 0x84,
+			}),
+			Buffer.from([0x03, 0xf8, 0x00, 0x00, 0x1f, 0x03, 0xf8, 0x00, 0x00, 0x1f]),
+		);
+		const colours = await read(sixteen);
+		expect(colours).toMatchObject({ width: 2, height: 2, bitsPerPixel: 32 });
+		// The counts of the places of the picture of the engine of the counts of the engine of the walk of the
+		// engine stand of the counts of the walk of the engine of the places of the picture of the engine of
+		// the counts of the engine of the walk of the engine of the counts of them.
+		expect([...colours.pixels]).toEqual([
+			0, 0, 0xff, 0, 0xff, 0, 0, 0, 0, 0, 0xff, 0, 0xff, 0, 0, 0,
+		]);
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the picture of the engine of the counts of them stand of the counts of the places of the
+		// picture of the engine of the engine of the counts of them.
+		const withAlpha = picture(
+			bitmapData({
+				palette: 0,
+				bitDepth: 32,
+				bottom: 1,
+				right: 2,
+				depthType: 0x82,
+			}),
+			Buffer.from([0x07, 0x44, 0x00, 0x33, 0x00, 0x22, 0x00, 0x11, 0x00]),
+			{ fourCC: "ALFA", body: Buffer.from([0x01, 0x80, 0x40]) },
+		);
+		const alpha = await read(withAlpha);
+		expect(alpha).toMatchObject({ width: 2, height: 1, bitsPerPixel: 32 });
+		expect([...alpha.pixels]).toEqual([0x11, 0x22, 0x33, 0x80, 0, 0, 0, 0x40]);
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the picture of the engine that stand behind the counts of the walk of the engine of the
+		// places of the picture of the engine stand of no counts of them at all.
+		const short = picture(
+			bitmapData({ palette: -2, bitDepth: 8, bottom: 2, right: 4 }),
+			Buffer.from([0x03, 0x11]),
+		);
+		await expect(extract(short, "art.BITD")).rejects.toMatchObject({
 			code: "INVALID_ARCHIVE",
 		});
 	});
