@@ -1,6 +1,7 @@
 // Format reference: GARbro "ArcFormats/CatSystem/ImageHG3.cs", classes `Hg3Format`, `HgMetaData` and
 // `Hg3Reader`. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -15,6 +16,8 @@ import {
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import { hgGeometry, type HgGeometry, unpackHgStream } from "./hg-core.js";
 
 /** 'HG-3', the mark of the newer CatSystem picture. */
@@ -42,6 +45,11 @@ const PLAIN_CONTROL_UNPACKED_FIELD = 0x24;
 const PLAIN_SECTION = "img0000\0";
 const JPEG_SECTION = "img_jpg\0";
 const WEBP_SECTION = "img_wbp\0";
+/** The names of the two sections a picture behind a JPEG may carry beside it, and of the one that names a
+ * swap of the first and the third byte of every pixel. */
+const ALPHA_SECTION = "img_al";
+const MODE_SECTION = "imgmode";
+const JPEG_NAME = "img_jpg";
 
 export interface Hg3Layout {
 	/** Which of the three kinds of picture the section names. */
@@ -159,6 +167,105 @@ export async function unpackHg3Plain(
 	);
 }
 
+/**
+ * `Hg3Reader.ReadSections`: the sections of a picture stand one behind the other from the head size on,
+ * every one of them named by eight bytes that stop at the first nought and followed by the count of the
+ * places of the section, the last of them standing of no places at all. The table names the place every
+ * section begins at, which is what the walks of the reference look them up by.
+ */
+export function readHg3Sections(
+	data: Buffer,
+	layout: Hg3Layout,
+): Map<string, number> {
+	const sections = new Map<string, number>();
+	// The reference counts the head from the mark `stdinfo` on, so its own head size is the one the picture
+	// names plus the fourteen bytes in front of that mark.
+	let at = STREAM_BASE + layout.headerSize;
+	do {
+		if (at + 12 > data.length) break;
+		const name = data
+			.subarray(at, at + SECTION_NAME_SIZE)
+			.toString("latin1")
+			.replace(/\0.*$/s, "");
+		const size = data.readUInt32LE(at + SECTION_NAME_SIZE);
+		sections.set(name, at);
+		if (0 === size) break;
+		at += size;
+	} while (at < data.length);
+	return sections;
+}
+
+/**
+ * `Hg3Reader.UnpackJpeg`: the section `img_jpg` carries a JPEG the count of the places of which stands
+ * twelve bytes into it. The reference decodes that JPEG with the decoder of the platform and lays the
+ * section `img_al`, a zlib stream, over the fourth byte of every pixel, or a byte of `0xFF` where no such
+ * section stands; a section `imgmode` swaps the first and the third byte of every pixel. This port decodes
+ * the picture with its own reader of the JPEG interchange format and does the same around it.
+ */
+export async function unpackHg3Jpeg(
+	stored: Buffer,
+	layout: Hg3Layout,
+): Promise<Buffer> {
+	if ("jpeg" !== layout.kind) {
+		throw invalidPicture("CatSystem picture is not one behind a JPEG");
+	}
+	const sections = readHg3Sections(stored, layout);
+	const start = sections.get(JPEG_NAME);
+	if (start === undefined || start + 0x10 > stored.length) {
+		throw invalidPicture("CatSystem picture stands of no section of a JPEG");
+	}
+	const size = stored.readInt32LE(start + 12);
+	if (size < 0 || start + 0x10 + size > stored.length) {
+		throw invalidPicture("CatSystem picture stands short of its JPEG");
+	}
+	const picture = stored.subarray(start + 0x10, start + 0x10 + size);
+	if (!readJpegHeaderFields(picture)) {
+		throw invalidPicture(
+			"The places of the picture stand of no walks of a JPEG",
+		);
+	}
+	const image = readJpegImage(picture);
+	const width = layout.width;
+	const height = layout.height;
+	if (image.width < width || image.height < height) {
+		throw invalidPicture(
+			"The places of the picture stand short of the head of it",
+		);
+	}
+	let alpha: Buffer | undefined;
+	const alphaAt = sections.get(ALPHA_SECTION);
+	if (alphaAt !== undefined) {
+		if (alphaAt + 0x18 > stored.length) {
+			throw invalidPicture("CatSystem picture stands short of its alpha");
+		}
+		const packed = stored.readInt32LE(alphaAt + 0x10);
+		const size = stored.readInt32LE(alphaAt + 0x14);
+		if (packed < 0 || size < 0 || alphaAt + 0x18 + packed > stored.length) {
+			throw invalidPicture("CatSystem picture stands short of its alpha");
+		}
+		alpha = await inflateZlibBuffer(
+			stored.subarray(alphaAt + 0x18, alphaAt + 0x18 + packed),
+			size,
+		);
+	}
+	// The reference reads the frame of the JPEG with the row length of the head of the picture, so a frame
+	// larger than the head keeps the places of the picture itself alone.
+	const swap = sections.has(MODE_SECTION);
+	const stride = image.width * 4;
+	const output = Buffer.alloc(width * height * 4);
+	for (let y = 0; y < height; y += 1) {
+		for (let x = 0; x < width; x += 1) {
+			const src = y * stride + x * 4;
+			const dst = (y * width + x) * 4;
+			output[dst] = image.pixels[src + (swap ? 2 : 0)] ?? 0;
+			output[dst + 1] = image.pixels[src + 1] ?? 0;
+			output[dst + 2] = image.pixels[src + (swap ? 0 : 2)] ?? 0;
+			output[dst + 3] = alpha ? (alpha[y * width + x] ?? 0) : 0xff;
+		}
+	}
+	return output;
+}
+
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
@@ -273,6 +380,10 @@ export const catSystemHg3ImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readHg3Layout(stored, Number(source.size));
 		if (!layout) {
 			throw invalidPicture("Not a CatSystem picture");
+		}
+		if ("jpeg" === layout.kind) {
+			const pixels = await unpackHg3Jpeg(stored, layout);
+			return Readable.from([writeBmp32(layout.width, layout.height, pixels)]);
 		}
 		if ("plain" !== layout.kind) {
 			throw invalidPicture(

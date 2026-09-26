@@ -22,17 +22,34 @@ The head size past the `stdinfo` mark begins a section that names one of three k
 | section | what it holds |
 | --- | --- |
 | `img0000` | two zlib streams: the packed and the unpacked size of the data at `0x18` and `0x1C`, and of the control bits at `0x20` and `0x24`, with the streams themselves `0x28` in |
-| `img_jpg` | a table of sections with a JPEG and, behind it, a fourth plane of its own |
+| `img_jpg` | a JPEG whose length stands twelve bytes into the section, and, in the sections behind it, an alpha channel and a flag that swaps the first and the third byte of every pixel |
 | `img_wbp` | a WebP, which the reference itself does not decode |
 
 The plain picture is unfolded exactly as the HG-2 reader unfolds its own — the same run walk over two zlib
 streams and the same four planes with the step of every byte (see `cat-system-hg2-image.md`), which is why the
 two share `hg-core.ts`. Its rows are stored **bottom up**, which is what `CreateFlipped` means.
 
-This port reads a plain picture. The two sections whose own decoder the reference keeps in other formats are
-recognised and listed, and their extraction is refused with a message of this project's own; the reference
-throws `NotImplementedException` for the WebP section and would need the JPEG decoder for the other. The
-write path throws `NotImplementedException`, so this is a read only format.
+### A picture behind a JPEG
 
-The tests cover the head, the two sections whose decoder is not carried, the fields the reader is turned away
-for, a plain picture of two zlib streams, the refusal of the JPEG section, and a file that is not signed.
+The sections of such a picture stand one behind the other from the head size on, every one of them named by
+eight bytes that stop at the first nought, followed by the length of the section; the last one carries a
+length of nought and ends the table. `UnpackJpeg` looks up `img_jpg`, reads the length of the JPEG twelve
+bytes into that section, and hands the JPEG behind it to the platform's decoder. The fourth byte of every
+pixel comes from the section `img_al`, a zlib stream whose packed and unpacked lengths stand at `0x10` and
+`0x14` and whose bytes follow at `0x18`, or is `0xFF` where that section stands absent; a section `imgmode`
+swaps the first and the third byte of every pixel.
+
+This port decodes the JPEG with its own reader of the JPEG interchange format. It reads the frame with the row
+length of the head of the picture, exactly as the reference does through `CopyPixels`, so a frame larger than
+the head keeps the places of the picture itself alone, and it refuses a frame smaller than the head, where the
+reference's copy would fail too. A frame of fewer than three samples a pixel, which the reference turns away,
+is widened here instead, since the reader of this project hands out four bytes a pixel for every JPEG.
+
+This port reads a plain picture and a picture behind a JPEG. The WebP section is recognised and listed, and
+its extraction is refused with a message of this project's own; the reference itself throws
+`NotImplementedException` for it. The write path throws `NotImplementedException`, so this is a read only
+format.
+
+The tests cover the head, the two kinds of section, the fields the reader is turned away for, a plain picture
+of two zlib streams, a picture behind a JPEG with its alpha channel and with the swap of its colours, the
+refusal of a section that holds no JPEG, the refusal of the WebP section, and a file that is not signed.
