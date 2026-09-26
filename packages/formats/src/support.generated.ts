@@ -18064,9 +18064,22 @@ export const formatSupportCatalog = {
 			localId: "slg-tic-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
-			unsupported: ["archive creation"],
-			remainingVerification: ["real-game GARbro differential output"],
+			supported: [
+				"detect",
+				"list",
+				"extraction",
+				"the cipher of the engine",
+				"the picture decoded into a bitmap through `packages/formats/src/shared/jpeg-image.ts`",
+			],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the platform decoder of the reference against this reader at the edge of a colour change",
+			],
 		},
 		{
 			reference: {

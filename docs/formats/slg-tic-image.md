@@ -4,8 +4,8 @@ Reference: `GARbro/ArcFormats/Slg/ImageTIG.cs`, class `TicFormat` — the siblin
 over the same cipher. GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT.
 
 Implementation: `packages/formats/src/slg/tic-image.ts` (`slgTicImageDescriptor`, `slgTicImageFormat`, id
-`slg-tic-image`), which reuses `decryptTig` from the TIG port and a shared JPEG header reader,
-`packages/formats/src/shared/jpeg.ts`.
+`slg-tic-image`), which reuses `decryptTig` from the TIG port and the shared readers of this project,
+`packages/formats/src/shared/jpeg.ts` and `packages/formats/src/shared/jpeg-image.ts`.
 
 A JPEG scrambled exactly as its PNG sibling is: every byte has the **low byte of one draw** of the Microsoft C
 runtime's generator subtracted from it, from a seed of `0x7F7F7F7F` starting at the file's first byte. The
@@ -28,11 +28,14 @@ The measurements come from the **decrypted** file through the shared reader, a p
 * every other segment is skipped by its own length, which may land past the end of the file and end the walk.
 
 Because the reference reads through a **seekable** decrypting stream and its graphic reader seeks across the
-segments, the whole file is decrypted before the header is read here, and the entry returns the decrypted
-graphic itself. It is reported as compressed for the same reason the PNG sibling is, and the format declares no
-extension, so the word is the only way in.
+segments, the whole file is decrypted before the header is read here. The entry returns a bitmap: the picture
+is read with the reader of this project, `packages/formats/src/shared/jpeg-image.ts`, which follows the
+baseline sequential profile of ITU-T T.81, where the reference hands the decrypted stream to `Jpeg.Read`, the
+platform decoder of the Windows imaging stack. It is reported as compressed for the same reason the PNG
+sibling is, and the format declares no extension, so the word is the only way in.
 
 The tests cover the registered word and the absent extension, the need for the cipher and the seed it starts
 from, the depth of a colour, grey and unusually deep frame, a walk past an application segment and a Huffman
-table marker, the decrypted output with the file's own bytes recovered by scrambling it again, four heads the
-reader refuses, and the entry name.
+table marker, the picture decoded into a bitmap (a grey stream exactly as the Python imaging library decodes
+it, and a stream of three components within two places of the same), four heads the reader refuses, and the
+name of the entry.

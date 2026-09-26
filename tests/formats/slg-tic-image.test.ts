@@ -3,6 +3,13 @@ import { MsvcRandom } from "@garbro-mcp/codecs";
 import { slgTicImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import {
+	COLOUR_JPEG,
+	COLOUR_PIXELS,
+	GREY_JPEG,
+	GREY_PIXELS,
+} from "../helpers/jpeg.js";
 
 const DEFAULT_KEY = 0x7f7f7f7f;
 
@@ -106,7 +113,7 @@ describe("SLG system encrypted JPEG image", () => {
 				bitsPerPixel: 24,
 			});
 			expect(colour.metadata).toMatchObject({
-				image: "jpeg",
+				image: "bmp",
 				compression: "slg-tig",
 			});
 		} finally {
@@ -158,12 +165,24 @@ describe("SLG system encrypted JPEG image", () => {
 		}
 	});
 
-	it("hands the decrypted graphic back", async () => {
-		const jpeg = buildJpeg({ width: 5, height: 4 });
-		const stored = encrypt(jpeg);
-		const output = await extract(stored);
-		expect(output.equals(jpeg)).toBe(true);
-		expect(encrypt(output).equals(stored)).toBe(true);
+	it("decodes the decrypted graphic into a bitmap", async () => {
+		// The reference hands the decrypted bytes to `Jpeg.Read`, the platform decoder of the Windows imaging
+		// stack; this port reads them with its own reader of the format.
+		const grey = readBmpImage(await extract(encrypt(GREY_JPEG)));
+		if (!grey) throw new Error("no bitmap");
+		expect(grey).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...grey.pixels]).toEqual([...GREY_PIXELS]);
+		const colour = readBmpImage(await extract(encrypt(COLOUR_JPEG)));
+		if (!colour) throw new Error("no bitmap");
+		expect(colour).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		let worst = 0;
+		for (let at = 0; at < COLOUR_PIXELS.length; at += 1) {
+			worst = Math.max(
+				worst,
+				Math.abs((COLOUR_PIXELS[at] ?? 0) - (colour.pixels[at] ?? 0)),
+			);
+		}
+		expect(worst).toBeLessThanOrEqual(2);
 	});
 
 	it("refuses a head that is not a frame", async () => {
@@ -213,15 +232,15 @@ describe("SLG system encrypted JPEG image", () => {
 		).rejects.toThrow(/SLG encrypted image/);
 	});
 
-	it("names the entry after the image", async () => {
+	it("names the entry after the picture it hands over", async () => {
 		const archive = await slgTicImageFormat.open(
 			sourceOf(encrypt(buildJpeg())),
 			"sub/CG07.tic",
 		);
 		try {
-			expect(archive.entries[0]?.path).toBe("CG07.jpg");
+			expect(archive.entries[0]?.path).toBe("image.bmp");
 			expect(archive.entries[0]?.compressed).toBe(true);
-			expect(archive.entries[0]?.sizeKnown).toBe(true);
+			expect(archive.entries[0]?.sizeKnown).toBe(false);
 		} finally {
 			await archive.close();
 		}

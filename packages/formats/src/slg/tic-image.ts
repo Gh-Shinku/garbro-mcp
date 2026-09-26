@@ -8,7 +8,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { changeExtension } from "../shared/companion.js";
+import { writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -64,15 +65,14 @@ export const slgTicImageFormat: ArchiveFormat = defineFixedArchive({
 		void sourcePath;
 		return (await readLayout(source)) !== undefined;
 	},
-	async read(source: ByteSource, sourcePath: string) {
+	async read(source: ByteSource) {
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid SLG encrypted image");
-		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "jpg"),
+				path: "image.bmp",
 				offset: 0n,
 				size: source.size,
 				// The stored bytes are encrypted, so what the entry returns is not what it holds.
@@ -84,12 +84,12 @@ export const slgTicImageFormat: ArchiveFormat = defineFixedArchive({
 					bitsPerPixel: layout.bitsPerPixel,
 				} as Record<string, unknown>,
 			}),
-			sizeKnown: true,
+			sizeKnown: false,
 		};
 		return {
 			entries: [entry],
 			metadata: {
-				image: "jpeg",
+				image: "bmp",
 				compression: "slg-tig",
 				width: layout.width,
 				height: layout.height,
@@ -99,6 +99,9 @@ export const slgTicImageFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const file = Buffer.from(await source.readAt(0n, Number(source.size)));
-		return Readable.from([decryptTig(file)]);
+		// The reference reads the decrypted picture through `Jpeg.Read`, the platform decoder of the Windows
+		// imaging stack; this port reads it with its own reader of the format and hands a bitmap over.
+		const image = readJpegImage(decryptTig(file));
+		return Readable.from([writeBmp32(image.width, image.height, image.pixels)]);
 	},
 });
