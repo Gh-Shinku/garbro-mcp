@@ -395,6 +395,7 @@ import { grocerPicImageFormat } from "./grocer/pic-image.js";
 import { grooverPcgFormat } from "./groover/pcg.js";
 import { gsDataFormat, gsPackFormat } from "./gs-pack/archive.js";
 import { gsPackPicImageFormat } from "./gs-pack/pic-image.js";
+import { gsPackScwScriptFormat } from "./gs-pack/scw-script.js";
 import { gscripterDataFormat } from "./gscripter/data.js";
 import { gssLsdFormat } from "./gss/lsd.js";
 import { gsxK2ImageFormat } from "./gsx/k2-image.js";
@@ -2472,6 +2473,7 @@ export function createDefaultRegistry(
 			macromediaSndAudioFormat,
 			pictImageFormat,
 			gsPackPicImageFormat,
+			gsPackScwScriptFormat,
 			rinaRadImageFormat,
 			yuRisYcgImageFormat,
 			shiinaRioChdImageFormat,

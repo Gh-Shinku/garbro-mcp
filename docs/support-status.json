@@ -8300,6 +8300,23 @@
 		},
 		{
 			"reference": {
+				"type": "script",
+				"tag": "SCW",
+				"class": "GsScriptFormat",
+				"source": "ArcFormats/GsPack/ArcGsPack.cs"
+			},
+			"localId": "gs-pack-scw-script",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the three words a script of the engine may stand at its head: `SCW `, `Scw5` and `Scw4`",
+				"the places of the script as they stand, which is what the reference hands over as well: the class is a `GenericScriptFormat` of `GameRes/ScriptText.cs`, whose `ConvertFrom` hands the places of the file over as they stand and whose `Read` and `Write` stand of nothing"
+			],
+			"unsupported": ["archive creation", "script writing"],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "DAT/GScripter",
 				"class": "DataOpener",
