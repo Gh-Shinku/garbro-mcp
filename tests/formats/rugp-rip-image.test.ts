@@ -142,6 +142,88 @@ function rip007Run(input: {
 	]);
 }
 
+it("reads a picture of the walk of the places of an alpha of the class", async () => {
+	// The walk of the kind 3 (`UncompressRgba`) stands of a count of the places of the run in front of it
+	// and of a run of counts behind it: a count of the places of one alpha behind every count, and the
+	// places of the colour of the alpha behind it. The places of the picture of this walk stand of the
+	// **second** pair of the counts of the head of the class, where the places of the picture of the
+	// walks of the bits stand of the first pair: the two pairs of the fixture stand apart, so the
+	// picture of the walk is held to the pair of it.
+	const writer = new MsbWriter();
+	// A place of an alpha of one (seven places of the count of it of nothing behind the flag of it), and
+	// then a place of a colour of the places of a blue, of a green and of a red of three.
+	writer.bits([1]);
+	writer.bits([0, 0, 0, 0, 0, 0, 0]);
+	writer.bits([1, 0, 0, 0, 0, 0, 0]);
+	const bits = writer.toBuffer();
+	// The run of the counts of the walk: a count of one place of the picture of no alpha, and a count of
+	// one place of the alpha of it.
+	const run = Buffer.concat([i32(4 + bits.length), bits, Buffer.from([1, 1])]);
+	const archive = new BufferByteSource(
+		ripRun({
+			width: 2,
+			height: 1,
+			placeWidth: 3,
+			placeHeight: 1,
+			kind: 3,
+			subKind: 2,
+			run,
+		}),
+	);
+	const opened = await ripFormat.open(archive, "sample.rip");
+	try {
+		expect(opened.metadata).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 32,
+		});
+		const extracted = await consumeBuffer(
+			await opened.openEntry(opened.entries[0]?.id ?? ""),
+		);
+		const read = readBmpImage(extracted);
+		if (!read) throw new Error("no picture of the walk of the project");
+		// The first place of the row stands of no place of a colour at all (a picture of nothing), and the
+		// second of the place of the colour of three of an alpha of one.
+		expect([...read.pixels]).toEqual([0, 0, 0, 0, 3, 3, 3, 1]);
+	} finally {
+		await opened.close();
+	}
+});
+
+it("reads a picture of the walk of the bits of the kind 3 of the class", async () => {
+	// The third walk of the bits (`UncompressRgb3`): the same places of the run as the walk of the kind 1,
+	// of a count of three places of a blue and of a red and of one of a green stood on every place of it.
+	const writer = new MsbWriter();
+	// A place of a colour of the picture: the flag of it, a count of twelve places of a blue, a count of
+	// no place of a green, and a count of twelve places of a red.
+	writer.bits([1]);
+	writer.bits([1, 1, 1, 1]);
+	writer.bits([0, 0]);
+	writer.bits([1, 1, 1, 1]);
+	const archive = new BufferByteSource(
+		ripRun({
+			width: 1,
+			height: 1,
+			kind: 2,
+			subKind: 3,
+			run: writer.toBuffer(),
+		}),
+	);
+	const opened = await ripFormat.open(archive, "sample.rip");
+	try {
+		const extracted = await consumeBuffer(
+			await opened.openEntry(opened.entries[0]?.id ?? ""),
+		);
+		const read = readBmpImage(extracted);
+		if (!read) throw new Error("no picture of the walk of the project");
+		// The places of the walk of the class stand of the places of it: three of a blue, of a red and of
+		// a green of the walk of the kind 3 behind the walk of the kind 1 of a count of one.
+		expect([...read.pixels]).toEqual([15, 1, 15, 0]);
+	} finally {
+		await opened.close();
+	}
+});
+
 describe("rUGP picture of a CRip007 object", () => {
 	it("reads a picture of the walk of the class, of the places of a colour", async () => {
 		// A walk of two rows of two places: the counts of the places of the walk stand of a count of their own

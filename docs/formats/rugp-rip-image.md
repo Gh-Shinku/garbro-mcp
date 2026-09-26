@@ -22,8 +22,10 @@ of the kind 1.
 | 0x18 | a count the reference reads and stands of none (`i32`) |
 | 0x1C | the run itself |
 
-The places of the picture stand of the kind of the walk: of the second pair of the counts where the kind is 3,
-and of the first where it is not. The kind is `flags & 0xFF` and stands of one to three; the kind of the walk
+The places of the picture stand of the kind of the walk: of the second pair of the counts (`m_w`, `m_h`) where
+the kind is 3, and of the first (`m_width`, `m_height`) where it is not. The walk of the kind 3 stands of the
+places of the picture of the second pair rather than of the first, so a picture of the two pairs of a count
+that stand apart is drawn of the pair of the walk of it. The kind is `flags & 0xFF` and stands of one to three; the kind of the walk
 of the bits behind it is `(flags >> 16) & 0xFF`.
 
 ## The walks of the kind
@@ -32,7 +34,16 @@ of the bits behind it is `(flags >> 16) & 0xFF`.
 | --- | --- | --- |
 | 1 | `UncompressSia` | a picture of eight places of a grey: a count of the places of one colour, and then the colour of the run behind that count |
 | 2 | `UncompressRgb1` (kind 1), `UncompressRgb2` (kind 2), `UncompressRgb3` (kind 3) | a walk over the **bits** of the run, of a place of a colour of the engine |
-| 3 | `UncompressRgba` (kind 2) | a picture of a colour and of a place of an alpha, of the runs of the alpha |
+| 3 | `UncompressRgba` (kind 2 only) | a picture of a colour and of a place of an alpha, of the counts of the places of the run |
+
+The kind 3 stands of a walk of its own: the count of the places of the run of it stands in front of the run
+(`i32`), the places of the run stand behind that count, and the walk draws of the places of a colour where the
+places of the run hold a place of an alpha. Every run of the walk stands of a count of the places of one alpha
+(`u8`), and a place of the alpha of nothing stands of a picture of no place of a colour at all: a place of an
+alpha of a count of it names the places of the alpha of that count, of the flag of the places of the colour
+behind it (`ReadABits`). The two walks of the bits stand of the kinds 1 and 3 of the places of the walk of
+the class (`ReadLong` and `ReadShort`); the kind 3 of them (`UncompressRgb3`) stands of the places of the
+colour of the kind 1 of a count of three places of a blue and of a red and of one of a green.
 
 The walk of a place of a colour of the engine stands of three tables of its own: `ReadLong` (the places of a
 blue and of a red), `ReadShort` (the places of a green) and `ReadABits` (the places of the alpha of the kind
@@ -94,4 +105,6 @@ fixture. A picture of the class `CRip007` of the places of a colour stands besid
 picture of the class of the places of an alpha: a place of an alpha of thirty one and a place of an alpha of
 no change, of the counts of the repeat of the walk. A file of another mark, of another class, of a count of
 the places of the picture of nothing, of a kind of no walk, and a picture of the walks of the kind 2, are
-pinned beside them.
+pinned beside them. The kind 3 of the class stands beside them as well, of a place of the alpha of one and a
+place of the alpha of nothing, of a picture of the two pairs of the counts of the head of the class: the
+picture of the walk is held to the second pair of them, where the walks of the bits stand of the first.

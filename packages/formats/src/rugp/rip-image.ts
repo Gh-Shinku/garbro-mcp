@@ -691,10 +691,13 @@ export function unpackRip(object: RipObject, run: Buffer): Buffer {
 		);
 	}
 	if (KIND_ALPHA === object.kind && 2 === object.subKind) {
+		// The walk of the places of an alpha of the class stands of the *second* pair of the counts of the
+		// head of it (the places of the walk), where the walks of the bits stand of the first pair: the
+		// picture of this walk stands of the places of the walk of it, of the counts of the head behind them.
 		return writeBmp32(
-			object.placeWidth,
-			object.placeHeight,
-			unpackRipRgba(run, object.placeWidth, object.placeHeight),
+			object.width,
+			object.height,
+			unpackRipRgba(run, object.width, object.height),
 			false,
 		);
 	}

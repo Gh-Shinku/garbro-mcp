@@ -22068,16 +22068,14 @@ export const formatSupportCatalog = {
 				"the picture of the walk of the project, of the palette of a grey and the places of a colour of the engine",
 				"the walk of the places of a colour of the class `CRip007` (`UncompressRgb`), of the tables of the places of the walk of it (`tblQuantTransfer`)",
 				"the walk of the places of a colour and of a place of an alpha of the class `CRip007` (`UncompressRgba`), of the counts of the repeat of it",
+				"the walk of the places of a colour of the kind 3 of the bits of the class `CRip` (`UncompressRgb3`), of the counts of three places of a blue and of a red and of one of a green",
+				"the walk of a picture of a colour and a place of an alpha of the kind 3 of the class `CRip` (`UncompressRgba`), of the counts of the places of the run of it (`ReadABits`)",
 			],
 			unsupported: [
 				"picture creation",
 				"the run of the bits of the kind 2 of the class `CRip` (`UncompressRgb2`)",
 			],
-			remainingVerification: [
-				"real-game GARbro differential output",
-				"a picture of the walk of a colour and a place of an alpha (`flags & 0xFF` of 3)",
-				"a picture of the kind 3 of the bits of the class `CRip` (`UncompressRgb3`)",
-			],
+			remainingVerification: ["real-game GARbro differential output"],
 		},
 	],
 } as const;
