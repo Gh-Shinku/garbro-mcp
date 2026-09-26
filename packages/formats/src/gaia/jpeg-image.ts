@@ -9,7 +9,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { changeExtension } from "../shared/companion.js";
+import { writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -21,63 +23,22 @@ const MARKER = Buffer.from([0xff, 0xfd, 0x00]);
 /** Where the embedded JPEG begins. */
 const JPEG_OFFSET = 100;
 
-const SOI = 0xffd8;
-
 /**
- * The equivalent of `Jpeg.ReadMetaData`: walk the marker segments and take the dimensions from the first
- * start-of-frame marker. SOF markers are `0xC0..0xCF` apart from `0xC4` (Huffman tables), `0xC8` (JPEG
- * extensions) and `0xCC` (arithmetic coding tables), which share the range but are not frame headers.
+ * The equivalent of `Jpeg.ReadMetaData`: the marker walk of `packages/formats/src/shared/jpeg.ts`, which
+ * follows the reference's own walk — a start of image marker, then a length for every marker, and the first
+ * marker of the frame row apart from the Huffman table marker carrying the measurements.
+ *
+ * An earlier reading of this port walked the markers itself and took every marker whose high nibble is
+ * `0xd` for a marker without a payload, which reads the quantisation table marker as one and loses the walk;
+ * a stream of any real encoder carries such a table, so the reader here is shared with the other formats.
  */
 function readJpegSize(
 	buffer: Buffer,
 	offset: number,
 ): { width: number; height: number } | undefined {
-	if (offset + 2 > buffer.length) return undefined;
-	if (buffer.readUInt16BE(offset) !== SOI) return undefined;
-	let pos = offset + 2;
-	while (pos + 2 <= buffer.length) {
-		if (buffer[pos] !== 0xff) return undefined;
-		const first = buffer[pos + 1];
-		if (first === undefined) return undefined;
-		let marker: number = first;
-		// Runs of 0xFF are fill bytes and a marker may be preceded by several of them.
-		while (marker === 0xff) {
-			pos += 1;
-			if (pos + 2 > buffer.length) return undefined;
-			const next = buffer[pos + 1];
-			if (next === undefined) return undefined;
-			marker = next;
-		}
-		if (marker === 0x00) return undefined;
-		if ((marker & 0xf0) === 0xd0 || marker === 0x01) {
-			// Standalone markers carry no payload.
-			pos += 2;
-			continue;
-		}
-		if (pos + 4 > buffer.length) return undefined;
-		const size = buffer.readUInt16BE(pos + 2);
-		if (size < 2 || pos + 2 + size > buffer.length) return undefined;
-		if (
-			marker >= 0xc0 &&
-			marker <= 0xcf &&
-			marker !== 0xc4 &&
-			marker !== 0xc8 &&
-			marker !== 0xcc
-		) {
-			if (size < 7) return undefined;
-			return {
-				height: buffer.readUInt16BE(pos + 5),
-				width: buffer.readUInt16BE(pos + 7),
-			};
-		}
-		// SOI and EOI are standalone markers, even though they fall outside the ranges above.
-		if (marker === 0xd8 || marker === 0xd9) {
-			pos += 2;
-			continue;
-		}
-		pos += 2 + size;
-	}
-	return undefined;
+	const fields = readJpegHeaderFields(buffer.subarray(offset));
+	if (!fields) return undefined;
+	return { width: fields.width, height: fields.height };
 }
 
 async function readLayout(
@@ -131,18 +92,17 @@ export const hiddenJpegImageFormat: ArchiveFormat = defineFixedArchive({
 	async detect(source: ByteSource): Promise<boolean> {
 		return (await readLayout(source)) !== undefined;
 	},
-	async read(source: ByteSource, sourcePath: string) {
+	async read(source: ByteSource) {
 		const size = await readLayout(source);
 		if (!size)
 			throw new GarbroError(
 				"INVALID_ARCHIVE",
 				"Invalid Gaia hidden JPEG image",
 			);
-		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "jpg"),
+				path: "image.bmp",
 				offset: BigInt(JPEG_OFFSET),
 				size: source.size - BigInt(JPEG_OFFSET),
 				metadata: {
@@ -151,13 +111,12 @@ export const hiddenJpegImageFormat: ArchiveFormat = defineFixedArchive({
 					height: size.height,
 				} as Record<string, unknown>,
 			}),
-			// The extraction is a straight copy of the stored bytes.
-			sizeKnown: true,
+			sizeKnown: false,
 		};
 		return {
 			entries: [entry],
 			metadata: {
-				image: "jpeg",
+				image: "bmp",
 				width: size.width,
 				height: size.height,
 				prefixSize: JPEG_OFFSET,
@@ -176,6 +135,9 @@ export const hiddenJpegImageFormat: ArchiveFormat = defineFixedArchive({
 				Number(source.size) - JPEG_OFFSET,
 			),
 		);
-		return Readable.from([jpeg]);
+		// The reference reads the picture through `Jpeg.Read`, which is the platform decoder of the Windows
+		// imaging stack; this port reads it with its own reader of the format and hands a bitmap over.
+		const image = readJpegImage(jpeg);
+		return Readable.from([writeBmp32(image.width, image.height, image.pixels)]);
 	},
 });

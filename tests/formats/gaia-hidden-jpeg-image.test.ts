@@ -2,6 +2,8 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { hiddenJpegImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 
 const MARKER = Buffer.from([0xff, 0xfd, 0x00]);
 const PREFIX_SIZE = 100;
@@ -51,32 +53,35 @@ describe("gaia hidden jpeg image", () => {
 		expect(hiddenJpegImageFormat.detection?.signatures).toEqual([]);
 	});
 
-	it("copies the jpeg out of the prefix", async () => {
-		const jpeg = buildJpeg();
-		const stored = buildHidden(jpeg);
+	it("decodes the jpeg behind the prefix into a bitmap", async () => {
+		const stored = buildHidden(GREY_JPEG);
 		const source = sourceOf(stored);
 		expect(await hiddenJpegImageFormat.detect(source, "CG01.DAT")).toBe(true);
 		const archive = await hiddenJpegImageFormat.open(source, "CG01.DAT");
 		try {
-			expect(archive.entries.map((entry) => entry.path)).toEqual(["CG01.jpg"]);
+			expect(archive.entries.map((entry) => entry.path)).toEqual(["image.bmp"]);
 			expect(archive.entries[0]?.metadata).toMatchObject({
 				type: "image",
-				width: WIDTH,
-				height: HEIGHT,
+				width: 8,
+				height: 8,
 			});
 			expect(archive.metadata).toMatchObject({
-				image: "jpeg",
-				width: WIDTH,
-				height: HEIGHT,
+				image: "bmp",
+				width: 8,
+				height: 8,
 				prefixSize: PREFIX_SIZE,
 			});
-			expect(archive.entries[0]?.size).toBe(BigInt(jpeg.length));
+			expect(archive.entries[0]?.size).toBe(BigInt(GREY_JPEG.length));
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			// A straight copy, so the output is byte for byte the stored image.
-			expect(output).toEqual(jpeg);
-			expect(output.readUInt16BE(0)).toBe(0xffd8);
+			// The reference reads the picture through `Jpeg.Read`, the platform decoder of the Windows imaging
+			// stack; this port reads it with its own reader of the format, so the output is a bitmap of the
+			// places the Python imaging library also decodes from the same stream.
+			const image = readBmpImage(output);
+			if (!image) throw new Error("no bitmap");
+			expect(image).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+			expect([...image.pixels]).toEqual([...GREY_PIXELS]);
 		} finally {
 			await archive.close();
 		}

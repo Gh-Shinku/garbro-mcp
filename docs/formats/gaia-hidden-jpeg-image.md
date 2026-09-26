@@ -14,21 +14,19 @@ pins by changing them to values that would otherwise look meaningful.
 
 The port exposes the resource as a single entry:
 
-* detection checks the three byte marker and then parses the embedded JPEG the way `Jpeg.ReadMetaData`
-  does: walk the marker segments from the start of image and take the width and height from the first
-  start-of-frame marker. SOF markers occupy `0xC0..0xCF` but three values in that range are not frame
-  headers — `0xC4` is a Huffman table, `0xC8` a JPEG extension and `0xCC` an arithmetic coding table — and
-  the walker skips them. Standalone markers (`SOI`, `EOI`, the restart markers and `TEM`) carry no length.
-  A payload that is not a JPEG, or a JPEG without a frame header, is declined; both are tested, as is a
-  frame header that follows other segments;
-* extraction is a straight copy of the stored bytes from offset 100 to the end of the file. Nothing is
-  rewritten, so the entry is the fifth port in this repository to set `sizeKnown: true`, and the test
-  compares the output byte for byte with the image it was built from;
-* the entry is named after the source file with a `jpg` extension. The descriptor advertises `jpg` and
-  `jpeg`, and the reference declares no extension list at all — the format is a candidate for every file,
-  so the marker and the JPEG structure carry the whole weight of detection;
-* entry metadata carries `type: "image"`, width and height, and the archive metadata records
-  `image: "jpeg"`, the dimensions and the prefix size.
+* detection checks the three byte marker and then parses the embedded JPEG with the shared reader of this
+  project, `packages/formats/src/shared/jpeg.ts`, which follows `Jpeg.ReadMetaData`: a start of image
+  marker, then a length for every marker, and the width and height from the first marker of the frame row
+  apart from the Huffman table marker. A payload that is not a JPEG, or a JPEG without a frame header, is
+  declined; both are tested, as is a frame header that follows other segments;
+* extraction reads the picture with `packages/formats/src/shared/jpeg-image.ts` and hands a bitmap over, as
+  the reference hands the stream to `Jpeg.Read`, the platform decoder of the Windows imaging stack. The
+  entry is named `image.bmp` and its tests pin the places of a grey stream exactly, against the decode of
+  the Python imaging library;
+* the reference declares no extension list at all — the format is a candidate for every file, so the marker
+  and the JPEG structure carry the whole weight of detection;
+* entry metadata carries `type: "image"`, width and height, and the archive metadata records `image: "bmp"`,
+  the dimensions and the prefix size.
 
 The descriptor is flagged as encrypted because the stored form is an obfuscated image rather than a
 readable one, even though the extraction only strips a prefix. Encoding and archive creation are out of

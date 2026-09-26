@@ -9,7 +9,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { changeExtension } from "../shared/companion.js";
+import { writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -151,15 +152,14 @@ export const g00JpegImageFormat: ArchiveFormat = defineFixedArchive({
 	async detect(source: ByteSource): Promise<boolean> {
 		return (await readFields(source)) !== undefined;
 	},
-	async read(source: ByteSource, sourcePath: string) {
+	async read(source: ByteSource) {
 		const layout = await readFields(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Siglus JPEG image");
-		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "jpg"),
+				path: "image.bmp",
 				offset: 0n,
 				size: source.size,
 				compressed: true,
@@ -176,7 +176,7 @@ export const g00JpegImageFormat: ArchiveFormat = defineFixedArchive({
 		return {
 			entries: [entry],
 			metadata: {
-				image: "jpg",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				bitsPerPixel: layout.bitsPerPixel,
@@ -188,7 +188,9 @@ export const g00JpegImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Siglus JPEG image");
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-		// The payload is a JPEG once decrypted, so it is carried over rather than decoded.
-		return Readable.from([decrypt(stored.subarray(HEADER_SIZE))]);
+		// The reference decrypts the payload and reads it through `Jpeg.Read`, the platform decoder of the
+		// Windows imaging stack; this port reads it with its own reader of the format and hands a bitmap over.
+		const image = readJpegImage(decrypt(stored.subarray(HEADER_SIZE)));
+		return Readable.from([writeBmp32(image.width, image.height, image.pixels)]);
 	},
 });

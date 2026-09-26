@@ -2,6 +2,13 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { G00_JPEG_KEY, g00JpegImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import {
+	COLOUR_JPEG,
+	COLOUR_PIXELS,
+	GREY_JPEG,
+	GREY_PIXELS,
+} from "../helpers/jpeg.js";
 
 const HEADER_SIZE = 5;
 
@@ -202,36 +209,41 @@ describe("siglus engine encrypted jpeg image", () => {
 		).toBe(false);
 	});
 
-	it("extracts the decrypted JPEG", async () => {
-		const jpeg = buildJpeg(4, 3);
-		expect(await extract(buildG00(jpeg))).toEqual(jpeg);
+	it("decodes the decrypted JPEG into a bitmap", async () => {
+		const output = readBmpImage(await extract(buildG00(GREY_JPEG)));
+		if (!output) throw new Error("no bitmap");
+		// The reference decrypts the payload and reads it through `Jpeg.Read`, the platform decoder of the
+		// Windows imaging stack; this port reads it with its own reader of the format.
+		expect(output).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...output.pixels]).toEqual([...GREY_PIXELS]);
 		const archive = await g00JpegImageFormat.open(
-			sourceOf(buildG00(jpeg)),
+			sourceOf(buildG00(GREY_JPEG)),
 			"CG_01.G00",
 		);
 		try {
-			expect(archive.entries[0]?.path).toBe("CG_01.jpg");
+			expect(archive.entries[0]?.path).toBe("image.bmp");
 			expect(archive.entries[0]?.sizeKnown).toBe(false);
-			expect(archive.metadata).toMatchObject({ image: "jpg" });
+			expect(archive.metadata).toMatchObject({ image: "bmp" });
 		} finally {
 			await archive.close();
 		}
 	});
 
-	it("repeats the key past its own length", async () => {
-		// A payload longer than the two hundred and fifty six byte key, so the pad has to wrap. The JPEG's own
-		// header stays intact — it has to be readable — and the arbitrary bytes follow it.
-		const filler: Buffer = Buffer.alloc(300, 0x00);
-		for (let index = 0; index < filler.length; index += 1) {
-			filler[index] = (index * 7 + 3) & 0xff;
+	it("repeats the key past its own length inside the coded data of the picture", async () => {
+		// This picture is longer than the two hundred and fifty six byte key, so the pad wraps while the coded
+		// data itself is still being decrypted: a wrapped key that stood wrong would show in the places below.
+		expect(COLOUR_JPEG.length).toBeGreaterThan(256);
+		const output = readBmpImage(await extract(buildG00(COLOUR_JPEG)));
+		if (!output) throw new Error("no bitmap");
+		expect(output).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		let worst = 0;
+		for (let at = 0; at < COLOUR_PIXELS.length; at += 1) {
+			worst = Math.max(
+				worst,
+				Math.abs((COLOUR_PIXELS[at] ?? 0) - (output.pixels[at] ?? 0)),
+			);
 		}
-		const long = Buffer.concat([buildJpeg(4, 3), filler]);
-		expect(long.length).toBeGreaterThan(256);
-		const output = await extract(buildG00(long));
-		expect(output).toEqual(long);
-		// The byte at twice the key's length uses the key's first byte again, and it is not a zero here.
-		expect(output[256]).toBe(long[256]);
-		expect(long[256]).not.toBe(0x00);
+		expect(worst).toBeLessThanOrEqual(2);
 	});
 
 	it("declines a stream that ends before a frame header", async () => {
