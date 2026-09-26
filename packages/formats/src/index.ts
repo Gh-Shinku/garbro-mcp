@@ -304,6 +304,7 @@ import { mwpImageFormat } from "./emic/mwp-image.js";
 import { emicFormat } from "./emic/pack.js";
 import { emonEmeFormat } from "./emon/eme.js";
 import { cabFormat } from "./entexec/cab.js";
+import { alicesoftDcfImageFormat } from "./alicesoft/dcf-image.js";
 import { entisEriFormat, entisEriImageFormat } from "./entis/eri.js";
 import { entisMioAudioFormat } from "./entis/mio-audio.js";
 import { entisNoaFormat } from "./entis/noa.js";
@@ -1584,6 +1585,7 @@ export function createDefaultRegistry(
 		valkyriaAm2Format,
 		p8Format,
 		alkFormat,
+		alicesoftDcfImageFormat,
 		alicesoftQntImageFormat,
 		cdpaPackFormat,
 		i24ImageFormat,

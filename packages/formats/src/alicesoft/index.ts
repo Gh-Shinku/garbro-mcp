@@ -5,3 +5,4 @@ export * from "./ald.js";
 export * from "./alk.js";
 export * from "./pms-image.js";
 export * from "./qnt-image.js";
+export * from "./dcf-image.js";

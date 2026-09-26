@@ -325,8 +325,6 @@ beside the ones nothing has been written for yet, so the queue of untouched rows
 list of the `--json` form, which holds exactly the not-started rows. Without `--all` both forms stop at
 the first forty of them.
 
-- `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
-  the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `EXE` (`Experimental/Microsoft/ArcEXE.cs`) is **not portable**: it reads an executable's resources through the reference's `ExeFile.ResourceAccessor`, which is a set of Windows loader calls (`LoadLibraryEx`, `FreeLibrary`, `FindResource`, `LoadResource`, `SizeofResource` and the enumeration callbacks behind them) rather than anything read out of the file. The managed half of the same file - the headers, the sections, the overlay, the loaded base, addresses and a byte search - **is** portable and now stands in this project as `packages/formats/src/microsoft/exe-file.ts`, which is what the ported `BIN/PAC` archive and, later, any other reader of an executable needs.
 - The **base picture of a difference** is the one place the reference hands a file to another format of
   its own outside an archive: `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`) names its base beside itself
