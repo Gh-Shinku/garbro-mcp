@@ -367,12 +367,6 @@ the first forty of them.
   walk and the sample packers the sound input hands over. It is self contained - every one of those classes
   stands in the same file - but the whole of it is a codec whose places can only be pinned by a mirror of
   its own arithmetic, so it is a staged port too, and a longer one than `PCM`.
-- `NOA` (`ArcFormats/Entis/ArcNOA.cs`, class `NoaOpener`, 616 lines) is the archive of the same engine. Its
-  index and its own `ERISADecodeContext` are portable, but every entry it lists is an `ERI`, `EMI`, `MIO`,
-  `EMS` or `TXT` file of that engine, so listing an archive of it without the whole Entis stack
-  (`EriReader.cs` of 2844 lines, `MioDecoder.cs` of 968, `ErisaMatrix.cs` of 488, `ErisaNemesis.cs` of 338)
-  names files that cannot be read. It is the last port of that engine.
-
 ## Two engines can share a tag and a class name
 
 The gap inventory identifies an implementation by its kind, tag, source file and class name, and two

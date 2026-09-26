@@ -306,6 +306,7 @@ import { emonEmeFormat } from "./emon/eme.js";
 import { cabFormat } from "./entexec/cab.js";
 import { entisEriFormat, entisEriImageFormat } from "./entis/eri.js";
 import { entisMioAudioFormat } from "./entis/mio-audio.js";
+import { entisNoaFormat } from "./entis/noa.js";
 import { entisPacFormat } from "./entis/pac.js";
 import { EscudeBinFormat } from "./escude/bin.js";
 import { glnkFormat } from "./eternity/glnk.js";
@@ -2155,6 +2156,7 @@ export function createDefaultRegistry(
 		entisEriFormat,
 		entisEriImageFormat,
 		entisMioAudioFormat,
+		entisNoaFormat,
 		piasEncryptedFormat,
 		alicesoftAfaFormat,
 		abmFormat,
