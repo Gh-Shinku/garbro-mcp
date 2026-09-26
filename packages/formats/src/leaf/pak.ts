@@ -9,6 +9,12 @@ import {
 	createFixedEntry,
 	defineFixedArchive,
 } from "../shared/fixed-archive.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
+import { readPngImage } from "../shared/png-image.js";
+import { readPngHeaderFields } from "../shared/png.js";
+import { renderTgaImage } from "../gameres/tga-image.js";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
 
 /** The word the reference registers, and the word behind it. */
 const SIGNATURE = Buffer.from("LEAF", "latin1");
@@ -125,6 +131,31 @@ export function readLeafPackLayout(
 	return { count, indexOffset, indexSize, entries };
 }
 
+/** The places of the head of a picture of the kind the entries of this archive hold. */
+const TGA_HEAD_SIZE = 18;
+const BITS_PER_PLACE_AT = 16;
+const ALPHA_PLACES_AT = 17;
+
+/**
+ * The decoder of the platform the reference falls back to, which reads every kind of picture it knows; this
+ * port reads the two kinds those decoders are used for in practice and stands of `undefined` everywhere else.
+ */
+async function readOtherPicture(data: Buffer): Promise<Buffer | undefined> {
+	if (readJpegHeaderFields(data)) {
+		const picture = readJpegImage(data);
+		return writeBmp32(picture.width, picture.height, picture.pixels);
+	}
+	if (readPngHeaderFields(data)) {
+		const picture = await readPngImage(data);
+		if (picture) {
+			return 32 === picture.bitsPerPixel
+				? writeBmp32(picture.width, picture.height, picture.pixels)
+				: writeBmp24(picture.width, picture.height, picture.pixels);
+		}
+	}
+	return undefined;
+}
+
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
@@ -198,6 +229,32 @@ export const leafPakFormat: ArchiveFormat = defineFixedArchive({
 		if (start < 0 || end > stored.length) {
 			throw invalidArchive("Leaf archive entry stands outside the archive");
 		}
-		return Readable.from([decryptLeafPlaces(stored.subarray(start, end))]);
+		const places = decryptLeafPlaces(stored.subarray(start, end));
+		// `PakOpener.OpenImage` reads an entry named `.tga` as a picture of that kind, with two places of its
+		// head put right where the engine stood of nothing: a picture of no places of a colour of a place
+		// stands of two and thirty, and one of that many stands of eight places of the alpha of a colour. The
+		// reference hands the result to its own reader of that kind of picture and, where that reader fails,
+		// to the decoder of the platform.
+		if (entry.path.toLowerCase().endsWith(".tga")) {
+			const picture = Buffer.from(places);
+			if (picture.length >= TGA_HEAD_SIZE) {
+				if (0 === picture[BITS_PER_PLACE_AT]) picture[BITS_PER_PLACE_AT] = 32;
+				if (
+					0 === picture[ALPHA_PLACES_AT] &&
+					32 === picture[BITS_PER_PLACE_AT]
+				) {
+					picture[ALPHA_PLACES_AT] = 8;
+				}
+			}
+			try {
+				return Readable.from([renderTgaImage(picture)]);
+			} catch {
+				// The reference catches the failure of its own reader as well and hands the stream to the
+				// decoder of the platform, which reads every kind of picture it knows.
+				const other = await readOtherPicture(picture);
+				if (other) return Readable.from([other]);
+			}
+		}
+		return Readable.from([places]);
 	},
 });

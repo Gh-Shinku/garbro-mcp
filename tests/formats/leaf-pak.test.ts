@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import {
@@ -148,6 +149,51 @@ describe("Leaf resource archive", () => {
 		);
 		expect(first).toEqual(FILE_0);
 		expect(second).toEqual(FILE_1);
+	});
+
+	it("reads a picture of the kind the entries of the archive hold", async () => {
+		// `PakOpener.OpenImage` puts two places of the head of a picture named `.tga` right where the engine
+		// stood of nothing - a picture of no places of a colour of a place stands of two and thirty, and one
+		// of that many stands of eight places of the alpha of a colour - and hands it to the reader of that
+		// kind of picture.
+		const picture = Buffer.alloc(18 + 8, 0x00);
+		picture[2] = 2; // a picture of its own colours
+		picture.writeUInt16LE(2, 0x0c);
+		picture.writeUInt16LE(1, 0x0e);
+		picture[16] = 0; // of no places of a colour of a place
+		picture[17] = 0;
+		picture.set([10, 20, 30, 255, 40, 50, 60, 128], 18);
+		const archive = leafFile({
+			records: record("ART", "tga", 0x0a, picture.length),
+			files: picture,
+			count: 1,
+		});
+		const handle = await leafPakFormat.open(
+			new BufferByteSource(archive),
+			"scene.pak",
+		);
+		expect(handle.entries.map((entry) => entry.path)).toEqual(["ART.tga"]);
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(handle.entries[0]?.id ?? "")),
+		);
+		if (!image) throw new Error("the entry is not a bitmap");
+		expect([image.width, image.height]).toEqual([2, 1]);
+		expect([...image.pixels]).toEqual([10, 20, 30, 255, 40, 50, 60, 128]);
+		// A picture of a kind that reader does not know stands handed out as it is.
+		const stray = leafFile({
+			records: record("ART", "tga", 0x0a, 4),
+			files: Buffer.from([1, 2, 3, 4]),
+			count: 1,
+		});
+		const other = await leafPakFormat.open(
+			new BufferByteSource(stray),
+			"scene.pak",
+		);
+		expect([
+			...((await consumeBuffer(
+				await other.openEntry(other.entries[0]?.id ?? ""),
+			)) as Buffer),
+		]).toEqual([1, 2, 3, 4]);
 	});
 
 	it("finds an archive of its own kind", async () => {

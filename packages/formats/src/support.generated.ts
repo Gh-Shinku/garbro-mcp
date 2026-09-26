@@ -11220,10 +11220,12 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the walk of places the key of a title stands as",
+				"the pictures of the entries of the archive, whose head stands of the two places the engine left out, read with the reader of that kind of picture of this project and handed out as a bitmap",
 			],
 			unsupported: [
 				"archive creation",
 				"archives of titles whose key the reference names in its own list of games",
+				"a picture of an entry whose places are in no picture format this port reads, where the reference hands the stream to the decoder of the platform",
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},

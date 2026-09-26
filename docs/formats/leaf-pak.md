@@ -51,11 +51,28 @@ which is what the reference stands when it reads a file of the archive.
 - A file of an archive stands in the clear as its places stand, the archive standing behind no walk of the
   LZSS kind, which is what the reference hands out.
 
+## Pictures of the archive
+
+An entry the index names `.tga` stands of a picture of that kind with two places of its head left as the
+engine stood them: a picture of no places of a colour of a place stands of two and thirty of them, and a
+picture of that many places of a colour of a place stands of eight places of the alpha of a colour.
+`PakOpener.OpenImage` puts those two places right — the count of the places of a colour of a place at `0x10`
+and the count of the places of the alpha of a colour at `0x11` — hands the stream to the reader of that kind
+of picture, and hands it to the decoder of the platform where that reader fails, which reads every kind of
+picture it knows.
+
+This port puts the same two places right and reads the picture with its own reader of that kind of picture,
+handing out a bitmap; where that reader fails it reads the JPEG and PNG interchange formats, and an entry
+whose places are in none of those kinds stands handed out as it stands. The name of the entry stands as the
+index of the archive stands it, which is what the reference reports as well.
+
 ## Tests
 
 `tests/formats/leaf-pak.test.ts` covers the walk of the places and the walk of the key standing over and over,
 the walk of the names of an archive, the words a file is turned away for, an archive that names no file or
 more files than it holds, a file that stands outside the archive, a name that does not stand as the name of a
-file, the files of an archive stood in the clear, and the finding of an archive of its own kind. The archive of
+file, the files of an archive stood in the clear, a picture of the kind the entries hold whose head stands of
+the two places the engine left out, an entry of that name whose places are in no picture format this port
+reads, and the finding of an archive of its own kind. The archive of
 the test stands worked out with a walk of the key of its own, so its places stand under a walk this port did
 not work out.
