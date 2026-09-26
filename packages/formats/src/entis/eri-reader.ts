@@ -61,6 +61,8 @@ export interface EriPictureInput {
 	data: Buffer;
 	/** The counts of a colour of the picture (`Palette `), of a count of no colour at all. */
 	palette?: Uint8Array;
+	/** The places of the picture in front of the places of the walk of this picture. */
+	keyFrame?: Uint8Array;
 }
 
 export interface EriPicture {
@@ -110,6 +112,7 @@ export class EriReader {
 	readonly arrangeTable: Int32Array;
 	readonly context: ErisaRleDecodeContext;
 	readonly palette: Uint8Array | undefined;
+	readonly keyFrame: Uint8Array | undefined;
 	table: Int32Array;
 	output: Uint8Array;
 	tree: ErisaHuffmanTree | undefined;
@@ -126,6 +129,7 @@ export class EriReader {
 		const info = input.info;
 		this.info = info;
 		this.palette = input.palette;
+		this.keyFrame = input.keyFrame;
 		// The places of a picture of the engine stand of the counts of the walk of the engine of the
 		// counts of a picture of the engine alone: every other kind of the walk of the places of it stands
 		// refused, of the counts of the walk of the engine of the reference as well.
@@ -592,25 +596,115 @@ export function eriColorOperation(
 
 /**
  * `GetLLRestoreFunc`: the places of the walk of the engine of the counts of a block of the picture, of the
- * counts of the places of a colour of it. The picture of the engine in front of the places of the walk of
- * the picture stands unported (`RestoreDelta*`), of the reference as well: the reference stands of the
- * counts of the walk of the engine of the picture in front of it, of the counts of the walk of the engine
- * of the count of the walk of the picture itself.
+ * counts of the places of a colour of it. A picture of the engine behind the places of the walk of the
+ * picture in front of it stands of the counts of the walk of the engine of the places of the picture in
+ * front of them (`RestoreDelta*`), of the counts of the walk of the engine of the count of the walk of the
+ * picture of one count of a colour alone: the reference stands of a picture of one count of a colour of the
+ * counts of the walk of the engine of the count of the walk of the picture of its own at all.
  */
 function eriRestoreFunction(reader: EriReader): (reader: EriReader) => void {
 	switch (reader.info.bpp) {
 		case 32:
-			return 0 === (reader.info.formatType & TYPE_WITH_ALPHA)
-				? restoreRgb24
-				: restoreRgba32;
+			if (0 === (reader.info.formatType & TYPE_WITH_ALPHA)) {
+				return undefined === reader.keyFrame ? restoreRgb24 : restoreDeltaRgb24;
+			}
+			return undefined === reader.keyFrame ? restoreRgba32 : restoreDeltaRgba32;
 		case 24:
-			return restoreRgb24;
+			return undefined === reader.keyFrame ? restoreRgb24 : restoreDeltaRgb24;
 		case 8:
 			return restoreGray8;
 		default:
 			throw unsupportedPicture(
 				"The places of a picture of the engine stand of the places of the count of the walk of the engine of its own",
 			);
+	}
+}
+
+/** `RestoreDeltaRGBA32`: the places of a picture of four counts of a colour in front of a picture. */
+export function restoreDeltaRgba32(reader: EriReader): void {
+	const source = reader.keyFrame ?? new Uint8Array(0);
+	const area = reader.blockArea;
+	const output = reader.output;
+	let dstLine = reader.dstBlockAt;
+	let srcLine = 0;
+	for (let y = 0; y < reader.dstHeight; y += 1) {
+		let dst = dstLine;
+		let src = srcLine;
+		for (let x = 0; x < reader.dstWidth; x += 1) {
+			output[dst] = ((source[dst] ?? 0) + (reader.decodeBuf[src] ?? 0)) & 0xff;
+			output[dst + 1] =
+				((source[dst + 1] ?? 0) + (reader.decodeBuf[src + area] ?? 0)) & 0xff;
+			output[dst + 2] =
+				((source[dst + 2] ?? 0) +
+					(reader.decodeBuf[src + area * PLACES_PER_PLACE] ?? 0)) &
+				0xff;
+			output[dst + 3] =
+				((source[dst + 3] ?? 0) + (reader.decodeBuf[src + area * 3] ?? 0)) &
+				0xff;
+			src += 1;
+			dst += PLACES_PER_WORD;
+		}
+		srcLine += reader.blockSize;
+		dstLine += reader.dstLineBytes;
+	}
+}
+
+/** `RestoreDeltaRGB24`: the places of a picture of three counts of a colour in front of a picture. */
+export function restoreDeltaRgb24(reader: EriReader): void {
+	const source = reader.keyFrame ?? new Uint8Array(0);
+	const area = reader.blockArea;
+	const output = reader.output;
+	let dstLine = reader.dstBlockAt;
+	let srcLine = 0;
+	for (let y = 0; y < reader.dstHeight; y += 1) {
+		let dst = dstLine;
+		let src = srcLine;
+		for (let x = 0; x < reader.dstWidth; x += 1) {
+			output[dst] = ((source[dst] ?? 0) + (reader.decodeBuf[src] ?? 0)) & 0xff;
+			output[dst + 1] =
+				((source[dst + 1] ?? 0) + (reader.decodeBuf[src + area] ?? 0)) & 0xff;
+			output[dst + 2] =
+				((source[dst + 2] ?? 0) +
+					(reader.decodeBuf[src + area * PLACES_PER_PLACE] ?? 0)) &
+				0xff;
+			src += 1;
+			dst += reader.dstPixelBytes;
+		}
+		srcLine += reader.blockSize;
+		dstLine += reader.dstLineBytes;
+	}
+}
+
+/**
+ * `AddImageBuffer`: the places of a picture of the engine stand of the counts of the walk of the engine of
+ * the places of the picture in front of them, of the counts of the walk of the engine of the places of the
+ * count of the walk of the picture itself.
+ */
+export function addEriImageBuffer(input: {
+	destination: Uint8Array;
+	destinationStride: number;
+	destinationPlaces: number;
+	source: Uint8Array;
+	sourceStride: number;
+	sourcePlaces: number;
+	width: number;
+	height: number;
+	alpha: boolean;
+}): void {
+	const places = input.alpha ? 4 : 3;
+	for (let y = 0; y < input.height; y += 1) {
+		let at = input.sourceStride * y;
+		let to = input.destinationStride * y;
+		for (let x = 0; x < input.width; x += 1) {
+			for (let place = 0; place < places; place += 1) {
+				input.destination[to + place] =
+					((input.destination[to + place] ?? 0) +
+						(input.source[at + place] ?? 0)) &
+					0xff;
+			}
+			to += input.destinationPlaces;
+			at += input.sourcePlaces;
+		}
 	}
 }
 

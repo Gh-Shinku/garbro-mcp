@@ -7175,10 +7175,23 @@
 				"frame count limit",
 				"ImageFrm and DiffeFrm frames",
 				"stream and palette record skipping",
-				"placement checks"
+				"placement checks",
+				"the places of the frames of the picture, of the counts of the walk of the engine of the place of the count of the walk of the picture itself (`EriMultiImage.GetFrame`, of the walk of the places of the picture of `packages/formats/src/entis/eri-reader.ts`)",
+				"the places of a frame behind a frame in front of it (`DiffeFrm`, of the counts of the walk of the engine of the places of the frame in front of it)",
+				"the counts of a colour of the picture (`Palette `), of the places of the picture of one count of a colour",
+				"the places of a picture of the engine in front of the places of the walk of a picture (`reference-file`, of the counts of the walk of the engine of the name of the picture of the counts of the walk of the engine of the picture itself)",
+				"the places of the picture handed out as a bitmap of the project, of the places of a count of the walk of the engine of every frame of it"
 			],
-			"unsupported": ["archive creation", "entis image decoder"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"unsupported": [
+				"archive creation",
+				"entis image decoder",
+				"the counts of a colour of the picture (`Palette `) of the kinds of the places of the picture the image port holds no walk of (see `entis-eri-image`)",
+				"the frames of the picture beyond the count of the walk of the picture in front of them (the reference stands of the counts of the walk of the engine of the frames of its own)"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the places of the frames of the counts of the walk of the engine beyond the kind `RunlengthHuffman` (the fixture stands of the counts of the walk of the engine of the kind `RunlengthHuffman` alone)"
+			]
 		},
 		{
 			"reference": {

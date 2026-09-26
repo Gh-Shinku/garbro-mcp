@@ -36,23 +36,47 @@ length down as it goes, which is why the body may hold slack.
 
 From the stream position the file holds a chain of records, again an eight byte identifier and a 64 bit
 length. A `Stream  ` record advances by its header alone, so its body is itself a section chain. A
-`Palette ` record is consumed by the image decoder. `ImageFrm` and `DiffeFrm` records become entries named
-`<base>#<index>` with the index padded to four digits and counted over the frames only, and the scan stops
-once the declared frame count is reached. Every frame has to fit in the file, and a file without any frame
-is declined.
+`Palette ` record carries the colors of an eight bit picture and is recorded for the decoder. `ImageFrm` and
+`DiffeFrm` records become entries named `<base>#<index>.bmp` with the index padded to four digits and counted
+over the frames only, and the scan stops once the declared frame count is reached. Every frame has to fit in
+the file, and a file without any frame is declined.
 
 ## Extraction
 
-Frames are extracted verbatim. The Entis image decoder, which turns frames, difference frames and the
-palette into a bitmap, is out of scope.
+Every frame is decoded with the Entis picture walk (`packages/formats/src/entis/eri-reader.ts`, the lossless
+walk of `EriReader`) and handed out as a bitmap, which is what `EriMultiImage.GetFrame` does: the places of
+the picture are accumulated per block, and a `DiffeFrm` frame stands of the places of the frame in front of
+it as well, every place of the picture being the sum of the place of the frame in front of it and of the
+place of the count of the walk of the picture itself. The frame in front of a frame is decoded along the way,
+so the whole chain up to the requested frame is read.
+
+A picture whose `descript` section names a `reference-file` tag stands of the places of the picture of that
+file as well (`EriFormat.ReadImageData`): the file is read beside the picture, decoded with the same walk and
+its places are added to the places of the picture, every count of a colour of the picture itself. The name of
+the tag stands of the counts of the walk of the engine of the name of the picture of the counts of the walk of
+the engine of the picture itself (`EriFormat.ParseTagInfo`).
 
 ## Port notes and deviations
 
 - Archive creation is out of scope.
-- The image decoder and the palette reader are not ported, so a `Palette ` record is skipped rather than
-  validated.
+- The kinds of the counts of a picture of the engine of the two ways of it, the kinds 2 and 4 of the walk of
+  the places of the picture, the counts of the walk of the engine of the kind `ArithmeticCode`, the places of
+  a picture of the count of the walk of the engine of sixteen places of a colour and a picture that stands of
+  a `reference-file` of fewer than twenty four places of a count stand refused (`UNSUPPORTED_FEATURE`), as
+  `entis-eri-image` stands of them.
+- The counts of a colour of the picture (`Palette `) stand read of the walk of the frames, of the counts of
+  the walk of the engine of the places of the count of the walk of the picture itself: the reference stands of
+  the counts of a colour of the count of the walk of the picture of no count of the walk of the engine at all
+  (`ReadPalette`, of the counts of a colour of the count of the walk of the picture of its own).
+- The frames of the picture stand of the counts of the walk of the engine of every count of the walk of the
+  picture itself: the reference stands of the counts of the walk of the engine of the frames of the walk of
+  the picture of its own (`EriMultiImage.Frames`, of the counts of the walk of the engine of the places of
+  the count of the walk of the picture itself), and this port stands of the counts of the walk of the engine
+  of the frames of the count of the walk of the picture in front of them alone.
 - The metadata block is read in one slice bounded by the declared `Header  ` length, and a metadata block
   larger than 16 MiB is declined.
+- The entry names carry the depth of the bitmap this port hands out, which the reference leaves to the
+  caller.
 
 ## References
 

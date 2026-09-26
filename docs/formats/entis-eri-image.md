@@ -74,10 +74,15 @@ the walk of the engine of the kind `0x00020200` of the head of the picture).
   (`UNSUPPORTED_FEATURE`): the reference stands of them of the counts of a colour of the places of the walk
   of the engine of the two ways of the engine itself (`PixelFormats.Bgr555`), and this port stands of no
   count of the walk of the engine of the counts of a colour of sixteen places of a count at all.
-* The places of a picture of the kind of the counts of a picture of the engine in front of the places of the
-  walk of the picture (`RestoreDeltaRGB24`, `RestoreDeltaRGBA32`, of the counts of a picture of a picture of
-  the frames of its own) stand refused (`UNSUPPORTED_FEATURE`): this port stands of the places of the picture
-  of the count of the walk of the picture alone.
+* A picture of the engine in front of the places of the walk of the picture stands of the counts of the walk
+  of the engine of the places of the picture in front of it (`RestoreDeltaRGB24`, `RestoreDeltaRGBA32`), where
+  the picture of the count of the walk of the engine of its own stands of them: the picture of one count of a
+  colour stands of the counts of the walk of the engine of the count of the walk of the picture of its own at
+  all, of the reference as well.
+* A picture whose `descript` section names a `reference-file` tag stands of the places of the picture of that
+  file as well (`EriFormat.ReadImageData`, of the counts of the walk of the engine of the picture of the count
+  of the walk of it): a picture of fewer than twenty four places of a count stands refused
+  (`UNSUPPORTED_FEATURE`), of the reference as well.
 * The reference stands of the counts of the walk of the engine of the counts of a count of a block of the
   picture of no count of the walk of the engine at all: this port stands of a count of the walk of the engine
   of sixteen places of a count of a block at most, of the counts of the places of the picture of the engine
