@@ -13658,10 +13658,11 @@ export const formatSupportCatalog = {
 				"the search of a name within a dictionary of the file (`GetKey`) and the whole of the objects of a dictionary (`GetDict`)",
 				"a name of the file (`GetString`), a list of the file (`GetList`), a chunk of the file (`GetChunk`) and of the newer tables of the file (`GetExtraChunk`)",
 				"the three walks of the places of an archive: the pictures of the source of the file, the layers of the file, and every object of the root dictionary that stands of a chunk of the file, of the places of the chunk handed over as they stand",
+				"the pictures of the engine (`PsbTextureDecoder`): the places of a colour (`RGBA8`, of the count of the places of a row of the full picture, cut to the count the archive names), one place of grey (`L8`), a place of grey and a covering place (`A8L8`), four places of half a place each (`RGBA4444`), the walk of the counts of the places of the file (`RL`) and the blocks of the fifth kind (`DXT5`), each handed over as a bitmap of this project",
 			],
 			unsupported: [
 				"archive creation",
-				"the places of a picture of the engine, which the reference reads of a decoder of its own (`PsbTextureDecoder`) and of the TLG format for a picture of that name",
+				"the pictures of a layer of the engine, which the reference reads through the TLG format: their places stand handed over as they stand",
 				"the kinds of the names of the files of the engine, which the reference stands of its own table of the places of a name",
 				"a file whose head stands of the cipher of the engine as well (the first flag), which the reference stands of the key of the game as well",
 			],

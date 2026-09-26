@@ -13,6 +13,8 @@ import {
 	PsbReader,
 	readPsbHeader,
 } from "../../packages/formats/src/emote/psb-reader.js";
+import { decodePsbTexture } from "../../packages/formats/src/emote/psb-texture.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 /** The places of the file of the tables of the fixture. */
 const NAMES = 0x28;
@@ -184,6 +186,130 @@ describe("Emote PSB container", () => {
 			PsbReader.parse(psbFile({ name: "x", value: 1, broken: "root" })),
 		).toBeUndefined();
 		expect(PsbReader.parse(Buffer.alloc(0x10, 0x00))).toBeUndefined();
+	});
+});
+
+describe("Emote PSB picture of the engine", () => {
+	it("reads a picture of the places of a colour of the file, of the full count of a row", () => {
+		// The picture of the engine stands of the count of the places of a row of the *full* picture, and
+		// the places handed over stand of the count of the cut picture: the second row of the cut picture
+		// stands of the places behind the full row of the file.
+		const data = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+			22, 23, 24,
+		]);
+		const places = decodePsbTexture(data, {
+			texType: "RGBA8",
+			fullWidth: 3,
+			fullHeight: 2,
+			width: 2,
+			height: 2,
+		});
+		if (!places) throw new Error("no picture");
+		const picture = readBmpImage(places);
+		if (!picture) throw new Error("no picture read");
+		expect([picture.width, picture.height, picture.bitsPerPixel]).toEqual([
+			2, 2, 32,
+		]);
+		expect([...picture.pixels]).toEqual([
+			1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20,
+		]);
+	});
+
+	it("reads the grey, the grey of a covering place and the four places of a colour of the engine", () => {
+		const grey = decodePsbTexture(Buffer.from([0x40, 0x80]), {
+			texType: "L8",
+			fullWidth: 2,
+			fullHeight: 1,
+			width: 2,
+			height: 1,
+		});
+		if (!grey) throw new Error("no picture");
+		const greyPicture = readBmpImage(grey);
+		expect([...(greyPicture?.pixels ?? [])]).toEqual([
+			0x40, 0x40, 0x40, 0xff, 0x80, 0x80, 0x80, 0xff,
+		]);
+		const alpha = decodePsbTexture(Buffer.from([0x11, 0x22, 0x33, 0x44]), {
+			texType: "A8L8",
+			fullWidth: 2,
+			fullHeight: 1,
+			width: 2,
+			height: 1,
+		});
+		if (!alpha) throw new Error("no picture");
+		expect([...(readBmpImage(alpha)?.pixels ?? [])]).toEqual([
+			0x11, 0x11, 0x11, 0x22, 0x33, 0x33, 0x33, 0x44,
+		]);
+		// A place of the file of four places of half a place each: the low half names the first place of a
+		// colour of the picture, and the count of the places of a colour stands of the count itself.
+		const half = decodePsbTexture(Buffer.from([0x21, 0xf0]), {
+			texType: "RGBA4444",
+			fullWidth: 1,
+			fullHeight: 1,
+			width: 1,
+			height: 1,
+		});
+		if (!half) throw new Error("no picture");
+		expect([...(readBmpImage(half)?.pixels ?? [])]).toEqual([
+			0x11, 0x22, 0x00, 0xff,
+		]);
+	});
+
+	it("reads a picture of the engine of the walk of its own places", () => {
+		// A place of a count of the low place at nought stands of the places of the file themselves, and a
+		// place of a count of the high place at one stands of one place of a colour, stood again and again.
+		const data = Buffer.from([
+			0x01, 1, 2, 3, 4, 5, 6, 7, 8, 0x80, 9, 10, 11, 12,
+		]);
+		const places = decodePsbTexture(data, {
+			texType: "RL",
+			fullWidth: 3,
+			fullHeight: 1,
+			width: 3,
+			height: 1,
+		});
+		if (!places) throw new Error("no picture");
+		expect([...(readBmpImage(places)?.pixels ?? [])]).toEqual([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+		]);
+		// A picture whose places stand short of the counts of its own places stands refused.
+		expect(() =>
+			decodePsbTexture(Buffer.from([0x02, 1, 2, 3, 4]), {
+				texType: "RL",
+				fullWidth: 3,
+				fullHeight: 1,
+				width: 3,
+				height: 1,
+			}),
+		).toThrow();
+		// A kind of picture the reference carries no walk of stands of nothing.
+		expect(
+			decodePsbTexture(Buffer.alloc(4), {
+				texType: "RGBA1010102",
+				fullWidth: 1,
+				fullHeight: 1,
+				width: 1,
+				height: 1,
+			}),
+		).toBeUndefined();
+	});
+
+	it("reads a picture of the blocks of the file", () => {
+		// One block of the fifth kind of four places by four, of one colour of no covering place at all.
+		const block = Buffer.from([
+			0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+		]);
+		const places = decodePsbTexture(block, {
+			texType: "DXT5",
+			fullWidth: 4,
+			fullHeight: 4,
+			width: 4,
+			height: 4,
+		});
+		if (!places) throw new Error("no picture");
+		const picture = readBmpImage(places);
+		expect([picture?.width, picture?.height]).toEqual([4, 4]);
 	});
 });
 

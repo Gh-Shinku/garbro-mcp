@@ -65,11 +65,29 @@ stands of a **chunk** of the file. The port stands of the same order, and the pl
 - which stand of the place of the chunks of the file and of the count of the chunk - stand handed over as
 they stand.
 
+## The pictures of the engine
+
+A picture of a texture stands of the kind the archive names for it, and of the counts of the full picture
+(the counts the archive names as the counts of the picture) and of the cut picture (the counts it names
+beside them): a row of the picture handed over stands of the count of the places of a colour of the cut
+picture, and the places of the file behind it stand of the count of a row of the full picture.
+
+| the kind | the walk of it |
+| --- | --- |
+| `RGBA8` | four places of the file for every place of a colour, of the count of a row of the full picture and cut to the count of a row of the cut picture |
+| `L8` | one place of grey of the file for every place of a colour of the cut picture, of a covering place of two hundred and fifty five |
+| `A8L8` | a place of grey and a covering place of the file for every place of a colour of the cut picture |
+| `RGBA4444` | four places of half a place each of every place of half a place of the file, of the count of the places of the file of the count of the places of a colour: the low half first |
+| `RL` | counts of the places of a colour of the file: a count of the high place at nought stands of the places of the file themselves (of four places of the file for every place of a count of one more), and a count of the high place at one stands of one place of a colour of the file, stood again and again (once for every count of three more) |
+| `DXT5` | the blocks of the fifth kind of the file (`shared/dxt.ts`), of the counts of the **cut** picture, as the reference stands of them |
+| every other kind | the reference stands of no walk of it, and so does this port: the picture stands refused |
+
+Every picture is handed over as a bitmap of this project of thirty two places of a colour.
+
 ## Deviations
 
-* The **decoder of a picture** of the engine (`PsbTextureDecoder`) is not carried, and neither is the TLG
-  picture a layer stands of: the places of a chunk stand handed over as they stand. This is what the
-  reference hands over as well where the walk of a picture stands of no place of the file of its own.
+* A picture of the name **`TLG`** (a layer of the archive) stands handed over as its places stand: the
+  reference reads it through the format of that name.
 * A file whose **head** stands of the cipher of the engine as well (the first flag) stands refused, where
   the reference stands of that cipher of the key of the game. The reference's own head cipher stands of the
   same key, and a stock build holds the one key above.

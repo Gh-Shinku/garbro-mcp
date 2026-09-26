@@ -14,12 +14,15 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
+	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
 import { PsbReader, type PsbValue } from "./psb-reader.js";
+import { decodePsbTexture } from "./psb-texture.js";
 
 const BASELINE_COMMIT = "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0";
 /** `PsbOpener.KnownKeys`: the key of the games the reference holds a key of. */
@@ -206,6 +209,38 @@ export const emotePsbDescriptor: FormatDescriptor = {
 	],
 };
 
+/**
+ * `PsbOpener.OpenEntry`: the places of a chunk of the file, which stand handed over as they stand, and the
+ * picture of a texture of the engine, which stands of the kind of the picture the archive names. A picture
+ * of the name `TLG` stands in the stage of the pictures of that name behind this one, so its places stand
+ * handed over as they stand.
+ */
+export const emotePsbEntryOpener: FixedEntryOpener = async (source, entry) => {
+	const data = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.size)),
+	);
+	const metadata = (entry.metadata ?? {}) as Record<string, unknown>;
+	const texType = metadata.textureType;
+	if ("image" !== metadata.type || "string" !== typeof texType) {
+		return Readable.from([data]);
+	}
+	if ("TLG" === texType) return Readable.from([data]);
+	const picture = decodePsbTexture(data, {
+		texType,
+		fullWidth: Number(metadata.width ?? 0),
+		fullHeight: Number(metadata.height ?? 0),
+		width: Number(metadata.truncatedWidth ?? metadata.width ?? 0),
+		height: Number(metadata.truncatedHeight ?? metadata.height ?? 0),
+	});
+	if (!picture) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture of the engine of the kind \`${texType}\` stands of a walk this project does not carry`,
+		);
+	}
+	return Readable.from([picture]);
+};
+
 export const emotePsbFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: emotePsbDescriptor,
 	detection: { signatures: [{ bytes: Buffer.from("PSB", "latin1") }] },
@@ -247,6 +282,7 @@ export const emotePsbFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
+	openEntry: emotePsbEntryOpener,
 });
 
 function invalidArchive(message: string): GarbroError {
