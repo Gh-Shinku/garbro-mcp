@@ -33,3 +33,4 @@ export * from "./aes.js";
 export * from "./cmvs-huffman.js";
 export * from "./cmvs-decoder.js";
 export * from "./lz4.js";
+export * from "./erisa-huffman.js";
