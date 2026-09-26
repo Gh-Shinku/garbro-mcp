@@ -4,3 +4,4 @@ export * from "./mp3-audio.js";
 export * from "./png-image.js";
 export * from "./tga-image.js";
 export * from "./wav-audio.js";
+export * from "./aiff-audio.js";

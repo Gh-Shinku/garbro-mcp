@@ -370,6 +370,7 @@ import { gameresBmpImageFormat } from "./gameres/bmp-image.js";
 import { gameresTgaImageFormat } from "./gameres/tga-image.js";
 import { gameresJpegImageFormat } from "./gameres/jpeg-image.js";
 import { gameresMp3AudioFormat } from "./gameres/mp3-audio.js";
+import { aiffAudioFormat } from "./gameres/aiff-audio.js";
 import { gameresWavAudioFormat } from "./gameres/wav-audio.js";
 import { gameSystemAdp4AudioFormat } from "./gamesystem/adp4-audio.js";
 import { gamesystemAlpImageFormat } from "./gamesystem/alp-image.js";
@@ -2433,6 +2434,7 @@ export function createDefaultRegistry(
 		lzBetImageFormat,
 		gameresJpegImageFormat,
 		gameresMp3AudioFormat,
+		aiffAudioFormat,
 		gameresWavAudioFormat,
 		rugpRhaAudioFormat,
 		rioFormat,

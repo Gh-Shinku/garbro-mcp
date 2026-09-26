@@ -221,7 +221,8 @@ further than the reference's own list of them.
   port of `BIP` (`ArcFormats/Cri/ImageBIP.cs`) is `cri-bip-image`, and `qlie-dpng-image` is the port of the
   tiled picture of the same engine.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library.
-- `AIFF` (`ArcFormats/AudioAIFF.cs`) and `WMA` (`ArcFormats/AudioWMA.cs`) hand theirs to NAudio.
+- `WMA` (`ArcFormats/AudioWMA.cs`) hands its stream to NAudio. (`AIFF` stood beside it and is now read: the
+  walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) hands its stream to an Opus library.
 - `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, class `PngIsmFormat`) has no layout of its own to port: it is a
   **plain PNG**, whose head the reference reads through `Png.ReadMetaData`, and whose picture it takes from

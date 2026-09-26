@@ -721,6 +721,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "audio",
+				tag: "AIFF",
+				class: "AiffAudio",
+				source: "ArcFormats/AudioAIFF.cs",
+			},
+			localId: "gameres-aiff-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word `FORM` of the format at the head of a file, of the extensions `aif` and `aiff`",
+				"the kinds of a form `AIFF` and `AIFC` behind that word, and the refusal of every other kind of a form",
+				"the walk of the chunks of the form, of the count of the places of a chunk behind the name of it",
+				"the places of a sound of `COMM`: the kinds of the places of the samples of it, the counts of the sound, the places of a sample of it, and the count of the places of a sample (`readAiffExtended`)",
+				"the places of the samples of `SSND`, of the place of the walk of a sound behind the head of it",
+				"a sound of the places of the samples of the other way of the engine (`NONE`, `twos`), of the places of the samples of it turned over into a wave file of the project",
+				"a sound of the places of the samples of the engine as they stand (`sowt`)",
+			],
+			unsupported: [
+				"sound creation",
+				"the walks of a sound of a kind of its own (`ima4`, `ulaw`, `fl32` and their like), which the reference hands over to its reader as well",
+				"a sound of a count of the places of a sample that stands of a place of a bit of its own",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "audio",
 				tag: "WAV",
 				class: "WaveAudio",
 				source: "GameRes/AudioWAV.cs",
