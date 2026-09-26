@@ -17,8 +17,13 @@ interface DetectionCandidate {
 
 export class FormatRegistry {
 	readonly #formats: ArchiveFormat[] = [];
+	readonly #aliases: ReadonlyMap<string, readonly string[]>;
 
-	constructor(formats: readonly ArchiveFormat[] = []) {
+	constructor(
+		formats: readonly ArchiveFormat[] = [],
+		options: { aliases?: ReadonlyMap<string, readonly string[]> } = {},
+	) {
+		this.#aliases = options.aliases ?? new Map<string, readonly string[]>();
 		for (const format of formats) this.register(format);
 	}
 
@@ -49,16 +54,24 @@ export class FormatRegistry {
 		return this.#formats.map((format) => format.descriptor);
 	}
 
+	/**
+	 * The formats whose walk stands of the places of a name of the extension named, of the places of the
+	 * names the reference stands of a resource of another kind as well (`ResourceAlias`). The formats of
+	 * the extension itself stand first.
+	 */
 	listFormatsForExtension(extension: string): readonly FormatDescriptor[] {
 		const normalized = extension.replace(/^\./, "").toLowerCase();
 		if (normalized.length === 0) return [];
-		return this.#formats
-			.filter((format) =>
-				format.descriptor.extensions.some(
-					(candidate) => candidate.toLowerCase() === normalized,
-				),
-			)
-			.map((format) => format.descriptor);
+		const own = this.#formats.filter((format) =>
+			format.descriptor.extensions.some(
+				(candidate) => candidate.toLowerCase() === normalized,
+			),
+		);
+		const named = this.#aliases.get(normalized) ?? [];
+		const aliased = this.#formats.filter(
+			(format) => named.includes(format.descriptor.id) && !own.includes(format),
+		);
+		return [...own, ...aliased].map((format) => format.descriptor);
 	}
 
 	async detectArchive(inputPath: string): Promise<DetectionResult | undefined> {

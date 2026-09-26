@@ -14,3 +14,7 @@ sentences are being replaced with plain language as each format is revisited.
 
 Every note names the GARbro baseline commit its claims were read at, so a claim can be re-checked against
 the reference tree this project keeps at `./GARbro`.
+
+The reference also carries a table of file-name aliases beside its format registry (`ResourceAlias`); that
+table, and how this project stands of it, is written down in `docs/format-aliases.md` rather than in a note
+of its own, because it belongs to the registry rather than to one format.
