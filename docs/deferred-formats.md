@@ -274,15 +274,23 @@ further than the reference's own list of them.
   an encrypted archive stands of, the head of an archive (its four marks, the schema of the walk of it and the
   count of the places behind it), the walk of a payload of an `.ici` file (a key that turns of its own and a
   checksum of sixteen places behind every run of thirty two) and the two walks of the places of an encrypted
-  object. What remains is the object graph itself: the table of the classes of the engine (`s_classTable`),
-  the `CObject` walks behind it, the archive opener (`RioOpener`) and the picture.
+  object. The **graph** itself has landed as `packages/formats/src/rugp/rio-objects.ts`: the table of the
+  classes of the engine, the walks of the objects behind it (`CObjectArcMan` and the records of its archives,
+  `CrelicUnitedGameProject` and the blocks of its version, `CStdB`, `CBoxOcean`, `CObjectOcean`, and the runs
+  of strings and of objects of the stream), and the walks of the graph itself (the root of an archive, the
+  list of its classes, one node of it, one reference of it and the object of a node). Three places of the
+  reference stand as `NotImplementedException` and stand as a refusal here as well rather than as a guess:
+  the class list of an archive that does **not** stand encrypted (its names are looked up in a map the
+  reference never filled), the message classes of a type, and the anonymous references. What remains is the
+  archive opener (`RioOpener`) and the picture.
 
 - `RIP` (`ArcFormats/rUGP/ImageRIP.cs`, class `RipFormat`, extensions `rip` and `sia`) is the picture of the
   same engine and stands in the same place as `S5I`: its own signature is nothing, because `ReadMetaData`
   first asks whether the file carries `CRioArchive.ObjectSignature` and then builds a `CRioArchive` to read
   a `CRip` or `CRip007` object out of it. With the core of that walk ported (see `S5I` above) the object it
-  reads stands behind the same remainder: the table of the classes of the engine and the walks of the objects
-  of them, of which `CRip` and `CRip007` are two.
+  reads stands behind the same remainder: with the graph ported (see `S5I` above) what remains of it is the
+  archive opener and the walks of the pictures of the engine (`CRip`, `CRip007` and `CS5i`), which the
+  reference carries behind the classes of the graph.
 - `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
   reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
   stock build does open these containers - but a first port of it stands withdrawn. The container is a

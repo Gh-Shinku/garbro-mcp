@@ -439,24 +439,26 @@ function loadRioScrambledClass(stream: RioStream): RioClassHeader | undefined {
  * and the count of them the archive stands of.
  */
 export class RioClassReader {
-	readonly #loadArray: unknown[] = [null, this];
-	#field4C = 0;
-	#objectSchema = -1;
+	/** The classes of the archive, of the places a tag of a class of the graph names them of. */
+	protected readonly loadArray: unknown[] = [null, this];
+	/** The flags of the stream, of the places of the head of the walk and of the classes behind them. */
+	protected fieldFlags = 0;
+	protected objectSchemaValue = -1;
 
 	get loadCount(): number {
-		return this.#loadArray.length;
+		return this.loadArray.length;
 	}
 
 	get objectSchema(): number {
-		return this.#objectSchema;
+		return this.objectSchemaValue;
 	}
 
 	get isEncrypted(): boolean {
-		return 0 !== (this.#field4C & 4);
+		return 0 !== (this.fieldFlags & 4);
 	}
 
 	get field4C(): number {
-		return this.#field4C;
+		return this.fieldFlags;
 	}
 
 	/**
@@ -482,17 +484,17 @@ export class RioClassReader {
 		}
 		if (CLASS_TAG_STREAM === word) {
 			const header =
-				0 !== (this.#field4C & 8)
+				0 !== (this.fieldFlags & 8)
 					? loadRioScrambledClass(stream)
 					: loadRioRuntimeClass(stream);
 			if (!header) return undefined;
-			this.#objectSchema = header.schema;
-			this.#loadArray.push(header.className);
+			this.objectSchemaValue = header.schema;
+			this.loadArray.push(header.className);
 			return { className: header.className, tag: tag | 0 };
 		}
 		const index = (tag & 0x7fffffff) >>> 0;
-		if (0 === index || index >= this.#loadArray.length) return undefined;
-		const found = this.#loadArray[index];
+		if (0 === index || index >= this.loadArray.length) return undefined;
+		const found = this.loadArray[index];
 		return typeof found === "string"
 			? { className: found, tag: tag | 0 }
 			: undefined;
@@ -519,12 +521,12 @@ export class RioClassReader {
 			if (version >= 0x11) {
 				const wide = stream.readUInt16();
 				if (wide === undefined) return undefined;
-				this.#field4C = (this.#field4C & 0xffff) | (wide << 16);
+				this.fieldFlags = (this.fieldFlags & 0xffff) | (wide << 16);
 			}
 		} else {
 			stream.seekBack(2);
 		}
-		if (RIO_ENCRYPTED_SIGNATURE === signature) this.#field4C |= 0xc;
+		if (RIO_ENCRYPTED_SIGNATURE === signature) this.fieldFlags |= 0xc;
 		const walked = this.readClass(stream);
 		if (!walked) return undefined;
 		return { signature, schema, className: walked.className };
