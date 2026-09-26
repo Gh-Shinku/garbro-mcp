@@ -1,6 +1,9 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+import { pngFile } from "../helpers/png.js";
 import {
 	decryptUtage,
 	utageImageFormat,
@@ -93,7 +96,7 @@ describe("Utage engine encrypted image", () => {
 			sourceOf(encryptedPng),
 			"dir/cg.dat",
 		);
-		expect(pngHandle.entries[0]?.path).toBe("cg.png");
+		expect(pngHandle.entries[0]?.path).toBe("image.bmp");
 		expect(pngHandle.entries[0]?.metadata).toMatchObject({
 			type: "image",
 			width: 0x0140,
@@ -104,7 +107,7 @@ describe("Utage engine encrypted image", () => {
 			sourceOf(encryptedJpeg),
 			"dir/cg.dat",
 		);
-		expect(jpegHandle.entries[0]?.path).toBe("cg.jpg");
+		expect(jpegHandle.entries[0]?.path).toBe("image.bmp");
 		expect(jpegHandle.entries[0]?.metadata).toMatchObject({
 			width: 0x0140,
 			height: 0x00f0,
@@ -112,9 +115,32 @@ describe("Utage engine encrypted image", () => {
 		});
 	});
 
-	it("hands the picture out behind the key", async () => {
-		expect(await extract(encryptedPng)).toEqual(png);
-		expect(await extract(encryptedJpeg)).toEqual(jpeg);
+	it("decodes the picture behind the key into a bitmap", async () => {
+		// The reference reads the decrypted picture through the reader of the graphic the key reveals; this
+		// port reads it with the readers of this project and hands a bitmap over.
+		const picture = pngFile({
+			width: 2,
+			height: 2,
+			colourType: 6,
+			rows: [
+				[1, 2, 3, 4, 5, 6, 7, 8],
+				[9, 10, 11, 12, 13, 14, 15, 16],
+			],
+		});
+		const decryptedPng = readBmpImage(await extract(decryptUtage(picture)));
+		if (!decryptedPng) throw new Error("no bitmap");
+		expect(decryptedPng).toMatchObject({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 32,
+		});
+		expect([...decryptedPng.pixels]).toEqual([
+			3, 2, 1, 4, 7, 6, 5, 8, 11, 10, 9, 12, 15, 14, 13, 16,
+		]);
+		const grey = readBmpImage(await extract(decryptUtage(GREY_JPEG)));
+		if (!grey) throw new Error("no bitmap");
+		expect(grey).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...grey.pixels]).toEqual([...GREY_PIXELS]);
 	});
 
 	it("refuses a file that is not a picture behind the key", async () => {

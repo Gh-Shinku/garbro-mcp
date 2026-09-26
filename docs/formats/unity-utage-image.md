@@ -19,12 +19,15 @@ nothing, which offers the format for **every** file that no other format claimed
 word holds a **PNG**; every other file holds a **JPEG**, and a file that does not turn into one is not claimed.
 The measurements are read from the header of that picture, which is where this port reads them too.
 
-Neither picture is decoded here, because the project carries no decoder for either: `openEntry` hands the
-picture out **as it stands behind the key** — the decrypted bytes — where the reference decodes it and hands
-back the pixels. That is the same deviation the other pass-through ports of this project take, and the bytes
-handed out are exactly the bytes the reference decodes.
+Both pictures are decoded here, as the reference decodes them: the reference reads the decrypted stream through
+the reader of the graphic the key reveals, and this port reads it with the two readers of this project,
+`packages/formats/src/shared/png-image.ts` and `packages/formats/src/shared/jpeg-image.ts`, and hands a bitmap
+over. The JPEG reader follows the baseline sequential profile of ITU-T T.81 and its widening of a
+twice-as-coarse chroma stands in the colour space of the stream where the platform decoder of the reference
+does it inside its colour conversion, so the two pictures differ by a few places at the edge of a colour change.
 
 The tests cover a byte of nothing and a byte of the key staying where they are, the signature of a PNG behind
 the key, finding a picture behind the key beside one that carries no word of its own, declining a picture that
-is not behind the key, what each picture says about itself, handing each picture out behind the key, and
-refusing a file that is not one.
+is not behind the key, what each picture says about itself, each picture decoded into a bitmap — a graphic
+written here place by place, and a grey stream exactly as the Python imaging library decodes it — and refusing a
+file that is not one.

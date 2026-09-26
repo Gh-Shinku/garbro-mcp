@@ -9,7 +9,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { changeExtension } from "../shared/companion.js";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -92,12 +94,6 @@ export const utageImageDescriptor: FormatDescriptor = {
 	],
 };
 
-/** The picture is handed out as it stands, because the project carries no decoder for either of the two. */
-const EXTENSIONS: Record<UtageImageKind, string> = {
-	png: "png",
-	jpeg: "jpg",
-};
-
 export const utageImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: utageImageDescriptor,
 	detection: {
@@ -108,18 +104,17 @@ export const utageImageFormat: ArchiveFormat = defineFixedArchive({
 		if (source.size < 4n) return false;
 		return readUtageLayout(await readStored(source)) !== undefined;
 	},
-	async read(source: ByteSource, sourcePath: string) {
+	async read(source: ByteSource) {
 		const layout = readUtageLayout(await readStored(source));
 		if (!layout) {
 			throw new GarbroError("INVALID_ARCHIVE", "Not a Utage picture");
 		}
-		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		return {
 			entries: [
 				{
 					...createFixedEntry({
 						id: 0,
-						path: changeExtension(fileName, EXTENSIONS[layout.kind]),
+						path: "image.bmp",
 						offset: 0n,
 						size: source.size,
 						compressed: false,
@@ -134,7 +129,7 @@ export const utageImageFormat: ArchiveFormat = defineFixedArchive({
 				},
 			],
 			metadata: {
-				image: EXTENSIONS[layout.kind],
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				bitsPerPixel: layout.bitsPerPixel,
@@ -143,9 +138,26 @@ export const utageImageFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const stored = await readStored(source);
-		if (!readUtageLayout(stored)) {
+		const layout = readUtageLayout(stored);
+		if (!layout) {
 			throw new GarbroError("INVALID_ARCHIVE", "Not a Utage picture");
 		}
-		return Readable.from([decryptUtage(stored)]);
+		// The reference reads the decrypted picture through the reader of the graphic the key reveals — the
+		// portable network graphic reader or `Jpeg.Read`, the platform decoder of the Windows imaging stack —
+		// and this port reads it with the two readers of this project and hands a bitmap over.
+		const decrypted = decryptUtage(stored);
+		if ("png" === layout.kind) {
+			const image = await readPngImage(decrypted);
+			if (!image) {
+				throw new GarbroError("INVALID_ARCHIVE", "Not a Utage picture");
+			}
+			return Readable.from([
+				32 === image.bitsPerPixel
+					? writeBmp32(image.width, image.height, image.pixels)
+					: writeBmp24(image.width, image.height, image.pixels),
+			]);
+		}
+		const image = readJpegImage(decrypted);
+		return Readable.from([writeBmp32(image.width, image.height, image.pixels)]);
 	},
 });

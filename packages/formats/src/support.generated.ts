@@ -20856,13 +20856,22 @@ export const formatSupportCatalog = {
 			localId: "unity-utage-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
+			supported: [
+				"detect",
+				"list",
+				"extraction",
+				"the key of the engine",
+				"the picture decoded into a bitmap through `packages/formats/src/shared/png-image.ts` and `packages/formats/src/shared/jpeg-image.ts`",
+			],
 			unsupported: [
 				"archive creation",
 				"image writing",
-				"decoding the picture",
+				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
-			remainingVerification: ["real-game GARbro differential output"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the platform decoder of the reference against this reader at the edge of a colour change",
+			],
 		},
 		{
 			reference: {
