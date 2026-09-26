@@ -8,3 +8,4 @@ export * from "./adx-audio.js";
 export * from "./bip-image.js";
 export * from "./hca-audio.js";
 export * from "./hca-core.js";
+export * from "./hca-frame.js";

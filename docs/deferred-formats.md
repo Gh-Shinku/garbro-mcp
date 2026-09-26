@@ -376,12 +376,14 @@ the first forty of them.
   walk and the sample packers the sound input hands over. It is self contained - every one of those classes
   stands in the same file - but the whole of it is a codec whose places can only be pinned by a mirror of
   its own arithmetic, so it is a staged port too, and a longer one than `PCM`. **The head of it stands
-  ported now**, as `cri-hca-audio`: the word of the head, the walk of the counts of it, the counts of the
-  places of the channels of the sound and the count of the places of the counts of a block of the walk of
-  the engine; what stands behind it - the table of the counts of the places of the sound (`AthTable`), the
-  cipher of it (`Cipher`, which stands of the key of the game rather than of the head) and the walk of the
-  counts of a picture of the engine - stands in `docs/support-status.json`, as the record of the row names
-  it.
+  ported now**, as `cri-hca-audio`, and so do the counts of a frame of it: the word of the head, the walk of
+  the counts of it, the counts of the places of the channels of the sound, the count of the places of the
+  counts of a block of the walk of the engine, the table of the counts of the places of the sound
+  (`AthTable`), the cipher of it (`Cipher`) and the counts of the places of a picture of the engine of a
+  sound of the engine (`Channel.Decode1` to `Decode4`, with the walk of the engine of the counts of a block
+  and the counts of the places of the picture of the engine itself). What stands behind them - the walk of
+  the counts of a picture of the engine of the engine itself (`Channel.Decode5`) and the counts of the places
+  of the sound of the engine - stands in `docs/support-status.json`, as the record of the row names it.
 ## Two engines can share a tag and a class name
 
 The gap inventory identifies an implementation by its kind, tag, source file and class name, and two

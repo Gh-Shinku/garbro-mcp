@@ -22352,16 +22352,20 @@ export const formatSupportCatalog = {
 				"the table of the counts of the places of a sound of the engine (`AthTable`), of the kind of no counts of them and of the kind of one count, of the counts of the places of the counts of the walk of the engine of the list of the engine and of the last places of the counts of them behind the last count of the list",
 				"the cipher of a sound of the engine (`Cipher`): the table of the counts of the walk of the engine of the kind of no cipher at all and of the kind of one count, of the counts of it that stand of no count of the places of the picture of the engine at all, and the places of the counts of the walk of the engine of the count of the places of the sound itself",
 				"the counts of the key of the engine the reference stands of (`HcaAudio.DefaultKey`), of the counts of no key at all",
+				"the counts of the places of a block of a sound of the engine (`CheckSum`), of the counts of the places of the counts of the walk of the engine of the table of them",
+				"the counts of the walk of the engine of the places of the picture of the engine (`HsaBitStream`): the counts of the counts of the walk of the engine at the places of the picture of the engine, the walks of the engine behind the end of a sound of the engine, and the counts of the walk of the engine of the counts of the places of the picture of the engine itself (`Peek`, `GetBits` and `Seek`)",
+				"the counts of the places of a picture of the engine of a sound of the engine (`Channel.Decode1`), of the counts of the walk of the engine of the counts of the places of the picture of the engine of the engine itself, of the counts of the places of the picture of the engine of the counts of them, of the places of the counts of the walk of the engine that stand in front of them and of the counts of the places of the picture of the engine of the counts of the walk of the engine of the kind of the counts of two places of them",
+				"the counts of the places of a picture of the engine of a count of the walk of the engine (`Channel.Decode2`, `Decode3` and `Decode4`)",
 			],
 			unsupported: [
-				"the frames of the sound of the engine: the bits of a count of the places of the picture of the engine, the counts of the places of a picture of the engine and the walk of the counts of a picture of the engine itself (the counts of the places of the picture of the engine of the walk of the engine of the counts of a picture, of the places of a colour and of the places of a picture of the engine)",
 				"the cipher of the kind of the key of the game (the kind of the count of fifty six places), which the walk of the engine of the reference itself stands of no counts of the walk of the engine at all (`throw new NotImplementedException`)",
-				"the tables of the counts of the walk of a picture of the engine the frames of the sound stand of (the counts of the places of a picture of the engine, the counts of the places of a count of the picture and the places of a count of the walk of a picture of the engine)",
+				"the walk of the counts of a picture of the engine of the engine itself (`Channel.Decode5`) and the counts of the places of the sound of the engine that stand of it, of every count of the places of the sound",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
 				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it",
 				"the counts of the places of the sound of the engine of a kind of the key of the game of the engine of the counts of no key at all, which stand of the counts of the walk of the engine of no cipher at all",
+				"a frame of a sound of the engine of the counts of the walk of the engine of a count of the places of the picture of the engine of the engine itself, of both kinds of the counts of the walk of the engine (`Channel.Decode2`) and of a count of the walk of the engine of the counts of two places of them",
 			],
 		},
 		{

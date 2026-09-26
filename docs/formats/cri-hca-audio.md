@@ -83,6 +83,34 @@ places) stands of `throw new NotImplementedException ("Encrypted HCA streams not
 reference: this port refuses such a sound at the head of it, as the reference does, so a sound of the engine
 of that kind of cipher stands detected by neither.
 
+## The counts of a frame of the sound
+
+A frame of the sound is a block of the size the head names: two counts of the walk of the engine at the end of
+it, which stand of the counts of the places of the block itself (`CheckSum`, the walk of the engine of the
+counts of the places of a block of the walk of the engine over its own counts), and behind them the counts of
+the walk of the engine of the places of the picture of the engine.
+
+* The counts of the walk of the engine of the places of the picture of the engine (`HsaBitStream`) stand of the
+  places of the frame, of the counts of the places of the picture of the engine of the count of the walk of the
+  engine that stand in front of them. A walk of the engine behind the end of the frame stands of no count of
+  the places at all, and the walk of the engine of the counts of the places of the picture of the engine
+  (`Seek`) stands of the count of the places of the frame that stands behind it.
+* The counts of the places of a picture of the engine of a sound of the engine (`Channel.Decode1`) stand of the
+  counts of the walk of the engine of the places of the picture of the engine of the counts of the places of a
+  block of the walk of the engine, which stand of the table of the counts of the places of the sound of the
+  engine, of the counts of the places of the counts of the walk of the engine of the table of the places of it
+  and of the count of the places of the walk of the engine itself.
+* The counts of the places of a picture of the engine of a count of the walk of the engine (`Channel.Decode2`
+  and `Channel.Decode3`) stand of the counts of the places of the picture of the engine of the counts of the
+  walk of the engine that stand in front of them, of the counts of the walk of the engine of the table of the
+  counts of the places of them, and of the counts of the places of a picture of the engine of a count of the
+  walk of the engine that stands behind it (`Channel.Decode4`).
+
+Everything of a frame that stands behind those counts - the counts of the places of the picture of the engine
+of the engine itself (`Channel.Decode5`, the walk of the counts of a picture of the engine and the walk of the
+counts of the places of the picture of the engine over the counts of the places of the frame that stand behind
+them) - stands unported, and the extraction of a sound of the engine stands refused for it.
+
 ## Deviations
 
 * The port reads the whole file to reach the head. The reference reads the head in place and then stands of
@@ -126,7 +154,20 @@ of that kind of cipher stands detected by neither.
   the sound of the engine of the walk of the engine of the cipher of it,
 * the refusals of the counts of the table of the places of the sound and of the cipher of it: a kind of the
   table of the places of the sound the reference names no counts of the walk of the engine of, a kind of the
-  cipher of the key of the game, and a kind of the cipher of no count of the walk of the engine at all.
+  cipher of the key of the game, and a kind of the cipher of no count of the walk of the engine at all,
+* the counts of the places of a block of a sound of the engine: the counts of the walk of the engine over the
+  counts of a block, of the counts of the places of the block itself and of the count of the places of the
+  counts of the walk of the engine of the block that stand at the place of the block,
+* the counts of the walk of the engine of the places of the picture of the engine: the counts of the counts of
+  the walk of the engine at the places of the picture of the engine of a sound of the engine, the walks of the
+  engine behind the end of a sound of the engine, and the counts of the walk of the engine of the counts of the
+  places of the picture of the engine itself,
+* the counts of the places of a picture of the engine of a sound of the engine: the counts of the counts of the
+  walk of the engine of the counts of the places of the picture of the engine of the engine itself, of the
+  counts of the places of the picture of the engine that stand in front of them, of the places of the counts of
+  the walk of the engine that stand behind the counts of the walk of the engine of the picture of the engine
+  itself, and of the counts of the places of the walk of the engine of the counts of the places of the picture
+  of the engine behind them (`Channel.Decode1`, `Decode2`, `Decode3` and `Decode4`).
 
 ## References
 
