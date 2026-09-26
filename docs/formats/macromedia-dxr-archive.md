@@ -194,6 +194,33 @@ and of the counts of the places of the picture of the engine of the count of the
 places of the count of the places of the picture of the engine where the name stands of no counts of them at
 all.
 
+## The counts of the places of a sound of the engine
+
+A sound of the engine of the counts of the walk of the engine of the places of the picture of the engine of the
+engine itself (`sndH`) and of the counts of the places of the picture of the engine of the counts of the walk
+of the engine of the places of it (`sndS`) stands of the counts of the places of the picture of the engine of
+the counts of the walk of the engine of the places of the picture of the engine at fixed places of the count
+of the walk of the engine of the engine itself, which the reference stands of as a count of no counts of the
+walk of the engine of the places of the picture of the engine at all (its own comment stands of them as a
+count of the engine of the walk of the engine of its own):
+
+| offset | field |
+| --- | --- |
+| 0x2c | the counts of the places of the sound of the engine of the count of the walk of the engine |
+| 0x30 | the counts of the places of the picture of the engine of the count of the places of the sound of it |
+| 0x44 | the counts of the places of the picture of the engine of every count of the places of the sound |
+| 0x4c | the counts of the places of the sound of the engine |
+| 0x50 | the counts of the places of the picture of the engine of every count of the places of the picture of the engine |
+
+Every count of them stands of the counts of the engine of the walk of the engine itself. The places of the
+sound stand of the counts of the engine of the walk of the engine itself where the counts of the places of the
+picture of the engine of every count of the places of the sound stand of sixteen places and above: the port
+stands of them of the counts of the places of the picture of the engine of the engine itself, of the counts of
+the places of the sound of the engine of the count of the walk of the engine of the places of the picture of
+the engine of the counts of the engine itself. A sound of a count of the places of the picture of the engine
+of no counts of the walk of the engine at all stands of the counts of the places of the picture of the engine
+of the counts of the walk of the engine of the places of the picture of the engine as they stand.
+
 ## Deviations
 
 * The port reads the words of the head, the map of the places of the picture of the engine, the counts of the
@@ -250,6 +277,13 @@ all.
   stand behind,
 * the counts of the places of the picture of the engine of the engine itself that stand of no counts of the
   walk of the engine at all,
+* the counts of the places of a sound of the engine of the counts of the walk of the engine of the places of
+  the picture of the engine of the counts of the engine itself: the counts of the walk of the engine of the
+  places of the picture of the engine of the counts of them and of the counts of the engine itself, of the
+  counts of the places of the picture of the engine of the counts of the walk of the engine of the places of
+  the picture of the engine of the counts of the engine itself in front of sixteen places and behind them, and
+  the refusals of the counts of the walk of the engine of the places of the picture of the engine of the counts
+  of the places of the sound of the engine that stand behind them,
 * the keys of the picture of the engine: the counts of the places of the picture of the engine of the count
   of the walk of the engine, the count of the keys the movie of the engine stands of, and the whole of the
   table of them,
@@ -279,6 +313,7 @@ all.
   `DirectorFile.ReadCasts`, `DirectorFile.PopulateCast`, `CastList.Deserialize`, `Cast.Deserialize`,
   `CastMember.Deserialize`, `CastInfo.Deserialize`, `ArcDXR.ImportMedia`, `ArcDXR.ImportBitmap`,
   `ArcDXR.ImportSound`, `ArcDXR.SanitizeName`, `BitmapEntry.DeserializeHeader`,
+  `SoundEntry.DeserializeHeader`, `DxrOpener.OpenSound`, `WaveAudio.WriteRiffHeader`,
   `DirectorFile.ReadKeyTable`, `DirectorFile.ReadConfig`, `DirectorFile.GetChunkReader`,
   `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `KeyTable.Deserialize`,
   `KeyTableEntry.Deserialize`, `DirectorConfig.Deserialize`, `Reader.CloneUnless`

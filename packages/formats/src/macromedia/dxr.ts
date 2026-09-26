@@ -23,6 +23,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeWave } from "../shared/wav.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -77,6 +78,14 @@ const SOUND_CHUNK = "snd ";
 const SOUND_HEAD_CHUNK = "sndH";
 const SOUND_BODY_CHUNK = "sndS";
 const CAST_VERSION_NEW = 1200;
+/** The counts of the places of the picture of the engine of the counts of the walk of the engine of them. */
+const SOUND_HEAD_SIZE = 0x54;
+const SOUND_CHANNELS_OFFSET = 0x4c;
+const SOUND_RATE_OFFSET = 0x2c;
+const SOUND_AVERAGE_OFFSET = 0x30;
+const SOUND_ALIGN_OFFSET = 0x50;
+const SOUND_BITS_OFFSET = 0x44;
+const SOUND_BITS_SWAPPED = 16;
 const BITMAP_DEPTH_SIZE = 0x0a;
 const BITMAP_BIT_DEPTH_OFFSET = 0x16;
 const BITMAP_PALETTE_OFFSET = 0x1a;
@@ -632,9 +641,21 @@ export function readDirectorCastMember(
 		undefined === dataLength
 	)
 		return undefined;
+	// The counts of the walk of the engine of the places of the picture of the engine of the counts of the
+	// engine itself and of the counts of the engine of the walk of the engine of its own stand of the counts
+	// of the walk of the engine of the places of the picture of the engine of the counts of them: the counts
+	// of the walk of the engine of the places of the picture of the engine of the counts of the engine itself
+	// stand of the counts of the walk of the engine, and of the counts of the engine itself of the counts of
+	// the walk of the engine of the places of the picture of the engine of the counts of them.
 	let info: DirectorCastInfo | undefined;
-	if (infoLength > 0) info = readDirectorCastInfo(memberReader);
-	const specificData = memberReader.readBytes(dataLength);
+	let specificData: Buffer | undefined;
+	if (version > CAST_VERSION_NEW) {
+		if (infoLength > 0) info = readDirectorCastInfo(memberReader);
+		specificData = memberReader.readBytes(dataLength);
+	} else {
+		specificData = memberReader.readBytes(dataLength);
+		if (infoLength > 0) info = readDirectorCastInfo(memberReader);
+	}
 	if (!specificData || !info) return undefined;
 	return { type, flags, specificData, info };
 }
@@ -1164,6 +1185,70 @@ export function readDirectorMovieMedia(
 	return readDirectorMedia(movie, casts, contextVersion);
 }
 
+/** The counts of the places of a sound of the engine of a movie of the engine. */
+export interface DirectorSoundFormat {
+	formatTag: number;
+	channels: number;
+	sampleRate: number;
+	averageBytesPerSecond: number;
+	blockAlign: number;
+	bitsPerSample: number;
+}
+
+/**
+ * The counts of the places of a sound of the engine of the counts of the walk of the engine of the places of
+ * the picture of the engine (`SoundEntry.DeserializeHeader`, of the counts of the walk of the engine of the
+ * reference itself): the counts of the engine of the walk of the engine of the places of the sound of the
+ * engine at fixed places of the count of the walk of the engine, of the counts of the engine itself.
+ */
+export function readDirectorSoundFormat(
+	header: Buffer,
+): DirectorSoundFormat | undefined {
+	if (header.length < SOUND_HEAD_SIZE) return undefined;
+	return {
+		formatTag: 1,
+		channels: header.readUInt32BE(SOUND_CHANNELS_OFFSET) & 0xffff,
+		sampleRate: header.readUInt32BE(SOUND_RATE_OFFSET),
+		averageBytesPerSecond: header.readUInt32BE(SOUND_AVERAGE_OFFSET),
+		blockAlign: header.readUInt32BE(SOUND_ALIGN_OFFSET) & 0xffff,
+		bitsPerSample: header.readUInt32BE(SOUND_BITS_OFFSET) & 0xffff,
+	};
+}
+
+/**
+ * The counts of the places of a sound of the engine of the counts of the walk of the engine of the places of
+ * the picture of the engine (`DxrOpener.OpenSound`): the counts of the walk of the engine of the places of
+ * the sound of the engine stand of the counts of the places of the picture of the engine of the engine itself
+ * behind the counts of the walk of the engine of the places of the picture of the engine, so the places of
+ * the counts of the walk of the engine of the places of the sound of the engine stand of the counts of the
+ * engine of the walk of the engine itself.
+ */
+export function buildDirectorSound(
+	format: DirectorSoundFormat,
+	samples: Buffer,
+): Buffer {
+	let pcm = samples;
+	if (format.bitsPerSample >= SOUND_BITS_SWAPPED && 0 === pcm.length % 2) {
+		pcm = Buffer.from(pcm);
+		for (let at = 1; at < pcm.length; at += 2) {
+			const first = pcm[at - 1] ?? 0;
+			pcm[at - 1] = pcm[at] ?? 0;
+			pcm[at] = first;
+		}
+	}
+	return writeWave(
+		{
+			formatTag: format.formatTag,
+			channels: format.channels,
+			sampleRate: format.sampleRate,
+			averageBytesPerSecond: format.averageBytesPerSecond,
+			blockAlign: format.blockAlign,
+			bitsPerSample: format.bitsPerSample,
+		},
+		pcm,
+	);
+}
+
 export const macromediaDxrArchiveDescriptor: FormatDescriptor = {
 	id: "macromedia-dxr-archive",
 	name: "Macromedia Director resource archive",
@@ -1314,6 +1399,25 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 					"The counts of the places of a count of the walk of the engine stand behind",
 				);
 			}
+		}
+		if (media?.headerId !== undefined) {
+			// The counts of the walk of the engine of the places of the picture of the engine of the sound of
+			// the engine stand of the counts of the walk of the engine of the places of the picture of the
+			// engine of the counts of the walk of the engine itself.
+			const headerChunk = movie.directory.find(
+				(candidate) => candidate.id === media.headerId,
+			);
+			if (!headerChunk)
+				throw invalidMovie(
+					"A count of the walk of the engine stands behind the movie",
+				);
+			const header = chunkBuffer(movie, headerChunk);
+			const format = readDirectorSoundFormat(header);
+			if (!format)
+				throw invalidMovie(
+					"The counts of the places of a sound of the engine stand behind it",
+				);
+			return Readable.from([buildDirectorSound(format, bytes)]);
 		}
 		if (entry.path.endsWith(`.${BITMAP_CHUNK}`) || entry.path.endsWith(".BITD"))
 			throw new GarbroError(

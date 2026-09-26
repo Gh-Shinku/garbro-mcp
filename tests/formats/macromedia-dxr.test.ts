@@ -368,6 +368,43 @@ function bitmapData(input: { palette: number; bitDepth: number }): Buffer {
 	return data;
 }
 
+/** A count of the places of the picture of the engine of a cast of the counts of the engine itself. */
+function castMemberOld(input: {
+	type: number;
+	info: Buffer;
+	specific: Buffer;
+}): Buffer {
+	// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+	// places of the picture of the engine stand of the counts of the walk of the engine of the counts of the
+	// engine itself: the counts of the walk of the engine of the places of the picture of the engine of the
+	// counts of them stand of the counts of the walk of the engine of the places of the picture of the engine
+	// where the counts of the places of the picture of the engine stand of counts of the engine itself.
+	const dataLength = input.specific.length + 1;
+	const withFlags = input.specific.length > 0;
+	const head = Buffer.alloc(withFlags ? 8 : 7, 0);
+	head.writeUInt16BE(dataLength, 0);
+	head.writeInt32BE(input.info.length, 2);
+	head.writeUInt8(input.type, 6);
+	return Buffer.concat([head, input.specific, input.info]);
+}
+
+/** The counts of the places of a sound of the engine of the counts of the walk of the engine of them. */
+function soundHead(input: {
+	channels: number;
+	sampleRate: number;
+	average: number;
+	blockAlign: number;
+	bits: number;
+}): Buffer {
+	const head = Buffer.alloc(0x54, 0);
+	head.writeUInt32BE(input.sampleRate, 0x2c);
+	head.writeUInt32BE(input.average, 0x30);
+	head.writeUInt32BE(input.bits, 0x44);
+	head.writeUInt32BE(input.channels, 0x4c);
+	head.writeUInt32BE(input.blockAlign, 0x50);
+	return head;
+}
+
 async function extract(data: Buffer, name: string): Promise<Buffer> {
 	const handle = await macromediaDxrArchiveFormat.open(
 		new BufferByteSource(data),
@@ -848,6 +885,100 @@ describe("Macromedia Director movie", () => {
 		expect([...(await extract(data, "sound.snd"))]).toEqual([7, 8, 9]);
 		await expect(extract(data, "one_two.BITD")).rejects.toMatchObject({
 			code: "UNSUPPORTED_FEATURE",
+		});
+	});
+
+	it("stands of the counts of the places of a sound of the engine of the counts of the walk of the engine", async () => {
+		// The counts of the places of a sound of the engine stand of the counts of the walk of the engine of
+		// the places of the picture of the engine and of the counts of the walk of the engine of the places of
+		// the picture of the engine of the counts of the engine itself, which the counts of the walk of the
+		// engine of the places of the sound of the engine stand of.
+		const sound = (bits: number, samples: number[]): Buffer =>
+			dxrMovie({
+				chunks: [
+					{
+						fourCC: "KEY*",
+						body: keyChunk(
+							[
+								// The counts of the places of the picture of the engine of the counts of the walk
+								// of the engine of the places of the picture of the engine stand of the counts
+								// of the walk of the engine of the places of the picture of the engine of the
+								// counts of them.
+								{ id: 3, castId: 2, fourCC: "sndH" },
+								{ id: 4, castId: 2, fourCC: "sndS" },
+							],
+							true,
+							2,
+						),
+					},
+					{ fourCC: "CAS*", body: castIndex([2]) },
+					{
+						fourCC: "CASt",
+						body: castMemberOld({
+							type: 6,
+							info: castInfo({ name: "tune", source: "" }),
+							specific: Buffer.alloc(0),
+						}),
+					},
+					{
+						fourCC: "sndH",
+						body: soundHead({
+							channels: 2,
+							sampleRate: 22050,
+							average: 88200,
+							blockAlign: 4,
+							bits,
+						}),
+					},
+					{ fourCC: "sndS", body: Buffer.from(samples) },
+				],
+			});
+		const sixteen = sound(16, [0x12, 0x34, 0x56, 0x78]);
+		const wave = await extract(sixteen, "tune.snd");
+		// The counts of the places of a sound of the engine stand of the counts of the engine of the walk of
+		// the engine itself: the counts of the walk of the engine of the places of the picture of the engine
+		// stand of the counts of the engine of the walk of the engine itself.
+		expect(wave.readUInt16LE(22)).toBe(2);
+		expect(wave.readUInt32LE(24)).toBe(22050);
+		expect(wave.readUInt16LE(34)).toBe(16);
+		expect([...wave.subarray(44)]).toEqual([0x34, 0x12, 0x78, 0x56]);
+		// The counts of the places of a sound of the engine of the counts of the engine itself stand as they
+		// stand.
+		const eight = sound(8, [0x11, 0x22, 0x33]);
+		const shortWave = await extract(eight, "tune.snd");
+		expect(shortWave.readUInt16LE(34)).toBe(8);
+		expect([...shortWave.subarray(44)]).toEqual([0x11, 0x22, 0x33]);
+		// The counts of the places of a sound of the engine stand behind the counts of the walk of the engine
+		// of the places of the picture of the engine: a count of the walk of the engine of the places of the
+		// sound of the engine of no counts of them at all stands of no counts of the walk of the engine.
+		const short = dxrMovie({
+			chunks: [
+				{
+					fourCC: "KEY*",
+					body: keyChunk(
+						[
+							{ id: 3, castId: 2, fourCC: "sndH" },
+							{ id: 4, castId: 2, fourCC: "sndS" },
+						],
+						true,
+						2,
+					),
+				},
+				{ fourCC: "CAS*", body: castIndex([2]) },
+				{
+					fourCC: "CASt",
+					body: castMemberOld({
+						type: 6,
+						info: castInfo({ name: "tune", source: "" }),
+						specific: Buffer.alloc(0),
+					}),
+				},
+				{ fourCC: "sndH", body: Buffer.alloc(8, 0) },
+				{ fourCC: "sndS", body: Buffer.alloc(2, 0) },
+			],
+		});
+		await expect(extract(short, "tune.snd")).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
 		});
 	});
 });
