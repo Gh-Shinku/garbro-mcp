@@ -23,7 +23,9 @@ file at 4, and then a head of six places of four places each (of eight for a fil
 Every one of those places must stand at 0x28 or behind it, in front of the place of the chunks, and within
 the file, and the root object must stand of a **dictionary** (the kind 0x21 of the file). A file whose flags
 name the cipher of the engine stands of that cipher over the places of the file that stand between the
-tables of the names and the places of the chunks.
+tables of the names and the places of the chunks, and a file whose first flag names it stands of it over the
+**head itself** as well (over the places of the tables of the head, the places of the kind and of the flags
+of the file standing as they stand), of the same walk and of the same key.
 
 ## The cipher of the engine
 
@@ -93,9 +95,9 @@ Every picture is handed over as a bitmap of this project of thirty two places of
   A picture of the kind five therefore stands read of the same walk the row of that name of this project
   stands of (which the test pins: the places of the same file stand of the same picture through both), and
   one of the kinds nought and one stands refused rather than read of a walk of another kind.
-* A file whose **head** stands of the cipher of the engine as well (the first flag) stands refused, where
-  the reference stands of that cipher of the key of the game. The reference's own head cipher stands of the
-  same key, and a stock build holds the one key above.
+* The head of a file of the first flag and the tables of the names behind it stand of **one** walk of the
+  cipher, of the key of the game, as the reference stands of them: the places of the head stand of the walk
+  first, and the places of the tables after them.
 * The kinds of the names of the files of the engine stand of the name `file` alone, where the reference
   stands of its table of the places of a name; a picture stands named `image`.
 * A dictionary whose names stand of no name of the file stands refused rather than read.

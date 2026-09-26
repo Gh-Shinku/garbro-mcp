@@ -104,15 +104,28 @@ function invalidArchive(message: string): GarbroError {
 export function readPsbHeader(
 	data: Buffer,
 	encrypted: boolean,
+	cipher?: PsbCipher,
 ): PsbHeader | undefined {
 	if (data.length < HEAD_START + HEAD_SIZE_OLD) return undefined;
 	const version = data.readUInt16LE(HEAD_START);
 	let flags = data.readUInt16LE(HEAD_START + 2);
 	if (encrypted && version < 3) flags = 2;
-	if (0 !== (flags & 1)) return undefined;
 	const headSize = version > 3 ? HEAD_SIZE_NEW : HEAD_SIZE_OLD;
 	if (data.length < HEAD_START + headSize) return undefined;
-	const header = data.subarray(HEAD_START + 4, HEAD_START + 4 + headSize);
+	const header = Buffer.from(
+		data.subarray(HEAD_START + 4, HEAD_START + 4 + headSize),
+	);
+	// The places of the tables of the head stand of the cipher of the engine as well where the first flag
+	// of the head names it, of the same key of the game and of the same walk as the places behind it.
+	if (0 !== (flags & 1)) {
+		if (undefined === cipher) return undefined;
+		if (version > 3) {
+			cipher.xor(header, 0, 0x24);
+			cipher.xor(header, 0x24, 0x0c);
+		} else {
+			cipher.xor(header, 0, HEAD_SIZE_OLD);
+		}
+	}
 	const header4 = (at: number): number => header.readInt32LE(at);
 	const parsed: PsbHeader = {
 		version,
@@ -181,13 +194,17 @@ export class PsbReader {
 		data: Buffer,
 		options: { key?: number } = {},
 	): PsbReader | undefined {
-		const header = readPsbHeader(data, false);
+		// The reference stands of one walk of the cipher for the head of the file and for the places of the
+		// tables behind it, of the same key, so the port stands of one walk as well, of the head first.
+		const cipher =
+			undefined === options.key ? undefined : new PsbCipher(options.key);
+		const header = readPsbHeader(data, false, cipher);
 		if (!header) return undefined;
 		if (header.version < 2) return undefined;
 		const reader = new PsbReader(data, header);
 		if (0 !== (header.flags & 2)) {
-			if (undefined === options.key) return undefined;
-			new PsbCipher(options.key).xor(
+			if (undefined === cipher) return undefined;
+			cipher.xor(
 				reader.#data,
 				header.names,
 				header.chunkOffsets - header.names,

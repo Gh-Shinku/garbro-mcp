@@ -60,13 +60,20 @@ function psbFile(input: {
 	value: number;
 	broken?: "table" | "root" | "cipher";
 	cipher?: number;
+	headCipher?: boolean;
 	chunk?: { offset: number; length: number };
 }): Buffer {
 	const file = Buffer.alloc(CHUNK_DATA + 0x100, 0x00);
 	file.write("PSB\0", 0, "latin1");
 	file.writeUInt16LE(3, 4);
 	file.writeUInt16LE(
-		"cipher" === input.broken ? 1 : undefined === input.cipher ? 0 : 2,
+		"cipher" === input.broken
+			? 1
+			: undefined === input.cipher
+				? 0
+				: undefined === input.headCipher
+					? 2
+					: 3,
 		6,
 	);
 	const head = Buffer.alloc(0x20, 0x00);
@@ -120,7 +127,11 @@ function psbFile(input: {
 	}
 	if (undefined !== input.cipher) {
 		const end = PARENTS + 6 + ENTRIES * 4;
-		new PsbCipher(input.cipher).xor(file, NAMES, end - NAMES);
+		// The reference stands of one walk of the cipher for the head of the file first and for the places
+		// of the tables of the names behind it after that, so the fixture stands of one walk as well.
+		const cipher = new PsbCipher(input.cipher);
+		if (true === input.headCipher) cipher.xor(file, 8, 0x20);
+		cipher.xor(file, NAMES, end - NAMES);
 	}
 	return file;
 }
@@ -192,6 +203,21 @@ describe("Emote PSB container", () => {
 		expect(PsbReader.parse(data)).toBeUndefined();
 		const wrong = PsbReader.parse(data, { key: 1 });
 		expect(() => wrong?.nameMap()).toThrow();
+		// A file whose head stands of the cipher as well: the places of its tables stand of the same walk
+		// and of the same key, and the head of the file stands of them where that key stands at hand.
+		const hidden = psbFile({
+			name: "x",
+			value: 0x0040abcd,
+			cipher: 970396437,
+			headCipher: true,
+		});
+		expect(readPsbHeader(hidden, false)).toBeUndefined();
+		const seen = PsbReader.parse(hidden, { key: 970396437 });
+		if (!seen) throw new Error("no reader");
+		expect(seen.header.flags).toBe(3);
+		expect(seen.offsetOf("x")).toBe(OBJECT);
+		expect(PsbReader.parse(hidden)).toBeUndefined();
+		expect(PsbReader.parse(hidden, { key: 2 })).toBeUndefined();
 	});
 
 	it("stands of no file of another object at the root of the file or of no head at all", () => {
