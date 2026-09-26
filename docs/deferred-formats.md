@@ -369,11 +369,13 @@ the first forty of them.
   stand ported too**. **The counts of the walk of the engine of the
   places of the picture of the engine of the counts of the walk of the engine (`MCsL`, `CAS*`) and the pictures
   and sounds of the counts of the places of the picture of the engine (`ImportMedia`) stand ported too.** What
-  stands behind them is the counts of the places of a picture of the engine and of a sound of the engine
-  themselves (the walk of the counts of the places of the picture of the engine of the engine itself and the
-  wave container of a sound of the engine). **The counts of the walk of the
-  engine of the engine itself (`FGDC`, `FGDM`) stand ported too.** The whole of it is written through
-  the table driven deserializer of `DirectorFile.cs`, which the port stands of for the head and the map alone.
+  stands behind them is the counts of the places of a picture of the engine of the counts of the walk of the
+  engine of the places of the picture of the engine of the engine itself (the walk of the counts of the places
+  of the picture of the engine of the engine itself and the counts of the walk of the engine of the places of
+  the picture of the engine of the engine itself). **The counts of the walk of the engine of the engine itself
+  (`FGDC`, `FGDM`) and the counts of the places of a sound of the engine stand ported too.** The whole of it
+  is written through the table driven deserializer of `DirectorFile.cs`, which the port stands of for the head
+  and the map alone.
 - `HCA` (`ArcFormats/Cri/AudioHCA.cs`, class `HcaAudio`, 1213 lines) is the audio of the Cri engine and is
   the same shape on a larger scale: a big endian container, a table of scale factors built from a type of
   the head (`AthTable`), a cipher of the head's own type (`Cipher`, with the key of the game), a Huffman
