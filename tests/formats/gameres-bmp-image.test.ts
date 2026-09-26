@@ -1,8 +1,14 @@
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { gameresBmpImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { withCompanionFiles } from "../helpers/companion.js";
 import {
+	readBmpImage,
 	writeBmp1,
 	writeBmp8,
 	writeBmp16,
@@ -54,6 +60,35 @@ async function extract(file: Buffer, name = "CG01.bmp"): Promise<Buffer> {
 	} finally {
 		await archive.close();
 	}
+}
+
+/** The places of the picture of the companion tests: two places square, of three places of a colour. */
+const COMPANION_PICTURE = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+/** The places of the alpha of the companion: a place a place of the picture. */
+const COMPANION_ALPHA = Buffer.from([
+	0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
+]);
+
+/** The picture the format hands out of a companion whose rows stand in the given order. */
+async function alphaOf(bottomUp: boolean): Promise<number[]> {
+	const picture = writeBmp24(2, 2, COMPANION_PICTURE, bottomUp);
+	let places: number[] = [];
+	await withCompanionFiles(
+		"CG01.bmp",
+		{ "CG01.bmp": picture, "CG01.alp": COMPANION_ALPHA },
+		async (mainPath) => {
+			const source = await FileByteSource.open(mainPath);
+			const archive = await gameresBmpImageFormat.open(source, mainPath);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("missing entry");
+			const image = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			if (!image) throw new Error("no bitmap");
+			places = [...image.pixels];
+		},
+	);
+	return places;
 }
 
 describe("Windows bitmap", () => {
@@ -138,6 +173,38 @@ describe("Windows bitmap", () => {
 				Buffer.from(item.pixels),
 			);
 		}
+	});
+
+	it("lays the alpha channel of a companion over the picture", async () => {
+		// `AlpBitmap` looks for a companion of the same name with the extension `.alp`, of three places of a
+		// colour of a place of a row behind it, and lays it over the fourth place of every place of the
+		// picture. The rows of the companion stand of the rows of the picture as the file stores them, which
+		// is the way the reference walks them as well: a picture whose rows stand the other way round in the
+		// file takes the rows of its companion the same way round.
+		// A picture whose rows stand the other way round in the file - which is what a height above nought
+		// stands for - takes the rows of its companion the other way round as well.
+		expect(await alphaOf(true)).toEqual([
+			7, 8, 9, 0x50, 10, 11, 12, 0x60, 1, 2, 3, 0x10, 4, 5, 6, 0x20,
+		]);
+		expect(await alphaOf(false)).toEqual([
+			1, 2, 3, 0x10, 4, 5, 6, 0x20, 7, 8, 9, 0x50, 10, 11, 12, 0x60,
+		]);
+		// A companion of another count, and a picture with no companion at all, stand aside.
+		const picture = writeBmp24(2, 1, Buffer.from([1, 2, 3, 4, 5, 6]));
+		await withCompanionFiles(
+			"CG01.bmp",
+			{ "CG01.bmp": picture, "CG01.alp": Buffer.from([1, 2, 3]) },
+			async (mainPath) => {
+				const source = await FileByteSource.open(mainPath);
+				const archive = await gameresBmpImageFormat.open(source, mainPath);
+				const entry = archive.entries[0];
+				if (!entry) throw new Error("missing entry");
+				const image = readBmpImage(
+					await consumeBuffer(await archive.openEntry(entry.id)),
+				);
+				expect(image?.bitsPerPixel).toBe(24);
+			},
+		);
 	});
 
 	it("reads a bitmap stored with the older header", async () => {

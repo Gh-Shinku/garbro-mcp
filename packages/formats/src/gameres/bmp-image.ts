@@ -8,8 +8,14 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
-import { changeExtension } from "../shared/companion.js";
+import {
+	type BmpImage,
+	readBmpImage,
+	toBgra32,
+	writeBmp32,
+	writeBmpImage,
+} from "../shared/bmp.js";
+import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -89,14 +95,36 @@ async function readBmpFields(
 	};
 }
 
-/** The bitmap behind the header, written out again at the depth it was stored in. */
-async function renderBmpImage(source: ByteSource): Promise<Buffer> {
-	const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-	const image = readBmpImage(stored);
-	if (!image) {
-		throw new GarbroError("INVALID_ARCHIVE", "Invalid Windows bitmap");
-	}
-	return writeBmpImage(image);
+/** The places of the alpha of the picture, of the walk of the companion behind it. */
+interface BmpAlphaPlane {
+	places: Buffer;
+	stride: number;
+	/** Whether the rows of the companion stand of the rows of the picture the other way round. */
+	bottomUp: boolean;
+}
+
+/**
+ * `AlpBitmap.Read`: the companion of the same name with the extension `.alp`. Its places stand of as many
+ * places of the alpha as a row of the picture holds, of the count a row of a bitmap stands of, which is the
+ * count of the places of the picture rounded up to four; a companion whose count stands of the count of the
+ * places of the picture itself stands of that count instead. A companion of any other count stands aside.
+ */
+async function readAlphaPlane(
+	sourcePath: string,
+	image: BmpImage,
+	stored: Buffer,
+): Promise<BmpAlphaPlane | undefined> {
+	const fileName = sourcePath.replace(/^.*[/\\]/, "");
+	const companion = changeExtension(fileName, "alp");
+	if (companion.toLowerCase() === fileName.toLowerCase()) return undefined;
+	const places = await readCompanionFile(sourcePath, companion);
+	if (!places) return undefined;
+	const rounded = ((image.width + 3) & ~3) * image.height;
+	const plain = image.width * image.height;
+	const stride =
+		places.length === rounded ? (image.width + 3) & ~3 : image.width;
+	if (places.length !== rounded && places.length !== plain) return undefined;
+	return { places, stride, bottomUp: stored.readInt32LE(0x16) > 0 };
 }
 
 export const gameresBmpImageDescriptor: FormatDescriptor = {
@@ -170,7 +198,26 @@ export const gameresBmpImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource, _entry, sourcePath: string) {
-		void sourcePath;
-		return Readable.from([await renderBmpImage(source)]);
+		// `BmpFormat` tries the readers its own extensions stand for before its own: `AlpBitmap` looks for a
+		// companion of the same name with the extension `.alp`, of three places of a colour of a place of a
+		// row behind it, and lays it over the fourth place of every place of the picture. Where the companion
+		// stands absent or of no such size, the extension stands aside and the picture stands as it is.
+		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
+		const image = readBmpImage(stored);
+		if (!image) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Windows bitmap");
+		}
+		const alpha = await readAlphaPlane(sourcePath, image, stored);
+		if (!alpha) return Readable.from([writeBmpImage(image)]);
+		const pixels = toBgra32(image, true);
+		if (!pixels) return Readable.from([writeBmpImage(image)]);
+		for (let y = 0; y < image.height; y += 1) {
+			const row = alpha.bottomUp ? image.height - 1 - y : y;
+			for (let x = 0; x < image.width; x += 1) {
+				pixels[(y * image.width + x) * 4 + 3] =
+					alpha.places[row * alpha.stride + x] ?? 0;
+			}
+		}
+		return Readable.from([writeBmp32(image.width, image.height, pixels)]);
 	},
 });

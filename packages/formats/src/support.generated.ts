@@ -7816,12 +7816,13 @@ export const formatSupportCatalog = {
 			localId: "gameres-bmp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
-			unsupported: [
-				"archive creation",
-				"run length bitmaps",
-				"appended alpha plane",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the appended alpha plane of a companion with the extension `.alp`, laid over the fourth place of every place of the picture",
 			],
+			unsupported: ["archive creation", "run length bitmaps"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

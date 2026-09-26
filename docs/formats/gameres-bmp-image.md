@@ -37,8 +37,16 @@ The picture is written again at the depth it was stored in, so an eight bit bitm
 sixteen bit one keeps its colour masks and a palette bitmap keeps its indices. Two things the reference does are
 left out:
 
-* the readers it tries before its own decoder, which lay an **appended alpha plane** over the picture, are behind
-  a setting that is off unless a user turns it on, so the port leaves them alone;
+* the readers it tries before its own decoder are behind a setting that is off unless a user turns it on; of
+  them this port carries the one that matters in practice, `AlpBitmap`, which looks for a companion of the same
+  name with the extension `.alp` and lays it over the fourth place of every place of the picture. The companion
+  holds as many places of the alpha as a row of the picture holds, of the count a row of a bitmap stands of —
+  the count of the places of the picture rounded up to four — or of the count of the places of the picture
+  itself; a companion of any other count, and a picture with no companion, stand as they are. The rows of the
+  companion stand of the rows of the picture as the file stores them and not as they are read, so a picture
+  whose rows stand the other way round in the file takes the rows of its companion the other way round as
+  well; the reference walks the stored rows in either case, which is the same thing for such a picture and the
+  other way round for one stored the right way up;
 * a **run length** bitmap is refused with `INVALID_ARCHIVE` where the framework the reference hands it to would
   decode it, since the shared reader here knows only the two uncompressed layouts.
 
