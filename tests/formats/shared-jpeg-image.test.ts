@@ -10,7 +10,12 @@ import {
 	COLOUR_PIXELS,
 	GREY_JPEG,
 	GREY_PIXELS,
-	PROGRESSIVE_JPEG,
+	PROGRESSIVE_COLOUR_JPEG,
+	PROGRESSIVE_COLOUR_PIXELS,
+	PROGRESSIVE_GREY_JPEG,
+	PROGRESSIVE_GREY_PIXELS,
+	PROGRESSIVE_TALL_JPEG,
+	PROGRESSIVE_TALL_PIXELS,
 	TALL_JPEG,
 	TALL_PIXELS,
 	WIDE_JPEG,
@@ -260,6 +265,49 @@ function colourJpeg(input: {
 	return Buffer.concat(parts);
 }
 
+/**
+ * A progressive JPEG of one grey component of eight places square, of two scans: the first carries the direct
+ * current coefficient the test names with its low bit dropped, and the second carries that bit.
+ */
+function progressiveJpeg(direct: number): Buffer {
+	const quantisation = segment(
+		0xdb,
+		Buffer.from([0, ...new Array(64).fill(1)]),
+	);
+	const huffman = segment(0xc4, huffmanTable(0x00, ONE_A_LENGTH, DC_SYMBOLS));
+	const frame = Buffer.alloc(9, 0);
+	frame[0] = 8;
+	frame.writeUInt16BE(8, 1);
+	frame.writeUInt16BE(8, 3);
+	frame[5] = 1;
+	frame[6] = 1;
+	frame[7] = 0x11;
+	frame[8] = 0;
+	const writer = new BitWriter();
+	writeBlock(writer, direct >> 1, 0);
+	writer.align();
+	const first = Buffer.concat([
+		segment(0xda, Buffer.from([1, 1, 0x00, 0, 0, 0x01])),
+		writer.toBuffer(),
+	]);
+	const second = new BitWriter();
+	second.write(direct & 1, 1);
+	second.align();
+	const refinement = Buffer.concat([
+		segment(0xda, Buffer.from([1, 1, 0x00, 0, 0, 0x10])),
+		second.toBuffer(),
+	]);
+	return Buffer.concat([
+		Buffer.from([0xff, 0xd8]),
+		quantisation,
+		segment(0xc2, frame),
+		huffman,
+		first,
+		refinement,
+		Buffer.from([0xff, 0xd9]),
+	]);
+}
+
 /** The places of the flat blocks the fixture names, eight places square each, in the order of the blocks. */
 function flatBlocks(input: {
 	width: number;
@@ -375,12 +423,64 @@ describe("JPEG reader", () => {
 		expect(worst).toBeLessThanOrEqual(45);
 	});
 
-	it("turns away a progressive stream", () => {
-		expect(() => readJpegImage(PROGRESSIVE_JPEG)).toThrow(GarbroError);
-		try {
-			readJpegImage(PROGRESSIVE_JPEG);
-		} catch (error) {
-			expect((error as GarbroError).code).toBe("UNSUPPORTED_FEATURE");
+	it("reads a progressive stream built here: a scan and a refinement of it", () => {
+		// The first scan carries the direct current coefficient with its low bit dropped, and the second scan
+		// carries that bit, so the two together give the coefficient the fixture names.
+		const direct = 8 * 20 + 1;
+		const image = readJpegImage(progressiveJpeg(direct));
+		expect(image).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...image.pixels]).toEqual([
+			...flatBlocks({ width: 8, height: 8, blocks: [direct] }),
+		]);
+		// The coefficient stands at 161, so every sample is 161 / 8 rounded, above the middle of the range.
+		expect(pixelAt(image.pixels, 8, 0, 0)).toEqual([148, 148, 148, 255]);
+	});
+
+	it("reads a progressive stream of one grey component behind the Python imaging library", () => {
+		const image = readJpegImage(PROGRESSIVE_GREY_JPEG);
+		expect(image).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		const { worst } = differences(image.pixels, PROGRESSIVE_GREY_PIXELS);
+		expect(worst).toBeLessThanOrEqual(1);
+	});
+
+	it("reads a progressive stream whose components each sample the picture", () => {
+		const image = readJpegImage(PROGRESSIVE_COLOUR_JPEG);
+		expect(image).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		// The scans of a progressive stream carry the same coefficients a baseline one would, so the two
+		// pictures agree with libjpeg's own to the same rounding.
+		const { worst } = differences(image.pixels, PROGRESSIVE_COLOUR_PIXELS);
+		expect(worst).toBeLessThanOrEqual(2);
+	});
+
+	it("reads a progressive stream whose chroma is sampled twice as coarsely both ways", () => {
+		const image = readJpegImage(PROGRESSIVE_TALL_JPEG);
+		const { mean, worst } = differences(image.pixels, PROGRESSIVE_TALL_PIXELS);
+		expect(mean).toBeLessThanOrEqual(12);
+		expect(worst).toBeLessThanOrEqual(45);
+	});
+
+	it("turns away a frame of a kind this reader does not read", () => {
+		// An arithmetic coded frame (`SOF9`) follows a walk this reader does not read, and so does a lossless
+		// one (`SOF3`).
+		for (const kind of [0xc3, 0xc9, 0xca, 0xcb]) {
+			const frame = Buffer.alloc(20, 0);
+			frame.writeUInt16BE((0xff00 | kind) >>> 0, 0);
+			frame.writeUInt16BE(17, 2);
+			frame[4] = 8;
+			frame.writeUInt16BE(8, 5);
+			frame.writeUInt16BE(8, 7);
+			frame[9] = 1;
+			const data = Buffer.concat([
+				Buffer.from([0xff, 0xd8]),
+				frame,
+				Buffer.from([0xff, 0xd9]),
+			]);
+			expect(() => readJpegImage(data)).toThrow(GarbroError);
+			try {
+				readJpegImage(data);
+			} catch (error) {
+				expect((error as GarbroError).code).toBe("UNSUPPORTED_FEATURE");
+			}
 		}
 	});
 

@@ -26,12 +26,15 @@ The entry is named `image.bmp` and holds a bitmap of the places that reader retu
 The platform decoder widens a twice-as-coarse chroma inside its colour conversion, while the reader of this
 project widens it in the colour space of the stream, so the two pictures differ by a few places at the edge
 of a colour change; a stream of one grey component, or one whose components each sample the picture, agrees
-to within the rounding of the colour conversion. A progressive stream, a stream of four places a colour, of
-twelve bits a sample or of arithmetic coding is turned away as an unsupported feature. Writing the format is
+to within the rounding of the colour conversion. A progressive stream arrives over several scans, each
+covering a band of the coefficients of a component with successive approximation, and is read as well; a
+stream of four places a colour, of twelve bits a sample or of arithmetic coding is turned away as an
+unsupported feature. Writing the format is
 not ported, though the reference can write one through the encoder of its framework.
 
 The tests cover finding a picture behind the word of the format, finding one through the word of nothing when
 the segment a camera writes first is absent, stepping over a segment that is not a frame, declining a file
 that does not walk as a picture, the depth as the product of the bits and the colours — beside a grey picture
 of eight bits — the picture decoded into a bitmap (a grey stream exactly as the Python imaging library decodes it, and a
-stream of three components within two places of the same), and a file that is not a picture.
+stream of three components within two places of the same), and a file that is not a picture. The tests of the
+JPEG reader pin a progressive stream of three components within two places of the same library as well.

@@ -3,12 +3,16 @@
 // for such a payload, so this is a reader of the format itself rather than a port: the layout below follows
 // ITU-T T.81 (JPEG), baseline sequential DCT, eight bits a sample.
 //
-// Read here: SOF0 and SOF1 frames of one or three components with Huffman coding, quantisation tables of
-// eight or sixteen bits, restart intervals, and the Adobe colour transform marker. Turned away as an
-// unsupported feature: a progressive frame (SOF2) or any other frame kind, an arithmetic coded stream, a
-// frame of four or more components, a frame of twelve bits a sample, and a scan that does not hold every
-// component of its frame. Turned away as an invalid stream: a broken marker walk, a broken Huffman table, a
-// restart marker that is missing or out of range, and a coefficient that runs past the end of its block.
+// Read here: SOF0, SOF1 and SOF2 frames of one or three components with Huffman coding, quantisation tables
+// of eight or sixteen bits, restart intervals, and the Adobe colour transform marker. A baseline frame
+// carries one scan that covers every coefficient of every block; a progressive frame arrives over several
+// scans, each covering a band of the coefficients of one component, with the bits below the band added by a
+// refinement of it. The coefficients of all the scans are joined into the blocks of the components as they
+// come, and the blocks are laid out once the stream has been read. Turned away as an unsupported feature:
+// any other frame kind, which is an arithmetic coded or an otherwise unread stream, a frame of four or more
+// components, and a frame of twelve bits a sample. Turned away as an invalid stream: a broken marker walk, a
+// broken Huffman table, a restart marker that is missing or out of range, a scan that joins the places
+// behind the first of a block, and a coefficient that runs past the band of its scan.
 //
 // The reference decodes through the platform, which upsamples chroma with a wider filter than the nearest
 // sample this reader takes, so the two pictures differ by a little at the edges of a colour change. This is
@@ -98,16 +102,20 @@ interface Component {
 	id: number;
 	horizontal: number;
 	vertical: number;
-	/** The quantisation table in natural order, as a multiple of the transmitted coefficient. */
-	quant: Int32Array;
-	dc: HuffmanTable;
-	ac: HuffmanTable;
+	/** The number of the quantisation table of the component, which is read when the blocks are laid out. */
+	quantIndex: number;
+	/** The blocks of the component, in the order the stream carries them, sixty four coefficients each. */
+	coefficients: Int32Array;
+	/** The blocks of the component within the groups of its frame. */
 	blocksPerLine: number;
 	blocksPerColumn: number;
+	/** The blocks of the component within its own size, which a scan of one component alone walks. */
+	ownBlocksPerLine: number;
+	ownBlocksPerColumn: number;
 	/** The width of one row of samples of this component. */
 	stride: number;
 	samples: Uint8Array;
-	/** The running sum of the direct current coefficients, which a restart marker clears. */
+	/** The running sum of the direct current coefficients, which a scan and a restart marker clear. */
 	predictor: number;
 }
 
@@ -119,16 +127,36 @@ interface Frame {
 	mcusPerLine: number;
 	mcusPerColumn: number;
 	components: Component[];
+	/** The quantisation tables the stream has declared, which the blocks are read against at the end. */
+	quantTables: (Int32Array | undefined)[];
+	/** Whether the frame arrives over several scans, each covering a part of the coefficients. */
+	progressive: boolean;
 	/** One when the components are a luminance and two chrominance places, zero when they are red, green
 	 * and blue; undefined when the stream carries no Adobe marker. */
 	transform: number | undefined;
 }
 
-interface Scan {
-	frame: Frame;
+/** One component of a scan, with the tables that scan reads it through. */
+interface ScanComponent {
+	component: Component;
+	dc: HuffmanTable | undefined;
+	ac: HuffmanTable | undefined;
+}
+
+/** The head of a scan: which components it holds, which coefficients of them, and where it starts. */
+interface ScanHead {
 	/** The place of the first byte of the coded data. */
 	position: number;
+	components: ScanComponent[];
+	/** The first coefficient of the scan, and the last. */
+	from: number;
+	to: number;
+	/** The bits the coefficients of this scan start at, and the bits a refinement of them adds. */
+	high: number;
+	low: number;
 	restartInterval: number;
+	/** Whether the scan walks the groups of the frame or the blocks of one component alone. */
+	interleaved: boolean;
 }
 
 function invalidPicture(message: string): GarbroError {
@@ -280,206 +308,9 @@ function readFrame(body: Buffer): {
 	return { width, height, components };
 }
 
-/** Walks the markers up to the coded data and builds the components they describe. */
-function parseStream(data: Buffer): Scan {
-	if (data.length < 2 || MARKER_PREFIX !== data[0] || SOI !== data[1]) {
-		throw invalidPicture("Not a stream of the format");
-	}
-	const quantTables: (Int32Array | undefined)[] = [];
-	const dcTables: (HuffmanTable | undefined)[] = [];
-	const acTables: (HuffmanTable | undefined)[] = [];
-	let frame:
-		| {
-				width: number;
-				height: number;
-				components: {
-					id: number;
-					horizontal: number;
-					vertical: number;
-					quant: number;
-				}[];
-		  }
-		| undefined;
-	let restartInterval = 0;
-	let transform: number | undefined;
-	let position = 2;
-	while (position + 1 < data.length) {
-		if (MARKER_PREFIX !== data[position]) {
-			throw invalidPicture("The marker walk of the stream stands out of step");
-		}
-		while (position < data.length && MARKER_PREFIX === data[position])
-			position += 1;
-		if (position >= data.length) {
-			throw invalidPicture("The marker walk of the stream runs past its end");
-		}
-		const marker = data[position] ?? 0;
-		position += 1;
-		if (EOI === marker) throw invalidPicture("The stream carries no picture");
-		if (marker >= RST0 && marker <= RST0 + 7) continue;
-		if (position + 2 > data.length) {
-			throw invalidPicture("A length of the stream stands short of it");
-		}
-		const length = data.readUInt16BE(position);
-		if (length < 2 || position + length > data.length) {
-			throw invalidPicture("A length of the stream stands over its end");
-		}
-		const body = data.subarray(position + 2, position + length);
-		if (SOF0 === marker || SOF1 === marker) {
-			frame = readFrame(body);
-		} else if (
-			SOF2 === marker ||
-			(marker >= SOF3 && marker <= 0xcf && marker !== DHT)
-		) {
-			throw unsupportedPicture(
-				"A frame of the stream follows a walk this reader does not read",
-			);
-		} else if (DQT === marker) {
-			let at = 0;
-			while (at < body.length) at += readQuantTable(body, at, quantTables);
-		} else if (DHT === marker) {
-			let at = 0;
-			while (at < body.length) {
-				const head = body[at] ?? 0;
-				const kind = head >> 4;
-				const id = head & 0x0f;
-				if (id >= HUFFMAN_TABLE_COUNT || (0 !== kind && 1 !== kind)) {
-					throw invalidPicture("A Huffman table of the stream carries no name");
-				}
-				const table = readHuffmanTable(body, at + 1);
-				if (0 === kind) dcTables[id] = table;
-				else acTables[id] = table;
-				at += 1 + MAX_CODE_LENGTH + table.symbols.length;
-			}
-		} else if (DRI === marker) {
-			if (body.length < 2)
-				throw invalidPicture("A restart interval stands short of it");
-			restartInterval = body.readUInt16BE(0);
-		} else if (APP14 === marker && body.length > ADOBE_TRANSFORM_AT) {
-			transform = body[ADOBE_TRANSFORM_AT] ?? 0;
-		} else if (SOS === marker) {
-			if (!frame)
-				throw invalidPicture("The stream names its scan before its frame");
-			const scan = buildScan(frame, body, {
-				quantTables,
-				dcTables,
-				acTables,
-				transform,
-				restartInterval,
-			});
-			return {
-				frame: scan,
-				position: position + length,
-				restartInterval,
-			};
-		}
-		position += length;
-	}
-	throw invalidPicture("The stream carries no scan");
-}
-
-/** Builds the components of a frame from the scan that names their coding tables. */
-function buildScan(
-	frame: {
-		width: number;
-		height: number;
-		components: {
-			id: number;
-			horizontal: number;
-			vertical: number;
-			quant: number;
-		}[];
-	},
-	body: Buffer,
-	tables: {
-		quantTables: (Int32Array | undefined)[];
-		dcTables: (HuffmanTable | undefined)[];
-		acTables: (HuffmanTable | undefined)[];
-		transform: number | undefined;
-		restartInterval: number;
-	},
-): Frame {
-	const count = body[0] ?? 0;
-	if (count !== frame.components.length) {
-		throw unsupportedPicture(
-			"A scan of the stream names a part of the places of a colour of its frame",
-		);
-	}
-	if (body.length < 1 + count * 2 + 3) {
-		throw invalidPicture("A scan of the stream stands short of it");
-	}
-	// A sequential scan covers every coefficient of its blocks; a narrower span is a walk this reader does
-	// not follow.
-	if (0 !== (body[1 + count * 2] ?? 0) || 63 !== (body[2 + count * 2] ?? 0)) {
-		throw unsupportedPicture(
-			"A scan of the stream covers a part of the places of a block",
-		);
-	}
-	if (0 !== (body[3 + count * 2] ?? 0)) {
-		throw unsupportedPicture(
-			"A scan of the stream carries a refinement this reader does not read",
-		);
-	}
-	let maxHorizontal = 1;
-	let maxVertical = 1;
-	for (const component of frame.components) {
-		maxHorizontal = Math.max(maxHorizontal, component.horizontal);
-		maxVertical = Math.max(maxVertical, component.vertical);
-	}
-	const mcusPerLine = Math.ceil(frame.width / (BLOCK_DIM * maxHorizontal));
-	const mcusPerColumn = Math.ceil(frame.height / (BLOCK_DIM * maxVertical));
-	const components: Component[] = [];
-	for (let index = 0; index < count; index += 1) {
-		const description = frame.components[index];
-		if (!description)
-			throw invalidPicture("A component of the frame stands out of it");
-		const id = body[1 + index * 2] ?? 0;
-		if (id !== description.id) {
-			throw invalidPicture(
-				"A scan of the stream names a component of no frame",
-			);
-		}
-		const selector = body[2 + index * 2] ?? 0;
-		const dc = tables.dcTables[selector >> 4];
-		const ac = tables.acTables[selector & 0x0f];
-		const quant = tables.quantTables[description.quant];
-		if (!dc || !ac || !quant) {
-			throw invalidPicture(
-				"A scan of the stream names a table that stands nowhere",
-			);
-		}
-		const blocksPerLine = mcusPerLine * description.horizontal;
-		const blocksPerColumn = mcusPerColumn * description.vertical;
-		const stride = blocksPerLine * BLOCK_DIM;
-		components.push({
-			id,
-			horizontal: description.horizontal,
-			vertical: description.vertical,
-			quant,
-			dc,
-			ac,
-			blocksPerLine,
-			blocksPerColumn,
-			stride,
-			samples: new Uint8Array(stride * blocksPerColumn * BLOCK_DIM),
-			predictor: 0,
-		});
-	}
-	return {
-		width: frame.width,
-		height: frame.height,
-		maxHorizontal,
-		maxVertical,
-		mcusPerLine,
-		mcusPerColumn,
-		components,
-		transform: tables.transform,
-	};
-}
-
 /**
  * Reads the coded bits of a scan, most significant bit first. A byte of `0xff` inside the coded data is
- * followed by a zero byte; any other byte behind it is a marker, which ends the coded data and is left for
- * the caller.
+ * followed by a zero byte; any other byte behind it is a marker, which ends the coded data.
  */
 class JpegBitReader {
 	private cache = 0;
@@ -495,9 +326,25 @@ class JpegBitReader {
 		this.position = from;
 	}
 
-	/** The marker that ended the coded data, or zero when none was seen yet. */
-	peekMarker(): number {
-		return this.marker;
+	/**
+	 * The place of the marker that follows the coded data, which the marker walk behind this one continues
+	 * from. The bits left in the last byte are dropped, and a stream that ends without a marker reports its
+	 * own end, which ends the walk.
+	 */
+	endOfScan(): number {
+		this.bits = 0;
+		if (0 !== this.marker) return this.markerAt;
+		let at = this.position;
+		while (at + 1 < this.data.length) {
+			if (
+				MARKER_PREFIX === this.data[at] &&
+				STUFFED_BYTE !== this.data[at + 1]
+			) {
+				return at;
+			}
+			at += 1;
+		}
+		return this.data.length;
 	}
 
 	/** Takes the marker that ends the coded data, which stands at the reader's place. */
@@ -595,39 +442,490 @@ function receiveExtend(reader: JpegBitReader, count: number): number {
 	return value;
 }
 
-/** Reads one block of coefficients, undoes its quantisation and lays its samples into the component. */
-const BLOCK = new Float64Array(BLOCK_SIZE);
-const ROW = new Float64Array(BLOCK_SIZE);
+/**
+ * Builds the components of a frame, their blocks and the tables they are read against. A scan of one
+ * component alone walks that component's own blocks, which are fewer than the blocks of the groups when the
+ * component samples the picture more coarsely than the frame: the blocks behind the component's own edge are
+ * carried by the joined scans and stand empty in a scan of the component alone.
+ */
+function buildFrame(
+	description: {
+		width: number;
+		height: number;
+		components: {
+			id: number;
+			horizontal: number;
+			vertical: number;
+			quant: number;
+		}[];
+	},
+	progressive: boolean,
+	quantTables: (Int32Array | undefined)[],
+): Frame {
+	let maxHorizontal = 1;
+	let maxVertical = 1;
+	for (const component of description.components) {
+		maxHorizontal = Math.max(maxHorizontal, component.horizontal);
+		maxVertical = Math.max(maxVertical, component.vertical);
+	}
+	const mcusPerLine = Math.ceil(
+		description.width / (BLOCK_DIM * maxHorizontal),
+	);
+	const mcusPerColumn = Math.ceil(
+		description.height / (BLOCK_DIM * maxVertical),
+	);
+	const components: Component[] = [];
+	for (const entry of description.components) {
+		const blocksPerLine = mcusPerLine * entry.horizontal;
+		const blocksPerColumn = mcusPerColumn * entry.vertical;
+		const ownBlocksPerLine = Math.ceil(
+			Math.ceil((description.width * entry.horizontal) / maxHorizontal) /
+				BLOCK_DIM,
+		);
+		const ownBlocksPerColumn = Math.ceil(
+			Math.ceil((description.height * entry.vertical) / maxVertical) /
+				BLOCK_DIM,
+		);
+		const stride = blocksPerLine * BLOCK_DIM;
+		components.push({
+			id: entry.id,
+			horizontal: entry.horizontal,
+			vertical: entry.vertical,
+			quantIndex: entry.quant,
+			coefficients: new Int32Array(
+				blocksPerLine * blocksPerColumn * BLOCK_SIZE,
+			),
+			blocksPerLine,
+			blocksPerColumn,
+			ownBlocksPerLine,
+			ownBlocksPerColumn,
+			stride,
+			samples: new Uint8Array(stride * blocksPerColumn * BLOCK_DIM),
+			predictor: 0,
+		});
+	}
+	return {
+		width: description.width,
+		height: description.height,
+		maxHorizontal,
+		maxVertical,
+		mcusPerLine,
+		mcusPerColumn,
+		components,
+		quantTables,
+		progressive,
+		transform: undefined,
+	};
+}
 
-function decodeBlock(
+/**
+ * Reads the head of a scan: the components it holds and the tables it reads them through, the coefficients
+ * it covers and the bits of them it carries. A scan of a frame of several components covers the direct
+ * current coefficient of each of them alone; a scan that covers the other coefficients names one component.
+ */
+function readScanHead(
+	frame: Frame,
+	body: Buffer,
+	tables: {
+		dcTables: (HuffmanTable | undefined)[];
+		acTables: (HuffmanTable | undefined)[];
+		restartInterval: number;
+	},
+	position: number,
+): ScanHead {
+	const count = body[0] ?? 0;
+	if (count < 1 || count > frame.components.length) {
+		throw invalidPicture(
+			"A scan of the stream names a count of places of a colour its frame does not hold",
+		);
+	}
+	if (body.length < 1 + count * 2 + 3) {
+		throw invalidPicture("A scan of the stream stands short of it");
+	}
+	const from = body[1 + count * 2] ?? 0;
+	const to = body[2 + count * 2] ?? 0;
+	const approximation = body[3 + count * 2] ?? 0;
+	const high = approximation >> 4;
+	const low = approximation & 0x0f;
+	if (to > 63 || from > to) {
+		throw invalidPicture("A scan of the stream covers no places of a block");
+	}
+	if (0 !== high && high !== low + 1) {
+		throw invalidPicture(
+			"A scan of the stream refines places of no scan before it",
+		);
+	}
+	const components: ScanComponent[] = [];
+	for (let index = 0; index < count; index += 1) {
+		const id = body[1 + index * 2] ?? 0;
+		const component = frame.components.find((entry) => entry.id === id);
+		if (!component) {
+			throw invalidPicture(
+				"A scan of the stream names a component of no frame",
+			);
+		}
+		const selector = body[2 + index * 2] ?? 0;
+		const dc = tables.dcTables[selector >> 4];
+		const ac = tables.acTables[selector & 0x0f];
+		// A scan that covers the direct current place needs the table of it, and one that covers the other
+		// places needs the table of those.
+		if ((0 === from && !dc) || (to > 0 && !ac)) {
+			throw invalidPicture(
+				"A scan of the stream names a table that stands nowhere",
+			);
+		}
+		components.push({ component, dc, ac });
+	}
+	const interleaved = count > 1;
+	if (interleaved && from > 0) {
+		throw invalidPicture(
+			"A scan of the stream joins the places behind the first of a block",
+		);
+	}
+	return {
+		position,
+		components,
+		from,
+		to,
+		high,
+		low,
+		restartInterval: tables.restartInterval,
+		interleaved,
+	};
+}
+
+/**
+ * Reads the coefficients of a scan that covers a band of them, without a refinement. A code that ends the
+ * band stands for this block and for as many blocks behind it as it counts, and the count is carried between
+ * the blocks of the scan; a block a count covers carries no code of its own.
+ */
+function decodeAcScan(
 	reader: JpegBitReader,
-	component: Component,
-	blockRow: number,
-	blockColumn: number,
-): void {
-	for (let index = 0; index < BLOCK_SIZE; index += 1) BLOCK[index] = 0;
-	const direct = decodeHuffman(reader, component.dc);
-	component.predictor += direct > 0 ? receiveExtend(reader, direct) : 0;
-	BLOCK[0] = component.predictor * (component.quant[0] ?? 0);
-	let step = 1;
-	while (step < BLOCK_SIZE) {
-		const symbol = decodeHuffman(reader, component.ac);
+	table: HuffmanTable,
+	head: ScanHead,
+	block: Int32Array,
+	from: number,
+	eobRun: number,
+): number {
+	if (eobRun > 0) return eobRun - 1;
+	let step = from;
+	while (step <= head.to) {
+		const symbol = decodeHuffman(reader, table);
 		const run = symbol >> 4;
 		const width = symbol & 0x0f;
 		if (0 === width) {
-			if (15 !== run) break;
+			if (15 !== run) {
+				// The band ends here, for this block and for the blocks behind it that the code counts. The
+				// blocks it covers carry no code of their own, so the count is carried between blocks.
+				let span = 1 << run;
+				if (run > 0) span += reader.readBits(run);
+				return span - 1;
+			}
 			step += 16;
 			continue;
 		}
 		step += run;
-		if (step >= BLOCK_SIZE) {
-			throw invalidPicture("A block of the stream runs past its end");
+		if (step > head.to) {
+			throw invalidPicture(
+				"A block of the stream runs past the band of its scan",
+			);
 		}
-		const at = ZIGZAG[step] ?? 0;
-		BLOCK[at] = receiveExtend(reader, width) * (component.quant[at] ?? 0);
+		block[ZIGZAG[step] ?? 0] = receiveExtend(reader, width) << head.low;
 		step += 1;
 	}
-	// The inverse transform, a pass over the rows and then a pass over the columns.
+	return eobRun - 1;
+}
+
+/**
+ * Reads the coefficients of a scan that refines a band another scan carried: every coefficient that stands
+ * already takes one bit more, and the codes name the places where a coefficient stands for the first time.
+ * A code that ends the band stands for this block and for as many blocks behind it as it counts, and the
+ * count is carried between the blocks of the scan.
+ */
+function decodeAcRefinement(
+	reader: JpegBitReader,
+	table: HuffmanTable,
+	head: ScanHead,
+	block: Int32Array,
+	from: number,
+	eobRun: number,
+): number {
+	const bit = 1 << head.low;
+	const negative = -bit;
+	let step = from;
+	if (0 === eobRun) {
+		for (; step <= head.to; step += 1) {
+			const symbol = decodeHuffman(reader, table);
+			let run = symbol >> 4;
+			const width = symbol & 0x0f;
+			let value = 0;
+			if (0 !== width) {
+				if (1 !== width) {
+					throw invalidPicture(
+						"A coefficient of the stream stands at a width this reader does not read",
+					);
+				}
+				value = reader.readBit() ? bit : negative;
+			} else if (15 !== run) {
+				// The band ends here, for this block and for the blocks behind it that the code counts.
+				eobRun = 1 << run;
+				if (run > 0) eobRun += reader.readBits(run);
+				break;
+			}
+			// Walk over the coefficients that stand already, each of them taking a correction bit, and over as
+			// many places that stand empty as the code names.
+			do {
+				const at = ZIGZAG[step] ?? 0;
+				const standing = block[at] ?? 0;
+				if (0 !== standing) {
+					if (reader.readBit() && 0 === (standing & bit)) {
+						block[at] = standing + (standing > 0 ? bit : negative);
+					}
+				} else {
+					run -= 1;
+					if (run < 0) break;
+				}
+				step += 1;
+			} while (step <= head.to);
+			if (0 !== value) {
+				if (step > head.to) {
+					throw invalidPicture(
+						"A block of the stream runs past the band of its scan",
+					);
+				}
+				block[ZIGZAG[step] ?? 0] = value;
+			}
+		}
+	}
+	if (eobRun > 0) {
+		// The places behind the last coefficient the block named: every coefficient that stands already takes
+		// one more correction bit.
+		for (; step <= head.to; step += 1) {
+			const at = ZIGZAG[step] ?? 0;
+			const standing = block[at] ?? 0;
+			if (0 === standing) continue;
+			if (reader.readBit() && 0 === (standing & bit)) {
+				block[at] = standing + (standing > 0 ? bit : negative);
+			}
+		}
+		eobRun -= 1;
+	}
+	return eobRun;
+}
+
+/** Reads one block of a scan into the coefficients of its component. */
+function decodeBlock(
+	reader: JpegBitReader,
+	entry: ScanComponent,
+	head: ScanHead,
+	component: Component,
+	blockRow: number,
+	blockColumn: number,
+	eobRun: number,
+): number {
+	const at = (blockRow * component.blocksPerLine + blockColumn) * BLOCK_SIZE;
+	const block = component.coefficients.subarray(at, at + BLOCK_SIZE);
+	if (0 === head.from) {
+		if (0 === head.high) {
+			const table = entry.dc;
+			if (!table) {
+				throw invalidPicture(
+					"A scan of the stream names a table that stands nowhere",
+				);
+			}
+			const direct = decodeHuffman(reader, table);
+			component.predictor += direct > 0 ? receiveExtend(reader, direct) : 0;
+			block[0] = component.predictor << head.low;
+		} else if (reader.readBit()) {
+			// A refinement of the direct current place: one bit, which stands at the place of the scan.
+			block[0] = (block[0] ?? 0) | (1 << head.low);
+		}
+	}
+	if (head.to > 0) {
+		const table = entry.ac;
+		if (!table) {
+			throw invalidPicture(
+				"A scan of the stream names a table that stands nowhere",
+			);
+		}
+		const from = 0 === head.from ? 1 : head.from;
+		if (0 === head.high) {
+			eobRun = decodeAcScan(reader, table, head, block, from, eobRun);
+		} else {
+			eobRun = decodeAcRefinement(reader, table, head, block, from, eobRun);
+		}
+	}
+	return eobRun;
+}
+
+/** Reads the coded data of a scan, and returns the place of the marker that ends it. */
+function decodeScan(data: Buffer, frame: Frame, head: ScanHead): number {
+	const reader = new JpegBitReader(data, head.position);
+	const single = head.components[0]?.component;
+	const across = head.interleaved
+		? frame.mcusPerLine
+		: (single?.ownBlocksPerLine ?? 0);
+	const down = head.interleaved
+		? frame.mcusPerColumn
+		: (single?.ownBlocksPerColumn ?? 0);
+	const limit = across * down;
+	let done = 0;
+	let eobRun = 0;
+	for (const entry of head.components) entry.component.predictor = 0;
+	for (let row = 0; row < down; row += 1) {
+		for (let column = 0; column < across; column += 1) {
+			for (const entry of head.components) {
+				const { component } = entry;
+				if (head.interleaved) {
+					for (let down2 = 0; down2 < component.vertical; down2 += 1) {
+						for (
+							let across2 = 0;
+							across2 < component.horizontal;
+							across2 += 1
+						) {
+							eobRun = decodeBlock(
+								reader,
+								entry,
+								head,
+								component,
+								row * component.vertical + down2,
+								column * component.horizontal + across2,
+								eobRun,
+							);
+						}
+					}
+				} else {
+					eobRun = decodeBlock(
+						reader,
+						entry,
+						head,
+						component,
+						row,
+						column,
+						eobRun,
+					);
+				}
+			}
+			done += 1;
+			if (
+				head.restartInterval > 0 &&
+				done < limit &&
+				0 === done % head.restartInterval
+			) {
+				const marker = reader.expectRestart();
+				if (marker < RESTART_FIRST || marker > RESTART_LAST) {
+					throw invalidPicture(
+						"The stream carries no restart marker where it names one",
+					);
+				}
+				for (const entry of head.components) entry.component.predictor = 0;
+				eobRun = 0;
+			}
+		}
+	}
+	return reader.endOfScan();
+}
+
+/**
+ * Walks the markers of a stream and reads every scan of it, which is what a progressive stream needs: its
+ * coefficients arrive over several scans and are joined into the blocks of the components as they come. A
+ * baseline stream carries one scan, which covers every coefficient of every block of its frame.
+ */
+function parsePicture(data: Buffer): Frame {
+	if (data.length < 2 || MARKER_PREFIX !== data[0] || SOI !== data[1]) {
+		throw invalidPicture("Not a stream of the format");
+	}
+	const quantTables: (Int32Array | undefined)[] = [];
+	const dcTables: (HuffmanTable | undefined)[] = [];
+	const acTables: (HuffmanTable | undefined)[] = [];
+	let frame: Frame | undefined;
+	let restartInterval = 0;
+	let transform: number | undefined;
+	let scans = 0;
+	let position = 2;
+	while (position + 1 < data.length) {
+		if (MARKER_PREFIX !== data[position]) {
+			throw invalidPicture("The marker walk of the stream stands out of step");
+		}
+		while (position < data.length && MARKER_PREFIX === data[position])
+			position += 1;
+		if (position >= data.length) {
+			throw invalidPicture("The marker walk of the stream runs past its end");
+		}
+		const marker = data[position] ?? 0;
+		position += 1;
+		if (EOI === marker) break;
+		if (marker >= RST0 && marker <= RST0 + 7) continue;
+		if (position + 2 > data.length) {
+			throw invalidPicture("A length of the stream stands short of it");
+		}
+		const length = data.readUInt16BE(position);
+		if (length < 2 || position + length > data.length) {
+			throw invalidPicture("A length of the stream stands over its end");
+		}
+		const body = data.subarray(position + 2, position + length);
+		if (SOF0 === marker || SOF1 === marker || SOF2 === marker) {
+			if (frame) throw invalidPicture("The stream names more than one frame");
+			frame = buildFrame(readFrame(body), SOF2 === marker, quantTables);
+		} else if (marker >= SOF3 && marker <= 0xcf && marker !== DHT) {
+			throw unsupportedPicture(
+				"A frame of the stream follows a walk this reader does not read",
+			);
+		} else if (DQT === marker) {
+			let at = 0;
+			while (at < body.length) at += readQuantTable(body, at, quantTables);
+		} else if (DHT === marker) {
+			let at = 0;
+			while (at < body.length) {
+				const head = body[at] ?? 0;
+				const kind = head >> 4;
+				const id = head & 0x0f;
+				if (id >= HUFFMAN_TABLE_COUNT || (0 !== kind && 1 !== kind)) {
+					throw invalidPicture("A Huffman table of the stream carries no name");
+				}
+				const table = readHuffmanTable(body, at + 1);
+				if (0 === kind) dcTables[id] = table;
+				else acTables[id] = table;
+				at += 1 + MAX_CODE_LENGTH + table.symbols.length;
+			}
+		} else if (DRI === marker) {
+			if (body.length < 2)
+				throw invalidPicture("A restart interval stands short of it");
+			restartInterval = body.readUInt16BE(0);
+		} else if (APP14 === marker && body.length > ADOBE_TRANSFORM_AT) {
+			transform = body[ADOBE_TRANSFORM_AT] ?? 0;
+		} else if (SOS === marker) {
+			if (!frame)
+				throw invalidPicture("The stream names its scan before its frame");
+			frame.transform = transform;
+			const head = readScanHead(
+				frame,
+				body,
+				{ dcTables, acTables, restartInterval },
+				position + length,
+			);
+			position = decodeScan(data, frame, head);
+			scans += 1;
+			continue;
+		}
+		position += length;
+	}
+	if (!frame) throw invalidPicture("The stream carries no frame");
+	if (0 === scans) throw invalidPicture("The stream carries no scan");
+	frame.transform = transform;
+	return frame;
+}
+
+/** The block a component's samples are laid out from, and the row the inverse transform walks. */
+const BLOCK = new Float64Array(BLOCK_SIZE);
+const ROW = new Float64Array(BLOCK_SIZE);
+
+/** The inverse transform of one block of a component: a pass over the rows, then a pass over the columns. */
+function transformBlock(
+	component: Component,
+	blockRow: number,
+	blockColumn: number,
+): void {
 	for (let frequency = 0; frequency < BLOCK_DIM; frequency += 1) {
 		for (let place = 0; place < BLOCK_DIM; place += 1) {
 			let sum = 0;
@@ -656,36 +954,30 @@ function decodeBlock(
 	}
 }
 
-/** Reads the coded data of a scan into the samples of its components. */
-function decodeScan(data: Buffer, scan: Scan): void {
-	const { frame, restartInterval } = scan;
-	const reader = new JpegBitReader(data, scan.position);
-	const limit = frame.mcusPerLine * frame.mcusPerColumn;
-	let done = 0;
-	for (let row = 0; row < frame.mcusPerColumn; row += 1) {
-		for (let column = 0; column < frame.mcusPerLine; column += 1) {
-			for (const component of frame.components) {
-				for (let down = 0; down < component.vertical; down += 1) {
-					for (let across = 0; across < component.horizontal; across += 1) {
-						decodeBlock(
-							reader,
-							component,
-							row * component.vertical + down,
-							column * component.horizontal + across,
-						);
-					}
-				}
+/**
+ * Undoes the quantisation of every block of a component and lays its samples out. A block the stream never
+ * carried stands at nothing, which the level shift turns into the middle of the range.
+ */
+function transformComponent(frame: Frame, component: Component): void {
+	const quant = frame.quantTables[component.quantIndex];
+	if (!quant) {
+		throw invalidPicture(
+			"A component of the frame names a table of multiples that stands nowhere",
+		);
+	}
+	for (let blockRow = 0; blockRow < component.blocksPerColumn; blockRow += 1) {
+		for (
+			let blockColumn = 0;
+			blockColumn < component.blocksPerLine;
+			blockColumn += 1
+		) {
+			const at =
+				(blockRow * component.blocksPerLine + blockColumn) * BLOCK_SIZE;
+			for (let index = 0; index < BLOCK_SIZE; index += 1) {
+				BLOCK[index] =
+					(component.coefficients[at + index] ?? 0) * (quant[index] ?? 0);
 			}
-			done += 1;
-			if (restartInterval > 0 && done < limit && 0 === done % restartInterval) {
-				const marker = reader.expectRestart();
-				if (marker < RESTART_FIRST || marker > RESTART_LAST) {
-					throw invalidPicture(
-						"The stream carries no restart marker where it names one",
-					);
-				}
-				for (const component of frame.components) component.predictor = 0;
-			}
+			transformBlock(component, blockRow, blockColumn);
 		}
 	}
 }
@@ -819,9 +1111,10 @@ function clampColour(value: number): number {
  * this reader does not follow is turned away.
  */
 export function readJpegImage(data: Buffer): JpegImage {
-	const scan = parseStream(data);
-	decodeScan(data, scan);
-	const { frame } = scan;
+	const frame = parsePicture(data);
+	for (const component of frame.components) {
+		transformComponent(frame, component);
+	}
 	const { width, height } = frame;
 	for (const component of frame.components) {
 		if (

@@ -7700,7 +7700,7 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -7811,7 +7811,7 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"archive creation",
 				"image writing",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -16045,7 +16045,7 @@ export const formatSupportCatalog = {
 				"the graphic of the alpha, read by `packages/formats/src/shared/png-image.ts`",
 			],
 			unsupported: [
-				"a JPEG of the four places a colour of the press, of twelve bits a sample, of a progressive walk or of arithmetic coding",
+				"a JPEG of the four places a colour of the press, of twelve bits a sample or of arithmetic coding",
 				"the platform decoders the reference hands both streams to",
 				"archive creation",
 			],
@@ -16286,7 +16286,7 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -18005,7 +18005,7 @@ export const formatSupportCatalog = {
 			],
 			unsupported: [
 				"image creation",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -18075,7 +18075,7 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
@@ -20867,7 +20867,7 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"archive creation",
 				"image writing",
-				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+				"a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",

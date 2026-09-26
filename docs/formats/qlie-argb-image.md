@@ -63,8 +63,11 @@ library, exactly; a stream whose components each sample the picture, to within t
 chroma is sampled twice as coarsely across, to within three; a stream whose chroma is sampled twice as
 coarsely both ways, within the wider bound libjpeg's own widening implies; a stream whose chrominance places
 sample the picture four times as coarsely as the luma, where the reader repeats the nearest sample rather
-than widening with the filter above, against hand-computed places; the refusal of a progressive stream; and
-the refusals of a stream that is no stream of the format.
+than widening with the filter above, against hand-computed places; a progressive stream of one grey component
+and one whose components each sample the picture, each within a place or two of the same library; a
+progressive stream built here of two scans, the second refining the bits of the first, against hand-computed
+places; the refusal of an arithmetic coded frame; and the refusals of a stream that is no stream of the
+format.
 
 ## References
 
