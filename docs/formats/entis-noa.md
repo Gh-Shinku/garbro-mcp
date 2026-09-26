@@ -172,8 +172,9 @@ calls as a caller asks for, and a stream whose last block stands short.
   nowhere and a file that is no executable,
 * the scan of the document for the entry of an archive: the file name of a path, the case of it, and a name no
   entry carries,
-* the password read out of the executable behind the archive, and the absence of one for an archive no entry
-  names,
+* the password read out of the executable behind the archive, the absence of one for an archive no entry
+  names, and the two directories the reference walks: the executable of the directory above the archive is
+  read first, and the one beside the archive names it when nothing stands above,
 * the places of an entry of the kind `BSHFCrypt`, decoded with that password (a block of no bits, which the
   cipher leaves as it stands under any password).
 

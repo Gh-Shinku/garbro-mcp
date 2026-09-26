@@ -5,6 +5,9 @@
 // the engine behind them).
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import {
 	BufferByteSource,
 	FileByteSource,
@@ -468,6 +471,39 @@ describe("Entis GLS archive keys", () => {
 				expect(await extractNoaPassword(mainPath, "other.noa")).toBeUndefined();
 			},
 		);
+	});
+
+	it("looks for the password in the directory above the archive, and there first", async () => {
+		// The reference reads the executables of the directory above the archive and then the ones of the
+		// archive's own directory, so an executable that stands in both places names the archive first.
+		const directory = await mkdtemp(resolve(tmpdir(), "garbro-noa-keys-"));
+		try {
+			await mkdir(resolve(directory, "game"));
+			await writeFile(
+				resolve(directory, "above.exe"),
+				executableWithDocument(
+					cotomiDocument([{ path: "CG01.noa", key: "from above" }]),
+				),
+			);
+			await writeFile(
+				resolve(directory, "game", "beside.exe"),
+				executableWithDocument(
+					cotomiDocument([{ path: "CG01.noa", key: "from beside" }]),
+				),
+			);
+			const archivePath = resolve(directory, "game", "CG01.noa");
+			await writeFile(archivePath, Buffer.alloc(0x40));
+			expect(await extractNoaPassword(archivePath, "CG01.noa")).toBe(
+				"from above",
+			);
+			// With nothing above it, the executable beside the archive is the one that names it.
+			await rm(resolve(directory, "above.exe"));
+			expect(await extractNoaPassword(archivePath, "CG01.noa")).toBe(
+				"from beside",
+			);
+		} finally {
+			await rm(directory, { recursive: true, force: true });
+		}
 	});
 
 	it("decodes the places of an entry of the kind BSHFCrypt with that password", async () => {
