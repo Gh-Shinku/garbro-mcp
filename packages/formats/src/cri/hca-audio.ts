@@ -16,6 +16,11 @@ import type {
 import type { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import {
+	HCA_DEFAULT_KEY,
+	createHcaCipher,
+	readHcaAthTable,
+} from "./hca-core.js";
+import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
@@ -297,6 +302,26 @@ export function readHcaHeader(data: Buffer): HcaLayout | undefined {
 	};
 }
 
+/**
+ * The counts of the walk of a sound of the engine the reference stands of before it walks the frames of it:
+ * the head of the sound, the table of the counts of the places of it and the cipher of it.
+ */
+export function readHcaSound(
+	data: Buffer,
+	key: readonly [number, number] = HCA_DEFAULT_KEY,
+): { layout: HcaLayout; ath: Uint8Array; cipher: Uint8Array } | undefined {
+	const layout = readHcaHeader(data);
+	if (!layout) return undefined;
+	// The reference stands of the counts of the table of the places of a sound of the engine of the counts
+	// of the places of the sound itself and of the cipher of it of the counts of the key of the engine: the
+	// walk of the engine of this port stands of the counts of the key of the reference (`DefaultKey`), which
+	// stands of the counts of the engine of the cipher of the kind of the key of the game unported.
+	const ath = readHcaAthTable(layout.athType, layout.sampleRate);
+	if (!ath) return undefined;
+	const cipher = createHcaCipher(layout.cipherType, key[0], key[1]);
+	return { layout, ath, cipher };
+}
+
 export const criHcaAudioDescriptor: FormatDescriptor = {
 	id: "cri-hca-audio",
 	name: "Cri HCA audio",
@@ -331,14 +356,15 @@ export const criHcaAudioFormat: ArchiveFormat = defineFixedArchive({
 	async detect(source: ByteSource): Promise<boolean> {
 		if (source.size < BigInt(HEAD_SIZE)) return false;
 		try {
-			return readHcaHeader(await readStored(source)) !== undefined;
+			return readHcaSound(await readStored(source)) !== undefined;
 		} catch {
 			return false;
 		}
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const layout = readHcaHeader(await readStored(source));
-		if (!layout) throw invalidSound("Not a sound of the Cri engine");
+		const sound = readHcaSound(await readStored(source));
+		if (!sound) throw invalidSound("Not a sound of the Cri engine");
+		const layout = sound.layout;
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
@@ -370,10 +396,18 @@ export const criHcaAudioFormat: ArchiveFormat = defineFixedArchive({
 				version: layout.version,
 				cipherType: layout.cipherType,
 				athType: layout.athType,
+				// The counts of the walk of the engine of the cipher of the sound stand of the counts of the
+				// places of the sound itself where the cipher stands of no counts of it at all.
+				encrypted: 0 !== layout.cipherType,
 			},
 		};
 	},
-	async openEntry(): Promise<Readable> {
+	async openEntry(source: ByteSource): Promise<Readable> {
+		// The counts of the table of the places of the sound of the engine and the cipher of it stand of the
+		// counts of the walk of the engine of the head of the sound itself, which the reference reads before
+		// it stands of the frames of it.
+		const sound = readHcaSound(await readStored(source));
+		if (!sound) throw invalidSound("Not a sound of the Cri engine");
 		// The frames of a sound of the engine stand of the walks of the counts of a picture of it (the tables
 		// of the counts of the walk of a picture, the places of the counts of a block and the picture of the
 		// counts of the places of it), which this port has not taken.

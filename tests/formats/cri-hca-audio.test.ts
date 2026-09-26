@@ -4,7 +4,14 @@
 // counts of a block of it.
 import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
-import { criHcaAudioFormat, readHcaHeader } from "@garbro-mcp/formats";
+import {
+	criHcaAudioFormat,
+	createHcaCipher,
+	decipherHcaBlock,
+	readHcaAthTable,
+	readHcaHeader,
+	readHcaSound,
+} from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 
 /** The counts of the places of the count of the walk of the head of a sound of the engine. */
@@ -231,5 +238,103 @@ describe("Cri engine sound", () => {
 		} finally {
 			await handle.close();
 		}
+	});
+});
+
+describe("Cri engine sound walks", () => {
+	it("stands of the counts of the places of a sound of the engine", () => {
+		// The reference stands of no counts of the places of a sound of the engine at all for the kind of no
+		// count of them, and of the counts of the list of the places of the counts of them for the kind of one
+		// count, which stand of the counts of the places of the sound of the engine itself.
+		expect([...(readHcaAthTable(0, 44100) ?? [])]).toEqual(
+			new Array(0x80).fill(0),
+		);
+		const table = readHcaAthTable(1, 44100);
+		if (!table) throw new Error("no table");
+		// The reference stands of the key of the engine twice at every count of the places of the counts of
+		// the walk of the engine, once at the count of itself and once at the count of the count of them that
+		// stands behind it, so the count of the places of the counts of the walk of the engine stands of the
+		// count of the places of the sound of the engine of the counts of the places of the counts of them
+		// that stand before it: the first ones stand of the counts of the places of the counts of the walk of
+		// the engine of the table of the engine, at the places of the counts of them.
+		expect(table[0]).toBe(0x78);
+		expect(table[1]).toBe(0x47);
+		expect(table[2]).toBe(0x43);
+		// The counts of the places of the counts of the walk of the engine stand of the counts of the places
+		// of the counts of them that stand behind them, at no place behind the last counts of them: the count
+		// of the places of the counts of the walk of the engine of the count of the places of the counts of
+		// them that stands at the count of the places of the counts of the walk of the engine of the sound of
+		// the engine itself stands of the last places of the counts of them.
+		for (const place of table) expect(place).toBeGreaterThanOrEqual(0x3b);
+		expect(table[60]).not.toBe(0xff);
+		expect([...table.subarray(61)]).toEqual(new Array(0x80 - 61).fill(0xff));
+		// A count of the key of the engine behind the counts of the places of the counts of the walk of the
+		// engine stands of the counts of the places of the last count of them, at every count of the places
+		// of the counts of the walk of the engine of the count of the walk of the engine itself.
+		const high = readHcaAthTable(1, 0xffffffff);
+		if (!high) throw new Error("no table");
+		expect(high[0]).toBe(0x78);
+		expect([...high.subarray(1)]).toEqual(new Array(0x7f).fill(0xff));
+		// The reference stands of the counts of the walk of the engine of the kind of the table of the counts
+		// of the places of a sound of the engine of no count of them at all.
+		expect(() => readHcaAthTable(2, 44100)).toThrowError(GarbroError);
+	});
+
+	it("stands of the counts of the cipher of a sound of the engine", () => {
+		// The counts of the walk of the engine of no cipher at all stand of the places of the counts of the
+		// walk of the engine of the places of the picture of the engine itself.
+		expect([...(createHcaCipher(0, 1, 2) ?? [])]).toEqual(
+			new Array(0x100).fill(0).map((_, at) => at),
+		);
+		const table = createHcaCipher(1, 1, 2);
+		if (!table) throw new Error("no table");
+		expect(table[0]).toBe(0);
+		expect(table[0xff]).toBe(0xff);
+		// The counts of the walk of the engine of the cipher of the engine stand of the counts of the places
+		// of the sound of the engine itself, which stand of the counts of the walk of the engine of the counts
+		// of them behind them.
+		expect(table[1]).toBe(0x0b);
+		expect(table[2]).toBe(0x9a);
+		expect(table[3]).toBe(0xdd);
+		expect(new Set([...table]).size).toBe(0x100);
+		// The reference stands of the counts of the walk of the engine of no cipher at all where the key of
+		// the engine stands of no counts of it, of every kind of the cipher of it.
+		expect([...createHcaCipher(56, 0, 0)]).toEqual(
+			new Array(0x100).fill(0).map((_, at) => at),
+		);
+		// The reference stands of no counts of the walk of the engine of the cipher of the key of the game.
+		expect(() => createHcaCipher(56, 0x30dbe1ab, 0xcc554639)).toThrowError(
+			GarbroError,
+		);
+		expect(() => createHcaCipher(7, 1, 2)).toThrowError(GarbroError);
+	});
+
+	it("stands of the places of the counts of the walk of the engine of the cipher of it", () => {
+		const table = createHcaCipher(1, 1, 2);
+		const block = Buffer.from([0, 1, 2, 3, 0xff]);
+		decipherHcaBlock(table, block);
+		expect([...block]).toEqual([0, 0x0b, 0x9a, 0xdd, 0xff]);
+	});
+
+	it("stands of the counts of the table of the places and of the cipher of the head of a sound", async () => {
+		const plain = hcaFile({ cipherType: 0 });
+		const sound = readHcaSound(plain);
+		expect(sound?.layout.cipherType).toBe(0);
+		expect(sound?.ath).toHaveLength(0x80);
+		expect(await detect(plain)).toBe(true);
+		// A sound of the engine of a kind of the cipher of the key of the game stands of no counts of the walk
+		// of the engine of its own, so the reference stands of no sound of the engine at all.
+		const keyed = hcaFile({ cipherType: 56, chunks: "plain" });
+		expect(() => readHcaSound(keyed)).toThrowError(GarbroError);
+		expect(await detect(keyed)).toBe(false);
+		await expect(
+			criHcaAudioFormat.open(new BufferByteSource(keyed), "sound.hca"),
+		).rejects.toMatchObject({ code: "UNSUPPORTED_FEATURE" });
+		// The counts of the walk of the engine of the table of the places of a sound of the engine stand of
+		// the counts of the places of the sound itself, which stand of the counts of the walk of the engine
+		// of the kind of one count at the counts of them.
+		const unknownAth = hcaFile({ athType: 9, chunks: "plain" });
+		expect(() => readHcaSound(unknownAth)).toThrowError(GarbroError);
+		expect(await detect(unknownAth)).toBe(false);
 	});
 });

@@ -22379,15 +22379,20 @@
 				"the counts of the places of the sound: the count of the channels, the places of the sound, the count of the blocks of it and the count of the places of a block of the walk of the engine",
 				"the count of the places of the counts of a block of the walk of the engine (`CompParams.R9`), of the division of C# and of the place the reference adds",
 				"the counts of the places of the channels of the sound (`InitChannels`)",
-				"the places of the frames of a sound of the engine, named of the head of it, and the places of it the walk hands out"
+				"the places of the frames of a sound of the engine, named of the head of it, and the places of it the walk hands out",
+				"the table of the counts of the places of a sound of the engine (`AthTable`), of the kind of no counts of them and of the kind of one count, of the counts of the places of the counts of the walk of the engine of the list of the engine and of the last places of the counts of them behind the last count of the list",
+				"the cipher of a sound of the engine (`Cipher`): the table of the counts of the walk of the engine of the kind of no cipher at all and of the kind of one count, of the counts of it that stand of no count of the places of the picture of the engine at all, and the places of the counts of the walk of the engine of the count of the places of the sound itself",
+				"the counts of the key of the engine the reference stands of (`HcaAudio.DefaultKey`), of the counts of no key at all"
 			],
 			"unsupported": [
-				"the frames of the sound of the engine: the table of the counts of the places of the sound (`AthTable`), the cipher of it (`Cipher`), the walk of the counts of a picture of the engine and the counts of the places of the sound of it",
-				"the key of the sound of the engine, which the reference stands of `HcaAudio.DefaultKey` rather than of the head of a sound"
+				"the frames of the sound of the engine: the bits of a count of the places of the picture of the engine, the counts of the places of a picture of the engine and the walk of the counts of a picture of the engine itself (the counts of the places of the picture of the engine of the walk of the engine of the counts of a picture, of the places of a colour and of the places of a picture of the engine)",
+				"the cipher of the kind of the key of the game (the kind of the count of fifty six places), which the walk of the engine of the reference itself stands of no counts of the walk of the engine at all (`throw new NotImplementedException`)",
+				"the tables of the counts of the walk of a picture of the engine the frames of the sound stand of (the counts of the places of a picture of the engine, the counts of the places of a count of the picture and the places of a count of the walk of a picture of the engine)"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it"
+				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it",
+				"the counts of the places of the sound of the engine of a kind of the key of the game of the engine of the counts of no key at all, which stand of the counts of the walk of the engine of no cipher at all"
 			]
 		},
 		{

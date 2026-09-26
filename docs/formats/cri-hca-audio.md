@@ -59,6 +59,30 @@ reference does not know in front of the counts of the cipher and of the table, a
   keeps the switch of the reference, where the counts of four, five, six, seven and eight places stand of the
   counts of the smaller counts of places as well.
 
+## The counts of the places of the sound and the cipher of it
+
+Behind the counts of the head the reference builds two counts of its own, before it walks the frames of the
+sound.
+
+* The table of the counts of the places of the sound (`AthTable`) stands of the kind the head names and of the
+  count of the places of the sound: of no counts at all for the kind of no count of them, and otherwise of the
+  counts of the list of the engine, which the count of the places of the sound names at every count of the
+  places of the counts of the walk of the engine. The reference adds the count of the places of the sound
+  **twice** at every count of the places of the counts of the walk of the engine, once within the count of
+  itself and once at the count of the count of them that stands behind it, and stands of the last places of the
+  counts of them at every count behind the counts of the list.
+* The cipher of the sound (`Cipher`) stands of the table of the counts of the places of a sound of the engine
+  of the places of the counts of the walk of the engine, and the places of the counts of the walk of the engine
+  stand of it count by count. The reference reads the kind of the cipher from the head, but stands of the kind
+  of no cipher at all wherever the key of the engine stands of no counts of it, whatever the head says.
+
+The count of the key of the engine is the `DefaultKey` of the reference, `0x30DBE1AB` and `0xCC554639`, which
+the engine of the sound of the engine of the places of the picture of the engine of one game stands of rather
+than the head of a sound. The cipher of the kind of the key of the game (the kind of the count of fifty six
+places) stands of `throw new NotImplementedException ("Encrypted HCA streams not implemented")` in the
+reference: this port refuses such a sound at the head of it, as the reference does, so a sound of the engine
+of that kind of cipher stands detected by neither.
+
 ## Deviations
 
 * The port reads the whole file to reach the head. The reference reads the head in place and then stands of
@@ -91,9 +115,20 @@ reference does not know in front of the counts of the cipher and of the table, a
 * the refusals: a word of another sound, a head too short to hold the counts of the walk of the engine, a
   sound of no channels at all, of more than sixteen channels, of a count of the places of a block behind eight
   places, and of no counts of the walk of the engine at all,
-* the refusal of the frames of the sound.
+* the refusal of the frames of the sound,
+* the counts of the places of the sound of the engine: the kind of no counts of them and the kind of one
+  count, of the count of the places of the sound of the engine itself, of the counts of the places of the
+  counts of the walk of the engine of the table of the engine and of the count of the places of the counts of
+  them that stands behind the last count of them,
+* the cipher of the sound of the engine: the kind of no cipher at all (the places of the counts of the walk of
+  the engine of the sound itself), the kind of one count (the counts of the places of the counts of the walk
+  of the engine of the cipher of the engine, which stand of every count of them) and the places of a count of
+  the sound of the engine of the walk of the engine of the cipher of it,
+* the refusals of the counts of the table of the places of the sound and of the cipher of it: a kind of the
+  table of the places of the sound the reference names no counts of the walk of the engine of, a kind of the
+  cipher of the key of the game, and a kind of the cipher of no count of the walk of the engine at all.
 
 ## References
 
-- `GARbro/ArcFormats/Cri/AudioHCA.cs` — `HcaReader.ParseHeader`, `HcaReader.ReadSignature`,
+- `GARbro/ArcFormats/Cri/AudioHCA.cs` — `AthTable`, `Cipher`, `HcaReader.ParseHeader`, `HcaReader.ReadSignature`,
   `HcaReader.InitChannels`, `HcaReader.DecodeBlock`, `HcaAudio.DefaultKey`
