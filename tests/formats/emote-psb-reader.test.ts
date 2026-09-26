@@ -6,7 +6,11 @@
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
-import { emoteDrefFormat, emotePsbFormat } from "@garbro-mcp/formats";
+import {
+	emoteDrefFormat,
+	emotePsbFormat,
+	kirikiriTlgImageFormat,
+} from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import {
 	blendDrefLayer,
@@ -18,6 +22,7 @@ import {
 	readPsbHeader,
 } from "../../packages/formats/src/emote/psb-reader.js";
 import { decodePsbTexture } from "../../packages/formats/src/emote/psb-texture.js";
+import { decodeEmotePicture } from "../../packages/formats/src/emote/psb-archive.js";
 import {
 	readBmpImage,
 	writeBmp32,
@@ -197,7 +202,72 @@ describe("Emote PSB container", () => {
 	});
 });
 
+/** A picture of the fifth kind of the engine of the places of the file, of the one colour of a plane. */
+function tlg5(colour: number): Buffer {
+	const head = Buffer.alloc(20, 0x00);
+	head.write("TLG5.0", 0, "latin1");
+	head.write("\0raw\x1a", 6, "latin1");
+	head[11] = 3;
+	head.writeUInt32LE(2, 12); // the count of the places of a row
+	head.writeUInt32LE(1, 16); // the count of the places of a column
+	const start = Buffer.alloc(4, 0x00);
+	start.writeInt32LE(1, 0); // the count of the places of a block
+	const parts: Buffer[] = [head, start, Buffer.alloc(4, 0x00)];
+	for (const grey of [colour, 0x20, 0x30]) {
+		const plane = Buffer.from([grey, 0x20]);
+		const word = Buffer.alloc(5, 0x00);
+		word[0] = 1; // the places of the plane stand as they stand
+		word.writeInt32LE(plane.length, 1);
+		parts.push(word, plane);
+	}
+	const body = Buffer.concat(parts);
+	return Buffer.concat([
+		body,
+		Buffer.alloc(Math.max(0, 0x26 - body.length), 0x00),
+	]);
+}
+
 describe("Emote PSB picture of the engine", () => {
+	it("reads a picture of the name of the walk of that name", async () => {
+		const picture = decodeEmotePicture(
+			{
+				textureType: "TLG",
+				width: 2,
+				height: 1,
+				truncatedWidth: 2,
+				truncatedHeight: 1,
+			},
+			tlg5(0x10),
+		);
+		if (!picture) throw new Error("no picture");
+		const read = readBmpImage(picture);
+		if (!read) throw new Error("no picture read");
+		expect([read.width, read.height, read.bitsPerPixel]).toEqual([2, 1, 32]);
+		// The picture of the name stands of the walk of the places of the file of that name, of the same
+		// walk the row of that name of this project stands of: a picture of the same places of the file
+		// stands of the same places of a picture here as it does there.
+		const stored = tlg5(0x10);
+		const tlgSource = new BufferByteSource(stored);
+		const tlgArchive = await kirikiriTlgImageFormat.open(
+			tlgSource,
+			"picture.tlg",
+		);
+		try {
+			const tlgEntry = tlgArchive.entries[0];
+			if (!tlgEntry) throw new Error("no picture of the name");
+			const throughTheRow = await consumeBuffer(
+				await tlgArchive.openEntry(tlgEntry.id),
+			);
+			expect(picture).toEqual(throughTheRow);
+		} finally {
+			await tlgArchive.close();
+		}
+		// A picture of the name that stands of no walk of that name stands of nothing.
+		expect(
+			decodeEmotePicture({ textureType: "TLG" }, Buffer.alloc(0x30, 0x00)),
+		).toBeUndefined();
+	});
+
 	it("reads a picture of the places of a colour of the file, of the full count of a row", () => {
 		// The picture of the engine stands of the count of the places of a row of the *full* picture, and
 		// the places handed over stand of the count of the cut picture: the second row of the cut picture

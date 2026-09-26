@@ -24,8 +24,7 @@ import {
 	type FixedEntry,
 	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
-import { readEmotePsbIndex } from "./psb-archive.js";
-import { decodePsbTexture } from "./psb-texture.js";
+import { decodeEmotePicture, readEmotePsbIndex } from "./psb-archive.js";
 
 const BASELINE_COMMIT = "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0";
 /** `DrefFormat.Signatures`: the words a file of the engine may begin with. */
@@ -165,13 +164,7 @@ async function readDrefLayer(
 		};
 	}
 	const metadata = plan.metadata as Record<string, unknown>;
-	const places = decodePsbTexture(Buffer.from(chunk), {
-		texType: String(metadata.textureType ?? ""),
-		fullWidth: Number(metadata.width ?? 0),
-		fullHeight: Number(metadata.height ?? 0),
-		width: Number(metadata.truncatedWidth ?? metadata.width ?? 0),
-		height: Number(metadata.truncatedHeight ?? metadata.height ?? 0),
-	});
+	const places = decodeEmotePicture(metadata, Buffer.from(chunk));
 	if (!places) return undefined;
 	const picture = readBmpImage(places);
 	if (!picture) return undefined;

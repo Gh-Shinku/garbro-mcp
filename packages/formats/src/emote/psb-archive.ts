@@ -15,6 +15,9 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readTlgLayout, unpackTlg5 } from "../kirikiri/tlg-image.js";
+import { unpackTlg6 } from "../kirikiri/tlg6.js";
+import { writeBmp32 } from "../shared/bmp.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -210,10 +213,37 @@ export const emotePsbDescriptor: FormatDescriptor = {
 };
 
 /**
+ * `PsbOpener.OpenImage`: the picture of an object of the engine, of the kind of the picture the archive
+ * names. A picture of the name `TLG` stands of the walk of the places of the file of that name
+ * (`kirikiri/tlg-image.ts`); every other picture stands of the kinds of the engine (`psb-texture.ts`).
+ */
+export function decodeEmotePicture(
+	metadata: Record<string, unknown>,
+	data: Buffer,
+): Buffer | undefined {
+	const texType = metadata.textureType;
+	if ("TLG" === texType) {
+		const layout = readTlgLayout(data, data.length);
+		if (!layout) return undefined;
+		const pixels =
+			6 === layout.version
+				? unpackTlg6(data, layout)
+				: unpackTlg5(data, layout);
+		return writeBmp32(layout.width, layout.height, pixels, false);
+	}
+	if ("string" !== typeof texType) return undefined;
+	return decodePsbTexture(data, {
+		texType,
+		fullWidth: Number(metadata.width ?? 0),
+		fullHeight: Number(metadata.height ?? 0),
+		width: Number(metadata.truncatedWidth ?? metadata.width ?? 0),
+		height: Number(metadata.truncatedHeight ?? metadata.height ?? 0),
+	});
+}
+
+/**
  * `PsbOpener.OpenEntry`: the places of a chunk of the file, which stand handed over as they stand, and the
- * picture of a texture of the engine, which stands of the kind of the picture the archive names. A picture
- * of the name `TLG` stands in the stage of the pictures of that name behind this one, so its places stand
- * handed over as they stand.
+ * picture of a texture of the engine, which stands of the kind of the picture the archive names.
  */
 export const emotePsbEntryOpener: FixedEntryOpener = async (source, entry) => {
 	const data = Buffer.from(
@@ -224,14 +254,7 @@ export const emotePsbEntryOpener: FixedEntryOpener = async (source, entry) => {
 	if ("image" !== metadata.type || "string" !== typeof texType) {
 		return Readable.from([data]);
 	}
-	if ("TLG" === texType) return Readable.from([data]);
-	const picture = decodePsbTexture(data, {
-		texType,
-		fullWidth: Number(metadata.width ?? 0),
-		fullHeight: Number(metadata.height ?? 0),
-		width: Number(metadata.truncatedWidth ?? metadata.width ?? 0),
-		height: Number(metadata.truncatedHeight ?? metadata.height ?? 0),
-	});
+	const picture = decodeEmotePicture(metadata, data);
 	if (!picture) {
 		throw new GarbroError(
 			"UNSUPPORTED_FEATURE",
