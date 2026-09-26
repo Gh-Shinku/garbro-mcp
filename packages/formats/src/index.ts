@@ -304,7 +304,7 @@ import { mwpImageFormat } from "./emic/mwp-image.js";
 import { emicFormat } from "./emic/pack.js";
 import { emonEmeFormat } from "./emon/eme.js";
 import { cabFormat } from "./entexec/cab.js";
-import { entisEriFormat } from "./entis/eri.js";
+import { entisEriFormat, entisEriImageFormat } from "./entis/eri.js";
 import { entisPacFormat } from "./entis/pac.js";
 import { EscudeBinFormat } from "./escude/bin.js";
 import { glnkFormat } from "./eternity/glnk.js";
@@ -2152,6 +2152,7 @@ export function createDefaultRegistry(
 		nitroplusNpaSteinsGateFormat,
 		discoveryDatFormat,
 		entisEriFormat,
+		entisEriImageFormat,
 		piasEncryptedFormat,
 		alicesoftAfaFormat,
 		abmFormat,

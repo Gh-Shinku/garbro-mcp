@@ -434,3 +434,143 @@ export const entisEriFormat: ArchiveFormat = defineFixedArchive({
 		]);
 	},
 });
+
+/** `EriFormat.ReadMetaData`: the head of a picture of the engine, of the places of the picture of it. */
+async function readEriPicture(source: ByteSource): Promise<
+	| {
+			fileHeader: EriFileHeader | undefined;
+			imageInfo: EriImageInfo | undefined;
+			description: string | undefined;
+	  }
+	| undefined
+> {
+	if (source.size < BigInt(HEADER_SIZE + SECTION_HEADER_SIZE)) return undefined;
+	const head = Buffer.from(await source.readAt(0n, HEADER_SIZE));
+	if (!head.subarray(0, SIGNATURE.length).equals(SIGNATURE)) return undefined;
+	if (!SUPPORTED_IDS.has(head.readUInt32LE(ID_OFFSET))) return undefined;
+	const identifier = head.subarray(0x10);
+	if (
+		!IDENTIFIERS.some((value) =>
+			identifier.subarray(0, value.length).equals(value),
+		)
+	)
+		return undefined;
+	const sectionHeader = Buffer.from(
+		await source.readAt(BigInt(HEADER_SIZE), SECTION_HEADER_SIZE),
+	);
+	const header = readSectionHeader(sectionHeader, 0);
+	if (!header || header.id !== HEADER_SECTION || header.length <= 0n) {
+		return undefined;
+	}
+	const bodySize = Number(header.length);
+	if (bodySize > 0x1000000) return undefined;
+	if (
+		BigInt(HEADER_SIZE + SECTION_HEADER_SIZE) + BigInt(bodySize) >
+		source.size
+	) {
+		return undefined;
+	}
+	const block = Buffer.from(
+		await source.readAt(BigInt(HEADER_SIZE + SECTION_HEADER_SIZE), bodySize),
+	);
+	return readEriMetadata(block);
+}
+
+export const entisEriImageDescriptor: FormatDescriptor = {
+	id: "entis-eri-image",
+	name: "Entis rasterized image",
+	extensions: ["eri", "emi"],
+	capabilities: {
+		detect: true,
+		list: true,
+		extract: true,
+		create: false,
+		encryption: false,
+	},
+	attribution: [
+		{
+			project: "GARbro",
+			source: "ArcFormats/Entis/ImageERI.cs",
+			license: "MIT",
+			commit: "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
+		},
+	],
+};
+
+/**
+ * The Entis rasterized picture, of the walk of the head of it alone: the places of the picture stand of the
+ * walks of the engine (`ArcFormats/Entis/EriReader.cs`), which stand unported here. A picture of the engine
+ * stands of the same head as the archives of it (`entis-eri`), of the places of a picture of the kind
+ * `ImageFrm` behind them.
+ */
+export const entisEriImageFormat: ArchiveFormat = defineFixedArchive({
+	descriptor: entisEriImageDescriptor,
+	detection: {
+		signatures: [
+			{ bytes: SIGNATURE },
+			{ bytes: Buffer.from("VIST", "latin1") },
+		],
+	},
+	async detect(source: ByteSource): Promise<boolean> {
+		try {
+			const picture = await readEriPicture(source);
+			return picture?.imageInfo !== undefined;
+		} catch {
+			return false;
+		}
+	},
+	async read(source: ByteSource, sourcePath: string) {
+		const picture = await readEriPicture(source);
+		if (!picture?.imageInfo) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Entis picture layout");
+		}
+		const info = picture.imageInfo;
+		const extension = sourceExtension(sourcePath);
+		const name =
+			extension.length > 0
+				? basename(sourcePath, `.${extension}`)
+				: basename(sourcePath);
+		const entry: FixedEntry = {
+			...createFixedEntry({
+				id: 0,
+				path: `${name.length > 0 ? name : "image"}.bmp`,
+				offset: 0n,
+				size: source.size,
+				compressed: true,
+				metadata: {
+					type: "image",
+					width: info.width,
+					height: info.height,
+					bitsPerPixel: info.bpp,
+					transformation: info.transformation,
+					architecture: info.architecture,
+					formatType: info.formatType,
+				} as Record<string, unknown>,
+			}),
+			sizeKnown: false,
+		};
+		return {
+			entries: [entry],
+			metadata: {
+				image: "bmp",
+				width: info.width,
+				height: info.height,
+				bitsPerPixel: info.bpp,
+				transformation: info.transformation,
+				architecture: info.architecture,
+				formatType: info.formatType,
+				version: info.version,
+				frameCount: picture.fileHeader?.frameCount ?? 0,
+				...(picture.description !== undefined
+					? { description: picture.description }
+					: {}),
+			},
+		};
+	},
+	async openEntry() {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			"The places of an Entis picture stand of the walk of the engine to come",
+		);
+	},
+});

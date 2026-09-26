@@ -7154,6 +7154,34 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "image",
+				tag: "ERI",
+				class: "EriFormat",
+				source: "ArcFormats/Entis/ImageERI.cs",
+			},
+			localId: "entis-eri-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word `Enti` (and `VIST`) at the head of a file, of the extensions `eri` and `emi`",
+				"the identifier of the kind of the file and the name of it, of the three names the reference stands of",
+				"the chain of the sections of the head of the file, of the counts of the places of them",
+				"the `FileHdr ` section: the count of the kind of the file, the counts of the frames of it and the count of the time of them",
+				"the `ImageInf` section: the kind of the walk of the places of the picture, the kind of the places of a colour of it, the counts of the picture, the counts of the places of a colour of it and the counts of the walk of the places of it",
+				"the `descript` section, of the places of a mark of a name of the two ways of the engine in front of them",
+				"a picture of the engine of no place of a frame at all, of the count of the frames of it of nothing",
+			],
+			unsupported: [
+				"picture creation",
+				"the places of the picture itself: the walks of the engine (`EriReader.cs`), of the count of the kind of the places of the walk of it, of the places of a colour of it and of the places of a block of it",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of a picture of the kind `Lossless_EMI`/`Lossless_ERI` (the walks of the engine to come)",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "DAT/DISCOVERY",
 				class: "DatOpener",
