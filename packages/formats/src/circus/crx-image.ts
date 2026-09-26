@@ -320,10 +320,22 @@ function unpadRows(
 }
 
 /** `Reader.Unpack`: the places of the picture, read as the kind of it names them. */
-export async function unpackCrxPicture(
+/** The places of a picture of the engine as the walk of it hands them out. */
+export interface CrxPlaces {
+	/** The places of the picture, of the places of a row of the walk of it (`stride` places a row). */
+	pixels: Buffer;
+	/** The places of a row of the walk of the picture, of the padding of it. */
+	stride: number;
+	/** The places of a row of the picture itself, of no padding. */
+	rowBytes: number;
+	palette: Buffer | undefined;
+}
+
+/** `Reader.Unpack`: the places of a picture of the walk of it, of the kind of the head of it. */
+export async function unpackCrxPlaces(
 	data: Buffer,
 	layout: CrxLayout,
-): Promise<Buffer> {
+): Promise<CrxPlaces> {
 	const placeSize = Math.trunc(layout.bitsPerPixel / PLACE_BITS);
 	const rowBytes = layout.width * placeSize;
 	const stride = (rowBytes + 3) & ~3;
@@ -371,19 +383,37 @@ export async function unpackCrxPicture(
 			}
 		}
 	}
-	const pixels = unpadRows(output, stride, rowBytes, layout.height);
+	return { pixels: output, stride, rowBytes, palette };
+}
+
+/** The picture of the walk of a file of the project, of the places of the walk of it. */
+export function crxImageOf(layout: CrxLayout, places: CrxPlaces): Buffer {
+	const pixels = unpadRows(
+		places.pixels,
+		places.stride,
+		places.rowBytes,
+		layout.height,
+	);
 	if (BITS_8 === layout.bitsPerPixel) {
 		return writeBmp8Palette(
 			layout.width,
 			layout.height,
 			pixels,
-			palette ?? Buffer.alloc(COLOURS * 4, 0x00),
+			places.palette ?? Buffer.alloc(COLOURS * 4, 0x00),
 		);
 	}
 	if (BITS_32 === layout.bitsPerPixel) {
 		return writeBmp32(layout.width, layout.height, pixels);
 	}
 	return writeBmp24(layout.width, layout.height, pixels);
+}
+
+/** The picture of a file of the engine, of the walk of it. */
+export async function unpackCrxPicture(
+	data: Buffer,
+	layout: CrxLayout,
+): Promise<Buffer> {
+	return crxImageOf(layout, await unpackCrxPlaces(data, layout));
 }
 
 async function readStored(source: ByteSource): Promise<Buffer> {

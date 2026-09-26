@@ -20673,6 +20673,31 @@
 		{
 			"reference": {
 				"type": "image",
+				"tag": "CRXD",
+				"class": "CrxdFormat",
+				"source": "ArcFormats/Circus/ImageCRXD.cs"
+			},
+			"localId": "circus-crxd-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the mark `CRXD` at the head of a file, of the extension `crx`",
+				"the head of the difference: the offset of the base picture within the archive of the engine, the name of the base beside the file (twenty places), and the kind of the places of the differences",
+				"the kind `CRXG`: the picture of the differences within the file, of the walk of `circus-crx-image`",
+				"the base picture beside the file, of the name of the head of the difference",
+				"the places of the picture of the differences over the places of the base: the places of a colour of the two added and the place of an alpha of the base less that of the difference, over the crossing of the places of the two pictures",
+				"the base picture as it stands where the two pictures stand apart"
+			],
+			"unsupported": [
+				"picture creation",
+				"the kind `CRXJ`: the picture of the differences behind an offset of the CRM archive of the engine, which a file of its own cannot stand of",
+				"a base picture of another count of places than the picture of the differences"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "image",
 				"tag": "TPGF",
 				"class": "TpgFormat",
 				"source": "Legacy/Types/ImageTPGF.cs"

@@ -186,6 +186,7 @@ import { cherryPak2Format, cherryPakFormat } from "./cherry/pak.js";
 import { crmFormat } from "./circus/crm.js";
 import { circusPcmAudioFormat } from "./circus/pcm-audio.js";
 import { circusDatFormat } from "./circus/dat.js";
+import { crxdImageFormat } from "./circus/crxd-image.js";
 import { crxImageFormat } from "./circus/crx-image.js";
 import { circusPckFormat } from "./circus/pck.js";
 import { circusVcPacFormat, vcPakFormat } from "./circus/vc.js";
@@ -1890,6 +1891,7 @@ export function createDefaultRegistry(
 		system21PakFormat,
 		isaFormat,
 		circusDatFormat,
+		crxdImageFormat,
 		crxImageFormat,
 		mgxFormat,
 		broomPkFormat,
