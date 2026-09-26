@@ -266,14 +266,23 @@ further than the reference's own list of them.
 ## The picture lives inside an archive this project does not read
 
 - `S5I` (`ArcFormats/rUGP/ImageS5I.cs`) reads one object of a `CRioArchive`, whose walk lives in the
-  fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs` and `LoadRio*` helpers that this project has not
-  ported.
+  fifteen hundred line `ArcFormats/rUGP/ArcRIO.cs`. The **core** of that walk has landed as
+  `packages/formats/src/rugp/rio-core.ts`: the primitives of the stream of the engine (the lengths of its
+  strings of one, two and four places, its counts of sixteen and of thirty two, its booleans), the **class
+  tags** of an object graph (a place of sixteen that names a class either of the count of the classes of the
+  archive or of a stream that carries the name itself), the tree of the characters a scrambled class name of
+  an encrypted archive stands of, the head of an archive (its four marks, the schema of the walk of it and the
+  count of the places behind it), the walk of a payload of an `.ici` file (a key that turns of its own and a
+  checksum of sixteen places behind every run of thirty two) and the two walks of the places of an encrypted
+  object. What remains is the object graph itself: the table of the classes of the engine (`s_classTable`),
+  the `CObject` walks behind it, the archive opener (`RioOpener`) and the picture.
 
 - `RIP` (`ArcFormats/rUGP/ImageRIP.cs`, class `RipFormat`, extensions `rip` and `sia`) is the picture of the
   same engine and stands in the same place as `S5I`: its own signature is nothing, because `ReadMetaData`
   first asks whether the file carries `CRioArchive.ObjectSignature` and then builds a `CRioArchive` to read
-  a `CRip` or `CRip007` object out of it. Without the `RIO` walk there is no object to read at all, so this
-  one stands behind that port rather than behind a decoder of its own.
+  a `CRip` or `CRip007` object out of it. With the core of that walk ported (see `S5I` above) the object it
+  reads stands behind the same remainder: the table of the classes of the engine and the walks of the objects
+  of them, of which `CRip` and `CRip007` are two.
 - `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
   reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
   stock build does open these containers - but a first port of it stands withdrawn. The container is a
@@ -336,7 +345,8 @@ the first forty of them.
 - `DCF` (`ArcFormats/AliceSoft/ImageDCF.cs`) reads a base picture and overlays whose base name comes from
   the AFA archive that holds them; the AFA archive is already ported (`ArcFormats/AliceSoft/ArcAFA.cs`).
 - `RIO` (`ArcFormats/rUGP/ArcRIO.cs`, 1487 lines) is the object-manager archive that `S5I` needs, and the
-  reason that picture stands unread.
+  reason that picture stands unread. Its core stands ported (see `S5I` above); the object graph it hands the
+  pictures of the engine (the class table, the `CObject` walks, the archive opener) stands unported.
 - `EXE` (`Experimental/Microsoft/ArcEXE.cs`) is **not portable**: it reads an executable's resources through the reference's `ExeFile.ResourceAccessor`, which is a set of Windows loader calls (`LoadLibraryEx`, `FreeLibrary`, `FindResource`, `LoadResource`, `SizeofResource` and the enumeration callbacks behind them) rather than anything read out of the file. The managed half of the same file - the headers, the sections, the overlay, the loaded base, addresses and a byte search - **is** portable and now stands in this project as `packages/formats/src/microsoft/exe-file.ts`, which is what the ported `BIN/PAC` archive and, later, any other reader of an executable needs.
 - The **base picture of a difference** is the one place the reference hands a file to another format of
   its own outside an archive: `DIF/MnV` (`ArcFormats/MnoViolet/ImageDIF.cs`) names its base beside itself
