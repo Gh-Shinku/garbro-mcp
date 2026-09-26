@@ -163,8 +163,8 @@ open archives that the shipped defaults already cover.
   them stands (`if (!KnownKeys.Any()) return 0;`) - which is what the port does, and which for `TpRandom`
   means the counts of the places of the picture stand in the order of the file. What stands behind it is the
   kind of the places of a picture of the engine itself, which the reference hands to `JpegBitmapDecoder` of
-  WPF. The archives of the same engine (`GAL/X`, `GAL/X200` and the picture of `GAL/X200`) stand unported,
-  and the next line is their reason.
+  WPF. The archives of the same engine (`GAL/X`, `GAL/X200`) and the picture of `GAL/X200` stand unported,
+  and their reason stands beside their own entries below.
 - `AIR` (`ArcFormats/AIRNovel/ArcAIR.cs`) reads its plain containers as **ordinary zips**, which this project
   already reads, and its keyed ones through RC4 with a passphrase that `KnownKeys` - an **empty** dictionary
   and a prompt - supplies at run time. A stock build therefore reads only the plain ones, which need nothing
