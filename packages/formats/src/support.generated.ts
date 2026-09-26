@@ -19324,6 +19324,32 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "archive",
+				tag: "ARC/Tactics/2",
+				class: "Arc2Opener",
+				source: "ArcFormats/Tactics/ArcTactics.cs",
+			},
+			localId: "tactics-arc2",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word of the engine at the head of a file (`TACT` at 0 and `ICS_ARC_FILE` at 4), of the extensions `arc` and `adf`",
+				"the flat list of the pictures of the engine at 0x10: words of 0x14 places of the file (the count of the places of the picture, the count of the places it stands of where they are packed, the count of the places of its name and eight places this port stands of no use of), then the name of the picture, then its places",
+				"the word of the end of the list, of a count of the places of a name of nought",
+				"the names of the pictures of the engine as the places of the file stand them",
+			],
+			unsupported: [
+				"archive creation",
+				"the places of a picture of the engine, which stand of the password of the game the reference stands of no place of the file for",
+				"the walk of the engine of the places of a packed picture (`UnpackCustomLzss`)",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a file whose list this walk reads, checked against a run of the reference with the password of its game",
+			],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "TGF",
 				class: "TgfFormat",
