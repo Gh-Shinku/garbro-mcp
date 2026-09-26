@@ -50,15 +50,44 @@ encoded with, which extraction needs to rebuild the keystream. The directory dec
 when the header marker is missing, when the count is not sane, when a name length is out of range, or when a
 payload leaves the file.
 
+## Pictures of the engine
+
+An entry that opens with the word `IMGX` is no picture of a kind any reader knows: `NpfOpener.OpenImage` hands
+it to `ImgXDecoder`, which walks the bits of the entry itself. Behind the word stands the complement of the
+count of the places the picture unfolds to, with the two halves of the word the other way round, and the walk
+begins at the eighth byte: the bits of the file are taken from the least significant place of every byte first,
+and the words of the walk stand of nine places at first and of one place more every time the walk meets the
+word `257`. The word `256` ends the walk and the word `258` starts it again, of nine places and of a fresh
+tree. What unfolds is the head of a picture of four places of the file — the count of its own places at nought,
+its width at four, its height at eight, the places of a colour of a place at `0x0E` and, of a picture of one
+place of the file, the count of its colours at `0x20` — and then the colours and the places of the picture
+behind it. The walk hands out a bitmap.
+
+This port reads that walk with its own least significant bit first reader
+(`packages/codecs/src/lsb-bit-reader.ts`) and hands the picture out as a bitmap, of one, three or four places
+of the file a place, where the reference hands it to the rendering stack of its platform. An entry that opens
+with that word and unfolds to no head of a picture of those depths is refused with `INVALID_ARCHIVE`; the
+reference would fail in its own walk as well. Every other entry is handed out exactly as the archive stores it.
+
 ## Deviations from GARbro
 
 - Both generators are ported with signed 32-bit arithmetic, matching the reference's wrapping behaviour on
   overflow.
 - GARbro reads names and payloads through bounds-checking views that would either throw or return short data;
   this port declines the archive when a name or payload range leaves the file.
+- The walk of a picture of the engine itself is bounded: a picture of more than 256 mebibytes of places, a
+  head that stands outside the places it unfolds, and a run of places that would leave them are all refused,
+  where the reference reads past its own buffers in those places.
+- An entry that opens with the word of the walk but unfolds to no head of a picture stands refused, as above,
+  rather than handed out as it stands.
 
 ## Tests
 
 `tests/formats/nonono-npf.test.ts` writes both generator variants to memory with test-side copies of the
 generators and covers entry names with a backslash and CP932 characters, payload extraction, the empty
-directory, a different version word, truncated payloads and a file without the format marker.
+directory, a different version word, truncated payloads, a file without the format marker, and the pictures of
+the engine: a picture of four places of the file a place and one of a palette of its own, whose places the
+fixture writes the other way round of the walk, and a resource that opens with the word of the walk but
+unfolds to no head of a picture. `tests/codecs/lsb-bit-reader.test.ts` covers the reader: the order of the
+places, a word that reaches into the byte behind it, the end of the file, and the places of the file it is
+given and no others.

@@ -14551,8 +14551,13 @@ export const formatSupportCatalog = {
 				"per-entry names",
 				"CP932 names",
 				"payload extraction",
+				"the pictures of the engine itself (`IMGX`): the walk of the bits of the entry, the head it unfolds and the places behind it, handed out as a bitmap",
 			],
-			unsupported: ["archive creation", "real-game differential files"],
+			unsupported: [
+				"archive creation",
+				"real-game differential files",
+				"an entry that opens with the word of the walk but unfolds to no head of a picture, where the reference fails in its own walk",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

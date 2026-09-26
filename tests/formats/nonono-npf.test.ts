@@ -2,6 +2,8 @@ import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
 import { nononoNpfFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
+import { buffer as consumeBuffer } from "node:stream/consumers";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const DEFAULT_SEED = 0x46415420; // 'FAT '
 const HEADER_OFFSET = 12;
@@ -148,6 +150,58 @@ const EXPECTED = [
 	{ path: "背景.cg", size: 13, content: Buffer.from("third payload") },
 ];
 
+/** The head of the picture a walk of the engine of this kind unfolds: the places of the file of the head
+ * of a bitmap of four places of the file, then its places. */
+function imgxPicture(input: {
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: Buffer;
+	palette?: Buffer;
+}): Buffer {
+	const head: Buffer = Buffer.alloc(0x36, 0x00);
+	head.writeInt32LE(0x36, 0);
+	head.writeUInt32LE(input.width, 4);
+	head.writeUInt32LE(input.height, 8);
+	head.writeUInt16LE(input.bitsPerPixel, 0x0e);
+	head.writeInt32LE(input.palette ? input.palette.length / 4 : 0, 0x20);
+	return Buffer.concat([head, input.palette ?? Buffer.alloc(0), input.pixels]);
+}
+
+/** The other direction of `ImgXDecoder.Unpack`, of the counts of the places of the file: every place of the
+ * file stands as its own count of the walk, and the count that ends the walk stands behind them. */
+function imgxStream(unpacked: Buffer): Buffer {
+	const head = Buffer.alloc(8, 0x00);
+	head.write("IMGX", 0, "latin1");
+	const rotated = ((unpacked.length << 16) | (unpacked.length >>> 16)) >>> 0;
+	head.writeUInt32LE(~rotated >>> 0, 4);
+	const codes = [...unpacked, 0x100];
+	const places: number[] = [];
+	for (const code of codes) {
+		for (let at = 0; at < 9; at += 1) places.push((code >> at) & 1);
+	}
+	const body: Buffer = Buffer.alloc(Math.ceil(places.length / 8), 0x00);
+	for (const [at, bit] of places.entries()) {
+		// The walk of this engine takes the least significant place of every byte of the file first.
+		if (bit !== 0) body[at >> 3] = (body[at >> 3] ?? 0) | (1 << (at & 7));
+	}
+	return Buffer.concat([head, body]);
+}
+
+async function contentOf(archive: Buffer, at: number): Promise<Buffer> {
+	const handle = await nononoNpfFormat.open(
+		new BufferByteSource(archive),
+		"sample.npf",
+	);
+	try {
+		const entry = handle.entries[at];
+		if (!entry) throw new Error("no entry");
+		return consumeBuffer(await handle.openEntry(entry.id));
+	} finally {
+		await handle.close();
+	}
+}
+
 async function expectDeclined(archive: Buffer): Promise<void> {
 	const source = new BufferByteSource(archive);
 	expect(await nononoNpfFormat.detect(source, "sample.npf")).toBe(false);
@@ -169,6 +223,63 @@ describe("NGS engine resource archive", () => {
 			archive: buildNpf(ENTRIES, 2),
 			entries: EXPECTED,
 			metadata: { entryCount: 3 },
+		});
+	});
+
+	it("reads the picture of a resource of the engine itself", async () => {
+		// `NpfOpener.OpenImage` hands an entry that opens with the word `IMGX` to `ImgXDecoder`, whose walk of
+		// the bits unfolds the head of a picture and its places; the entry itself stands of no picture of its
+		// own. The picture of this fixture is two places square, of four places of the file a place.
+		const picture = imgxPicture({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 32,
+			pixels: Buffer.from([
+				10, 20, 30, 255, 40, 50, 60, 128, 70, 80, 90, 64, 100, 110, 120, 32,
+			]),
+		});
+		const archive = buildNpf(
+			[{ name: "art.imgx", content: imgxStream(picture) }],
+			1,
+		);
+		const image = readBmpImage(await contentOf(archive, 0));
+		if (!image) throw new Error("the resource is not a bitmap");
+		expect([image.width, image.height]).toEqual([2, 2]);
+		expect([...image.pixels]).toEqual([
+			10, 20, 30, 255, 40, 50, 60, 128, 70, 80, 90, 64, 100, 110, 120, 32,
+		]);
+		// A picture of a palette of its own stands as a picture of one place of the file.
+		const palette = Buffer.alloc(4 * 4, 0x00);
+		palette[4] = 0x11;
+		palette[5] = 0x22;
+		palette[6] = 0x33;
+		const indexed = imgxPicture({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 8,
+			palette,
+			pixels: Buffer.from([1, 0]),
+		});
+		const paletted = readBmpImage(
+			await contentOf(
+				buildNpf([{ name: "art.imgx", content: imgxStream(indexed) }], 2),
+				0,
+			),
+		);
+		if (!paletted) throw new Error("the resource is not a bitmap");
+		expect(paletted.bitsPerPixel).toBe(8);
+	});
+
+	it("turns away a resource of the engine that stands of no picture of its own", async () => {
+		// The word of the walk stands there, but what unfolds is no head of a picture.
+		const stray = Buffer.concat([
+			Buffer.from("IMGX", "latin1"),
+			Buffer.alloc(4, 0x00),
+			Buffer.alloc(0x40, 0x11),
+		]);
+		const archive = buildNpf([{ name: "art.imgx", content: stray }], 1);
+		await expect(contentOf(archive, 0)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
 		});
 	});
 

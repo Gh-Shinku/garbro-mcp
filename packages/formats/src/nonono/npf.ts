@@ -9,6 +9,7 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { IMGX_SIGNATURE, unpackImgx } from "./imgx.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -195,6 +196,20 @@ async function openNpfEntry(
 		state.generator === 2 ? new RandomGenerator2() : new RandomGenerator1();
 	generator.srand(state.seed);
 	decrypt(data, generator);
+	// `NpfOpener.OpenImage` hands an entry that opens with the word `IMGX` to the walk of the pictures of
+	// this engine, which the raw places of the entry cannot stand for, and everything else to the decoder of
+	// the platform. This port reads the pictures of the walk itself and hands every other entry out as it
+	// stands.
+	if (data.length > 8 && IMGX_SIGNATURE === data.readUInt32LE(0)) {
+		const picture = unpackImgx(data);
+		if (!picture) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"The places of the picture of this resource stand of no picture of their own",
+			);
+		}
+		return Readable.from([picture]);
+	}
 	return Readable.from([data]);
 }
 
