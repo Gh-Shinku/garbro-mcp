@@ -11,7 +11,16 @@ import type {
 } from "@garbro-mcp/core";
 import { inflateZlibBufferCapped } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
-import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
+import {
+	readBmpImage,
+	writeBmp24,
+	writeBmp32,
+	writeBmpImage,
+} from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
+import { readPngImage } from "../shared/png-image.js";
+import { readPngHeaderFields } from "../shared/png.js";
 import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -99,17 +108,33 @@ export function readFwgiLayout(
  * `FwgiFormat.Read`: the bitmap the head points at is read as a bitmap of its own and handed on, which is
  * how the reference reads `Bmp.ReadMetaData` and then `Bmp.Read` over the region.
  */
-export function readFwgiBitmap(
+export async function readFwgiBitmap(
 	stored: Buffer,
 	layout: FwgiLayout,
-): Buffer | undefined {
+): Promise<Buffer | undefined> {
 	const region = stored.subarray(
 		layout.dataOffset,
 		layout.dataOffset + layout.dataLength,
 	);
 	const image = readBmpImage(region);
-	if (!image) return undefined;
-	return writeBmpImage(image);
+	if (image) return writeBmpImage(image);
+	// `FweiFormat.OpenImage` reads a bitmap where the region is one and hands it to the decoder of the
+	// platform everywhere else, which reads whatever kind of picture the region holds. This port reads the
+	// two kinds of picture those decoders are used for in practice, and turns a region of any other kind
+	// away, since no reader of those kinds exists here.
+	if (readJpegHeaderFields(region)) {
+		const picture = readJpegImage(region);
+		return writeBmp32(picture.width, picture.height, picture.pixels);
+	}
+	if (readPngHeaderFields(region)) {
+		const picture = await readPngImage(region);
+		if (picture) {
+			return 32 === picture.bitsPerPixel
+				? writeBmp32(picture.width, picture.height, picture.pixels)
+				: writeBmp24(picture.width, picture.height, picture.pixels);
+		}
+	}
+	return undefined;
 }
 
 /**
@@ -247,7 +272,7 @@ export const frontWingFwgiImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) {
 			throw invalidPicture("Not a FrontWing picture");
 		}
-		const bitmap = readFwgiBitmap(stored, layout);
+		const bitmap = await readFwgiBitmap(stored, layout);
 		if (!bitmap) {
 			throw invalidPicture("FrontWing picture does not hold a bitmap");
 		}
@@ -350,7 +375,7 @@ export const frontWingFweiImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) {
 			throw invalidPicture("Not a FrontWing picture");
 		}
-		const bitmap = readFwgiBitmap(assembled, layout);
+		const bitmap = await readFwgiBitmap(assembled, layout);
 		if (!bitmap) {
 			throw invalidPicture("FrontWing picture does not hold a bitmap");
 		}

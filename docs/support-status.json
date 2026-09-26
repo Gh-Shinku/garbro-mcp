@@ -7552,7 +7552,12 @@
 			"localId": "frontwing-fwei-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the region the head points at, read as a bitmap or, where it is no bitmap, as the JPEG or PNG interchange format it holds"
+			],
 			"unsupported": ["archive creation", "image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
@@ -7566,7 +7571,12 @@
 			"localId": "frontwing-fwgi-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the region the head points at, read as a bitmap or, where it is no bitmap, as the JPEG or PNG interchange format it holds"
+			],
 			"unsupported": ["archive creation", "image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},

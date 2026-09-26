@@ -5,7 +5,12 @@ import { resolve } from "node:path";
 import { deflateSync } from "node:zlib";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { afterEach, describe, expect, it } from "vitest";
-import { writeBmp24 } from "../../packages/formats/src/shared/bmp.js";
+import {
+	readBmpImage,
+	writeBmp24,
+} from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+import { pngFile } from "../helpers/png.js";
 import {
 	assembleFwei,
 	frontWingFweiImageFormat,
@@ -133,6 +138,36 @@ describe("FrontWing image", () => {
 	it("hands the bitmap the head points at on", async () => {
 		const out = await extract(frontWingFwgiImageFormat, fwgiFile());
 		expect(out.toString("hex")).toBe(BITMAP.toString("hex"));
+	});
+
+	it("reads a picture of another kind where the region holds one", async () => {
+		// `FweiFormat.OpenImage` hands a region that is no bitmap to the decoder of the platform, which reads
+		// whatever kind of picture it holds; this port reads the two kinds those decoders are used for.
+		const jpeg = readBmpImage(
+			await extract(frontWingFwgiImageFormat, fwgiFile(GREY_JPEG)),
+		);
+		if (!jpeg) throw new Error("no bitmap");
+		expect([jpeg.width, jpeg.height]).toEqual([8, 8]);
+		expect([...jpeg.pixels]).toEqual([...GREY_PIXELS]);
+		const png = readBmpImage(
+			await extract(
+				frontWingFwgiImageFormat,
+				fwgiFile(
+					pngFile({
+						width: 2,
+						height: 1,
+						colourType: 2,
+						rows: [[1, 2, 3, 4, 5, 6]],
+					}),
+				),
+			),
+		);
+		if (!png) throw new Error("no bitmap");
+		expect([...png.pixels]).toEqual([3, 2, 1, 6, 5, 4]);
+		// A region that is in neither of those kinds of picture stands turned away.
+		await expect(
+			extract(frontWingFwgiImageFormat, fwgiFile(Buffer.alloc(16, 0x11))),
+		).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
 	});
 
 	it("assembles the stream of the encoded kind out of its companion", () => {

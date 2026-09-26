@@ -13,8 +13,14 @@ Implementation: `packages/formats/src/frontwing/fg-image.ts` — `frontWingFwgiI
 The word `FWGI`, the word `1` at four, the offsets of the picture at twelve and sixteen, the width and the
 height at `0x1C` and `0x20`, and the place and the size of the bitmap at `0x128` and `0x12C` — where the
 place stands **four bytes before** where the bitmap really is. The depth is always reported as thirty two
-bits. The bitmap itself is read as a bitmap, with the same reader the other bitmap ports share, and handed
-on.
+bits. The region itself is read as a bitmap, with the same reader the other bitmap ports share, and handed
+on. Where the region is **no** bitmap, `FweiFormat.OpenImage` hands it to the decoder of the platform, which
+reads whatever kind of picture it holds; this port reads the JPEG and PNG interchange formats itself, which
+are the two those decoders are used for in practice, and turns a region of any other kind away with
+`INVALID_ARCHIVE`.
+
+The bitmap of a region that is neither of those two kinds of picture is nevertheless reported by the head of
+the file with the width and the height it names, exactly as the reference reports them.
 
 ## FG/FWEI — an encoded stream and its companion
 
@@ -37,6 +43,6 @@ companion to stand beside the file.
 The write paths of both formats throw `NotImplementedException`, so this is a read only pair.
 
 The tests cover the head of the older kind, the word, version and places it is turned away for, the bitmap
-it points at handed on, the assembly of the encoded stream out of its companion both as it stands and packed,
-the refusal of a companion of the wrong size, the refusal of an encoded picture without its companion, and a
-file that is not signed.
+it points at handed on, a region that holds a JPEG and one that holds a PNG, a region that holds neither, the
+assembly of the encoded stream out of its companion both as it stands and packed, the refusal of a companion
+of the wrong size, the refusal of an encoded picture without its companion, and a file that is not signed.
