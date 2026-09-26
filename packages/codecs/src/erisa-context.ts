@@ -26,7 +26,12 @@ const HIGH_BITS_MASK = 0x55000000;
 const HIGH_PLACE = -2147483648;
 const SECOND_PLACE = 0x40000000;
 const UNKNOWN = 0xff;
-const BASE_LIMIT = 0x100;
+// The reference stands of the count of the walk of the engine of the count of the walk of the engine of no
+// count of the walk of it at all: the count of the walk of it doubles of every place of the walk of the
+// engine of the count of the walk of the engine behind it, of a count of the walk of the engine of its own
+// of thirty places of a count. This port turns away a count of the walk of the engine of the count of the
+// walk of the engine of the count of the walk of it of its own instead.
+const BASE_LIMIT = 0x40000000;
 
 function invalidStream(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);

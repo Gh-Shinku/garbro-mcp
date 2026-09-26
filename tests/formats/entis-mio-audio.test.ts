@@ -121,6 +121,82 @@ function countPlaces(count: number): number[] {
 }
 
 /**
+ * The places of a count of the walk of the counts of the engine of no name at all, of the count of the walk
+ * of it (`GetGammaCode`): the count of the walk of the engine stands of a place of the walk of it of its own
+ * in front of the counts of the walk of the engine behind it, and every count of the walk of the engine
+ * behind the count of the walk of it stands of a place of the count of the walk of it and of the count of
+ * the walk of the engine behind the places of the walk of it.
+ */
+function gammaBits(value: number): number[] {
+	if (1 === value) return [0];
+	const top = 31 - Math.clz32(value);
+	const code = value - (1 << top);
+	const bits: number[] = [1];
+	for (let at = top - 1; at >= 0; at -= 1) {
+		bits.push((code >>> at) & 1);
+		bits.push(0 === at ? 0 : 1);
+	}
+	return bits;
+}
+
+/** The places of a name of the walk of the engine, of the tree of the counts of the walk of the engine. */
+function addSymbolBits(
+	bits: number[],
+	tree: ErisaHuffmanTree,
+	symbol: number,
+): void {
+	if (ERISA_HUFFMAN_NULL === tree.escape) {
+		// The tree of the counts of the walk of the engine stands of no place of a name at all: the count of
+		// the walk of the engine stands of the places of the count of the walk of it itself.
+		bits.push(...countPlaces(symbol));
+		tree.addNewEntry(symbol);
+		return;
+	}
+	const found = tree.symbolLookup[symbol] ?? ERISA_HUFFMAN_NULL;
+	if (ERISA_HUFFMAN_NULL !== found) {
+		// The place of the name of the tree stands of the walk of the places of the tree of the counts of the
+		// walk of the engine, and the count of the walk of the place stands of the walk of it.
+		bits.push(...pathTo(tree, found));
+		tree.increaseOccuredCount(found);
+		return;
+	}
+	// The place of the count of the walk of the engine of the places of the walk of the engine of no name at
+	// all stands of the places of the count of the walk of the engine itself behind it.
+	bits.push(...pathTo(tree, tree.escape));
+	tree.increaseOccuredCount(tree.escape);
+	bits.push(...countPlaces(symbol));
+	tree.addNewEntry(symbol);
+}
+
+/**
+ * The places of the count of the walk of the engine of the count of no name at all, of the count of the
+ * places of the walk of it (`GetLengthHuffman`): the counts of the walk of the engine of the count of no
+ * name at all stand of the counts of the walk of the engine of the count of the walk of the engine of its
+ * own, of no place of a count of the walk of the engine at all.
+ */
+function addLengthBits(
+	bits: number[],
+	tree: ErisaHuffmanTree,
+	count: number,
+): void {
+	if (ERISA_HUFFMAN_NULL === tree.escape) {
+		bits.push(...gammaBits(count));
+		tree.addNewEntry(count);
+		return;
+	}
+	const found = tree.symbolLookup[count] ?? ERISA_HUFFMAN_NULL;
+	if (ERISA_HUFFMAN_NULL !== found) {
+		bits.push(...pathTo(tree, found));
+		tree.increaseOccuredCount(found);
+		return;
+	}
+	bits.push(...pathTo(tree, tree.escape));
+	tree.increaseOccuredCount(tree.escape);
+	bits.push(...gammaBits(count));
+	tree.addNewEntry(count);
+}
+
+/**
  * An encoder of the counts of the walk of the engine: the walk of the port stands of the places of the tree
  * of the counts of the walk of the engine, and this encoder stands of the walk of the places of the tree of
  * it itself (the places of the names of the tree, of the places of the count of no name of it and of the
@@ -129,37 +205,29 @@ function countPlaces(count: number): number[] {
 function encodeErinaBits(places: readonly number[]): number[] {
 	// The walk of the engine stands of the tree of the counts of the walk of the engine of the name of the
 	// count of the count in front of it: every name of the walk of the engine stands of a tree of its own.
+	// The count of the walk of the engine of no name at all stands of a count of the walk of the engine of
+	// its own (`0x100`) and of the count of the places of the walk of it.
 	const trees: ErisaHuffmanTree[] = [];
 	for (let at = 0; at < 0x101; at += 1) trees.push(new ErisaHuffmanTree());
+	const lengthTree = new ErisaHuffmanTree();
 	const bits: number[] = [];
 	let tree = trees[0] ?? new ErisaHuffmanTree();
-	for (const place of places) {
-		const symbol = place & 0xff;
-		const next = trees[symbol & 0xff];
-		if (ERISA_HUFFMAN_NULL === tree.escape) {
-			// The tree of the counts of the walk of the engine stands of no place of a name at all: the
-			// count of the walk of the engine stands of the places of the count of the walk of it itself.
-			bits.push(...countPlaces(symbol));
-			tree.addNewEntry(symbol);
-			tree = next ?? tree;
-			continue;
+	let at = 0;
+	while (at < places.length) {
+		const symbol = (places[at] ?? 0) & 0xff;
+		addSymbolBits(bits, tree, symbol);
+		at += 1;
+		if (0 === symbol) {
+			// The count of the walk of the engine of the places of the walk of the engine of no name at all
+			// stands of the count of the places of the walk of the engine behind it.
+			let run = 1;
+			while (at < places.length && 0 === ((places[at] ?? 0) & 0xff)) {
+				run += 1;
+				at += 1;
+			}
+			addLengthBits(bits, lengthTree, run);
 		}
-		const found = tree.symbolLookup[symbol] ?? ERISA_HUFFMAN_NULL;
-		if (ERISA_HUFFMAN_NULL !== found) {
-			// The place of the name of the tree stands of the walk of the places of the tree of the counts
-			// of the walk of the engine, and the count of the walk of the place stands of the walk of it.
-			bits.push(...pathTo(tree, found));
-			tree.increaseOccuredCount(found);
-			tree = next ?? tree;
-			continue;
-		}
-		// The place of the count of the walk of the engine of the places of the walk of the engine of no
-		// name at all stands of the places of the count of the walk of the engine itself behind it.
-		bits.push(...pathTo(tree, tree.escape));
-		tree.increaseOccuredCount(tree.escape);
-		bits.push(...countPlaces(symbol));
-		tree.addNewEntry(symbol);
-		tree = next ?? tree;
+		tree = trees[symbol] ?? tree;
 	}
 	return bits;
 }
@@ -538,6 +606,107 @@ describe("Entis sound", () => {
 		for (const [at, value] of two.entries()) {
 			expect(Math.abs(value - 2 * (one[at] ?? 0))).toBeLessThanOrEqual(2);
 		}
+	});
+
+	it("stands of the counts of the walk of the engine of the places of no name at all", async () => {
+		// The places of a count of the walk of the engine of no name at all stand of the count of the places
+		// of the walk of the engine behind them (`GetLengthHuffman`), of the counts of the walk of the
+		// engine of the count of the walk of the engine of its own (`GetGammaCode`): a sound of the engine
+		// of the places of no name at all stands of the counts of the walk of the engine of every place of
+		// the count of the walk of it over each other.
+		const deltas = [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x03];
+		const { wave, read } = await soundOf(
+			buildSound({
+				streams: [
+					soundStreamSection({
+						sampleCount: deltas.length,
+						places: encodeErina(deltas),
+					}),
+				],
+			}),
+		);
+		if (!read) throw new Error("no wave file of the walk");
+		let value = 0;
+		const expected: number[] = [];
+		for (const delta of deltas) {
+			value = (value + delta) & 0xff;
+			expected.push(value);
+		}
+		expect([
+			...wave.subarray(read.dataOffset, read.dataOffset + read.dataSize),
+		]).toEqual(expected);
+		expect(expected).toEqual([1, 1, 1, 1, 3, 3, 6]);
+		// The places of a sound of the counts of the walk of the engine of sixteen places of a count stand
+		// of the counts of the walk of the engine of no name at all as well.
+		const folded = [0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00];
+		const sixteen = await soundOf(
+			buildSound({
+				info: soundInfoSection({ bitsPerSample: 16 }),
+				streams: [
+					soundStreamSection({
+						sampleCount: 2,
+						places: encodeErina(folded),
+					}),
+				],
+			}),
+		);
+		if (!sixteen.read) throw new Error("no wave file of the walk");
+		let count = 0;
+		let eight = 0;
+		const words: number[] = [];
+		for (let at = 0; at < 2; at += 1) {
+			const low = ((folded[2 + at] ?? 0) << 24) >> 24;
+			const high = ((folded[at] ?? 0) << 24) >> 24;
+			const value16 = (low & 0xff) | ((high ^ (low >> 8)) << 8);
+			count = (count + value16) & 0xffff;
+			eight = (eight + count) & 0xffff;
+			words.push(eight & 0xff, (eight >> 8) & 0xff);
+		}
+		expect([
+			...sixteen.wave.subarray(
+				sixteen.read.dataOffset,
+				sixteen.read.dataOffset + sixteen.read.dataSize,
+			),
+		]).toEqual(words);
+	});
+
+	it("stands of the counts of the walk of the engine of the places of no place of a picture of the engine", async () => {
+		// The places of the walk of the engine of a picture of the engine of no place of the count of the
+		// walk of the engine at all stand of the counts of the walk of the engine of no place of the count
+		// of the walk of the sound of the engine at all: the counts of the walk of the engine of the count
+		// of the walk of the engine of no count of the walk of the engine at all stand of the counts of the
+		// walk of the engine of no count of the walk of the engine of its own.
+		const { wave, read } = await soundOf(
+			lotSound({
+				sampleCount: 2,
+				places: new Array(0x200).fill(0),
+				coefficient: 0x10,
+			}),
+		);
+		if (!read) throw new Error("no wave file of the walk");
+		expect(read.dataSize).toBe(4);
+		expect([
+			...wave.subarray(read.dataOffset, read.dataOffset + read.dataSize),
+		]).toEqual([0, 0, 0, 0]);
+		// The counts of the walk of the engine of the two counts of a colour of a picture of the engine
+		// stand of the counts of the walk of the engine of no place of the count of the walk of the engine
+		// at all as well.
+		const stereo = await soundOf(
+			lotSound({
+				channels: 2,
+				sampleCount: 2,
+				places: new Array(0x400).fill(0),
+				coefficient: 0x10,
+			}),
+		);
+		if (!stereo.read) throw new Error("no wave file of the walk");
+		expect(stereo.read.dataSize).toBe(8);
+		expect([
+			...stereo.wave.subarray(
+				stereo.read.dataOffset,
+				stereo.read.dataOffset + stereo.read.dataSize,
+			),
+		]).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
 	});
 
 	it("stands of the counts of the walk of the engine of a count of the walk of a sound of the engine", () => {

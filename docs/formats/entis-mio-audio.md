@@ -90,6 +90,11 @@ count of the walk of the engine of every count of a colour of a count of the wal
 
 ## Deviations
 
+* The counts of the walk of the engine of the count of the walk of the engine of the count of no name at all
+  stand of the counts of the walk of the engine of the count of the walk of the engine of the count of the
+  walk of it of a count of thirty places of the count of the walk of the engine alone: the reference stands
+  of no count of the walk of the engine of the count of the walk of the engine of its own at all, of a count
+  of the walk of the engine of the count of the walk of it of the count of the walk of the engine itself.
 * The counts of the walk of the engine of the places of the count of the walk of the engine of a count of the
   walk of a picture of the engine stand of the places of the walk of the engine of the count of the walk of
   the engine of the places of the count of the walk of the engine itself: the reference stands of the places
@@ -125,6 +130,14 @@ the places of a sound of two counts of a colour stand pinned (every count of a c
 the walk of the engine of the places of it) and the places of a sound of sixteen places of a count stand
 pinned as well.
 
+A sound of the engine of the places of no name at all stands pinned: the places of a sound of eight places
+of a count stand of the counts of the walk of the engine of every place of the count of the walk of it over
+each other (`[1, 1, 1, 1, 3, 3, 6]` of the counts of the walk of the engine of the count of the walk of the
+engine of the count of the walk of the sound of the engine of the places of the walk of it), and the places
+of a sound of the walks of a picture of the engine of no place of the count of the walk of the engine at all
+stand of the places of no place of the count of the walk of the engine at all, of one count of a colour and
+of two counts of a colour.
+
 A sound of the kind `LOT_ERI` stands of the bits of the walk of the counts of the engine of its own
 (`dctPlaces`), of the places of the walk of the engine of the count of the walk of the sound itself: the
 counts of the walk of the engine of the places of a count of the walk of the sound stand pinned
@@ -143,8 +156,9 @@ count of the walk of a picture stand of the counts of the walk of the engine of 
 all), and the places of it of the counts of the walk of the engine of the count of the walk of a picture of
 their own stand of places of the walk of the engine of their own.
 
-The counts of the walk of the engine of the places of the count of the walk of the engine of the count of no
-name at all (the walk of the counts of the gamma of the count of the walk of the engine) stand of no count
-of the walk of the engine of the fixture: every count of the walk of the engine of the fixture stands of the
-places of the walk of the engine of the count of the walk of the engine itself, of no place of the count of
-no name at all.
+The places of the count of the walk of the engine of no name at all stand of the counts of the walk of the
+engine of the count of the walk of the engine of its own (`GetLengthHuffman`, of the counts of the walk of
+the counts of the gamma of the count of the walk of the engine): a sound of the engine of the places of no
+name at all stands of the counts of the walk of the engine of the walk of the count of the walk of the sound
+itself (`gammaBits`, an encoder of the counts of the walk of the counts of the gamma of the count of the walk
+of the engine behind the walk of it).
