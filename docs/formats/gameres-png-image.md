@@ -30,5 +30,9 @@ hands the places of the picture over as a bitmap of that count of places.
 * **A picture standing of the places of another picture** (the walk of two places of a picture of seven
   places to a byte). Refused with `UNSUPPORTED_FEATURE`; the reference stands of the reader of the pictures
   of a system of its own, which reads them.
+* **An interlaced picture** (`interlace` of one, the seven walks of Adam7). Refused with
+  `UNSUPPORTED_FEATURE`; the reference hands the file to the decoder of its platform, which reads one. The
+  reader of this project walks the places of a picture as one run of rows, which is the walk of every
+  picture whose head names no interlace.
 * **Writing a picture.** The reference writes a portable network graphic and the chunk of the place of a
   picture in it; the port reads alone.
