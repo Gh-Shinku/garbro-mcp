@@ -61,8 +61,10 @@ layout of ITU-T T.81, of four flat blocks, exactly; the same stream with a resta
 a stream whose coefficients stand at the width of a byte; a grey stream recorded from the Python imaging
 library, exactly; a stream whose components each sample the picture, to within two places; a stream whose
 chroma is sampled twice as coarsely across, to within three; a stream whose chroma is sampled twice as
-coarsely both ways, within the wider bound libjpeg's own widening implies; the refusal of a progressive
-stream; and the refusals of a stream that is no stream of the format.
+coarsely both ways, within the wider bound libjpeg's own widening implies; a stream whose chrominance places
+sample the picture four times as coarsely as the luma, where the reader repeats the nearest sample rather
+than widening with the filter above, against hand-computed places; the refusal of a progressive stream; and
+the refusals of a stream that is no stream of the format.
 
 ## References
 

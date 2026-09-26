@@ -176,6 +176,90 @@ function greyJpeg(input: {
 	return Buffer.concat(parts);
 }
 
+/**
+ * Writes one block of a component: the difference from the block before it as a category and a magnitude,
+ * and then the end of the block marker of the table this fixture declares.
+ */
+function writeBlock(
+	writer: BitWriter,
+	direct: number,
+	previous: number,
+): number {
+	const difference = direct - previous;
+	const magnitude = Math.abs(difference);
+	const category = 0 === magnitude ? 0 : 32 - Math.clz32(magnitude);
+	writer.write(((1 << category) - 1) << 1, category + 1);
+	if (category > 0) {
+		writer.write(
+			difference > 0 ? difference : difference + (1 << category) - 1,
+			category,
+		);
+	}
+	writer.write(0, 1);
+	return direct;
+}
+
+/**
+ * A baseline JPEG of three components, built here from the layout, whose blocks are flat in the same way.
+ * The colour of a pixel follows from the direct current coefficients of the three components: the luma comes
+ * from the block that stands over the pixel and the two chrominance places from the block of their own
+ * component, which is stretched over the picture when that component samples it less often than the luma.
+ */
+function colourJpeg(input: {
+	width: number;
+	height: number;
+	/** The sampling of each component, luma first. */
+	sampling: readonly [number, number][];
+	/** The direct current coefficients of every block of every component, in the order they are coded. */
+	blocks: readonly (readonly number[])[];
+}): Buffer {
+	const quantisation = segment(
+		0xdb,
+		Buffer.from([0, ...new Array(64).fill(1)]),
+	);
+	const huffman = segment(
+		0xc4,
+		Buffer.concat([
+			huffmanTable(0x00, ONE_A_LENGTH, DC_SYMBOLS),
+			huffmanTable(0x10, [1, ...ONLY_END_OF_BLOCK.slice(1)], [0x00]),
+		]),
+	);
+	const frame = Buffer.alloc(6 + 3 * input.sampling.length, 0);
+	frame[0] = 8;
+	frame.writeUInt16BE(input.height, 1);
+	frame.writeUInt16BE(input.width, 3);
+	frame[5] = input.sampling.length;
+	input.sampling.forEach(([horizontal, vertical], index) => {
+		frame[6 + index * 3] = index + 1;
+		frame[7 + index * 3] = (horizontal << 4) | vertical;
+		frame[8 + index * 3] = 0;
+	});
+	const scan = Buffer.from([
+		input.sampling.length,
+		...input.sampling.flatMap((_, index) => [index + 1, 0x00]),
+		0,
+		63,
+		0,
+	]);
+	const parts: Buffer[] = [
+		Buffer.from([0xff, 0xd8]),
+		quantisation,
+		segment(0xc0, frame),
+		huffman,
+		segment(0xda, scan),
+	];
+	const writer = new BitWriter();
+	for (const component of input.blocks) {
+		let previous = 0;
+		for (const direct of component) {
+			previous = writeBlock(writer, direct, previous);
+		}
+	}
+	writer.align();
+	parts.push(writer.toBuffer(), Buffer.from([0xff, 0xd9]));
+	return Buffer.concat(parts);
+}
+
 /** The places of the flat blocks the fixture names, eight places square each, in the order of the blocks. */
 function flatBlocks(input: {
 	width: number;
@@ -227,6 +311,33 @@ describe("JPEG reader", () => {
 			greyJpeg({ width: 8, height: 8, blocks: [255 * 8] }),
 		);
 		expect(pixelAt(image.pixels, 8, 0, 0)).toEqual([255, 255, 255, 255]);
+	});
+
+	it("stretches a component that samples the picture four times as coarsely", () => {
+		// The luma samples the picture once, the two chrominance places every fourth place, so the reader has
+		// to widen them by repeating the nearest sample. The picture is one block group of four luma blocks
+		// and one block of each chrominance place.
+		const image = readJpegImage(
+			colourJpeg({
+				width: 32,
+				height: 8,
+				sampling: [
+					[4, 1],
+					[1, 1],
+					[1, 1],
+				],
+				blocks: [[8 * 20, 8 * 40, 8 * 60, 8 * 80], [8 * 30], [8 * 40]],
+			}),
+		);
+		expect(image).toMatchObject({ width: 32, height: 8, bitsPerPixel: 32 });
+		// The luma of the four blocks is 148, 168, 188 and 208; both chrominance places are flat, at 30 and
+		// 40 above their own middle, so the colour of every block follows from those three numbers:
+		// red is 148 + 1.402 * 40, green is 148 - 0.344136 * 30 - 0.714136 * 40, blue is 148 + 1.772 * 30.
+		expect(pixelAt(image.pixels, 32, 0, 0)).toEqual([201, 109, 204, 255]);
+		expect(pixelAt(image.pixels, 32, 8, 0)).toEqual([221, 129, 224, 255]);
+		expect(pixelAt(image.pixels, 32, 16, 0)).toEqual([241, 149, 244, 255]);
+		// The last block, and the last place of the picture: the chrominance places are the same ones.
+		expect(pixelAt(image.pixels, 32, 31, 7)).toEqual([255, 169, 255, 255]);
 	});
 
 	it("reads a grey stream behind the Python imaging library", () => {
