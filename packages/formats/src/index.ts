@@ -225,6 +225,7 @@ import { gbcImageFormat } from "./primel/gbc-image.js";
 import { primelPcfFormat } from "./primel/pcf-archive.js";
 import { cmvsPb3ImageFormat } from "./cmvs/pb3-image.js";
 import { cmvsPsbImageFormat } from "./cmvs/psb-image.js";
+import { emotePsbFormat } from "./emote/psb-archive.js";
 import { cottonClubLmgImageFormat } from "./cotton-club/lmg-image.js";
 import { creativeVocAudioFormat } from "./creative/voc-audio.js";
 import { criAdxAudioFormat } from "./cri/adx-audio.js";
@@ -1482,6 +1483,7 @@ export function createDefaultRegistry(
 			gbcImageFormat,
 			primelPcfFormat,
 			cmvsPsbImageFormat,
+			emotePsbFormat,
 			cmvsPb3ImageFormat,
 			sviuJbpImageFormat,
 			gbpImageFormat,

@@ -1,11 +1,15 @@
-// The first stage of the PSB container of the Emote engine (GARbro "ArcFormats/Emote/ArcPSB.cs", classes
-// `PsbOpener` and `PsbReader`), against an archive built in the test. The engine stands of a head that names
-// six tables, of two tables of names (the walk of a name stands of a table whose every place names the place
-// of the walk behind it, and of a table that names the place behind every place of the first) and of a table
-// of the objects of the file.
+// The PSB container of the Emote engine (GARbro "ArcFormats/Emote/ArcPSB.cs", classes `PsbOpener` and
+// `PsbReader`), against archives built in the test. The engine stands of a head that names six tables, of
+// two tables of names (the walk of a name stands of a table whose every place names the place of the walk
+// behind it, and of a table that names the place behind every place of the first), of a table of the objects
+// of the file, and of the cipher of its own.
 import { Buffer } from "node:buffer";
+import { buffer as consumeBuffer } from "node:stream/consumers";
+import { BufferByteSource } from "@garbro-mcp/core";
+import { emotePsbFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import {
+	PsbCipher,
 	PsbReader,
 	readPsbHeader,
 } from "../../packages/formats/src/emote/psb-reader.js";
@@ -14,7 +18,9 @@ import {
 const NAMES = 0x28;
 const ENTRIES = 0x400;
 const PARENTS = NAMES + 6 + ENTRIES * 4;
-const OBJECT = PARENTS + 6 + ENTRIES * 4 + 0x10;
+const CHUNKS = PARENTS + 6 + ENTRIES * 4;
+const LENGTHS = CHUNKS + 0x20;
+const OBJECT = LENGTHS + 0x20;
 const ROOT = OBJECT + 0x20;
 const CHUNK_DATA = ROOT + 0x40;
 
@@ -30,19 +36,24 @@ function table(values: number[]): Buffer {
 }
 
 /**
- * An archive of the engine, of the one name `x` and of one count of the file it stands of. The tables of the
- * names stand of a place for the root of the walk (nought), of a place for the one place behind it that the
- * name `x` stands of, and of a place for the place the walk of the name ends at.
+ * An archive of the engine, of the one name `x`. The tables of the names stand of a place for the root of
+ * the walk (nought), of a place for the place behind the root that the name `x` stands of, and of a place
+ * for the place the walk of the name ends at, which stands of the place of the object the name names.
  */
 function psbFile(input: {
 	name: string;
 	value: number;
 	broken?: "table" | "root" | "cipher";
+	cipher?: number;
+	chunk?: { offset: number; length: number };
 }): Buffer {
-	const file = Buffer.alloc(CHUNK_DATA, 0x00);
+	const file = Buffer.alloc(CHUNK_DATA + 0x80, 0x00);
 	file.write("PSB\0", 0, "latin1");
 	file.writeUInt16LE(3, 4);
-	file.writeUInt16LE("cipher" === input.broken ? 1 : 0, 6);
+	file.writeUInt16LE(
+		"cipher" === input.broken ? 1 : undefined === input.cipher ? 0 : 2,
+		6,
+	);
 	const head = Buffer.alloc(0x20, 0x00);
 	const place = (at: number, value: number): void => {
 		head.writeInt32LE(value, at);
@@ -50,8 +61,10 @@ function psbFile(input: {
 	place(0x04, NAMES);
 	place(0x08, NAMES); // the strings of the file stand of no use in this stage
 	place(0x0c, NAMES);
-	place(0x10, NAMES);
-	place(0x14, NAMES);
+	// The place of the places of the chunks ends the run of the file the cipher stands over, which begins
+	// at the tables of the names.
+	place(0x10, undefined === input.cipher ? CHUNKS : PARENTS + 6 + ENTRIES * 4);
+	place(0x14, LENGTHS);
 	place(0x18, "table" === input.broken ? 0x10 : CHUNK_DATA);
 	place(0x1c, ROOT);
 	head.copy(file, 8);
@@ -67,30 +80,37 @@ function psbFile(input: {
 	parents[child] = 0;
 	names[terminal] = OBJECT; // the place of the file of the object the name stands of
 	parents[terminal] = child;
-	const namesTable = table(names);
-	const parentsTable = table(parents);
-	namesTable.copy(file, NAMES);
-	parentsTable.copy(file, PARENTS);
+	table(names).copy(file, NAMES);
+	table(parents).copy(file, PARENTS);
 
 	// The object the name stands of, and the root of the file, which is a dictionary of one name.
 	file[OBJECT] = 0x08; // a count of four places of the file
 	file.writeInt32LE(input.value, OBJECT + 1);
 	const keys = table([OBJECT]);
-	file["root" === input.broken ? ROOT + 1 : ROOT] = 0x21;
 	file[ROOT] = "root" === input.broken ? 0x20 : 0x21;
 	keys.copy(file, ROOT + 1);
 	const values = table([0]);
-	const valuePlace = ROOT + 1 + keys.length + values.length;
 	values.copy(file, ROOT + 1 + keys.length);
-	// The object of the dictionary stands where the table of its places names it.
-	if (valuePlace + 5 <= file.length) {
+	const valuePlace = ROOT + 1 + keys.length + values.length;
+	if (undefined === input.chunk) {
 		file[valuePlace] = 0x08;
 		file.writeInt32LE(input.value, valuePlace + 1);
+	} else {
+		// The object of the dictionary stands of the places of a chunk of the engine instead: the count of
+		// the places of the chunk of the engine stands of the kind 0x19 of the file.
+		file[valuePlace] = 0x19;
+		file.writeUInt32LE(0, valuePlace + 1);
+		table([input.chunk.offset]).copy(file, CHUNKS);
+		table([input.chunk.length]).copy(file, LENGTHS);
+	}
+	if (undefined !== input.cipher) {
+		const end = PARENTS + 6 + ENTRIES * 4;
+		new PsbCipher(input.cipher).xor(file, NAMES, end - NAMES);
 	}
 	return file;
 }
 
-describe("Emote PSB container, the first stage", () => {
+describe("Emote PSB container", () => {
 	it("reads the head of the archive and the places of its tables", () => {
 		const data = psbFile({ name: "x", value: 0x0040abcd });
 		const header = readPsbHeader(data, false);
@@ -106,15 +126,14 @@ describe("Emote PSB container, the first stage", () => {
 		expect(
 			readPsbHeader(psbFile({ name: "x", value: 1, broken: "table" }), false),
 		).toBeUndefined();
-		// A head of the cipher of the engine stands in the stage behind this one.
+		// A head that stands of the cipher of the engine stands in the stage behind this one.
 		expect(
 			readPsbHeader(psbFile({ name: "x", value: 1, broken: "cipher" }), false),
 		).toBeUndefined();
 	});
 
 	it("reads a name of the file out of the two tables of the names", () => {
-		const data = psbFile({ name: "x", value: 0x0040abcd });
-		const reader = PsbReader.parse(data);
+		const reader = PsbReader.parse(psbFile({ name: "x", value: 0x0040abcd }));
 		if (!reader) throw new Error("no reader");
 		expect(reader.offsetOf("x")).toBe(OBJECT);
 		expect(reader.offsetOf("y")).toBeUndefined();
@@ -123,21 +142,76 @@ describe("Emote PSB container, the first stage", () => {
 	});
 
 	it("reads an object of the file out of a dictionary of the file", () => {
-		const data = psbFile({ name: "x", value: 0x0040abcd });
-		const reader = PsbReader.parse(data);
+		const reader = PsbReader.parse(psbFile({ name: "x", value: 0x0040abcd }));
 		if (!reader) throw new Error("no reader");
 		const at = reader.key("x", ROOT);
 		expect(at).toBeTypeOf("number");
 		if (undefined === at) throw new Error("no place");
-		expect(reader.scalar(at)).toBe(0x0040abcd);
+		expect(reader.object(at)).toBe(0x0040abcd);
 		expect(reader.key("y", ROOT)).toBeUndefined();
-		// The object the name stands of stands of the table of the names as well.
 		expect(reader.scalar(OBJECT)).toBe(0x0040abcd);
+		// An object of no kind of the engine stands refused rather than read.
+		expect(() => reader.object(OBJECT + 0x10)).toThrow();
+	});
+
+	it("reads the cipher of the engine, of the key of the game", () => {
+		// The places of the file the cipher of the engine stands of, of the key 970396437 of the reference.
+		// The counts below were worked out by an implementation of that walk written in another language
+		// from the same lines of the reference, so they pin the port against a second reading of the
+		// algorithm rather than against its own arithmetic.
+		const stream = Buffer.alloc(12, 0x00);
+		new PsbCipher(970396437).xor(stream, 0, stream.length);
+		expect([...stream]).toEqual([
+			0x5f, 0x42, 0x3d, 0xe0, 0xc0, 0x16, 0xcf, 0x27, 0x1f, 0x4e, 0x8e, 0xa9,
+		]);
+		// A file whose tables stand of the cipher of the engine stands read of the key of the game, and
+		// stands of no read where no key, or another key, stands at hand.
+		const data = psbFile({ name: "x", value: 0x0040abcd, cipher: 970396437 });
+		const reader = PsbReader.parse(data, { key: 970396437 });
+		if (!reader) throw new Error("no reader");
+		expect(reader.header.flags).toBe(2);
+		expect(reader.offsetOf("x")).toBe(OBJECT);
+		expect([...reader.nameMap()]).toEqual([[OBJECT, "x"]]);
+		// The head of the file stands of the tables of the cipher, so a walk of no key reads a head of its
+		// own and stands of no name of the file at all.
+		expect(PsbReader.parse(data)).toBeUndefined();
+		const wrong = PsbReader.parse(data, { key: 1 });
+		expect(() => wrong?.nameMap()).toThrow();
 	});
 
 	it("stands of no file of another object at the root of the file or of no head at all", () => {
-		const broken = psbFile({ name: "x", value: 1, broken: "root" });
-		expect(PsbReader.parse(broken)).toBeUndefined();
+		expect(
+			PsbReader.parse(psbFile({ name: "x", value: 1, broken: "root" })),
+		).toBeUndefined();
 		expect(PsbReader.parse(Buffer.alloc(0x10, 0x00))).toBeUndefined();
+	});
+});
+
+describe("Emote PSB archive", () => {
+	it("lists the pictures and the chunks of the archive and hands their places over", async () => {
+		const chunk = { offset: 0x40, length: 5 };
+		const data = psbFile({ name: "x", value: 0x0040abcd, chunk });
+		// The places of the chunk stand of the cipher of the engine behind the tables of the file: the two
+		// tables of the names end at the place the head of the fixture names for the chunks.
+		Buffer.from("hello", "latin1").copy(data, CHUNK_DATA + chunk.offset);
+		const source = new BufferByteSource(data);
+		expect(await emotePsbFormat.detect(source, "sample.psb")).toBe(true);
+		const archive = await emotePsbFormat.open(source, "sample.psb");
+		try {
+			expect(archive.entries.map((entry) => entry.path)).toEqual(["x"]);
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			expect(Number(entry.size)).toBe(5);
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				Buffer.from("hello", "latin1"),
+			);
+		} finally {
+			await archive.close();
+		}
+		// A file of no such object at its root stands of no archive of the engine.
+		const other = psbFile({ name: "x", value: 0x0040abcd });
+		expect(
+			await emotePsbFormat.detect(new BufferByteSource(other), "other.psb"),
+		).toBe(false);
 	});
 });

@@ -22,6 +22,50 @@ const LEAST_TABLE = 0x28;
 /** The place of the file of the head of a dictionary of the engine. */
 const DICT_TYPE = 0x21;
 
+/** An object of the file: a count, a name, a list, a dictionary, or the places of a chunk of the file. */
+export type PsbValue =
+	| null
+	| boolean
+	| number
+	| string
+	| PsbValue[]
+	| Map<string, PsbValue>
+	| { chunk: { offset: number; length: number } };
+
+/**
+ * `PsbReader.Decrypt`: the cipher of the engine. The key stands of six places of the file, of which the
+ * fourth stands of the key of the game and the fifth and the sixth of nought; every four places of the file
+ * the walk stands of a new place of the key, and every place of the file stands exclusive ored with the low
+ * place of that one.
+ */
+export class PsbCipher {
+	readonly #state: number[];
+
+	constructor(key: number) {
+		this.#state = [0x075bcd15, 0x159a55e5, 0x1f123bb5, key >>> 0, 0, 0];
+	}
+
+	/** The walk of the cipher over a run of the places of the file. */
+	xor(data: Buffer, offset: number, length: number): void {
+		for (let at = 0; at < length; at += 1) {
+			if (0 === this.#state[4]) {
+				const v5 = this.#state[3] ?? 0;
+				const v6 =
+					((this.#state[0] ?? 0) ^ ((this.#state[0] ?? 0) << 11)) >>> 0;
+				this.#state[0] = this.#state[1] ?? 0;
+				this.#state[1] = this.#state[2] ?? 0;
+				const eax = (v6 ^ v5 ^ ((v6 ^ (v5 >>> 11)) >>> 8)) >>> 0;
+				this.#state[2] = v5;
+				this.#state[3] = eax;
+				this.#state[4] = eax;
+			}
+			const place = offset + at;
+			data[place] = (data[place] ?? 0) ^ ((this.#state[4] ?? 0) & 0xff);
+			this.#state[4] = (this.#state[4] ?? 0) >>> 8;
+		}
+	}
+}
+
 /** The table of the objects of the file, of a place within it. */
 export interface PsbArray {
 	/** The count of the places of the file of the whole of the table, of its head and its objects. */
@@ -128,12 +172,27 @@ export class PsbReader {
 		this.#header = header;
 	}
 
-	/** `PsbReader.Parse`, of a file of no cipher: the head alone, and the root object of a dictionary. */
-	static parse(data: Buffer, encrypted = false): PsbReader | undefined {
-		const header = readPsbHeader(data, encrypted);
+	/**
+	 * `PsbReader.Parse`, of a file of no cipher: the head alone, of the root object of a dictionary behind
+	 * it. A head that names the cipher of the engine (its second flag) stands of the cipher as well, of the
+	 * key of the game the reference holds.
+	 */
+	static parse(
+		data: Buffer,
+		options: { key?: number } = {},
+	): PsbReader | undefined {
+		const header = readPsbHeader(data, false);
 		if (!header) return undefined;
 		if (header.version < 2) return undefined;
 		const reader = new PsbReader(data, header);
+		if (0 !== (header.flags & 2)) {
+			if (undefined === options.key) return undefined;
+			new PsbCipher(options.key).xor(
+				reader.#data,
+				header.names,
+				header.chunkOffsets - header.names,
+			);
+		}
 		if (DICT_TYPE !== reader.#byte(header.root)) return undefined;
 		return reader;
 	}
@@ -145,6 +204,8 @@ export class PsbReader {
 	#byte(at: number): number {
 		return this.#data[at] ?? 0;
 	}
+
+	#names: Map<number, string> | undefined;
 
 	/**
 	 * `PsbReader.GetArray`: a table of the objects of the file. The kind of the head of a table stands of
@@ -304,6 +365,142 @@ export class PsbReader {
 		const values = this.array(dictAt + 1 + keys.arraySize);
 		const dataOffset = this.element(values, index);
 		return dictAt + 1 + keys.arraySize + values.arraySize + dataOffset;
+	}
+
+	/** `PsbReader.GetString`: a name of the file, out of the tables of the names of the file. */
+	string(at: number): string {
+		const index = this.integer(at, 0x14);
+		const strings = this.array(this.#header.strings);
+		const place = this.#header.stringsData + this.element(strings, index);
+		const stop = this.#data.indexOf(0, place);
+		const end = -1 === stop ? this.#data.length : stop;
+		return this.#data.toString("utf8", place, end);
+	}
+
+	/** `PsbReader.GetList`: the objects of a list of the file, of the places of its objects. */
+	list(at: number): PsbValue[] {
+		const base = at + 1;
+		const objects = this.array(base);
+		const list: PsbValue[] = [];
+		for (let index = 0; index < objects.count; index += 1) {
+			list.push(
+				this.object(base + objects.arraySize + this.element(objects, index)),
+			);
+		}
+		return list;
+	}
+
+	/**
+	 * `PsbReader.GetDict`: the objects of a dictionary of the file, of the names of the file. The names of
+	 * the objects of a dictionary stand in the table of the names of the file, which every object of the
+	 * dictionary stands of.
+	 */
+	dict(at: number): Map<string, PsbValue> {
+		const base = at + 1;
+		const keys = this.array(base);
+		const found = new Map<string, PsbValue>();
+		if (0 === keys.count) return found;
+		const values = this.array(base + keys.arraySize);
+		for (let index = 0; index < keys.count; index += 1) {
+			const key = this.element(keys, index);
+			this.#names ??= this.nameMap();
+			const name = this.#names.get(key);
+			if (undefined === name) {
+				throw invalidArchive(
+					"The dictionary of the file stands of no name of the file",
+				);
+			}
+			found.set(
+				name,
+				this.object(
+					base +
+						this.element(values, index) +
+						keys.arraySize +
+						values.arraySize,
+				),
+			);
+		}
+		return found;
+	}
+
+	/** `PsbReader.GetChunk`: the places of the file of a chunk of the engine, of its own tables. */
+	chunk(at: number): { offset: number; length: number } {
+		const index = this.integer(at, 0x18);
+		const chunks = this.array(this.#header.chunkOffsets);
+		if (index >= chunks.count) {
+			throw invalidArchive("Invalid chunk index");
+		}
+		const lengths = this.array(this.#header.chunkLengths);
+		return {
+			offset: this.element(chunks, index),
+			length: this.element(lengths, index),
+		};
+	}
+
+	/** `PsbReader.GetExtraChunk`: the places of a chunk of the newer tables of the engine. */
+	extraChunk(at: number): { offset: number; length: number } {
+		const index = this.integer(at, 0x21);
+		if (
+			undefined === this.#header.extraOffsets ||
+			undefined === this.#header.extraLengths
+		) {
+			throw invalidArchive("The file stands of no newer tables");
+		}
+		const chunks = this.array(this.#header.extraOffsets);
+		if (index >= chunks.count) {
+			throw invalidArchive("Invalid chunk index");
+		}
+		const lengths = this.array(this.#header.extraLengths);
+		return {
+			offset: this.element(chunks, index),
+			length: this.element(lengths, index),
+		};
+	}
+
+	/** `PsbReader.GetObject`: an object of the file, of the kind of the place of its head. */
+	object(at: number): PsbValue {
+		switch (this.#byte(at)) {
+			case 0x15:
+			case 0x16:
+			case 0x17:
+			case 0x18:
+				return this.string(at);
+			case 0x19:
+			case 0x1a:
+			case 0x1b:
+			case 0x1c:
+				return { chunk: this.chunk(at) };
+			case 0x1d:
+			case 0x1e:
+				return 0x1e === this.#byte(at) ? this.#data.readFloatLE(at + 1) : 0;
+			case 0x1f:
+				return this.#data.readDoubleLE(at + 1);
+			case 0x20:
+				return this.list(at);
+			case 0x21:
+				return this.dict(at);
+			case 0x22:
+			case 0x23:
+			case 0x24:
+			case 0x25:
+				return { chunk: this.extraChunk(at) };
+			default: {
+				const scalar = this.scalar(at);
+				if (undefined === scalar) {
+					throw invalidArchive(
+						`Unknown serialized object type 0x${this.#byte(at).toString(16).toUpperCase()}`,
+					);
+				}
+				return scalar;
+			}
+		}
+	}
+
+	/** `PsbReader.GetRootKey`: the object a name of the root dictionary of the file stands of. */
+	rootKey(name: string): PsbValue | undefined {
+		const at = this.key(name, this.#header.root);
+		if (undefined === at) return undefined;
+		return this.object(at);
 	}
 
 	/** `PsbReader.GetObject` of the numbers and of the objects of no type of their own. */

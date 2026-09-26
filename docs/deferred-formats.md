@@ -288,28 +288,18 @@ further than the reference's own list of them.
 
 ## The picture lives inside an archive this project does not read
 
-- `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
-  reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
-  stock build does open these containers - but a first port of it stands withdrawn. The container is a
-  serialised object graph: a head naming six tables, a **name trie** whose nodes reach their children by a
-  base of their own, arrays whose count field is itself an object of the file (which is what the array's own
-  header size is read from), and dictionaries whose values hold places counted from the end of their own
-  arrays. The head, the key schedule and the table checks were written and are understood; the trie walk came
-  back with an **empty name map** on a hand built container, and every dictionary lookup stands on it, so the
-  reader was withdrawn rather than landed unverified. A second pass wants a **real** container to step
-  through, or a mirror writer for the trie built alongside the reader, since the walk's own condition
-  (`i >= nm1.Count || nm2[i] != prev`) is subtle enough that a synthetic fixture alone did not pin it.
-  **That second pass has begun**: the head, the two tables of the objects, the walk of a name (`GetOffset`),
-  the whole map of the names (`ReadNames`) and the search of a key within a dictionary (`GetKey`) **stand
-  ported now**, as `packages/formats/src/emote/psb-reader.ts`, and they stand pinned by a **mirror writer**
-  built in the test (`tests/formats/emote-psb-reader.test.ts`) exactly as this entry asked for: the fixture
-  stands of a table whose every place names the place of the walk behind it and of a table that names the
-  place behind every place of the first, of one name, of the object that name stands of and of a dictionary
-  of one key, and the walk of the name, the map of the names and the search of the key all stand of the
-  object the fixture named. What stands of the stages behind it: the cipher of the head (`GetHeader` of a
-  file whose flag of one stands), the strings, the lists and the dictionaries themselves, the chunks, and
-  the pictures of the archive; so the row `PSB/EMOTE` does not stand opened yet, and this file records the
-  stage rather than the port.
+- `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) **stands ported now**, as
+  `emote-psb-archive`: the head of the container of the engine and its six tables (and the three behind them
+  for a file of a kind beyond three), the cipher of the engine of the key the reference holds
+  (`KnownKeys`), the tables of the objects and the objects of numbers, the two tables of the names with
+  the walk of a name and the whole of the names, the search of a name within a dictionary and the whole of a
+  dictionary, the names and the lists and the chunks of the file, and the three walks of the places of an
+  archive - the pictures of the source, the layers, and every object of the root dictionary that stands of a
+  chunk. What the port does not carry is the **decoder of a picture** of the engine
+  (`PsbTextureDecoder`, of the places of the picture of the engine) and the **TLG** picture of a layer: the
+  places of a chunk stand handed over as they stand, which is what the reference hands over as well where
+  the picture stands of no walk of its own. So `DREF` below stands one step nearer than when it was written:
+  the archive it names stands read now, and what stands behind it is the drawing of the layers.
 - `DREF` (`ArcFormats/Emote/ImageDREF.cs`) is not a picture at all: it is a little endian text file of
   `psb://<archive>/<entry>` lines, and the reference composes it by opening each named archive with the
   `PSB/EMOTE` opener, finding the entry by name, and drawing the layers one over another with WPF. It

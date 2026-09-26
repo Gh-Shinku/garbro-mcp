@@ -13650,6 +13650,37 @@
 		},
 		{
 			"reference": {
+				"type": "archive",
+				"tag": "PSB/EMOTE",
+				"class": "PsbOpener",
+				"source": "ArcFormats/Emote/ArcPSB.cs"
+			},
+			"localId": "emote-psb-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the word `PSB` at the head of a file, of the extensions `psb`, `pimg`, `dpak`, `psbz` and `psp`",
+				"the head of the container of the engine: the kind of the file, its flags, and the places of its six tables (and of the three behind them for a file of a kind beyond three), with the checks the reference stands of",
+				"the cipher of the engine (`PsbReader.Decrypt`): the key of six places of the file, of which the fourth stands of the key of the game the reference holds (`KnownKeys` of one key), and the walk of the places of the file of the tables of the names",
+				"the tables of the objects of the file, of their own heads (the count of the objects of a table and the count of the places of an object), and an object of the kinds one to four and nine to twelve of the file (nothing, the two kinds of the true and the false, the counts and the long counts)",
+				"the two tables of the names of the file, of the walk of a name (`GetOffset`) and of the whole of the names (`ReadNames`), which the dictionary of the file stands of",
+				"the search of a name within a dictionary of the file (`GetKey`) and the whole of the objects of a dictionary (`GetDict`)",
+				"a name of the file (`GetString`), a list of the file (`GetList`), a chunk of the file (`GetChunk`) and of the newer tables of the file (`GetExtraChunk`)",
+				"the three walks of the places of an archive: the pictures of the source of the file, the layers of the file, and every object of the root dictionary that stands of a chunk of the file, of the places of the chunk handed over as they stand"
+			],
+			"unsupported": [
+				"archive creation",
+				"the places of a picture of the engine, which the reference reads of a decoder of its own (`PsbTextureDecoder`) and of the TLG format for a picture of that name",
+				"the kinds of the names of the files of the engine, which the reference stands of its own table of the places of a name",
+				"a file whose head stands of the cipher of the engine as well (the first flag), which the reference stands of the key of the game as well"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"an archive of a real game of the engine"
+			]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "GRA",
 				"class": "GraFormat",
