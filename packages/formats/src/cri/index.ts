@@ -6,3 +6,4 @@ export * from "./xtx-image.js";
 export * from "./spc-image.js";
 export * from "./adx-audio.js";
 export * from "./bip-image.js";
+export * from "./hca-audio.js";

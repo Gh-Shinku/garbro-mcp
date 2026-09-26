@@ -364,7 +364,13 @@ the first forty of them.
   the head (`AthTable`), a cipher of the head's own type (`Cipher`, with the key of the game), a Huffman
   walk and the sample packers the sound input hands over. It is self contained - every one of those classes
   stands in the same file - but the whole of it is a codec whose places can only be pinned by a mirror of
-  its own arithmetic, so it is a staged port too, and a longer one than `PCM`.
+  its own arithmetic, so it is a staged port too, and a longer one than `PCM`. **The head of it stands
+  ported now**, as `cri-hca-audio`: the word of the head, the walk of the counts of it, the counts of the
+  places of the channels of the sound and the count of the places of the counts of a block of the walk of
+  the engine; what stands behind it - the table of the counts of the places of the sound (`AthTable`), the
+  cipher of it (`Cipher`, which stands of the key of the game rather than of the head) and the walk of the
+  counts of a picture of the engine - stands in `docs/support-status.json`, as the record of the row names
+  it.
 ## Two engines can share a tag and a class name
 
 The gap inventory identifies an implementation by its kind, tag, source file and class name, and two

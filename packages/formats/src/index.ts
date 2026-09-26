@@ -234,6 +234,7 @@ import { criGxtImageFormat } from "./cri/gxt-image.js";
 import { spcFormat } from "./cri/spc.js";
 import { criSpcImageFormat } from "./cri/spc-image.js";
 import { criBipImageFormat } from "./cri/bip-image.js";
+import { criHcaAudioFormat } from "./cri/hca-audio.js";
 import { criXtxImageFormat } from "./cri/xtx-image.js";
 import { cromwellOpkFormat } from "./cromwell/opk.js";
 import { cromwellPakFormat } from "./cromwell/pak.js";
@@ -1815,6 +1816,7 @@ export function createDefaultRegistry(
 		criGxtImageFormat,
 		criXtxImageFormat,
 		criBipImageFormat,
+		criHcaAudioFormat,
 		criSpcImageFormat,
 		azsysCpbImageFormat,
 		azIsaacArchiveFormat,

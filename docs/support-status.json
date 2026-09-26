@@ -22361,6 +22361,34 @@
 				"real-game GARbro differential output",
 				"the places of the picture of the counts of the walk of the engine of a picture of four places of a colour a place and of the counts of the walk of the engine of the count of the walk of the picture of its own (the fixture stands of the places of the picture of the count of the walk of the engine of three places of them and of the counts of the walk of the engine of the count of the walk of the picture itself)"
 			]
+		},
+		{
+			"reference": {
+				"type": "audio",
+				"tag": "HCA",
+				"class": "HcaAudio",
+				"source": "ArcFormats/Cri/AudioHCA.cs"
+			},
+			"localId": "cri-hca-audio",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the word of the head of a sound of the engine, of the high bit of every byte of it cleared, as the reference reads it",
+				"the word of the version and the place of the frames of the sound",
+				"the walk of the counts of the head of it (`fmt`, `comp`, `loop`, `ciph`, `rva`, `ath`), of the counts of the places of every one of them, and the end of the walk at a count the reference does not know",
+				"the counts of the places of the sound: the count of the channels, the places of the sound, the count of the blocks of it and the count of the places of a block of the walk of the engine",
+				"the count of the places of the counts of a block of the walk of the engine (`CompParams.R9`), of the division of C# and of the place the reference adds",
+				"the counts of the places of the channels of the sound (`InitChannels`)",
+				"the places of the frames of a sound of the engine, named of the head of it, and the places of it the walk hands out"
+			],
+			"unsupported": [
+				"the frames of the sound of the engine: the table of the counts of the places of the sound (`AthTable`), the cipher of it (`Cipher`), the walk of the counts of a picture of the engine and the counts of the places of the sound of it",
+				"the key of the sound of the engine, which the reference stands of `HcaAudio.DefaultKey` rather than of the head of a sound"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it"
+			]
 		}
 	]
 }
