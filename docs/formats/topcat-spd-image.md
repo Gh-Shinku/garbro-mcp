@@ -38,8 +38,13 @@ and of `DiffTable`).
 
 ## What this port does not carry
 
-* **A picture of the walk of a JPEG of the places of the file of it** (the walk 0x103). The reference stands
-  of WPF for the places of the file of the JPEG; this port stands of `UNSUPPORTED_FEATURE`.
+* **A picture of the walk of a JPEG of the places of the file of it** (the walk 0x103). The head of this
+  kind of picture is 0x18 bytes long. The 0x3C bytes behind it are the first words of a JPEG with
+  0xA8961EF1 taken off each of the first 0xF of them, the rest of the picture following untouched; the
+  reference puts those words back and hands the whole of the stream to WPF's JPEG decoder. This port puts
+  the same words back and reads the picture with its own reader of the JPEG interchange format, handing
+  out a bitmap in its place, and refuses with `INVALID_ARCHIVE` a stream that is in no format that reader
+  knows, where the reference would let the platform decoder fail.
 * **A picture of the places of a colour of a place of it of no walk of the engine** (of no 24 or 32 places of
   a colour to a place of the picture), and a picture of a walk of the places of the file this project does
   not know: `UNSUPPORTED_FEATURE`, as the reference stands of `NotSupportedException` and of

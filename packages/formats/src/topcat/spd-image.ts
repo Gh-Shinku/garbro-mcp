@@ -10,6 +10,8 @@ import type {
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
 import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 import { changeExtension } from "../shared/companion.js";
 import { copyOverlapped } from "../shared/copy.js";
 import {
@@ -30,6 +32,11 @@ const TYPE_LZ_RLE_2 = 0x100;
 const TYPE_SPDC = 0x101;
 const TYPE_LZ_RLE_ALPHA_2 = 0x102;
 const TYPE_JPEG = 0x103;
+/** Where the stream of a JPEG of this kind of picture stands, and how much of it is written over. */
+const JPEG_HEAD_AT = 0x18;
+const JPEG_HEADER_SIZE = 0x3c;
+const JPEG_HEADER_WORDS = 0x0f;
+const JPEG_HEADER_KEY = 0xa8961ef1;
 const BITS_24 = 24;
 const BITS_32 = 32;
 const MAX_SIDE = 0x8000;
@@ -386,10 +393,29 @@ const DIFF_TABLE: readonly number[] = [
 /** `SpdFormat.Read`: the picture of the walk of the engine, handed over as a bitmap. */
 export function unpackSpdPicture(data: Buffer, layout: SpdLayout): Buffer {
 	if (TYPE_JPEG === layout.method) {
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"the places of a picture of the walk of the engine stand of the walks of the places of a JPEG of their own",
-		);
+		// `SpdFormat.ReadJpeg`: the head of the picture is 0x18 bytes long and the 0x3C bytes behind it are
+		// the first words of a JPEG whose first 0xF words had 0xA8961EF1 taken off them, the rest of the
+		// picture following them untouched. The reference puts those bytes back in front of the rest of the
+		// stream and hands the whole of it to the platform's JPEG decoder; this port reads it with its own
+		// reader of that format.
+		if (data.length < JPEG_HEAD_AT + JPEG_HEADER_SIZE) {
+			throw invalidPicture("The places of the picture stand short of the file");
+		}
+		const picture = Buffer.from(data.subarray(JPEG_HEAD_AT));
+		for (let word = 0; word < JPEG_HEADER_WORDS; word += 1) {
+			const at = word * 4;
+			picture.writeUInt32LE(
+				(picture.readUInt32LE(at) + JPEG_HEADER_KEY) >>> 0,
+				at,
+			);
+		}
+		if (!readJpegHeaderFields(picture)) {
+			throw invalidPicture(
+				"The places of the picture stand of no walks of the places of a picture",
+			);
+		}
+		const image = readJpegImage(picture);
+		return writeBmp32(image.width, image.height, image.pixels);
 	}
 	if (BITS_24 !== layout.bitsPerPixel && BITS_32 !== layout.bitsPerPixel) {
 		throw new GarbroError(

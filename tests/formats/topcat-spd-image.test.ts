@@ -4,6 +4,8 @@ import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { spdImageFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { readSpdLayout } from "../../packages/formats/src/topcat/spd-image.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 
 /**
  * The head of a picture of the engine: the mark of it, then the places of the file of the words of the
@@ -201,5 +203,27 @@ describe("TopCat compressed image", () => {
 				new BufferByteSource(spdFile("SPDX", 2, 2, 24, 1, 12, Buffer.alloc(0))),
 			),
 		).toBe(false);
+	});
+	it("reads the picture of the walks of the places of a JPEG of its own", async () => {
+		// `SpdFormat.ReadJpeg` takes 0xA8961EF1 off the first 0xF words of the JPEG that stands at 0x18 of
+		// this kind of picture and reads the whole of the stream; this port takes the same words back and
+		// reads the picture with its own reader of that format.
+		const jpeg = Buffer.from(GREY_JPEG);
+		const stored = Buffer.concat([Buffer.alloc(4), jpeg]);
+		for (let word = 0; word < 0x0f; word += 1) {
+			const at = 4 + word * 4;
+			stored.writeUInt32LE((stored.readUInt32LE(at) - 0xa8961ef1) >>> 0, at);
+		}
+		const bmp = await bmpOf(
+			spdFile("SPDC", 8, 8, 24, 0x103, jpeg.length, stored),
+		);
+		const image = readBmpImage(bmp);
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([8, 8]);
+		expect([...image.pixels]).toEqual([...GREY_PIXELS]);
+		// A picture of this kind whose places are in no picture format the reader knows stands refused.
+		await expect(
+			bmpOf(spdFile("SPDC", 2, 2, 24, 0x103, 8, Buffer.alloc(4 + 0x40, 0x00))),
+		).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
 	});
 });
