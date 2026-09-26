@@ -22389,6 +22389,42 @@
 				"real-game GARbro differential output",
 				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "GAL",
+				"class": "GalFormat",
+				"source": "ArcFormats/LiveMaker/ImageGAL.cs"
+			},
+			"localId": "livemaker-gal-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the word of the head of a picture of the engine and the letters of the version of it, of the counts of the engine of one hundred to one hundred and seven",
+				"the counts of the head of a picture of the engine of the counts of one hundred and three and above: the width, the height, the counts of the places of a colour, the counts of the frames, the count of the places of the walk of the engine of the places of the picture and the counts of the places of a block of the walk of the engine of it",
+				"the head of the pictures of the counts of the engine of one hundred and two and below, of the counts of the picture of the engine alone",
+				"the counts of the frame of a picture of the engine: the names of the places of the picture of the engine, the counts of the places of the picture and the counts of the places of a colour of it",
+				"the counts of the places of a picture of the engine of the counts of the places of the picture itself: the counts of no places at all, of one place behind no place at all and of the counts of the places of the picture of the engine, of the bounds of every one of them",
+				"the counts of the places of a picture of the engine of no counts of the places of a block of the walk of the engine itself",
+				"the walk of the engine of the counts of the places of the picture of the engine (`TpRandom`), of the counts of no key at all and of the keys of the engine itself",
+				"the places of a picture of the engine of the counts of the walk of the engine of the places of the picture itself: the walk of the counts of the places of the picture of the engine of the counts of the places of the picture and the walk of the engine of the places of the picture of the engine of the counts of the places of the picture of it, of the counts of the places of a picture of the engine of no sign at all",
+				"the places of a picture of the engine of the counts of the places of a picture of the engine of four, eight, sixteen, twenty four and thirty two places of a colour, of the counts of the places of the picture of the engine of the engine itself and of the counts of the places of the picture of it",
+				"the places of a picture of the engine handed out as a bitmap of the project"
+			],
+			"unsupported": [
+				"the places of a picture of the engine of the kind of the engine itself (the reference hands the counts of the places of the picture to `JpegBitmapDecoder` of WPF, which this project has no walk of the engine of the counts of the places of the picture of it for)",
+				"the key of the walk of the counts of the places of the picture of the engine, which the reference stands of the counts of the engine of its own rather than of the head of a picture (a picture of the engine of a key stands of the counts of the places of the picture in the order of the file rather than of the counts of the walk of the engine of them)",
+				"the frames of a picture of the engine behind the first one, which the reference reads and stands of the places of the first frame alone",
+				"the creation of a picture of the engine (the walk of the engine of this project stands of no counts of the places of a picture at all, as the reference's `Write` stands of no counts of them)"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"the heads of the versions of the counts of the engine of one hundred, one hundred and one, and one hundred and three to one hundred and six",
+				"a picture of the engine of counts of the places of the picture that stand of the counts of the places of the picture of the engine of a frame of the engine behind the first one",
+				"a picture of a count of four places of a colour of the walk of the engine and a picture of a count of sixteen places of it, of the counts of the places of the picture of the engine of the engine itself",
+				"a picture of the engine of the counts of the places of the picture of the engine of a key of the walk of the engine itself, which stands of the counts of the engine of the picture of the engine"
+			]
 		}
 	]
 }

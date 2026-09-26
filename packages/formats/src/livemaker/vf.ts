@@ -47,7 +47,7 @@ function indexReadSize(count: number, available: bigint): number {
  * GARbro `TpRandom`: a small linear congruential generator used to scramble the index. Only the low
  * byte is used, but the full value is returned.
  */
-class TpRandom {
+export class TpRandom {
 	readonly #seed: number;
 	#current = 0;
 

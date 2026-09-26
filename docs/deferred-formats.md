@@ -154,21 +154,17 @@ open archives that the shipped defaults already cover.
   stock build reads none of these archives. The payloads are raw deflate streams before that (`NpkStream`),
   which this project already reads, and an entry of a single uncompressed segment is a plain stream.
 
-- `GAL` (`ArcFormats/LiveMaker/ImageGAL.cs`, class `GalFormat`, mark `Gale`): the head of the versions 100
-  to 107 is plain - the version stands in the letters 4 to 6 - and the walk of the places stands on the
-  file alone. What is not in the file is the **key of a shuffled picture**: `QueryKey` asks `KnownKeys`,
-  which the shipped `DefaultScheme` keeps empty, and the reference's own setting, and hands the places of
-  a picture over unshuffled under the key of nothing when neither of them stands (`if (!KnownKeys.Any())
-  return 0;`). A port could read every picture that carries no shuffle bit and list all of them; the
-  shuffled ones would stand of a key of nothing.
-
-## The index is not in the archive
-
-The names, sizes and order of the entries come from a listing that GARbro keeps beside the games rather
-than inside the archive, so a game file alone cannot be walked.- `BIN/IDX` (`ArcFormats/Unity/ArcBIN.cs`) keys each archive with a **key and an initialisation vector of its
-  own**, looked up by the archive's name in `BinPackScheme.KnownKeys` - a dictionary that ships **empty** -
-  and its entries are keyed with the AES of that pair. With no key there is nothing to try, so a stock build
-  reads no archive of this kind.
+- `GAL` (`ArcFormats/LiveMaker/ImageGAL.cs`, class `GalFormat`, mark `Gale`): **ported now**, as
+  `livemaker-gal-image`: the heads of the versions 100 to 107, the counts of the frames and of the places of
+  them, the walk of the counts of the places of the picture of the engine (`TpRandom`) and the places of a
+  picture of the engine of the counts of the places of a picture of the engine. The key of a shuffled picture
+  is not in the file: `QueryKey` asks `KnownKeys`, which the shipped `DefaultScheme` keeps empty, and the
+  reference's own setting, and hands the places of a picture over under the key of nothing when neither of
+  them stands (`if (!KnownKeys.Any()) return 0;`) - which is what the port does, and which for `TpRandom`
+  means the counts of the places of the picture stand in the order of the file. What stands behind it is the
+  kind of the places of a picture of the engine itself, which the reference hands to `JpegBitmapDecoder` of
+  WPF. The archives of the same engine (`GAL/X`, `GAL/X200` and the picture of `GAL/X200`) stand unported,
+  and the next line is their reason.
 - `AIR` (`ArcFormats/AIRNovel/ArcAIR.cs`) reads its plain containers as **ordinary zips**, which this project
   already reads, and its keyed ones through RC4 with a passphrase that `KnownKeys` - an **empty** dictionary
   and a prompt - supplies at run time. A stock build therefore reads only the plain ones, which need nothing
