@@ -134,7 +134,7 @@ open archives that the shipped defaults already cover.
   archives read through a scheme of the source, but every entry of them is unwrapped by the `Decoder` of the
   same engine, whose index, names and entries are all read through it. (The older archive of the same engine,
   `WAR/1.0` of `ArcFormats/ShiinaRio/ArcWARC1.0.cs`, is ported as `shiina-rio-warc`.)
-- `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): the key of the archive is looked up in `KnownKeys`, held as
+- `TCD` / `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): the key of the archive is looked up in `KnownKeys`, held as
   `new Dictionary<string, int>()` in the source and filled from a data file, and every entry of the archive is
   unwrapped with it.
 - `SERAPH/ARCH` (`ArcFormats/Seraphim/ArcSeraph.cs`): the archive stands at a place within a file that is named
@@ -165,6 +165,10 @@ open archives that the shipped defaults already cover.
   kind of the places of a picture of the engine itself, which the reference hands to `JpegBitmapDecoder` of
   WPF. The archives of the same engine (`GAL/X`, `GAL/X200`) and the picture of `GAL/X200` stand unported,
   and their reason stands beside their own entries below.
+- `BIN/IDX` (`ArcFormats/Unity/ArcBIN.cs`) keys each archive with a **key and an initialisation vector of its
+  own**, looked up by the archive's name in `BinPackScheme.KnownKeys` - a dictionary that ships **empty** -
+  and its entries are keyed with the AES of that pair. With no key there is nothing to try, so a stock build
+  reads no archive of this kind.
 - `AIR` (`ArcFormats/AIRNovel/ArcAIR.cs`) reads its plain containers as **ordinary zips**, which this project
   already reads, and its keyed ones through RC4 with a passphrase that `KnownKeys` - an **empty** dictionary
   and a prompt - supplies at run time. A stock build therefore reads only the plain ones, which need nothing
