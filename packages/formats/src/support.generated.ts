@@ -14671,6 +14671,35 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "NSA",
+				class: "NsaOpener",
+				source: "ArcFormats/NScripter/ArcNSA.cs",
+			},
+			localId: "nscripter-nsa-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the count of the places of the files of the engine and the place of the tables of them, of the words of the file of the engine read from its high places down, of the extensions `nsa`",
+				"the walk of the index of the engine, which begins two places of the file behind where the first word of the file stands of nought: a name of the places of the engine of a place of no name behind it, the kind of the walk of the file, the places of the file, the count of them and the count of the places they stand of where they are packed",
+				"the kinds of the walk of a file of the engine: `0` stands of the places of the file as they stand, `1` of the walk of a picture of the engine, `2` of the walk of the places of the file of the engine and `4` of bzip2",
+				"the walk of a picture of the engine (`spb`): the count of the places of the picture of two places of the file at the head, then three walks, one for every place of a colour of the picture, of a count of three places of the file and of counts of eight and of four places, which the picture of the engine stands of as a bitmap of twenty four places of a colour of the engine's own",
+				"the walk of the places of the file of the engine (`Unpacker.DecodeLZSS`, of the counts `EI` of eight and `EJ` of four places of the file): a place of the file of one place of the stream or a place of the frame of the walk and a count of the places behind it",
+				"a file whose places stand of the mark of a sound of the engine, which stands of an archive of one file of the name `mp3`",
+			],
+			unsupported: [
+				"archive creation",
+				"the walk of bzip2 of a file of the kind `4` or of the name `nbz`, which this project carries no walk of at all",
+				"the places of a file of the engine packed with a password (`EncryptedViewStream`), which the reference reads out of the settings of the user alone",
+				"the kinds of the names of the files of the engine other than a sound of the name `nbz`",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an archive of a real game of the engine",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SAR",
 				class: "SarOpener",
 				source: "ArcFormats/NScripter/ArcSAR.cs",

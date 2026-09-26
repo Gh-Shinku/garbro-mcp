@@ -672,6 +672,7 @@ import { nitroplusPakFormat } from "./nitroplus/pak.js";
 import { igaFormat } from "./noesis/iga.js";
 import { nononoNpfFormat } from "./nonono/npf.js";
 import { ns2ArchiveFormat } from "./nscripter/ns2-archive.js";
+import { nsaFormat } from "./nscripter/nsa-archive.js";
 import { nscripterSarFormat } from "./nscripter/sar.js";
 import { nsOpenerFormat } from "./nscripter/script.js";
 import { nsystemMgdImageFormat } from "./nsystem/mgd-image.js";
@@ -1754,6 +1755,7 @@ export function createDefaultRegistry(
 			koeiYkFormat,
 			digitalWorksBinPacFormat,
 			ns2ArchiveFormat,
+			nsaFormat,
 			alicesoftAjpImageFormat,
 			g2PgxImageFormat,
 			ismIsgImageFormat,
