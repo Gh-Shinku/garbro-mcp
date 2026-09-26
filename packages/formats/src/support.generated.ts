@@ -5058,6 +5058,31 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DZI",
+				class: "DziFormat",
+				source: "ArcFormats/Malie/ImageDZI.cs",
+			},
+			localId: "malie-dzi-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word `DZI` at the head of a descriptor, of the extension of the file it stands in",
+				"the walk of the lines of the descriptor: the counts of the picture, the count of the levels, the counts of a level and the names of the tiles of it",
+				"the places of the tiles of a line, of 256 places a name, of a place of no name as well",
+				"the tiles of the first level of the descriptor standing in the places of the picture, of a tile of a bitmap and of a portable network graphic",
+				"a tile of a picture of three places a colour standing of an alpha of the picture behind it",
+				"the picture of the walk cropped to the places the tiles reach, of the counts of the head in the metadata of the file",
+			],
+			unsupported: [
+				"picture creation",
+				"a tile of a kind this project reads no walk of (a `jpg` and its like), which the reference reads through a library of its own",
+				"the levels of the tiles behind the first, which the reference parses into the metadata alone",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MGF",
 				class: "MgfFormat",
 				source: "ArcFormats/Malie/ImageMGF.cs",

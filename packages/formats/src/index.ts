@@ -565,6 +565,7 @@ import { majiroRc8ImageFormat } from "./majiro/rc8-image.js";
 import { rctImageFormat } from "./majiro/rct-image.js";
 import { malieLibFormat } from "./malie/lib.js";
 import { malieLibuFormat } from "./malie/libu.js";
+import { dziImageFormat } from "./malie/dzi-image.js";
 import { mgfImageFormat } from "./malie/mgf-image.js";
 import { mgpk0Format } from "./manga-gamer/mgpk0.js";
 import { animFormat } from "./marble/anim.js";
@@ -2274,6 +2275,7 @@ export function createDefaultRegistry(
 		surImageFormat,
 		btnImageFormat,
 		plantechPacImageFormat,
+		dziImageFormat,
 		mgfImageFormat,
 		hotImageFormat,
 		pgaImageFormat,
