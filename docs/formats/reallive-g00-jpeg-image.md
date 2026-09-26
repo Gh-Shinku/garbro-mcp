@@ -55,9 +55,12 @@ forever, so here it simply ends the search.
 
 ## Output
 
-The decrypted bytes are a JPEG, and there is no JPEG decoder here, so they are **carried over** as they are —
-the same approach the Gaia, MGF and Ice IBM formats take — and the entry is named `.jpg`. Five bytes are dropped,
-so `sizeKnown` is false. `Write` throws `NotImplementedException` in the reference.
+The decrypted bytes are a JPEG, and they are read with the reader of this project,
+`packages/formats/src/shared/jpeg-image.ts` (the baseline sequential profile of ITU-T T.81), so the entry is a
+bitmap of the places that reader returns. The reference reads the same stream through `Jpeg.Read`, the platform
+decoder of the Windows imaging stack. The entry is named `image.bmp`, five bytes are dropped, so `sizeKnown` is
+false, and the tests pin a grey stream exactly against the decode of the Python imaging library. `Write` throws
+`NotImplementedException` in the reference.
 
 ## Process notes
 

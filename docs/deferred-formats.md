@@ -221,8 +221,9 @@ further than the reference's own list of them.
   baseline sequential profile of a JPEG (`packages/formats/src/shared/jpeg-image.ts`) that the reference
   itself does not carry: it hands the JPEG of that picture to the platform decoder of the Windows imaging
   stack. `gameres-jpeg-image` **now decodes** its payload with that reader as well, as the reference does
-  through the platform decoder. `gaia-hidden-jpeg-image` and `reallive-g00-jpeg-image` still hand the stream
-  over as it stands and could now decode it too.
+  through the platform decoder. `gaia-hidden-jpeg-image` and `reallive-g00-jpeg-image` **also decode** their payload with that reader
+  now. `gameres-jpeg-image` and those two are the JPEG-carrying rows of the tree; every other row that hands
+  a JPEG over is an archive of its own whose entries keep their own formats.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library: the reference carries no
   walk of a cabinet of its own at all - it stands of `Microsoft.Deployment.Compression.Cab`, the managed
   cabinet reader of the WiX deployment tools, which does not stand in the tree - so there is no algorithm of

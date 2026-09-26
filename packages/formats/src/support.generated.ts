@@ -16281,11 +16281,18 @@ export const formatSupportCatalog = {
 				"extraction",
 				"xor pad decryption",
 				"jpeg header parsing",
-				"bitmap pass through",
+				"the picture decoded into a bitmap through `packages/formats/src/shared/jpeg-image.ts`",
 				"metadata",
 			],
-			unsupported: ["jpeg decoding", "image encoding"],
-			remainingVerification: ["real-game GARbro differential output"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the platform decoder of the reference against this reader at the edge of a colour change",
+			],
 		},
 		{
 			reference: {
