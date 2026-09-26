@@ -299,6 +299,17 @@ further than the reference's own list of them.
   reader was withdrawn rather than landed unverified. A second pass wants a **real** container to step
   through, or a mirror writer for the trie built alongside the reader, since the walk's own condition
   (`i >= nm1.Count || nm2[i] != prev`) is subtle enough that a synthetic fixture alone did not pin it.
+  **That second pass has begun**: the head, the two tables of the objects, the walk of a name (`GetOffset`),
+  the whole map of the names (`ReadNames`) and the search of a key within a dictionary (`GetKey`) **stand
+  ported now**, as `packages/formats/src/emote/psb-reader.ts`, and they stand pinned by a **mirror writer**
+  built in the test (`tests/formats/emote-psb-reader.test.ts`) exactly as this entry asked for: the fixture
+  stands of a table whose every place names the place of the walk behind it and of a table that names the
+  place behind every place of the first, of one name, of the object that name stands of and of a dictionary
+  of one key, and the walk of the name, the map of the names and the search of the key all stand of the
+  object the fixture named. What stands of the stages behind it: the cipher of the head (`GetHeader` of a
+  file whose flag of one stands), the strings, the lists and the dictionaries themselves, the chunks, and
+  the pictures of the archive; so the row `PSB/EMOTE` does not stand opened yet, and this file records the
+  stage rather than the port.
 - `DREF` (`ArcFormats/Emote/ImageDREF.cs`) is not a picture at all: it is a little endian text file of
   `psb://<archive>/<entry>` lines, and the reference composes it by opening each named archive with the
   `PSB/EMOTE` opener, finding the entry by name, and drawing the layers one over another with WPF. It

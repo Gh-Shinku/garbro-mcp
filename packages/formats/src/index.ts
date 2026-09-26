@@ -1157,6 +1157,7 @@ export * from "./eagls/index.js";
 export * from "./ebg-system/index.js";
 export * from "./ebisu/index.js";
 export * from "./electriciteit/index.js";
+export * from "./emote/index.js";
 export * from "./elf/index.js";
 export * from "./ellefin/index.js";
 export * from "./emic/index.js";
