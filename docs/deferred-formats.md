@@ -314,8 +314,8 @@ further than the reference's own list of them.
   (`ArcFormats/ArcCommon.cs`, `DataFileFormat`) stand on `GenericScriptFormat` as well and carry no walk
   of the file of their own: the classes stand of the walk of the engine of the scripts of the reference,
   of the marks `SCW `, `Scw5` and `Scw4` of the first of them and of no mark of the second of them (of
-  the description "Unidentified data file" of it). The archives of the GsPack engine stand in this project
-  as `gspack`; the scripts of it stand of no walk of them here.
+  of the description "Unidentified data file" of it). The archives of the GsPack engine stand in this
+  project as `gs-pack`, `gs-data` and `gs-pack-pic-image`; **the scripts of it stand ported now as well**, as `gs-pack-scw-script`, which stands of the three marks of a script and hands the places of the file over as they stand, exactly as `GenericScriptFormat.ConvertFrom` does - see `docs/formats/gs-pack-scw-script.md`.
 
 - `AMP/LEAF` (`ArcFormats/Leaf/ArcPAK.cs`, class `AmpFormat`) stands on `GenericScriptFormat` as well and
   carries no walk of a file at all: the class holds a tag, a description, a mark of nothing and, beside it,
