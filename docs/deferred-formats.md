@@ -217,14 +217,11 @@ open archives that the shipped defaults already cover.
 The archive side is walkable, but every entry is a picture or a sound in a format the project reads no
 further than the reference's own list of them.
 
-- `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`, 114 lines) stands of a head of `ARGBSaveData1` and the kind 3 in
-  it, the count of a **JPEG** at the seventeenth place of the head and the count of a **PNG** mask behind
-  it, which it joins into a picture of the places of the JPEG and the grey places of the mask. The walk of
-  the places of a PNG stands in hand (`shared/png-image.ts`), so what stands of this row is the walk of the
-  places of a **JPEG**: the project holds the head fields of one (`shared/jpeg.ts`) and no decoder, and
-  `gameres-jpeg-image` hands a graphic of that kind over as it stands rather than reading its places. The
-  port of `BIP` (`ArcFormats/Cri/ImageBIP.cs`) is `cri-bip-image`, and `qlie-dpng-image` is the port of the
-  tiled picture of the same engine.
+- `ARGB` (`ArcFormats/Qlie/ImageARGB.cs`) **is ported** as `qlie-argb-image`, together with a reader of the
+  baseline sequential profile of a JPEG (`packages/formats/src/shared/jpeg-image.ts`) that the reference
+  itself does not carry: it hands the JPEG of that picture to the platform decoder of the Windows imaging
+  stack. The other rows whose payload is a JPEG (`gameres-jpeg-image`, `gaia-hidden-jpeg-image`,
+  `reallive-g00-jpeg-image`) still hand the stream over as it stands and could now decode it.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library: the reference carries no
   walk of a cabinet of its own at all - it stands of `Microsoft.Deployment.Compression.Cab`, the managed
   cabinet reader of the WiX deployment tools, which does not stand in the tree - so there is no algorithm of

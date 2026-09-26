@@ -1,0 +1,60 @@
+// Recorded JPEG fixtures: streams written by the Python imaging library (Pillow 11.1.0) at the samplings
+// named below, together with the places that library decodes each of them to. Pillow decodes through
+// libjpeg. The tests of `packages/formats/src/shared/jpeg-image.ts` use those places as an oracle wherever
+// the two readers widen a component the same way, and as a coarse one where libjpeg folds the widening of
+// the chroma into its colour conversion.
+import { Buffer } from "node:buffer";
+
+/** Eight places square, one grey component. */
+export const GREY_JPEG = Buffer.from(
+	"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAALCAAIAAgBAREA/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/9oACAEBAAA/ACv/2Q==",
+	"base64",
+);
+
+/** The places of the grey picture, four a pixel, blue first. */
+export const GREY_PIXELS = Buffer.from(
+	"gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/4CAgP+AgID/gICA/w==",
+	"base64",
+);
+
+/** Sixteen places square, three components of one sample each. */
+export const COLOUR_JPEG = Buffer.from(
+	"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAQABADAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDybw/4TV0DOgCjqcV0YDD0sRSdeu7RW7/r8Fu3ohZbmzTSTO80jwrHhdtuM9gwyT+AqMQsKl+7oq71XNrJqz+zHbVWTcrd7X0/SspzWWl5HaaF4b/cwjy+cbsEdT0H9a8XD49LC0ae7tzWdrOT92PVPT3m0umuttP5wyvMvevc7rR/DW4EkZBweR/n8q4a2NVZTnKpdOz1S7Xu77t7xi7RUUpSSS1/TMpzO1j/2Q==",
+	"base64",
+);
+
+/** The places of the colour picture, four a pixel, blue first. */
+export const COLOUR_PIXELS = Buffer.from(
+	"DAAB/wwAEP8AACP/AAI1/wIARP8QAFT/AwBn/wsAc/8LAIr/EwCZ/wADrv8ABL3/AAHL/wAE2v8AAOr/BwD4/xAOA/8AExP/FBEn/xwROf8RFUb/IRNV/yYQaP8cEnb/QRKM/0MTm/9FEq//cQi9/1gLyv9hC9v/YhDz/2oT//8AIwD/FCIQ/w8nJf9GITX/SSNB/ycqUP9OJWP/ViRy/2gfe/9hJo//dimp/7Mgvv+nI83/xh3e/9Id9P/CIf//ADUA/xgwDv9CLyL/QDMx/zw4Pf9xMkz/oC5k/4s1df/HN4r/qTuZ/9wwrv/dLb3//yDJ/yJF1f9HNuX/MTbx/wZCBf8ORhP/R0Al/z1JM/96Q0D/qUBT/4lNbP/2PH7/7D6S//8xmv8YV6j/KE+3/1pIyf9PTN3/akTw/4U8/v8VUwf/H1UU/yNaI/9wUzT/qVFD/59aV/+5V2//11B+/yNXf/8YWo//V1Kn/4pQwP/HTtX/nVjp//8++f8bZf//BmkD/yRlD/9KZiH/oGI0/4lwRv+3aVj//1Rq/zh0dP9Oa4b/jGSb/99btf+vZ8f/ymDR/yx32/9XZef/bFzw/xR3A/8ceA//V3Yh/454Nv/4b0n/3HJa/zyEZv9OdG7/gnmN/6tznP/gaK//MIS4/0F8wf+IdNX/yXXz/8yB//8Qhwb/PY0S/2aHGP+5gi3/74tR/x+JRv9Ki2T/eYl4/+WCjP/Ph53/UJWo/3+Htv+QjM3/wYTf/yiV6/82jPb/F5MD/0KdEv9gnR3/pZw0//+NSf8coUv/j5ht/6uXfv/NlpP/P6CS/3COof+5kcH/5JTb/0ug3v9vkev/5on//wCuAP9GsBD/dbAf/9ypNf8XvTr/WqtO/+Cebf/gnnv/SbGI/3epl/+cmqb/ALq4/1S10f+AruT/wpry/xy8//8AvwD/crgR/6+4Iv/hujr/IMAy/4u6VP+rt2v/Ksdw/3y3hf+7tZ7/ANGr/zy7sv+kssn/0bPk/0PJ8/98tPv/AMwB/1jKEv+kzCf//788/0/IOP/IxmD/x8Fu/z7Pbf+W05H/3ryY/1fPpv+wyL7//8DU/0ra2/+Px+r/3cP//wDeAP9d1A3/wtUo/yPwNf9H3z//nOBj/yzubP+C1nD/vtOI/1XrmP+I3an/1c66/1Tyzv++3N3/783s/0rv/v8A7gD/WugL/8/pK/9E8Sv/ae9B///XWv9b8mb/weh1/xj0fP97953/zuaw/z/ys/+U7Mj/+ejl/2r+8v+/3/b/Ev8B/2b+Ef/H/zL/Mf8n/4z7Rf8a/1X/dPpi/8P/e/8t/4r/2emb/xv/rP+F/sH/3vbU/0X/3v+/7uz/Of///w==",
+	"base64",
+);
+
+/** Sixteen places square, the chroma sampled twice as coarsely across. */
+export const WIDE_JPEG = Buffer.from(
+	"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAQABADASEAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDybw/4TV0DOgCjqcV3mkeFY8LttxnsGGSfwFbeyw8cPGc4qUpK+uyX5tt6JLfXVW1+k4VzZ3VmdpoXhv8Acwjy+cbsEdT0H9a7rR/DW4EkZBweR/n8q+dr45SpQhzWVl0X8tn929t3Fvvp+d8KZnqtT//Z",
+	"base64",
+);
+
+/** The places of the wide picture, four a pixel, blue first. */
+export const WIDE_PIXELS = Buffer.from(
+	"AAAL/wAAEv8AAB7/AAEu/wYBP/8HAVD/AANi/wACcv8AAoH/AAKV/wADqf8AAbz/AADN/wAA3f8AAen/AAXx/wAODP8AERb/AxYj/w4WM/8cFEP/JhJT/ysRZf8xD3T/PhOM/08Pnv9qC7D/bwbB/2AHz/9aCeH/XxD0/2MW//8PGwf/FyAT/yQlI/8vJjP/NCZC/zolUv9AJ2X/USN1/2obgv+FGpj/nR6v/6Mgxf+YItX/oyDl/8Ag9v/SIf//AC4E/w4xD/8pNR//OzUw/0E2QP9dM1L/kC9n/6Uuef+nOZL/rjai/8Mys/+/MMP/nzDO/3wx2f9RNuD/Pznm/wBCCf8SRRP/OUQj/1xDM/94QUT/kkJZ/6BHb//FQ4L//jqU/9U6nf9VS6j/IVG3/z5Oyf9cS9z/dUbo/4NE7v8DVQj/JlQS/2NPIP+QTTT/pVBI/7tSXf/QUXD/q1h//ztVev8gWYz/SVih/3xVu/+3UtP/xFLl/6BX7/+MWPL/FmYD/y1lDP9ZZhz/gGgy/5lrSf+ma1v/oGdo/4hlc/9iaYL/dGqY/7dlsP/TYcX/xWDT/59g3P9nY+T/Smfo/wd6Af8ieQv/V3gd/5J4Nf/Idkz/wHdb/3V7ZP9ZdGv/gnuI/5J4nP+QeK7/fnO7/1x0yP9ld9z/lH71/7OH//8DigT/Ko8V/16FH/+CiDb/k5pX/3J5Rv9/gmL/koV3/7WIkf+ijKT/WZKs/1aMu/+ehtT/qIbl/2iJ6v9LjO7/KpAD/1eXFv+ZjyP/t5U7/6KeT/+Pikv/s5Nq/7uVff+um5P/mI2V/5CHof+ZlsP/lKLc/4SV3v+Fj+f/mJ79/xujAP9ErxP/ea0k/4i1PP9Trz7/W6xN/6Csav+iq3n/Zq6E/1Kxlv9Vq6H/Wqm0/2Kyz/9mtOL/YrHq/2i19P8RtwD/RMAT/5G7Jv+zwT7/fqw0/3i+U/9sxWj/abtw/4a2gv+DwZ3/RMan/0q5sf+nsMv/urfk/3bB7f9Qw+7/I8UC/1rIFP+7xir/zsk+/3y/OP962Fz/gtFq/4zAbf+6zJH/scOa/47Ep/+JzcL/ldPb/57G4v+4vuv/0sj9/y/PAP9C2BD/Yecp/3XhNf+H1D3/keVd/2XlaP9g3XD/ldqJ/6XZnf+U2az/f9y//2vp1v975eb/s9bw/9bV/P8g5gD/Ou0O/2r8K/975yn/o+U//6fsVf977mH/Z/h3/0fsef9r+p3/mfGv/6Dftf+i58z/pPbp/5H29P9/7vD/MfsE/0//FP+L/zL/dfQm/2H/Qf9o/0//kfZe/6z/ff+G+oH/b/+V/1D/p/9e/77/lv/U/5z83v+B/Oj/fP/1/w==",
+	"base64",
+);
+
+/** Sixteen places square, the chroma sampled twice as coarsely both ways. */
+export const TALL_JPEG = Buffer.from(
+	"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDybw/4TV0DOgCjqcV3mkeFY8LttxnsGGSfwFdpoXhv9zCPL5xuwR1PQf1rutH8NbgSRkHB5H+fyrknmVGFGKUU215a6X69Omm270K4V4nd17x//9k=",
+	"base64",
+);
+
+/** The places of the tall picture, four a pixel, blue first. */
+export const TALL_PIXELS = Buffer.from(
+	"AAUG/wAEC/8DABn/EgAn/xICOP8OA0n/CgVa/wkDaP8UAHn/IACK/y8An/82ALH/NgDC/yoA0f8SAd7/Bwbm/wARC/8AEhT/FBMj/yITMv8lE0L/JhNS/yYTYv8qEnH/OhWJ/0YSm/9TEK3/Vg29/1QLzf9MDt7/Pxjw/zog/P8NGgr/FiAU/yIkJP8vJTX/OyNF/0UhVf9PImf/WiB4/2Uahv91HJv/hiGz/4wjyP+II9n/gSXq/30q+/99L///GigG/yEtD/8tMyL/PTQx/1UxQv9mMFX/dzNq/4A0fP+OO5f/kDqm/5c3uf+XNcn/kS/V/4wr3/+IJ+n/hibu/xs+Bf8nQw7/O0Yg/1ZFMP96QUL/kkNY/6BHbv+eTIH/i1CU/3tLnf9zRKr/c0C5/39AzP+KQN7/j0Dr/5FA8f8aUwT/KVUO/0VWHf9pVjD/kVVF/6hXWv+nW23/m1x8/3RKef9tS4v/c0+h/3xWuv+GXNP/j13l/5ZZ7/+YVfL/FGUE/yhmDP9OZx3/d2k0/51qSv+ma1z/jGto/39nc/+DZIH/kmWW/6dpr/+la8P/jGzR/4Fm2/+KXuH/j1vl/xZ2BP8rdg7/WXYg/4B7Nv+af03/mX5c/394ZP9zb2r/jHqH/5t4mv+pdav/oW64/4hsxf+Dc9j/kYHx/56O//8ehQb/PIsW/2SDIP+BiDf/jptX/256Rv99gmL/h4d3/5SPkP+WkKH/j4ir/5CBuv+khtL/monk/3CI6P9diuz/JZAE/0aaFv90lSb/iZ08/3ulUP9qkU3/j5lq/5mbff+UoZP/eJSU/2SRn/99ncD/q57c/5eS3f9fl+b/Va36/y+dA/9SqRn/gKkq/5GyQP9oqUP/baZR/6Crbf+mqXz/iaWH/2usl/9ErKX/Tqq3/5Co0v+WquP/X7Dt/0q69v82rQT/WbkY/4W8K/+UxEL/Y685/3S9V/+aumv/mbBy/460hP99wp3/VMKq/1C3sv+Ct8z/k77l/3HC7/9ewPD/OMAC/1TKE/+D0Cv/ktU+/2/BOP+B1lz/htFp/4XCbP+m0Y7/oMiY/4nFpv+Jzr//kNXY/4zM3v+Ux+f/pNP5/yzRAP9I2A3/feIp/4zdNP9+1jz/iudc/4HgZ/+A12//l9uG/5zdmP+S26n/j9u7/5Xi1P+b4OP/qNrs/7Xe9/8Z5wD/OuwP/3v3L/+G4yz/jOhB/5LwVv+O6mP/jPB4/2nmef9u+p3/afqv/23ps/+b6M3/tPPp/6Xz8v+U6+//GfwL/z3/G/+F/zr/iOwu/5b4SP+Y9Vb/mvFl/5f/hP9o/Yf/VP+Z/07/rP9t/8L/r/za/7jz5P+a9ez/k//5/w==",
+	"base64",
+);
+
+/** A progressive stream, which the reader of this project does not follow. */
+export const PROGRESSIVE_JPEG = Buffer.from(
+	"/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wgARCAAQABADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAABQb/xAAVAQEBAAAAAAAAAAAAAAAAAAABA//aAAwDAQACEAMQAAABknmnYv8A/8QAGBAAAwEBAAAAAAAAAAAAAAAAAAMEASH/2gAIAQEAAQUCnkFS4Im4mY//xAAWEQEBAQAAAAAAAAAAAAAAAAAFAGH/2gAIAQMBAT8BKT2//8QAGBEAAgMAAAAAAAAAAAAAAAAAAQIABCH/2gAIAQIBAT8BNlAgyf/EABgQAAIDAAAAAAAAAAAAAAAAAAABECEy/9oACAEBAAY/AjIqj//EABkQAAMBAQEAAAAAAAAAAAAAAAABESGRof/aAAgBAQABPyFDVawzTo9MUP/aAAwDAQACAAMAAAAQ+//EABYRAQEBAAAAAAAAAAAAAAAAAAEAEf/aAAgBAwEBPxBdJ//EABoRAQACAwEAAAAAAAAAAAAAAAEhQQARMWH/2gAIAQIBAT8QJAKnkxu6qOdYz//EAB0QAQACAgIDAAAAAAAAAAAAAAEAESExQYGRwfD/2gAIAQEAAT8QBjBtqVKF8AteiYjasE26PcpKljTk+8T/2Q==",
+	"base64",
+);
