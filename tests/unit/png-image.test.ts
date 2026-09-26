@@ -18,6 +18,8 @@ function chunk(type: string, body: Buffer): Buffer {
 	return Buffer.concat([length, tag, body, word]);
 }
 
+import { interlacedRows } from "../helpers/png.js";
+
 interface Parts {
 	width: number;
 	height: number;
@@ -38,7 +40,21 @@ function pngFile(parts: Parts): Buffer {
 	head[12] = parts.interlace ?? 0;
 	const body: Buffer[] = [SIGNATURE, chunk("IHDR", head)];
 	if (parts.palette) body.push(chunk("PLTE", parts.palette));
-	body.push(chunk("IDAT", deflateSync(Buffer.concat(parts.rows))));
+	// A picture the test asks to be interlaced holds the seven walks of Adam7, and the rows of it stand
+	// without the place of the filter their own walk puts in front of them.
+	const walks =
+		1 === (parts.interlace ?? 0)
+			? Buffer.concat(
+					interlacedRows({
+						width: parts.width,
+						height: parts.height,
+						colourType: parts.colour,
+						depth: parts.depth,
+						rows: parts.rows.map((line) => [...line.subarray(1)]),
+					}),
+				)
+			: Buffer.concat(parts.rows);
+	body.push(chunk("IDAT", deflateSync(walks)));
 	body.push(chunk("IEND", Buffer.alloc(0)));
 	return Buffer.concat(body);
 }

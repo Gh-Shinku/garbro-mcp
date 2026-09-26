@@ -10,7 +10,10 @@ import {
 } from "../../packages/formats/src/shared/png.js";
 import { readPngOffsets } from "../../packages/formats/src/gameres/png-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
-import { pngFile as interlacedPngFile } from "../helpers/png.js";
+import {
+	interlacedRows,
+	pngFile as interlacedPngFile,
+} from "../helpers/png.js";
 
 /** A chunk of a portable network graphic, of the count of its places and the words of it. */
 function chunk(kind: string, body: Buffer): Buffer {
@@ -48,7 +51,21 @@ function pngFile(input: {
 		parts.push(chunk("oFFs", offsets));
 	}
 	if (input.palette) parts.push(chunk("PLTE", input.palette));
-	parts.push(chunk("IDAT", deflateSync(Buffer.concat(input.rows))));
+	// A picture the test asks to be interlaced holds the seven walks of Adam7, and the rows of it stand
+	// without the place of the filter their own walk puts in front of them.
+	const body =
+		1 === (input.interlace ?? 0)
+			? Buffer.concat(
+					interlacedRows({
+						width: input.width,
+						height: input.height,
+						colourType: input.colourType ?? 2,
+						depth: input.depth ?? 8,
+						rows: input.rows.map((row) => [...row.subarray(1)]),
+					}),
+				)
+			: Buffer.concat(input.rows);
+	parts.push(chunk("IDAT", deflateSync(body)));
 	parts.push(chunk("IEND", Buffer.alloc(0)));
 	return Buffer.concat(parts);
 }
