@@ -22047,5 +22047,36 @@ export const formatSupportCatalog = {
 				"a picture of a schema whose count of places is longer than the picture",
 			],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "RIP",
+				class: "RipFormat",
+				source: "ArcFormats/rUGP/ImageRIP.cs",
+			},
+			localId: "rugp-rip-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the mark of an object of the engine at the head of a file, of the extensions `rip` and `sia`",
+				"the classes `CRip` and `CRip007` behind that mark, and the refusal of every other class",
+				"the head of the class `CRip`: the places of the picture, the counts of them, the flags of the walk of it, and the count of the run",
+				"the head of the class `CRip007`: the counts of the picture of it",
+				"the walk of a run of places of a grey (`flags & 0xFF` of 1), of one place a picture",
+				"the walk of the bits of the kind 1 and of the kind 3 (`flags & 0xFF` of 2), of the places of a colour of the engine (`ReadLong`, `ReadShort`)",
+				"the walk of a picture of a colour and a place of an alpha (`flags & 0xFF` of 3), of the places of the run of the alpha (`ReadABits`)",
+				"the picture of the walk of the project, of the palette of a grey and the places of a colour of the engine",
+			],
+			unsupported: [
+				"picture creation",
+				"the run of the bits of the kind 2 of the class `CRip` (`UncompressRgb2`)",
+				"the walks of the class `CRip007` (`UncompressRgb` and the alpha walk behind `CompressInfo`)",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of the walk of a colour and a place of an alpha (`flags & 0xFF` of 3)",
+				"a picture of the kind 3 of the bits of the class `CRip` (`UncompressRgb3`)",
+			],
+		},
 	],
 } as const;

@@ -767,6 +767,7 @@ import { radFormat } from "./rsystem/rad.js";
 import { rsystemRsgImageFormat } from "./rsystem/rsg-image.js";
 import { rugpRhaAudioFormat } from "./rugp/rha-audio.js";
 import { rioFormat } from "./rugp/rio-archive.js";
+import { ripFormat } from "./rugp/rip-image.js";
 import { s5iFormat } from "./rugp/s5i-image.js";
 import { ykFormat } from "./rune/yk.js";
 import {
@@ -2436,6 +2437,7 @@ export function createDefaultRegistry(
 		rugpRhaAudioFormat,
 		rioFormat,
 		s5iFormat,
+		ripFormat,
 		studioJikkenshitsuGrdImageFormat,
 		studioJikkenshitsuSpeedImageFormat,
 		studioJikkenshitsuGrcImageFormat,

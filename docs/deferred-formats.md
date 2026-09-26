@@ -265,13 +265,6 @@ further than the reference's own list of them.
 
 ## The picture lives inside an archive this project does not read
 
-- `RIP` (`ArcFormats/rUGP/ImageRIP.cs`, class `RipFormat`, extensions `rip` and `sia`) is the picture of the
-  same engine and stands in the same place as `S5I`: its own signature is nothing, because `ReadMetaData`
-  first asks whether the file carries `CRioArchive.ObjectSignature` and then builds a `CRioArchive` to read
-  a `CRip` or `CRip007` object out of it. With the core of that walk ported (see `S5I` above) the object it
-  reads stands behind the same remainder: with the core, the graph, the archive opener and the picture of the
-  class `CS5i` ported — the rows `rugp-rio-archive` and `rugp-s5i-image` of the support records — what
-  remains of it is the walk of the two pictures of the other class of the engine (`CRip` and `CRip007`).
 - `PSB/EMOTE` (`ArcFormats/Emote/ArcPSB.cs`, 878 lines, tag `PSB/EMOTE`) is **portable in principle** - the
   reference ships a real key (`KnownKeys = new uint[] { 970396437u }`) and falls back on a plain parse, so a
   stock build does open these containers - but a first port of it stands withdrawn. The container is a
