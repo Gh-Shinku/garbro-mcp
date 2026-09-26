@@ -6,15 +6,23 @@
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
-import { emotePsbFormat } from "@garbro-mcp/formats";
+import { emoteDrefFormat, emotePsbFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
+import {
+	blendDrefLayer,
+	readDrefLayers,
+} from "../../packages/formats/src/emote/dref-image.js";
 import {
 	PsbCipher,
 	PsbReader,
 	readPsbHeader,
 } from "../../packages/formats/src/emote/psb-reader.js";
 import { decodePsbTexture } from "../../packages/formats/src/emote/psb-texture.js";
-import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import {
+	readBmpImage,
+	writeBmp32,
+} from "../../packages/formats/src/shared/bmp.js";
+import { withCompanionFiles } from "../helpers/companion.js";
 
 /** The places of the file of the tables of the fixture. */
 const NAMES = 0x28;
@@ -49,7 +57,7 @@ function psbFile(input: {
 	cipher?: number;
 	chunk?: { offset: number; length: number };
 }): Buffer {
-	const file = Buffer.alloc(CHUNK_DATA + 0x80, 0x00);
+	const file = Buffer.alloc(CHUNK_DATA + 0x100, 0x00);
 	file.write("PSB\0", 0, "latin1");
 	file.writeUInt16LE(3, 4);
 	file.writeUInt16LE(
@@ -310,6 +318,121 @@ describe("Emote PSB picture of the engine", () => {
 		if (!places) throw new Error("no picture");
 		const picture = readBmpImage(places);
 		expect([picture?.width, picture?.height]).toEqual([4, 4]);
+	});
+});
+
+describe("Emote compound picture of the places of its layers", () => {
+	/** A picture of the engine of two places by two, of one colour of the places of the file. */
+	function pictureOf(colour: [number, number, number, number]): Buffer {
+		const pixels = Buffer.alloc(2 * 2 * 4, 0x00);
+		for (let at = 0; at < pixels.length; at += 4) {
+			pixels[at] = colour[0];
+			pixels[at + 1] = colour[1];
+			pixels[at + 2] = colour[2];
+			pixels[at + 3] = colour[3];
+		}
+		return writeBmp32(2, 2, pixels);
+	}
+
+	/** An archive of the engine of one object, whose places stand of the bitmap given. */
+	function psbOf(picture: Buffer): Buffer {
+		const chunk = { offset: 0x40, length: picture.length };
+		const data = psbFile({ name: "x", value: 0, chunk });
+		picture.copy(data, CHUNK_DATA + chunk.offset);
+		return data;
+	}
+
+	it("reads the places of a picture of the engine out of the lines of its file", () => {
+		const data = Buffer.concat([
+			Buffer.from([0xef, 0xbb, 0xbf]),
+			Buffer.from("psb://a.psb/x\r\npsb://b.psb/x\r\n", "utf8"),
+		]);
+		expect(readDrefLayers(data)).toEqual([
+			{ archive: "a.psb", entry: "x" },
+			{ archive: "b.psb", entry: "x" },
+		]);
+		// A file of no such line stands of no picture of the engine.
+		expect(
+			readDrefLayers(Buffer.from("psb://a.psb/x\r\nwhat\r\n", "utf16le")),
+		).toBeUndefined();
+		expect(readDrefLayers(Buffer.alloc(0))).toBeUndefined();
+	});
+
+	it("draws the places of a layer over the picture behind them", () => {
+		const canvas = {
+			width: 2,
+			height: 2,
+			pixels: Buffer.alloc(2 * 2 * 4, 0x00),
+		};
+		// The picture behind stands of the places of a colour of the first layer, and the covering place of
+		// the layer stands of half of the whole of it: the counts stand of the counts of the places of the
+		// file of the two of them, of the whole of the count of the places of a colour taken off.
+		const first = pictureOf([0x00, 0x00, 0xff, 0xff]);
+		const firstPicture = readBmpImage(first);
+		if (!firstPicture) throw new Error("no picture");
+		canvas.pixels = Buffer.from(firstPicture.pixels);
+		const second = pictureOf([0x00, 0xff, 0x00, 0x80]);
+		const secondPicture = readBmpImage(second);
+		if (!secondPicture) throw new Error("no picture");
+		blendDrefLayer(canvas, {
+			width: secondPicture.width,
+			height: secondPicture.height,
+			offsetX: 1,
+			offsetY: 1,
+			pixels: secondPicture.pixels,
+		});
+		const at = (row: number, column: number): number[] => [
+			...canvas.pixels.subarray(
+				(row * 2 + column) * 4,
+				(row * 2 + column) * 4 + 4,
+			),
+		];
+		expect(at(0, 0)).toEqual([0x00, 0x00, 0xff, 0xff]);
+		expect(at(0, 1)).toEqual([0x00, 0x00, 0xff, 0xff]);
+		expect(at(1, 0)).toEqual([0x00, 0x00, 0xff, 0xff]);
+		// The layer stands of one place of the file behind and to the right of the picture behind it, so
+		// the second row of the layer, and the places of it behind the row of the picture, stand past the
+		// foot and the side of it.
+		expect(at(1, 1)).toEqual([0x00, 0x80, 0x7f, 0xff]);
+	});
+
+	it("reads a picture of the engine of the archives its file names", async () => {
+		const first = psbOf(pictureOf([0x00, 0x00, 0xff, 0xff]));
+		const second = psbOf(pictureOf([0x00, 0xff, 0x00, 0x00]));
+		const text = Buffer.concat([
+			Buffer.from([0xff, 0xfe]),
+			Buffer.from("psb://first.psb/x\r\npsb://second.psb/x\r\n", "utf16le"),
+		]);
+		await withCompanionFiles(
+			"sample.dref",
+			{ "sample.dref": text, "first.psb": first, "second.psb": second },
+			async (mainPath) => {
+				const source = new BufferByteSource(text);
+				expect(await emoteDrefFormat.detect(source, mainPath)).toBe(true);
+				const archive = await emoteDrefFormat.open(source, mainPath);
+				try {
+					expect(archive.entries.map((entry) => entry.path)).toEqual([
+						"picture.bmp",
+					]);
+					const entry = archive.entries[0];
+					if (!entry) throw new Error("no entry");
+					const places = await consumeBuffer(await archive.openEntry(entry.id));
+					const picture = readBmpImage(places);
+					if (!picture) throw new Error("no picture");
+					expect([picture.width, picture.height, picture.bitsPerPixel]).toEqual(
+						[2, 2, 32],
+					);
+					// The layer behind stands of the covering place of nought, so the places of the
+					// picture behind it stand as they stand.
+					expect([...picture.pixels]).toEqual([
+						0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff,
+						0xff, 0x00, 0x00, 0xff, 0xff,
+					]);
+				} finally {
+					await archive.close();
+				}
+			},
+		);
 	});
 });
 

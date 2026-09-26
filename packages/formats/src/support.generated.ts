@@ -13674,6 +13674,32 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "DREF",
+				class: "DrefFormat",
+				source: "ArcFormats/Emote/ImageDREF.cs",
+			},
+			localId: "emote-dref-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the four words a file of the engine may begin with (`psb:` of the places of the file of one place each, of the same behind two words of the places of the file at the head of the file, and of the places of the file of two places each), of the extension `dref`",
+				"the lines of the file: every one of them stands of an archive of the engine and of an object of that archive, of the shape `psb://<archive>/<object>`",
+				"the places of the file of the text of the file, of the marks of the places of the file of one and of two places each",
+				"the layers of the picture: the archive of every line stands opened of the container of the engine and the object of it stands of the picture of the places of its chunk, of the kind of the picture the archive names, and of a bitmap where the object stands of a bitmap",
+				"the walk of the places of the file of `WriteableBitmap` (`DrefFormat.BlendLayer`): a layer of a covering place of the whole of it stands as it stands, a layer of a covering place of nought stands of nothing, and a layer between the two stands of the counts of the places of the file of the layer and of the picture behind it (the covering place of the picture behind it standing of the greater of the two)",
+			],
+			unsupported: [
+				"archive creation",
+				"the picture of an object of the engine of a kind this project carries no walk of (an object of no picture of its own stands of a bitmap alone)",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"a picture of a real game of the engine",
+			],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "GRA",
 				class: "GraFormat",
 				source: "ArcFormats/MnoViolet/ImageGRA.cs",

@@ -300,12 +300,16 @@ further than the reference's own list of them.
   places of a chunk stand handed over as they stand, which is what the reference hands over as well where
   the picture stands of no walk of its own. So `DREF` below stands one step nearer than when it was written:
   the archive it names stands read now, and what stands behind it is the drawing of the layers.
-- `DREF` (`ArcFormats/Emote/ImageDREF.cs`) is not a picture at all: it is a little endian text file of
-  `psb://<archive>/<entry>` lines, and the reference composes it by opening each named archive with the
-  `PSB/EMOTE` opener, finding the entry by name, and drawing the layers one over another with WPF. It
-  stands on three things this project does not have in that shape - the `PSB/EMOTE` archive, which is not
-  ported, lookups by name through the virtual file system, and WPF layer blending - so even its metadata
-  needs the archive.
+- `DREF` (`ArcFormats/Emote/ImageDREF.cs`) **stands ported now**, as `emote-dref-image`: it is a little
+  endian text file of `psb://<archive>/<entry>` lines, and the port resolves the archives of those lines
+  beside the file it was given (the same directory the reference stands of), opens each of them with the
+  container of the engine (`emote-psb-archive`), stands of the object of that name, and draws the picture of
+  every layer over the picture of the lines before it. The drawing is the reference's own walk of the places
+  of the file (`DrefFormat.BlendLayer`): a layer of a covering place of the whole of it stands as it stands,
+  one of a covering place of nought stands of nothing, and one between the two stands of the counts of the
+  places of the file of the layer and of the picture behind it. What stands of the reference alone is WPF's
+  `WriteableBitmap` itself, which this port does not carry: the places of the file stand of a run of this
+  project instead.
 
 ## The reference class is only a base for engines to build on
 
