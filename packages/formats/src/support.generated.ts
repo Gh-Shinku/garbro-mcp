@@ -12866,6 +12866,39 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "CAB",
+				class: "CabOpener",
+				source: "Experimental/Cabinet/ArcCAB.cs",
+			},
+			localId: "microsoft-cab-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the cabinet head and its optional reserved room and neighbour names",
+				"the folder table walk",
+				"the file table walk, whose names stand behind their own records",
+				"folders of no compression",
+				"folders of MSZIP with the window of the blocks before them",
+				"metadata of the version and the cabinet number",
+			],
+			unsupported: [
+				"archive creation",
+				"folders of Quantum and LZX compression",
+				"joining the parts of a file that continues across the cabinets of a set",
+				"a cabinet that stands inside another archive",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"folders of Quantum and LZX compression",
+				"a cabinet set whose file is in more than one part",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "EXE/NE",
 				class: "NeExeOpener",
 				source: "Experimental/Microsoft/ArcNE.cs",
@@ -20041,10 +20074,11 @@ export const formatSupportCatalog = {
 				"the bitmap the reference hands over, of the rows of the picture from the top of it down",
 				"the walk of the runs of the picture (of the walks 0, 0x100, 2 and 0x102), of the places of the file of the runs of the counts of them",
 				"the places of the alpha of a picture, of the runs of the places of the file of a colour of the picture and of the runs of the alpha of it",
+				"the walks of the places of a JPEG of the places of the file of a picture (the walk 0x103): the words of the head of the stream put back and the picture read as the JPEG interchange format, handed out as a bitmap of this project",
 			],
 			unsupported: [
 				"creating a picture",
-				"a picture of the walk of a JPEG of the places of the file of it",
+				"a picture of the walk of a JPEG whose places are in no picture format this port reads: the reference hands the stream to the decoder of WPF, which reads every format it knows",
 				"a picture of the places of a colour of a place of it of no walk of the engine",
 				"a picture of a walk of the places of the file this project does not know",
 			],

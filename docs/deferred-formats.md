@@ -227,10 +227,15 @@ further than the reference's own list of them.
 - `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library: the reference carries no
   walk of a cabinet of its own at all - it stands of `Microsoft.Deployment.Compression.Cab`, the managed
   cabinet reader of the WiX deployment tools, which does not stand in the tree - so there is no algorithm of
-  the engine to align with, only the cabinet format itself (`MSCF`). A port of it would be a reader of the
-  format from its specification rather than an alignment, which is the same standing as `WMA` and `OPUS`
-  beside it. (The other `CabOpener` of the tree, `ArcFormats/EntExec/ArcCAB.cs`, is a walk of the engine and
-  **is** ported, as `entexec-cab`.)
+  the engine to align with, only the cabinet format itself (`MSCF`). **The format is read here as far as its
+  own specification carries it**: `microsoft-cab-archive` reads the head, the tables of folders and files,
+  and the blocks of a folder of no compression and of MSZIP, checked against a real cabinet of Windows
+  (`C:\Windows\appcompat\appraiser\Appraiser_AlternateData.cab`, whose four files come out byte for byte
+  as the system's `expand.exe` writes them). What stays unread is all that stands of no specification this
+  project aligns with: **the LZX and Quantum compressions**, whose walks are large works of their own with
+  no reference walk to compare against (a folder of either is listed and refused at extraction), and the
+  joining of the parts of a file that continues across the cabinets of a set. (The other `CabOpener` of the
+  tree, `ArcFormats/EntExec/ArcCAB.cs`, is a walk of the engine and **is** ported, as `entexec-cab`.)
 - `WMA` (`ArcFormats/AudioWMA.cs`) hands its stream to NAudio. (`AIFF` stood beside it and is now read: the
   walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) hands its stream to an Opus library.
