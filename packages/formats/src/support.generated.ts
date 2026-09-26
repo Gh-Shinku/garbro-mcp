@@ -14630,11 +14630,12 @@ export const formatSupportCatalog = {
 				"the alpha channel run and list forms",
 				"the three colour group kinds",
 				"bitmap output at the depth the alpha channel asks for",
+				"mode two, whose payload is a whole portable network graphic, read with the reader of the PNG interchange format of this project and handed out as a bitmap of the size of its frame",
 			],
 			unsupported: [
 				"archive creation",
 				"image encoding",
-				"mode two, whose payload is a whole portable network graphic that the reference hands to an image library this project does not carry",
+				"a picture of mode two that is in no picture format the reader of this project knows, where the reference hands the stream to the imaging stack of its platform",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",

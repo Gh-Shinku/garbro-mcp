@@ -49,9 +49,12 @@ length of its own:
 
 ## Mode 2: a picture of another kind
 
-The payload is a whole portable network graphic, which the reference hands to the Windows imaging stack.
-This project carries no such decoder, so the mode raises `UNSUPPORTED_FEATURE` with that reason rather than
-guessing.
+The payload is a whole portable network graphic: a count of the places of the picture stands at the head of
+the data, and the stream behind it is the picture. The reference hands that stream to the Windows imaging
+stack and returns the frame it decodes, whose size is the size of the picture itself rather than the size the
+head of the file names. This port reads the stream with its own reader of the PNG interchange format and
+hands out a bitmap of the size of that frame, with the depth the picture itself carries: four bytes a place
+for a picture that has an alpha channel of its own, three for one that does not.
 
 ## Deviations from the reference
 
@@ -62,14 +65,20 @@ guessing.
 * A count of zero in the alpha channel's list form is walked past, since the reference reads another count
   there and so reaches the end of its stream.
 * The packed mode's two channel lengths are not checked against each other, as in the reference.
+* The reference hands the stream of mode 2 to the imaging stack, which reads every kind of picture it knows;
+  this port reads the PNG interchange format itself, so a stream that is in no such format, or whose count of
+  the places of the picture stands behind the file, is refused with `INVALID_ARCHIVE`.
+* The bitmap of mode 2 carries the size of the frame of the picture itself, while the entry of the file
+  carries the measurements the head of the file names, exactly as the reference reports them.
 
 ## Verification
 
-Eight fixtures in `tests/formats/nsystem-mgd-image.test.ts` cover the header and its rejections, stored
-pixels both with and without an alpha byte, a packed colour channel using all three group kinds, a
-difference in the four bit form that takes one channel short of zero (leaving `0xfb`), both forms of the
-alpha channel, the bitmap depth each case calls for, a picture whose data reaches past the file, the mode
-that holds a picture of another kind, and detection, listing and extraction through the registered format.
+Nine tests in `tests/formats/nsystem-mgd-image.test.ts` cover the header and its rejections, stored pixels
+both with and without an alpha byte, a packed colour channel using all three group kinds, a difference in the
+four bit form that takes one channel short of zero (leaving `0xfb`), both forms of the alpha channel, the
+bitmap depth each case calls for, a picture whose data reaches past the file, the picture of mode 2 read with
+the reader of the PNG interchange format of this project, the count and the places of that mode that stand
+behind the file, and detection, listing and extraction through the registered format.
 
 Writing the tests found a mistake in the port: the packed mode reads a length word the decoder never uses
 before its alpha length, so the alpha channel sits a word further in than it first appeared.

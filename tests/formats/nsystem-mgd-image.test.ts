@@ -2,6 +2,8 @@ import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
 	decodeMgdPixels,
 	nsystemMgdImageFormat,
@@ -68,6 +70,21 @@ function layoutOf(file: Buffer): MgdLayout {
 function bitmapOf(file: Buffer): Buffer {
 	const layout = layoutOf(file);
 	return packMgdBitmap(decodeMgdPixels(file, layout), layout);
+}
+
+/** The places of the file of the picture as the format itself hands them out. */
+async function walkOf(file: Buffer): Promise<Buffer> {
+	const handle = await nsystemMgdImageFormat.open(
+		new BufferByteSource(file),
+		"picture.mgd",
+	);
+	const entry = handle.entries[0];
+	if (!entry) throw new Error("no entry");
+	const chunks: Buffer[] = [];
+	for await (const chunk of await handle.openEntry(entry.id)) {
+		chunks.push(Buffer.from(chunk as Uint8Array));
+	}
+	return Buffer.concat(chunks);
 }
 
 /** A packed payload: the alpha length, the alpha channel, the colour length, the colour channel. */
@@ -220,14 +237,70 @@ describe("NSystem image format", () => {
 		expect(() => decodeMgdPixels(file, layoutOf(file))).toThrow(GarbroError);
 	});
 
-	it("refuses the mode whose payload is a picture of another kind", () => {
+	it("reads the picture of another kind the third mode holds", async () => {
+		// `MgdFormat.Read` of the third mode hands the stream behind the count of the places of the picture
+		// to the decoder of the platform and returns the frame of it; this port reads it with its own reader
+		// of the PNG interchange format and hands out a bitmap of the size of that frame.
+		const png = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 6,
+			rows: [[1, 2, 3, 4, 5, 6, 7, 8]],
+		});
 		const file = buildMgd({
-			width: 1,
+			width: 2,
 			height: 1,
 			mode: MODE_PNG,
-			payload: Buffer.alloc(8, 0x00),
+			payload: png,
 		});
-		expect(() => decodeMgdPixels(file, layoutOf(file))).toThrow(GarbroError);
+		const image = readBmpImage(await walkOf(file));
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([2, 1]);
+		// The places of the file of the picture stand red, green, blue then alpha, so the first byte of
+		// every place of the bitmap is the third of the picture.
+		expect([...image.pixels]).toEqual([3, 2, 1, 4, 7, 6, 5, 8]);
+		// The walk of the other two modes is not one of a picture of another kind.
+		expect(() =>
+			decodeMgdPixels(
+				buildMgd({
+					width: 1,
+					height: 1,
+					mode: MODE_PNG,
+					payload: Buffer.alloc(4, 0x00),
+				}),
+				layoutOf(
+					buildMgd({
+						width: 1,
+						height: 1,
+						mode: MODE_PNG,
+						payload: Buffer.alloc(4, 0x00),
+					}),
+				),
+			),
+		).toThrow(GarbroError);
+	});
+
+	it("refuses a picture of the third mode whose own count or places stand behind it", async () => {
+		const short = buildMgd({
+			width: 2,
+			height: 1,
+			mode: MODE_PNG,
+			payload: Buffer.alloc(4, 0x00),
+		});
+		const layout = layoutOf(short);
+		short.writeInt32LE(0x1000, layout.dataOffset);
+		await expect(walkOf(short)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
+		const stray = buildMgd({
+			width: 2,
+			height: 1,
+			mode: MODE_PNG,
+			payload: Buffer.alloc(16, 0x11),
+		});
+		await expect(walkOf(stray)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
 	});
 
 	it("detects, lists and extracts through the registered format", async () => {

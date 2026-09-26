@@ -9,6 +9,7 @@ import {
 import { Readable } from "node:stream";
 import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { readPngImage, type PngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -277,13 +278,59 @@ export function decodeMgdPixels(data: Buffer, layout: MgdLayout): MgdPixels {
 			return { pixels: output, hasAlpha: alpha.hasAlpha };
 		}
 		case MODE_PNG:
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"NSystem picture of mode two holds a PNG, which the reference hands to an image library and this project does not decode",
+			// The walk of this mode is a picture of another kind, which `decodeMgdPng` reads.
+			throw invalidPicture(
+				"NSystem picture of mode two stands of a picture of another kind",
 			);
 		default:
 			throw invalidPicture("Unknown NSystem picture mode");
 	}
+}
+
+/**
+ * `MgdFormat.Read` of the third mode: the count of the places of the picture stands at the head of the data
+ * of the file and the stream behind it is handed to the decoder of the platform, which reads whatever kind of
+ * picture it holds. This port reads it with its own reader of the PNG interchange format and hands the frame
+ * of that picture out as a bitmap of its own size, exactly as the reference hands the frame over rather than
+ * the measurements the head of the file names.
+ */
+export async function decodeMgdPng(
+	data: Buffer,
+	layout: MgdLayout,
+): Promise<PngImage> {
+	if (MODE_PNG !== layout.mode) {
+		throw invalidPicture("NSystem picture is not one of another kind");
+	}
+	if (layout.dataOffset + 4 > data.length) {
+		throw invalidPicture("NSystem picture has no length word");
+	}
+	const size = data.readInt32LE(layout.dataOffset);
+	if (size < 0 || layout.dataOffset + 4 + size > data.length) {
+		throw invalidPicture("NSystem picture stands short of its own picture");
+	}
+	const image = await readPngImage(
+		data.subarray(layout.dataOffset + 4, layout.dataOffset + 4 + size),
+	);
+	if (!image) {
+		throw invalidPicture(
+			"NSystem picture stands of no picture of another kind",
+		);
+	}
+	return image;
+}
+
+/** The bitmap of a picture of the file, of whichever of the three modes it stands in. */
+async function walkMgdPicture(
+	data: Buffer,
+	layout: MgdLayout,
+): Promise<Buffer> {
+	if (MODE_PNG === layout.mode) {
+		const frame = await decodeMgdPng(data, layout);
+		return 32 === frame.bitsPerPixel
+			? writeBmp32(frame.width, frame.height, frame.pixels)
+			: writeBmp24(frame.width, frame.height, frame.pixels);
+	}
+	return packMgdBitmap(decodeMgdPixels(data, layout), layout);
 }
 
 /** Writes the four byte pixels as the bitmap depth the stored alpha channel calls for. */
@@ -360,8 +407,6 @@ export const nsystemMgdImageFormat = defineFixedArchive({
 		const data = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const layout = readMgdLayout(data);
 		if (!layout) throw invalidPicture("Not an NSystem picture");
-		return Readable.from([
-			packMgdBitmap(decodeMgdPixels(data, layout), layout),
-		]);
+		return Readable.from([await walkMgdPicture(data, layout)]);
 	},
 });
