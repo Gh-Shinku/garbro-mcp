@@ -7182,6 +7182,34 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "audio",
+				tag: "MIO",
+				class: "MioAudio",
+				source: "ArcFormats/Entis/AudioMIO.cs",
+			},
+			localId: "entis-mio-audio",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word `Enti`, the identifier of the kind of the file and the name `Music Interleaved` at the head of a sound",
+				"the walk of the sections of the head of a sound: the `SoundInf` section (the counts of the sound and the kind of the walk of the places of it) and the chain of the counts of the walk of the engine (`SoundStm`) behind the places of the walk of the sound",
+				"a sound of the kind `Lossless_ERI` of the counts of a picture of the engine of the kind `RunlengthHuffman`, of eight places of a count of the walk of it",
+				"the places of a sound of the kinds of the walk of the counts of the engine (`DecodeSoundPCM8` and `DecodeSoundPCM16`), of the counts of the walk of the engine over each other",
+				"the places of a sound of one count of a colour and of two counts of a colour, of the counts of the walk of the engine of every count of a colour",
+				"the places of a sound of the walk of the engine handed out as a wave file of the project",
+			],
+			unsupported: [
+				"sound creation",
+				"the places of a sound of the kinds of the walks of a picture of the engine (`LOT_ERI` and `LOT_ERI_MSS`, of the walks of the counts of a picture, of the places of a colour and of the places of a block of `MioDecoder`)",
+				"the places of a sound of the walk of the `Nemesis` of the engine, which the reference holds no walk of as well",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the places of a sound of the kinds of the walks of a picture of the engine (the walks of the engine to come)",
+			],
+		},
+		{
+			reference: {
 				type: "archive",
 				tag: "DAT/DISCOVERY",
 				class: "DatOpener",

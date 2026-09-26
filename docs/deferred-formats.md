@@ -347,7 +347,11 @@ the first forty of them.
 - `MIO` (`ArcFormats/Entis/AudioMIO.cs`, class `MioAudio`, 362 lines) is portable on its own: its
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
-  the unit is that pair rather than a missing input.
+  the unit is that pair rather than a missing input. The head of a sound of the engine, the counts of the
+  walk of the engine of it and the places of a sound of the kind `Lossless_ERI` stand read now, as
+  `entis-mio-audio`, over the walks of the counts of the engine of this project (`codecs/erisa-huffman.ts`,
+  `codecs/erisa-context.ts`); what stands of the walks of a picture of the engine (`LOT_ERI`,
+  `LOT_ERI_MSS`) stands in `docs/support-status.json` rather than here.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
   its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
   tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven
