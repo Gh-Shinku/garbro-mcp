@@ -22049,6 +22049,34 @@
 				"an archive whose graph stands of an `.ici` payload and of the index it names",
 				"the second kind of archive, whose places stand of the count of the places of the head of the graph"
 			]
+		},
+		{
+			"reference": {
+				"type": "image",
+				"tag": "S5I",
+				"class": "S5iFormat",
+				"source": "ArcFormats/rUGP/ImageS5I.cs"
+			},
+			"localId": "rugp-s5i-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the mark of an object of the engine at the head of a file",
+				"the class `CS5i` behind the count of the walk of the object, and the refusal of every other class",
+				"the two counts of the picture at the head of the object",
+				"the places of the picture right behind the head of the object, where the walk of it stands of no schema",
+				"the count of the places of the picture, and the picture behind it, where the walk of it stands of a schema",
+				"thirty two places of a colour (BGRA) a place, and the picture of the walk of the project",
+				"the refusal of a picture of no places and of a run of places shorter than the picture"
+			],
+			"unsupported": [
+				"picture creation",
+				"the classes of the other pictures of the engine (`CRip`, `CRip007`), which stand of the walk of their own"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"a picture of a schema whose count of places is longer than the picture"
+			]
 		}
 	]
 }

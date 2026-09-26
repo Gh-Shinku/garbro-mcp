@@ -443,7 +443,10 @@ export class RioClassReader {
 	protected readonly loadArray: unknown[] = [null, this];
 	/** The flags of the stream, of the places of the head of the walk and of the classes behind them. */
 	protected fieldFlags = 0;
+	/** The schema of the class of the stream (`m_objectSchema`), of no class at all before one is read. */
 	protected objectSchemaValue = -1;
+	/** The schema of the walk of the archive (`Schema`), which the count of the mark of it names. */
+	protected archiveSchema = 0;
 
 	get loadCount(): number {
 		return this.loadArray.length;
@@ -459,6 +462,11 @@ export class RioClassReader {
 
 	get field4C(): number {
 		return this.fieldFlags;
+	}
+
+	/** `CRioArchive.Schema`: the count of the places of the head of the walk of the archive. */
+	get schema(): number {
+		return this.archiveSchema;
 	}
 
 	/**
@@ -513,11 +521,12 @@ export class RioClassReader {
 		if (signature === undefined || !RIO_CORE_SIGNATURES.includes(signature)) {
 			return undefined;
 		}
-		let schema = -1;
+		let schema = 0;
 		const version = stream.readUInt16();
 		if (version === undefined) return undefined;
 		if (version >= 0x10 && version <= 0x3fff) {
 			schema = version;
+			this.archiveSchema = version;
 			if (version >= 0x11) {
 				const wide = stream.readUInt16();
 				if (wide === undefined) return undefined;
