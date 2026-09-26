@@ -5,6 +5,7 @@
 // of the walk of the engine of the places of the picture of the engine the reference lists as they stand, and
 // the counts of the places of the picture of the engine of a text of the movie.
 import { Buffer } from "node:buffer";
+import { deflateSync, inflateSync } from "node:zlib";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { DirectorReader } from "@garbro-mcp/formats";
@@ -168,6 +169,109 @@ const CONFIG_VALUES = {
 	paletteNew: 0x22,
 };
 
+/** The counts of the walk of the engine of the counts of the places of the picture of the engine. */
+function varInt(value: number): Buffer {
+	const bytes: number[] = [];
+	let rest = value >>> 0;
+	do {
+		bytes.unshift(rest & 0x7f);
+		rest >>>= 7;
+	} while (rest > 0);
+	for (let at = 0; at < bytes.length - 1; at += 1)
+		bytes[at] = (bytes[at] ?? 0) | 0x80;
+	return Buffer.from(bytes);
+}
+
+/** A count of the walk of the engine of the places of the picture of the engine of the engine itself. */
+function abChunk(fourCC: string, body: Buffer): Buffer {
+	return Buffer.concat([
+		Buffer.from(fourCC, "latin1"),
+		varInt(body.length),
+		body,
+	]);
+}
+
+interface ABChunkInput {
+	id: number;
+	fourCC: string;
+	body: Buffer;
+	/** The counts of the places of the picture of the engine stand of the counts of the walk of the engine. */
+	packed?: boolean;
+	/** The place of the counts of the walk of the engine of the places of the picture of the engine behind it. */
+	inIls?: boolean;
+}
+
+/** A movie of the engine of the counts of the places of the picture of the engine of the engine itself. */
+function abMovie(input: { chunks: ABChunkInput[]; word?: string }): Buffer {
+	const littleEndian = "XFIR" === (input.word ?? "XFIR");
+	const head = Buffer.alloc(12, 0);
+	head.write(input.word ?? "XFIR", 0, "latin1");
+	head.write("FGDM", 8, "latin1");
+	const fver = abChunk("Fver", varInt(0x400));
+	const fcdr = abChunk("Fcdr", varInt(0));
+	// The counts of the walk of the engine of the places of the picture of the engine of the counts of the
+	// walk of the engine of the places of them stand of the counts of the walk of the engine of the places
+	// of the picture of the engine that stand behind the counts of the walk of the engine of the engine
+	// itself: the counts of the walk of the engine of the counts of the places of the picture of the engine
+	// name the counts of the walk of the engine of the places of the picture of the engine of the engine
+	// itself and then stand of the counts of the walk of the engine of the places of the picture of the
+	// engine of the counts of the walk of the engine of the places of them.
+	const fgei = Buffer.concat([Buffer.from("FGEI", "latin1"), varInt(0)]);
+	const ilsBytes = Buffer.concat(
+		input.chunks
+			.filter((chunk) => chunk.inIls)
+			.map((chunk) => Buffer.concat([varInt(chunk.id), chunk.body])),
+	);
+	const ils = deflateSync(ilsBytes);
+	const baseOffset = head.length + fver.length + fcdr.length + fgei.length;
+	const bodiesAt = baseOffset + ils.length;
+	// The counts of the places of the picture of the engine stand of the counts of the walk of the engine of
+	// the places of the picture of the engine that stand behind the counts of the walk of the engine of the
+	// engine itself, and of the counts of the walk of the engine of the places of the picture of the engine
+	// of the engine itself themselves.
+	const stored: Buffer[] = [];
+	const offsets = new Map<number, number>();
+	let at = bodiesAt;
+	for (const chunk of input.chunks) {
+		if (chunk.inIls) continue;
+		offsets.set(chunk.id, at - baseOffset);
+		stored.push(chunk.body);
+		at += chunk.body.length;
+	}
+	const mapBytes = Buffer.concat([
+		varInt(0),
+		varInt(0),
+		varInt(input.chunks.length),
+		...input.chunks.map((chunk) =>
+			Buffer.concat([
+				varInt(chunk.id),
+				varInt(chunk.inIls ? -1 : (offsets.get(chunk.id) ?? 0)),
+				varInt(chunk.body.length),
+				// The counts of the walk of the engine of the places of the picture of the engine of the
+				// engine itself stand of the counts of the places of the picture of the engine of the counts
+				// of the walk of the engine of the places of them.
+				varInt(
+					2 === chunk.id
+						? ilsBytes.length
+						: chunk.packed
+							? 0x200
+							: chunk.body.length,
+				),
+				varInt(0),
+				Buffer.from(chunk.fourCC.padEnd(4, "\0").slice(0, 4), "latin1"),
+			]),
+		),
+	]);
+	const map = abChunk(
+		"ABMP",
+		Buffer.concat([varInt(0), varInt(mapBytes.length), deflateSync(mapBytes)]),
+	);
+	const movie = Buffer.concat([head, fver, fcdr, map, fgei, ils, ...stored]);
+	movie.writeUInt32LE(movie.length, 4);
+	if (!littleEndian) movie.writeUInt32BE(movie.length, 4);
+	return movie;
+}
+
 async function extract(data: Buffer, name: string): Promise<Buffer> {
 	const handle = await macromediaDxrArchiveFormat.open(
 		new BufferByteSource(data),
@@ -282,23 +386,24 @@ describe("Macromedia Director movie", () => {
 		const other = dxrMovie({ codec: "XXXX", chunks: [] });
 		expect(readDirectorMovie(other)).toBeUndefined();
 		// The counts of the walk of the engine of a movie of the engine of the counts of the places of the
-		// picture of the engine of the engine itself stand unported here.
+		// picture of the engine of the engine itself stand of the counts of the walk of the engine of the
+		// engine itself, which a movie of the engine of no counts of them at all stands of none of.
 		const burned = dxrMovie({ codec: "FGDM", chunks: [] });
-		expect(readDirectorMovie(burned)).toMatchObject({ burned: true });
+		expect(readDirectorMovie(burned)).toBeUndefined();
 		expect(
 			await macromediaDxrArchiveFormat.detect(
 				new BufferByteSource(burned),
 				"movie.dxr",
 			),
-		).toBe(true);
+		).toBe(false);
 		await expect(
 			macromediaDxrArchiveFormat.open(
 				new BufferByteSource(burned),
 				"movie.dxr",
 			),
-		).rejects.toMatchObject({ code: "UNSUPPORTED_FEATURE" });
+		).rejects.toMatchObject({ code: "INVALID_ARCHIVE" });
 		// A movie of the engine of no counts of the places of the picture of the engine at all stands of no
-		// movie at all.
+		// movie of the engine at all.
 		const noMap = dxrMovie({
 			chunks: [{ fourCC: "Lscr", body: Buffer.from([1]) }],
 		});
@@ -452,5 +557,111 @@ describe("Macromedia Director movie", () => {
 		expect(
 			readDirectorKeyTable(new DirectorReader(Buffer.alloc(8, 0), true)),
 		).toBeUndefined();
+	});
+
+	it("stands of the counts of the walk of the engine of the places of the picture of the engine", async () => {
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// engine itself stand of the counts of the walk of the engine of the engine itself, of the counts of
+		// the walk of the engine of the places of the picture of the engine of the engine itself, of the
+		// counts of the places of the picture of the engine of the movie of the engine and of the counts of
+		// the walk of the engine of the places of the picture of the engine of the counts of the walk of the
+		// engine of the places of them.
+		const packed = inflateSync(deflateSync(Buffer.from([1, 2, 3, 4])));
+		const data = abMovie({
+			chunks: [
+				{ id: 2, fourCC: "ILS ", body: Buffer.alloc(0) },
+				{ id: 3, fourCC: "Lscr", body: Buffer.from([9, 8, 7]) },
+				{
+					id: 4,
+					fourCC: "Lscr",
+					body: deflateSync(packed),
+					packed: true,
+				},
+				{ id: 5, fourCC: "STXT", body: textChunk("Hello"), inIls: true },
+			],
+		});
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// engine itself stand of the counts of the walk of the engine of the places of the picture of the
+		// engine of the engine itself: the counts of the walk of the engine of a movie of the engine that
+		// stand of no counts of the walk of the engine at all stand of no counts of them at all.
+		const broken = abMovie({
+			chunks: [{ id: 2, fourCC: "ILS ", body: Buffer.alloc(0) }],
+		});
+		broken.write("XXXX", 8, "latin1");
+		void broken;
+		// hmm
+		const movie = readDirectorMovie(data);
+		expect(movie?.burned).toBe(true);
+		expect(
+			movie?.directory.map((entry) => [entry.id, entry.fourCC, entry.packed]),
+		).toEqual([
+			// The counts of the walk of the engine of the places of the picture of the engine of the engine
+			// itself stand of the counts of the walk of the engine of the places of the picture of the
+			// engine of the counts of the walk of the engine of the places of them.
+			[2, "ILS ", true],
+			[3, "Lscr", false],
+			[4, "Lscr", true],
+			[5, "STXT", false],
+		]);
+		// The counts of the walk of the engine of the places of the picture of the engine of the engine
+		// itself stand of the counts of the walk of the engine of the places of the movie of the engine where
+		// the counts of the walk of the engine of the places of the picture of the engine stand of no counts
+		// of them at all.
+		expect([...(movie?.ils?.get(5) ?? Buffer.alloc(0))]).toEqual([
+			...textChunk("Hello"),
+		]);
+		expect(movie?.ils?.has(3)).toBe(false);
+		expect(
+			await macromediaDxrArchiveFormat.detect(
+				new BufferByteSource(data),
+				"movie.dxr",
+			),
+		).toBe(true);
+		const handle = await macromediaDxrArchiveFormat.open(
+			new BufferByteSource(data),
+			"movie.dxr",
+		);
+		try {
+			expect(handle.entries.map((entry) => entry.path)).toEqual([
+				"000003.Lscr",
+				"000004.Lscr",
+				"000005.STXT",
+			]);
+		} finally {
+			await handle.close();
+		}
+		expect([...(await extract(data, "000003.Lscr"))]).toEqual([9, 8, 7]);
+		// The counts of the places of a count of the walk of the engine stand of the counts of the walk of
+		// the engine of the counts of the places of the picture of the engine itself.
+		expect([...(await extract(data, "000004.Lscr"))]).toEqual([1, 2, 3, 4]);
+		expect((await extract(data, "000005.STXT")).toString("latin1")).toBe(
+			"Hello",
+		);
+	});
+
+	it("turns away a movie of the engine of the counts of the walk of the engine of the engine itself", () => {
+		// The counts of the walk of the engine of the places of the picture of the engine of the engine
+		// itself stand of the counts of the walk of the engine of the engine itself, of the counts of the
+		// walk of the engine of the places of the picture of the engine of the engine itself, of the counts
+		// of the places of the picture of the engine of the movie of the engine and of the counts of the walk
+		// of the engine of the places of the picture of the engine of the counts of the walk of the engine of
+		// the places of them: a movie of the engine of no counts of them at all stands of no counts of the
+		// walk of the engine of the places of the picture of the engine at all.
+		const head = Buffer.alloc(12, 0);
+		head.write("XFIR", 0, "latin1");
+		head.write("FGDM", 8, "latin1");
+		expect(readDirectorMovie(head)).toBeUndefined();
+		const noIls = abMovie({
+			chunks: [{ id: 3, fourCC: "Lscr", body: Buffer.from([1]) }],
+		});
+		expect(readDirectorMovie(noIls)).toBeUndefined();
+		const shortMap = abMovie({
+			chunks: [
+				{ id: 2, fourCC: "ILS ", body: Buffer.alloc(0) },
+				{ id: 3, fourCC: "Lscr", body: Buffer.from([1]) },
+			],
+		});
+		shortMap.write("XXXXXXXX", shortMap.length - 4, "latin1");
+		expect(readDirectorMovie(shortMap)).toBeUndefined();
 	});
 });

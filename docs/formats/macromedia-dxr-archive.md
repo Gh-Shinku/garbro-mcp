@@ -106,6 +106,54 @@ counts of the places of the engine of the walk of the engine of the counts of th
 engine of the counts of the walk of the engine (`Binary.BigEndian`), whatever the counts of the places of the
 picture of the engine of the movie, and then the text of it.
 
+## The counts of the places of the picture of the engine of the engine itself
+
+A movie of the words `FGDC` and `FGDM` stands of no map of the counts of the places of the picture of the
+engine: its counts of the walk of the engine stand of the counts of the walk of the engine of the engine itself,
+in the order of the sum of the places of the picture of the engine the movie of the engine stands of:
+
+* `Fver`: the counts of the places of the picture of the engine of the count of the walk of the engine of the
+  engine itself, then the counts of the walk of the engine of the places of the picture of the engine of the
+  engine itself and of the counts of the places of the picture of the engine of the engine itself, which stand
+  of the counts of the engine of the walk of the engine of the counts of the places of the picture of the
+  engine of the version of the walk of the engine of the engine itself alone, and the counts of the places of
+  the picture of the engine of the version of the engine itself.
+* `Fcdr`: the counts of the walk of the engine of the places of the picture of the engine of the engine
+  itself, which stand of the counts of the walk of the engine of the compression of the places of the picture
+  of the engine and are stood over here: every count of the places of the picture of the engine of the movie
+  of the engine stands of the counts of the walk of the engine of the engine itself.
+* `ABMP`: the counts of the places of the picture of the engine of the movie of the engine: the counts of the
+  engine of the walk of the engine of the compression of the places of the picture of the engine, the counts
+  of the places of the picture of the engine of the counts of the walk of the engine of the places of the
+  picture of the engine of them, and then of the counts of the walk of the engine of the places of the picture
+  of the engine of the counts of them (`ZLibStream`). Every count of them stands of the counts of the places
+  of the picture of the engine of the count of the walk of the engine itself, of the place of the counts of
+  the walk of the engine of the places of the picture of the engine of them (which may stand of no place at
+  all), of the counts of the places of the picture of the engine, of the counts of the places of the picture
+  of the engine of the walk of the engine of the places of the picture of the engine of them, of the counts
+  of the walk of the engine of the compression of the places of the picture of the engine, and of the counts
+  of the walk of the engine of the places of the picture of the engine of the counts of the walk of the
+  engine itself.
+* `FGEI`: the place the places of the picture of the engine of the movie of the engine stand at, which every
+  count of the places of the picture of the engine of the movie of the engine stands of where its place stands
+  of counts of the walk of the engine of the places of the picture of the engine at all.
+* `ils`: the counts of the walk of the engine of the places of the picture of the engine of the engine itself
+  (`ZLibStream` over the places of the picture of the engine that stand behind the counts of the walk of the
+  engine of the places of the picture of the engine of the counts of the walk of the engine of the places of
+  them): the counts of the walk of the engine of the places of the picture of the engine of the count of the
+  walk of the engine of the places of the count of the places of the picture of the engine of the engine
+  itself and the counts of the places of the picture of the engine of that count of the walk of the engine,
+  for every count of the places of the picture of the engine that stands of no place of the places of the
+  movie of the engine at all.
+
+A count of the places of the picture of the engine of a movie of the engine of the engine itself stands of the
+counts of the walk of the engine of the places of the picture of the engine of the engine itself where it stands
+of no place of the places of the movie of the engine at all, and every count of the walk of the engine of the
+places of the picture of the engine of the engine itself stands of the counts of the walk of the engine of the
+places of the picture of the engine where the counts of the places of the picture of the engine and the counts
+of the places of the picture of the engine of the walk of the engine of the places of the picture of the engine
+of them stand of the counts of the engine itself.
+
 ## Deviations
 
 * The port reads the words of the head and the map of the places of the picture of the engine, and lists the
@@ -120,20 +168,6 @@ picture of the engine of the movie, and then the text of it.
   the counts of the places of the picture of the engine of the counts of the walk of the engine stand behind
   it: this port stands of the list of the counts of the walk of the engine of the engine itself alone, which
   needs the map of the places of the picture of the engine alone.
-* A movie of the counts of the walk of the engine of the engine itself (`FGDC`, `FGDM`) stands of the counts
-  of the walk of the engine of the places of the picture of the engine of the engine itself, which the
-  reference stands of and this port has not taken: such a movie stands of the counts of the engine of this
-  port and stands of no counts of the places of the picture of the engine at all where its counts of the walk
-  of the engine stand read.
-* A count of the places of the picture of the engine that stands at no count of the places of a picture of the
-  engine at all stands of no counts of the walk of the engine of the places of the movie of the engine: the
-  reference stands of the counts of the walk of the engine of the engine itself at such a count and its own
-  counts of the walk of the engine stand behind, which this port refuses.
-
-## Tests
-
-`tests/formats/macromedia-dxr.test.ts` builds movies in the test:
-
 * the word of the head, the word of the kind of the walk of the engine, the map of the places of the picture
   of the engine and the counts of the walk of the engine of the places of the picture of the engine of every
   count of them, of the counts of the walk of the engine of the places of the engine of the counts of the
@@ -146,6 +180,16 @@ picture of the engine of the movie, and then the text of it.
   engine (`STXT`),
 * a movie of the counts of the walk of the engine of the counts of the places of the picture of the engine of
   the engine itself (`RIFX`),
+* the counts of the walk of the engine of the places of the picture of the engine of a movie of the engine of
+  the counts of the places of the picture of the engine of the engine itself: the counts of its own (`Fver`,
+  `Fcdr`, `ABMP` and `FGEI`), the counts of the places of the picture of the engine of the movie of the
+  engine, the counts of the walk of the engine of the places of the picture of the engine of the engine
+  itself (`ils`), the counts of the places of the picture of the engine of a count of the walk of the engine
+  that stands of no place of the places of the movie of the engine at all, and the counts of the walk of the
+  engine of the places of the picture of the engine of the counts of the places of the picture of the engine
+  of them,
+* a movie of the engine of the counts of the walk of the engine of the engine itself that stands of no counts
+  of them at all,
 * the keys of the picture of the engine: the counts of the places of the picture of the engine of the count
   of the walk of the engine, the count of the keys the movie of the engine stands of, and the whole of the
   table of them,
@@ -171,6 +215,7 @@ picture of the engine of the movie, and then the text of it.
 - `GARbro/ArcFormats/Macromedia/ArcDXR.cs` — `DxrOpener.TryOpen`, `DxrOpener.OpenEntry`,
   `DxrOpener.OpenChunkStream`, `DxrOpener.RawChunks`
 - `GARbro/ArcFormats/Macromedia/DirectorFile.cs` — `DirectorFile.Deserialize`, `DirectorFile.ReadMMap`,
+  `DirectorFile.ReadAfterBurner`, `DirectorFile.ReadABMap`, `AfterBurnerEntry.Deserialize`,
   `DirectorFile.ReadKeyTable`, `DirectorFile.ReadConfig`, `DirectorFile.GetChunkReader`,
   `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `KeyTable.Deserialize`,
   `KeyTableEntry.Deserialize`, `DirectorConfig.Deserialize`, `Reader.CloneUnless`

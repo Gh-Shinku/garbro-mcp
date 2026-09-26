@@ -15,6 +15,7 @@
 // sounds of the picture of the engine) stand unported.
 
 import { Buffer } from "node:buffer";
+import { inflateSync } from "node:zlib";
 import { GarbroError } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
@@ -62,6 +63,11 @@ const CONFIG_VERSION_OFFSET = 0x24;
 const CONFIG_PALETTE_OFFSET_OLD = 0x46;
 const CONFIG_PALETTE_OFFSET_NEW = 0x4e;
 const CONFIG_VERSION_NEW = 1200;
+
+const AB_VERSION_MMAP = 0x400;
+const AB_VERSION_STRING = 0x500;
+const AB_ILS_ID = 2;
+const ILS_ENTRY_LIMIT = 0x10000;
 
 function invalidMovie(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
@@ -159,6 +165,12 @@ export class DirectorReader {
 			if (0 === (byte & 0x80)) return value;
 		}
 		return undefined;
+	}
+
+	/** The counts of the walk of the engine of the places of the picture of the engine behind a place. */
+	slice(at: number): Buffer | undefined {
+		if (at < 0 || at > this.#data.length) return undefined;
+		return this.#data.subarray(at);
 	}
 
 	skip(count: number): boolean {
@@ -396,6 +408,8 @@ export interface DirectorMovie {
 	directory: DirectorEntry[];
 	/** The counts of the walk of the engine of the places of the picture of the engine, where they stand. */
 	burned: boolean;
+	/** The counts of the walk of the engine of the places of the picture of the engine of the engine itself. */
+	ils?: Map<number, Buffer>;
 	keyTable?: {
 		entrySize: number;
 		totalCount: number;
@@ -416,6 +430,148 @@ export function directorRawChunks(movie: DirectorMovie): DirectorEntry[] {
 	return listed;
 }
 
+/** The counts of the places of the picture of the engine of the counts of the walk of the engine of them. */
+function varIntLength(value: number): number {
+	let length = 1;
+	let rest = value >>> 0;
+	while (rest > 0x7f) {
+		rest >>>= 7;
+		length += 1;
+	}
+	return length;
+}
+
+/** The counts of the places of a count of the places of the picture of the engine of the engine itself. */
+function readAfterBurnerEntry(
+	reader: DirectorReader,
+): DirectorEntry | undefined {
+	const id = reader.readVarInt();
+	const offset = reader.readVarInt();
+	const size = reader.readVarInt();
+	const unpackedSize = reader.readVarInt();
+	const compMethod = reader.readVarInt();
+	const fourCC = reader.readFourCC();
+	if (
+		undefined === id ||
+		undefined === offset ||
+		undefined === size ||
+		undefined === unpackedSize ||
+		undefined === compMethod ||
+		undefined === fourCC
+	)
+		return undefined;
+	return {
+		id,
+		fourCC,
+		offset,
+		size,
+		unpackedSize,
+		// The reference stands of the counts of the walk of the engine of the places of the picture of the
+		// engine of the counts of the places of them where the counts of the places of the picture of the
+		// engine and the counts of the walk of the engine of the places of the picture of the engine of them
+		// stand of the counts of the engine itself.
+		packed: size !== unpackedSize,
+	};
+}
+
+/**
+ * The counts of the walk of the engine of the places of the picture of the engine of a movie of the engine of
+ * the counts of the places of the picture of the engine of the engine itself (`FGDC`, `FGDM`): the counts of
+ * the walk of the engine of the engine itself (`Fver`), the counts of the walk of the engine of the places of
+ * the picture of the engine of the engine itself (`Fcdr`), the counts of the places of the picture of the
+ * engine of the movie of the engine (`ABMP`) and the counts of the walk of the engine of the places of the
+ * picture of the engine of the counts of the walk of the engine of the places of them (`FGEI`), which stand
+ * of the counts of the walk of the engine of the places of the picture of the engine of the engine itself
+ * (`ils`) for every count of the places of the picture of the engine of the counts of the walk of the engine
+ * of no count of the places of the picture of the engine at all.
+ */
+function readDirectorAfterBurner(
+	reader: DirectorReader,
+): { directory: DirectorEntry[]; ils: Map<number, Buffer> } | undefined {
+	if ("Fver" !== reader.readFourCC()) return undefined;
+	const length = reader.readVarInt();
+	if (undefined === length) return undefined;
+	const nextPos = reader.position + length;
+	const version = reader.readVarInt();
+	if (undefined === version) return undefined;
+	if (version > AB_VERSION_MMAP) {
+		// The counts of the walk of the engine of the places of the picture of the engine of the engine
+		// itself and of the counts of the places of the picture of the engine of the engine itself.
+		if (undefined === reader.readVarInt() || undefined === reader.readVarInt())
+			return undefined;
+	}
+	if (version > AB_VERSION_STRING) {
+		const stringLength = reader.readU8();
+		if (undefined === stringLength || !reader.skip(stringLength))
+			return undefined;
+	}
+	reader.position = nextPos;
+	if ("Fcdr" !== reader.readFourCC()) return undefined;
+	const skipLength = reader.readVarInt();
+	if (undefined === skipLength || !reader.skip(skipLength)) return undefined;
+	if ("ABMP" !== reader.readFourCC()) return undefined;
+	const mapLength = reader.readVarInt();
+	if (undefined === mapLength) return undefined;
+	const mapEnd = reader.position + mapLength;
+	// The counts of the walk of the engine of the places of the picture of the engine stand of the counts of
+	// the engine itself: the reference stands of the counts of the places of the picture of the engine of the
+	// engine itself and of the counts of their own, and then of the counts of the walk of the engine.
+	if (undefined === reader.readVarInt() || undefined === reader.readVarInt())
+		return undefined;
+	let unpacked: Buffer;
+	try {
+		unpacked = inflateSync(reader.slice(reader.position) ?? Buffer.alloc(0));
+	} catch {
+		return undefined;
+	}
+	const mapReader = new DirectorReader(unpacked, reader.littleEndian);
+	if (
+		undefined === mapReader.readVarInt() ||
+		undefined === mapReader.readVarInt()
+	)
+		return undefined;
+	const count = mapReader.readVarInt();
+	if (undefined === count || count < 0 || count > ENTRY_LIMIT) return undefined;
+	const directory: DirectorEntry[] = [];
+	for (let at = 0; at < count; at += 1) {
+		const entry = readAfterBurnerEntry(mapReader);
+		if (!entry) return undefined;
+		directory.push(entry);
+	}
+	reader.position = mapEnd;
+	if ("FGEI" !== reader.readFourCC()) return undefined;
+	if (undefined === reader.readVarInt()) return undefined;
+	// The counts of the places of the picture of the engine of every count of the walk of the engine of the
+	// places of the picture of the engine of the movie of the engine stand of the counts of the walk of the
+	// engine of the places of the picture of the engine that stand behind the counts of the walk of the
+	// engine of the engine itself.
+	const baseOffset = reader.position;
+	for (const entry of directory)
+		if (entry.offset >= 0) entry.offset += baseOffset;
+	const ilsChunk = directory.find((entry) => AB_ILS_ID === entry.id);
+	if (!ilsChunk) return undefined;
+	let ilsBytes: Buffer;
+	try {
+		ilsBytes = inflateSync(reader.slice(reader.position) ?? Buffer.alloc(0));
+	} catch {
+		return undefined;
+	}
+	const ilsReader = new DirectorReader(ilsBytes, reader.littleEndian);
+	const ils = new Map<number, Buffer>();
+	let pos = 0;
+	while (pos < ilsChunk.unpackedSize) {
+		const id = ilsReader.readVarInt();
+		const chunk = directory.find((entry) => entry.id === id);
+		if (undefined === id || !chunk) return undefined;
+		const bytes = ilsReader.readBytes(chunk.size);
+		if (!bytes) return undefined;
+		if (ils.size >= ILS_ENTRY_LIMIT) return undefined;
+		ils.set(id, bytes);
+		pos += varIntLength(id) + chunk.size;
+	}
+	return { directory, ils };
+}
+
 /**
  * Reads the head and the map of the places of a movie of the engine. The counts of the walk of the engine of
  * the places of the picture of the engine of it stand behind the map of the counts of the places of the
@@ -430,11 +586,15 @@ export function readDirectorMovie(data: Buffer): DirectorMovie | undefined {
 	const codec = reader.readFourCC();
 	if (undefined === codec) return undefined;
 	if (CODEC_BURNED === codec || CODEC_BURNED_OLD === codec) {
-		// The counts of the walks of the engine of a movie of the engine of the counts of the places of the
-		// picture of the engine of the engine itself (the counts of the places of the walk of the engine of
-		// the engine of `Fver` and the counts of the walk of the engine of the places of the picture of the
-		// engine of the engine itself) stand unported here.
-		return { codec, littleEndian, directory: [], burned: true };
+		const burned = readDirectorAfterBurner(reader);
+		if (!burned) return undefined;
+		return {
+			codec,
+			littleEndian,
+			directory: burned.directory,
+			burned: true,
+			ils: burned.ils,
+		};
 	}
 	if (CODEC_MAP !== codec && CODEC_MAP_OLD !== codec) return undefined;
 	if (MAP_CHUNK !== reader.readFourCC()) return undefined;
@@ -526,11 +686,6 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 		const movie = readDirectorMovie(await readStored(source));
 		if (!movie)
 			throw invalidMovie("Not a movie of the Macromedia Director engine");
-		if (movie.burned)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"The counts of the walk of the engine of a movie of the engine stand unported",
-			);
 		const entries: FixedEntry[] = [];
 		for (const chunk of directorRawChunks(movie)) {
 			let offset = chunk.offset;
@@ -546,9 +701,13 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 				createFixedEntry({
 					id: entries.length,
 					path: name,
-					offset: BigInt(offset),
+					// The counts of the places of the picture of the engine of a count of the walk of the
+					// engine of the engine itself stand of the counts of the walk of the engine of the places
+					// of the picture of the engine of the counts of the walk of the engine of the places of
+					// the movie of the engine itself: this port stands of no counts of them at all.
+					offset: offset >= 0 ? BigInt(offset) : 0n,
 					size: BigInt(size),
-					compressed: false,
+					compressed: chunk.packed,
 					metadata: { type: "data", fourCC: chunk.fourCC },
 				}),
 			);
@@ -571,19 +730,55 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource, entry) {
 		const data = await readStored(source);
-		const offset = Number(entry.offset);
-		const size = Number(entry.size);
-		if (offset + size > data.length)
-			throw invalidMovie("A chunk stands behind the movie");
-		const chunk = data.subarray(offset, offset + size);
+		const movie = readDirectorMovie(data);
+		if (!movie)
+			throw invalidMovie("Not a movie of the Macromedia Director engine");
+		const id = Number.parseInt(entry.path.slice(0, 6), 10);
+		const chunk = movie.directory.find((candidate) => candidate.id === id);
+		if (!chunk)
+			throw invalidMovie(
+				"A count of the walk of the engine of the movie stands behind it",
+			);
+		let offset = chunk.offset;
+		let size = chunk.size;
+		if (FILE_CHUNK === chunk.fourCC && offset >= 0) {
+			offset -= HEAD_SIZE;
+			size += HEAD_SIZE;
+		}
+		let bytes: Buffer | undefined;
+		if (offset >= 0) {
+			if (offset + size > data.length)
+				throw invalidMovie(
+					"A count of the walk of the engine stands behind the movie",
+				);
+			bytes = data.subarray(offset, offset + size);
+		} else {
+			// The counts of the walk of the engine of the places of the picture of the engine of the engine
+			// itself stand where the counts of the walk of the engine of the places of the picture of the
+			// engine stand of no counts of the places of the picture of the engine at all.
+			bytes = movie.ils?.get(chunk.id);
+		}
+		if (!bytes)
+			throw invalidMovie(
+				"A count of the places of the picture of the engine stands of no counts of it",
+			);
+		if (chunk.packed) {
+			try {
+				bytes = inflateSync(bytes);
+			} catch {
+				throw invalidMovie(
+					"The counts of the places of a count of the walk of the engine stand behind",
+				);
+			}
+		}
 		if (entry.path.endsWith(`.${TEXT_CHUNK}`)) {
-			const text = directorText(chunk);
+			const text = directorText(bytes);
 			if (!text)
 				throw invalidMovie(
 					"A count of the places of a text of the movie stands behind it",
 				);
 			return Readable.from([text]);
 		}
-		return Readable.from([chunk]);
+		return Readable.from([bytes]);
 	},
 });
