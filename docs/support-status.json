@@ -546,6 +546,39 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "UNITY/FS",
+				"class": "UnityFSOpener",
+				"source": "ArcFormats/Unity/ArcUnityFS.cs"
+			},
+			"localId": "unity-unityfs-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the word `UnityFS` behind a place of no name at the head of a file, of the kind six of the head of it alone, of the extensions `unity3d`, `asset` and `bundle`",
+				"the head of the file: the counts of the engine and of the walk of it, the count of the places of the file, the counts of the index as it stands and as it stands of the walk of it, and the flags of the file (the walk of the index, and the index standing at the head of the file or at the end of it)",
+				"the index of the file: the streams of the places of it (the counts of them as they stand and as they stand of the walk of them) and the bundles over them (the places, the counts, the flags and the names of them)",
+				"an index and a stream standing as they stand, and an index and a stream standing of the walk of the blocks of the format (`codecs/lz4.ts`)",
+				"the streams of the file standing of each other, one behind the other",
+				"the serialized assets of the bundles of the file: the head of an asset, the kinds of the walk of it (`TypeTree`, of the places of a name in front of the walk or of a run of the places of the walk itself) and the objects of it (`asset-file.ts`)",
+				"the names of the objects of an asset of the table of the bundles of it, of the places of the walk of the objects themselves behind it",
+				"the places of a script of the objects of the kind `TextAsset`, of the count of the places of the walk of the engine where the flags of the kind of it name one",
+				"the places of the objects of the other kinds themselves, of the kind of them as the name of it",
+				"the places of the bundles themselves where no object of them stands of a walk"
+			],
+			"unsupported": [
+				"archive creation",
+				"the walk of an index or of a stream of the LZMA kind, which the reference reaches through a library of its own",
+				"the places of a picture of the objects of the kind `Texture2D`",
+				"the places of a sound of the objects of the kind `AudioClip`"
+			],
+			"remainingVerification": [
+				"real-game GARbro differential output",
+				"an archive of more than one stream of the file, and of an index standing at the end of the file"
+			]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "DAT/PMASTER",
 				"class": "DatOpener",
 				"source": "ArcFormats/Unity/PMaster/ArcDAT.cs"

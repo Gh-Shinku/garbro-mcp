@@ -967,6 +967,7 @@ import { unityDsmArchiveFormat } from "./unity/dsm-archive.js";
 import { unityDsmScriptFormat } from "./unity/dsm-script.js";
 import { unityFsb5AudioFormat } from "./unity/fsb5-audio.js";
 import { unityPMasterDatFormat } from "./unity/pmaster-dat.js";
+import { unityFsFormat } from "./unity/unity-fs.js";
 import { utageImageFormat } from "./unity/utage-image.js";
 import { aqaFormat } from "./unknown/aqa.js";
 import { unknownCtfImageFormat } from "./unknown/ctf-image.js";
@@ -2428,6 +2429,7 @@ export function createDefaultRegistry(
 		gsxK4ImageFormat,
 		projectMyuGamImageFormat,
 		keroqKgd1ImageFormat,
+		unityFsFormat,
 		utageImageFormat,
 		unityFsb5AudioFormat,
 		unityDsmScriptFormat,
