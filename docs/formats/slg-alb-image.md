@@ -10,10 +10,14 @@ The file opens with `ALB1` and the size its stream unfolds to, and what unfolds 
 **picture of one of three kinds**: a PNG, a DDS or a JPEG. The reference hands that picture to whichever
 format reads it and lets it report the metadata; the three kinds are what tells them apart.
 
-This port unwraps the same stream, but hands the **picture itself** over as the entry rather than a bitmap:
-the PNG and JPEG decoders are ones this project deliberately does not carry, while the DDS one it does, and
-the header fields of all three are read off the unwrapped picture so the listing can report them where the
-header lies within the head it unwraps. This is the shape the WebP port already has.
+This port unwraps the same stream and hands a **bitmap** over, as the reference does: the picture is read with
+the three readers of this project — `packages/formats/src/shared/png-image.ts`,
+`packages/formats/src/shared/jpeg-image.ts` and the Direct Draw surface reader of
+`packages/formats/src/directdraw/dds-image.ts` — and the header fields of all three are read off the unwrapped
+picture so the listing can report them where the header lies within the head it unwraps. The JPEG reader
+follows the baseline sequential profile of ITU-T T.81; the reference hands that kind to `Jpeg.Read`, the
+platform decoder of the Windows imaging stack, so the two differ by a few places at the edge of a colour change
+where the platform widens a twice-as-coarse chroma inside its colour conversion.
 
 ## The dictionary walk
 
@@ -46,6 +50,7 @@ grows the stack until it overflows.
 
 Ten fixtures in `tests/formats/slg-alb-image.test.ts` cover a dictionary whose entries stand for their own
 bytes, one whose entries stand for others and nest inside each other (the walk comes out depth first), one
-that is run length coded, a stream of several blocks one behind the other, the three kinds of picture with
-the name each is handed over with, the header fields read off the unwrapped picture, the listing and its
-metadata, and the files and streams that are turned away.
+that is run length coded, a stream of several blocks one behind the other, each of the three kinds of picture
+decoded into a bitmap (a graphic written here place by place, a Direct Draw surface of the places the test
+names, and a grey stream exactly as the Python imaging library decodes it), the header fields read off the
+unwrapped picture, the listing and its metadata, and the files and streams that are turned away.

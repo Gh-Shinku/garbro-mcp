@@ -7,6 +7,9 @@ import {
 	unpackAlb,
 } from "../../packages/formats/src/slg/alb-image.js";
 import { expectArchive } from "../helpers/archive.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+import { pngFile } from "../helpers/png.js";
 
 const HEADER_SIZE = 0x10;
 const BLOCK_TAG = 0x4850;
@@ -77,19 +80,6 @@ function pngHead(width: number, height: number): Buffer {
 	return head;
 }
 
-function ddsHead(width: number, height: number): Buffer {
-	const head = Buffer.alloc(0x80, 0x00);
-	head.write("DDS ", 0, "latin1");
-	head.writeInt32LE(124, 4);
-	head.writeUInt32LE(height, 0x10);
-	head.writeUInt32LE(width, 0x14);
-	return head;
-}
-
-function jpegHead(): Buffer {
-	return Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
-}
-
 function layoutOf(file: Buffer) {
 	const layout = readAlbLayout(file);
 	if (!layout) throw new Error("the fixture does not read as an SLG picture");
@@ -110,6 +100,40 @@ async function entryOf(file: Buffer): Promise<{ path: string; size: bigint }> {
 	}
 }
 
+/** A Direct Draw surface of two places by one, of the places the test names, blue first. */
+function ddsPicture(body: Buffer): Buffer {
+	const head: Buffer = Buffer.alloc(0x80, 0x00);
+	head.write("DDS ", 0, "latin1");
+	head.writeInt32LE(0x7c, 4);
+	head.writeUInt32LE(1, 0x0c);
+	head.writeUInt32LE(2, 0x10);
+	head.writeInt32LE(32, 0x58);
+	head.writeUInt32LE(0xff0000, 0x5c);
+	head.writeUInt32LE(0x00ff00, 0x60);
+	head.writeUInt32LE(0x0000ff, 0x64);
+	head.writeUInt32LE(0xff000000, 0x68);
+	return Buffer.concat([head, body]);
+}
+
+/** The picture of one entry, unfolded and read. */
+async function extract(file: Buffer): Promise<Buffer> {
+	const archive = await slgAlbImageFormat.open(
+		new BufferByteSource(file),
+		"face.alb",
+	);
+	try {
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("the picture has no entry");
+		const chunks: Buffer[] = [];
+		for await (const chunk of await archive.openEntry(entry.id)) {
+			chunks.push(Buffer.from(chunk as Uint8Array));
+		}
+		return Buffer.concat(chunks);
+	} finally {
+		await archive.close();
+	}
+}
+
 describe("SLG system ALB image", () => {
 	it("unwraps a picture whose dictionary stands for its own bytes", async () => {
 		const picture = pngHead(3, 2);
@@ -121,7 +145,7 @@ describe("SLG system ALB image", () => {
 			picture,
 		);
 		expect(await entryOf(file)).toEqual({
-			path: "face.png",
+			path: "image.bmp",
 			size: BigInt(picture.length),
 		});
 	});
@@ -135,19 +159,19 @@ describe("SLG system ALB image", () => {
 		);
 		try {
 			expect(archive.metadata).toMatchObject({
-				image: "png",
+				image: "bmp",
 				width: 0x123,
 				height: 0x45,
 				bitsPerPixel: 24,
 				unpackedSize: picture.length,
 			});
-			const chunks: Buffer[] = [];
+			// The head of the picture is enough for its measurements, but the picture itself has to be whole to
+			// be read: this fixture stops behind its own header, so the extraction is turned away.
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("the picture has no entry");
-			for await (const chunk of await archive.openEntry(entry.id)) {
-				chunks.push(Buffer.from(chunk as Uint8Array));
-			}
-			expect(Buffer.concat(chunks)).toEqual(picture);
+			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
+				code: "INVALID_ARCHIVE",
+			});
 		} finally {
 			await archive.close();
 		}
@@ -193,23 +217,48 @@ describe("SLG system ALB image", () => {
 		);
 	});
 
-	it("hands each kind of picture over with the name of its own", async () => {
-		const dds = ddsHead(4, 5);
-		const ddsFile = albFile(literalBlock(dds), dds.length);
-		expect(layoutOf(ddsFile).kind).toBe("dds");
-		expect(await entryOf(ddsFile)).toEqual({
-			path: "face.dds",
-			size: BigInt(dds.length),
+	it("decodes each kind of picture into a bitmap", async () => {
+		// The reference hands the unfolded picture to the format that reads it; this port reads it with the
+		// same three readers of its own and hands a bitmap over.
+		const png = pngFile({
+			width: 2,
+			height: 2,
+			colourType: 6,
+			rows: [
+				[1, 2, 3, 4, 5, 6, 7, 8],
+				[9, 10, 11, 12, 13, 14, 15, 16],
+			],
 		});
-		const jpeg = jpegHead();
-		const jpegFile = albFile(literalBlock(jpeg), jpeg.length);
-		expect(layoutOf(jpegFile).kind).toBe("jpeg");
-		expect(await entryOf(jpegFile)).toEqual({
-			path: "face.jpg",
-			size: BigInt(jpeg.length),
+		const decodedPng = readBmpImage(
+			await extract(albFile(literalBlock(png), png.length)),
+		);
+		if (!decodedPng) throw new Error("no bitmap");
+		expect(decodedPng).toMatchObject({ width: 2, height: 2, bitsPerPixel: 32 });
+		expect([...decodedPng.pixels]).toEqual([
+			3, 2, 1, 4, 7, 6, 5, 8, 11, 10, 9, 12, 15, 14, 13, 16,
+		]);
+		const dds = ddsPicture(
+			Buffer.from([0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80]),
+		);
+		const decodedDds = readBmpImage(
+			await extract(albFile(literalBlock(dds), dds.length)),
+		);
+		if (!decodedDds) throw new Error("no bitmap");
+		expect(decodedDds).toMatchObject({ width: 2, height: 1, bitsPerPixel: 32 });
+		expect([...decodedDds.pixels]).toEqual([
+			0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
+		]);
+		const decodedJpeg = readBmpImage(
+			await extract(albFile(literalBlock(GREY_JPEG), GREY_JPEG.length)),
+		);
+		if (!decodedJpeg) throw new Error("no bitmap");
+		expect(decodedJpeg).toMatchObject({
+			width: 8,
+			height: 8,
+			bitsPerPixel: 32,
 		});
+		expect([...decodedJpeg.pixels]).toEqual([...GREY_PIXELS]);
 	});
-
 	it("lists the picture as one entry of its own kind", async () => {
 		const picture = pngHead(6, 7);
 		const file = albFile(literalBlock(picture), picture.length);
@@ -217,9 +266,9 @@ describe("SLG system ALB image", () => {
 			format: slgAlbImageFormat,
 			archive: file,
 			sourcePath: "face.alb",
-			entries: [{ path: "face.png", size: picture.length }],
+			entries: [{ path: "image.bmp", size: picture.length }],
 			metadata: {
-				image: "png",
+				image: "bmp",
 				width: 6,
 				height: 7,
 				compressed: true,

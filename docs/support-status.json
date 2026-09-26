@@ -18014,20 +18014,22 @@
 			"supported": [
 				"detect",
 				"list",
-				"extract",
+				"extraction",
 				"the dictionary of a block, as it stands and run length coded",
 				"the expansion of an entry that stands for more than itself",
 				"a stream of several blocks",
 				"the three kinds of picture the stream unwraps to",
-				"the header fields read off the unwrapped picture"
+				"the header fields read off the unwrapped picture",
+				"each kind of picture decoded into a bitmap through `packages/formats/src/shared/png-image.ts`, `packages/formats/src/directdraw/dds-image.ts` and `packages/formats/src/shared/jpeg-image.ts`"
 			],
 			"unsupported": [
 				"image creation",
-				"decoding the picture inside, which is a PNG, a DDS or a JPEG and is handed over as it stands; the PNG and JPEG decoders are ones this project does not carry"
+				"a progressive stream, a stream of four places a colour, of twelve bits a sample or of arithmetic coding"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"a real picture, which would show whether any engine stores anything but a DDS in one of these"
+				"a real picture, which would show whether any engine stores anything but a DDS in one of these",
+				"the platform decoder of the reference against this reader at the edge of a colour change"
 			]
 		},
 		{

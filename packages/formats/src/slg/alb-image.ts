@@ -9,8 +9,10 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readDdsLayout } from "../directdraw/dds-image.js";
-import { changeExtension } from "../shared/companion.js";
+import { readDdsLayout, readDdsPicture } from "../directdraw/dds-image.js";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -220,13 +222,6 @@ function innerFields(
 	return readJpegHeaderFields(picture);
 }
 
-/** The extension a picture of a kind is handed over with. */
-function innerExtension(kind: AlbKind): string {
-	if ("png" === kind) return "png";
-	if ("dds" === kind) return "dds";
-	return "jpg";
-}
-
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
@@ -259,7 +254,7 @@ export const slgAlbImageFormat: ArchiveFormat = defineFixedArchive({
 		if (source.size < BigInt(HEADER_SIZE)) return false;
 		return readAlbLayout(await readStored(source)) !== undefined;
 	},
-	async read(source: ByteSource, sourcePath: string) {
+	async read(source: ByteSource) {
 		const stored = await readStored(source);
 		const layout = readAlbLayout(stored);
 		if (!layout) {
@@ -272,10 +267,9 @@ export const slgAlbImageFormat: ArchiveFormat = defineFixedArchive({
 				Math.min(layout.unpackedSize, FIELDS_SIZE),
 			),
 		);
-		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = createFixedEntry({
 			id: 0,
-			path: changeExtension(fileName, innerExtension(layout.kind)),
+			path: "image.bmp",
 			offset: BigInt(HEADER_SIZE),
 			size: BigInt(layout.unpackedSize),
 			compressed: true,
@@ -285,9 +279,9 @@ export const slgAlbImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		});
 		return {
-			entries: [entry],
+			entries: [{ ...entry, sizeKnown: false }],
 			metadata: {
-				image: layout.kind,
+				image: "bmp",
 				compressed: true,
 				unpackedSize: layout.unpackedSize,
 				...fields,
@@ -307,6 +301,30 @@ export const slgAlbImageFormat: ArchiveFormat = defineFixedArchive({
 		if (picture.length < layout.unpackedSize) {
 			throw invalidImage("The picture unfolds to less than it declares");
 		}
-		return Readable.from([picture]);
+		// The reference hands the unfolded picture to the format that reads it — the portable network graphic
+		// reader, the Direct Draw surface reader or `Jpeg.Read`, the platform decoder of the Windows imaging
+		// stack — and this port reads it with the same three readers of this project and hands a bitmap over.
+		if ("png" === layout.kind) {
+			const image = await readPngImage(picture);
+			if (!image) throw invalidImage("Not an SLG picture");
+			return Readable.from([
+				32 === image.bitsPerPixel
+					? writeBmp32(image.width, image.height, image.pixels)
+					: writeBmp24(image.width, image.height, image.pixels),
+			]);
+		}
+		if ("dds" === layout.kind) {
+			const surface = readDdsLayout(picture, picture.length);
+			if (!surface) throw invalidImage("Not an SLG picture");
+			return Readable.from([
+				writeBmp32(
+					surface.width,
+					surface.height,
+					readDdsPicture(picture, surface),
+				),
+			]);
+		}
+		const image = readJpegImage(picture);
+		return Readable.from([writeBmp32(image.width, image.height, image.pixels)]);
 	},
 });
