@@ -13483,11 +13483,11 @@
 				"the canvas chunk with the size of the pictures",
 				"the walk of the chunks up to the first picture's own chunk",
 				"the chunks an engine leaves between the canvas and the pictures",
-				"the first picture handed over as the PNG it holds"
+				"the first picture, rebuilt as the PNG it holds and read with the reader of the PNG interchange format of this project, handed over as a bitmap"
 			],
 			"unsupported": [
 				"image creation",
-				"PNG decoding, which the project hands over rather than decodes"
+				"a picture of a kind the reader of the PNG interchange format of this project turns away, where the reference hands the stream to the decoder of the platform"
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",

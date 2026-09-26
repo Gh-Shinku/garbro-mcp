@@ -9,7 +9,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -171,7 +173,7 @@ export const mngImageFormat: ArchiveFormat = defineFixedArchive({
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "png"),
+				path: changeExtension(fileName, "bmp"),
 				offset: 0n,
 				size: source.size,
 				compressed: true,
@@ -182,13 +184,13 @@ export const mngImageFormat: ArchiveFormat = defineFixedArchive({
 					bitsPerPixel: 32,
 				},
 			}),
-			// The picture is handed over as the PNG it holds, which is not the length of the file.
+			// The picture is unfolded out of the PNG the file holds, which is not the length of the file.
 			sizeKnown: false,
 		};
 		return {
 			entries: [entry],
 			metadata: {
-				image: "png",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
 				// The engine never opens a picture of this kind at any other depth.
@@ -201,7 +203,19 @@ export const mngImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readMngImageLayout(stored);
 		if (!layout)
 			throw invalidImage("Not a Multiple-image Network Graphics file");
-		// The picture is a PNG, which the project hands over as it stands, as it does for other containers.
-		return Readable.from([readMngPicture(stored, layout)]);
+		// `MngFormat.Read` wraps the bytes behind the first chunk of the picture in the header a PNG carries
+		// and hands the whole of it to the decoder of the platform; this port unwraps them the same way and
+		// reads the picture with its own reader of that format, handing out a bitmap in its place.
+		const picture = await readPngImage(readMngPicture(stored, layout));
+		if (!picture) {
+			throw invalidImage(
+				"The picture behind the head stands of no picture of its own",
+			);
+		}
+		return Readable.from([
+			32 === picture.bitsPerPixel
+				? writeBmp32(picture.width, picture.height, picture.pixels)
+				: writeBmp24(picture.width, picture.height, picture.pixels),
+		]);
 	},
 });

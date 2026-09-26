@@ -19,8 +19,14 @@ a file that reaches its end before any picture begins is refused.
 ## How the picture is read
 
 The picture is a PNG: the reference wraps the bytes from that first `IHDR` in the marker a PNG carries and
-hands the whole thing to the decoder beside it. This project hands that PNG over as it stands, as it does
-for the other formats that hold a picture of another kind inside them, so nothing is decoded here.
+hands the whole thing to the decoder beside it. This port rebuilds the same stream and reads it with its own
+reader of the PNG interchange format, so a picture of this format is handed out as a bitmap named `.bmp`,
+with four bytes a place where the picture itself carries four and three where it does not.
+
+The picture the file holds is a **complete** PNG behind the marker: a stream whose chunks carry their own
+check words, since the reader of the PNG interchange format of this project walks them. A stream whose check
+words do not match what they stand over is refused with `INVALID_ARCHIVE`, where the platform decoder of the
+reference would refuse it as well.
 
 ## Deviations from the reference
 
@@ -28,6 +34,10 @@ for the other formats that hold a picture of another kind inside them, so nothin
   carries the chunks that end the file as well; this port cuts at the end of the first `IEND`, which is where
   the archive half beside it cuts its frames and where a decoder stops. A decoder sees the same picture
   either way.
+* The reference hands the rebuilt stream to the platform's decoder, which reads every kind of head a PNG may
+  carry; this port reads the PNG interchange format itself, so a picture of a kind that reader turns away
+  (an interlaced picture of a kind other than Adam7, a head of no places, a colour of a kind it has no walk
+  for) is refused with `INVALID_ARCHIVE`.
 * The walk of the chunks has no bound of its own in the reference; here it is bounded, a chunk whose length
   is not to be trusted is refused, and so is a chunk that does not advance.
 * A canvas chunk has to carry the eight bytes the size is read from, which the reference reads without
@@ -36,13 +46,13 @@ for the other formats that hold a picture of another kind inside them, so nothin
 ## Verification
 
 Six tests build files with a mirror writer: a canvas with its size, and the first picture found at the place
-the reference counts it to; the picture handed over as a PNG whose own header a decoder reads back - the
-frame's size and depth, which the engine leaves to the decoder - and which the format's own extract returns
-byte for byte; a file with other chunks between the canvas and the pictures; a file with two pictures, where
-the first is taken and nothing of the second is carried; a file that stops behind its pictures; and the
-refusals - the four bytes a PNG carries behind its word, a first chunk that is not the canvas, a canvas too
-short to name a size, no width, no picture before the file ends, a chunk whose length is not to be trusted,
-and a file that stops inside a chunk header.
+the reference counts it to; the picture rebuilt as a PNG whose own header a decoder reads back - the frame's
+size and depth, which the engine leaves to the decoder - and the bitmap that stream unfolds to, whose places
+are the places of the file of the picture itself; a file with other chunks between the canvas and the
+pictures; a file with two pictures, where the first is taken and nothing of the second is carried; a file
+that stops behind its pictures; and the refusals - the four bytes a PNG carries behind its word, a first
+chunk that is not the canvas, a canvas too short to name a size, no width, no picture before the file ends, a
+chunk whose length is not to be trusted, and a file that stops inside a chunk header.
 
 What stands on the reference alone: the cut at the first `IEND` rather than at the end of the file, which no
 fixture here compares against the reference's own range; and no real file is on hand to compare against

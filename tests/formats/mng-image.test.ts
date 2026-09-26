@@ -1,4 +1,6 @@
 import { Buffer } from "node:buffer";
+import { deflateSync } from "node:zlib";
+import { crc32 } from "@garbro-mcp/codecs";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import {
@@ -7,18 +9,23 @@ import {
 	readMngPicture,
 } from "../../packages/formats/src/mng/mng-image.js";
 import { readPngHeaderFields } from "../../packages/formats/src/shared/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from([0x8a, 0x4d, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const PNG_SIGNATURE = Buffer.from([
 	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
 ]);
 
-/** A chunk: its length and name in front, its own bytes, and a check word behind. */
+/** A chunk: its length and name in front, its own bytes, and a check word behind. The check word is the
+ * one the picture itself carries, since the reader of the picture of this project walks it. */
 function chunk(type: string, body: Buffer): Buffer {
 	const head = Buffer.alloc(8, 0x00);
 	head.writeUInt32BE(body.length, 0);
 	head.write(type, 4, "latin1");
-	return Buffer.concat([head, body, Buffer.alloc(4, 0x00)]);
+	const named = Buffer.concat([Buffer.from(type, "latin1"), body]);
+	const crc = Buffer.alloc(4, 0x00);
+	crc.writeUInt32BE(crc32(named), 0);
+	return Buffer.concat([head, body, crc]);
 }
 
 function imageHeader(
@@ -88,7 +95,14 @@ function simpleFrames(): MngFixture["frames"] {
 			height: 3,
 			depth: 8,
 			colourType: 2,
-			body: Buffer.from([1, 2, 3, 4]),
+			// Three rows of two places, every row behind its own place of a walk of the file that stands of
+			// no walk of the engine at all.
+			body: deflateSync(
+				Buffer.from([
+					0, 1, 2, 3, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 13, 14, 15, 16, 17,
+					18,
+				]),
+			),
 		},
 	];
 }
@@ -126,7 +140,7 @@ describe("MNG image", () => {
 		expect(layout.pngOffset).toBe(frames[0]);
 	});
 
-	it("hands the first picture over as the PNG it holds", async () => {
+	it("reads the first picture of the file as the PNG it holds", async () => {
 		const { file } = mngFile({
 			width: 640,
 			height: 480,
@@ -145,7 +159,17 @@ describe("MNG image", () => {
 		// The frame's own header, which the engine leaves to the decoder beside it.
 		expect(fields).toEqual({ width: 2, height: 3, bitsPerPixel: 24 });
 		const extracted = await pictureOf(file);
-		expect(extracted).toEqual(picture);
+		// `MngFormat.Read` hands the rebuilt PNG to the decoder of the platform; this port reads it with its
+		// own reader of that format, so what comes out is a bitmap of the places of the picture.
+		const image = readBmpImage(extracted);
+		if (!image) throw new Error("the picture is not a bitmap");
+		expect([image.width, image.height]).toEqual([2, 3]);
+		expect(image.bitsPerPixel).toBe(24);
+		// The places of the file of the picture of the engine stand of the places of the file of the colour
+		// of the three of them first, which is the walk of the engine of this port.
+		expect([...image.pixels]).toEqual([
+			3, 2, 1, 6, 5, 4, 9, 8, 7, 12, 11, 10, 15, 14, 13, 18, 17, 16,
+		]);
 	});
 
 	it("steps over the chunks an engine leaves between the canvas and the pictures", () => {
