@@ -62,9 +62,18 @@ stand of this name", not the answer to "which format opened this file".
 
 ## What is not carried
 
-* A resource the reference names but this project carries no walk of: `DAT/GENERIC` (`DataFileFormat`), `TXT`
-  (`TextScriptFormat`) and `SCR` (`BinScriptFormat`). Those are format rows of their own, not part of the
-  alias work.
+* Three of the kinds the table names stand of nothing in this project, and the reason is the reference rather
+  than the port: `TXT` (`TextScriptFormat`), `SCR` (`BinScriptFormat`) and `DAT/GENERIC` (`DataFileFormat`)
+  are `GenericScriptFormat`s (`GameRes/ScriptText.cs`), whose `Signature` is nought, whose `IsScript` answers
+  `false` and whose `Read` and `Write` throw. `ScriptFormat.FindFormat` keeps only the formats whose
+  `IsScript` answers `true`, so the reference itself never identifies a file as any of these three; they are
+  registry entries for the alias table, and `DAT/GENERIC` even answers an empty `Type`. A port of them would
+  be a row nothing could ever be detected as, so they are left alone. `AMP/LEAF` (`ArcFormats/Leaf/ArcPAK.cs`,
+  class `AmpFormat`) is a fourth of the same shape: an empty `Type`, a `Signature` of nought and no
+  extensions. The fifth kind of the table's targets that this project carries no walk of, `SCR` of the
+  GsWin engine's three-word script (`ArcFormats/GsPack/ArcGsPack.cs`, class `GsScriptFormat`), is a walk of
+  its own and **is** ported, as `gs-pack-scw-script`; note that the alias table's `SCR` target is the other
+  class of the same name in `GameRes/ScriptText.cs`, not that one.
 * The reference's `Type` field of an alias entry (`ResourceAlias` may name `archive`, `image`, `audio` or
   `script` and so narrow which registry the target is looked up in). At this baseline none of the 26 entries
   sets it, so every one of them is resolved across all formats, which is what this port does.
