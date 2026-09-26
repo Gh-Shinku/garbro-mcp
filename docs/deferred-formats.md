@@ -51,9 +51,9 @@ open archives that the shipped defaults already cover.
   (`NcSchemeCrc32`) rather than of the folding hash of the older reader.
 - `PKZ` (`ArcFormats/Sviu/ArcPKZ.cs`), `PKG/2` (`ArcFormats/Yatagarasu/ArcPKG2.cs`),
   `ADS` (`ArcFormats/BlackRainbow/ArcADS.cs`), `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`),
-  `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`), `ARC/AI5WIN` (`ArcFormats/elf/ArcAi5Win.cs`) and
+  `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`) and
   `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
-  a `KnownKeys` table.
+  a `KnownKeys` table. (`ARC/AI5WIN` stood here as well, but its shape of the index **stands read now without a key**: the reference falls back on `Ai5ArcIndexReader.GuessSchemes`, which reads the count of a name and the three ciphers out of the index itself, and the port `elf-ai5win` stands of that guess, so the empty table of the reference costs it nothing - see `docs/formats/elf-ai5win.md`.)
 - `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`, the `ARC/FOMA` opener) cannot read a file on its own at all:
   its index is not in the archive but in a **separate executable** that stands beside it, and where in that
   executable is a number the engine keeps **per archive name per executable name**. `Is9Scheme.KnownSchemes`
@@ -141,18 +141,18 @@ open archives that the shipped defaults already cover.
   archives read through a scheme of the source, but every entry of them is unwrapped by the `Decoder` of the
   same engine, whose index, names and entries are all read through it. (The older archive of the same engine,
   `WAR/1.0` of `ArcFormats/ShiinaRio/ArcWARC1.0.cs`, is ported as `shiina-rio-warc`.)
-- `TCD` / `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): the key of the archive is looked up in `KnownKeys`, held as
-  `new Dictionary<string, int>()` in the source and filled from a data file, and every entry of the archive is
-  unwrapped with it.
+- `TCD` / `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): this one stood here wrongly - the tables of the archive read **without any key at all**, of the cipher of their own section, which stands in the file. The `KnownKeys` table of the source reaches one place only, `OpenSpdc`, where a picture whose places stand of the cipher of the engine's own stands; a stock build carries no key for it and hands such a picture over as it stands, which is what the reference does as well. **It stands ported now**, as `topcat-tcd3` - see `docs/formats/topcat-tcd3.md`.
+
+
 - `SERAPH/ARCH` (`ArcFormats/Seraphim/ArcSeraph.cs`): the archive stands at a place within a file that is named
   by a scheme - `KnownSchemes` holds `new Dictionary<string, ArchPacScheme>()` and the reader walks the places
   the schemes name in the order of their offsets. With no scheme it can tell no archive at all.
 - `YPF` (`ArcFormats/YuRis/ArcYPF.cs`, `QueryEncryptionScheme` at line 192): the key of the index and of every
   entry comes out of a scheme the reader is asked for by the name of the file, out of a table held as
   `new Dictionary<string, YpfScheme>()` in the source; without one it reads nothing.
-- `NSA` (`ArcFormats/NScripter/ArcNSA.cs`): the key that unwraps an entry is looked up in `KnownKeys`, held as
-  `new Dictionary<string, string>()` in the source and filled from a data file, and the payloads of the
-  archives of that engine are **bzip2** streams this project has no decoder for.
+- `NSA` (`ArcFormats/NScripter/ArcNSA.cs`): this one stood here wrongly as well - the index of such an archive reads **without any key at all**, and `KnownKeys` reaches only the encrypted variant of the same format (`NsaEncryptedArchive`, behind `QueryPassword`), which the reference itself cannot read without a password from the user. **It stands ported now**, as `nscripter-nsa-archive`: the index, the walk of the places of the file of the engine, and the picture of the name `spb`, which the reference stands of as a bitmap of twenty four places of a colour. What stands unread of it is a file of the walk of **bzip2** (the kind `4` and the name `nbz`), of which this project carries no walk - see `docs/formats/nscripter-nsa-archive.md`.
+
+
 
 - `NPK` (`ArcFormats/NitroPlus/ArcNPK.cs`, class `NpkOpener`, signature `NPK2`): the whole index is
   **AES-CBC** encrypted under a key of the game of the archive. `TryOpen` asks `QueryEncryption` for it,
