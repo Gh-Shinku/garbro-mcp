@@ -13,6 +13,7 @@ import {
 	readBmpImage,
 	toBgra32,
 } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 
 /** The places of the file of the walk of the bits of the picture of the engine, of the high place. */
 class Bits {
@@ -103,9 +104,8 @@ function withId(id: number, rest: Buffer): Buffer {
 	return Buffer.concat([head, rest]);
 }
 
-const JPEG: Buffer = Buffer.from([
-	0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46,
-]);
+/** The stream of the picture of the engine of the walk of the engine of it, of the places of the file of it. */
+const JPEG: Buffer = GREY_JPEG;
 
 function swfFile(): Buffer {
 	return Buffer.concat([
@@ -134,9 +134,32 @@ function swfFile(): Buffer {
 	]);
 }
 
+/** The places of the file of the picture of the engine of the third kind of it: the count of the places of
+ * the picture, the picture itself, and the stream of the alpha of it behind them. */
+function jpeg3(id: number, jpeg: Buffer, alpha: Buffer): Buffer {
+	const body: Buffer = Buffer.alloc(6, 0);
+	body.writeUInt16LE(id, 0);
+	body.writeInt32LE(jpeg.length, 2);
+	return Buffer.concat([body, jpeg, deflateSync(alpha)]);
+}
+
+/** A picture of the engine of the third kind, of the alpha of it of the places of the file of the walk. */
+function swfJpeg3File(alpha: Buffer): Buffer {
+	return Buffer.concat([
+		swfHead(8, 8, 0x0c00, 1),
+		tag(35, jpeg3(9, GREY_JPEG, alpha)),
+		tag(0, Buffer.alloc(0)),
+	]);
+}
+
 /** The places of the file of the picture of the engine, of the walk of the engine of the file of it. */
 async function open(data: Buffer) {
 	return swfArchiveFormat.open(new BufferByteSource(data), "cg.swf");
+}
+
+/** The picture of the engine of the walk of the engine of the file of it, as a bitmap of this project. */
+async function pictureOf(data: Buffer, at: number) {
+	return readBmpImage(await contentOf(data, at));
 }
 
 async function contentOf(data: Buffer, at: number): Promise<Buffer> {
@@ -180,8 +203,8 @@ describe("Shockwave Flash presentation", () => {
 		expect(handle.entries.map((entry) => entry.path)).toEqual([
 			"cg#00001.bin",
 			"cg#00002.bin",
-			"cg#00003.jpg",
-			"cg#00004.jpg",
+			"cg#00003.bmp",
+			"cg#00004.bmp",
 			"cg#00005.bmp",
 			"cg#00006.bmp",
 			"cg#00007.mp3",
@@ -207,8 +230,15 @@ describe("Shockwave Flash presentation", () => {
 		const data = swfFile();
 		expect([...(await contentOf(data, 0))]).toEqual([0x01, 0x00, 0x02]);
 		expect([...(await contentOf(data, 1))]).toEqual([0x02, 0x00, 0x0a]);
-		expect([...(await contentOf(data, 2))]).toEqual([...JPEG]);
-		expect([...(await contentOf(data, 3))]).toEqual([...JPEG]);
+		// The two kinds of picture the engine keeps as a JPEG are read with the reader of this project: the
+		// places of the file of the picture of the engine itself stand behind the count of the places of the
+		// file of it, and those of the second kind behind the places of the file of the walk of it.
+		expect([...((await pictureOf(data, 2))?.pixels ?? [])]).toEqual([
+			...GREY_PIXELS,
+		]);
+		expect([...((await pictureOf(data, 3))?.pixels ?? [])]).toEqual([
+			...GREY_PIXELS,
+		]);
 	});
 
 	it("reads the places of the file of the picture of the engine of the walk of the engine of it", async () => {
@@ -279,6 +309,43 @@ describe("Shockwave Flash presentation", () => {
 		expect(image?.bitsPerPixel).toBe(16);
 		expect(image?.masks).toEqual({ red: 0xf800, green: 0x07e0, blue: 0x001f });
 		expect([...(image?.pixels ?? [])]).toEqual([...places]);
+	});
+
+	it("reads the picture of the third kind and the alpha of it", async () => {
+		// `SwfJpeg3Decoder` reads the stream of the alpha of the picture behind the places of the file of the
+		// picture itself and lays it over the fourth place of every place of the picture.
+		const alpha = Buffer.alloc(64);
+		for (let at = 0; at < 64; at += 1) alpha[at] = at + 1;
+		const image = await pictureOf(swfJpeg3File(alpha), 0);
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([8, 8]);
+		const expected = Buffer.from(GREY_PIXELS);
+		for (let at = 0; at < 64; at += 1) expected[at * 4 + 3] = at + 1;
+		expect([...image.pixels]).toEqual([...expected]);
+		// A stream that stands short of the count of the places of the picture leaves nought behind it.
+		const short = await pictureOf(swfJpeg3File(Buffer.alloc(4, 0x77)), 0);
+		if (!short) throw new Error("no bitmap");
+		const padded = Buffer.from(GREY_PIXELS);
+		for (let at = 0; at < 64; at += 1)
+			padded[at * 4 + 3] = at < 4 ? 0x77 : 0x00;
+		expect([...short.pixels]).toEqual([...padded]);
+	});
+
+	it("turns away a picture of the third kind whose count of the places of the file stands behind it", async () => {
+		const body: Buffer = Buffer.alloc(6, 0);
+		body.writeUInt16LE(9, 0);
+		body.writeInt32LE(GREY_JPEG.length + 0x100, 2);
+		const data = Buffer.concat([
+			swfHead(8, 8, 0x0c00, 1),
+			tag(35, Buffer.concat([body, GREY_JPEG])),
+			tag(0, Buffer.alloc(0)),
+		]);
+		const handle = await open(data);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		await expect(handle.openEntry(entry.id)).rejects.toMatchObject({
+			code: "INVALID_ARCHIVE",
+		});
 	});
 
 	it("reads the places of the file of the sound of the stream of the picture of the engine", async () => {

@@ -52,17 +52,34 @@ up to the next sound stream tag.
 
 ## Extraction
 
-* `DefineBitsJpeg` — the body from offset two.
-* `DefineBitsJpeg2` — from the first `FF D8` signature at or behind offset two, where the reference's
-  scan skips over the `FF D9` and `FF FF D8` shapes before it.
-* `DefineBitsJpeg3` — the `i32` at offset two is the length of the JPEG, which stands at offset six. The
-  alpha plane that follows it is dropped: this port hands the JPEG over alone, where the reference decodes
-  both and applies the alpha.
+* `DefineBitsJpeg`, `DefineBitsJpeg2` and `DefineBitsJpeg3` — decoded to a bitmap (below).
 * `DefineBitsLossless` and `DefineBitsLossless2` — decoded to a bitmap (below).
 * `DefineSound` — for the mp3 kind (the flags byte at offset two shifted right by four is two) the body
   from offset nine, otherwise the body from offset two, which is exactly what the reference returns (it
   computes the sample rate, the sample size and the channel count and then uses none of them).
-* every other tag — the body as it stands. The JPEG tags are handed over without decoding.
+* every other tag — the body as it stands.
+
+## Pictures kept as a JPEG
+
+Three tags keep a picture as a JPEG, and `SwfOpener.OpenImage` hands each of them to the platform's JPEG
+decoder:
+
+* `DefineBitsJpeg` (6) — the picture stands behind the count of the places of the file of it. The reference
+  walks the body for the `FF D8` mark of a JPEG and reads from there; this port does the same;
+* `DefineBitsJpeg2` (21) — the picture stands behind the places of the file of the walk of it, which the
+  reference walks for the mark with `FindJpegSignature`, skipping the `FF D9` and `FF FF D8` shapes on the
+  way;
+* `DefineBitsJpeg3` (35) — the `i32` at offset two is the count of the places of the file of the picture,
+  which stands at offset six; behind it stands the alpha channel of the picture as a stream of zlib,
+  unpacked into as many places as the picture holds and laid over the fourth place of every place of it,
+  where a stream that stands short of that count leaves nought behind it.
+
+This port reads the JPEG with its own reader of the JPEG interchange format and lays the alpha channel of
+the third kind over it in the same way, so a picture of any of the three kinds is handed out as a bitmap
+with four bytes a place, named `.bmp`. A body of the first two kinds that holds no JPEG mark, a
+`DefineBitsJpeg3` whose count of the places of its picture stands behind the body, and a picture whose
+bytes are in no format the reader of this project knows are refused with `INVALID_ARCHIVE`, where the
+platform decoder of the reference is handed the stream instead.
 
 ## Lossless pictures
 
@@ -84,12 +101,14 @@ row of the inflated data is the top row of the picture.
 ## Tests and deviations
 
 `tests/formats/macromedia-swf.test.ts` builds small files of its own: a plain `FWS` file and the same
-file with a deflated body (`CWS`), carrying a `JpegTables` tag, a `DoAction` tag, both JPEG tags, a
-`DefineBitsLossless2` of thirty two bits, a `DefineBitsLossless` of thirty two bits, a palette picture of
-eight bits, a picture of sixteen bits, a `DefineSound` of the mp3 kind, a sound stream head of the mp3
-kind with two blocks behind it, a tag of no interest and an empty tag. The fixtures pin the head, the tag
-walk, the names and kinds, the JPEG contents, the decoded bitmaps (both the stored bytes and the colours
+file with a deflated body (`CWS`), carrying a `JpegTables` tag, a `DoAction` tag, both JPEG tags of the
+first two kinds, a `DefineBitsLossless2` of thirty two bits, a `DefineBitsLossless` of thirty two bits, a
+palette picture of eight bits, a picture of sixteen bits, a `DefineSound` of the mp3 kind, a sound stream
+head of the mp3 kind with two blocks behind it, a tag of no interest and an empty tag; a picture of the
+third kind stands in a file of its own. The fixtures pin the head, the tag walk, the names and kinds, the
+places of the pictures of the three JPEG kinds, the decoded bitmaps (both the stored bytes and the colours
 through the colour table) and the sound contents.
 
-The reference's `SwfOpener` also exposes an image interface, which hands over the decoded pictures for the
-JPEG tags as well; this port only hands the JPEG bytes over, as the archive side of the reference does.
+The reference's `SwfOpener` exposes both an archive side, which hands the places of a `DefineBitsJpeg` over
+as they stand, and an image side, which decodes it; this port follows the image side for every picture of
+the engine, as it does for the lossless kinds.

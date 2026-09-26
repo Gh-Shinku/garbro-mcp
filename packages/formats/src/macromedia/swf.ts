@@ -21,6 +21,8 @@ import {
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
 
 const HEAD_SIZE = 8;
 const PLAIN = "FWS";
@@ -201,24 +203,84 @@ function soundBlocks(chunks: SwfChunk[], head: SwfChunk): SwfChunk[] {
 	return blocks;
 }
 
-/** The places of the file of the picture of the engine of the walk of the engine of the table of it. */
-function jpegOf(chunk: SwfChunk): Buffer | undefined {
+/** `SwfOpener.OpenBitsJpeg`: the places of the file of the picture of the first kind of it. */
+export function findBitsJpeg(body: Buffer): number {
+	for (let at = 0; at < body.length - 2; at += 1) {
+		if (0xff === body[at] && 0xd8 === body[at + 1]) return at;
+	}
+	return -1;
+}
+
+/**
+ * `SwfOpener.OpenImage` for the three kinds of picture the engine keeps as a JPEG:
+ *
+ * * `DefineBitsJpeg` stands of the picture itself behind the places of the file of the count of the places
+ *   of it, which the reference walks to find the mark of the walk of the places of the file;
+ * * `DefineBitsJpeg2` stands of the places of the file of the walk of the engine of the places of the file
+ *   of the picture, which `FindJpegSignature` walks to;
+ * * `DefineBitsJpeg3` names the count of the places of the file of the picture of it at two and keeps the
+ *   places of the file of the alpha of it behind them, as a stream of zlib.
+ *
+ * The reference hands each of them to the decoder of the platform and lays the alpha of the third over the
+ * fourth place of every place of the picture; this port reads the JPEG with its own reader of that format
+ * and does the same around it.
+ */
+export async function unpackSwfJpeg(chunk: SwfChunk): Promise<Buffer> {
+	const body = chunk.body;
+	let picture: Buffer;
+	let alphaAt = -1;
 	if (TYPES.Jpeg === chunk.type) {
-		return chunk.body.subarray(2);
+		const at = findBitsJpeg(body);
+		if (at < 0) {
+			throw invalidPicture(
+				"The places of the file of the picture of the engine stand of no walk of the engine",
+			);
+		}
+		picture = body.subarray(at);
+	} else if (TYPES.Jpeg2 === chunk.type) {
+		const at = findJpegSignature(body);
+		if (at < 0) {
+			throw invalidPicture(
+				"The places of the file of the picture of the engine stand of no walk of the engine",
+			);
+		}
+		picture = body.subarray(at);
+	} else {
+		if (body.length < 6) {
+			throw invalidPicture(
+				"The places of the file of the picture of the engine stand of no head of it",
+			);
+		}
+		const length = body.readInt32LE(2);
+		if (length < 0 || 6 + length > body.length) {
+			throw invalidPicture(
+				"The count of the places of the file of the picture of the engine stands behind it",
+			);
+		}
+		picture = body.subarray(6, 6 + length);
+		alphaAt = 6 + length;
 	}
-	if (TYPES.Jpeg2 === chunk.type) {
-		const at = findJpegSignature(chunk.body);
-		return at < 0 ? undefined : chunk.body.subarray(at);
+	if (!readJpegHeaderFields(picture)) {
+		throw invalidPicture(
+			"The places of the file of the picture of the engine stand of no walk of the engine",
+		);
 	}
-	if (TYPES.Jpeg3 === chunk.type) {
-		const length = chunk.body.readInt32LE(2);
-		if (length < 0 || 6 + length > chunk.body.length) return undefined;
-		// The places of the file of the alpha of the picture of the engine stand of the walk of the places
-		// of the file of it behind the places of the file of the picture of the engine itself: this port
-		// stands of the places of the file of the picture of the engine alone.
-		return chunk.body.subarray(6, 6 + length);
+	const image = readJpegImage(picture);
+	const width = image.width;
+	const height = image.height;
+	const pixels: Buffer = Buffer.alloc(width * height * 4, 0x00);
+	Buffer.from(image.pixels).copy(pixels);
+	if (alphaAt >= 0) {
+		// `SwfJpeg3Decoder` reads the stream of the alpha of the picture into places of the count of the
+		// places of the picture, so a stream that stands short of that count leaves nought behind it.
+		const alpha: Buffer = Buffer.alloc(width * height, 0x00);
+		const unpacked = await inflateZlibBuffer(body.subarray(alphaAt));
+		unpacked.copy(alpha, 0, 0, Math.min(unpacked.length, alpha.length));
+		for (let at = 0; at < alpha.length; at += 1) {
+			pixels[at * 4 + 3] = alpha[at] ?? 0;
+		}
 	}
-	return undefined;
+	return writeBmp32(width, height, pixels);
 }
 
 /** `SwfJpeg2Decoder.FindJpegSignature`: the places of the file of the picture of the engine. */
@@ -351,8 +413,13 @@ async function readEntry(
 	if (TYPES.Lossless === chunk.type || TYPES.Lossless2 === chunk.type) {
 		return await unpackSwfLossless(chunk);
 	}
-	const jpeg = jpegOf(chunk);
-	if (jpeg) return jpeg;
+	if (
+		TYPES.Jpeg === chunk.type ||
+		TYPES.Jpeg2 === chunk.type ||
+		TYPES.Jpeg3 === chunk.type
+	) {
+		return await unpackSwfJpeg(chunk);
+	}
 	if (TYPES.Sound === chunk.type) return soundOf(chunk);
 	return Buffer.from(chunk.body);
 }
@@ -364,7 +431,7 @@ function kindOf(type: number): string {
 function extensionOf(type: number): string {
 	if (TYPES.Sound === type) return "mp3";
 	if (TYPES.Jpeg === type || TYPES.Jpeg2 === type || TYPES.Jpeg3 === type) {
-		return "jpg";
+		return "bmp";
 	}
 	if (TYPES.Lossless === type || TYPES.Lossless2 === type) return "bmp";
 	return "bin";

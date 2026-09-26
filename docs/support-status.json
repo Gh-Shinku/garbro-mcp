@@ -11979,15 +11979,14 @@
 				"entry names from the word at the start of the tag body, and the extension from the tag kind",
 				"the contents of DefineBitsJpeg from behind the body word",
 				"the contents of DefineBitsJpeg2 from the embedded JPEG signature",
-				"the contents of DefineBitsJpeg3 up to its declared JPEG length",
+				"DefineBitsJpeg, DefineBitsJpeg2 and DefineBitsJpeg3 decoded with the reader of the JPEG interchange format of this project, the third of them with the stream of the alpha of the picture laid over the fourth place of every place",
 				"DefineBitsLossless and DefineBitsLossless2 decoded to a bitmap, at eight bits with a colour table, at sixteen bits of five and six bit colour, and at thirty two bits",
 				"the contents of DefineSound, of the mp3 kind from behind its header and of the other kinds from behind the body word",
 				"the mp3 sound streams of SoundStreamHead, SoundStreamHead2 and the SoundStreamBlock tags that follow them"
 			],
 			"unsupported": [
 				"archive creation",
-				"JPEG decoding (the JPEG tags are handed over without it)",
-				"the alpha plane of DefineBitsJpeg3 (the JPEG is handed over without it)"
+				"a JPEG whose places are in no picture format this port reads, where the reference hands the stream to the decoder of the platform"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
