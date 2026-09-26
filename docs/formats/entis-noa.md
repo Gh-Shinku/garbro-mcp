@@ -69,13 +69,38 @@ probability model, follows a chain of sub-models keyed on the last four symbols,
 
 The remaining encryption kinds (`0x40000000`, `0x20000000`, `0xc0000010`, `0xa0000010`) need a password that
 the reference takes from a `IDR_COTOMI` resource of a neighbouring executable or from its own settings. This
-port has no such source.
+port has no such source, so those entries are still refused.
+
+## The BSHF cipher
+
+The cipher behind the encryption kind `0x40000000` is ported as `packages/codecs/src/erisa-bshf.ts`. A stream
+of it is decoded thirty two bytes at a time, and a block of thirty two bytes is a bag of two hundred and fifty
+six bits that the password permutes. The password is expanded to at least thirty two bytes: the byte `0x1b`
+follows a shorter password and every byte behind it is the sum of the byte the count wraps to and the byte
+before it. Then, for every bit of a block, a counter takes the next password byte, the low three bits of the
+counter name a place inside a byte and the rest name the byte; that byte is scanned forward, whole bytes at a
+time in eights and then bit by bit, until a place stands free, and the bit of the source goes there. The scan
+continues from that place for the bit behind it, and the place in the password advances by one for every
+block.
+
+A password of no bytes does not leave a block where it is: the counter stands still but the scan keeps moving,
+so the first eight bits of the source land in the first byte of the block in reverse order and the bits behind
+them land where the scan reaches next. `tests/codecs/erisa-bshf.test.ts` pins the expansion of a short
+password by hand, a password of thirty two bytes and more standing as it is, an empty password standing as a
+space and a character outside ASCII standing as a question mark, the places a password of ones names, the
+places a password of no bytes names, the permutation of every block — one bit in, one bit out, and two hundred
+and fifty six different places — the password walking forward for every block, a block handed out in as many
+calls as a caller asks for, and a stream whose last block stands short.
 
 ## Deviations
 
 * Password-encrypted entries are listed but refused at extraction with `UNSUPPORTED_FEATURE`. The reference
-  decodes them through `DecodeBSHF` once it has a password, which it reads from a neighbouring executable or
-  from its own settings; this port has neither a password source nor the `BSHF` cipher.
+  decodes the kind `0x40000000` through `DecodeBSHF` once it has a password, which it reads from a
+  `IDR_COTOMI` resource of a neighbouring executable or from its own settings; the cipher is ported here (see
+  below) but this port has no password source, and the reference's own table of game keys stands empty in the
+  tree, so the cipher stands unwired.
+* The reference hands an encrypted entry out **as it stands** when it finds no password; this port turns such
+  an entry away instead, because the bytes it would hand over are not the bytes the entry names.
 * The `Nemesis` walk is the reference's, but its fixture stands of the counts of the walk of the engine of the
   port itself: the reference holds no walk that stands of the places of the count of the walk of the engine
   of a picture of the engine (its own encoder is elsewhere). The walk therefore stands pinned of the counts
