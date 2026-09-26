@@ -92,8 +92,13 @@ open archives that the shipped defaults already cover.
   then calls `DetectEncryptionScheme` on what the answer holds.
 - `BIN/PAC` (`ArcFormats/DigitalWorks/ArcBIN.cs`) reaches its key through a `Scheme` whose `DefaultScheme`
   ships without one.
-- `CRZ` (`ArcFormats/Crowd/ImageCRZ.cs`) is an `SZDD` stream, which this project can already walk, behind
-  a header whose key comes from `CrzScheme.KnownKeys`, empty in the shipped `DefaultScheme`.
+- `CRZ` (`ArcFormats/Crowd/ImageCRZ.cs`) is an `SZDD` stream, which this project can already walk
+  (`inflateLzss` of the walk of the engine of the counts of the places of it, of the counts of the places of
+  a frame of `0x1000` and of the places of the counts of the walk of the engine itself that this format
+  stands at `0x1000 - 0x10`), behind a header whose key comes from `CrzScheme.KnownKeys`, empty in the
+  shipped `DefaultScheme`: the walk of the engine stands of `KnownKeys.Keys.Max (x => x.Length)` before it
+  reads a count of the picture, which stands of no count of them at all over an empty dictionary, so without
+  the scheme of a game the reference stands of no picture of this kind at all.
 
 - `PCK/TAMAMO` (`ArcFormats/Tamamo/ArcPCK.cs`, `PckScheme` at line 221): the archive opens with `PACK` and
   the mark `_FILE001`, but its **whole index** is decrypted with a key `QueryKey (file.Name)` looks up in
@@ -220,7 +225,13 @@ further than the reference's own list of them.
   `gameres-jpeg-image` hands a graphic of that kind over as it stands rather than reading its places. The
   port of `BIP` (`ArcFormats/Cri/ImageBIP.cs`) is `cri-bip-image`, and `qlie-dpng-image` is the port of the
   tiled picture of the same engine.
-- `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library.
+- `CAB` (`Experimental/Cabinet/ArcCAB.cs`) hands every entry to a cabinet library: the reference carries no
+  walk of a cabinet of its own at all - it stands of `Microsoft.Deployment.Compression.Cab`, the managed
+  cabinet reader of the WiX deployment tools, which does not stand in the tree - so there is no algorithm of
+  the engine to align with, only the cabinet format itself (`MSCF`). A port of it would be a reader of the
+  format from its specification rather than an alignment, which is the same standing as `WMA` and `OPUS`
+  beside it. (The other `CabOpener` of the tree, `ArcFormats/EntExec/ArcCAB.cs`, is a walk of the engine and
+  **is** ported, as `entexec-cab`.)
 - `WMA` (`ArcFormats/AudioWMA.cs`) hands its stream to NAudio. (`AIFF` stood beside it and is now read: the
   walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) hands its stream to an Opus library.
