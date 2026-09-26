@@ -292,6 +292,7 @@ import { ebisuEp1Format } from "./ebisu/ep1.js";
 import { electriciteitDatFormat } from "./electriciteit/dat.js";
 import { pkkFormat } from "./electriciteit/pkk.js";
 import { ai5DatFormat } from "./elf/ai5dat.js";
+import { ai5WinFormat } from "./elf/arc-ai5win.js";
 import { ai5G24ImageFormat, ai5Msk16ImageFormat } from "./elf/g24-image.js";
 import { elfGccImageFormat } from "./elf/gcc-image.js";
 import { elfGphImageFormat } from "./elf/gph-image.js";
@@ -1718,6 +1719,7 @@ export function createDefaultRegistry(
 			cgdFormat,
 			ucomDataFormat,
 			ai5DatFormat,
+			ai5WinFormat,
 			awfFormat,
 			mgdFormat,
 			wvbFormat,

@@ -6116,6 +6116,34 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ARC/AI5WIN",
+				class: "ArcAI5Opener",
+				source: "ArcFormats/elf/ArcAi5Win.cs",
+			},
+			localId: "elf-ai5win",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the count of the places of the pictures of the engine at 0",
+				"the shape of the index of the engine read out of the index itself (`Ai5ArcIndexReader.GuessSchemes`): the count of the places of a name of one of 0x14, 0x1e, 0x20 and 0x100, the cipher of the names off the last place of the field of the first name, the cipher of the places off the first picture and the cipher of the counts off the second picture of the file",
+				"the records of the index: the places of a name, exclusive-ored with the cipher of the names, and then the count of the places of the picture and the places of it, exclusive-ored with their own ciphers",
+				"a name of the engine of a place below the least place of a name of the engine, of a place of no name beyond the count of the scheme, or of no place of no name within it, of which each stands refused",
+				"a place of a picture within the index of the archive or beyond the file, of which each stands refused",
+				"the places of a picture of the engine, which stand of the LZSS walk of the engine for the names `mes`, `lib`, `a`, `a6`, `msk` and `x` (`codecs/lzss.ts`)",
+			],
+			unsupported: [
+				"archive creation",
+				"the schemes of the table of the reference (`KnownSchemes`), which a stock build of the reference leaves empty as well",
+				"the kinds of the names of the pictures of the engine",
+			],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"an archive of a real game of the engine",
+			],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "BIN/HED",
 				class: "PakOpener",
 				source: "ArcFormats/elf/ArcHED.cs",
