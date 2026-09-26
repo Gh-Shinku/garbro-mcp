@@ -426,10 +426,12 @@ export class EriReader {
 						operation = context.getNBits(4) | 0xc0;
 						context.initGammaContext();
 					}
-				} else if (TYPE_GRAY === this.info.formatType) {
-					operation = 0xc0;
 				} else {
-					operation = 0;
+					// The counts of the walk of the engine of the count of the walk of the engine of a
+					// picture of one count of a colour stand of the counts of the walk of the engine of the
+					// kind of the places of the picture itself, of the counts of the walk of the engine of
+					// the places of the count of the walk of the picture of the counts of the gamma of it.
+					operation = TYPE_GRAY === this.info.formatType ? 0xc0 : 0;
 					if (
 						0 === (encodeType & 1) &&
 						ARCHITECTURE_RUN_LENGTH_GAMMA === this.info.architecture

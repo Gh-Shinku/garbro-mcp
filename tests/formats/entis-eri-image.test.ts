@@ -303,6 +303,92 @@ describe("Entis rasterized image", () => {
 		}
 	});
 
+	it("stands of the counts of the walk of the engine of the gamma of a picture", async () => {
+		// The places of the count of the walk of a picture of the engine stand of the counts of the walk of
+		// the engine of the kind `RunlengthGamma` as well (`DecodeGammaCodeBytes`): the counts of the walk
+		// of the engine of the places of the picture stand of the counts of the walk of the engine of the
+		// count of the walk of the picture itself, of no count of the walk of the engine of its own at all.
+		const block = Array.from({ length: BLOCK_AREA }, (_, at) =>
+			0 === at % 5 ? 0 : (at * 7 + 1) & 0xff || 1,
+		);
+		const counted = countedPicture([block], BLOCK, BLOCK, 1);
+		const data = buildPicture({
+			sections: [
+				fileHeaderSection(1),
+				imageInfoSection(BLOCK, BLOCK, 8, {
+					architecture: -1,
+					formatType: 0x00000002,
+					blockingDegree: 3,
+				}),
+			],
+			frames: [frameSection(losslessFrame({ blocks: [block], gamma: true }))],
+		});
+		const source = new BufferByteSource(data);
+		const archive = await entisEriImageFormat.open(source, "picture.eri");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			const image = readBmpImage(
+				await consume(await archive.openEntry(entry.id)),
+			);
+			if (!image) throw new Error("no bitmap of the walk");
+			expect(image).toMatchObject({
+				width: BLOCK,
+				height: BLOCK,
+				bitsPerPixel: 8,
+			});
+			expect([...image.pixels]).toEqual(counted[0]);
+		} finally {
+			await archive.close();
+		}
+		// The counts of the walk of the engine of the count of the walk of a picture of the counts of a
+		// colour of three places of them stand of the counts of the walk of the engine of the count of the
+		// walk of the engine of the count of the walk of the picture itself.
+		const places = Array.from(
+			{ length: BLOCK_AREA * 3 },
+			(_, at) => (0 === at % 7 ? 0 : (at * 11 + 3) & 0xff) || 1,
+		);
+		const three = countedPicture([places], BLOCK, BLOCK, 3);
+		const colour = buildPicture({
+			sections: [
+				fileHeaderSection(1),
+				imageInfoSection(BLOCK, BLOCK, 24, {
+					architecture: -1,
+					formatType: 0x00000001,
+					blockingDegree: 3,
+				}),
+			],
+			frames: [
+				frameSection(
+					losslessFrame({ blocks: [places], gamma: true, channels: 3 }),
+				),
+			],
+		});
+		const colourSource = new BufferByteSource(colour);
+		const colourArchive = await entisEriImageFormat.open(
+			colourSource,
+			"picture.eri",
+		);
+		try {
+			const entry = colourArchive.entries[0];
+			if (!entry) throw new Error("no entry");
+			const image = readBmpImage(
+				await consume(await colourArchive.openEntry(entry.id)),
+			);
+			if (!image) throw new Error("no bitmap of the walk");
+			expect(image.bitsPerPixel).toBe(24);
+			const expected: number[] = [];
+			for (let at = 0; at < BLOCK_AREA; at += 1) {
+				for (let place = 0; place < 3; place += 1) {
+					expected.push(three[place]?.[at] ?? 0);
+				}
+			}
+			expect([...image.pixels]).toEqual(expected);
+		} finally {
+			await colourArchive.close();
+		}
+	});
+
 	it("stands of the counts of a colour of a picture of one count of a colour", async () => {
 		// The counts of a colour of the picture (`Palette `) stand of the counts of the walk of the engine
 		// of the picture of one count of a colour, of the counts of a colour of the count of the walk of it.

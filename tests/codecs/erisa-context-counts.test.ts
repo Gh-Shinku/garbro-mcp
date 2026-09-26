@@ -10,6 +10,8 @@
 // the walk of the engine of the walk of the engine behind them.
 import { Buffer } from "node:buffer";
 import { GarbroError } from "@garbro-mcp/core";
+import { ErisaRleDecodeContext } from "@garbro-mcp/codecs";
+import { bitsToBuffer, gammaBits } from "../helpers/erisa.js";
 import {
 	ERISA_ORDER_0,
 	type ErisaPlaces,
@@ -162,5 +164,27 @@ describe("Entis counts of the walk of the engine", () => {
 		}).toThrow(GarbroError);
 		expect(ERISA_HUFFMAN_ESCAPE & PLACE_MASK).toBe(PLACE_MASK);
 		expect(new ErisaHuffmanTree().tree.length).toBe(0x201);
+	});
+
+	it("stands of the counts of the walk of the engine of the gamma of every count of it", () => {
+		// The counts of the walk of the counts of a picture of the engine of the kind `RunlengthGamma`
+		// stand of the counts of the walk of the engine of the count of the walk of the engine of a count of
+		// the places of the picture: the counts of the walk of the engine stand of the counts of the walk of
+		// the engine of the places of the count of the walk of the engine of their own.
+		const failed: number[] = [];
+		for (let value = 1; value < 0x100; value += 1) {
+			const bits: number[] = [1];
+			bits.push(...gammaBits(1));
+			bits.push(0);
+			bits.push(...gammaBits(value));
+			const context = new ErisaRleDecodeContext(0x10000);
+			context.attachInputFile(bitsToBuffer(bits));
+			context.flushBuffer();
+			context.initGammaContext();
+			const places = new Uint8Array(1);
+			expect(context.decodeBytes(places, 1)).toBe(1);
+			if (places[0] !== value) failed.push(value);
+		}
+		expect(failed).toEqual([]);
 	});
 });

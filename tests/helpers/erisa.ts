@@ -184,6 +184,46 @@ export function bitsToBuffer(bits: readonly number[]): Buffer {
 	return out;
 }
 
+/**
+ * The places of the walk of the engine of the counts of a picture of the engine, of the kind
+ * `RunlengthGamma` (`DecodeGammaCodeBytes`): the count of the walk of the engine of the kind of the first
+ * count of the places of the picture, the counts of the walk of the engine of every count of the places of
+ * it and the counts of the walk of the engine of the places of the count of the walk of the engine itself.
+ */
+export function gammaPlaces(places: readonly number[]): number[] {
+	const bits: number[] = [];
+	let at = 0;
+	let first = true;
+	while (at < places.length) {
+		const zero = 0 === ((places[at] ?? 0) & 0xff);
+		let run = 0;
+		while (
+			at + run < places.length &&
+			zero === (0 === ((places[at + run] ?? 0) & 0xff))
+		) {
+			run += 1;
+		}
+		if (first) {
+			// The count of the walk of the engine of the first count of the places of the picture stands of
+			// the counts of the walk of the engine of the places of the count of no name at all of it.
+			bits.push(zero ? 0 : 1);
+			first = false;
+		}
+		bits.push(...gammaBits(run));
+		if (!zero) {
+			for (let place = 0; place < run; place += 1) {
+				// The count of the walk of the engine stands of a sign of its own and of the count of the
+				// walk of the engine behind it: the places of the count of the walk of the engine stand of
+				// the counts of the walk of the engine of the count of the walk of it itself.
+				bits.push(0);
+				bits.push(...gammaBits((places[at + place] ?? 0) & 0xff));
+			}
+		}
+		at += run;
+	}
+	return bits;
+}
+
 /** The places of the walk of the engine of a count of the walk of a sound of the engine. */
 export function encodeErina(places: readonly number[]): Buffer {
 	return bitsToBuffer(encodeErinaBits(places));

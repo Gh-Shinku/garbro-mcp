@@ -119,6 +119,14 @@ places of the picture stand pinned of the counts of the walk of the engine of th
 picture itself (`countedPicture`, of the counts of the walk of the engine of the reference outside this port)
 and of the counts of a colour of the picture of the form of the bitmap of the engine.
 
+The places of a picture of the counts of the walk of the engine of the kind `RunlengthGamma` stand of a
+fixture of their own (`gammaPlaces`, of the counts of the walk of the engine of the kind of the count of the
+walk of the engine of `tests/helpers/erisa.ts`), of one count of a colour and of three counts of a colour, of
+the places of the count of no name at all in the places of the picture of their own and of the counts of the
+walk of the engine of a count of the walk of the engine otherwise: the counts of the walk of the engine of
+every count of it stand of the counts of the walk of the engine of the places of the picture of the count of
+the walk of the engine of `tests/codecs/erisa-context-counts.test.ts`.
+
 The counts of the walk of the engine of the places of a picture of the kind of the counts of a picture of the
 engine of the two ways of it, of the kind `ArithmeticCode`, of the counts of a picture of the engine of the
 count of the walk of the engine of sixteen places of a colour and of the kinds 2 and 4 of the walk of the

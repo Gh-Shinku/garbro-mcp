@@ -2,7 +2,12 @@
 // a picture of the counts of the engine itself, of the counts of the walk of the engine of the encoder of
 // the port (`tests/helpers/erisa.ts`).
 import { ErisaHuffmanTree } from "@garbro-mcp/codecs";
-import { ErisaEncoder, addSymbolBits, bitsToBuffer } from "./erisa.js";
+import {
+	ErisaEncoder,
+	addSymbolBits,
+	bitsToBuffer,
+	gammaPlaces,
+} from "./erisa.js";
 import { Buffer } from "node:buffer";
 
 /** The counts of the walk of the engine of a block of a picture of the engine, of no count of it. */
@@ -19,12 +24,15 @@ export const BLOCK_AREA = BLOCK * BLOCK;
  */
 export function losslessFrame(input: {
 	blocks: readonly (readonly number[])[];
+	channels?: number;
 	walkVersion?: number;
 	opTable?: number;
 	encodeType?: number;
 	bitCount?: number;
 	operations?: readonly number[];
 	operationTree?: boolean;
+	/** The counts of the walk of the engine of the places of the picture, of the gamma of them. */
+	gamma?: boolean;
 }): Buffer {
 	const bits: number[] = [];
 	const word = (value: number, count: number): void => {
@@ -56,6 +64,16 @@ export function losslessFrame(input: {
 			// every count of a block stand of the counts of the walk of the engine of the count of the walk
 			// of it, one behind the other.
 			addSymbolBits(bits, operations, 0xc0);
+		}
+		if (input.gamma) {
+			if ((input.channels ?? 0) >= 3) {
+				// The counts of the walk of the engine of the count of the walk of the picture of the counts
+				// of a colour of three places of them and up stand of the counts of the walk of the engine of
+				// the count of the walk of the engine of the count of the walk of the picture itself.
+				word(0, 4);
+			}
+			bits.push(...gammaPlaces(block));
+			continue;
 		}
 		const before = encoder.bits.length;
 		encoder.addPlaces(block);

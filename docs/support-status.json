@@ -7217,7 +7217,8 @@
 				"the counts of the walk of the engine of the count of the walk of the places of a count of a block (`PerformOperation`: the counts of the walk of the engine of the count of the walk of the picture itself, of the counts of a colour of the block, of the counts of the walk of the engine of the places of the picture of the count of the walk of the engine behind them and of the count of the walk of the engine of the picture in front of them)",
 				"the places of a picture of one count of a colour, of three counts of a colour and of four counts of a colour (`RestoreGray8`, `RestoreRGB24`, `RestoreRGBA32`), of the counts of the walk of the engine of the place of the count of the walk of the picture of its own",
 				"the counts of the places of a colour of the picture (`fEncodeType & 1`) of the counts of the walk of the engine of the count of a block of the picture of its own (`GetHuffmanCode`, of the tree of the counts of the walk of the engine of the kind `0x00020200` of the head of the picture)",
-				"the places of a picture of the engine handed out as a bitmap of the project, of the counts of a colour of the picture of the places of a count of a colour of eight places of the count"
+				"the places of a picture of the engine handed out as a bitmap of the project, of the counts of a colour of the picture of the places of a count of a colour of eight places of the count",
+				"the counts of the walk of the engine of the places of a count of a block of the picture of the kind `RunlengthGamma` (`DecodeGammaCodeBytes`: the counts of the walk of the engine of the count of the walk of the picture of the gamma of its own, of the counts of the walk of the engine of the count of no name at all of it and of the counts of the walk of the engine of the count of the walk of the engine behind them), of one count of a colour and of three counts of a colour"
 			],
 			"unsupported": [
 				"picture creation",
@@ -7229,7 +7230,6 @@
 			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
-				"the places of a picture of the counts of the walk of the engine of the kind `RunlengthGamma` and of the kind `Nemesis` (the fixture stands of the counts of the walk of the engine of the kind `RunlengthHuffman` alone)",
 				"the places of a picture of the counts of the walk of the engine of a picture of the engine in three counts of a colour and up of the count of a block of the picture of their own (the fixture stands of the places of the count of the walk of the engine of the counts of a colour of the port itself)"
 			]
 		},
