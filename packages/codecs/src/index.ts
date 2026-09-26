@@ -34,3 +34,5 @@ export * from "./cmvs-huffman.js";
 export * from "./cmvs-decoder.js";
 export * from "./lz4.js";
 export * from "./erisa-huffman.js";
+export * from "./erisa-context.js";
+export * from "./erisa-gamma-table.js";
