@@ -154,15 +154,58 @@ places of the picture of the engine where the counts of the places of the pictur
 of the places of the picture of the engine of the walk of the engine of the places of the picture of the engine
 of them stand of the counts of the engine itself.
 
+## The counts of the places of the picture of the engine of the counts of the walk of the engine
+
+The counts of the walk of the engine of the places of the picture of the engine of the movie of the engine stand
+of the counts of the places of the picture of the engine of the counts of the walk of the engine (`MCsL`), of
+every one of them, and every count of them stands of the counts of the walk of the engine of the places of the
+picture of the engine of a count of the places of the picture of the engine (`CAS*`), which stands of the counts
+of the walk of the engine of the places of the picture of the engine of the counts of them:
+
+* The counts of the counts of the places of the picture of the engine (`MCsL`) stand of the counts of the
+  places of the picture of the engine of the counts of the walk of the engine of the places of the counts of
+  them, at the places of the counts of the walk of the engine of the places of the picture of the engine that
+  stand behind the counts of the walk of the engine of the counts of them, of the counts of the places of every
+  one of them. The reference stands of the counts of the places of the picture of the engine of the first
+  counts of the counts of them for **every** count of the counts of them: the counts of the walk of the engine
+  of the places of the counts of them stand of no counts of the places of the picture of the engine at all.
+* The counts of the places of the picture of the engine of a count of the places of the picture of the engine
+  (`CAS*`) stand of the counts of the walk of the engine of the places of the picture of the engine of the
+  places of the counts of them: the counts of the places of the picture of the engine of the count of the walk
+  of the engine itself of the places of the picture of the engine, of the counts of the places of the picture
+  of the engine of the counts of the walk of the engine of the places of the picture of the engine of the
+  counts of the engine itself (`CastMember`).
+* The counts of the places of the picture of the engine of a count of the places of the picture of the engine
+  (`CastInfo`) stand of the counts of the places of the picture of the engine of the counts of the walk of the
+  engine of the places of the counts of them, of the name of the count of the walk of the engine of the places
+  of the picture of the engine and of the counts of the places of the picture of the engine of the walk of the
+  engine of it.
+
+Every count of the places of the picture of the engine that stands of the kind of a picture of the engine
+(`BITD`, of the counts of the places of the picture of the engine of the engine itself `ediM`) or of the kind
+of a sound of the engine (`snd `, `ediM`, `sndH` and `sndS`) stands of the counts of the places of the
+picture of the engine of the counts of the walk of the engine of the places of the picture of the engine
+itself (`ImportMedia`): the name of the count of the counts of the places of them, of the counts of the walk
+of the engine of the places of the picture of the engine `.BITD`/`.jpg`/`.snd`/`.ediM`, at the places of the
+counts of the places of the picture of the engine the counts of the walk of the engine of the places of the
+picture of the engine name. The names stand of the counts of the walk of the engine of the places of the
+picture of the engine `[:?*<>/\\]` of the count of the places of the picture of the engine turned into `_`,
+and of the counts of the places of the picture of the engine of the count of the walk of the engine of the
+places of the count of the places of the picture of the engine where the name stands of no counts of them at
+all.
+
 ## Deviations
 
-* The port reads the words of the head and the map of the places of the picture of the engine, and lists the
-  counts of the walk of the engine of the engine itself. The counts of the walk of the engine of the places of
-  the picture of the engine that the reference reads behind the map - the keys of the picture of the engine
-  (`KEY*`), the counts of the walk of the engine of the places of the picture of the engine (`VWCF`, `DRCF`)
-  and the counts of the places of the picture of the engine of the counts of the walk of the engine
-  (`MCsL`, `CAS*`), and the pictures and sounds of the counts of the places of the picture of the engine -
-  stand unported.
+* The port reads the words of the head, the map of the places of the picture of the engine, the counts of the
+  walk of the engine of the places of the picture of the engine of the counts of the walk of the engine of the
+  places of them and the pictures and sounds of the counts of the places of the picture of the engine. The
+  counts of the places of a picture of the engine of the counts of the walk of the engine of the places of the
+  counts of them (`Channel.Decode5` of these counts of the walk of the engine: the walk of the counts of the
+  places of the picture of the engine of the engine itself and the counts of the places of the picture of the
+  engine of the counts of the walk of the engine of the places of the picture of the engine of the engine
+  itself) and the counts of the places of a sound of the engine stand unported: a count of the walk of the
+  engine of the places of the picture of the engine of the kind of the engine itself stands of the counts of
+  the places of the picture of the engine as they stand.
 * The reference stands of no movie of the engine at all where the counts of the places of the walk of the
   engine of the picture of the engine, of the counts of the places of the picture of the engine itself or of
   the counts of the places of the picture of the engine of the counts of the walk of the engine stand behind
@@ -190,6 +233,23 @@ of them stand of the counts of the engine itself.
   of them,
 * a movie of the engine of the counts of the walk of the engine of the engine itself that stands of no counts
   of them at all,
+* the counts of the walk of the engine of the places of the picture of the engine of the counts of the walk of
+  the engine of the places of the counts of them and of the counts of them themselves (`MCsL`, `CAS*`,
+  `CastMember` and `CastInfo`), of the counts of the places of the picture of the engine of the engine itself
+  and behind it, of the names of the counts of the walk of the engine of the places of the picture of the
+  engine `[:?*<>/\\]` of the count of the places of the picture of the engine turned into `_` and of the
+  counts of the places of the picture of the engine of the count of the walk of the engine of the places of the
+  count of the places of the picture of the engine where the name stands of no counts of them at all,
+* the pictures and the sounds of the counts of the places of the picture of the engine: a picture of the
+  engine itself (`BITD`) of the counts of the places of the picture of the engine of the engine itself and of
+  the counts of the walk of the engine of the places of the picture of the engine of the counts of them, a
+  picture of the engine of the counts of the walk of the engine of the places of the picture of the engine of
+  the kind of the engine itself without the counts of the places of the picture of the engine of the engine
+  itself (`ediM`), and a sound of the engine (`snd `), of the counts of the walk of the engine of the places of
+  every one of them and of the counts of the walk of the engine of the places of the picture of the engine they
+  stand behind,
+* the counts of the places of the picture of the engine of the engine itself that stand of no counts of the
+  walk of the engine at all,
 * the keys of the picture of the engine: the counts of the places of the picture of the engine of the count
   of the walk of the engine, the count of the keys the movie of the engine stands of, and the whole of the
   table of them,
@@ -216,6 +276,9 @@ of them stand of the counts of the engine itself.
   `DxrOpener.OpenChunkStream`, `DxrOpener.RawChunks`
 - `GARbro/ArcFormats/Macromedia/DirectorFile.cs` — `DirectorFile.Deserialize`, `DirectorFile.ReadMMap`,
   `DirectorFile.ReadAfterBurner`, `DirectorFile.ReadABMap`, `AfterBurnerEntry.Deserialize`,
+  `DirectorFile.ReadCasts`, `DirectorFile.PopulateCast`, `CastList.Deserialize`, `Cast.Deserialize`,
+  `CastMember.Deserialize`, `CastInfo.Deserialize`, `ArcDXR.ImportMedia`, `ArcDXR.ImportBitmap`,
+  `ArcDXR.ImportSound`, `ArcDXR.SanitizeName`, `BitmapEntry.DeserializeHeader`,
   `DirectorFile.ReadKeyTable`, `DirectorFile.ReadConfig`, `DirectorFile.GetChunkReader`,
   `MemoryMap.Deserialize`, `MemoryMapEntry.Deserialize`, `KeyTable.Deserialize`,
   `KeyTableEntry.Deserialize`, `DirectorConfig.Deserialize`, `Reader.CloneUnless`

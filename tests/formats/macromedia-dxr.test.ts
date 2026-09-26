@@ -272,6 +272,102 @@ function abMovie(input: { chunks: ABChunkInput[]; word?: string }): Buffer {
 	return movie;
 }
 
+/** The counts of the places of the picture of the engine of a count of the counts of the places of them. */
+function castInfo(input: { name: string; source: string }): Buffer {
+	const items = [
+		Buffer.from(`${input.source}\0`, "latin1"),
+		Buffer.concat([
+			Buffer.from([input.name.length]),
+			Buffer.from(input.name, "latin1"),
+		]),
+	];
+	const offsets: number[] = [];
+	let at = 0;
+	for (const item of items) {
+		offsets.push(at);
+		at += item.length;
+	}
+	const table = Buffer.alloc(2 + offsets.length * 4 + 4, 0);
+	table.writeUInt16BE(offsets.length, 0);
+	for (const [index, offset] of offsets.entries())
+		table.writeInt32BE(offset, 2 + index * 4);
+	table.writeInt32BE(at, 2 + offsets.length * 4);
+	const head = Buffer.alloc(0x14, 0);
+	// The counts of the walk of the engine of the counts of the places of the picture of the engine of the
+	// counts of the walk of the engine of the places of them stand of the counts of the places of the head of
+	// the counts of the places of the picture of the engine of the engine itself.
+	head.writeUInt32BE(0x14, 0);
+	return Buffer.concat([head, table, ...items]);
+}
+
+/** A count of the places of the picture of the engine of a cast of a movie of the engine. */
+function castMember(input: {
+	type: number;
+	info: Buffer;
+	specific: Buffer;
+}): Buffer {
+	const head = Buffer.alloc(0x0c, 0);
+	head.writeInt32BE(input.type, 0);
+	head.writeInt32BE(input.info.length, 4);
+	head.writeInt32BE(input.specific.length, 8);
+	return Buffer.concat([head, input.info, input.specific]);
+}
+
+/** The counts of the places of the picture of the engine of a cast of a movie of the engine. */
+function castIndex(ids: number[]): Buffer {
+	const body = Buffer.alloc(ids.length * 4, 0);
+	for (const [index, id] of ids.entries()) body.writeInt32BE(id, index * 4);
+	return body;
+}
+
+/** The counts of the walk of the engine of the places of the picture of the engine of the counts of them. */
+function castList(input: { id: number; name: string; path: string }): Buffer {
+	const item = (text: string): Buffer =>
+		Buffer.concat([Buffer.from([text.length]), Buffer.from(text, "latin1")]);
+	const items = [
+		Buffer.alloc(0),
+		item(input.name),
+		item(input.path),
+		Buffer.alloc(2, 0),
+		Buffer.alloc(8, 0),
+	];
+	const offsets: number[] = [];
+	let at = 0;
+	for (const one of items) {
+		offsets.push(at);
+		at += one.length;
+	}
+	const head = Buffer.alloc(0x0c, 0);
+	head.writeUInt32BE(0x0c, 0);
+	head.writeUInt16BE(1, 6);
+	head.writeUInt16BE(4, 8);
+	const table = Buffer.alloc(2 + offsets.length * 4 + 4, 0);
+	table.writeUInt16BE(offsets.length, 0);
+	for (const [index, offset] of offsets.entries())
+		table.writeInt32BE(offset, 2 + index * 4);
+	table.writeInt32BE(at, 2 + offsets.length * 4);
+	// The counts of the places of the picture of the engine of the counts of them that stand of the counts
+	// of the walk of the engine of the places of the picture of the engine of the counts of the engine itself.
+	items[4]?.writeUInt16BE(1, 0);
+	items[4]?.writeUInt16BE(0x100, 2);
+	items[4]?.writeInt32BE(input.id, 4);
+	return Buffer.concat([head, table, ...items]);
+}
+
+/** The counts of the places of a picture of the engine of a count of the walk of the engine of them. */
+function bitmapData(input: { palette: number; bitDepth: number }): Buffer {
+	const data = Buffer.alloc(0x1c, 0);
+	data.writeUInt8(0, 0);
+	data.writeUInt8(0, 1);
+	data.writeInt16BE(0, 2);
+	data.writeInt16BE(0, 4);
+	data.writeInt16BE(0x40, 6);
+	data.writeInt16BE(0x40, 8);
+	data.writeUInt16BE(input.bitDepth, 0x16);
+	data.writeInt16BE(input.palette, 0x1a);
+	return data;
+}
+
 async function extract(data: Buffer, name: string): Promise<Buffer> {
 	const handle = await macromediaDxrArchiveFormat.open(
 		new BufferByteSource(data),
@@ -663,5 +759,95 @@ describe("Macromedia Director movie", () => {
 		});
 		shortMap.write("XXXXXXXX", shortMap.length - 4, "latin1");
 		expect(readDirectorMovie(shortMap)).toBeUndefined();
+	});
+
+	it("stands of the counts of the places of the picture of the engine of the counts of the walk of the engine", async () => {
+		// The counts of the walk of the engine of the places of the picture of the engine of the movie of the
+		// engine stand of the counts of the walk of the engine of the places of the picture of the engine of
+		// the counts of the places of the picture of the engine themselves and of the counts of the walk of
+		// the engine of the places of every one of them.
+		const bitmapMember = castMember({
+			type: 1,
+			info: castInfo({ name: "one:two", source: "on mouseUp" }),
+			specific: bitmapData({ palette: 1, bitDepth: 8 }),
+		});
+		const jpegMember = castMember({
+			type: 1,
+			info: castInfo({ name: "", source: "" }),
+			specific: Buffer.alloc(0),
+		});
+		const soundMember = castMember({
+			type: 6,
+			info: castInfo({ name: "sound", source: "" }),
+			specific: Buffer.alloc(0),
+		});
+		const data = dxrMovie({
+			chunks: [
+				{
+					fourCC: "VWCF",
+					body: configChunk({ ...CONFIG_VALUES, version: 1300 }),
+				},
+				{
+					fourCC: "KEY*",
+					body: keyChunk(
+						[
+							{ id: 3, castId: 0x400, fourCC: "CAS*" },
+							{ id: 7, castId: 4, fourCC: "BITD" },
+							{ id: 8, castId: 4, fourCC: "ALFA" },
+							{ id: 11, castId: 4, fourCC: "CLUT" },
+							{ id: 9, castId: 5, fourCC: "ediM" },
+							{ id: 10, castId: 6, fourCC: "snd " },
+						],
+						true,
+						6,
+					),
+				},
+				{
+					fourCC: "MCsL",
+					body: castList({ id: 0x400, name: "cast", path: "" }),
+				},
+				{ fourCC: "CAS*", body: castIndex([4, 5, 6]) },
+				{ fourCC: "CASt", body: bitmapMember },
+				{ fourCC: "CASt", body: jpegMember },
+				{ fourCC: "CASt", body: soundMember },
+				{ fourCC: "BITD", body: Buffer.from([1, 2, 3]) },
+				{ fourCC: "ALFA", body: Buffer.from([4]) },
+				{ fourCC: "ediM", body: Buffer.from([5, 6]) },
+				{ fourCC: "snd ", body: Buffer.from([7, 8, 9]) },
+				{ fourCC: "CLUT", body: Buffer.from([0xaa, 0xbb]) },
+				{ fourCC: "Lscr", body: Buffer.from([0xaa]) },
+			],
+		});
+		const handle = await macromediaDxrArchiveFormat.open(
+			new BufferByteSource(data),
+			"movie.dxr",
+		);
+		let paths: string[] = [];
+		try {
+			paths = handle.entries.map((entry) => entry.path);
+		} finally {
+			await handle.close();
+		}
+		// The names of the counts of the walk of the engine stand of the counts of the places of the picture of
+		// the engine of the counts of them, of the counts of the walk of the engine of the places of the
+		// picture of the engine of the counts of them that stand of no counts of them at all.
+		expect(paths.slice(0, 3)).toEqual([
+			"one_two.BITD",
+			"000009.jpg",
+			"sound.snd",
+		]);
+		// The counts of the walk of the engine of the places of the picture of the engine the reference lists
+		// as they stand stand behind the counts of the walk of the engine of the places of the picture of the
+		// engine of the counts of the places of the picture of the engine themselves.
+		expect(paths.slice(3)).toEqual(["000012.Lscr"]);
+		expect([...(await extract(data, "000012.Lscr"))]).toEqual([0xaa]);
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine stand
+		// of the counts of the walk of the engine of the places of the picture of the engine of the counts of
+		// the places of the picture of the engine of them.
+		expect([...(await extract(data, "000009.jpg"))]).toEqual([5, 6]);
+		expect([...(await extract(data, "sound.snd"))]).toEqual([7, 8, 9]);
+		await expect(extract(data, "one_two.BITD")).rejects.toMatchObject({
+			code: "UNSUPPORTED_FEATURE",
+		});
 	});
 });

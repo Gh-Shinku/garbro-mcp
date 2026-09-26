@@ -16,7 +16,7 @@
 
 import { Buffer } from "node:buffer";
 import { inflateSync } from "node:zlib";
-import { GarbroError } from "@garbro-mcp/core";
+import { GarbroError, decodeCp932 } from "@garbro-mcp/core";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -67,6 +67,22 @@ const CONFIG_VERSION_NEW = 1200;
 const AB_VERSION_MMAP = 0x400;
 const AB_VERSION_STRING = 0x500;
 const AB_ILS_ID = 2;
+const CAST_LIST_CHUNK = "MCsL";
+const CAST_CHUNK = "CAS*";
+const BITMAP_CHUNK = "BITD";
+const EDIM_CHUNK = "ediM";
+const ALPHA_CHUNK = "ALFA";
+const CLUT_CHUNK = "CLUT";
+const SOUND_CHUNK = "snd ";
+const SOUND_HEAD_CHUNK = "sndH";
+const SOUND_BODY_CHUNK = "sndS";
+const CAST_VERSION_NEW = 1200;
+const BITMAP_DEPTH_SIZE = 0x0a;
+const BITMAP_BIT_DEPTH_OFFSET = 0x16;
+const BITMAP_PALETTE_OFFSET = 0x1a;
+const BITMAP_PALETTE_SIZE = 0x1c;
+/** The counts of the walk of the engine of the places of the picture of the engine the names of it stand of. */
+const FORBIDDEN_NAMES = /[:?*<>/\\]/g;
 const ILS_ENTRY_LIMIT = 0x10000;
 
 function invalidMovie(message: string): GarbroError {
@@ -401,9 +417,460 @@ export function readDirectorConfig(
 	};
 }
 
+/** The counts of the places of the picture of the engine of a count of the walk of the engine of them. */
+export interface DirectorCastEntry {
+	name: string;
+	path: string;
+	flags: number;
+	minMember: number;
+	maxMember: number;
+	id: number;
+}
+
+/** The counts of the walk of the engine of the places of the picture of the engine of the movie. */
+export interface DirectorCastList {
+	dataOffset: number;
+	castCount: number;
+	itemsPerCast: number;
+	items: Buffer[];
+	entries: DirectorCastEntry[];
+}
+
+/** The counts of a name of the picture of the engine: a count of the places of it and the places of it. */
+function readDirectorString(item: Buffer | undefined): string {
+	if (!item || item.length <= 1 || 0 === item[0]) return "";
+	const length = Math.min(item[0] ?? 0, item.length - 1);
+	return decodeCp932(item.subarray(1, 1 + length));
+}
+
+/**
+ * The counts of the counts of the places of the picture of the engine of a movie of the engine (`MCsL`): the
+ * counts of the walk of the engine of the places of every count of the counts of them.
+ */
+export function readDirectorCastList(
+	reader: DirectorReader,
+): DirectorCastList | undefined {
+	const base = reader.position;
+	const listReader = reader.clone(false);
+	const dataOffset = listReader.readU32();
+	if (undefined === dataOffset || !listReader.skip(2)) return undefined;
+	const castCount = listReader.readU16();
+	const itemsPerCast = listReader.readU16();
+	if (
+		undefined === castCount ||
+		undefined === itemsPerCast ||
+		!listReader.skip(2)
+	)
+		return undefined;
+	listReader.position = base + dataOffset;
+	const offsetCount = listReader.readU16();
+	if (undefined === offsetCount || offsetCount > ENTRY_LIMIT) return undefined;
+	const offsets: number[] = [];
+	for (let at = 0; at < offsetCount; at += 1) {
+		const offset = listReader.readI32();
+		if (undefined === offset) return undefined;
+		offsets.push(offset);
+	}
+	const itemsLength = listReader.readI32();
+	if (undefined === itemsLength) return undefined;
+	// The reference reads the counts of the places of the picture of the engine one behind the other, of the
+	// counts of the places of every one of them: the counts of the walk of the engine of the places of the
+	// counts of them stand of the counts of the places of the picture of the engine themselves.
+	const items: Buffer[] = [];
+	for (let at = 0; at < offsetCount; at += 1) {
+		const next = at + 1 < offsetCount ? (offsets[at + 1] ?? 0) : itemsLength;
+		const size = next - (offsets[at] ?? 0);
+		if (size < 0) return undefined;
+		const item = listReader.readBytes(size);
+		if (!item) return undefined;
+		items.push(item);
+	}
+	const entries: DirectorCastEntry[] = [];
+	for (let at = 0; at < castCount; at += 1) {
+		// The reference stands of the counts of the places of the picture of the engine of the first counts
+		// of the walk of the engine of the places of the counts of them for every count of the counts of them:
+		// the count of the walk of the engine of the places of the counts of them stands of no counts of the
+		// places of the picture of the engine at all.
+		const entry: DirectorCastEntry = {
+			name: itemsPerCast >= 1 ? readDirectorString(items[1]) : "",
+			path: itemsPerCast >= 2 ? readDirectorString(items[2]) : "",
+			flags: 0,
+			minMember: 0,
+			maxMember: 0,
+			id: 0,
+		};
+		const flags = items[3];
+		if (itemsPerCast >= 3 && flags && flags.length >= 2)
+			entry.flags = flags.readUInt16BE(0);
+		const members = items[4];
+		if (itemsPerCast >= 4 && members && members.length >= 8) {
+			entry.minMember = members.readUInt16BE(0);
+			entry.maxMember = members.readUInt16BE(2);
+			entry.id = members.readInt32BE(4);
+		}
+		entries.push(entry);
+	}
+	return { dataOffset, castCount, itemsPerCast, items, entries };
+}
+
+/** The counts of the places of the picture of the engine of a count of the walk of the engine of them. */
+export function readDirectorCast(
+	reader: DirectorReader,
+	size: number,
+): number[] | undefined {
+	const count = Math.trunc(size / 4);
+	if (count < 0 || count > ENTRY_LIMIT) return undefined;
+	const castReader = reader.clone(false);
+	const index: number[] = [];
+	for (let at = 0; at < count; at += 1) {
+		const id = castReader.readI32();
+		if (undefined === id) return undefined;
+		index.push(id);
+	}
+	return index;
+}
+
+/** The counts of the places of the picture of the engine of a count of the counts of the places of them. */
+export interface DirectorCastInfo {
+	dataOffset: number;
+	scriptKey: number;
+	flags: number;
+	scriptId: number;
+	name: string;
+	sourceText: string;
+	items: Buffer[];
+}
+
+/** The counts of the places of the picture of the engine of a count of the counts of the places of them. */
+export function readDirectorCastInfo(
+	reader: DirectorReader,
+): DirectorCastInfo | undefined {
+	const base = reader.position;
+	const dataOffset = reader.readU32();
+	const scriptKey = reader.readU32();
+	if (undefined === dataOffset || undefined === scriptKey || !reader.skip(4))
+		return undefined;
+	const flags = reader.readU32();
+	const scriptId = reader.readI32();
+	if (undefined === flags || undefined === scriptId) return undefined;
+	reader.position = base + dataOffset;
+	const tableLength = reader.readU16();
+	if (undefined === tableLength || tableLength > ENTRY_LIMIT) return undefined;
+	const offsets: number[] = [];
+	for (let at = 0; at < tableLength; at += 1) {
+		const offset = reader.readI32();
+		if (undefined === offset) return undefined;
+		offsets.push(offset);
+	}
+	const dataLength = reader.readI32();
+	if (undefined === dataLength) return undefined;
+	const listOffset = reader.position;
+	const items: Buffer[] = [];
+	for (let at = 0; at < offsets.length; at += 1) {
+		const offset = offsets[at] ?? 0;
+		const next = at + 1 < offsets.length ? (offsets[at + 1] ?? 0) : dataLength;
+		reader.position = listOffset + offset;
+		const item = reader.readBytes(next - offset);
+		if (!item) return undefined;
+		items.push(item);
+	}
+	const source = items[0];
+	let sourceText = "";
+	if (source) {
+		const end = source.indexOf(0);
+		sourceText = decodeCp932(source.subarray(0, end < 0 ? source.length : end));
+	}
+	return {
+		dataOffset,
+		scriptKey,
+		flags,
+		scriptId,
+		name: readDirectorString(items[1]),
+		sourceText,
+		items,
+	};
+}
+
+/** The counts of the places of a picture of the engine of a count of the walk of the engine of them. */
+export interface DirectorCastMember {
+	type: number;
+	flags: number;
+	specificData: Buffer;
+	info: DirectorCastInfo;
+}
+
+/** The counts of the places of the picture of the engine of a count of the walk of the engine of them. */
+export function readDirectorCastMember(
+	reader: DirectorReader,
+	version: number,
+): DirectorCastMember | undefined {
+	const memberReader = reader.clone(false);
+	let type: number | undefined;
+	let infoLength: number | undefined;
+	let dataLength: number | undefined;
+	let flags = 0;
+	if (version > CAST_VERSION_NEW) {
+		type = memberReader.readI32();
+		infoLength = memberReader.readI32();
+		dataLength = memberReader.readI32();
+	} else {
+		const length = memberReader.readU16();
+		if (undefined === length) return undefined;
+		infoLength = memberReader.readI32();
+		type = memberReader.readU8();
+		dataLength = length - 1;
+		if (dataLength > 0) {
+			const memberFlags = memberReader.readU8();
+			if (undefined === memberFlags) return undefined;
+			flags = memberFlags;
+			dataLength -= 1;
+		}
+	}
+	if (
+		undefined === type ||
+		undefined === infoLength ||
+		undefined === dataLength
+	)
+		return undefined;
+	let info: DirectorCastInfo | undefined;
+	if (infoLength > 0) info = readDirectorCastInfo(memberReader);
+	const specificData = memberReader.readBytes(dataLength);
+	if (!specificData || !info) return undefined;
+	return { type, flags, specificData, info };
+}
+
+/** The counts of the places of a picture of the engine of a count of the walk of the engine of them. */
+export interface DirectorBitmap {
+	depthType: number;
+	flags: number;
+	top: number;
+	left: number;
+	bottom: number;
+	right: number;
+	bitDepth: number;
+	palette: number;
+}
+
+/** The counts of the places of a picture of the engine of a count of the walk of the engine of them. */
+export function readDirectorBitmap(data: Buffer): DirectorBitmap | undefined {
+	if (data.length < BITMAP_DEPTH_SIZE) return undefined;
+	const bitmap: DirectorBitmap = {
+		depthType: data.readUInt8(0),
+		flags: data.readUInt8(1),
+		top: data.readInt16BE(2),
+		left: data.readInt16BE(4),
+		bottom: data.readInt16BE(6),
+		right: data.readInt16BE(8),
+		bitDepth: 0,
+		palette: 0,
+	};
+	if (data.length > BITMAP_BIT_DEPTH_OFFSET) {
+		// The counts of the walk of the engine of the places of the picture of the engine stand of the counts
+		// of the places of the picture of the engine of the engine itself.
+		bitmap.bitDepth = data.readUInt16BE(BITMAP_BIT_DEPTH_OFFSET) & 0xff;
+		if (data.length >= BITMAP_PALETTE_SIZE)
+			bitmap.palette = data.readInt16BE(BITMAP_PALETTE_OFFSET);
+	}
+	return bitmap;
+}
+
+/** A count of the places of the picture of the engine of the counts of the walk of the engine of them. */
+export interface DirectorMediaEntry {
+	kind: string;
+	name: string;
+	fourCC: string;
+	id: number;
+	offset: number;
+	size: number;
+	unpackedSize: number;
+	packed: boolean;
+	/** The counts of the walk of the engine of the places of the picture of the engine of the places of it. */
+	headerId?: number;
+	paletteId?: number;
+	alphaId?: number;
+}
+
+function sanitizeDirectorName(name: string | undefined, id: number): string {
+	const trimmed = name?.trim() ?? "";
+	if (0 === trimmed.length) return id.toString().padStart(6, "0");
+	return trimmed.replace(FORBIDDEN_NAMES, "_");
+}
+
+/** The counts of the places of the picture of the engine of the counts of the walk of the engine of them. */
+export function readDirectorMedia(
+	movie: DirectorMovie,
+	casts: readonly number[][],
+	contextVersion: number,
+): DirectorMediaEntry[] {
+	const media: DirectorMediaEntry[] = [];
+	const seen = new Set<number>();
+	for (const index of casts) {
+		for (const id of index) {
+			if (id <= 0 || seen.has(id)) continue;
+			seen.add(id);
+			const chunk = movie.directory.find((entry) => entry.id === id);
+			if (!chunk) continue;
+			const memberReader = new DirectorReader(
+				chunkBuffer(movie, chunk),
+				movie.littleEndian,
+			);
+			const member = readDirectorCastMember(memberReader, contextVersion);
+			if (!member) continue;
+			const keys = (movie.keyTable?.table ?? []).filter(
+				(key) => key.castId === id,
+			);
+			const entry =
+				1 === member.type
+					? importDirectorBitmap(movie, member, keys, index)
+					: 6 === member.type
+						? importDirectorSound(movie, member, keys)
+						: undefined;
+			if (entry && entry.size > 0) media.push(entry);
+		}
+	}
+	return media;
+}
+
+function chunkBuffer(movie: DirectorMovie, chunk: DirectorEntry): Buffer {
+	const bytes =
+		0 === chunk.offset && movie.ils?.has(chunk.id)
+			? movie.ils.get(chunk.id)
+			: movie.source.subarray(chunk.offset, chunk.offset + chunk.size);
+	if (!bytes) return Buffer.alloc(0);
+	return chunk.packed ? safeInflate(bytes) : bytes;
+}
+
+function safeInflate(bytes: Buffer): Buffer {
+	try {
+		return inflateSync(bytes);
+	} catch {
+		return bytes;
+	}
+}
+
+function importDirectorBitmap(
+	movie: DirectorMovie,
+	member: DirectorCastMember,
+	keys: readonly DirectorKeyEntry[],
+	index: readonly number[],
+): DirectorMediaEntry | undefined {
+	const bitd = keys.find((key) => BITMAP_CHUNK === key.fourCC);
+	const edim = keys.find((key) => EDIM_CHUNK === key.fourCC);
+	const alpha = keys.find((key) => ALPHA_CHUNK === key.fourCC);
+	if (!bitd && !edim) return undefined;
+	let entry: DirectorMediaEntry;
+	if (bitd) {
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the picture of the engine of the counts of the places of them alone: the counts of the
+		// places of the picture of the engine of the engine itself stand of the counts of the walk of the
+		// engine of the places of the picture of the engine of their own.
+		const bitmap = readDirectorBitmap(member.specificData);
+		if (!bitmap) return undefined;
+		const chunk = movie.directory.find((candidate) => candidate.id === bitd.id);
+		if (!chunk) return undefined;
+		entry = {
+			kind: "image",
+			name: `${sanitizeDirectorName(member.info.name, bitd.id)}.BITD`,
+			fourCC: BITMAP_CHUNK,
+			id: bitd.id,
+			offset: chunk.offset,
+			size: chunk.size,
+			unpackedSize: chunk.unpackedSize,
+			packed: chunk.packed,
+		};
+		if (bitmap.palette > 0) {
+			// The counts of the places of the picture of the engine of the places of the picture of the engine
+			// of the counts of the walk of the engine of the engine itself stand of the counts of the places
+			// of the picture of the engine of the counts of them that stand at the count of the walk of the
+			// engine of the places of the picture of the engine of the places of the picture of the engine.
+			const memberId = index[bitmap.palette - 1];
+			const clut = (movie.keyTable?.table ?? []).find(
+				(key) => CLUT_CHUNK === key.fourCC && key.castId === memberId,
+			);
+			if (clut) entry.paletteId = clut.id;
+		}
+	} else if (edim) {
+		const chunk = movie.directory.find((candidate) => candidate.id === edim.id);
+		if (!chunk) return undefined;
+		entry = {
+			kind: "image",
+			name: `${sanitizeDirectorName(member.info.name, edim.id)}.jpg`,
+			fourCC: EDIM_CHUNK,
+			id: edim.id,
+			offset: chunk.offset,
+			size: chunk.size,
+			unpackedSize: chunk.size,
+			packed: false,
+		};
+	} else return undefined;
+	if (alpha) entry.alphaId = alpha.id;
+	return entry;
+}
+
+function importDirectorSound(
+	movie: DirectorMovie,
+	member: DirectorCastMember,
+	keys: readonly DirectorKeyEntry[],
+): DirectorMediaEntry | undefined {
+	let head: DirectorKeyEntry | undefined;
+	let body: DirectorKeyEntry | undefined;
+	for (const key of keys) {
+		if (EDIM_CHUNK === key.fourCC) {
+			const chunk = movie.directory.find(
+				(candidate) => candidate.id === key.id,
+			);
+			if (!chunk) continue;
+			return {
+				kind: "audio",
+				name: `${sanitizeDirectorName(member.info.name, chunk.id)}.ediM`,
+				fourCC: EDIM_CHUNK,
+				id: chunk.id,
+				offset: chunk.offset,
+				size: chunk.size,
+				unpackedSize: chunk.unpackedSize,
+				packed: chunk.packed,
+			};
+		}
+		if (SOUND_CHUNK === key.fourCC) {
+			const chunk = movie.directory.find(
+				(candidate) => candidate.id === key.id,
+			);
+			if (!chunk || 0 === chunk.size) continue;
+			return {
+				kind: "audio",
+				name: `${sanitizeDirectorName(member.info.name, chunk.id)}.snd`,
+				fourCC: SOUND_CHUNK,
+				id: chunk.id,
+				offset: chunk.offset,
+				size: chunk.size,
+				unpackedSize: chunk.size,
+				packed: false,
+			};
+		}
+		if (!head && SOUND_HEAD_CHUNK === key.fourCC) head = key;
+		else if (!body && SOUND_BODY_CHUNK === key.fourCC) body = key;
+	}
+	if (!head || !body) return undefined;
+	const chunk = movie.directory.find((candidate) => candidate.id === body.id);
+	if (!chunk) return undefined;
+	return {
+		kind: "audio",
+		name: `${sanitizeDirectorName(member.info.name, body.id)}.snd`,
+		fourCC: SOUND_CHUNK,
+		id: body.id,
+		offset: chunk.offset,
+		size: chunk.size,
+		unpackedSize: chunk.unpackedSize,
+		packed: chunk.packed,
+		headerId: head.id,
+	};
+}
+
 /** The counts of a movie of the engine: the word of the walk of the engine of it and the counts of them. */
 export interface DirectorMovie {
 	codec: string;
+	/** The counts of the places of the movie of the engine, which the counts of the walk of the engine stand of. */
+	source: Buffer;
 	littleEndian: boolean;
 	directory: DirectorEntry[];
 	/** The counts of the walk of the engine of the places of the picture of the engine, where they stand. */
@@ -591,6 +1058,7 @@ export function readDirectorMovie(data: Buffer): DirectorMovie | undefined {
 		return {
 			codec,
 			littleEndian,
+			source: data,
 			directory: burned.directory,
 			burned: true,
 			ils: burned.ils,
@@ -609,6 +1077,7 @@ export function readDirectorMovie(data: Buffer): DirectorMovie | undefined {
 	const movie: DirectorMovie = {
 		codec,
 		littleEndian,
+		source: data,
 		directory: map.directory,
 		burned: false,
 	};
@@ -643,6 +1112,56 @@ export function directorText(data: Buffer): Buffer | undefined {
 	const length = data.readUInt32BE(4);
 	if (offset + length > data.length || offset < 8) return undefined;
 	return data.subarray(offset, offset + length);
+}
+
+/**
+ * The counts of the places of the picture of the engine of the counts of the walk of the engine of the movie
+ * of the engine: the counts of the walk of the engine of the places of the picture of the engine of the counts
+ * of the places of the picture of the engine themselves (`MCsL`, of the older counts of the engine `CAS*`),
+ * of every one of them, and the pictures and the sounds of the counts of the walk of the engine (`ImportMedia`).
+ */
+export function readDirectorMovieMedia(
+	movie: DirectorMovie,
+): DirectorMediaEntry[] {
+	if (movie.burned) return [];
+	const contextVersion = movie.config?.version ?? 0;
+	const casts: number[][] = [];
+	const castListChunk = movie.directory.find(
+		(entry) => CAST_LIST_CHUNK === entry.fourCC,
+	);
+	if (contextVersion > CAST_VERSION_NEW && castListChunk) {
+		const list = readDirectorCastList(
+			new DirectorReader(chunkBuffer(movie, castListChunk), movie.littleEndian),
+		);
+		if (list) {
+			for (const cast of list.entries) {
+				const key = (movie.keyTable?.table ?? []).find(
+					(candidate) =>
+						CAST_CHUNK === candidate.fourCC && candidate.castId === cast.id,
+				);
+				if (!key) continue;
+				const chunk = movie.directory.find(
+					(candidate) => candidate.id === key.id,
+				);
+				if (!chunk) continue;
+				const index = readDirectorCast(
+					new DirectorReader(chunkBuffer(movie, chunk), movie.littleEndian),
+					chunk.size,
+				);
+				if (index) casts.push(index);
+			}
+		}
+	} else {
+		const chunk = movie.directory.find((entry) => CAST_CHUNK === entry.fourCC);
+		if (chunk) {
+			const index = readDirectorCast(
+				new DirectorReader(chunkBuffer(movie, chunk), movie.littleEndian),
+				chunk.size,
+			);
+			if (index) casts.push(index);
+		}
+	}
+	return readDirectorMedia(movie, casts, contextVersion);
 }
 
 export const macromediaDxrArchiveDescriptor: FormatDescriptor = {
@@ -687,6 +1206,22 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 		if (!movie)
 			throw invalidMovie("Not a movie of the Macromedia Director engine");
 		const entries: FixedEntry[] = [];
+		// The counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the counts of them stand of the counts of the walk of the engine of the places of the
+		// picture of the engine of the movie of the engine, which stand in front of the counts of the walk of
+		// the engine of the places of the picture of the engine.
+		for (const media of readDirectorMovieMedia(movie)) {
+			entries.push(
+				createFixedEntry({
+					id: entries.length,
+					path: media.name,
+					offset: media.offset >= 0 ? BigInt(media.offset) : 0n,
+					size: BigInt(media.size),
+					compressed: media.packed,
+					metadata: { type: media.kind, fourCC: media.fourCC },
+				}),
+			);
+		}
 		for (const chunk of directorRawChunks(movie)) {
 			let offset = chunk.offset;
 			let size = chunk.size;
@@ -733,7 +1268,16 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 		const movie = readDirectorMovie(data);
 		if (!movie)
 			throw invalidMovie("Not a movie of the Macromedia Director engine");
-		const id = Number.parseInt(entry.path.slice(0, 6), 10);
+		// The counts of the walk of the engine of the places of the picture of the engine of the counts of the
+		// places of the picture of the engine themselves stand of the counts of the places of the picture of
+		// the engine of the counts of them, which stand of no counts of the places of the picture of the
+		// engine at all at the counts of the walk of the engine of the places of the picture of the engine:
+		// the counts of the places of the picture of the engine of the counts of the walk of the engine of the
+		// places of the movie of the engine themselves stand of their own counts of the walk of the engine.
+		const media = readDirectorMovieMedia(movie).find(
+			(candidate) => candidate.name === entry.path,
+		);
+		const id = media ? media.id : Number.parseInt(entry.path.slice(0, 6), 10);
 		const chunk = movie.directory.find((candidate) => candidate.id === id);
 		if (!chunk)
 			throw invalidMovie(
@@ -762,7 +1306,7 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 			throw invalidMovie(
 				"A count of the places of the picture of the engine stands of no counts of it",
 			);
-		if (chunk.packed) {
+		if (media ? media.packed : chunk.packed) {
 			try {
 				bytes = inflateSync(bytes);
 			} catch {
@@ -771,6 +1315,11 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 				);
 			}
 		}
+		if (entry.path.endsWith(`.${BITMAP_CHUNK}`) || entry.path.endsWith(".BITD"))
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				"The counts of the places of a picture of the engine stand unported",
+			);
 		if (entry.path.endsWith(`.${TEXT_CHUNK}`)) {
 			const text = directorText(bytes);
 			if (!text)
