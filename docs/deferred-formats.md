@@ -381,9 +381,12 @@ the first forty of them.
   counts of a block of the walk of the engine, the table of the counts of the places of the sound
   (`AthTable`), the cipher of it (`Cipher`) and the counts of the places of a picture of the engine of a
   sound of the engine (`Channel.Decode1` to `Decode4`, with the walk of the engine of the counts of a block
-  and the counts of the places of the picture of the engine itself). What stands behind them - the walk of
-  the counts of a picture of the engine of the engine itself (`Channel.Decode5`) and the counts of the places
-  of the sound of the engine - stands in `docs/support-status.json`, as the record of the row names it.
+  and the counts of the places of the picture of the engine itself). The walk of the counts of a picture
+  of the engine of the engine itself (`Channel.Decode5`) and the counts of the places of the sound of the
+  engine stand ported as well, so a sound of the engine stands read to a wave container of sixteen places;
+  what stands behind them is the cipher of the key of the game (`Init56`, which the reference itself stands of
+  no counts of the walk of the engine at all) and the single precision counts of the places of the picture of
+  the engine that the reference stands of by default.
 ## Two engines can share a tag and a class name
 
 The gap inventory identifies an implementation by its kind, tag, source file and class name, and two

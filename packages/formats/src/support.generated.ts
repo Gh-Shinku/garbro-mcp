@@ -22356,16 +22356,18 @@ export const formatSupportCatalog = {
 				"the counts of the walk of the engine of the places of the picture of the engine (`HsaBitStream`): the counts of the counts of the walk of the engine at the places of the picture of the engine, the walks of the engine behind the end of a sound of the engine, and the counts of the walk of the engine of the counts of the places of the picture of the engine itself (`Peek`, `GetBits` and `Seek`)",
 				"the counts of the places of a picture of the engine of a sound of the engine (`Channel.Decode1`), of the counts of the walk of the engine of the counts of the places of the picture of the engine of the engine itself, of the counts of the places of the picture of the engine of the counts of them, of the places of the counts of the walk of the engine that stand in front of them and of the counts of the places of the picture of the engine of the counts of the walk of the engine of the kind of the counts of two places of them",
 				"the counts of the places of a picture of the engine of a count of the walk of the engine (`Channel.Decode2`, `Decode3` and `Decode4`)",
+				"the walk of the counts of a picture of the engine of the engine itself (`Channel.Decode5`), of the counts of the places of the picture of the engine of the count of the walk of the engine that stands in front of it",
+				"the counts of the places of the sound of the engine of every frame of the walk of the engine, of the counts of the places of the picture of the engine of the walk of the engine, handed out as a wave container of sixteen places (`HcaInput.PackSample16`)",
 			],
 			unsupported: [
 				"the cipher of the kind of the key of the game (the kind of the count of fifty six places), which the walk of the engine of the reference itself stands of no counts of the walk of the engine at all (`throw new NotImplementedException`)",
-				"the walk of the counts of a picture of the engine of the engine itself (`Channel.Decode5`) and the counts of the places of the sound of the engine that stand of it, of every count of the places of the sound",
+				"the counts of the places of the sound of the engine of the kind of the counts of the places of the picture of the engine of the engine itself (`ConversionFormat.IeeeFloat`), which the reference stands of by default and this port stands of the counts of sixteen places instead",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",
+				"a sound of the engine whose frames stand of the counts of the walk of the engine of a picture of the engine (the tests of this port stand of the counts of the places of the picture of the engine of no count of the walk of the engine at all alone, so the counts of the walk of the engine of the engine itself stand pinned by the counts of the places of the picture of the engine of no count at all and by the counts of the walk of the engine of the places of the picture of the engine alone)",
 				"a sound of the engine of the common kind, whose head stands of a count of the walk of the engine the reference does not know (`dec`) in front of the counts of the cipher and of the table of it",
 				"the counts of the places of the sound of the engine of a kind of the key of the game of the engine of the counts of no key at all, which stand of the counts of the walk of the engine of no cipher at all",
-				"a frame of a sound of the engine of the counts of the walk of the engine of a count of the places of the picture of the engine of the engine itself, of both kinds of the counts of the walk of the engine (`Channel.Decode2`) and of a count of the walk of the engine of the counts of two places of them",
 			],
 		},
 		{

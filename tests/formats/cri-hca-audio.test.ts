@@ -3,8 +3,10 @@
 // `loop`, `ciph`, `rva`, `ath`), the counts of the channels of the sound and the count of the places of the
 // counts of a block of it.
 import { Buffer } from "node:buffer";
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import {
+	checkHcaBlock,
 	criHcaAudioFormat,
 	createHcaCipher,
 	decipherHcaBlock,
@@ -34,6 +36,8 @@ interface HeadInput {
 	cipherType?: number;
 	athType?: number;
 	chunks?: ChunkKind;
+	/** The counts of the places of the frames of the sound of the engine, where they stand. */
+	frames?: Buffer;
 }
 
 /** A word of the walk of the head of a sound of the engine, of the counts of the places of it. */
@@ -89,7 +93,56 @@ function hcaFile(input: HeadInput = {}): Buffer {
 		head[at] = place;
 	head.writeUInt16BE(input.version ?? 0x200, 4);
 	head.writeUInt16BE(8 + body.length, 6);
-	return Buffer.concat([head, body, Buffer.alloc(input.blockSize ?? 0x200, 0)]);
+	return Buffer.concat([
+		head,
+		body,
+		input.frames ?? Buffer.alloc(input.blockSize ?? 0x200, 0),
+	]);
+}
+
+/** A frame of a sound of the engine: the counts of the walk of the engine and the counts of the walk of them. */
+function hcaFrame(payload: Buffer, blockSize: number): Buffer {
+	const frame = Buffer.alloc(blockSize, 0);
+	payload.copy(frame, 0);
+	// The counts of the places of the walk of the engine stand of the counts of the places of the block
+	// itself: the last two counts of the block stand of the counts of the walk of the engine of the places of
+	// the block of the sound of the engine that stand in front of them.
+	for (let place = 0; place <= 0xffff; place += 1) {
+		frame.writeUInt16BE(place, blockSize - 2);
+		if (0 === checkHcaBlock(frame)) return frame;
+	}
+	throw new Error("no counts of the places of the walk of the engine");
+}
+
+/**
+ * The counts of the walk of the engine of a frame of a sound of the engine of the counts of the places of a
+ * picture of the engine of no count of the walk of the engine at all: the word of the head of the frame, the
+ * counts of the walk of the engine of the counts of the walk of the engine itself, and the counts of the
+ * places of the picture of the engine of every count of the places of the sound of the engine.
+ */
+function silentFrame(blockSize: number): Buffer {
+	const payload = Buffer.alloc(9, 0);
+	payload[0] = 0xff;
+	payload[1] = 0xff;
+	return hcaFrame(payload, blockSize);
+}
+
+/** The counts of the places of a sound of the engine of a wave container. */
+function waveOf(data: Buffer): {
+	channels: number;
+	sampleRate: number;
+	bits: number;
+	pcm: Buffer;
+} {
+	if ("RIFF" !== data.toString("latin1", 0, 4))
+		throw new Error("no wave container");
+	const size = data.readUInt32LE(40);
+	return {
+		channels: data.readUInt16LE(22),
+		sampleRate: data.readUInt32LE(24),
+		bits: data.readUInt16LE(34),
+		pcm: data.subarray(44, 44 + size),
+	};
 }
 
 async function detect(data: Buffer): Promise<boolean> {
@@ -220,8 +273,18 @@ describe("Cri engine sound", () => {
 		expect(readHcaHeader(hcaFile({ chunks: "no-comp" }))).toBeUndefined();
 	});
 
-	it("stands of the frames of the sound of the engine unported", async () => {
-		const data = hcaFile();
+	it("stands of the counts of the places of a sound of the engine of no counts of them", async () => {
+		// The counts of the places of the picture of the engine of a frame of the walk of the engine of no
+		// counts of the walk of the engine at all stand of the counts of the places of the engine of no
+		// count of them at all, and the counts of the places of a frame of a sound of the engine of the
+		// counts of the walk of the engine stand of the counts of the places of the walk of the engine.
+		const data = hcaFile({
+			channels: 2,
+			blockCount: 1,
+			blockSize: 0x40,
+			frames: silentFrame(0x40),
+		});
+		expect(await detect(data)).toBe(true);
 		const handle = await criHcaAudioFormat.open(
 			new BufferByteSource(data),
 			"sound.hca",
@@ -229,12 +292,90 @@ describe("Cri engine sound", () => {
 		try {
 			const entry = handle.entries[0];
 			if (!entry) throw new Error("no entry");
-			await expect(handle.openEntry(entry.id)).rejects.toThrowError(
-				GarbroError,
+			const wave = waveOf(
+				await consumeBuffer(await handle.openEntry(entry.id)),
 			);
+			expect(wave).toMatchObject({ channels: 2, sampleRate: 44100, bits: 16 });
+			// Eight counts of the places of a block of the walk of the engine stand of every frame of the
+			// walk of the engine, of every count of the places of the sound of the engine of it.
+			expect(wave.pcm).toHaveLength(0x80 * 8 * 2 * 2);
+			expect(wave.pcm.every((place) => 0 === place)).toBe(true);
+		} finally {
+			await handle.close();
+		}
+	});
+
+	it("stands of the counts of the places of the frames of the sound of the engine", async () => {
+		// A frame of a sound of the engine of the counts of the walk of the engine of no count of the places
+		// of the block of the walk of the engine stands of no sound of the engine at all.
+		const frame = silentFrame(0x40);
+		frame[0] = (frame[0] ?? 0) ^ 0xff;
+		const broken = hcaFile({
+			channels: 2,
+			blockCount: 1,
+			blockSize: 0x40,
+			frames: frame,
+		});
+		const handle = await criHcaAudioFormat.open(
+			new BufferByteSource(broken),
+			"sound.hca",
+		);
+		try {
+			const entry = handle.entries[0];
+			if (!entry) throw new Error("no entry");
 			await expect(handle.openEntry(entry.id)).rejects.toMatchObject({
-				code: "UNSUPPORTED_FEATURE",
+				code: "INVALID_ARCHIVE",
 			});
+		} finally {
+			await handle.close();
+		}
+		// A sound of the engine whose frames stand behind the end of the sound of the engine stands of no
+		// counts of the places of the picture of the engine at all.
+		const short = hcaFile({
+			channels: 2,
+			blockCount: 4,
+			blockSize: 0x40,
+			frames: silentFrame(0x40),
+		});
+		const handle2 = await criHcaAudioFormat.open(
+			new BufferByteSource(short),
+			"sound.hca",
+		);
+		try {
+			const entry = handle2.entries[0];
+			if (!entry) throw new Error("no entry");
+			await expect(handle2.openEntry(entry.id)).rejects.toMatchObject({
+				code: "INVALID_ARCHIVE",
+			});
+		} finally {
+			await handle2.close();
+		}
+	});
+
+	it("stands of the counts of the places of the picture of the engine of the frame in front of it", async () => {
+		// A frame of the engine of no counts of the walk of the engine at all stands of the counts of the
+		// places of the frame that stands in front of it, as the reference stands of them.
+		const silent = hcaFile({
+			channels: 1,
+			blockCount: 2,
+			blockSize: 0x40,
+			frames: Buffer.concat([
+				silentFrame(0x40),
+				hcaFrame(Buffer.alloc(9, 0), 0x40),
+			]),
+		});
+		const handle = await criHcaAudioFormat.open(
+			new BufferByteSource(silent),
+			"sound.hca",
+		);
+		try {
+			const entry = handle.entries[0];
+			if (!entry) throw new Error("no entry");
+			const wave = waveOf(
+				await consumeBuffer(await handle.openEntry(entry.id)),
+			);
+			expect(wave.pcm).toHaveLength(2 * 0x80 * 8 * 1 * 2);
+			expect(wave.pcm.every((place) => 0 === place)).toBe(true);
 		} finally {
 			await handle.close();
 		}

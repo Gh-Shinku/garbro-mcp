@@ -13,13 +13,15 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
+import { writeWave } from "../shared/wav.js";
 import {
 	HCA_DEFAULT_KEY,
 	createHcaCipher,
 	readHcaAthTable,
 } from "./hca-core.js";
+import { HCA_SAMPLES_PER_FRAME, decodeHcaFrames } from "./hca-frame.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -47,9 +49,6 @@ const BLOCK_SIZE_MIN = 8;
 const R_COUNT = 8;
 const COMP_TAIL_SIZE = 2;
 const LOOP_SIZE = 12;
-/** The count of the places of a block of the walk of the engine (`0x80` places of eight counts). */
-const BLOCK_SAMPLES = 0x80;
-const BLOCK_COUNT_PER_FRAME = 8;
 
 function invalidSound(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
@@ -378,7 +377,7 @@ export const criHcaAudioFormat: ArchiveFormat = defineFixedArchive({
 					sampleRate: layout.sampleRate,
 					channels: layout.channels,
 					bitsPerSample: 16,
-					samples: layout.blockCount * BLOCK_SAMPLES * BLOCK_COUNT_PER_FRAME,
+					samples: layout.blockCount * HCA_SAMPLES_PER_FRAME,
 					frames: layout.blockCount,
 				},
 			}),
@@ -403,17 +402,23 @@ export const criHcaAudioFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource): Promise<Readable> {
-		// The counts of the table of the places of the sound of the engine and the cipher of it stand of the
-		// counts of the walk of the engine of the head of the sound itself, which the reference reads before
-		// it stands of the frames of it.
-		const sound = readHcaSound(await readStored(source));
+		const data = await readStored(source);
+		const sound = readHcaSound(data);
 		if (!sound) throw invalidSound("Not a sound of the Cri engine");
-		// The frames of a sound of the engine stand of the walks of the counts of a picture of it (the tables
-		// of the counts of the walk of a picture, the places of the counts of a block and the picture of the
-		// counts of the places of it), which this port has not taken.
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"The frames of a sound of the Cri engine stand unported",
-		);
+		const pcm = decodeHcaFrames(data, sound.layout, sound.ath, sound.cipher);
+		const blockAlign = sound.layout.channels * 2;
+		return Readable.from([
+			writeWave(
+				{
+					formatTag: 1,
+					channels: sound.layout.channels,
+					sampleRate: sound.layout.sampleRate,
+					averageBytesPerSecond: sound.layout.sampleRate * blockAlign,
+					blockAlign,
+					bitsPerSample: 16,
+				},
+				pcm,
+			),
+		]);
 	},
 });

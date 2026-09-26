@@ -106,13 +106,31 @@ the walk of the engine of the places of the picture of the engine.
   counts of the places of them, and of the counts of the places of a picture of the engine of a count of the
   walk of the engine that stands behind it (`Channel.Decode4`).
 
-Everything of a frame that stands behind those counts - the counts of the places of the picture of the engine
-of the engine itself (`Channel.Decode5`, the walk of the counts of a picture of the engine and the walk of the
-counts of the places of the picture of the engine over the counts of the places of the frame that stand behind
-them) - stands unported, and the extraction of a sound of the engine stands refused for it.
+Behind those counts stands the walk of the counts of a picture of the engine of the engine itself
+(`Channel.Decode5`): the counts of the places of the picture of the engine of a count of the walk of the engine
+stand of the counts of the places of the walk of the engine of the counts of them, and then of the counts of
+the places of the picture of the engine of the count of the walk of the engine that stands in front of them,
+which stand of the counts of the places of the picture of the engine of the count of the walk of the engine
+that stands behind it. Every frame of the walk of the engine stands of `0x400` places of a colour for every
+count of the places of the sound of the engine, which stand of the counts of the places of the sound of the
+engine in the order of the walk of the engine, and the extraction of a sound of the engine stands of a wave
+container of sixteen places of the counts of the places of the picture of the engine.
+
+A frame of the walk of the engine of no counts of the walk of the engine at all - the word of the head of the
+frame of no count of them at all - stands of the counts of the places of the picture of the engine of the frame
+that stands in front of it, which the reference stands of as well: the counts of the places of the picture of
+the engine of the frame that stands in front of it stand for the frame that stands behind it.
 
 ## Deviations
 
+* The reference hands the counts of the places of the sound of the engine out as single precision counts of
+  the places of the picture of the engine (`ConversionFormat.IeeeFloat`, which its own `TryOpen` stands of);
+  this port stands of the counts of sixteen places of the counts of the places of the picture of the engine
+  (`ConversionFormat.Pcm`, the `PackSample16` of the reference, of the counts of the places of the picture of
+  the engine that stand of `0x7FFF` and stand of the counts of the engine itself outside them). The walks
+  themselves stand of the counts of the engine of this project, which stand of no counts of the places of the
+  picture of the engine of the count of the places of the engine itself where the reference stands of a single
+  count of them.
 * The port reads the whole file to reach the head. The reference reads the head in place and then stands of
   the frames where the head names them; the head of this port is read once and the frames stand behind it.
   Extraction stands unported, so nothing stands of the frames.
@@ -167,9 +185,22 @@ them) - stands unported, and the extraction of a sound of the engine stands refu
   counts of the places of the picture of the engine that stand in front of them, of the places of the counts of
   the walk of the engine that stand behind the counts of the walk of the engine of the picture of the engine
   itself, and of the counts of the places of the walk of the engine of the counts of the places of the picture
-  of the engine behind them (`Channel.Decode1`, `Decode2`, `Decode3` and `Decode4`).
+  of the engine behind them (`Channel.Decode1`, `Decode2`, `Decode3` and `Decode4`),
+* the walk of the counts of a picture of the engine of the engine itself (`Channel.Decode5`) and the counts of
+  the places of the picture of the engine of the walk of the engine that stand of it, of the counts of the
+  places of the sound of the engine of every frame of the walk of the engine,
+* a sound of the engine of the counts of the places of a picture of the engine of no counts of the walk of the
+  engine at all, which stands of the counts of the places of the picture of the engine of the frame that stands
+  in front of it, and of a frame of no counts of the walk of the engine at all,
+* a wave container of a sound of the engine of the counts of the places of the picture of the engine of the
+  walk of the engine, of the counts of the places of the sound of the engine of the head of it,
+* the refusals of the frames of a sound of the engine: a frame of the counts of the walk of the engine of a
+  count of the places of the block of the walk of the engine that stands behind the counts of the places of the
+  block itself, and a frame that stands behind the end of the sound of the engine.
 
 ## References
 
 - `GARbro/ArcFormats/Cri/AudioHCA.cs` — `AthTable`, `Cipher`, `HcaReader.ParseHeader`, `HcaReader.ReadSignature`,
-  `HcaReader.InitChannels`, `HcaReader.DecodeBlock`, `HcaAudio.DefaultKey`
+  `HcaReader.InitChannels`, `HcaReader.DecodeBlock`, `HcaReader.ConvertSequential`, `Channel.Decode1`,
+  `Channel.Decode2`, `Channel.Decode3`, `Channel.Decode4`, `Channel.Decode5`, `HsaBitStream`,
+  `HcaReader.CheckSum`, `HcaInput.PackSample16`, `HcaAudio.DefaultKey`
