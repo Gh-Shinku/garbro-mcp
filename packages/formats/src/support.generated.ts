@@ -7821,6 +7821,7 @@ export const formatSupportCatalog = {
 				"list",
 				"extract",
 				"the appended alpha plane of a companion with the extension `.alp`, laid over the fourth place of every place of the picture",
+				"the two shapes of `BitmapWithAlpha`, of a bitmap whose alpha stands behind the places of its picture and of one whose count of the places of its file stands of three places a place",
 			],
 			unsupported: ["archive creation", "run length bitmaps"],
 			remainingVerification: ["real-game GARbro differential output"],

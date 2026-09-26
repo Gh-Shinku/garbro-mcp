@@ -420,6 +420,15 @@ export function readBmpImage(bmp: Buffer): BmpImage | undefined {
 			blue: bmp.readUInt32LE(BMP_HEADER_SIZE + 8),
 		};
 	}
+	// The framework the reference stands on reads a bitmap of two shapes before its own walk, which this port
+	// carries as the reference does.
+	const alpha = readBitmapWithAlpha(bmp, {
+		width,
+		height,
+		bitsPerPixel,
+		dataOffset,
+	});
+	if (alpha) return alpha;
 	const rowBytes = Math.ceil((width * bitsPerPixel) / 8);
 	const stride = (rowBytes + 3) & ~3;
 	const imageSize = stride * height;
@@ -477,6 +486,94 @@ export function writeBmpImage(image: BmpImage): Buffer {
 		default:
 			return writeBmp32(width, height, pixels);
 	}
+}
+
+/**
+ * `BitmapWithAlpha`, the reader of bitmaps of the framework the reference stands on, which the reference tries
+ * before its own walk:
+ *
+ * * a bitmap whose header names **three** places of the file a place while the count of the places of its own
+ *   file stands of the places of the picture alone carries the alpha of every place behind the places of the
+ *   picture, of a place a place of the picture;
+ * * a bitmap whose header names **four** places of the file a place while the places of its picture stand of
+ *   three, and the count of the places of its file stands of three places the place, carries the alpha in the
+ *   fourth place of every place, which the walk of this port stands of no places of the file at all.
+ *
+ * The walk reads the places of the picture from the place the head names and the alpha from the place the count
+ * of the places of the file ends at, both in the order the file stores them, so the places of the picture come
+ * out the right way up.
+ */
+function readBitmapWithAlpha(
+	bmp: Buffer,
+	fields: {
+		width: number;
+		height: number;
+		bitsPerPixel: number;
+		dataOffset: number;
+	},
+): BmpImage | undefined {
+	const { width, height, bitsPerPixel, dataOffset } = fields;
+	const count = width * height;
+	const pictureLength = Math.trunc((count * bitsPerPixel) / 8) + dataOffset;
+	const declared = bmp.readUInt32LE(2);
+	const fileLength =
+		0 === declared || 0x0e === declared
+			? bmp.length
+			: Math.min(declared, bmp.length);
+	if (
+		(pictureLength === fileLength || pictureLength + 2 === fileLength) &&
+		24 === bitsPerPixel &&
+		(fileLength + count === bmp.length ||
+			fileLength + count + width === bmp.length)
+	) {
+		return readBmpWithAppendedAlpha(bmp, width, height, dataOffset, fileLength);
+	}
+	if (32 === bitsPerPixel && fileLength - (count * 3 + dataOffset) <= 2) {
+		const pixels: Buffer = Buffer.alloc(count * 4, 0x00);
+		const bottomUp = bmp.readInt32LE(22) > 0;
+		for (let row = 0; row < height; row += 1) {
+			const stored = bottomUp ? height - 1 - row : row;
+			for (let at = 0; at < width * 4; at += 4) {
+				const from = dataOffset + stored * width * 4 + at;
+				pixels[row * width * 4 + at] = bmp[from] ?? 0;
+				pixels[row * width * 4 + at + 1] = bmp[from + 1] ?? 0;
+				pixels[row * width * 4 + at + 2] = bmp[from + 2] ?? 0;
+				pixels[row * width * 4 + at + 3] = bmp[from + 3] ?? 0;
+			}
+		}
+		return {
+			width,
+			height,
+			bitsPerPixel: 32,
+			palette: Buffer.alloc(0),
+			pixels,
+		};
+	}
+	return undefined;
+}
+
+/** The places of the picture of a bitmap of three places of the file a place, with its alpha behind them. */
+function readBmpWithAppendedAlpha(
+	bmp: Buffer,
+	width: number,
+	height: number,
+	dataOffset: number,
+	alphaOffset: number,
+): BmpImage {
+	const pixels: Buffer = Buffer.alloc(width * height * 4, 0x00);
+	const bottomUp = bmp.readInt32LE(22) > 0;
+	for (let row = 0; row < height; row += 1) {
+		const stored = bottomUp ? height - 1 - row : row;
+		for (let x = 0; x < width; x += 1) {
+			const from = dataOffset + stored * width * 3 + x * 3;
+			const dst = (row * width + x) * 4;
+			pixels[dst] = bmp[from] ?? 0;
+			pixels[dst + 1] = bmp[from + 1] ?? 0;
+			pixels[dst + 2] = bmp[from + 2] ?? 0;
+			pixels[dst + 3] = bmp[alphaOffset + stored * width + x] ?? 0;
+		}
+	}
+	return { width, height, bitsPerPixel: 32, palette: Buffer.alloc(0), pixels };
 }
 
 /**

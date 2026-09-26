@@ -207,6 +207,54 @@ describe("Windows bitmap", () => {
 		);
 	});
 
+	it("reads the two shapes of a bitmap whose alpha channel stands outside its head", async () => {
+		// `BitmapWithAlpha`, the reader of the framework the reference stands on, takes a bitmap whose head
+		// names three places of the file a place while the count of the places of its file stands of the places
+		// of the picture alone as a bitmap whose alpha stands behind those places, and one that names four
+		// places of the file a place while its places stand of three as a bitmap whose fourth place every
+		// place already stands in.
+		const head = (
+			bpp: number,
+			count: number,
+			pixels: number,
+			alpha: number,
+		): Buffer => {
+			const header: Buffer = Buffer.alloc(54, 0x00);
+			header.write("BM", 0, "latin1");
+			header.writeUInt32LE(count, 2);
+			header.writeUInt32LE(54, 10);
+			header.writeUInt32LE(40, 14);
+			header.writeInt32LE(2, 18);
+			header.writeInt32LE(2, 22);
+			header.writeUInt16LE(1, 26);
+			header.writeUInt16LE(bpp, 28);
+			return Buffer.concat([
+				header,
+				Buffer.from([
+					1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+				]).subarray(0, pixels),
+				Buffer.from([0x10, 0x20, 0x30, 0x40]).subarray(0, alpha),
+			]);
+		};
+		// The places of the picture stand of three places of the file a place, the alpha behind them, and the
+		// count of the places of the file stands of the places of the picture alone.
+		const appended = head(24, 54 + 12, 12, 4);
+		const one = readBmpImage(await extract(appended));
+		expect(one).toMatchObject({ width: 2, height: 2, bitsPerPixel: 32 });
+		expect([...(one?.pixels ?? [])]).toEqual([
+			7, 8, 9, 0x30, 10, 11, 12, 0x40, 1, 2, 3, 0x10, 4, 5, 6, 0x20,
+		]);
+		// The head names four places of the file a place while the count of the places of its file stands of
+		// three: the walk reads four places a place from the place the head names and stands of nought where
+		// the places of the file run out, which is what the framework's own walk reads as well.
+		const three = head(32, 54 + 6, 6, 0);
+		const two = readBmpImage(await extract(three));
+		expect(two).toMatchObject({ width: 2, height: 2, bitsPerPixel: 32 });
+		expect([...(two?.pixels ?? [])]).toEqual([
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0,
+		]);
+	});
+
 	it("reads a bitmap stored with the older header", async () => {
 		// Two rows of two pixels stored bottom up, which is the only way that header stores them.
 		const file = coreHeaderBmp(

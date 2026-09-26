@@ -50,6 +50,23 @@ left out:
 * a **run length** bitmap is refused with `INVALID_ARCHIVE` where the framework the reference hands it to would
   decode it, since the shared reader here knows only the two uncompressed layouts.
 
+The other reader of the framework, `BitmapWithAlpha`, is always in front of the reference's own walk, and this
+port carries it as well. It takes two shapes, both of them of a bitmap whose head declares a count of the places
+of its file that does not stand of the places of the picture the usual way:
+
+* a bitmap whose head names **three** places of the file a place while the count of the places of its file stands
+  of the places of the picture alone carries the alpha of every place **behind** those places, of a place a place
+  of the picture, and comes out as a picture of four places of the file a place;
+* a bitmap whose head names **four** places of the file a place while the count of the places of its file stands
+  of three places a place is read as a picture of four places of the file a place anyway, with the places the
+  file does not hold standing at nought.
+
+Both walks read the places of the picture from the place the head names and, of the first shape, the alpha from
+the place those places end at, in the order the file stores them, so the places of the picture come out the
+right way up. The reference walks both as if the rows of the file stood bottom up, which is what a bitmap of a
+height above nought carries; this port takes the height the head declares, so a picture whose rows stand the
+right way up in the file comes out the right way up here as well.
+
 The height a bitmap with top-down rows declares is stored negative. The reference reads that word as unsigned and
 reports a measurement in the billions; the port reports the height of the picture it hands back, which is the
 same measurement with its sign taken off.
