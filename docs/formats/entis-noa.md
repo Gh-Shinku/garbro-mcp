@@ -92,6 +92,12 @@ resource. A kind or a name is either a name or a number, and the search reads th
 language Windows would reach last. The reader is written from the format rather than ported, because the
 reference asks the platform for the resource and carries no walk of its own.
 
+Besides the fixtures of the tests, the reader was run by hand over a Windows executable of this machine (a
+launcher of the Python imaging library's vendor directory, 103 KiB): it reports nine resources, among them the
+manifest — kind 24, name 1, language 1033 — whose bytes begin `<assembly xmlns="urn:schemas-microsoft-com…`,
+and seven icons of kind 3 whose bytes begin with the forty byte header of an icon. That check stands outside
+the test suite because it reads a file of the machine rather than a fixture.
+
 ## The BSHF cipher
 
 The cipher behind the encryption kind `0x40000000` is ported as `packages/codecs/src/erisa-bshf.ts`. A stream
