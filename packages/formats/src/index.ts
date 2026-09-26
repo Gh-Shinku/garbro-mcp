@@ -194,6 +194,7 @@ import { clioExpImageFormat } from "./clio/exp-image.js";
 import { clioPacFormat } from "./clio/pac.js";
 import { cpz1Format } from "./cmvs/cpz1.js";
 import { cpz2Format } from "./cmvs/cpz2.js";
+import { cpzFormat } from "./cmvs/cpz5-archive.js";
 import { mskImageFormat } from "./cmvs/msk-image.js";
 import { cmvsPb2ImageFormat } from "./cmvs/pb2-image.js";
 import { mv2AudioFormat } from "./cmvs/mv2-audio.js";
@@ -1967,6 +1968,7 @@ export function createDefaultRegistry(
 		gamesystemDatFormat,
 		abelArcFormat,
 		cpz2Format,
+		cpzFormat,
 		cswareDatFormat,
 		hcsystemPakFormat,
 		vnsystemVfsFormat,

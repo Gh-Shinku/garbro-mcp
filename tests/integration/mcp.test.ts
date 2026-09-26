@@ -275,7 +275,7 @@ describe("MCP task server", () => {
 				diagnosis: {
 					kind: "registered-extension-no-match",
 					extension: "cpz",
-					candidateFormatIds: ["cmvs-cpz1", "cmvs-cpz2"],
+					candidateFormatIds: ["cmvs-cpz1", "cmvs-cpz2", "cmvs-cpz-archive"],
 				},
 			},
 		});

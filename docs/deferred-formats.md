@@ -358,47 +358,6 @@ the first forty of them.
   `ERISADecodeContext` stands in the same file, and its sound input stands on `MioDecoder` of
   `ArcFormats/Entis/MioDecoder.cs`, 968 lines of arithmetic. Nothing outside the Entis tree is needed, so
   the unit is that pair rather than a missing input.
-- `CPZ` (`ArcFormats/Cmvs/ArcCPZ.cs`, class `CpzOpener`, the layouts whose mark reads `CPZ5`, `CPZ6` or
-  `CPZ7`) is the newer archive of the CVNS engine, and its unit is four files rather than one: the opener
-  itself (776 lines), the head (`CpzHeader.cs`, 175), the walk of its entries (`Cpz5Decoder` and
-  `ArchiveKey`, in the opener), a Huffman reader of its own (`HuffmanDecoder.cs`, 108), now ported as
-  `packages/codecs/src/cmvs-huffman.ts` - the tree of the walk of `HuffmanCompression.cs` over a stream of
-  words read from the lowest place of a byte up - and a **custom MD5**
-  (`CmvsMD5.cs`, 194), whose state feeds the keys of every step - that piece is now ported, as
-  `packages/codecs/src/cmvs-md5.ts`: the round is the round of RFC 1321 over the block the engine shapes
-  (`w0 w1 w2 w3 80 … 80 00`, of its own initial state), and the seven keys of the engine differ in that
-  state and in the mapping of the four words the round leaves behind alone, of which the `mirai` key is the
-  state of the standard and is therefore held to `node:crypto` by the test of the family. Every index is encrypted end to end: the
-  head is checked against an MD5 of its own, the seventh layout unpacks its index key through the Huffman
-  reader, and the index itself then goes through a mix over a twenty four word secret, the walk of the
-  `Cpz5Decoder` (twice), a directory walk and an entry walk.
-  
-  The walk of `Cpz5Decoder` and `ArchiveKey` has landed as `packages/codecs/src/cmvs-decoder.ts`: the table
-  of the places of a byte of the walk (two swaps a turn over two hundred and fifty six turns, of a key that
-  walks a turn of its own), the walk of a run of that table, and the walk of the places of an entry over the
-  secret of the scheme, the digest of the head of the archive and a seed - **both directions of it**, which
-  the reference carries as `Encode` and `EncryptEntry` beside `Decode` and `DecryptEntry`. An earlier note
-  here said the inverse of that walk was a compressor the port would have to write first; the reference
-  carries it, so a fixture can be written *through* it, and the note was wrong. The head has landed as well, in
-  `packages/formats/src/cmvs/cpz5-header.ts`: the places of the fields of a head stand of the version its
-  mark spells, of the constants the reference takes every one of them apart with, the head is held to a sum
-  of the places of its own (which for the seventh layout covers places the head does not end at, since that
-  layout carries the count of the places of the key of its index behind the sum), and the places of an index
-  are held to the digest the head carries, and to the digest of the key behind them of the seventh layout.
-  The index and payload walks have landed as well, in
-  `packages/formats/src/cmvs/cpz5-index.ts`: the three mixes of the places of an index (the first, the rooms
-  of a directory and the runs of its entries), each of them **both ways** as the reference carries them, the
-  reader of the key behind the index of the seventh layout, the window walk of a payload (which the opener of
-  the older layouts of the engine stands of as well, `cmvs/cpz.ts`) and the places of a `PS2A` and of a
-  `PB3B` payload. Every walk of the index is held to its own inverse and to a second transcription of
-  `ArcCPZ.cs` written apart from the port; that transcription is what caught the one place the port had
-  dropped (the addend of the first mix, whose absence the round trip alone would have caught as well). The
-  walk of a directory adds the key of the archive to its seed on the way in alone, so the two directions are
-  each other's inverse for an archive whose key stands of nothing — the key of a stock build — and part
-  company for any other; both places are kept as the reference writes them, and the difference is pinned by
-  the test. What remains is the opener itself (the mark `CPZ5`/`CPZ6`/`CPZ7`, the directory and the entry
-  walks, `OpenEntry`) and the key file (`ArchiveKey`), of which a stock build stands of zeros: the reference
-  reads it out of a `start.ps3` beside the archive.
 - `DXR` (`ArcFormats/Macromedia/ArcDXR.cs`, class `DxrOpener`) is a Macromedia Director presentation, and
   its unit is `DirectorFile.cs` (836 lines) beside the opener (504): the reader of the `RIFX`/`XFIR` chunk
   tree, a `mmap` index and the `KEY*`/`CAS*` resources, all of it written through a **table driven

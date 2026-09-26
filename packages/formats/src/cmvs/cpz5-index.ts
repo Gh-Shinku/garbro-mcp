@@ -29,6 +29,18 @@ const INDEX_ENTRY_STEP = 0x139fa9b;
 const TAIL_BYTE = 0xff;
 /** The places of the head a `PS2A` run keeps its window walk behind. */
 const LZSS_HEAD = 0x30;
+/**
+ * The four places of the key of an archive, which the reference reads out of a `start.ps3` beside the
+ * archive (`FindArchiveKey`). A stock build of the engine, and every layout below the seventh, stands of
+ * zero for all four of them.
+ */
+export interface CpzArchiveKey {
+	readonly indexDirKey: number;
+	readonly indexEntryKey: number;
+	readonly entryDataKey1: number;
+	readonly entryDataKey2: number;
+}
+
 /** The places of the head of an index key, and of the places of the key within it. */
 const KEY_SIZE_AT = 16;
 const KEY_PLACES_AT = 20;

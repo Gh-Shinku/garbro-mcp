@@ -11,3 +11,4 @@ export * from "./pb3-image.js";
 export * from "./psb-image.js";
 export * from "./cpz5-header.js";
 export * from "./cpz5-index.js";
+export * from "./cpz5-archive.js";
