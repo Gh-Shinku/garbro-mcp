@@ -239,7 +239,18 @@ further than the reference's own list of them.
   that compression has real cabinets to be checked against, together with the `expand.exe` of the system as
   an outside reading: `C:\Windows\servicing\FodMetadata\FoDMetadata_Client.cab` (455 files) and
   `C:\Windows\Logs\CBS\CbsPersist_20260918195836.cab` (one file of 16 151 336 bytes, whose blocks unfold
-  to 16 151 848 — the bytes the system tool writes out). (The other `CabOpener` of the
+  to 16 151 848 — the bytes the system tool writes out). **A walk of LZX was written against those two
+  cabinets and does not yet stand whole.** What it reproduces exactly is the opening of the stream, the
+  kinds and lengths of its blocks, the three trees with the differences that name them, the literals, and
+  matches held in the three places of the last matches: over the first frame of thirty two thousand bytes
+  of `CbsPersist_20260918195836.cab` its bytes are **equal byte for byte** to the bytes the system tool
+  writes out, the walk of Intel calls of that frame included. What it does not yet reproduce is what stands
+  behind that frame: at 32 859 bytes the bytes part from the system tool's by one place, and by the end of
+  the first block of `FoDMetadata_Client.cab` the bit stream stands far enough out of step that the header
+  of the block behind reads as a kind of six. A match there names a length of 257 where 91 stands (the
+  places of both are matches of the same 91 bytes), so the fault stands in the walk of the tree of lengths
+  or in the place a match takes, not in the head of the format. The walk stands aside until it is whole,
+  because a reader that hands over bytes other than the ones the format stands for is worse than none. (The other `CabOpener` of the
   tree, `ArcFormats/EntExec/ArcCAB.cs`, is a walk of the engine and **is** ported, as `entexec-cab`.)
 - `WMA` (`ArcFormats/AudioWMA.cs`) hands its stream to NAudio. (`AIFF` stood beside it and is now read: the
   walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
