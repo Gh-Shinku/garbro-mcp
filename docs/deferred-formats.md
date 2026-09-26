@@ -87,7 +87,9 @@ open archives that the shipped defaults already cover.
   returns nothing from `TryOpen` for every file of this engine. Its entries would need the scheme as well,
   and the fourth method it names (`UnpackData`) is a stub that hands the bytes back as they stand.
 - `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads the resource `CIPHERCODE` out of an executable placed
-  beside the archive.
+  beside the archive, so the key **is** in the reach of the reader rather than in the archive: **it stands
+  ported now**, as `stack-gpk-archive`, of the walk of the two directories the reference stands of and of the
+  reader of a portable executable this project already carried - see `docs/formats/stack-gpk-archive.md`.
 - `PAK/EAGLS` (`ArcFormats/Eagls/ArcEAGLS.cs`) asks for its encryption through `Query<EaglsOptions>` and
   then calls `DetectEncryptionScheme` on what the answer holds.
 - `BIN/PAC` (`ArcFormats/DigitalWorks/ArcBIN.cs`) reaches its key through a `Scheme` whose `DefaultScheme`
