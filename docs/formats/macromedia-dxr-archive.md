@@ -265,8 +265,28 @@ places of a colour of the counts of the engine of the counts of them, and every 
 the engine of the walk of the engine itself.
 
 
+## Pictures whose medium is a JPEG or a PNG
+
+A cast member of the kind of a picture carries one of two things: the picture itself (`BITD`, described
+above) or a medium (`ediM`) that some other program wrote and that the movie only points at. The member
+gains a `.jpg` name in the second case. The reference hands such a medium over to the platform's own
+decoder when the member carries no alpha channel, and where the member does carry one (`ALFA`), it reads
+the JPEG itself and writes that alpha channel into the fourth byte of every pixel. A medium the platform
+decoder cannot read fails in the reference, since nothing else is tried.
+
+This port reads the stream with its own readers of the JPEG and PNG interchange formats, which are the two
+the platform decoder is used for in practice, and writes an alpha channel into the fourth byte of every
+pixel just as the reference does. A picture of three samples a pixel gains a fourth, opaque byte, which is
+the shape the platform decoder hands out for such a stream too. A stream of any other format is handed out
+as it stands, because no reader of those formats exists here, and a member whose medium is such a stream is
+listed all the same.
+
+
 ## Deviations
 
+* The reference hands a member medium (`ediM`) without an alpha channel to the platform's own decoder,
+  which reads every format the platform knows; this port reads the JPEG and PNG interchange formats itself
+  and hands any other stream out unchanged, as described above.
 * The port reads the words of the head, the map of the places of the picture of the engine, the counts of the
   walk of the engine of the places of the picture of the engine of the counts of the walk of the engine of the
   places of them and the pictures and sounds of the counts of the places of the picture of the engine. The

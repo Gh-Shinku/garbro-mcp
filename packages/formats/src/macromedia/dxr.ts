@@ -23,6 +23,10 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readJpegHeaderFields } from "../shared/jpeg.js";
+import { readPngImage } from "../shared/png-image.js";
+import { readPngHeaderFields } from "../shared/png.js";
 import { writeWave } from "../shared/wav.js";
 import {
 	directorBmp,
@@ -1509,6 +1513,66 @@ export const macromediaDxrArchiveFormat: ArchiveFormat = defineFixedArchive({
 				"UNSUPPORTED_FEATURE",
 				"The counts of the places of a picture of the engine stand unported",
 			);
+		if (entry.path.endsWith(".jpg")) {
+			// `DxrOpener.OpenJpeg` hands a picture whose member carries a JPEG medium and no alpha channel to
+			// the platform, which reads whatever format the stream holds, and where the member also carries an
+			// alpha channel it reads the JPEG itself and puts that alpha channel into the fourth place of every
+			// pixel. This port reads the stream with its own readers of the JPEG and PNG interchange formats
+			// (the two the platform decoder is used for in practice) and puts an alpha channel in the same way;
+			// a stream of any other format is handed out as it stands, since no reader of those formats exists
+			// here.
+			let surface:
+				| {
+						width: number;
+						height: number;
+						bitsPerPixel: number;
+						pixels: Uint8Array;
+				  }
+				| undefined;
+			if (readJpegHeaderFields(bytes))
+				surface = { ...readJpegImage(bytes), bitsPerPixel: 32 };
+			else if (readPngHeaderFields(bytes)) surface = await readPngImage(bytes);
+			if (surface) {
+				const width = surface.width;
+				const height = surface.height;
+				const pixels = Buffer.alloc(width * height * 4);
+				if (32 === surface.bitsPerPixel) {
+					Buffer.from(surface.pixels).copy(pixels);
+				} else {
+					// A picture of three places a pixel gains a fourth, opaque place, which is the shape the
+					// platform decoder hands out for such a stream as well.
+					for (let at = 0; at < width * height; at += 1) {
+						pixels[at * 4] = surface.pixels[at * 3] ?? 0;
+						pixels[at * 4 + 1] = surface.pixels[at * 3 + 1] ?? 0;
+						pixels[at * 4 + 2] = surface.pixels[at * 3 + 2] ?? 0;
+						pixels[at * 4 + 3] = 0xff;
+					}
+				}
+				let alpha: Buffer | undefined;
+				if (media?.alphaId !== undefined) {
+					const alphaChunk = movie.directory.find(
+						(candidate) => candidate.id === media.alphaId,
+					);
+					if (alphaChunk)
+						alpha = unpackDirectorAlpha(
+							chunkBuffer(movie, alphaChunk),
+							width,
+							height,
+						);
+				}
+				const picture = directorPicture(
+					{
+						width,
+						height,
+						bitsPerPixel: 32,
+						pixels,
+						...(alpha ? { alpha } : {}),
+					},
+					undefined,
+				);
+				return Readable.from([directorBmp(picture, width, height)]);
+			}
+		}
 		if (entry.path.endsWith(`.${TEXT_CHUNK}`)) {
 			const text = directorText(bytes);
 			if (!text)

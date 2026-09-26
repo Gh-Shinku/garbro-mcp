@@ -19,6 +19,8 @@ import {
 	readDirectorKeyTable,
 	readDirectorMovie,
 } from "@garbro-mcp/formats";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+import { pngFile } from "../helpers/png.js";
 import { describe, expect, it } from "vitest";
 
 const MAP_HEAD_SIZE = 0x18;
@@ -1120,5 +1122,119 @@ describe("Macromedia Director movie", () => {
 		await expect(extract(short, "art.BITD")).rejects.toMatchObject({
 			code: "INVALID_ARCHIVE",
 		});
+	});
+
+	it("decodes a picture whose member carries a JPEG medium", async () => {
+		// `DxrOpener.OpenImage` hands a member whose keys hold an `ediM` chunk over to the platform, which
+		// reads whatever format the stream holds. Where the stream is a JPEG this port reads it with its own
+		// reader of that format and hands a bitmap over; a stream of any other format stands as it is, which
+		// the listing test above pins with a two-byte medium.
+		const data = dxrMovie({
+			chunks: [
+				{
+					fourCC: "KEY*",
+					body: keyChunk([{ id: 3, castId: 2, fourCC: "ediM" }], true, 1),
+				},
+				{ fourCC: "CAS*", body: castIndex([2]) },
+				{
+					fourCC: "CASt",
+					body: castMemberOld({
+						type: 1,
+						info: castInfo({ name: "art", source: "" }),
+						specific: Buffer.alloc(0),
+					}),
+				},
+				{ fourCC: "ediM", body: GREY_JPEG },
+			],
+		});
+		const image = readBmpImage(await extract(data, "art.jpg"));
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([8, 8]);
+		expect([...image.pixels]).toEqual([...GREY_PIXELS]);
+	});
+
+	it("puts an alpha channel of a member into the JPEG medium it carries", async () => {
+		// `DxrOpener.OpenJpeg` hands a member medium with no alpha channel to the platform and reads the JPEG
+		// itself where the member carries one, putting that channel into the fourth place of every pixel
+		// through the same `ALFA` walk the `BITD` pictures use.
+		const alpha: number[] = [];
+		for (let at = 0; at < 64; at += 1) alpha.push(at + 1);
+		const data = dxrMovie({
+			chunks: [
+				{
+					fourCC: "KEY*",
+					body: keyChunk(
+						[
+							{ id: 3, castId: 2, fourCC: "ediM" },
+							{ id: 4, castId: 2, fourCC: "ALFA" },
+						],
+						true,
+						2,
+					),
+				},
+				{ fourCC: "CAS*", body: castIndex([2]) },
+				{
+					fourCC: "CASt",
+					body: castMemberOld({
+						type: 1,
+						info: castInfo({ name: "art", source: "" }),
+						specific: Buffer.alloc(0),
+					}),
+				},
+				{ fourCC: "ediM", body: GREY_JPEG },
+				{
+					fourCC: "ALFA",
+					body: Buffer.concat(
+						[0, 8, 16, 24, 32, 40, 48, 56].map((row) =>
+							Buffer.from([0x07, ...alpha.slice(row, row + 8)]),
+						),
+					),
+				},
+			],
+		});
+		const image = readBmpImage(await extract(data, "art.jpg"));
+		if (!image) throw new Error("no bitmap");
+		const expected = Buffer.from(GREY_PIXELS);
+		for (const [index, value] of alpha.entries())
+			expected[index * 4 + 3] = value;
+		expect([...image.pixels]).toEqual([...expected]);
+	});
+
+	it("decodes a picture whose member carries a PNG medium", async () => {
+		// The platform decoder the reference hands a medium without an alpha channel to reads the PNG
+		// interchange format as well, so this port does the same where the bytes are one.
+		const data = dxrMovie({
+			chunks: [
+				{
+					fourCC: "KEY*",
+					body: keyChunk([{ id: 3, castId: 2, fourCC: "ediM" }], true, 1),
+				},
+				{ fourCC: "CAS*", body: castIndex([2]) },
+				{
+					fourCC: "CASt",
+					body: castMemberOld({
+						type: 1,
+						info: castInfo({ name: "art", source: "" }),
+						specific: Buffer.alloc(0),
+					}),
+				},
+				{
+					fourCC: "ediM",
+					body: pngFile({
+						width: 2,
+						height: 1,
+						colourType: 2,
+						rows: [[1, 2, 3, 4, 5, 6]],
+					}),
+				},
+			],
+		});
+		const image = readBmpImage(await extract(data, "art.jpg"));
+		if (!image) throw new Error("no bitmap");
+		expect([image.width, image.height]).toEqual([2, 1]);
+		// The samples of the picture stand red, green then blue and every place of the picture stands blue,
+		// green then red, which is the order both readers hand out; the fourth place stands opaque, as the
+		// platform decoder leaves it for a picture of three places a pixel.
+		expect([...image.pixels]).toEqual([3, 2, 1, 0xff, 6, 5, 4, 0xff]);
 	});
 });
