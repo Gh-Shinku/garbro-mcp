@@ -221,7 +221,7 @@ export interface GalFrame {
 	placedAt: number;
 }
 
-function frameStride(
+export function galFrameStride(
 	width: number,
 	bitsPerPixel: number,
 ): { stride: number; alphaStride: number } {
@@ -353,7 +353,7 @@ function readGalRaw(
 }
 
 /** The counts of the places of a picture of the engine of one count of the walk of the places of it. */
-async function unpackGalLayer(
+export async function unpackGalLayer(
 	frame: GalFrame,
 	header: GalHeader,
 	packed: Buffer,
@@ -427,7 +427,7 @@ export function readGalFrameHead(
 		palette = reader.bytes(PALETTE_ENTRY * (1 << bitsPerPixel));
 		if (!palette) return undefined;
 	}
-	const { stride, alphaStride } = frameStride(width, bitsPerPixel);
+	const { stride, alphaStride } = galFrameStride(width, bitsPerPixel);
 	const frame: GalFrame = {
 		width,
 		height,
@@ -689,7 +689,7 @@ export function readGalPicture(
 	return { header, head };
 }
 
-function galBitmap(picture: GalPicture): Buffer {
+export function galBitmap(picture: GalPicture): Buffer {
 	if (
 		picture.palette &&
 		picture.pixels.length === picture.width * picture.height

@@ -193,8 +193,8 @@ open archives that the shipped defaults already cover.
   them stands (`if (!KnownKeys.Any()) return 0;`) - which is what the port does, and which for `TpRandom`
   means the counts of the places of the picture stand in the order of the file. What stands behind it is the
   kind of the places of a picture of the engine itself, which the reference hands to `JpegBitmapDecoder` of
-  WPF. The archives of the same engine (`GAL/X`, `GAL/X200`) and the picture of `GAL/X200` stand unported,
-  and their reason stands beside their own entries below.
+  WPF. The archives of the same engine (`GAL/X`, `GAL/X200`) and the picture of `GAL/X200` **stand ported
+  now**, as `livemaker-galx-archive` and `livemaker-galx-image`.
 - `BIN/IDX` (`ArcFormats/Unity/ArcBIN.cs`) keys each archive with a **key and an initialisation vector of its
   own**, looked up by the archive's name in `BinPackScheme.KnownKeys` - a dictionary that ships **empty** -
   and its entries are keyed with the AES of that pair. With no key there is nothing to try, so a stock build
@@ -242,8 +242,8 @@ open archives that the shipped defaults already cover.
 
 ## How many rows stand unported, and of what kind
 
-At this writing the deliverable list holds **1129** rows: **1080** of them stand of a port of this project and
-**49** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the kinds
+At this writing the deliverable list holds **1129** rows: **1083** of them stand of a port of this project and
+**46** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the kinds
 of reason are these, to the row:
 
 * **a key the file does not carry, of a table that ships empty** - **25 rows**: `PKZ`, `PKG/2`, `ADS`, `PBZ`,
@@ -266,11 +266,10 @@ of reason are these, to the row:
 * **nothing at all to lay out** - **4 rows**: `SCR`, `TXT`, `DAT/GENERIC` and `AMP/LEAF` are inert registry
   entries of the reference (a signature of nought, `IsScript` false, and no extension or a name alone).
   `PNG/ISM` stood here wrongly: **it stands ported now**, as `png-ism-image`.
-* **a walk this project does not carry, of a size worth a turn of its own** - **3 rows**: `WAR`
-  (`ShiinaRio/ArcWARC.cs`, 543 lines, behind a cipher of `WarcEncryption.cs`, 1314 lines, of which the
-  versions of 1.10 and behind stand of a scheme the reference itself holds, `EncryptionScheme.Warc110`), and
-  `GAL/X` with `GAL/X200` (of a shared reader of the XML head of a picture and of the layers of it). Neither
-  stands of a key a file does not carry, so these are the rows a turn should start from.
+* **a walk this project does not carry, of a size worth a turn of its own** - **1 row** (of the 3 that
+  stood here, the two `GAL/X` rows and the count of `WAR` at 110 **stand ported now**): the counts of `WAR`
+  above one hundred and ten, behind a cipher of `WarcEncryption.cs` (1314 lines) and a scheme of the game.
+  That row stands of no key the file carries either, so it is the row a turn should start from.
 
 ## The payload needs a decoder this project does not have
 
@@ -314,10 +313,13 @@ further than the reference's own list of them.
   carries (`shared/png-image.ts`) in place of the decoder of the platform, and of the same last priority -
   see `docs/formats/png-ism-image.md`. What remains is the routing of the pictures of the name `.png` of
   `ism-isa` here, the archive of the engine listing them and handing them over as they stand.
-- `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
-  which would need an XML walk this project does not have. `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`)
-  splits one such picture into its frames and layers, so it stands on the same walk and is not a
-  candidate of its own.
+- `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`) and
+  `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`) splits one such picture into its frames and layers. Both stood
+  here for the XML walk this project was said not to have; that walk is a head of XML of zlib, of counts the
+  reference reads one by one, and the places of the picture behind it stand of the walk of the pictures of
+  the engine itself, which this project already carries (`livemaker/gal-image.ts`). **Both stand ported
+  now**, as `livemaker-galx-image` and `livemaker-galx-archive` - see `docs/formats/livemaker-galx-image.md`
+  and `docs/formats/livemaker-galx-archive.md`.
 
 - `WEBP` (`Experimental/WebP/ImageWEBP.cs`, a second `WebPFormat` beside the one this project ports from
   `ArcFormats/WebP/ImageWEBP.cs`) keeps the same tag and the same class name and decodes nothing itself: it
