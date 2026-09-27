@@ -5,6 +5,9 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 /** `PnxFormat.Signature`, written out as bytes. */
 const SIGNATURE = Buffer.from([0xe1, 0x38, 0x26, 0x2f]);
@@ -13,6 +16,14 @@ const KEY = 0x68;
 const PNG_SIGNATURE = Buffer.from([
 	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
 ]);
+
+/** A whole portable network graphic of the three places of a colour a place. */
+function realPng(width: number, height: number): Buffer {
+	const rows = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width * 3 }, (_, at) => (at * 5 + y * 7 + 1) & 0xff),
+	);
+	return pngFile({ width, height, colourType: 2, rows });
+}
 
 function xor(data: Buffer): Buffer {
 	const output = Buffer.from(data);
@@ -59,9 +70,9 @@ describe("encrypted png image", () => {
 		expect(0xe1 ^ 0x89).toBe(KEY);
 	});
 
-	it("decrypts the whole file back to the original png", async () => {
-		const plain = buildPng();
-		const stored = buildEncrypted();
+	it("reads the places of the picture the file holds", async () => {
+		const plain = realPng(0x40, 0x30);
+		const stored = xor(plain);
 		const source = sourceOf(stored);
 		expect(await pnxEncryptedImageFormat.detect(source, "EV01.PNX")).toBe(true);
 		const archive = await pnxEncryptedImageFormat.open(source, "EV01.PNX");
@@ -87,8 +98,19 @@ describe("encrypted png image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(plain);
-			expect(output.length).toBe(stored.length);
+			// The cipher preserves the length, so the listed size is the size of the file the key stands over;
+			// the places of the picture stand read of the walk of the graphic.
+			const picture = readBmpImage(output);
+			const expected = await readPngImage(plain);
+			expect(picture).toMatchObject({
+				width: 0x40,
+				height: 0x30,
+				bitsPerPixel: 24,
+			});
+			expect(expected).not.toBeUndefined();
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...(expected?.pixels ?? []),
+			]);
 		} finally {
 			await archive.close();
 		}
