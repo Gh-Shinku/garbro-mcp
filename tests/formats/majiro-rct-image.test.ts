@@ -1,9 +1,18 @@
 import { Buffer } from "node:buffer";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { afterEach } from "vitest";
 import { rctImageFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { readRctLayout } from "../../packages/formats/src/majiro/rct-image.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 /** The head of a picture of the engine: the places of the head of it, then the walk of its places. */
 function rctFile(
@@ -24,6 +33,54 @@ function rctFile(
 	head.writeInt32LE(body.length, 16);
 	if (1 === version) head.writeUInt16LE(options.base ?? 0, 0x14);
 	return Buffer.concat([head, body]);
+}
+
+const temporaryDirectories: string[] = [];
+
+afterEach(async () => {
+	await Promise.all(
+		temporaryDirectories
+			.splice(0)
+			.map((path) => rm(path, { recursive: true, force: true })),
+	);
+});
+
+/** A directory of its own for a picture and the picture of its own name beside it. */
+async function temporaryDirectory(): Promise<string> {
+	const directory = await mkdtemp(resolve(tmpdir(), "garbro-rct-test-"));
+	temporaryDirectories.push(directory);
+	return directory;
+}
+
+/** A walk of the picture that stands of the places of the file itself alone, three of them to a run. */
+function plainWalk(pixels: Buffer): Buffer {
+	const parts: number[] = [];
+	for (let at = 0; at < 3 && at < pixels.length; at += 1) {
+		parts.push(pixels[at] ?? 0);
+	}
+	for (let at = 3; at < pixels.length; at += 3) {
+		// A count of nought stands of the three places of the file behind the run of its own.
+		parts.push(0x00);
+		for (let index = at; index < at + 3 && index < pixels.length; index += 1) {
+			parts.push(pixels[index] ?? 0);
+		}
+	}
+	return Buffer.from(parts);
+}
+
+/** The places of the colour of every pixel of a picture of four by three. */
+function placesOfColour(
+	colour: readonly [number, number, number],
+	width: number,
+	height: number,
+): Buffer {
+	const pixels = Buffer.alloc(width * height * 3, 0x00);
+	for (let at = 0; at < pixels.length; at += 3) {
+		pixels[at] = colour[0];
+		pixels[at + 1] = colour[1];
+		pixels[at + 2] = colour[2];
+	}
+	return pixels;
 }
 
 async function bmpOf(data: Buffer): Promise<Buffer> {
@@ -53,6 +110,175 @@ async function placesOf(data: Buffer, width: number, height: number) {
 }
 
 describe("Majiro game engine RGB image", () => {
+	it("reads a picture standing over a picture of its own name beside it", async () => {
+		const width = 4;
+		const height = 3;
+		const base = placesOfColour([0x01, 0x02, 0x03], width, height);
+		// Every fourth place of the picture stands of the key of no place of its own, of the other places of
+		// the picture of its own colours.
+		const overlay = Buffer.from(base);
+		const key = (at: number): void => {
+			overlay[at] = 0x00;
+			overlay[at + 1] = 0x00;
+			overlay[at + 2] = 0xff;
+		};
+		overlay[0] = 0x11;
+		overlay[1] = 0x12;
+		overlay[2] = 0x13;
+		key(3);
+		overlay[6] = 0x21;
+		overlay[7] = 0x22;
+		overlay[8] = 0x23;
+		key(9);
+		for (let at = 12; at < overlay.length; at += 3) {
+			overlay[at] = 0x31;
+			overlay[at + 1] = 0x32;
+			overlay[at + 2] = 0x33;
+		}
+		const directory = await temporaryDirectory();
+		await writeFile(
+			resolve(directory, "base.rct"),
+			rctFile(width, height, plainWalk(base)),
+		);
+		const name = Buffer.from("base.rct\u0000", "latin1");
+		const overPath = resolve(directory, "over.rct");
+		await writeFile(
+			overPath,
+			rctFile(width, height, Buffer.concat([name, plainWalk(overlay)]), {
+				version: 1,
+				base: name.length,
+			}),
+		);
+		const handle = await rctImageFormat.open(
+			await FileByteSource.open(overPath),
+			overPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const places = pixelsOf(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+			width,
+			height,
+		);
+		// The places of the key stand of the picture beneath, of every other place of the picture itself.
+		expect(places).toEqual([
+			0x11, 0x12, 0x13, 0x01, 0x02, 0x03, 0x21, 0x22, 0x23, 0x01, 0x02, 0x03,
+			0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33,
+			0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33, 0x31, 0x32, 0x33,
+		]);
+	});
+
+	it("reads a picture of its own name that stands nowhere as it stands", async () => {
+		const width = 2;
+		const height = 2;
+		const overlay = placesOfColour([0x41, 0x42, 0x43], width, height);
+		const directory = await temporaryDirectory();
+		const name = Buffer.from("nowhere.rct\u0000", "latin1");
+		const overPath = resolve(directory, "over.rct");
+		await writeFile(
+			overPath,
+			rctFile(width, height, Buffer.concat([name, plainWalk(overlay)]), {
+				version: 1,
+				base: name.length,
+			}),
+		);
+		const handle = await rctImageFormat.open(
+			await FileByteSource.open(overPath),
+			overPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		expect(
+			pixelsOf(
+				await consumeBuffer(await handle.openEntry(entry.id)),
+				width,
+				height,
+			),
+		).toEqual([...overlay]);
+	});
+
+	it("reads a picture of its own name of no count of the picture itself as it stands", async () => {
+		const width = 2;
+		const height = 2;
+		const overlay = placesOfColour([0x51, 0x52, 0x53], width, height);
+		const directory = await temporaryDirectory();
+		// The picture beside it stands of another count of pixels, so the reference leaves it out.
+		await writeFile(
+			resolve(directory, "base.rct"),
+			rctFile(1, 1, plainWalk(Buffer.from([0x61, 0x62, 0x63]))),
+		);
+		const name = Buffer.from("base.rct\u0000", "latin1");
+		const overPath = resolve(directory, "over.rct");
+		await writeFile(
+			overPath,
+			rctFile(width, height, Buffer.concat([name, plainWalk(overlay)]), {
+				version: 1,
+				base: name.length,
+			}),
+		);
+		const handle = await rctImageFormat.open(
+			await FileByteSource.open(overPath),
+			overPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		expect(
+			pixelsOf(
+				await consumeBuffer(await handle.openEntry(entry.id)),
+				width,
+				height,
+			),
+		).toEqual([...overlay]);
+	});
+
+	it("reads a picture standing of the mask of its own name beside it", async () => {
+		const width = 2;
+		const height = 2;
+		const pixels = placesOfColour([0x11, 0x12, 0x13], width, height);
+		const directory = await temporaryDirectory();
+		const picturePath = resolve(directory, "cg.rct");
+		await writeFile(picturePath, rctFile(width, height, plainWalk(pixels)));
+		// A mask of the engine beside the picture: a colour map whose entry of a place of the file stands of
+		// that count three times over, and the places of the file of the mask of four pixels.
+		const head = Buffer.alloc(0x14, 0x00);
+		head.writeUInt32LE(0x9a925a98, 0);
+		head.write("8_00", 4, "latin1");
+		head.writeUInt32LE(width, 8);
+		head.writeUInt32LE(height, 12);
+		const palette = Buffer.alloc(0x300, 0x00);
+		for (let entry = 0; entry < 0x100; entry += 1) {
+			palette[entry * 3] = entry;
+			palette[entry * 3 + 1] = entry;
+			palette[entry * 3 + 2] = entry;
+		}
+		const indices = Buffer.from([0, 51, 102, 153]);
+		const walk: number[] = [];
+		for (let at = 0; at < indices.length; at += 1) {
+			walk.push(indices[at] ?? 0);
+			if (at + 1 < indices.length) walk.push(0x00);
+		}
+		await writeFile(
+			resolve(directory, "cg_.rc8"),
+			Buffer.concat([head, palette, Buffer.from(walk)]),
+		);
+		const handle = await rctImageFormat.open(
+			await FileByteSource.open(picturePath),
+			picturePath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		expect(image).toMatchObject({ width, height, bitsPerPixel: 32 });
+		// The covering place of a pixel stands of the colour the colour map of the mask holds at the place of
+		// the file of the mask of that pixel, taken off the whole of the places of a colour of it.
+		expect([...(image?.pixels ?? [])]).toEqual([
+			0x11, 0x12, 0x13, 0xff, 0x11, 0x12, 0x13, 0xcc, 0x11, 0x12, 0x13, 0x99,
+			0x11, 0x12, 0x13, 0x66,
+		]);
+	});
+
 	it("reads the head of a picture and turns away the ones that stand of no picture", () => {
 		const good = rctFile(2, 2, Buffer.alloc(3, 0x00));
 		const layout = readRctLayout(good);

@@ -12409,6 +12409,8 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the places of the picture standing over a picture of its own name beside it, of the key of no place of its own",
+				"the places of the colours of a picture standing of the mask of its own name beside it",
 				"detect",
 				"list",
 				"extract",
@@ -12423,8 +12425,6 @@ export const formatSupportCatalog = {
 			unsupported: [
 				"creating a picture",
 				"a picture of a key (of a key standing of no places of the file of the picture itself)",
-				"the places of the picture of the file of it standing of the places of a picture beside it",
-				"the places of the colours of a picture standing of the mask of the engine beside it",
 			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},

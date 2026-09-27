@@ -8,10 +8,12 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
+import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
-import { writeBmp24 } from "../shared/bmp.js";
-import { changeExtension } from "../shared/companion.js";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import { copyOverlapped } from "../shared/copy.js";
+import { readRc8Layout, unpackRc8 } from "./rc8-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -38,6 +40,12 @@ const MAX_SIDE = 0x8000;
 const PLACES = 3;
 const RUN = 0x80;
 const RUN_LONG = 0x7f;
+/** How deep a picture of the engine may stand over another picture of its own name before it stands alone. */
+const BASE_RECURSION_LIMIT = 8;
+/** The colour a picture of the engine stands for no place of its own: the key the engine writes a picture of. */
+const KEY_BLUE = 0x00;
+const KEY_GREEN = 0x00;
+const KEY_RED = 0xff;
 /** The places of a pixel of the picture the runs of the walk of the engine stand of. */
 const PLAIN_BITS = 3;
 
@@ -111,13 +119,42 @@ export function rctSignatures(): readonly { bytes: Uint8Array }[] {
 }
 
 /**
- * `RctFormat.Reader.Unpack`: the places of the picture, of the walks of the places of a run of it. The
- * walk of the engine stands of runs of the places of the file itself, of the places of a pixel of the
- * picture: a run of the walk stands of a count of the places of the file (of three places of a pixel of
- * the picture, of no more than three of them, or of the count of the places of the file behind the run of
- * the second kind) and of the places of the picture of the run behind a count of them.
+ * The name of the picture a picture of the second kind stands over, of the places of the file of it at the
+ * head of the walk: a run of the places of the file of no more than the count the head names.
  */
-export function unpackRctPicture(data: Buffer, layout: RctLayout): Buffer {
+export function readRctBaseName(
+	data: Buffer,
+	layout: RctLayout,
+): string | undefined {
+	if (layout.baseNameLength <= 0) return undefined;
+	const end = Math.min(data.length, layout.dataOffset + layout.baseNameLength);
+	let at = layout.dataOffset;
+	while (at < end && 0x00 !== data[at]) at += 1;
+	if (0 === at - layout.dataOffset) return undefined;
+	return data.toString("latin1", layout.dataOffset, at);
+}
+
+/**
+ * `RctFormat.CombineImage`: the places of the picture of the engine that stand of the key of no place of
+ * their own stand read from the picture beneath, of the places of the picture of it behind them.
+ */
+export function combineRctPixels(base: Buffer, overlay: Buffer): Buffer {
+	for (let at = 0; at + 2 < overlay.length; at += PLACES) {
+		if (
+			KEY_BLUE === (overlay[at] ?? 0) &&
+			KEY_GREEN === (overlay[at + 1] ?? 0) &&
+			KEY_RED === (overlay[at + 2] ?? 0)
+		) {
+			overlay[at] = base[at] ?? 0;
+			overlay[at + 1] = base[at + 1] ?? 0;
+			overlay[at + 2] = base[at + 2] ?? 0;
+		}
+	}
+	return overlay;
+}
+
+/** `RctFormat.Reader.Unpack`: the places of the picture, of the walks of the places of a run of it. */
+export function unpackRctPixels(data: Buffer, layout: RctLayout): Buffer {
 	const total = layout.width * layout.height * PLACES;
 	const pixels: Buffer = Buffer.alloc(total, 0x00);
 	let at = layout.dataOffset + layout.baseNameLength;
@@ -202,7 +239,108 @@ export function unpackRctPicture(data: Buffer, layout: RctLayout): Buffer {
 			placed += count;
 		}
 	}
-	return writeBmp24(layout.width, layout.height, pixels);
+	return pixels;
+}
+
+/**
+ * `RctFormat.ApplyMaskToImage`: the mask of the picture stands beside it of the name of the picture of the
+ * engine and of the places of the file of `_.rc8`, and the covering place of every pixel stands of the
+ * colour the colour map of the mask holds at the place of the file of the mask of that pixel.
+ */
+export function maskRctPixels(
+	pixels: Buffer,
+	mask: Buffer,
+	palette: Buffer,
+): Buffer {
+	const places = Buffer.alloc(Math.trunc(pixels.length / PLACES) * 4, 0x00);
+	let source = 0;
+	for (let at = 0; at < places.length; at += 4) {
+		places[at] = pixels[source] ?? 0;
+		places[at + 1] = pixels[source + 1] ?? 0;
+		places[at + 2] = pixels[source + 2] ?? 0;
+		source += PLACES;
+		const entry = (mask[at >> 2] ?? 0) * 4;
+		const blue = palette[entry] ?? 0;
+		const green = palette[entry + 1] ?? 0;
+		const red = palette[entry + 2] ?? 0;
+		places[at + 3] = 0xff - Math.trunc((blue + green + red) / 3);
+	}
+	return places;
+}
+
+/** The name of the mask of a picture of the engine: the name of the picture and `_.rc8` behind it. */
+export function rctMaskName(sourcePath: string): string {
+	const name = sourcePath.replace(/^.*[/\\]/, "");
+	return `${changeExtension(name, "")}_.rc8`;
+}
+
+/**
+ * `RctFormat.Read`: the places of a colour of the picture, of the mask beside it where one stands. The
+ * reference leaves a mask that stands nowhere, or stands short, or stands of no count of the picture, out of
+ * its read of the catch behind it.
+ */
+async function readRctMask(
+	sourcePath: string,
+	layout: RctLayout,
+): Promise<{ indices: Buffer; palette: Buffer } | undefined> {
+	try {
+		const stored = await readCompanionFile(sourcePath, rctMaskName(sourcePath));
+		if (!stored) return undefined;
+		const mask = readRc8Layout(stored);
+		if (!mask || mask.width !== layout.width || mask.height !== layout.height) {
+			return undefined;
+		}
+		return { indices: unpackRc8(stored, mask), palette: mask.palette };
+	} catch {
+		return undefined;
+	}
+}
+
+/**
+ * `RctFormat.Reader.Unpack`, of the picture of the engine itself: the places of the picture of the second
+ * kind stand over the places of a picture of their own name beside them.
+ */
+export function unpackRctPicture(data: Buffer, layout: RctLayout): Buffer {
+	return writeBmp24(layout.width, layout.height, unpackRctPixels(data, layout));
+}
+
+/**
+ * `RctFormat.ReadPixelsData`: the places of the picture, of the picture of its own name beside it where the
+ * head names one. A picture that stands nowhere, or stands of no count of the picture itself, stands of no
+ * count of its own: the reference leaves such a picture as it stands, of the catch behind its read.
+ */
+async function readRctPixels(
+	data: Buffer,
+	layout: RctLayout,
+	sourcePath: string,
+	depth: number,
+): Promise<Buffer> {
+	const pixels = unpackRctPixels(data, layout);
+	if (layout.baseNameLength <= 0 || depth >= BASE_RECURSION_LIMIT)
+		return pixels;
+	const name = readRctBaseName(data, layout);
+	if (!name) return pixels;
+	try {
+		const base = await readCompanionFile(sourcePath, name);
+		if (!base) return pixels;
+		const baseLayout = readRctLayout(base);
+		if (
+			!baseLayout ||
+			baseLayout.width !== layout.width ||
+			baseLayout.height !== layout.height
+		) {
+			return pixels;
+		}
+		const under = await readRctPixels(
+			base,
+			baseLayout,
+			resolve(dirname(sourcePath), name),
+			depth + 1,
+		);
+		return combineRctPixels(under, pixels);
+	} catch {
+		return pixels;
+	}
 }
 
 async function readStored(source: ByteSource): Promise<Buffer> {
@@ -271,7 +409,7 @@ export const rctImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry(source: ByteSource) {
+	async openEntry(source: ByteSource, entry: FixedEntry, sourcePath: string) {
 		const data = await readStored(source);
 		const layout = readRctLayout(data);
 		if (!layout) throw invalidPicture("Not a picture of the Majiro engine");
@@ -281,6 +419,21 @@ export const rctImageFormat: ArchiveFormat = defineFixedArchive({
 				"the places of a picture of the engine standing of a key stand of no places of the file of it",
 			);
 		}
-		return Readable.from([unpackRctPicture(data, layout)]);
+		void entry;
+		const pixels = await readRctPixels(data, layout, sourcePath, 0);
+		const mask = await readRctMask(sourcePath, layout);
+		if (mask) {
+			// The reference hands a picture of a mask over as four places of a colour to a pixel.
+			return Readable.from([
+				writeBmp32(
+					layout.width,
+					layout.height,
+					maskRctPixels(pixels, mask.indices, mask.palette),
+				),
+			]);
+		}
+		return Readable.from([
+			writeBmp24(layout.width, layout.height, Buffer.from(pixels)),
+		]);
 	},
 });

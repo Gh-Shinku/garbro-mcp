@@ -51,15 +51,20 @@ down, of the places of a pixel of the picture of three places of the file to a p
   standing of the archive of the Majiro engine and of the pictures of the places of the file of it): no
   places of the file of the picture itself stand of the key of it, so the port stands of
   `UNSUPPORTED_FEATURE`. The head of such a picture stands readable all the same.
-* **The places of the picture of the file of it standing of the places of a picture beside it.** The
-  reference stands of the picture beside it (`ReadBaseImage`, of the name of the picture of the second
-  kind), of the places of the file of the picture of the walk of it, where the setting `OverlayFrames`
-  stands of it; this port stands of the places of the file of the picture itself alone, of no picture
-  beside it.
-* **The places of the colours of a picture standing of the mask of the engine beside it** (`_.rc8` of the
-  name of the picture, of the walk of the places of the file of it and of the alpha of it): standing of the
-  file system of the project, of no places of the file of the picture itself. The port hands over the places
-  of a colour of the picture alone.
+* **The places of the picture of the file of it standing of the places of a picture beside it** stand read
+  (`ReadBaseImage`): the head of a picture of the second kind names a picture beside it, and the places of
+  that picture stand read first and stand under the places of the picture itself, wherever the picture itself
+  writes the key of no place of its own (`CombineImage`, of the colour `0, 0, 255` of the places of a pixel
+  of the file). A picture of a name that stands nowhere, or that stands of no count of the picture itself,
+  stands left out, of the catch the reference stands of; a picture that stands over a picture of its own name
+  stands read the same way, down to eight of them. The setting `OverlayFrames` stands of `True` in the
+  reference, so this stands of its own default.
+* **The places of the colours of a picture standing of the mask of the engine beside it** stand read as well
+  (`ApplyMaskToImage`): a mask of the name of the picture and `_.rc8` beside it holds the colour map whose
+  entry at the place of the file of the mask of a pixel stands of the covering place of that pixel, taken off
+  the whole of the places of a colour of the entry. A picture of a mask stands of four places of a colour to
+  a pixel. The setting `ApplyMask` stands of `True` in the reference as well, so a picture of a mask beside
+  it stands of the mask rather than of its own places alone.
 * **Packing a picture.** The reference stands of a writer of its own (`RctFormat.Write`, of the walks of the
   places of the file and of the key of the engine); this port stands of the walk of the places of the file
   alone.
