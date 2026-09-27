@@ -62,3 +62,12 @@ the engine stands of the places of a file as they stand).
   colour of a frame that carries them);
 * the refusals: a file of no word of the shape, a file of no XML of this engine, and a frame whose places of
   counts reach past the end of the file.
+
+## The picture of the engine of the kind of the engine itself
+
+Where the XML of the head names the picture of the kind of the engine itself (`CompType` of two), the places of the
+count of the places of the frame hold a JPEG stream: the reference hands those places to `JpegBitmapDecoder` of its
+platform, and this port reads them with its own reader of that format (`shared/jpeg-image.ts`), standing them of the
+counts of the frame of the picture, as the pictures of the shape `GAL` of the same engine stand of them. A picture of
+that kind whose JPEG stands of counts the reader of this project does not read, or whose counts of the places of the
+file stand of the counts of the frame of the picture of their own, stands turned away, which the record names.

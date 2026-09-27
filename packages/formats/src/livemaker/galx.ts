@@ -18,9 +18,13 @@
 // walk of the places of a picture of the engine itself, which this project carries as `gal-image.ts`, and the
 // port stands of that walk (`unpackGalLayer`, `galFrameStride`, `flattenGal`) rather than of a second one.
 //
-// What the port does not carry: the walk of the places of a picture of the engine itself where the XML names
-// it (`CompType` of two, `JpegBitmapDecoder` of the reference), and a file whose `/Frames` node stands of
-// `Randomized` (the reference throws `NotImplementedException` for such a file itself).
+// The walk of the places of a picture of the engine itself where the XML names it (`CompType` of two) stands of
+// the reader of the JPEG of this project (`shared/jpeg-image.ts`), of the walk of the counts of the places of
+// the frame of the picture, as the walk of the pictures of the shape `GAL` stands of it.
+//
+// What the port does not carry: a file whose `/Frames` node stands of `Randomized` (the reference throws
+// `NotImplementedException` for such a file itself), and a picture of the kind of the engine itself whose
+// counts of the head of the JPEG stand beyond the ones the reader of this project reads.
 
 import {
 	GarbroError,
