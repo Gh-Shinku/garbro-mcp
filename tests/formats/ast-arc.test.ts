@@ -116,6 +116,26 @@ describe("AST script engine resource archive", () => {
 		});
 	});
 
+	it("classifies names through the GARBro extension catalogue", async () => {
+		const archive = await astArcFormat.open(
+			new BufferByteSource(
+				buildAst(1, [
+					{ name: "VOICE.OGG", content: Buffer.from("audio") },
+					{ name: "ICON.PNG", content: Buffer.from("image") },
+				]),
+			),
+			"sample.arc",
+		);
+		try {
+			expect(archive.entries.map((entry) => entry.resourceType)).toEqual([
+				"audio",
+				"image",
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
+
 	it("keeps a packed version 1 payload as stored", async () => {
 		const content = Buffer.from("version one payload");
 		const stored = Buffer.from(literalLzssStream(content));

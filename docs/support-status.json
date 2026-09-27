@@ -2203,10 +2203,22 @@
 				"version 2 exclusive-ored PNG detection",
 				"LZSS decoding with a 0xFF ring fill",
 				"exclusive-or of decoded payloads",
-				"version 1 raw payloads"
+				"version 1 raw payloads",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"unsupported": ["archive creation"],
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.archive-create",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {

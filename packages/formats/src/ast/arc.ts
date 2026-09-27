@@ -18,6 +18,7 @@ import {
 	normalizeEntryPath,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceType } from "../shared/resource-catalog.js";
 
 /** 'ARC2' and 'ARC1'; the fourth byte doubles as the version. */
 const ARC2_SIGNATURE = Buffer.from("ARC2", "latin1");
@@ -91,17 +92,17 @@ async function readAstIndex(source: ByteSource): Promise<AstIndex | undefined> {
 			if (!checkPlacement(offset, storedSize, source.size)) return undefined;
 			// Only version 2 archives are decoded, so a version 1 entry is stored as it is.
 			const compressed = version === 2 && storedSize !== unpackedSize;
-			entries.push(
-				createFixedEntry({
-					id: entries.length,
-					...normalizeEntryPath(name),
-					offset,
-					size: compressed ? unpackedSize : storedSize,
-					packedSize: storedSize,
-					compressed,
-					metadata: { version },
-				}),
-			);
+			const entry = createFixedEntry({
+				id: entries.length,
+				...normalizeEntryPath(name),
+				offset,
+				size: compressed ? unpackedSize : storedSize,
+				packedSize: storedSize,
+				compressed,
+				metadata: { version },
+			});
+			applyExtensionResourceType(entry);
+			entries.push(entry);
 		}
 		indexOffset = nameStart + BigInt(nameLength);
 	}

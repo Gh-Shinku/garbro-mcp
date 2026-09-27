@@ -2202,9 +2202,21 @@ export const formatSupportCatalog = {
 				"LZSS decoding with a 0xFF ring fill",
 				"exclusive-or of decoded payloads",
 				"version 1 raw payloads",
+				"GARBro catalog extension and alias based entry typing",
 			],
-			unsupported: ["archive creation", "extension based entry typing"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
+			readStatus: "complete",
+			gaps: [
+				{
+					code: "scope.archive-create",
+					disposition: "out-of-scope",
+				},
+				{
+					code: "verification.real-game",
+					disposition: "verification",
+				},
+			],
 		},
 		{
 			reference: {

@@ -40,7 +40,8 @@ the listing, although the records behind it still delimit the neighbouring entri
 
 Version 2 masks every name byte with 0xFF, so the name has to be unmasked before it is decoded. Names are
 read as whole fields — there is no terminator handling and no length limit beyond the file, since the
-reference grows its name buffer to whatever the record asks for.
+reference grows its name buffer to whatever the record asks for. Decoded names are classified through the
+shared GARBro extension catalogue; ambiguous extensions remain unclassified.
 
 ## Payload handling
 
@@ -69,10 +70,10 @@ Version 2 archives decode payloads:
 | Exclusive-ored PNG detection | Supported |
 | LZSS decoding with a 0xFF ring buffer fill | Supported |
 | Version 1 raw payloads | Supported |
-| Extension-based entry typing | Unsupported |
+| Extension-based entry typing | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a two-entry version 2 archive with a masked PNG beside a plain entry, an LZSS
-payload, a version 1 archive, a packed version 1 record that stays raw, a placeholder record, a foreign
+payload, extension-based audio and image typing, a version 1 archive, a packed version 1 record that stays raw, a placeholder record, a foreign
 signature, an insane entry count, offsets that do not increase, a name that reaches past the archive, and a
 file too small for its header.
