@@ -9,19 +9,17 @@
 // and the count of one place of the file a place of the picture stands for the place of the colour of the picture
 // (the dark place), which the walk of the picture of the file stands of the counts of its own head.
 //
-// Read here: the counts of the head of the format of the fax of one place of the file (the walk of group 3 of the
-// format, of the counts of the head of the format of the fax) and the counts of the two places of the file whose
-// count of the places of the file in front of it stands of the count of the places of the file of the picture (the
-// walk of group 4 of the format). Both walks read the counts of the head of the format of the fax alone: the walk
-// of the counts of one place of the file whose count of the places of the file stands for a count of the places of
-// the file of a colour of the picture (the count of the places of the file of a clump of a colour) and the walk of
-// the counts of the head of the format of the fax of the counts of the places of the file that stand apart (the
-// counts of the head of the format of the fax of the picture) stand turned away, each with a message of its own.
+// Read here: the counts of the head of the format of the fax of one place of the file (group 3 of the format, of the
+// counts of the head of the format of the fax, of one place of the file a place of the picture and of the two places
+// of the file as well) and the counts of the two places of the file (group 4 of the format, T.6). Both walks read
+// the counts of the head of the format of the fax alone: the count of the head of the format of the fax of the
+// counts of the places of the file of the picture itself stands turned away, which the record names. The walk of
+// the counts of the head of the format of the fax of the two places of the file follows the walk of the library of
+// the counts of the head of the format of the fax of the picture of this machine, of the counts of the head of the
+// format of the fax of the format (libtiff, of the counts of the head of the format of the fax of the picture of
+// Frank Cringle), of the counts of the head of the format of the fax of the picture of the format itself.
 
 import { GarbroError } from "@garbro-mcp/core";
-
-/** A count of the places of the colour of the picture (white). */
-const WHITE = 0;
 
 /** The counts of the head of the format of the fax of the counts of the places of the file of a colour of the
  * picture: a count of the head, of the count of the places of the file it stands for and of the count of the
@@ -238,6 +236,27 @@ const LONG_RUNS: readonly RunCode[] = [
 	[2560, 0b000000011111, 12],
 ];
 
+/** The counts of the head of the fax that stand for a count of the places of the file alone. */
+const PASS = -100;
+
+/** The counts of the head of the fax that stand for two counts of the places of the file. */
+const HORIZONTAL = -101;
+
+/** The counts of the head of the format of the fax of the two places of the file: the kind of the count of the
+ * head, of the count of the places of the file it stands for and of the count of the places of the file of the
+ * count of the head. */
+const TWO_PLACE_CODES: readonly RunCode[] = [
+	[PASS, 0b0001, 4],
+	[0, 0b1, 1],
+	[1, 0b011, 3],
+	[2, 0b000011, 6],
+	[3, 0b0000011, 7],
+	[-1, 0b010, 3],
+	[-2, 0b000010, 6],
+	[-3, 0b0000010, 7],
+	[HORIZONTAL, 0b001, 3],
+];
+
 /** The counts of the head of the format of the fax of the places of the file of a colour, of the count of the
  * places of the file of a count of the head behind them. */
 function buildIndex(
@@ -255,6 +274,7 @@ function buildIndex(
 	return index;
 }
 
+const MODE_INDEX = buildIndex(TWO_PLACE_CODES);
 const WHITE_INDEX = buildIndex([...WHITE_RUNS, ...LONG_RUNS]);
 const BLACK_INDEX = buildIndex([...BLACK_RUNS, ...LONG_RUNS]);
 
@@ -298,25 +318,45 @@ class BitWalker {
 }
 
 /** A walk of the counts of the fax of a picture, of the counts of the head of the format of the fax of the colour of
- * the picture. */
+ * the picture. The counts of the head of the format of the fax of the two places of the file stand of the counts of
+ * the head of the format of the fax as the library of the counts of the head of the format of the fax of the picture
+ * of this machine reads them (the walk of the counts of the head of the format of the fax of the count of the head of
+ * the picture of the format, of the count of the head of the picture of the counts of the head of the format of the
+ * fax. LICENSE of libtiff). */
 export class FaxDecoder {
 	private readonly rowBytes: number;
 
-	constructor(private readonly width: number) {
+	/** The counts of the places of the file of the row of the picture in front of the row of the picture: one count of
+	 * the places of the file of the colour of the picture and one count of the places of the file of the colour of the
+	 * other stand behind the other, the count of the places of the file of the colour of the picture in front. */
+	private runs: number[];
+
+	constructor(
+		private readonly width: number,
+		private readonly kind: number,
+		private readonly twoDimensional: boolean,
+	) {
 		this.rowBytes = (this.width + 7) >> 3;
+		this.runs = [this.width, 0];
 	}
 
-	/** The places of the rows of a strip, of the count of the places of the file of every row of the picture and of
-	 * the count of the places of the file of the row of the colour of the picture (the dark place). */
-	read(strip: Buffer, dark: number): Buffer[] {
+	/** The places of the rows of a strip, of the count of the places of the file of every row of the picture, one
+	 * place of the file a place of the picture. The count of one place of the file stands for the place of the colour
+	 * of the picture of the head of the format of the fax (the count the library of this machine writes), which the
+	 * walk of the picture of the file reads of the counts of the head of the picture. */
+	read(strip: Buffer, count: number): Buffer[] {
 		const walker = new BitWalker(strip);
 		const rows: Buffer[] = [];
 		for (;;) {
-			if (walker.done) return rows;
+			if (rows.length >= count || walker.done) return rows;
+			if (4 === this.kind) {
+				rows.push(this.pack(this.readTwoPlaceRow(walker)));
+				continue;
+			}
 			// Group 3 of the format: every row stands behind the count of the places of the file of the head of the
-			// row of the picture, of the count of the places of the file of the colour of the picture of the count
-			// of the head of the format, and of the count of the head of the format of the fax of the two places of
-			// the file where the head of the picture names such a walk.
+			// row of the picture, and the count of the head of the format of the fax of the two places of the file
+			// stands behind a count of the head of the format of the fax of one place of the file that names the
+			// walk of the row of the picture itself.
 			const zeros = this.countZeros(walker);
 			if (zeros < 0) return rows;
 			if (zeros < 11)
@@ -324,7 +364,15 @@ export class FaxDecoder {
 					"INVALID_ARCHIVE",
 					"A row of the picture of the fax stands of no count of the head of the head of the row of the picture",
 				);
-			rows.push(this.pack(this.readOnePlaceRow(walker), dark));
+			if (this.twoDimensional) {
+				const tag = walker.readBit();
+				if (tag < 0) return rows;
+				if (0 === tag) {
+					rows.push(this.pack(this.readTwoPlaceRow(walker)));
+					continue;
+				}
+			}
+			rows.push(this.pack(this.readOnePlaceRow(walker)));
 		}
 	}
 
@@ -346,20 +394,117 @@ export class FaxDecoder {
 	/** The counts of the places of the file of the row of the picture of the walk of the places of one place of the
 	 * file (group 3 of the format, of the counts of the head of the format of the fax of one place of the file). */
 	private readOnePlaceRow(walker: BitWalker): number[] {
-		const changes: number[] = [];
-		let colour = WHITE;
+		const runs: number[] = [];
 		let at = 0;
+		let colour = 0;
 		for (let guard = 0; guard < 2 * this.width + 64; guard += 1) {
-			if (at >= this.width) return this.trim(changes);
+			if (at >= this.width) break;
 			const run = this.readRun(walker, colour);
+			runs.push(Math.min(run, this.width - at));
 			at += run;
-			if (at <= this.width) changes.push(at);
 			colour ^= 1;
 		}
-		throw new GarbroError(
-			"INVALID_ARCHIVE",
-			"A row of the picture of the fax stands of counts of the places of the file of its own",
-		);
+		if (at < this.width) {
+			if (1 === runs.length % 2) runs.push(0);
+			runs.push(this.width - at);
+		}
+		this.runs = runs;
+		return runs;
+	}
+
+	/** The counts of the places of the file of the row of the picture of the walk of the places of the two places of
+	 * the file (group 4 of the format, of the counts of the head of the format of the fax of the two places of the
+	 * file), of the counts of the places of the file of the row of the picture in front of it. The counts of the
+	 * places of the file of the colour of the picture and the counts of the places of the file of the colour of the
+	 * other of the row of the picture in front of the row of the picture stand of the counts of the head of the
+	 * format of the fax of the two places of the file: the count of the places of the file of the colour of the
+	 * picture of the count of the head of the format of the fax of the two places of the file stands for the count of
+	 * the places of the file of the colour of the picture in front of it, and the count of the places of the file of
+	 * the colour of the other of it stands behind it, which the walk of the counts of the head of the format of the
+	 * fax of the file reads of the counts of the head of the format of the fax of the count of the head of the
+	 * picture. */
+	private readTwoPlaceRow(walker: BitWalker): number[] {
+		const reference = this.runs;
+		const runs: number[] = [];
+		let at = 0;
+		let run = 0;
+		let first = reference[0] ?? this.width;
+		let index = 1;
+		const check = (): void => {
+			// The counts of the head of the format of the fax of the two places of the file of the head of the row of
+			// the picture stand of the count of the places of the file of the colour of the picture in front of the
+			// row of the picture itself where the row of the picture stands of no count of the places of the file of
+			// the colour of the picture of its own yet: the count of the places of the file of the colour of the
+			// picture of the row of the picture in front of the row of the picture of no places of the file stands of
+			// a count of the places of the file to the right of the head of the row of the picture as well.
+			if (0 === runs.length) return;
+			while (first <= at && first < this.width) {
+				first += (reference[index] ?? 0) + (reference[index + 1] ?? 0);
+				index += 2;
+			}
+		};
+		const set = (extra: number): void => {
+			const held = run + extra;
+			if (held < 0)
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					"A row of the picture of the fax stands of a count of the places of the file in front of the head of the row of the picture",
+				);
+			if (at + extra > this.width) {
+				runs.push(this.width - at);
+				run = 0;
+				at = this.width;
+				return;
+			}
+			runs.push(held);
+			at += extra;
+			run = 0;
+		};
+		const advance = (): void => {
+			first += reference[index] ?? 0;
+			index += 1;
+		};
+		for (let guard = 0; guard < 2 * this.width + 64; guard += 1) {
+			if (at >= this.width) break;
+			const mode = walker.readCode(MODE_INDEX);
+			if (Number.isNaN(mode))
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					"A row of the picture of the fax stands of a count of the head of the format of the fax of the two places of the file this walk does not read",
+				);
+			if (PASS === mode) {
+				check();
+				run += first - at;
+				at = first;
+				advance();
+				continue;
+			}
+			if (HORIZONTAL === mode) {
+				if (1 === runs.length % 2) {
+					const black = this.readRun(walker, 1);
+					const white = this.readRun(walker, 0);
+					set(black);
+					set(white);
+				} else {
+					const white = this.readRun(walker, 0);
+					const black = this.readRun(walker, 1);
+					set(white);
+					set(black);
+				}
+				check();
+				continue;
+			}
+			check();
+			set(first - at + mode);
+			advance();
+		}
+		if (at < this.width) {
+			if (1 === runs.length % 2) runs.push(0);
+			runs.push(this.width - at);
+		}
+		runs.push(run);
+		this.runs = runs;
+		return runs;
 	}
 
 	/** The count of the places of the file of a count of the head of the format of the fax of a colour of the
@@ -368,7 +513,7 @@ export class FaxDecoder {
 	private readRun(walker: BitWalker, colour: number): number {
 		let total = 0;
 		for (let guard = 0; guard < 64; guard += 1) {
-			const run = walker.readCode(WHITE === colour ? WHITE_INDEX : BLACK_INDEX);
+			const run = walker.readCode(0 === colour ? WHITE_INDEX : BLACK_INDEX);
 			if (Number.isNaN(run))
 				throw new GarbroError(
 					"INVALID_ARCHIVE",
@@ -383,53 +528,30 @@ export class FaxDecoder {
 		);
 	}
 
-	/** The counts of the places of the file of the row of the picture, of the counts of the places of the file of
-	 * the counts of the head of the format of the fax of the picture that stand for the count of the places of the
-	 * file of the row of the picture itself. */
-	private trim(changes: number[]): number[] {
-		// The counts of the places of the file of the colours of the picture of a row stand for the counts of the
-		// head of the format of the fax of the colours of the picture one behind the other: a count of the places of
-		// the file of no places of the file of a colour of the picture stands for a row of the picture of no count
-		// of the head of the format of the fax, so such a count of the head of the format of the fax and the count
-		// of the head of the format of the fax behind it stand away of the counts of the head of the row of the
-		// picture, and the counts of the head of the format of the fax that stand beyond the places of the file of
-		// the picture stand away as well.
-		const kept: number[] = [];
-		for (const place of changes) {
-			if (place >= this.width) continue;
-			if (kept.length > 0 && kept[kept.length - 1] === place) {
-				kept.pop();
+	/** The places of the file of the row of the picture, of one count of the places of the file a place of the
+	 * picture, of the counts of the places of the file of the colour of the picture (nothing) and of the counts of the
+	 * places of the file of the colour of the other (one) the walk of the counts of the head of the format of the fax
+	 * of this machine stands. */
+	private pack(runs: number[]): Buffer {
+		const row: Buffer = Buffer.alloc(this.rowBytes, 0x00);
+		let at = 0;
+		for (let index = 0; index < runs.length; index += 1) {
+			const run = runs[index] ?? 0;
+			if (0 === index % 2) {
+				at += run;
 				continue;
 			}
-			kept.push(place);
-		}
-		return kept;
-	}
-
-	/** The places of the file of the row of the picture, of one count of the places of the file a place of the
-	 * picture, of the count of the places of the file of the colour of the picture of the dark place. */
-	private pack(changes: number[], dark: number): Buffer {
-		const row: Buffer = Buffer.alloc(this.rowBytes, dark ? 0xff : 0x00);
-		let colour = dark ^ 1;
-		let start = 0;
-		for (const place of [...changes, this.width]) {
-			if (colour !== dark) this.set(row, start, place, colour);
-			colour ^= 1;
-			start = place;
+			for (let place = 0; place < run; place += 1) this.setBit(row, at + place);
+			at += run;
 		}
 		return row;
 	}
 
-	/** The places of the file of a row of the picture of a count of the places of the file of the colour of the
-	 * picture of the other, of the counts of the places of the file of the counts of the head of the format of the
-	 * fax of the picture. */
-	private set(row: Buffer, start: number, end: number, value: number): void {
-		for (let place = start; place < end && place < this.width; place += 1) {
-			const at = place >> 3;
-			const mask = 1 << (7 - (place & 7));
-			if (0 === value) row[at] = (row[at] ?? 0) & ~mask & 0xff;
-			else row[at] = ((row[at] ?? 0) | mask) & 0xff;
-		}
+	/** The count of one place of the file of the row of the picture of the colour of the other. */
+	private setBit(row: Buffer, place: number): void {
+		if (place < 0 || place >= this.width) return;
+		const at = place >> 3;
+		row[at] = ((row[at] ?? 0) | (1 << (7 - (place & 7)))) & 0xff;
 	}
 }
 
@@ -437,5 +559,5 @@ export class FaxDecoder {
  * counts of the head of the format of the fax of the colour of the picture of the count of the places of the file
  * of the picture itself. */
 export function faxCompression(kind: number): boolean {
-	return 3 === kind;
+	return 3 === kind || 4 === kind;
 }

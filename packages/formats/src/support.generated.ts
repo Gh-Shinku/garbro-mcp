@@ -8027,11 +8027,11 @@ export const formatSupportCatalog = {
 				"the places of a picture whose strip holds one whole stream of the walk of the jpeg, of the kind whose tables stand in the stream itself",
 				"the places of a picture whose places of a colour stand apart, of one place of the file a sample, one count of strips for every place of a colour",
 				"the places of the colour of the two of them of one place of the file a place, of the counts of the head of the format of the two of them",
-				"the counts of the head of the format of the fax of one place of the file (group 3 of the format) of the pictures of one place of the file a place",
+				"the counts of the head of the format of the fax of one place of the file (group 3 of the format) and of the two places of the file (group 4 of the format, T.6) of the pictures of one place of the file a place",
 			],
 			unsupported: [
 				"archive creation: the reference writes such a file on its platform and this port reads them alone",
-				"the counts of the head of the format of the fax of the two places of the file (group 4 of the format) and the counts of the head of the format of the fax of the two places of the file of group 3 and the walk of the jpeg of the two thousand, and the stream of the walk of the jpeg of the old kind whose tables stand apart",
+				"the count of the head of the format of the fax of the counts of the places of the file of the picture itself and the walk of the jpeg of the two thousand, and the stream of the walk of the jpeg of the old kind whose tables stand apart",
 				"the kinds of the places of a colour and of the counts of the samples of it beyond the ones this walk reads",
 				"the clumps of the places of the colour of the two of them, whose counts of the head stand of their own",
 			],

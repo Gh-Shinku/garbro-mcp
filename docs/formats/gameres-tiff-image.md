@@ -119,10 +119,17 @@ of the picture stands of the colour of the picture of the head of the format of 
 of the head of the picture, which the library of the counts of the head of the format of the fax of this machine stands
 of as well: the walk of this project hands the places of the file of a place of the colour of the picture back of the
 count of one place of the file for the place of the colour of the picture of the head of the format of the fax, of the
-count of the places of the file of the picture of the format itself. The counts of the head of the format of the fax of
-the two places of the file (group 4 of the format, T.6) and the counts of the head of the format of the fax of the two
-places of the file of group 3 stand turned away, each with a message of its own, and so does a picture whose samples
-stand of more than one place of the file or whose places of the file stand of more than one place of the file a place
-of the picture. The fixtures of that walk (`FAX_THREE_TIFF`) were written by the python imaging library, which reads
+count of the places of the file of the picture of the format itself. The counts of the head of the format of the fax of the two places of the file (group 4 of the
+format, T.6) and the counts of the head of the format of the fax of the two places of the file of group 3 stand of the
+counts of the head of the format of the fax of the row of the picture in front of the row of the picture as well: the
+walk of this project follows the walk of the library of the counts of the head of the format of the fax of this machine
+(libtiff, of the counts of the head of the format of the fax of the picture of Frank Cringle) for those counts of the
+head of the format of the fax, of the counts of the head of the picture of the count of the head of the format. A
+picture whose samples stand of more than one place of the file or whose places of the file stand of more than one
+place of the file a place of the picture stands turned away. The fixtures of that walk (`FAX_THREE_TIFF`) were written by the python imaging library, which reads
 them back through libtiff, so the counts of the places of the picture of those fixtures stand of an oracle of another
 implementation.
+
+The counts of the places of the file of the rows of the picture stand of the count of the places of the file of the head
+of the picture, of the count of the places of the file of the head of the row of the picture of the fax itself, so the count of the head of the format of the fax of the end of the picture of the format stands away of the
+walk of this project rather than of a stray row of the picture.

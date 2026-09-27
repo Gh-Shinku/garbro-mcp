@@ -280,10 +280,6 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 	// stands of one place of the file a place of the picture, and the walk of this project reads the counts of the
 	// head of the format of the fax itself, since the reference stands its platform over such a file.
 	let fax: FaxDecoder | undefined;
-	if (4 === compression)
-		throw unsupportedPicture(
-			"A picture whose count of the head of the format of the fax stands for the counts of the head of the format of the fax of the two places of the file stands of no walk of this project",
-		);
 	if (faxCompression(compression)) {
 		const options = one(3 === compression ? TAG_T4_OPTIONS : TAG_T6_OPTIONS, 0);
 		if (0 !== (options & 0x2))
@@ -298,11 +294,7 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 			throw unsupportedPicture(
 				"A picture of the fax of more than one place of the file a place of the picture, or of more than one place of the file a sample, stands of no walk of this project",
 			);
-		if (0 !== (options & 0x1))
-			throw unsupportedPicture(
-				"A picture whose counts of the head of the format of the fax of the two places of the file stand of the counts of the head of the format of the fax of one place of the file as well stands of no walk of this project",
-			);
-		fax = new FaxDecoder(width);
+		fax = new FaxDecoder(width, compression, 0 !== (options & 0x1));
 	}
 	const rowBytes = Math.ceil((width * samples * sampleBits) / 8);
 	const stored: Buffer = Buffer.alloc(rowBytes * height, 0x00);
@@ -351,7 +343,6 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		// of the picture (white) themselves: the count of one place of the file stands for the count of the head of the
 		// format of the fax of one place of the file, of no count of the head of the picture, which the library of the
 		// walk of the counts of the head of the format of the fax stands of as well.
-		const dark = 0x01;
 		let row = 0;
 		for (let strip = 0; strip < offsets.length; strip += 1) {
 			const at = offsets[strip] ?? 0;
@@ -360,7 +351,10 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 				throw invalidPicture("The places of a strip stand outside the picture");
 			if (fax) {
 				if (row >= height) continue;
-				const walk = fax.read(data.subarray(at, at + length), dark);
+				const walk = fax.read(
+					data.subarray(at, at + length),
+					Math.min(rowsPerStrip, height - row),
+				);
 				for (const line of walk) {
 					if (row >= height) break;
 					line.copy(stored, row * rowBytes, 0, rowBytes);
