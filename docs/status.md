@@ -5,6 +5,10 @@ truth lives in [`support-status.json`](support-status.json) (one record per row,
 numbers come from `scripts/garbro-gap.mjs`; this file only rolls them up, so treat it as a summary and
 regenerate it when the numbers move.
 
+`support-status.json` schema version 2 adds an optional `readStatus` plus taxonomy-backed `gaps`. Migration is
+incremental: records touched by current work receive the structured fields, while the legacy prose fields stay
+available to existing consumers. Run `pnpm support:check` before regenerating the TypeScript catalogue.
+
 Written at commit `b69041cc` (2026-09-28). Regenerate the numbers with:
 
 ```bash

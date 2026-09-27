@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"codes": [
+		{
+			"code": "scope.archive-create",
+			"disposition": "out-of-scope",
+			"description": "Archive creation is outside the reading-port scope."
+		},
+		{
+			"code": "scope.image-encode",
+			"disposition": "out-of-scope",
+			"description": "Image encoding is outside the reading-port scope."
+		},
+		{
+			"code": "verification.real-game",
+			"disposition": "verification",
+			"description": "Real-game GARbro differential evidence has not been supplied."
+		},
+		{
+			"code": "external.user-scheme",
+			"disposition": "external",
+			"description": "A game-specific key or scheme must be supplied from outside the file."
+		},
+		{
+			"code": "entry-type.extension",
+			"disposition": "planned",
+			"description": "Entry classification through the resource extension catalogue is missing."
+		},
+		{
+			"code": "entry-type.signature",
+			"disposition": "planned",
+			"description": "Entry classification through the resource signature catalogue is missing."
+		}
+	]
+}

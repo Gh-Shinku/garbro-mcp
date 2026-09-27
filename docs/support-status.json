@@ -1,5 +1,5 @@
 {
-	"schemaVersion": 1,
+	"schemaVersion": 2,
 	"baselineCommit": "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0",
 	"defaultStatus": "not-started",
 	"implementations": [
@@ -8831,7 +8831,18 @@
 				"24bpp and 32bpp bitmap output"
 			],
 			"unsupported": ["archive creation"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.archive-create",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {
@@ -16469,7 +16480,18 @@
 				"full PNG structure, checksum and compressed stream validation during extraction"
 			],
 			"unsupported": ["archive creation"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.archive-create",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {
@@ -21933,7 +21955,18 @@
 				"32bpp bitmap output"
 			],
 			"unsupported": ["image encoding"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.image-encode",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {
@@ -22689,7 +22722,18 @@
 				"full PNG structure, checksum and compressed stream validation during extraction"
 			],
 			"unsupported": ["archive creation"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.archive-create",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {
@@ -23124,7 +23168,18 @@
 				"full PNG structure, checksum and compressed stream validation during extraction"
 			],
 			"unsupported": ["archive creation"],
-			"remainingVerification": ["real-game GARbro differential output"]
+			"remainingVerification": ["real-game GARbro differential output"],
+			"readStatus": "complete",
+			"gaps": [
+				{
+					"code": "scope.archive-create",
+					"disposition": "out-of-scope"
+				},
+				{
+					"code": "verification.real-game",
+					"disposition": "verification"
+				}
+			]
 		},
 		{
 			"reference": {

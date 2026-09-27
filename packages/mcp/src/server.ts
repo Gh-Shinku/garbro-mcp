@@ -152,6 +152,11 @@ interface SupportRecord {
 	supported: readonly string[];
 	unsupported: readonly string[];
 	remainingVerification?: readonly string[];
+	readStatus?: "complete" | "partial" | "blocked";
+	gaps?: readonly {
+		code: string;
+		disposition: "planned" | "external" | "out-of-scope" | "verification";
+	}[];
 }
 
 export interface BuildServerOptions extends ArchiveAutomationOptions {
