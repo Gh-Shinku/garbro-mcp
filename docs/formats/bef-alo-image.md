@@ -35,3 +35,13 @@ declined even though the metadata helper accepts it, because nothing can be draw
 GARbro *can* write this format — `AloFormat.Write` writes two zero bytes and then copies the bitmap from offset
 two, which also shows that the stored file and the bitmap have the same length. Encoding is out of scope, so
 `create` stays false.
+
+## The places of the picture
+
+`AloFormat.Read` stands of `Bmp.Read` over the surface the two restored bytes give back, so this port reads that
+bitmap with the shared bitmap walk and hands the places of the picture over as a bitmap of its own: of the width, the
+height and the depth of the head of the bitmap, of a row of the count of the places a row of the picture holds (so the
+padding of the file stands of no count) and of the rows in the order the head names, which for a bitmap of a positive
+height means the last row of the file first. Where the payload holds places behind the picture those places stand of no
+count of the walk; where the payload ends inside the places the head names, the walk stands turned away, which is where
+the reference throws.

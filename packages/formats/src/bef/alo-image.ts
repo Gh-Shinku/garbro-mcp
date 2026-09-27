@@ -8,7 +8,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -122,6 +122,16 @@ export const aloImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid obfuscated bitmap");
-		return Readable.from([layout.bmp]);
+		// `AloFormat.Read` stands of `Bmp.Read` over the unmasked surface: the bitmap stands read of the bitmap
+		// walk of this project and handed over as a bitmap of its own, so the places behind the picture stand
+		// of no count and a picture cut short of its places stands turned away.
+		const image = readBmpImage(layout.bmp);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid obfuscated bitmap data: ${layout.bmp.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

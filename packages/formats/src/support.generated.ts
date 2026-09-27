@@ -2576,12 +2576,9 @@ export const formatSupportCatalog = {
 				"marker reconstruction",
 				"bitmap trimming",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the unmasked surface",
 			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -10979,12 +10976,9 @@ export const formatSupportCatalog = {
 				"zlib decoding",
 				"bitmap trimming",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the unmasked, inflated surface",
 			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
