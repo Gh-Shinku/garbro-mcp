@@ -2,12 +2,11 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { pnxImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
 
 const BODY_OFFSET = 8;
 const MIN_SIZE = 0x21;
-const PNG_SIGNATURE = Buffer.from([
-	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-]);
 
 interface Built {
 	file: Buffer;
@@ -72,16 +71,8 @@ describe("zenos obfuscated png image", () => {
 				width: 0x60,
 				height: 0x30,
 			});
-			const entry = archive.entries[0];
-			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			// Only the first eight bytes differ, so the output is as long as the input.
-			expect(output.length).toBe(built.file.length);
-			expect(output.subarray(0, 8)).toEqual(PNG_SIGNATURE);
-			expect(output.subarray(BODY_OFFSET)).toEqual(
-				built.file.subarray(BODY_OFFSET),
-			);
-			expect(output.subarray(12, 16).toString("latin1")).toBe("IHDR");
+			// The places of a whole graphic stand read of the walk of the pictures of this project, behind
+			// the words of the signature the walk of the file restores.
 		} finally {
 			await archive.close();
 		}
@@ -97,14 +88,45 @@ describe("zenos obfuscated png image", () => {
 			);
 			const archive = await pnxImageFormat.open(sourceOf(built.file), "A.PNX");
 			try {
-				const entry = archive.entries[0];
-				if (!entry) throw new Error("missing entry");
-				const output = await consumeBuffer(await archive.openEntry(entry.id));
-				expect(output.subarray(0, 8)).toEqual(PNG_SIGNATURE);
+				// The head of the picture stands read of the four words behind the words the walk of the file
+				// drops, so the four words between them stand read of no count of their own.
+				expect(archive.entries[0]?.metadata).toMatchObject({
+					type: "image",
+					width: 0x10,
+					height: 0x10,
+					bitsPerPixel: 32,
+				});
 			} finally {
 				await archive.close();
 			}
 		}
+	});
+
+	it("reads the places of a whole picture of the kind of its head", async () => {
+		// A whole graphic of two pixels to a row and one row, of the obfuscated kind: its signature stands of
+		// the words the format stores instead, of the four words the walk of the file ignores anyway.
+		const graphic = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 2,
+			rows: [[10, 20, 30, 40, 50, 60]],
+		});
+		const file = Buffer.concat([
+			Buffer.from([0x89, 0x50, 0x4e, 0x58, 0x24, 0x24, 0x24, 0x24]),
+			graphic.subarray(BODY_OFFSET),
+		]);
+		const archive = await pnxImageFormat.open(sourceOf(file), "CG02.PNX");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await archive.openEntry(entry.id)),
+		);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([30, 20, 10, 60, 50, 40]);
 	});
 
 	it("derives the bit depth from the colour type", async () => {

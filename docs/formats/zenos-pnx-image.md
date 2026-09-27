@@ -30,4 +30,6 @@ The port exposes the resource as a single entry:
 * entry metadata carries `type: "image"` plus width, height and bit depth, and the archive metadata
   records `image: "png"` and `encrypted: true`.
 
-Pixel decoding, PNG structure validation beyond the IHDR and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `PngFormat.Read` over the stream the format builds: the eight words of the signature stand before the body the file holds from its eighth word, and the whole picture behind them stands read of the walk of the pictures of the portable network graphic kind of this project and handed over as a bitmap of its own. The walk of the file stands of the counts of the head of the picture alone: PNG structure beyond the words of its head
+stands read by the walk of the pictures of this project at extraction. Archive creation and image writing are out of
+scope.

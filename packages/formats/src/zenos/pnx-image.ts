@@ -9,6 +9,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -139,13 +141,34 @@ export const pnxImageFormat: ArchiveFormat = defineFixedArchive({
 				"INVALID_ARCHIVE",
 				"Invalid Zenos obfuscated PNG image",
 			);
-		// A prefix stream: the standard signature, then the body from offset 8 verbatim.
+		// A prefix stream: the standard signature, then the body from offset 8 verbatim, and `PngFormat.Read`
+		// stands of the walk of the pictures of that kind over it, which this project carries.
 		const body = Buffer.from(
 			await source.readAt(
 				BigInt(BODY_OFFSET),
 				Number(source.size) - BODY_OFFSET,
 			),
 		);
-		return Readable.from([Buffer.concat([PNG_SIGNATURE, body])]);
+		const image = await readPngImage(Buffer.concat([PNG_SIGNATURE, body]));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"The picture stands of no picture of the kind its head names",
+			);
+		}
+		if (32 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp32(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		if (24 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp24(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture stands of ${image.bitsPerPixel} places of a colour`,
+		);
 	},
 });
