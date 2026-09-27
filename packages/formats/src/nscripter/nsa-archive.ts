@@ -4,10 +4,9 @@
 //
 // The reference reads three walks of the places of a file: the LZSS of the engine, the walk of a picture of
 // the name `spb` (which it stands of as a bitmap of the engine's own), and bzip2 for a file of the name
-// `nbz`. This port carries the first two and turns a file of the third kind away, because it carries no
-// walk of bzip2.
+// `nbz`. This port carries all three.
 
-import { MsbBitReader } from "@garbro-mcp/codecs";
+import { MsbBitReader, decompressBzip2 } from "@garbro-mcp/codecs";
 import {
 	GarbroError,
 	type ArchiveFormat,
@@ -241,10 +240,17 @@ export const nsaEntryOpener: FixedEntryOpener = async (source, entry) => {
 		entry.metadata?.compression ?? NSA_COMPRESSION_NONE,
 	);
 	if (NSA_COMPRESSION_NBZ === compression || /\.nbz$/i.test(entry.path)) {
-		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"The places of a file of this kind stand of the walk of bzip2, which this project does not carry",
-		);
+		// The reference hands the places of a file of this kind over to `BZip2InputStream` of
+		// `ICSharpCode.SharpZipLib`, of the counts of the places of the file of a stream of bzip2 of its
+		// own; this port carries that walk itself (`@garbro-mcp/codecs`).
+		try {
+			return Readable.from([decompressBzip2(data)]);
+		} catch (error) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The places of a file of this kind stand of no count of the walk of bzip2 of their own: ${(error as Error).message}`,
+			);
+		}
 	}
 	if (NSA_COMPRESSION_SPB === compression) {
 		const picture = unpackNsaSpb(data);

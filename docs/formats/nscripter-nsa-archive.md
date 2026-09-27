@@ -50,7 +50,8 @@ every place of it: a place of the stream that stands of one stands of the next e
 one that stands of nought stands of eight and four places of the file, which name a place of the frame of
 the walk and the count of the places that stand there, of two places more.
 
-**bzip2** is not carried by this project, so a file of that kind stands turned away (`UNSUPPORTED_FEATURE`)
+**bzip2** is carried by this project as a walk of its own (`packages/codecs/src/bzip2.ts`), so a file of
+that kind stands read
 rather than read. A file whose places stand of the mark of a sound of the engine (`0x90FBFF` in its first
 three places of the file) stands of an archive of one file of the name `mp3`, of the whole of the places of
 the file.

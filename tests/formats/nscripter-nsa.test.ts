@@ -8,6 +8,13 @@ import { nsaFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
+// The places of the file of the walk of bzip2 of the count of the places of the file below, and the
+// places of the file of it as they stand.
+const PLAIN_B64 =
+	"bmJ6IHBheWxvYWQKQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo=";
+const BZ2_B64 =
+	"QlpoOTFBWSZTWUqWVBoAAAzXgKAQQCAgAAAQNAXAMAAIIAAxTAATQjU0aNDTykSdMyy4gXlx4mlSOFXPi7kinChIJUsqDQA=";
+
 /** A walker of the places of the file of the engine, which stands of the high place of a place first. */
 class BitWriter {
 	#bytes: number[] = [];
@@ -173,13 +180,17 @@ describe("NScripter engine resource archive", () => {
 		}
 	});
 
-	it("turns away a file of the walk of bzip2 and a file of no index at all", async () => {
+	it("reads a file of the walk of bzip2 and turns away a file of no index at all", async () => {
+		// The places of a file of the walk of bzip2 as `bzip2` itself writes them, of a file of the places
+		// of the walk of the counts of them (the count of the places of the file `A` and of the places of
+		// the file `Z`) and of one file of the places of the file `nbz payload`.
+		const plain = Buffer.from(PLAIN_B64, "base64");
 		const file = nsaFile({
 			files: [
 				{
 					name: "sound.nbz",
 					compression: 4,
-					data: Buffer.from("BZh9", "latin1"),
+					data: Buffer.from(BZ2_B64, "base64"),
 				},
 			],
 		});
@@ -189,9 +200,9 @@ describe("NScripter engine resource archive", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("no entry");
 			expect(entry.metadata).toMatchObject({ type: "audio", compression: 4 });
-			await expect(archive.openEntry(entry.id)).rejects.toMatchObject({
-				code: "UNSUPPORTED_FEATURE",
-			});
+			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
+				plain,
+			);
 		} finally {
 			await archive.close();
 		}
