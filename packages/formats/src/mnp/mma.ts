@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -215,6 +216,116 @@ async function readMmaLayout(
 	return entries.length > 0 ? entries : undefined;
 }
 
+/** `MmeImageDecoder`: a picture of this engine stands of twenty four or thirty two places of a colour. */
+const MME_IMAGE_FLAG = 8;
+/** `MmeMaskDecoder`: a picture of a covering place stands of eight places of a colour, one to a pixel. */
+const MME_MASK_FLAGS = [0x10, 0x18];
+/** The head of a picture of this engine: its counts, of four words. */
+const MME_HEAD_SIZE = 0x10;
+
+/** The colour map of a picture of a covering place, which the engine reads as a picture of grey. */
+function greyColourMap(): Buffer {
+	const entries = Buffer.alloc(256 * 4);
+	for (let level = 0; level < 256; level += 1) {
+		entries[level * 4] = level;
+		entries[level * 4 + 1] = level;
+		entries[level * 4 + 2] = level;
+	}
+	return entries;
+}
+
+/**
+ * `MmaOpener.OpenImage` and the two decoders behind it: the counts of the picture stand of the head of the entry,
+ * at nought, and its places stand behind the head the entry declares, of the walk its flags of storage name. A
+ * picture of a covering place stands of eight places of a colour, one to a pixel, and every other picture stands
+ * of twenty four or of thirty two; a picture of any other count stands turned away here, where the reference
+ * would hand it over as a picture of thirty two places of a colour over a row of its own count.
+ */
+function readMmePicture(
+	data: Buffer,
+	entry: {
+		path: string;
+		headerSize: number;
+		unpackedSize: number;
+		flags: number;
+	},
+): Buffer | undefined {
+	const kind = entry.flags & TYPE_MASK;
+	const isMask = MME_MASK_FLAGS.includes(kind);
+	if (MME_IMAGE_FLAG !== kind && !isMask) return undefined;
+	if (data.length < MME_HEAD_SIZE) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of too few places of the file`,
+		);
+	}
+	const width = data.readInt32LE(0);
+	const height = data.readInt32LE(4);
+	const bpp = isMask ? 8 : data.readInt32LE(8);
+	const stride = isMask ? width : data.readInt32LE(0xc);
+	if (width <= 0 || height <= 0 || stride <= 0) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of no places of the file`,
+		);
+	}
+	const places = 8 === bpp ? 1 : 24 === bpp ? 3 : 32 === bpp ? 4 : 0;
+	if (places === 0) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture ${entry.path} stands of ${bpp} places of a colour`,
+		);
+	}
+	if (stride < width * places || stride * height > entry.unpackedSize) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of a row of the wrong count`,
+		);
+	}
+	// `MmeBaseDecoder.GetImageData`: the places stand of the walk the flags of storage name.
+	const output = Buffer.alloc(entry.unpackedSize, 0x00);
+	const storage = entry.flags & STORAGE_MASK;
+	const stored = data.subarray(Math.min(entry.headerSize, data.length));
+	if (2 === storage) {
+		stored.copy(output, 0, 0, Math.min(stored.length, output.length));
+	} else if (4 === storage) {
+		const length = Math.min(stored.length, output.length);
+		stored.copy(output, 0, 0, length);
+		decrypt(output, 0, length);
+	} else if (6 === storage) {
+		const unpacked = unpackLz(stored, output.length);
+		if (!unpacked) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The picture ${entry.path} stands of no walk of the compressed streams`,
+			);
+		}
+		unpacked.copy(output);
+	} else {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of no walk of its places`,
+		);
+	}
+	// A row of the file stands of the count of its own places, of which a bitmap holds the places of the picture.
+	const pixels = Buffer.alloc(width * height * places, 0x00);
+	for (let row = 0; row < height; row += 1) {
+		output.copy(
+			pixels,
+			row * width * places,
+			row * stride,
+			row * stride + width * places,
+		);
+	}
+	if (isMask) {
+		return writeBmp8Palette(width, height, pixels, greyColourMap());
+	}
+	if (24 === bpp) return writeBmp24(width, height, pixels);
+	// `Bgr32` stands of no covering place, so the fourth place of every pixel stands of the whole of itself.
+	for (let at = 3; at < pixels.length; at += 4) pixels[at] = 0xff;
+	return writeBmp32(width, height, pixels);
+}
+
 export const mmaDescriptor: FormatDescriptor = {
 	id: "mnp-mma",
 	name: "MNP engine resource archive",
@@ -281,6 +392,15 @@ export const mmaFormat: ArchiveFormat = defineFixedArchive({
 		});
 		if (!output)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid MNP MMA payload");
+		// A picture of this engine stands of its own head, which the walk of the pictures of this engine reads;
+		// every other entry stands of the places of the file as they are.
+		const picture = readMmePicture(data, {
+			path: entry.path,
+			headerSize: metadata?.headerSize ?? 0,
+			unpackedSize: metadata?.unpackedSize ?? Number(entry.size),
+			flags: metadata?.flags ?? 0,
+		});
+		if (picture) return Readable.from([picture]);
 		// The stored and header branches yield exactly the declared unpacked size.
 		return Readable.from([Buffer.from(output)]);
 	},

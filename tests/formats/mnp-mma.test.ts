@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { mmaFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const INDEX_OFFSET = 0x40;
 const RECORD_SIZE = 0x14;
@@ -121,6 +122,55 @@ function buildMma(
 	for (const [index, payload] of payloads.entries())
 		payload.copy(file, offsets[index] ?? 0);
 	return file;
+}
+
+/** A picture of the engine: its counts, then its places. */
+function mmePicture(input: {
+	width: number;
+	height: number;
+	bpp?: number;
+	stride?: number;
+	places: Buffer;
+	isMask?: boolean;
+}): Buffer {
+	const head = Buffer.alloc(0x10);
+	head.writeInt32LE(input.width, 0);
+	head.writeInt32LE(input.height, 4);
+	if (!input.isMask) {
+		head.writeInt32LE(input.bpp ?? 24, 8);
+		head.writeInt32LE(
+			input.stride ?? input.width * ((input.bpp ?? 24) / 8),
+			0xc,
+		);
+	}
+	return Buffer.concat([head, input.places]);
+}
+
+/** The picture an entry stands of, read back through the bitmap walk of this project. */
+async function pictureOfEntry(
+	file: Buffer,
+	index: number,
+): Promise<{
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: number[];
+	palette: number[];
+}> {
+	const archive = await mmaFormat.open(sourceOf(file), "sample.mma");
+	const entry = archive.entries[index];
+	if (!entry) throw new Error("no entry");
+	const image = readBmpImage(
+		await consumeBuffer(await archive.openEntry(entry.id)),
+	);
+	if (!image) throw new Error("no bitmap");
+	return {
+		width: image.width,
+		height: image.height,
+		bitsPerPixel: image.bitsPerPixel,
+		pixels: [...image.pixels],
+		palette: [...image.palette],
+	};
 }
 
 function sourceOf(file: Buffer): BufferByteSource {
@@ -271,6 +321,117 @@ describe("mnp mma", () => {
 		} finally {
 			await archive.close();
 		}
+	});
+
+	it("reads the places of a picture of the engine, of a row of the count of its own", async () => {
+		// Two rows of two pixels of three places of a colour, every row standing of eight places of the file
+		// where the picture stands of six.
+		const places = Buffer.from([
+			1, 2, 3, 4, 5, 6, 0, 0, 7, 8, 9, 10, 11, 12, 0, 0,
+		]);
+		const picture = mmePicture({
+			width: 2,
+			height: 2,
+			bpp: 24,
+			stride: 8,
+			places,
+		});
+		const built = buildMma([picture], {
+			flags: [0xa],
+			headerSizes: [0x10],
+			unpackedSizes: [places.length],
+		});
+		expect(await pictureOfEntry(built, 0)).toMatchObject({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 24,
+			pixels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+		});
+	});
+
+	it("reads the places of a picture of the engine of thirty two places of a colour", async () => {
+		const places = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		]);
+		const picture = mmePicture({
+			width: 4,
+			height: 1,
+			bpp: 32,
+			places,
+		});
+		const built = buildMma([picture], {
+			flags: [0xa],
+			headerSizes: [0x10],
+			unpackedSizes: [places.length],
+		});
+		const shown = await pictureOfEntry(built, 0);
+		expect(shown).toMatchObject({ width: 4, height: 1, bitsPerPixel: 32 });
+		// `Bgr32` stands of no covering place, so the fourth place of every pixel stands of the whole.
+		expect(shown.pixels).toEqual([
+			1, 2, 3, 255, 5, 6, 7, 255, 9, 10, 11, 255, 13, 14, 15, 255,
+		]);
+	});
+
+	it("reads the places of a picture of a covering place", async () => {
+		const places = Buffer.from([7, 9, 11, 13]);
+		const picture = mmePicture({
+			width: 2,
+			height: 2,
+			places,
+			isMask: true,
+		});
+		const built = buildMma([picture], {
+			flags: [0x12],
+			headerSizes: [0x10],
+			unpackedSizes: [places.length],
+		});
+		const shown = await pictureOfEntry(built, 0);
+		expect(shown).toMatchObject({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 8,
+			pixels: [7, 9, 11, 13],
+		});
+		expect(shown.palette.slice(0x10, 0x14)).toEqual([4, 4, 4, 0]);
+	});
+
+	it("reads the places of a picture of the engine behind a header and a mask", async () => {
+		const places = Buffer.from([1, 2, 3, 4, 5, 6]);
+		const header = Buffer.alloc(0x10, 0xee);
+		const picture = mmePicture({ width: 2, height: 1, bpp: 24, places });
+		// The walk of the compressed streams stands of a word of its own before the places, of nought where
+		// the places stand as they are.
+		const stream = Buffer.concat([Buffer.from([0x00]), places]);
+		const built = buildMma(
+			[Buffer.concat([picture.subarray(0, 0x10), header, stream])],
+			{
+				flags: [0xe],
+				headerSizes: [0x10 + header.length],
+				unpackedSizes: [places.length],
+			},
+		);
+		expect(await pictureOfEntry(built, 0)).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+			pixels: [1, 2, 3, 4, 5, 6],
+		});
+	});
+
+	it("turns away a picture of a count of places of a colour the engine knows not", async () => {
+		const places = Buffer.alloc(4);
+		const picture = mmePicture({ width: 2, height: 1, bpp: 16, places });
+		const built = buildMma([picture], {
+			flags: [0xa],
+			headerSizes: [0x10],
+			unpackedSizes: [places.length],
+		});
+		const archive = await mmaFormat.open(sourceOf(built), "sample.mma");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("no entry");
+		await expect(archive.openEntry(entry.id)).rejects.toThrow(
+			/stands of 16 places of a colour/,
+		);
 	});
 
 	it("declines an archive with an unknown version", async () => {

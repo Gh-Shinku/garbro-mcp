@@ -59,7 +59,20 @@ stored byte is rotated **left** by five when read, so the encoder stores it rota
 
 ## Deviations
 
-* The image decoders (`MmeImageDecoder`, `MmeMaskDecoder`), archive creation and the `ImageFormat`
-  metadata of the reference are out of scope; payloads are extracted as described above.
+* `MmaOpener.OpenImage` reads the places of an entry whose `flags & 0x38` is eight, `0x10` or `0x18`: the head of
+  the picture stands at the front of the entry — its width and height for a picture of a covering place, and its
+  width, height, count of places of a colour and count of places of a row for every other picture — and the places
+  themselves stand behind the head the entry declares of itself, which is therefore never shorter than the head of
+  the picture. The walk of the places stands of the same flags of storage as `OpenEntry`, and a row of the file
+  stands of the count of a row the head names, of which a bitmap holds the places of the picture alone. A picture of
+  a covering place stands of eight places of a colour, one to a pixel, and hands over as a grey bitmap; every other
+  picture stands of twenty four or of thirty two places of a colour, and the fourth place of a pixel of a picture of
+  thirty two places of a colour stands of the whole of itself, since the reference reads such a picture as `Bgr32` of
+  no covering place. `0x38` stands of no walk of its own in the reference either, so such an entry stands handed over
+  as the places of the file.
+* A picture of a count of places of a colour the engine knows not stands turned away, where the reference would hand
+  it over as a picture of thirty two places of a colour over a row of its own count.
+* Archive creation and the `ImageFormat` metadata of the reference are out of scope; every other payload is
+  extracted as described above.
 * The LZ output is always allocated at `unpackedSize`, so a truncated stream yields that length with
   the remaining bytes left clear, matching the reference's `new byte[UnpackedSize]`.

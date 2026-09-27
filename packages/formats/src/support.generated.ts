@@ -13895,8 +13895,9 @@ export const formatSupportCatalog = {
 				"lz streams",
 				"masked payloads",
 				"payload type hints",
+				"the places of an image entry: the head of the picture, the walk of the storage flags, the count of a row and the covering place of a picture of thirty two places of a colour",
 			],
-			unsupported: ["archive creation", "mme image decoders"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
