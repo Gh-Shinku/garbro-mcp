@@ -9,7 +9,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -92,6 +94,16 @@ export const mgfImageDescriptor: FormatDescriptor = {
 	],
 };
 
+/** Restores the PNG of a stored file, decodes it and hands back the picture. `MgfFormat` extends `PngFormat`, so
+ * the reference decodes the picture as well and hands out pixels rather than the portable network graphic. */
+async function readPicture(source: ByteSource) {
+	if ((await readLayout(source)) === undefined) return undefined;
+	const rest = Buffer.from(
+		await source.readAt(BigInt(TAG_SIZE), Number(source.size) - TAG_SIZE),
+	);
+	return readPngImage(Buffer.concat([PNG_SIGNATURE, rest]));
+}
+
 export const mgfImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: mgfImageDescriptor,
 	detection: { signatures: [{ bytes: SIGNATURE }] },
@@ -102,20 +114,24 @@ export const mgfImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Malie MGF image");
+		const image = await readPicture(source);
+		if (!image)
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Malie MGF image");
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "png"),
+				path: changeExtension(fileName, "bmp"),
 				offset: 0n,
 				size: source.size,
 				metadata: {
 					type: "image",
-					width: layout.width,
-					height: layout.height,
+					width: image.width,
+					height: image.height,
+					bitsPerPixel: image.bitsPerPixel,
 					...(layout.bitsPerPixel === undefined
 						? {}
-						: { bitsPerPixel: layout.bitsPerPixel }),
+						: { storedBitsPerPixel: layout.bitsPerPixel }),
 				} as Record<string, unknown>,
 			}),
 			// Eight bytes are replaced by eight bytes, so the extraction is the same length as the source.
@@ -124,22 +140,27 @@ export const mgfImageFormat: ArchiveFormat = defineFixedArchive({
 		return {
 			entries: [entry],
 			metadata: {
-				image: "png",
-				width: layout.width,
-				height: layout.height,
+				image: "bmp",
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
 				tag: TAG.toString("latin1"),
 				prefixSize: TAG_SIZE,
 			},
 		};
 	},
 	async openEntry(source: ByteSource) {
-		if ((await readLayout(source)) === undefined)
+		const image = await readPicture(source);
+		if (!image)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Malie MGF image");
-		// The stored bytes from offset eight onward are a PNG from its eighth byte; putting the signature back
-		// is the whole of the conversion, and every other byte is carried through untouched.
-		const rest = Buffer.from(
-			await source.readAt(BigInt(TAG_SIZE), Number(source.size) - TAG_SIZE),
-		);
-		return Readable.from([Buffer.concat([PNG_SIGNATURE, rest])]);
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: Buffer.from(image.pixels),
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });
