@@ -1041,17 +1041,23 @@ function upsampleComponent(
 			for (let down2 = 0; down2 < step; down2 += 1) {
 				const target = (row * step + down2) * stride;
 				if (2 === down) {
-					const above = sampleAt(component, 0, row - 1);
-					const below = sampleAt(component, 0, row + 1);
-					const near = 0 === down2 ? above : below;
-					let last = sampleAt(component, 0, row) * 3 + near;
-					let current = sampleAt(component, 1, row) * 3 + near;
+					// The row of the sample of the count of the head of the picture in front of the row of the
+					// picture of the count of the head of the format: the count of the places of the file of the
+					// colour of the picture stands of the counts of the places of the file of the colour of the
+					// picture of its own row and of the row in front of it, every place of the file of them.
+					const nearRow = 0 === down2 ? row - 1 : row + 1;
+					let last =
+						sampleAt(component, 0, row) * 3 + sampleAt(component, 0, nearRow);
+					let current =
+						sampleAt(component, 1, row) * 3 + sampleAt(component, 1, nearRow);
 					samples[target] = (last * 4 + 8) >> 4;
 					samples[target + 1] = (last * 3 + current + 7) >> 4;
 					let previous = last;
 					last = current;
 					for (let place = 1; place < source - 1; place += 1) {
-						current = sampleAt(component, place + 1, row) * 3 + near;
+						current =
+							sampleAt(component, place + 1, row) * 3 +
+							sampleAt(component, place + 1, nearRow);
 						samples[target + place * 2] = (last * 3 + previous + 8) >> 4;
 						samples[target + place * 2 + 1] = (last * 3 + current + 7) >> 4;
 						previous = last;
