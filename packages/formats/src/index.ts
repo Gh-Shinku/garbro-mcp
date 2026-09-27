@@ -600,6 +600,7 @@ import { mermaidPwvAudioFormat } from "./mermaid/pwv-audio.js";
 import { shaFormat } from "./mg/sha.js";
 import { microsoftCabArchiveFormat } from "./microsoft/cab-archive.js";
 import { neFormat } from "./microsoft/ne-archive.js";
+import { executableResourcesFormat } from "./microsoft/resources-archive.js";
 import { microVisionArcFormat } from "./microvision/arc.js";
 import { gsdFormat } from "./microvision/gsd.js";
 import { gtxImageFormat } from "./microvision/gtx-image.js";
@@ -1777,6 +1778,7 @@ export function createDefaultRegistry(
 			succubusGhImageFormat,
 			liddellBpaImageFormat,
 			microsoftCabArchiveFormat,
+			executableResourcesFormat,
 			neFormat,
 			mgsFormat,
 			eternitySgfImageFormat,

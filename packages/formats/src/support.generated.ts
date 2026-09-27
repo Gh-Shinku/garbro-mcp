@@ -13771,6 +13771,29 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "archive",
+				tag: "EXE",
+				class: "ExeOpener",
+				source: "Experimental/Microsoft/ArcEXE.cs",
+			},
+			localId: "executable-resources",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the resources of a Windows executable listed as the files of an archive, of the resource table this project already reads (`shared/exe.ts`): the kind of a resource and the name of it, of the two tables of the reference (`RuntimeTypeMap` and `ExtensionTypeMap`)",
+				"the names of the files of the listing, of the shape of the reference: a resource of a numbered kind and name stands of `RT_BITMAP/00001.BMP` and its like, and a kind the reference holds no name for stands left out of the listing",
+				"the places of a picture of the kind `#2` (`RT_BITMAP`), of the bitmap head the reference puts in front of it (`OpenImage`), of both counts of the places of the picture the head may name",
+				"the places of a resource of any other kind, handed over as they stand",
+			],
+			unsupported: [
+				"archive creation",
+				"the version of an executable of the kind `#16` as a text, which the reference writes of its own walk of the version resource (`OpenVersion`) where `OpenRtVersionAsText` stands set: the places of that resource stand handed over as they stand here",
+				"the places of a resource that stands in no table of the executable it was read of",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GRA",
 				class: "GraFormat",
