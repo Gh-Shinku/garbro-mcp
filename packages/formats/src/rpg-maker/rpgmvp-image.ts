@@ -12,6 +12,8 @@ import {
 } from "../shared/fixed-archive.js";
 import { readPngHeaderFields } from "../shared/png.js";
 import { RPGMV_SIGNATURE, readRpgmvFile } from "./rpgmv-core.js";
+import { writeBmpImage } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 
 const PNG_WORD = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
 
@@ -102,8 +104,21 @@ export const rpgMakerRpgmvpImageFormat: ArchiveFormat = defineFixedArchive({
 			PNG_WORD,
 		);
 		if (!file) throw invalidPicture("Not an RPG Maker picture");
-		// What stands behind the head of the file stands as the words of a portable network graphic, which are
-		// handed out as they stand.
-		return Readable.from([file.body]);
+		// `RpgmvpFormat.Read` stands of `Png.Read` over what the places behind the head of the file stand for,
+		// so the graphic stands read of the walk of the portable network graphic of this project and handed
+		// over as a bitmap of its own.
+		const image = await readPngImage(file.body);
+		if (!image) throw invalidPicture("Not an RPG Maker picture");
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

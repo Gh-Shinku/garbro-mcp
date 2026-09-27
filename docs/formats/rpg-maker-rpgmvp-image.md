@@ -52,3 +52,12 @@ and the words that do not, where the key stands beside the file and above it and
 places of the key stood beside the head of the file, the picture a file of this kind stands for, the file
 whose key stands nowhere, a file of the engine whose places stand for no picture, and the words of the engine
 the file is told by.
+
+## The places of the picture
+
+The reference reads what the places behind the head of the file stand for with the walk of the portable network graphic,
+so this port reads that graphic with the walk of the portable network graphic of this project and hands the places of the
+picture over as a bitmap of its own: of the width, the height and the depth the head of the graphic names, of the rows in
+the order the head names and of the places the walk of the graphic yields. A graphic whose places run out before the
+places its head names, or whose places of a colour stand behind a kind the walk does not carry, stands turned away,
+which is where the reference throws.

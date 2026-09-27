@@ -5,6 +5,9 @@ import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import {
 	RPGMV_SIGNATURE,
 	decryptRpgmvStream,
@@ -118,8 +121,13 @@ describe("RPG Maker engine formats", () => {
 		expect(decryptRpgmvStream(stored, KEY)).toEqual(body);
 	});
 
-	it("hands out the picture the places of the key stand for", async () => {
-		const body = png();
+	it("reads the places of the picture the key stands for", async () => {
+		// A whole portable network graphic of the counts the head of the file names, of the four places of a
+		// colour a place.
+		const rows = Array.from({ length: 0x18 }, (_, y) =>
+			Array.from({ length: 0x18 * 4 }, (_, at) => (at * 7 + y * 3 + 1) & 0xff),
+		);
+		const body = pngFile({ width: 0x18, height: 0x18, colourType: 6, rows });
 		await withGame(
 			{
 				"www/data/System.json": SYSTEM_JSON,
@@ -141,9 +149,19 @@ describe("RPG Maker engine formats", () => {
 					const entry = archive.entries[0];
 					if (!entry) throw new Error("no entry");
 					expect(entry.path).toBe("picture.png");
-					expect(
+					const picture = readBmpImage(
 						await consumeBuffer(await archive.openEntry(entry.id)),
-					).toEqual(body);
+					);
+					const expected = await readPngImage(body);
+					expect(picture).toMatchObject({
+						width: 0x18,
+						height: 0x18,
+						bitsPerPixel: 32,
+					});
+					expect(expected).not.toBeUndefined();
+					expect([...(picture?.pixels ?? [])]).toEqual([
+						...(expected?.pixels ?? []),
+					]);
 				} finally {
 					await archive.close();
 				}
