@@ -23261,11 +23261,10 @@
 				"extraction",
 				"the container: the VP8X, ALPH, VP8 and VP8L chunk heads, with EXIF, XMP and ICCP chunks ignored and ANIM and ANMF refused",
 				"lossless images (VP8L): the transforms, the meta-Huffman codes, the LZ77 stage with the distance plane map, the colour cache and colour indexing, including the alpha channel",
-				"lossy key frame images (VP8) whose token data is not split into several partitions, for any picture size: the frame and partition heads, the macroblock modes, the coefficients, the second-order (WHT) stage, all intra predictors, the inverse transforms, the reconstruction of every macroblock row and the in-loop filter (the simple and the normal kind, luma and chroma, with the per-segment strengths and the sharpness, delta and high edge variance rules), verified byte for byte against the filtered planes of ffmpeg and of libwebp for single row, multi row, single column and multi column pictures"
+				"lossy key frame images (VP8) of any picture size and any number of token partitions (one, two, four or eight, taken by the macroblock rows in turn): the frame and partition heads, the macroblock modes, the coefficients, the second-order (WHT) stage, all intra predictors, the inverse transforms, the reconstruction of every macroblock row and the in-loop filter (the simple and the normal kind, luma and chroma, with the per-segment strengths and the sharpness, delta and high edge variance rules), verified byte for byte against the filtered planes of ffmpeg and of libwebp for single row, multi row, single column, multi column and four partition pictures"
 			],
 			"unsupported": [
 				"archive creation: the reference hands the image to the platform library and this port only reads such an image",
-				"lossy images (VP8) whose token data is split into more than one partition",
 				"animation (ANIM and ANMF) and images whose alpha channel is carried in a separate ALPH chunk"
 			],
 			"remainingVerification": [

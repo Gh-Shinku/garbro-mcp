@@ -12,13 +12,13 @@ This port reads:
   chunk headers; `EXIF`, `XMP ` and `ICCP` chunks are ignored;
 * lossless images (`VP8L`): the transforms, the meta-Huffman codes, the LZ77 stage with the distance plane map, the
   colour cache and colour indexing, including the alpha channel;
-* lossy images (`VP8`) that are key frames whose token data is not split into several partitions, for any picture
-  size: the frame and partition headers, the macroblock modes, the coefficients, the second-order (WHT) stage, all
-  intra predictors, the inverse transforms, the reconstruction of every macroblock row and the in-loop filter.
+* lossy images (`VP8`) that are key frames, for any picture size and any number of token partitions: the frame and
+  partition headers, the macroblock modes, the coefficients, the second-order (WHT) stage, all intra predictors, the
+  inverse transforms, the reconstruction of every macroblock row and the in-loop filter.
 
 Refused, each with a message of its own: animation (`ANIM`/`ANMF`); an alpha channel carried in a separate `ALPH`
-chunk; lossy images whose token data is split into more than one partition. A partially supported image is detected
-and refused when it is extracted; the refusal is not a detection failure.
+chunk. A partially supported image is detected and refused when it is extracted; the refusal is not a detection
+failure.
 
 ## Fixtures and oracle
 
@@ -32,6 +32,17 @@ writes exactly the same bytes as `ffmpeg`. `tests/helpers/webp.ts` holds the fix
 single macroblock row cases are 16x16 (solid, chequerboard, gradient, noise, quality 90), 4x3 and 48x16, and the
 multi row cases are 16x32, 16x48, 16x64, 32x48, 48x32 and 64x48. `NOISE_WEBP` and `NOISE_BIG_WEBP` are noise, which
 the encoder codes as 4x4 blocks, so they also cover the 4x4 predictors in later columns and macroblock rows.
+`MULTI_PARTITION_WEBP` is a 64x48 picture with four token partitions, written by `libvpx` through
+`ffmpeg -c:v libvpx -slices 4 -auto-alt-ref 0 -lag-in-frames 0`.
+
+### Token partitions
+
+A picture with a single token partition keeps all of its coefficient data in one partition and stores no sizes. A
+picture with more than one stores the sizes of the first `count - 1` of them as three byte values in little endian
+order (`ParsePartitions` of libwebp reads them little endian, whatever RFC 6386 says), the partitions follow that
+table and the last one runs to the end of the token data. A macroblock row takes the partition
+`mb_y & (count - 1)`, so a row is independent of the rows before it in the bit reader, but every row that shares a
+partition continues its bit stream.
 
 ## The lossy stage (VP8)
 
