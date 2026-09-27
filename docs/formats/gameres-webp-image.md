@@ -14,7 +14,8 @@ This port reads:
   colour cache and colour indexing, including the alpha channel;
 * lossy images (`VP8`) that are key frames, for any picture size and any number of token partitions: the frame and
   partition headers, the macroblock modes, the coefficients, the second-order (WHT) stage, all intra predictors, the
-  inverse transforms, the reconstruction of every macroblock row and the in-loop filter.
+  inverse transforms, the reconstruction of every macroblock row, the in-loop filter, and the BGRA places of the file
+  that the reference asks libwebp for (`WebPDecodeBGRAInto`).
 
 Refused, each with a message of its own: animation (`ANIM`/`ANMF`); an alpha channel carried in a separate `ALPH`
 chunk. A partially supported image is detected and refused when it is extracted; the refusal is not a detection
@@ -34,6 +35,22 @@ multi row cases are 16x32, 16x48, 16x64, 32x48, 48x32 and 64x48. `NOISE_WEBP` an
 the encoder codes as 4x4 blocks, so they also cover the 4x4 predictors in later columns and macroblock rows.
 `MULTI_PARTITION_WEBP` is a 64x48 picture with four token partitions, written by `libvpx` through
 `ffmpeg -c:v libvpx -slices 4 -auto-alt-ref 0 -lag-in-frames 0`.
+
+### The BGRA places of the file
+
+The reference does not ask libwebp for planes but for BGRA places of the file (`WebPDecodeBGRAInto`), so the port
+converts the planes the same way: the chroma planes are upsampled with the fancy walk of the reference
+(`UpsampleBgraLinePair` of `src/dsp/upsampling.c`, the `([9a+3b+3c+d, 3a+9b+3c+d; 3a+b+9c+3d, a+3b+3c+9d] + [8 8]) / 16`
+interpolations on the packed chroma counts, with the first row of the picture mirroring the first chroma row and the
+last row of an even sized picture mirroring the last chroma row) and every place of the file is converted with the
+fixed point BT.601 rules of `src/dsp/yuv.h` (`MultHi`, `VP8Clip8`, `VP8YUVToR/G/B`). A picture without an alpha plane
+gets an opaque alpha channel, which is what the reference library writes as well.
+`packages/formats/src/shared/webp-vp8-bgra.ts` holds that walk.
+
+The expected places of the file of these fixtures are the bytes `WebPDecodeBGRA` writes, read through the platform
+library of the machine this was written on, so the expectation comes from the very library the reference delegates
+to. `tests/helpers/webp.ts` records them for ten pictures, including `ODD_WEBP` (5x7) and `LOSSY_WEBP` (4x3), which
+cover the odd width and the odd height tails of the upsampling.
 
 ### Token partitions
 
