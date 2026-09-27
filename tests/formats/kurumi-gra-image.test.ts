@@ -3,6 +3,7 @@ import { kurumiGraImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from([0x56, 0x69, 0x72, 0x67]);
 const MAGIC = Buffer.from("Virgin Snow Compressed Data 1.0", "ascii");
@@ -27,6 +28,10 @@ function buildBmp(tail = 0): Buffer {
 	bmp.writeUInt32LE(bitmapSize, 2);
 	bmp.writeUInt32LE(DATA_OFFSET, 10);
 	bmp.writeUInt32LE(40, 14);
+	// The walk of the bitmap of this project stands of a bitmap that names no kind of covering of its rows.
+	bmp.writeUInt32LE(0, 30);
+	// Nor of a count of colours of its own: it holds one entry to a colour for every place a colour can take.
+	bmp.writeUInt32LE(0, 46);
 	bmp.writeInt32LE(WIDTH, 18);
 	bmp.writeInt32LE(HEIGHT, 22);
 	bmp.writeUInt16LE(1, 26);
@@ -96,13 +101,32 @@ describe("kurumi gra image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bmp);
+			// The places of the picture stand of the rows in the order the head of the bitmap names: the last
+			// row of the file stands first, of a row of the count of the stride of the file.
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: WIDTH,
+				height: HEIGHT,
+				bitsPerPixel: 8,
+			});
+			// The walk hands a row over of the count of the places a row of the picture holds, so the places
+			// the file holds behind the row of the picture stand of no count: the fixture writes its places
+			// over the stride of the file, of which only the first two of a row reach the picture.
+			const stride = (WIDTH + 3) & ~3;
+			const expected: number[] = [];
+			for (let row = HEIGHT - 1; row >= 0; row -= 1) {
+				for (let i = 0; i < WIDTH; i += 1) {
+					const at = row * stride + i;
+					expected.push(at < WIDTH * HEIGHT ? (at * 53 + 7) & 0xff : 0);
+				}
+			}
+			expect([...(picture?.pixels ?? [])]).toEqual(expected);
 		} finally {
 			await archive.close();
 		}
 	});
 
-	it("trims data past the declared bitmap size", async () => {
+	it("reads the places of the picture of the head of the bitmap alone", async () => {
 		// Sixteen bytes of slack after the pixels; the bitmap's own size wins.
 		const padded = buildBmp(16);
 		const stored = buildGra(padded);
@@ -114,9 +138,9 @@ describe("kurumi gra image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(padded.length - 16);
-			expect(output.equals(padded)).toBe(false);
-			expect(output.subarray(0, 8)).toEqual(padded.subarray(0, 8));
+			// The sixteen places behind the picture stand of no count of the walk, so the picture stands of
+			// the same places as the one of a file that ends with it.
+			expect(readBmpImage(output)).toEqual(readBmpImage(buildBmp()));
 		} finally {
 			await archive.close();
 		}

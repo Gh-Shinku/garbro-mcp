@@ -9,7 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -137,6 +137,16 @@ export const kurumiGraImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Kurumi GRA image");
-		return Readable.from([layout.bmp]);
+		// `GraFormat.Read` stands of `Bmp.Read` over the unmasked, inflated surface: the bitmap stands read of
+		// the bitmap walk of this project and handed over as a bitmap of its own, so the places behind the
+		// picture stand of no count and a picture cut short of its places stands turned away.
+		const image = readBmpImage(layout.bmp);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Kurumi GRA bitmap: ${layout.bmp.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });
