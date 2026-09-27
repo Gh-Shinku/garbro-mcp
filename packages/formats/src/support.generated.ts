@@ -23244,14 +23244,15 @@ export const formatSupportCatalog = {
 				"the container: the VP8X, ALPH, VP8 and VP8L chunk heads, with EXIF, XMP and ICCP chunks ignored and ANIM and ANMF refused",
 				"lossless images (VP8L): the transforms, the meta-Huffman codes, the LZ77 stage with the distance plane map, the colour cache and colour indexing, including the alpha channel",
 				"lossy key frame images (VP8) of any picture size and any number of token partitions (one, two, four or eight, taken by the macroblock rows in turn): the frame and partition heads, the macroblock modes, the coefficients, the second-order (WHT) stage, all intra predictors, the inverse transforms, the reconstruction of every macroblock row, the in-loop filter (the simple and the normal kind, luma and chroma, with the per-segment strengths and the sharpness, delta and high edge variance rules) and the BGRA places of the file the reference library writes (the fancy chroma upsampling and the fixed point BT.601 walk of libwebp), verified byte for byte against the planes of ffmpeg for single row, multi row, single column, multi column and four partition pictures and against the BGRA bytes of libwebp for ten pictures, odd sizes among them",
+				"the alpha plane of a lossy picture that carries one (the ALPH chunk: the raw and the lossless storages, the horizontal, vertical and gradient filters, and the levels left as the stream stores them), verified byte for byte against the alpha bytes of the BGRA places of the file of libwebp for seven pictures, two of which this project built from the plane of another fixture because the reference library never chooses the vertical and the gradient filter by itself",
 			],
 			unsupported: [
 				"archive creation: the reference hands the image to the platform library and this port only reads such an image",
-				"animation (ANIM and ANMF) and images whose alpha channel is carried in a separate ALPH chunk",
+				"animation (ANIM and ANMF)",
 			],
 			remainingVerification: [
-				"the lossy stage (VP8) is compared with ffmpeg (the filtered planes) and with the platform library of this machine (the BGRA places of the file); both are independent of this walk",
-				"the VP8L fixtures come from Pillow (libwebp) and the VP8 fixtures from Pillow, ffmpeg and libvpx plus ffmpeg",
+				"the lossy stage (VP8) is compared with ffmpeg (the filtered planes) and with the platform library of this machine (the BGRA places of the file, the alpha channel among them); both are independent of this walk",
+				"the VP8L fixtures come from Pillow (libwebp) and the VP8 fixtures from Pillow, ffmpeg and libvpx plus ffmpeg, while the two alpha planes that carry the vertical and the gradient filter come from the forward filters of libwebp, applied by this project and read back by libwebp",
 			],
 		},
 	],

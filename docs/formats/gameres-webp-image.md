@@ -17,9 +17,11 @@ This port reads:
   inverse transforms, the reconstruction of every macroblock row, the in-loop filter, and the BGRA places of the file
   that the reference asks libwebp for (`WebPDecodeBGRAInto`).
 
-Refused, each with a message of its own: animation (`ANIM`/`ANMF`); an alpha channel carried in a separate `ALPH`
-chunk. A partially supported image is detected and refused when it is extracted; the refusal is not a detection
-failure.
+* the alpha plane of a lossy picture that carries one (`ALPH`): the raw and the lossless storages, the three filters
+  and the levels left as the stream stores them.
+
+Refused, each with a message of its own: animation (`ANIM`/`ANMF`). A partially supported image is detected and
+refused when it is extracted; the refusal is not a detection failure.
 
 ## Fixtures and oracle
 
@@ -51,6 +53,32 @@ The expected places of the file of these fixtures are the bytes `WebPDecodeBGRA`
 library of the machine this was written on, so the expectation comes from the very library the reference delegates
 to. `tests/helpers/webp.ts` records them for ten pictures, including `ODD_WEBP` (5x7) and `LOSSY_WEBP` (4x3), which
 cover the odd width and the odd height tails of the upsampling.
+
+### The alpha plane of a lossy picture
+
+`packages/formats/src/shared/webp-alpha.ts` reads the `ALPH` chunk (`ALPHInit`, `ALPHDecode` and
+`WebPUnfilters` of `src/dec/alpha_dec.c` and `src/dsp/filters.c`). Its one byte head names the storage of the plane
+(raw bytes, or a lossless bit stream), the alpha filter (none, horizontal, vertical, gradient), the preprocessing of
+the levels and two reserved bits that must be clear.
+
+The lossless storage is a VP8L bit stream **without a five byte head of its own**: the dimensions come from the
+picture, so the stream starts at its transforms, which is why `readVp8lStream` of `webp-lossless.ts` exists next to
+`readVp8lPicture`. The alpha value of a place of the file is the **green** channel of the decoded pixel
+(`WebPExtractGreen`: the values of an alpha only stream live in the green plane). The filter then runs over the plane,
+row by row, with the row above as the prediction for the vertical and gradient kinds; the first row always stands for
+the horizontal filter, because the reference falls back to it whenever there is no row above.
+
+The preprocessing flag says that the levels of the plane were quantised when the picture was written. libwebp spreads
+them out again only when the caller asks for alpha dithering, which the reference does not, so this walk leaves the
+levels as they stand, exactly like the reference library does.
+
+The expected alpha bytes of the fixtures are the alpha bytes of the BGRA places of the file the platform library
+writes for the whole picture, so they come from the reference library. `tests/helpers/webp.ts` records seven
+pictures: a raw plane in its own chunk (the `PLACES_WEBP` fixture), a lossless plane, a plane written with the
+horizontal filter, a plane whose levels were quantised, an odd sized picture (5x7) and two pictures whose planes carry
+the vertical and the gradient filters. The library of the picture of the web never chooses those last two filters by
+itself, so this port builds them from the plane of the lossless fixture with the forward filters of the same reference
+file; the library reads them back to exactly the places of the file of the picture they were built from.
 
 ### Token partitions
 
