@@ -36,3 +36,11 @@ Details worth recording:
 The tests cover the registered word and the extension, the need for the cipher, the measurements of the
 decrypted header, the palette and grey colour types, the decrypted output with the file's own bytes recovered by
 putting it back through the cipher, three heads that are not graphics, and the entry name.
+
+## The places of the picture
+
+The reference stands `PngFormat.Read` over the decrypted stream, so this port reads the graphic with the walk of the
+portable network graphic of this project and hands the places of the picture over as a bitmap of its own: of the width,
+the height and the depth the head of the graphic names, of the rows in the order the head names and of the places the
+walk of the graphic yields. A graphic whose places run out before the places its head names, or whose places of a colour
+stand behind a kind the walk does not carry, stands turned away, which is where the reference throws.
