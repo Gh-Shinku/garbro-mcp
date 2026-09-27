@@ -13920,7 +13920,12 @@ export const formatSupportCatalog = {
 			localId: "mokopro-bmp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the walk of the places of the picture: the bitmap walk of this project over the unpacked surface",
+			],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
@@ -13940,11 +13945,7 @@ export const formatSupportCatalog = {
 				"LZSS decompression with space filled window",
 				"partial stream tolerance",
 			],
-			unsupported: [
-				"archive creation",
-				"compressed bitmap decoding",
-				"compressed audio decoding",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

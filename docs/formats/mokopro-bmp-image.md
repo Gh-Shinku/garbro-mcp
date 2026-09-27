@@ -21,9 +21,11 @@ bitmap of the engine, as it stands, and the head of the bitmap says what the pic
 
 ## Deviations from the reference
 
-- The reference reads the bitmap behind the container with its own bitmap reader and writes the picture out
-  again; the port hands out the bitmap the walk of runs gives, as it stands, since the format holds nothing
-  else. The head of that bitmap is read for the measurements of the entry.
+- `NNNNBmpFormat.Read` stands of `Bmp.Read` over the unpacked surface: the bitmap stands read of the bitmap walk of
+  this project — of the counts of its own head, of one, four, eight, sixteen, twenty four or thirty two places of a
+  colour to a pixel, and of the rows in the order its head names — and handed over as a bitmap of its own. A surface
+  the walk of this project cannot read stands turned away on extraction, which is where the reference would fail as
+  well, and the head of the bitmap is read for the measurements of the entry.
 - A file of fewer than eight bytes, a file whose word is not `NNNN`, a file whose size of the walk of runs
   stands below one or above what this project will hold, and a walk of runs that does not give a bitmap at all
   are turned away; the reference would throw while reading the head of the container or the head of the

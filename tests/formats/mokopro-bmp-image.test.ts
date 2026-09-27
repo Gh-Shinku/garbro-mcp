@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { mokoProBmpImageFormat } from "../../packages/formats/src/moko-pro/bmp-image.js";
@@ -14,9 +15,9 @@ function buildNnnn(stream: Buffer, unpackedSize: number): Buffer {
 	return Buffer.concat([header, encryptMoko(stream)]);
 }
 
-/** A bitmap of two places of width and two of height, one byte a place, with its rows padded. */
+/** A bitmap of two places of width and two of height, three places of a colour a place, with padded rows. */
 function bitmap(): Buffer {
-	const stride = 4;
+	const stride = 8;
 	const rows = 2;
 	const file = Buffer.alloc(54 + stride * rows, 0x00);
 	file.write("BM", 0, "latin1");
@@ -26,13 +27,18 @@ function bitmap(): Buffer {
 	file.writeInt32LE(2, 0x12);
 	file.writeInt32LE(2, 0x16);
 	file.writeUInt16LE(1, 0x1a);
-	file.writeUInt16LE(8, 0x1c);
+	file.writeUInt16LE(24, 0x1c);
 	file.writeUInt32LE(0, 0x1e);
 	file.writeUInt32LE(stride * rows, 0x22);
-	file[54] = 0x01;
-	file[55] = 0x02;
-	file[58] = 0x03;
-	file[59] = 0x04;
+	// The first row of the file stands of the last row of the picture.
+	const row0 = [0x11, 0x12, 0x13, 0x21, 0x22, 0x23];
+	const row1 = [0x31, 0x32, 0x33, 0x41, 0x42, 0x43];
+	row0.forEach((byte, at) => {
+		file[54 + at] = byte;
+	});
+	row1.forEach((byte, at) => {
+		file[54 + stride + at] = byte;
+	});
 	return file;
 }
 
@@ -61,10 +67,21 @@ describe("Mokopro compressed bitmap", () => {
 			packedSize: BigInt(data.length),
 			compressed: true,
 			encrypted: true,
-			metadata: { type: "image", width: 2, height: 2, bitsPerPixel: 8 },
+			metadata: { type: "image", width: 2, height: 2, bitsPerPixel: 24 },
 		});
-		expect(handle.metadata).toEqual({ image: "bmp", bitsPerPixel: 8 });
-		expect((await extract(data)).equals(bmp)).toBe(true);
+		expect(handle.metadata).toEqual({ image: "bmp", bitsPerPixel: 24 });
+		// The places of the picture stand read and handed over again: an eight bit picture of four colours
+		// stands of a bitmap of grey, whose rows stand of the file in the order a bitmap of a whole count
+		// names.
+		const picture = readBmpImage(await extract(data));
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 24,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			0x31, 0x32, 0x33, 0x41, 0x42, 0x43, 0x11, 0x12, 0x13, 0x21, 0x22, 0x23,
+		]);
 	});
 
 	it("declines a payload that is not a bitmap", async () => {

@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import { readBmpMetaData } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -101,6 +102,14 @@ export const mokoProBmpImageFormat: ArchiveFormat = defineFixedArchive({
 	async openEntry(source: ByteSource) {
 		const picture = await readMokoBitmap(source);
 		if (!picture) throw invalidPicture("Not a Mokopro bitmap");
-		return Readable.from([picture.bmp]);
+		// `NNNNBmpFormat.Read` stands of `Bmp.Read` over the unpacked surface: the bitmap stands read of the
+		// bitmap walk of this project and handed over as a bitmap of its own.
+		const image = readBmpImage(picture.bmp);
+		if (!image) {
+			throw invalidPicture(
+				`Invalid Mokopro bitmap data: ${picture.bmp.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });
