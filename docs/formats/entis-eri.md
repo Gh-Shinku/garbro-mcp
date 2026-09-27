@@ -82,3 +82,11 @@ the engine of the picture itself (`EriFormat.ParseTagInfo`).
 
 - `GARbro/ArcFormats/Entis/ArcERI.cs` - `EriOpener.TryOpen`, `EriOpener.OpenImage`
 - `GARbro/ArcFormats/Entis/ImageERI.cs` - `EriFormat.ReadMetaData`, `EriFile.ReadSection`
+
+## The decoder of the pictures
+
+This port carries the walk of the engine of the Entis pictures itself (`packages/formats/src/entis/eri-reader.ts` with the
+Erisa contexts), so the frames of a picture stand read by it and handed over as a bitmap of this project. The record used
+to name an "entis image decoder" among the things it does not do, which stood of the early stages of this port and names
+nothing that is missing now: the walks of the frames, of the counts of a colour and of the picture in front of the frame
+stand named among the things it does, and what it does not do is the two specific places the record still names.

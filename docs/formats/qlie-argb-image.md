@@ -75,3 +75,11 @@ format.
 - `packages/formats/src/qlie/argb-image.ts`
 - `packages/formats/src/shared/jpeg-image.ts`, `packages/formats/src/shared/jpeg.ts`
 - `packages/formats/src/shared/png-image.ts`
+
+## The two streams and their decoders
+
+The reference hands the stream of the jpeg and the stream of the graphic to the decoders of its platform; this port
+carries a walk of the jpeg (of the baseline sequential kinds) and the walk of the portable network graphic itself, and
+stands them over the two streams, joining the colours of the one with the brightness of the other. The record used to
+name "the platform decoders the reference hands both streams to" among the things it does not do, which names no gap of
+this port: what it does not carry is the kinds of jpeg the record names in its own item.

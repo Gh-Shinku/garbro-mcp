@@ -6357,7 +6357,6 @@ export const formatSupportCatalog = {
 			],
 			unsupported: [
 				"archive creation",
-				"entis image decoder",
 				"the counts of a colour of the picture (`Palette `) of the kinds of the places of the picture the image port holds no walk of (see `entis-eri-image`)",
 				"the frames of the picture beyond the count of the walk of the picture in front of them (the reference stands of the counts of the walk of the engine of the frames of its own)",
 			],
@@ -16530,7 +16529,6 @@ export const formatSupportCatalog = {
 			],
 			unsupported: [
 				"a JPEG of the four places a colour of the press, of twelve bits a sample or of arithmetic coding",
-				"the platform decoders the reference hands both streams to",
 				"archive creation",
 			],
 			remainingVerification: [
