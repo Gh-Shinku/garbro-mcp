@@ -4,6 +4,8 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
 import {
+	EXECUTABLE_EXTENSION_TYPE_MAP,
+	EXECUTABLE_RUNTIME_TYPE_MAP,
 	executableResourceId,
 	executableResourcesFormat,
 	wrapExecutableBitmap,
@@ -65,6 +67,24 @@ function executableWith(resources: { kind: number; data: Buffer }[]): Buffer {
 }
 
 describe("Windows executable resources", () => {
+	it("reads the two tables of names of the reference as they stand there", () => {
+		// Every kind of resource the reference holds a directory for and every extension it holds, read
+		// off `ArcEXE.cs` itself rather than retyped.
+		expect(EXECUTABLE_RUNTIME_TYPE_MAP).toEqual({
+			"#2": "RT_BITMAP",
+			"#10": "RT_RCDATA",
+			"#16": "RT_VERSION",
+		});
+		expect(EXECUTABLE_EXTENSION_TYPE_MAP).toEqual({
+			PNG: ".PNG",
+			WAVE: ".WAV",
+			MIDS: ".MID",
+			SCR: ".BIN",
+			"#2": ".BMP",
+			"#10": ".BIN",
+		});
+	});
+
 	it("reads the places of a resource of the engine", () => {
 		expect(executableResourceId("#2")).toBe("00002");
 		expect(executableResourceId("#1033")).toBe("01033");

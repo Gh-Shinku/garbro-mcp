@@ -38,16 +38,16 @@ import {
 const BASELINE_COMMIT = "b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0";
 
 /** `ExeOpener.RuntimeTypeMap`: the names of the kinds of resource that stand of a number. */
-const RUNTIME_TYPE_MAP: Record<string, string> = {
+export const EXECUTABLE_RUNTIME_TYPE_MAP: Record<string, string> = {
 	"#2": "RT_BITMAP",
 	"#10": "RT_RCDATA",
 	"#16": "RT_VERSION",
 };
 
 /** `ExeOpener.ExtensionTypeMap`: the extension of a file of every kind of resource. */
-const EXTENSION_TYPE_MAP: Record<string, string> = {
+export const EXECUTABLE_EXTENSION_TYPE_MAP: Record<string, string> = {
 	PNG: ".PNG",
-	WAVE: ".WAVE",
+	WAVE: ".WAV",
 	MIDS: ".MID",
 	SCR: ".BIN",
 	"#2": ".BMP",
@@ -148,11 +148,14 @@ export function executableResourceEntries(
 	const entries: FixedEntry[] = [];
 	for (const resource of resources) {
 		const type = resourceLabel(resource.type);
-		if (type.startsWith("#") && undefined === RUNTIME_TYPE_MAP[type]) {
+		if (
+			type.startsWith("#") &&
+			undefined === EXECUTABLE_RUNTIME_TYPE_MAP[type]
+		) {
 			continue;
 		}
-		const directory = RUNTIME_TYPE_MAP[type] ?? type;
-		const extension = EXTENSION_TYPE_MAP[type] ?? "";
+		const directory = EXECUTABLE_RUNTIME_TYPE_MAP[type] ?? type;
+		const extension = EXECUTABLE_EXTENSION_TYPE_MAP[type] ?? "";
 		const name = resourceLabel(resource.name);
 		const file = name.startsWith("#") ? executableResourceId(name) : name;
 		entries.push({
