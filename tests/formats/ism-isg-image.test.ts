@@ -1,7 +1,14 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { describe, expect, it } from "vitest";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
 import {
 	ismIsgImageFormat,
 	readIsgLayout,
@@ -62,6 +69,91 @@ async function extract(data: Buffer): Promise<Buffer> {
 	const entry = handle.entries[0];
 	if (!entry) throw new Error("no entry");
 	return consumeBuffer(await handle.openEntry(entry.id));
+}
+
+const temporaryDirectories: string[] = [];
+
+afterEach(async () => {
+	await Promise.all(
+		temporaryDirectories
+			.splice(0)
+			.map((path) => rm(path, { recursive: true, force: true })),
+	);
+});
+
+/** A directory of its own for a picture and the baseline picture beside it. */
+async function temporaryDirectory(): Promise<string> {
+	const directory = await mkdtemp(resolve(tmpdir(), "garbro-ism-test-"));
+	temporaryDirectories.push(directory);
+	return directory;
+}
+
+/**
+ * The simple way, of every pixel of the picture its own single byte and a control byte of nought behind
+ * every eight of them, which the engine writes as it goes.
+ */
+function runsBody(pixels: readonly number[]): Buffer {
+	const parts: number[] = [];
+	for (let at = 0; at < pixels.length; at += 8) {
+		parts.push(0x00);
+		for (let index = at; index < at + 8; index += 1)
+			parts.push(pixels[index] ?? 0);
+	}
+	return Buffer.from(parts);
+}
+
+/**
+ * A picture of the third way: the name of its baseline picture at 0x30, the count of overlay blocks and the
+ * length of the overlay stream behind it, the control bytes of the blocks, and that stream, which stands of
+ * literals alone here (a control byte of nought stands for eight bytes that stand as they are).
+ */
+function buildOverlay(options: {
+	width: number;
+	height: number;
+	baseName: string;
+	count: number;
+	control: Buffer;
+	blocks: Buffer;
+}): Buffer {
+	const stream = Buffer.concat([
+		...Array.from(
+			{ length: Math.ceil(options.blocks.length / 8) },
+			(_, index) =>
+				Buffer.concat([
+					Buffer.from([0x00]),
+					options.blocks.subarray(index * 8, index * 8 + 8),
+				]),
+		),
+	]);
+	const head = Buffer.alloc(DATA_START, 0x00);
+	head.write(MARK, 0, "latin1");
+	head[0x10] = TYPE_OVERLAY;
+	head[0x1d] = options.width & 0xff;
+	head[0x1e] = options.width >> 8;
+	head[0x1f] = options.height & 0xff;
+	head[0x20] = options.height >> 8;
+	head[0x23] = 4;
+	head.writeUInt32LE(stream.length, 0x11);
+	const counts = Buffer.alloc(8, 0x00);
+	counts.writeInt32LE(options.count, 0);
+	counts.writeInt32LE(stream.length, 4);
+	return Buffer.concat([
+		head,
+		Buffer.from(`${options.baseName}\u0000`, "latin1"),
+		counts,
+		options.control,
+		stream,
+	]);
+}
+
+/** The rows of a picture bottom up, the way the reference hands one over. */
+function flippedRows(pixels: readonly number[], width: number): number[] {
+	const out: number[] = [];
+	const height = Math.trunc(pixels.length / width);
+	for (let row = height - 1; row >= 0; row -= 1) {
+		out.push(...pixels.slice(row * width, row * width + width));
+	}
+	return out;
 }
 
 describe("ISM engine image format", () => {
@@ -150,19 +242,131 @@ describe("ISM engine image format", () => {
 		expect([...(image?.pixels ?? [])]).toEqual([9, 10, 11, 12, 9, 10, 11, 12]);
 	});
 
-	it("turns away the way that stands on a baseline picture of its own name", async () => {
-		const body = Buffer.from([0x00]);
-		const data = buildIsg({
-			width: 4,
-			height: 1,
-			type: TYPE_OVERLAY,
-			colours: 4,
-			packed: body.length,
-			body,
-		});
-		await expect(
-			ismIsgImageFormat.open(new BufferByteSource(data), "picture.isg"),
-		).rejects.toThrow(GarbroError);
+	it("reads a picture that stands over a baseline picture of a name it carries beside it", async () => {
+		// Sixteen by eight pixels, of which two blocks of four by four stand written over: the first block of
+		// the walk from the overlay data's own first bytes, and the sixth from the bytes behind those.
+		const width = 16;
+		const height = 8;
+		const base = Array.from({ length: width * height }, () => 1);
+		const blocks = Buffer.from([
+			...Array.from({ length: 4 }, () => [0, 1, 2, 3]).flat(),
+			...Array.from({ length: 4 }, () => [3, 2, 1, 0]).flat(),
+		]);
+		const directory = await temporaryDirectory();
+		const basePath = resolve(directory, "baseline.isg");
+		await writeFile(
+			basePath,
+			buildIsg({
+				width,
+				height,
+				type: TYPE_RUNS,
+				colours: 4,
+				packed: runsBody(base).length,
+				body: runsBody(base),
+			}),
+		);
+		const overlayPath = resolve(directory, "overlay.isg");
+		await writeFile(
+			overlayPath,
+			buildOverlay({
+				width,
+				height,
+				baseName: "baseline.isg",
+				count: 1,
+				// One control byte, one bit to a block: the first and the sixth block stand written over.
+				control: Buffer.from([0x21]),
+				blocks,
+			}),
+		);
+		const handle = await ismIsgImageFormat.open(
+			await FileByteSource.open(overlayPath),
+			overlayPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		expect(image).toMatchObject({ width, height, bitsPerPixel: 8 });
+		const expected = [...base];
+		for (let row = 0; row < 4; row += 1) {
+			for (let column = 0; column < 4; column += 1) {
+				expected[row * width + column] = blocks[row * 4 + column] ?? 0;
+				expected[(row + 4) * width + column + 4] =
+					blocks[16 + row * 4 + column] ?? 0;
+			}
+		}
+		expect([...(image?.pixels ?? [])]).toEqual(flippedRows(expected, width));
+		// The palette of the picture stands of the baseline picture as well.
+		expect([...(image?.palette ?? [])].slice(0, 16)).toEqual([
+			0, 0, 0, 255, 1, 2, 3, 255, 2, 4, 6, 255, 3, 6, 9, 255,
+		]);
+	});
+
+	it("reads a baseline picture the name of which stands longer than the twelve bytes the reference falls back to", async () => {
+		const width = 16;
+		const height = 8;
+		const base = Array.from({ length: width * height }, () => 2);
+		const directory = await temporaryDirectory();
+		// The name the picture carries stands nowhere; its first twelve bytes name the file beside it.
+		await writeFile(
+			resolve(directory, "baseline.isg"),
+			buildIsg({
+				width,
+				height,
+				type: TYPE_RUNS,
+				colours: 4,
+				packed: runsBody(base).length,
+				body: runsBody(base),
+			}),
+		);
+		const overlayPath = resolve(directory, "overlay.isg");
+		await writeFile(
+			overlayPath,
+			buildOverlay({
+				width,
+				height,
+				baseName: "baseline.isgxy",
+				count: 1,
+				control: Buffer.from([0x00]),
+				blocks: Buffer.alloc(0, 0x00),
+			}),
+		);
+		const handle = await ismIsgImageFormat.open(
+			await FileByteSource.open(overlayPath),
+			overlayPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const image = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		expect([...(image?.pixels ?? [])]).toEqual(flippedRows(base, width));
+	});
+
+	it("turns away a picture whose baseline picture stands nowhere beside it", async () => {
+		const directory = await temporaryDirectory();
+		const overlayPath = resolve(directory, "overlay.isg");
+		await writeFile(
+			overlayPath,
+			buildOverlay({
+				width: 16,
+				height: 8,
+				baseName: "nowhere.isg",
+				count: 1,
+				control: Buffer.from([0x00]),
+				blocks: Buffer.alloc(0, 0x00),
+			}),
+		);
+		const handle = await ismIsgImageFormat.open(
+			await FileByteSource.open(overlayPath),
+			overlayPath,
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		await expect(handle.openEntry(entry.id)).rejects.toThrow(
+			/baseline picture/,
+		);
 	});
 
 	it("turns away a file that is not a picture of this engine", () => {

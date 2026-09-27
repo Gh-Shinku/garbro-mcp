@@ -9548,6 +9548,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the overlay way: blocks of four by four pixels written over a baseline picture read from a file the overlay names beside it",
 				"detect",
 				"list",
 				"extract",
@@ -9556,13 +9557,9 @@ export const formatSupportCatalog = {
 				"the simple way: its control word read from the low bit up, eight decisions to a byte",
 				"a picture extracted through its own palette with its bottom-up rows kept",
 			],
-			unsupported: [
-				"create",
-				"the overlay way (0x34), which stands over a baseline picture read from a file the overlay names beside it",
-			],
+			unsupported: ["create"],
 			remainingVerification: [
 				"real-game GARbro differential output",
-				"the overlay way and its baseline pictures",
 				"the frame's own wrap, which only a hand built stream reaches here",
 			],
 		},

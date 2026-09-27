@@ -1,8 +1,12 @@
 // Format reference: GARBro "ArcFormats/Ism/ImageISG.cs", classes `IsgFormat` and the `Reader` behind it.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 //
-// Two of the three ways this engine packs a picture stand on the file itself. The third stands on a
-// **baseline picture read from a file of its own name** beside it, so it is left out of this port.
+// Two of the three ways this engine packs a picture stand on the file itself: a run length walk and an LZSS
+// walk, both over a palette of one byte a pixel. The third stands on a **baseline picture of a name the file
+// carries**, read from a file beside it, over which it writes blocks of four by four pixels. The reference
+// resolves that name through its own file system, across whatever archives stand mounted; this port reads it
+// beside the file it was asked from, and follows a baseline that is itself of the third way down to the same
+// count of pictures the reference stops at.
 
 import { GarbroError } from "@garbro-mcp/core";
 import type {
@@ -10,9 +14,10 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
+import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { writeBmp8Palette } from "../shared/bmp.js";
-import { changeExtension } from "../shared/companion.js";
+import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -50,6 +55,20 @@ const RUNS_BIT = 1;
 const RUNS_BIT_MARK = 0x100;
 /** A picture this project is willing to hold. */
 const LIMIT = 256 * 1024 * 1024;
+/** Where the name of the baseline picture of the third way begins, and how many bytes it may stand of. */
+const BASE_NAME_AT = 0x30;
+const BASE_NAME_SIZE = 0x10;
+/** The reference reads a name that stands nowhere again of its first twelve bytes. */
+const BASE_NAME_FALLBACK = 12;
+/** How deep a picture of the third way may stand over another before the reference gives up. */
+const RECURSION_LIMIT = 32;
+/** A block of the third way stands of four pixels of four rows. */
+const BLOCK_PIXELS = 4;
+/** The control bytes of the third way stand of one bit to a block of a hundred and twenty eight pixels. */
+const CONTROL_PIXELS = 128;
+/** The room the reference keeps for the overlay data: two blocks of the walk of the engine to a count. */
+const OVERLAY_ROOM = 32;
+const OVERLAY_SLACK = 8;
 
 export interface IsgLayout {
 	type: number;
@@ -216,6 +235,84 @@ export function unpackIsgRuns(
 	return at;
 }
 
+/**
+ * `Reader.Unpack34`: the name of the baseline picture the file carries, and the place behind it. The
+ * reference reads a name of at most sixteen bytes, ended by nought.
+ */
+export function readIsgBaseName(
+	data: Buffer,
+): { name: string; at: number } | undefined {
+	const end = Math.min(data.length, BASE_NAME_AT + BASE_NAME_SIZE);
+	let at = BASE_NAME_AT;
+	while (at < end && 0x00 !== data[at]) at += 1;
+	if (at >= end) return undefined;
+	const name = data.toString("latin1", BASE_NAME_AT, at);
+	if (0 === name.length) return undefined;
+	return { name, at: at + 1 };
+}
+
+/**
+ * `Reader.Unpack34`: the overlay blocks written over the pixels of the baseline picture. The walk stands of
+ * four by four pixels, of one bit of a control byte to a block, and the bytes of the blocks that stand read
+ * come one after another out of the unpacked overlay data.
+ */
+export function unpackIsgOverlay(
+	data: Buffer,
+	layout: IsgLayout,
+	base: Buffer,
+): Buffer {
+	const named = readIsgBaseName(data);
+	if (!named) throw invalid("The picture names no baseline picture");
+	const { width, height } = layout;
+	if (named.at + 8 > data.length) {
+		throw invalid("The picture stands short of its own counts");
+	}
+	const count = data.readInt32LE(named.at);
+	const packed = data.readInt32LE(named.at + 4);
+	const controls = Math.trunc((width * height) / CONTROL_PIXELS);
+	let at = named.at + 8;
+	if (controls < 0 || at + controls > data.length) {
+		throw invalid("The control bytes of the picture reach past the file");
+	}
+	const control = data.subarray(at, at + controls);
+	at += controls;
+	if (count < 0 || count * OVERLAY_ROOM + OVERLAY_SLACK > LIMIT) {
+		throw invalid(
+			"The picture declares a count of overlay blocks this project will not hold",
+		);
+	}
+	const overlay = Buffer.alloc(count * OVERLAY_ROOM + OVERLAY_SLACK, 0x00);
+	unpackIsgLzss(data, at, packed, overlay);
+	const pixels = Buffer.from(base);
+	let bit = 0;
+	let controlAt = 0;
+	let dataAt = 0;
+	for (let y = 0; y < height; y += BLOCK_PIXELS) {
+		for (let x = 0; x < width; x += BLOCK_PIXELS) {
+			if (0 !== ((1 << bit) & (control[controlAt] ?? 0))) {
+				let dst = y * width + x;
+				for (let row = 0; row < BLOCK_PIXELS; row += 1) {
+					for (let column = 0; column < BLOCK_PIXELS; column += 1) {
+						// The reference writes into the array of the baseline picture without a count of its own;
+						// a block that reaches past that array stands left out here.
+						if (dst + column < pixels.length) {
+							pixels[dst + column] = overlay[dataAt + column] ?? 0;
+						}
+					}
+					dataAt += BLOCK_PIXELS;
+					dst += width;
+				}
+			}
+			bit += 1;
+			if (8 === bit) {
+				bit = 0;
+				controlAt += 1;
+			}
+		}
+	}
+	return pixels;
+}
+
 /** `Reader.Unpack`: the palette the picture reads through, and the run of its own bytes behind it. */
 export function unpackIsgPicture(
 	data: Buffer,
@@ -223,8 +320,8 @@ export function unpackIsgPicture(
 ): { pixels: Buffer; palette: Buffer } {
 	if (TYPE_OVERLAY === layout.type) {
 		throw new GarbroError(
-			"UNSUPPORTED_FEATURE",
-			"The picture stands over a baseline picture of its own name beside it, which this port does not read",
+			"INVALID_ARCHIVE",
+			"A picture of this way stands over a baseline picture, which stands read of the file itself",
 		);
 	}
 	if (TYPE_LZSS !== layout.type && TYPE_RUNS !== layout.type) {
@@ -247,6 +344,58 @@ export function unpackIsgPicture(
 
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
+}
+
+/**
+ * `IsgFormat.Read`, of the third way as well: a picture that stands over a baseline picture read from a file
+ * of the name it carries beside itself. A baseline that is itself of the third way stands read the same way,
+ * of the count of pictures the reference stops at.
+ */
+async function readIsgPicture(
+	data: Buffer,
+	layout: IsgLayout,
+	sourcePath: string,
+	depth: number,
+): Promise<{ pixels: Buffer; palette: Buffer }> {
+	if (TYPE_OVERLAY !== layout.type) return unpackIsgPicture(data, layout);
+	if (depth >= RECURSION_LIMIT) {
+		throw invalid(
+			"The baseline pictures of this file stand deeper than the count of the reference",
+		);
+	}
+	const named = readIsgBaseName(data);
+	if (!named) throw invalid("The picture names no baseline picture");
+	let baseName = named.name;
+	let base = await readCompanionFile(sourcePath, baseName);
+	if (!base && baseName.length > BASE_NAME_FALLBACK) {
+		baseName = baseName.slice(0, BASE_NAME_FALLBACK);
+		base = await readCompanionFile(sourcePath, baseName);
+	}
+	if (!base) {
+		throw invalid(
+			`The baseline picture ${named.name} stands nowhere beside the file`,
+		);
+	}
+	const baseLayout = readIsgLayout(base);
+	if (
+		!baseLayout ||
+		baseLayout.width !== layout.width ||
+		baseLayout.height !== layout.height
+	) {
+		throw invalid(
+			"The baseline picture stands of no count of the picture itself",
+		);
+	}
+	const picture = await readIsgPicture(
+		base,
+		baseLayout,
+		resolve(dirname(sourcePath), baseName),
+		depth + 1,
+	);
+	return {
+		pixels: unpackIsgOverlay(data, layout, picture.pixels),
+		palette: picture.palette,
+	};
 }
 
 export const ismIsgImageDescriptor: FormatDescriptor = {
@@ -282,12 +431,14 @@ export const ismIsgImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) throw invalid("Not an ISM engine picture");
 		// A way this port cannot unpack is refused here rather than at the entry, so it never lists a
 		// picture whose bytes it cannot hand over.
-		if (TYPE_LZSS !== layout.type && TYPE_RUNS !== layout.type) {
+		if (
+			TYPE_LZSS !== layout.type &&
+			TYPE_RUNS !== layout.type &&
+			TYPE_OVERLAY !== layout.type
+		) {
 			throw new GarbroError(
 				"UNSUPPORTED_FEATURE",
-				TYPE_OVERLAY === layout.type
-					? "The picture stands over a baseline picture of its own name beside it, which this port does not read"
-					: `The ISM engine's picture of type 0x${layout.type.toString(16)} is not ported`,
+				`The ISM engine's picture of type 0x${layout.type.toString(16)} is not ported`,
 			);
 		}
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
@@ -319,11 +470,17 @@ export const ismIsgImageFormat: ArchiveFormat = defineFixedArchive({
 			},
 		};
 	},
-	async openEntry(source: ByteSource) {
+	async openEntry(source: ByteSource, entry: FixedEntry, sourcePath: string) {
 		const stored = await readStored(source);
 		const layout = readIsgLayout(stored);
 		if (!layout) throw invalid("Not an ISM engine picture");
-		const { pixels, palette } = unpackIsgPicture(stored, layout);
+		void entry;
+		const { pixels, palette } = await readIsgPicture(
+			stored,
+			layout,
+			sourcePath,
+			0,
+		);
 		// The reference hands the picture over flipped, so its rows are kept bottom up.
 		return Readable.from([
 			writeBmp8Palette(layout.width, layout.height, pixels, palette, true),

@@ -20,15 +20,20 @@ always **one byte a pixel** through a palette of its own, and the run of its byt
 * **the simple way** (0x10) reads its control word from its **low** bit up, eight decisions to a byte. A set
   bit stands for two bytes: one that stands as it is, and a length behind it, which fills `2 + length` places
   with that byte. A clear bit stands for one byte on its own;
-* **the overlay way** (0x34) is **not** ported: it stands over a *baseline picture read from a file the
-  overlay names beside it*, which this project does not look for. A picture of that way is refused by name
+* **the overlay way** (0x34) stands over a *baseline picture read from a file the overlay names beside it*.
+  The port reads that name beside the file it was asked from and writes the overlay's blocks of four by four
+  pixels over the baseline picture's own pixels, of the baseline's palette; a baseline that is itself of that
+  way stands read the same way, down to the count of pictures the reference stops at. The reference resolves
+  the name through its own file system, across whatever archives stand mounted, where this port reads it from
+  the directory of the file alone. A picture whose baseline picture stands nowhere is refused by name
   when the file is read, so it never lists an entry whose bytes cannot be handed over.
 
 Together with the run, the picture keeps a **palette of three bytes a colour** in front of it, at 0x30.
 
 ## Deviations from the reference
 
-* The overlay way, and the baseline pictures it needs, are refused rather than read, as above.
+* The overlay way reads its baseline picture from the directory of the file it was asked from, of the name
+  the file carries (and, where that name stands nowhere, of its first twelve bytes, as the reference does).
 * The reference hands the picture over **flipped**; this port keeps the same bottom-up order by writing its
   rows from the bottom.
 * Every read is bounded to the file and to the size the head names, a picture of no size is refused, and a
@@ -44,8 +49,10 @@ four bytes that stand as they are and a copy that reads them back from the frame
 halves of the copy's encoding - the eleven bit place and the length above it - proved by what comes back; and
 the simple way is given two decisions, each filling two places with its own byte. The rest cover the head of
 both ways (including the number of colours, and the whole palette when the head names none), a picture of each
-way extracted through its own palette with its bottom-up rows checked, the overlay way refused, the refusals
+way extracted through its own palette with its bottom-up rows checked, an overlay picture read over a hand
+built baseline picture beside it (of its blocks, of the fallback of a name that stands nowhere and of a
+baseline picture that stands nowhere), the refusals
 of a wrong word and a head that stops short, and the word of the picture itself.
 
-What stands on the reference alone: the overlay way is never read here, no real picture is on hand to compare
+What stands on the reference alone: no real picture of this engine is on hand to compare
 against GARbro's output, and the frame's own wrap around its end is only reached by a hand built stream.
