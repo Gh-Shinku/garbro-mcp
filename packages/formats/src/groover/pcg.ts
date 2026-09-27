@@ -226,7 +226,7 @@ function unpackRcb(
  */
 async function readPcgPicture(data: Buffer, path: string): Promise<Buffer> {
 	if (data.subarray(0, 4).equals(NCMP_SIGNATURE)) {
-		const { width, height, unpackedSize } = readPcgHead(data, path);
+		const { width, height } = readPcgHead(data, path);
 		// `NcmpReader.Unpack` reads the places of the picture as they stand.
 		const pixels = data.subarray(
 			PCG_HEADER_SIZE,
