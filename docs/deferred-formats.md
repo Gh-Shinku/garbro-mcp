@@ -239,6 +239,38 @@ open archives that the shipped defaults already cover.
   `docs/formats/weapon-dat-archive.md`. The count of `274` that stood here was wrong: the lists hold 1071
   pictures over eight names.
 
+## How many rows stand unported, and of what kind
+
+At this writing the deliverable list holds **1129** rows: **1080** of them stand of a port of this project,
+and **49** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the
+kinds of reason are these, in the order of how many rows they hold:
+
+* **a key the file does not carry, of a table that ships empty** (about twenty rows): the readers of
+  `PKZ`, `PKG/2`, `ADS`, `PBZ`, `ARC/FOMA`, `CG/ACTGS` with `CG/ACTGS/2`, `PCK/TAMAMO`, `AIR`, `BIN/IDX`,
+  `ASSETS/UNITY`, `OGG/TINK`, `CRZ`, `DAT/RepiPack`, `AVC`, `ACV`, `DAT/MINATO`, `ARC/noncolor`, `DPK`,
+  `DXA`, `LIBP`, `NPK`, `YPF` and `PAK/MORNING`. The exact empty expression of every one of those tables
+  stands read off the reference in the entries above, and none of those readers holds a guess of its own of
+  the kind `ARC/AI5WIN` does.
+* **a table the reference does not ship at all** (four rows): `MBM` and `PACK/BONK` need a `*.lst` listing
+  that stands nowhere in the reference tree, `ALL/GIGA` needs a table of 2090 lines that also stands nowhere
+  in it, and `DAT/WEAPON` - which *did* stand here - was carried, its table standing in the source itself.
+* **a walk of the platform rather than of the file** (five rows): `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
+  and `BIN/DXLIB`, of which the last four are stubs in the reference that read nothing at all; `OPUS` and
+  `WEBP` stand of codecs of the platform too, but of **public** ones, so they stand of no key and are the
+  rows a from-spec codec could carry.
+* **something outside the file**: `DAT/IGS` (an SQLite database beside the archive), `DAT/hibiki` (a scheme
+  in a data file of the reference's own installation), `BYTES/UNITY` and `DAT/GX4LIB` (a .NET
+  `BinaryFormatter` graph, of the spec MS-NRBF; the graph of `BYTES/UNITY` is three fields wide, but no .NET
+  runtime stands in this project's reach to build a fixture for it).
+* **nothing at all to lay out** (five rows): `SCR`, `TXT`, `DAT/GENERIC` and `AMP/LEAF` are inert registry
+  entries of the reference (a signature of nought, `IsScript` false, no extensions or only a name), and
+  `PNG/ISM` stood here wrongly - **it stands ported now**, as `png-ism-image`.
+* **a walk this project does not carry, of a size worth a turn of its own** (two rows): `WAR`
+  (`ShiinaRio/ArcWARC.cs`, 543 lines, of a cipher of `WarcEncryption.cs`, 1314 lines) whose versions of 1.10
+  and behind stand of a scheme the reference itself holds (`EncryptionScheme.Warc110`), and `GAL/X` with
+  `GAL/X200` (of a shared reader of the XML head and of the layers of a picture). Neither stands of any key
+  a file does not carry, so both are the rows a turn should start from.
+
 ## The payload needs a decoder this project does not have
 
 The archive side is walkable, but every entry is a picture or a sound in a format the project reads no
