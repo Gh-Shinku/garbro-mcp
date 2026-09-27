@@ -22872,7 +22872,7 @@ export const formatSupportCatalog = {
 				"metadata",
 				"the places of the picture: the bitmap walk of this project over the embedded surface",
 			],
-			unsupported: ["archive creation", "image encoding", "image decoding"],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

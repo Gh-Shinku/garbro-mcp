@@ -125,6 +125,11 @@ describe("yellowcap ggf image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
+			// The places behind the picture stand of no count of the walk, so the picture stands of the same
+			// places as the one of a stream that ends with it.
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(built.bitmap)?.pixels);
 		} finally {
 			await archive.close();
 		}
