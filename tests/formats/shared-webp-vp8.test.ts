@@ -4,6 +4,7 @@ import {
 	readVp8FrameHeader,
 	readVp8PartitionHeader,
 	Vp8BooleanDecoder,
+	readVp8TokenPartitions,
 } from "../../packages/formats/src/shared/webp-vp8.js";
 import { DEFAULT_COEFFICIENT_PROBABILITIES } from "../../packages/formats/src/shared/webp-vp8-tables.js";
 import {
@@ -188,5 +189,57 @@ describe("the walk of the picture of the web of the colour of the places of the 
 		expect([...header.probabilities]).toEqual([
 			...DEFAULT_COEFFICIENT_PROBABILITIES,
 		]);
+	});
+
+	it("splits the token partitions of a picture with four of them", () => {
+		// A picture whose first partition stands of two places of the file, with a table of three sizes in little
+		// endian order (three, one and two places of the file) and the partitions themselves after the table. The
+		// last partition stands of no count of the head of the format of the places of the file and runs to the end
+		// of the token data.
+		const payload = Buffer.from([
+			0x00,
+			0x00, // the first partition
+			0x03,
+			0x00,
+			0x00, // the size of the first token partition, three places of the file
+			0x01,
+			0x00,
+			0x00, // the size of the second, one place of the file
+			0x02,
+			0x00,
+			0x00, // the size of the third, two places of the file
+			0x11,
+			0x12,
+			0x13,
+			0x21,
+			0x31,
+			0x32,
+			0x41,
+			0x42,
+			0x43,
+			0x44,
+		]);
+		const frame = { payload, firstPartSize: 2 } as unknown as Parameters<
+			typeof readVp8TokenPartitions
+		>[0];
+		expect(readVp8TokenPartitions(frame, 1).map((p) => [...p])).toEqual([
+			[...payload.subarray(2)],
+		]);
+		expect(readVp8TokenPartitions(frame, 4).map((p) => [...p])).toEqual([
+			[0x11, 0x12, 0x13],
+			[0x21],
+			[0x31, 0x32],
+			[0x41, 0x42, 0x43, 0x44],
+		]);
+	});
+
+	it("turns down token partitions whose counts of the head of the format stand beyond the picture", () => {
+		const frame = {
+			payload: Buffer.from([0, 0, 0]),
+			firstPartSize: 0,
+		} as unknown as Parameters<typeof readVp8TokenPartitions>[0];
+		expect(() => readVp8TokenPartitions(frame, 4)).toThrow(
+			/beyond the places of the file/,
+		);
 	});
 });

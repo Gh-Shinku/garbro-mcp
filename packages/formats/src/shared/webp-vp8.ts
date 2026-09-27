@@ -112,6 +112,39 @@ export function readVp8FrameHeader(payload: Buffer): Vp8Frame {
 	};
 }
 
+/** Splits the token data of a picture into its token partitions (`ParsePartitions` of libwebp).
+ *
+ * The first partition of a picture holds the macroblock headers and is exactly `firstPartSize` bytes long; the token
+ * data follows it. A picture with a single token partition keeps all of that data in one partition and stores no
+ * sizes. A picture with more than one token partition stores the sizes of the first `count - 1` of them as three byte
+ * values in little endian order, the partitions themselves follow that table, and the last partition runs to the end
+ * of the token data. A macroblock row takes the token data of the partition `mb_y & (count - 1)`. */
+export function readVp8TokenPartitions(
+	frame: Vp8Frame,
+	count: number,
+): Buffer[] {
+	const data = frame.payload.subarray(frame.firstPartSize);
+	if (count <= 1) return [data];
+	const stored = count - 1;
+	if (data.length < 3 * stored)
+		throw invalid(
+			"The counts of the head of the format of the places of the file of the picture of the format stand beyond the places of the file of the picture",
+		);
+	const partitions: Buffer[] = [];
+	let at = 3 * stored;
+	for (let index = 0; index < stored; index += 1) {
+		const size =
+			(data[3 * index] ?? 0) |
+			((data[3 * index + 1] ?? 0) << 8) |
+			((data[3 * index + 2] ?? 0) << 16);
+		const end = Math.min(at + size, data.length);
+		partitions.push(data.subarray(at, end));
+		at = end;
+	}
+	partitions.push(data.subarray(at));
+	return partitions;
+}
+
 /** The counts of the places of the file of the picture of the format of the picture of the web of the colour of the
  * places of the picture, of the counts of the head of the format of the picture of the places of the file of their own
  * (the walk of the counts of the head of the format of the picture of the two places of the file). The walk of this

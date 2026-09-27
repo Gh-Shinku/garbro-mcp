@@ -39,6 +39,7 @@ import {
 import {
 	readVp8FrameHeader,
 	readVp8PartitionHeader,
+	readVp8TokenPartitions,
 	Vp8BooleanDecoder,
 } from "./webp-vp8.js";
 
@@ -567,7 +568,7 @@ function predictColourMode(
  * `src/dsp/dec.c`, and the reconstruction of a macroblock row and the in-loop filter that follows it follow
  * `src/dec/frame_dec.c` (`ReconstructRow`, `FinishRow`, `DoFilter`).
  *
- * Only key frames are read, and only when the token data of the picture is not split into several partitions. */
+ * Only key frames are read. */
 export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	const frame = readVp8FrameHeader(payload);
 	if (!frame.keyFrame)
@@ -575,10 +576,10 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 			"The picture of the format of the web of the colour of the places of the picture stands of the counts of the head of the format of the picture of the format of the two places of the file of the picture of the format",
 		);
 	const header = readVp8PartitionHeader(frame.partition);
-	if (1 !== header.tokenPartitions)
-		throw unsupported(
-			"The picture of the format of the web of the colour of the places of the picture stands of counts of the head of the format of the picture of the places of the file of their own",
-		);
+	const tokenPartitions = readVp8TokenPartitions(frame, header.tokenPartitions);
+	const tokens = tokenPartitions.map(
+		(partition) => new Vp8BooleanDecoder(partition),
+	);
 	const quantisers = buildVp8Quantisers(header);
 	const mbWidth = Math.ceil(frame.width / 16);
 	const mbHeight = Math.ceil(frame.height / 16);
@@ -604,9 +605,6 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	const vOutput = new Uint8Array(vPlane.length);
 
 	const first = header.decoder;
-	const tokens = new Vp8BooleanDecoder(
-		frame.payload.subarray(frame.firstPartSize),
-	);
 	const state: Vp8MacroblockState = createVp8MacroblockState(mbWidth);
 	const strengths = buildVp8FilterStrengths(header);
 	for (let mbY = 0; mbY < mbHeight; mbY += 1) {
@@ -630,7 +628,7 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 			const mode = modes[mbX];
 			if (!mode) throw invalid("no counts of the head of the format");
 			const residuals: Vp8MacroblockCoefficients = readVp8MacroblockResiduals(
-				tokens,
+				tokens[mbY & (tokenPartitions.length - 1)] as Vp8BooleanDecoder,
 				state,
 				mbX,
 				mode,
