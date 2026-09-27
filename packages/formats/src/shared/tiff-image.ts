@@ -195,9 +195,14 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 	const height = one(TAG_HEIGHT);
 	if (width <= 0 || height <= 0)
 		throw invalidPicture("The picture names no places of its own");
-	if (1 !== one(TAG_PLANAR, 1))
+	const planar = one(TAG_PLANAR, 1);
+	if (1 !== planar && 2 !== planar)
+		throw invalidPicture(
+			"The picture names a count of the places of a colour of its own",
+		);
+	if (2 === planar && 8 !== (values(TAG_BITS)?.[0] ?? 1))
 		throw unsupportedPicture(
-			"A picture whose places of a colour stand apart stands of no walk of this project",
+			"A picture whose places of a colour stand apart of more than one place of the file a sample stands of no walk of this project",
 		);
 	if (1 !== one(TAG_PREDICTOR, 1) && 2 !== one(TAG_PREDICTOR, 1))
 		throw unsupportedPicture(
@@ -306,6 +311,9 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 			}
 		}
 	} else {
+		// A picture whose places of a colour stand apart holds as many counts of strips as it holds places of a colour,
+		// one count behind the other, and a strip of such a picture holds the places of one place of a colour alone.
+		const stripsPerPlane = Math.max(1, Math.ceil(height / rowsPerStrip));
 		let row = 0;
 		for (let strip = 0; strip < offsets.length; strip += 1) {
 			const at = offsets[strip] ?? 0;
@@ -317,6 +325,22 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 				compression,
 				rowBytes * rowsPerStrip,
 			);
+			if (2 === planar) {
+				const plane = Math.floor(strip / stripsPerPlane);
+				const inPlane = strip % stripsPerPlane;
+				const from = inPlane * rowsPerStrip;
+				const held = Math.min(rowsPerStrip, height - from);
+				if (plane >= samples)
+					throw invalidPicture(
+						"The strips of the picture stand beyond its places of a colour",
+					);
+				for (let index = 0; index < held; index += 1) {
+					for (let x = 0; x < width; x += 1)
+						stored[(from + index) * rowBytes + x * samples + plane] =
+							plain[index * width + x] ?? 0;
+				}
+				continue;
+			}
 			const rows = Math.min(rowsPerStrip, height - row);
 			for (let index = 0; index < rows; index += 1) {
 				const from = index * rowBytes;

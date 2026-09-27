@@ -236,3 +236,17 @@ export const JPEG_TIFF_PLACES: readonly number[] = [
 	43, 72, 77, 50, 76, 75, 55, 80, 77, 63, 85, 77, 70, 90, 76, 77, 97, 76, 84,
 	102, 77, 91, 105, 77, 97, 110, 77, 104,
 ];
+
+/** Four by three places of a colour whose places of a colour stand apart, one count of strips for every place of a
+ * colour. The file was built by this project and the python imaging library reads it back through libtiff, which
+ * stands as an oracle of another implementation for it. */
+export const PLANAR_TIFF = Buffer.from(
+	"SUkqAAgAAAAKAAABBAABAAAABAAAAAEBBAABAAAAAwAAAAIBAwADAAAAhgAAAAMBAwABAAAAAQAAAAYBAwABAAAAAgAAABEBBAADAAAAjAAAABUBAwABAAAAAwAAABYBBAABAAAAAwAAABcBBAADAAAAmAAAABwBAwABAAAAAgAAAAAAAAAIAAgACACkAAAAsAAAALwAAAAMAAAADAAAAAwAAAAAKFB4By9Xfw42XoYABQoPPEFGS3h9gocAHjxaAyE/XQYkQmA=",
+	"base64",
+);
+
+/** The places of PLANAR_TIFF, blue first, of the four places a bitmap reads. */
+export const PLANAR_TIFF_PLACES: readonly number[] = [
+	0, 0, 0, 30, 5, 40, 60, 10, 80, 90, 15, 120, 3, 60, 7, 33, 65, 47, 63, 70, 87,
+	93, 75, 127, 6, 120, 14, 36, 125, 54, 66, 130, 94, 96, 135, 134,
+];

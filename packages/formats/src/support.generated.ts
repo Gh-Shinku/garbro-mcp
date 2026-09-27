@@ -8025,10 +8025,10 @@ export const formatSupportCatalog = {
 				"the strips of the walk of the counts of twelve places of the file (LZW), of the kind of the early count of that walk that this format names",
 				"the places of a picture that stand in tiles of their own, of the right and the lower tile clipped where the picture ends",
 				"the places of a picture whose strip holds one whole stream of the walk of the jpeg, of the kind whose tables stand in the stream itself",
+				"the places of a picture whose places of a colour stand apart, of one place of the file a sample, one count of strips for every place of a colour",
 			],
 			unsupported: [
 				"archive creation: the reference writes such a file on its platform and this port reads them alone",
-				"the places of a picture whose places of a colour stand apart",
 				"the kinds of the fax family and the walk of the jpeg of the two thousand, and the stream of the walk of the jpeg of the old kind whose tables stand apart",
 				"the kinds of the places of a colour and of the counts of the samples of it beyond the ones this walk reads",
 			],

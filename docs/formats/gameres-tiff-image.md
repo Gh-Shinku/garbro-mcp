@@ -84,3 +84,13 @@ library of the python imaging library writes — stands turned away with a messa
 of the reference fails as well. The fixture of that walk (`JPEG_TIFF`) was built by this project and read back by the
 python imaging library through libtiff, and the places of the stream of it stand as the oracle of the walk of the jpeg of
 that library.
+
+## The places of a colour that stand apart
+
+A picture whose count of the places of a colour stands apart (`PlanarConfiguration` of two) holds as many counts of
+strips as it holds places of a colour, one count behind the other, and a strip of such a picture holds the places of one
+place of a colour alone; the walk of this project stands those places into the places of the picture, one place of a
+colour behind the other, of one place of the file a sample. A picture of such a kind whose samples stand of more than one
+place of the file stands turned away, which the record names. The fixture of that walk (`PLANAR_TIFF`) was built by this
+project and read back by the python imaging library through libtiff, whose places stand as an oracle of another
+implementation for it.

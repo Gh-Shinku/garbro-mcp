@@ -15,6 +15,8 @@ import {
 	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
 	PALETTE_TIFF,
+	PLANAR_TIFF,
+	PLANAR_TIFF_PLACES,
 	PREDICTOR_TIFF,
 	PREDICTOR_TIFF_PLACES,
 	SIXTEEN_TIFF,
@@ -128,6 +130,14 @@ describe("the walk of the tagged image file", () => {
 			}
 		}
 		expect(worst).toBeLessThanOrEqual(8);
+	});
+
+	it("reads a picture whose places of a colour stand apart", async () => {
+		// One count of strips for every place of a colour, one count behind the other. The file of the fixture was
+		// built by this project and the python imaging library reads it back through libtiff.
+		const image = await readTiffImage(PLANAR_TIFF);
+		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual([...PLANAR_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {
