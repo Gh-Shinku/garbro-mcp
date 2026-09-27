@@ -160,6 +160,15 @@ describe("Bruns system encrypted image", () => {
 			metadata: { width: 4, height: 3, bitsPerPixel: 24 },
 		});
 		expect(handle.metadata).toEqual({ image: "png", bitsPerPixel: 24 });
+		// The places of the picture stand read of the walk of the graphic of this project.
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		const expected = await readPngImage(png);
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("declines a file that holds no picture this project reads", async () => {
