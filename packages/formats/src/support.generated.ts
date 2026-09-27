@@ -22317,6 +22317,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"bzip2 frame decoding",
 				"imagedate archives",
 				"complemented name decoding",
 				"frame name joining",
@@ -22325,11 +22326,7 @@ export const formatSupportCatalog = {
 				"stored frame passthrough",
 				"image type and rectangle metadata",
 			],
-			unsupported: [
-				"archive creation",
-				"bzip2 frame decoding",
-				"psd payload image decoding",
-			],
+			unsupported: ["archive creation", "psd payload image decoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

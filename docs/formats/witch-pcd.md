@@ -56,8 +56,8 @@ A frame shorter than 0x20 bytes is reported with the unknown format, which hands
 
 - The image decoder (`PsdFormatDecoder`) is out of scope, so entries are reported as images but their payloads
   are extracted rather than rendered.
-- bzip2 is not decoded; a frame of that kind fails extraction with an unsupported-feature error while its
-  declared size still shows up in the listing.
+- A bzip2 frame is decoded with the walk of `packages/codecs/src/bzip2.ts`, which the reference leaves to
+  `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream`.
 - The reference reads its index through its view without bounds checking; the port declines an index or a
   payload that leaves the file.
 - Archive creation stays out of scope.

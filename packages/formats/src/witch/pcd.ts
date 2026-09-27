@@ -7,7 +7,7 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import { inflateZlibBuffer } from "@garbro-mcp/codecs";
+import { decompressBzip2, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
 import {
 	createFixedEntry,
@@ -239,10 +239,9 @@ export const pcdImageFormat = defineFixedArchive({
 		if (formatId === FORMAT_ZLIB)
 			return Readable.from([inflateZlibBuffer(stored, Number(entry.size))]);
 		if (formatId === FORMAT_BZIP2)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"Witch PCD bzip2 payloads are not supported",
-			);
+			// The reference hands the places of a file of this shape over to `BZip2InputStream` of
+			// `ICSharpCode.SharpZipLib`; this port carries that walk itself (`@garbro-mcp/codecs`).
+			return Readable.from([decompressBzip2(stored)]);
 		return Readable.from([stored]);
 	},
 });

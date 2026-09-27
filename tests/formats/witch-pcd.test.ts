@@ -1,8 +1,15 @@
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { BufferByteSource } from "@garbro-mcp/core";
 import { pcdImageFormat } from "@garbro-mcp/formats";
 import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
+
+// The places of the file of the walk of bzip2 of the count of the places of the file below, and the places
+// of the file of it as they stand.
+const PLAIN_B64 =
+	"d2l0Y2ggcGF5bG9hZApBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWg==";
+const BZ2_B64 =
+	"QlpoOTFBWSZTWSFyo2MAAA9XgKAQQCAgAAAQLGTEoAAIIAAiE0aZDI2oU0yMTExFfTEQyhqd3Q576JoCgG7HxdyRThQkCFyo2MA=";
 
 const INDEX_OFFSET = 0xe;
 const RECTANGLE_SIZE = 0x18;
@@ -183,19 +190,23 @@ describe("Witch IMAGEDATE image archive", () => {
 		});
 	});
 
-	it("rejects a bzip2 frame at extraction", async () => {
-		const file = buildPcd([
-			{ name: "face/050", formatId: 2, body: Buffer.from("bzip body") },
-		]);
-		const archive = await pcdImageFormat.open(
-			new BufferByteSource(file),
-			"imagedate.bin",
-		);
-		const entry = archive.entries[0];
-		if (!entry) throw new Error("Missing entry");
-		await expect(archive.openEntry(entry.id)).rejects.toBeInstanceOf(
-			GarbroError,
-		);
+	it("reads a bzip2 frame", async () => {
+		// The places of the file of the walk of bzip2 as `bzip2` itself writes them, of a file of the places
+		// of the walk of the counts of them.
+		const body = Buffer.from(PLAIN_B64, "base64");
+		await expectArchive({
+			format: pcdImageFormat,
+			sourcePath: "imagedate.bin",
+			archive: buildPcd([
+				{
+					name: "face/050",
+					formatId: 2,
+					body: Buffer.from(BZ2_B64, "base64"),
+					unpackedSize: body.length,
+				},
+			]),
+			entries: [{ path: "face/050", size: body.length, content: body }],
+		});
 	});
 
 	it("rejects a foreign signature", async () => {
