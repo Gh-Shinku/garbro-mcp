@@ -37,8 +37,13 @@ A record with a zero size is skipped, and — unlike a plain walk — it does no
 following frames still consume their own sizes in order. Frame names use the record index rather than the entry count,
 so skipped records leave gaps: a single non-empty second record is named `<archive>#001`.
 
-Frames are typed as images and carry their geometry — position, size and thirty-two bit colour — as metadata. Decoding
-frame pixels belongs to the image layer and is out of scope here, so payloads are handed out as stored.
+Frames are typed as images and carry their geometry — position, size and thirty-two bit colour — as metadata. The
+payload of a frame is a **picture of its own** (a portable network graphic, a JPEG or a bitmap), which this port reads
+with its own walks, hands over as four places of a colour to a pixel, and then stands the covering place of every pixel
+off: where the covering place of a pixel stands of neither nought nor the whole, the three places of its colour stand of
+the places of the file of the picture taken against that covering place, which is what `PnaDecoder.ReadPixels` does. The
+counts of the head of the frame must stand of the counts of the picture itself, where the reference hands the places of
+the picture over of the counts of the frame.
 
 ## Support
 
@@ -51,9 +56,12 @@ frame pixels belongs to the image layer and is out of scope here, so payloads ar
 | Zero-size frame skipping without cursor advance | Supported |
 | Record-index based frame names | Supported |
 | Placement validation | Supported |
-| Raw frame extraction | Supported |
-| PNA pixel decoding (image layer) | Unsupported |
+| Frame picture decoding (portable network graphic, JPEG, bitmap) | Supported |
+| Covering place of a pixel stood of (un-premultiplied) | Supported |
+| PNA pixel decoding (image layer) | Supported |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover metadata and payload extraction, a skipped leading frame, an unsane frame count, an
-out-of-range frame and a truncated frame table.
+Synthetic fixtures cover the metadata of the listing, a skipped leading frame without a cursor advance, an unsane frame
+count, an out-of-range frame and a truncated frame table, and the walk of the pictures of the frames: a picture of four
+places of a colour whose covering places stand on their own, one whose covering place stands of the whole, one whose
+covering place stands of nought, a picture of three places of a colour, and a payload that stands of no picture.

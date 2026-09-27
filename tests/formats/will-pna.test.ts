@@ -1,7 +1,10 @@
+import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
+import { buffer as consumeBuffer } from "node:stream/consumers";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
 import { willPnaFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
-import { expectArchive } from "../helpers/archive.js";
 
 const INDEX_START = 0x14;
 const RECORD_SIZE = 0x28;
@@ -34,6 +37,34 @@ function buildPna(frames: readonly Frame[]): Buffer {
 		}
 	}
 	return Buffer.concat([header, index, ...payloads]);
+}
+
+/** The places of the file of a frame of a picture of its own, of the counts of the picture of it. */
+async function placesOfFrame(
+	archive: Buffer,
+	path: string,
+): Promise<{
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: number[];
+}> {
+	const handle = await willPnaFormat.open(
+		new BufferByteSource(archive),
+		"PNA.PNA",
+	);
+	const entry = handle.entries.find((item) => item.path === path);
+	if (!entry) throw new Error("no entry");
+	const image = readBmpImage(
+		await consumeBuffer(await handle.openEntry(entry.id)),
+	);
+	if (!image) throw new Error("no picture");
+	return {
+		width: image.width,
+		height: image.height,
+		bitsPerPixel: image.bitsPerPixel,
+		pixels: [...image.pixels],
+	};
 }
 
 describe("Pulltop PNA multi-frame archives", () => {
@@ -73,23 +104,69 @@ describe("Pulltop PNA multi-frame archives", () => {
 			{ width: 2, height: 2, content: first },
 			{ width: 3, height: 3, content: second },
 		]);
-		await expectArchive({
-			format: willPnaFormat,
-			archive,
-			sourcePath: "PNA.PNA",
-			entries: [
-				{
-					path: "PNA#001",
-					size: first.length,
-					content: first,
-				},
-				{
-					path: "PNA#002",
-					size: second.length,
-					content: second,
-				},
+		const handle = await willPnaFormat.open(
+			new BufferByteSource(archive),
+			"PNA.PNA",
+		);
+		expect(
+			handle.entries.map((entry) => ({ path: entry.path, size: entry.size })),
+		).toEqual([
+			{ path: "PNA#001", size: BigInt(first.length) },
+			{ path: "PNA#002", size: BigInt(second.length) },
+		]);
+	});
+
+	it("reads the picture of a frame, of the covering place of it taken off", async () => {
+		// A picture of four places of a colour, of the places of its colour taken over the covering place of
+		// the pixel: the reference stands of them the other way about, of a covering place of the whole or of
+		// nought standing of no count of its own.
+		const picture = pngFile({
+			width: 3,
+			height: 1,
+			colourType: 6,
+			rows: [[64, 128, 0, 128, 10, 20, 30, 255, 40, 50, 60, 0]],
+		});
+		const archive = buildPna([{ width: 3, height: 1, content: picture }]);
+		expect(await placesOfFrame(archive, "PNA#000")).toEqual({
+			width: 3,
+			height: 1,
+			bitsPerPixel: 32,
+			pixels: [
+				// 64 * 255 / 128 stands of 127, and the whole of them of 255.
+				0, 255, 127, 128, 30, 20, 10, 255, 60, 50, 40, 0,
 			],
 		});
+	});
+
+	it("reads the picture of a frame of three places of a colour, of the whole of the places of it", async () => {
+		const picture = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 2,
+			rows: [[10, 20, 30, 40, 50, 60]],
+		});
+		const archive = buildPna([{ width: 2, height: 1, content: picture }]);
+		expect(await placesOfFrame(archive, "PNA#000")).toEqual({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 32,
+			pixels: [30, 20, 10, 255, 60, 50, 40, 255],
+		});
+	});
+
+	it("turns away a frame that stands of no picture this project reads", async () => {
+		const archive = buildPna([
+			{ width: 1, height: 1, content: Buffer.from("no picture at all") },
+		]);
+		const handle = await willPnaFormat.open(
+			new BufferByteSource(archive),
+			"PNA.PNA",
+		);
+		const entry = handle.entries[0];
+		if (!entry) throw new Error("no entry");
+		await expect(handle.openEntry(entry.id)).rejects.toThrow(
+			/no picture this project reads/,
+		);
 	});
 
 	it("rejects an unsane frame count", async () => {

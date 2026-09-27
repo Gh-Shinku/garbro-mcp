@@ -22054,6 +22054,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the picture of a frame: the walks of the pictures of this project, and the covering place of a pixel stood of",
 				"PNAP signature",
 				"frame count at 0x10",
 				"0x28 byte frame table from 0x14",
@@ -22061,9 +22062,8 @@ export const formatSupportCatalog = {
 				"zero-size frames skipped without advancing the payload cursor",
 				"record-index based frame names",
 				"placement validation",
-				"raw frame extraction",
 			],
-			unsupported: ["archive creation", "PNA pixel decoding (image layer)"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
