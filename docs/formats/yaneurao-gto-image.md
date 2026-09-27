@@ -32,7 +32,8 @@ trusting the marker alone.
 Everything else comes from the bitmap: the width, the height and the depth of its DIB header, in the same way the
 Regrips readers work (see `regrips-prg-image.md` and `regrips-brg-image.md`, which likewise decode and pass the
 result through). Only the header is read during detection, so a bitmap that is cut short still detects, still
-lists, and is handed over as truncated as it was found.
+lists, and the places of the picture stand read of the bitmap walk of this project and handed over as a
+bitmap of its own, where the reference stands of `Bmp.Read`.
 
 This port's screenshot is the same one the shared bitmap reader gives every format: a header whose own size word is
 zero, or a DIB header older than forty bytes, is refused here while the reference tolerates it.

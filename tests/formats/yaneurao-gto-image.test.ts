@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { yaneuraoGtoImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const FILTER_KEY = 0x0c;
 
@@ -120,39 +121,56 @@ describe("Yaneurao obfuscated bitmap", () => {
 		}
 	});
 
-	it("hands the decoded bitmap over whole", async () => {
+	it("reads the places of the picture the key stands behind", async () => {
 		const file = buildGto({ width: 3, height: 2 });
-		const output = await extract(file);
-		// The port passes the decoded original through, so header, sizes and padding all survive.
-		expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
-		expect(output.length).toBe(file.length);
-		expect(output).toEqual(buildBmp({ width: 3, height: 2 }));
+		const picture = readBmpImage(await extract(file));
+		expect(picture).toMatchObject({
+			width: 3,
+			height: 2,
+			bitsPerPixel: 24,
+		});
+		// A row of three pixels of three places of a colour stands of nine places of the file where the row of
+		// a bitmap stands of twelve, so the padding of the file stands of no count of the picture.
+		const bmp = buildBmp({ width: 3, height: 2 });
+		const expected: number[] = [];
+		for (let row = 0; row < 2; row += 1) {
+			for (let at = 0; at < 9; at += 1)
+				expected.push(bmp[54 + row * 12 + at] ?? 0);
+		}
+		expect([...(picture?.pixels ?? [])]).toEqual(expected);
 	});
 
 	it("adds its key back at both ends of the byte range", async () => {
 		// The body alternates between the two extremes, so a key added back the wrong way would show.
-		const output = await extract(buildGto({ width: 2, height: 1 }));
-		expect(output.subarray(54, 62)).toEqual(
-			buildBmp({ width: 2, height: 1 }).subarray(54, 62),
+		const picture = readBmpImage(
+			await extract(buildGto({ width: 2, height: 1 })),
 		);
+		const bmp = buildBmp({ width: 2, height: 1 });
+		expect([...(picture?.pixels ?? [])]).toEqual([...bmp.subarray(54, 60)]);
 	});
 
 	it("reads a thirty two bit bitmap", async () => {
-		const output = await extract(buildGto({ width: 2, height: 1, bits: 32 }));
-		expect(output.readUInt16LE(28)).toBe(32);
-		expect(output.length).toBe(
-			buildBmp({ width: 2, height: 1, bits: 32 }).length,
+		const picture = readBmpImage(
+			await extract(buildGto({ width: 2, height: 1, bits: 32 })),
 		);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 32,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			...buildBmp({ width: 2, height: 1, bits: 32 }).subarray(54, 62),
+		]);
 	});
 
-	it("accepts a file that ends inside the bitmap", async () => {
+	it("turns a picture that ends inside its places away", async () => {
 		const file = buildGto({ width: 4, height: 4, truncate: 10 });
-		// The header is all it reads, so a short file still detects and still lists.
+		// The header is all the walk of the file reads, so a short file still detects and still lists, and the
+		// walk of the places of the picture stands turned away, which is where the reference throws.
 		expect(await yaneuraoGtoImageFormat.detect(sourceOf(file), "A.gto")).toBe(
 			true,
 		);
-		const output = await extract(file);
-		expect(output.length).toBe(file.length);
+		await expect(extract(file)).rejects.toThrow();
 	});
 
 	it("refuses a file whose header does not read back as a bitmap", async () => {
