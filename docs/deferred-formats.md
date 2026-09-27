@@ -256,9 +256,19 @@ of reason are these, to the row:
   that stands nowhere in the reference tree. `DAT/WEAPON` and `ALL/GIGA`, which stood here for the same
   reason, **are** ported: their tables stand in the source itself.
 * **a walk of the platform rather than of the file** - **10 rows**: `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
-  and `BIN/DXLIB`, of which the last four are stubs of the reference that read nothing at all; and of the
-  three whose walk stands of a **public** codec or container the reference leaves to its platform - `OPUS`,
-  `WEBP` and `TIFF` - which stand of no key at all and are the rows a from-spec walk could carry.
+  and `BIN/DXLIB`, of which the last four are stubs of the reference that read nothing at all (`EMS` and
+  `WBC` do not even compile: `EmsacDecoder.Decode` reads `m_buffer` and `m_lappedSubband`, neither of which
+  the class holds); and of the three whose walk stands of a **public** codec or container the reference
+  leaves to its platform - `OPUS`, `WEBP` and `TIFF` - which stand of no key at all and are the rows a
+  from-spec walk could carry.
+* **a codec outside the rows as well** - **bzip2**, which four readers of the reference stand of and none of
+  them walks: `ArcFormats/NScripter/ArcNSA.cs` (the kind `4` and the name `nbz`), `ArcFormats/Tamamo/ArcPCK.cs`,
+  `Legacy/Uran/ArcNCL.cs` and `Legacy/Witch/ArcPCD.cs` all hand their streams to
+  `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream`, a library rather than a walk of the reference. A port
+  would have to stand of the format documentation instead (of which there is none official; the readable
+  description of the wire format stands with `google/wuffs`, `std/bzip2`, which speaks of an `EOB` symbol
+  where the wire format itself holds `RUNA` and `RUNB` alone: the end of the sequence of the symbols of a
+  block is the one detail a from-spec walk has to settle first).
 * **something outside the file** - **4 rows**: `DAT/IGS` (an SQLite database beside the archive),
   `DAT/hibiki` (a scheme in a data file of the reference's own installation), and `BYTES/UNITY` with
   `DAT/GX4LIB` (a .NET `BinaryFormatter` graph, of the spec MS-NRBF; the graph of `BYTES/UNITY` is three

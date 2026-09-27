@@ -14926,7 +14926,7 @@
 			],
 			"unsupported": [
 				"archive creation",
-				"the walk of bzip2 of a file of the kind `4` or of the name `nbz`, which this project carries no walk of at all",
+				"the walk of bzip2 of a file of the kind `4` or of the name `nbz`: the reference reads those places through `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream` rather than through a walk of its own, and this project carries no walk of that format at all",
 				"the places of a file of the engine packed with a password (`EncryptedViewStream`), which the reference reads out of the settings of the user alone",
 				"the kinds of the names of the files of the engine other than a sound of the name `nbz`"
 			],
