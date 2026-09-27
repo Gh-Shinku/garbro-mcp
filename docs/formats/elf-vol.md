@@ -25,8 +25,9 @@ and it also serves as the last entry's end.
 Every entry then spans the gap between two consecutive offsets. The reference *skips* a pair whose gap is zero
 instead of emitting an empty entry, which leaves a hole in the generated four-digit numbering — an entry after a
 skipped pair keeps the index of its pair, not of its position in the directory. Names are built from the archive
-name and that index. The reference creates each entry through its lazy catalog lookup, and the port records no
-type, since these names carry no extension to infer one from. Payloads are stored verbatim.
+name and that index. Each non-empty payload with at least four bytes is classified through the shared GARBro
+signature catalogue. A unique match supplies its resource type and primary extension; ambiguous or unknown
+signatures leave the generated name alone. Payloads are stored verbatim.
 
 ## Support
 
@@ -40,8 +41,8 @@ type, since these names carry no extension to infer one from. Payloads are store
 | Zero-length span skipping with the numbering hole | Supported |
 | Generated four-digit names | Supported |
 | Verbatim extraction | Supported |
-| Type classification by content signature | Not ported |
+| Type classification by content signature | Supported |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover three derived spans, a table ending at its terminator, a skipped zero-length span, an
-unaligned first offset, and the extension requirement.
+Synthetic fixtures cover three derived spans, a table ending at its terminator, catalogue-wide signature typing, a
+skipped zero-length span, an unaligned first offset, and the extension requirement.

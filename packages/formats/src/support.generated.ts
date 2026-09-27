@@ -6263,12 +6263,21 @@ export const formatSupportCatalog = {
 				"zero length span skipping",
 				"generated four digit names",
 				"verbatim extraction",
+				"GARBro catalog type classification by content signature",
 			],
-			unsupported: [
-				"type classification by content signature",
-				"archive creation",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
+			readStatus: "complete",
+			gaps: [
+				{
+					code: "scope.archive-create",
+					disposition: "out-of-scope",
+				},
+				{
+					code: "verification.real-game",
+					disposition: "verification",
+				},
+			],
 		},
 		{
 			reference: {

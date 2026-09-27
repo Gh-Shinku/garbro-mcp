@@ -1,6 +1,7 @@
+import { BufferByteSource } from "@garbro-mcp/core";
 import { volFormat } from "@garbro-mcp/formats";
 import { expectArchive } from "../helpers/archive.js";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const FIRST_OFFSET = 0x10;
 
@@ -67,6 +68,25 @@ describe("Ancient elf VOL resource archive", () => {
 			sourcePath: "sample.vol",
 			entries: [{ path: "sample#0000", size: first.length, content: first }],
 		});
+	});
+
+	it("classifies payloads through the GARBro signature catalogue", async () => {
+		const content = Buffer.alloc(0x20);
+		content.writeUInt32LE(0xe0ffd8ff, 0);
+		const archive = await volFormat.open(
+			new BufferByteSource(
+				buildVol([FIRST_OFFSET + content.length], [content]),
+			),
+			"sample.vol",
+		);
+		try {
+			expect(archive.entries[0]).toMatchObject({
+				path: "sample#0000.jpg",
+				resourceType: "image",
+			});
+		} finally {
+			await archive.close();
+		}
 	});
 
 	it("skips a zero-length span and numbers the rest by pair index", async () => {

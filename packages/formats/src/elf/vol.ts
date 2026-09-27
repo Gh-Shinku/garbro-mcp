@@ -16,6 +16,7 @@ import {
 	sourceExtension,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const EXTENSION = "vol";
 const FIRST_OFFSET_FIELD = 0;
@@ -59,7 +60,7 @@ export const volDescriptor: FormatDescriptor = {
  * pair whose gap is zero instead of emitting an empty entry, which leaves a hole in the generated numbering.
  *
  * Names are built from the archive name and a four-digit index. The reference creates each entry through its
- * lazy catalog lookup, and the port records no type, since these names carry no extension to infer one from.
+ * lazy signature-catalog lookup, which also gives recognized payloads an extension and resource type.
  */
 async function readVolIndex(
 	source: ByteSource,
@@ -98,16 +99,19 @@ async function readVolIndex(
 		const size = end - start;
 		// The reference skips a zero-length span rather than storing an empty entry.
 		if (size === 0n) continue;
-		entries.push(
-			createFixedEntry({
-				id: entries.length,
-				...normalizeEntryPath(
-					`${baseName}#${String(id).padStart(NAME_DIGITS, "0")}`,
-				),
-				offset: start,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id: entries.length,
+			...normalizeEntryPath(
+				`${baseName}#${String(id).padStart(NAME_DIGITS, "0")}`,
+			),
+			offset: start,
+			size,
+		});
+		if (size >= 4n) {
+			const signature = (await source.readAt(start, 4)).readUInt32LE(0);
+			applySignatureResourceType(entry, signature);
+		}
+		entries.push(entry);
 	}
 	return entries;
 }
