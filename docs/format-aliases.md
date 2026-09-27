@@ -68,8 +68,8 @@ stand of this name", not the answer to "which format opened this file".
   `false` and whose `Read` and `Write` throw. `BinScriptFormat` declares the extensions `scr` and `bin`
   while `TextScriptFormat` declares no extension of its own at all, so the one can be looked up by name
   where the other cannot even be that; neither reaches `ScriptFormat.FindFormat` all the same, that walk
-  keeping only the formats whose `IsScript` answers `true`. `ScriptFormat.FindFormat` keeps only the formats whose
-  `IsScript` answers `true`, so the reference itself never identifies a file as any of these three; they are
+  keeping only the formats whose `IsScript` answers `true`, so the reference itself never identifies a file
+  as any of these three; they are
   registry entries for the alias table, and `DAT/GENERIC` even answers an empty `Type`. A port of them would
   be a row nothing could ever be detected as, so they are left alone. `AMP/LEAF` (`ArcFormats/Leaf/ArcPAK.cs`,
   class `AmpFormat`) is a fourth of the same shape: an empty `Type`, a `Signature` of nought and no
@@ -78,5 +78,12 @@ stand of this name", not the answer to "which format opened this file".
   its own and **is** ported, as `gs-pack-scw-script`; note that the alias table's `SCR` target is the other
   class of the same name in `GameRes/ScriptText.cs`, not that one.
 * The reference's `Type` field of an alias entry (`ResourceAlias` may name `archive`, `image`, `audio` or
-  `script` and so narrow which registry the target is looked up in). At this baseline none of the 26 entries
-  sets it, so every one of them is resolved across all formats, which is what this port does.
+  `script`, and `FormatCatalog.AddAliases` then looks the target up in that one registry rather than across
+  every format). **One** entry of the table sets it: `M` (`Legacy/Sophia/ArcNOR.cs`, class `MFormat`) names
+  `MP3` of the kind `audio`. The outcome here is the same either way, `MP3` naming one audio format of this
+  project; the port's table does not carry the field, so a target tag that ever named a format of two kinds
+  at once would have to be looked at again.
+* The table itself stands verified against the reference: every `[Export(typeof(ResourceAlias))]` class of the
+  reference (`ExportMetadata("Extension", …)` and `ExportMetadata("Target", …)`) stands in `GARBRO_ALIASES`,
+  26 extensions over 27 classes (`STR` and `TBL` each stand of two targets), with no entry of the port left
+  over. `SNR` (`ArcFormats/Otemoto/ArcTLZ.cs`, class `SnrFormat`, an `internal` class) is one of them.
