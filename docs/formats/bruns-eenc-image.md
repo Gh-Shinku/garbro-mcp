@@ -39,3 +39,11 @@ file changed to the kind of the picture behind.
 graphic, a bitmap unwrapped from a plain file, a bitmap unwrapped from a packet of the zlib kind, a portable
 network graphic unwrapped, a file that holds no picture this project reads and a file whose word is not that
 of the format.
+
+## The places of the picture
+
+The reference asks its own list of kinds which one the payload holds and then stands the walk of that kind over the
+payload, so this port does the same with the walks this project carries: a bitmap stands read of the bitmap walk and a
+portable network graphic of the walk of the graphic, each handed over as a bitmap of its own, of the counts of its head
+and of the places its walk yields. A picture of a kind the list does not name stands turned away, which is where the
+reference finds no kind either.

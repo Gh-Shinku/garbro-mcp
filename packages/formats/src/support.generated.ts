@@ -3432,7 +3432,12 @@ export const formatSupportCatalog = {
 			localId: "bruns-eenc-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the places of the picture: the walks of the bitmap and of the portable network graphic of this project over the payload",
+			],
 			unsupported: [
 				"archive creation",
 				"image encoding",

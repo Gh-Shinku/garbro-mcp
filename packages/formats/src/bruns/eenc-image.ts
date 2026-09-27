@@ -11,7 +11,7 @@ import type {
 } from "@garbro-mcp/core";
 import { inflateZlibBufferCapped } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -19,6 +19,7 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 import { readPngHeaderFields } from "../shared/png.js";
+import { readPngImage } from "../shared/png-image.js";
 
 /** The two words the reference registers: `EENC`, and `EENZ` where the payload is packed. */
 const SIGNATURE = Buffer.from("EENC", "latin1");
@@ -205,6 +206,30 @@ export const brunsEencImageFormat: ArchiveFormat = defineFixedArchive({
 	async openEntry(source: ByteSource) {
 		const picture = await readPicture(source);
 		if (!picture) throw invalidPicture("Not a Bruns picture");
-		return Readable.from([picture.payload]);
+		// `EencFormat.Read` stands the walk of the kind the head names over the payload — the reference asks its
+		// own list of kinds which one the payload holds — so the picture stands read of the walk of that kind of
+		// this project and handed over as a bitmap of its own.
+		if ("bmp" === picture.picture.extension) {
+			const bitmap = readBmpImage(picture.payload);
+			if (!bitmap) {
+				throw invalidPicture("Not a Bruns picture");
+			}
+			return Readable.from([writeBmpImage(bitmap)]);
+		}
+		const image = await readPngImage(picture.payload);
+		if (!image) {
+			throw invalidPicture("Not a Bruns picture");
+		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

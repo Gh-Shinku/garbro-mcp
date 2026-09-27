@@ -3,6 +3,9 @@ import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { deflateSync } from "node:zlib";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import {
 	brunsEencImageFormat,
 	decryptEenc,
@@ -29,10 +32,12 @@ function eencFile(input: {
 function bitmap(): Buffer {
 	const stride = 4;
 	const rows = 2;
-	const file = Buffer.alloc(54 + stride * rows, 0x00);
+	// The walk of the bitmap of this project stands of a list of colours of one entry to a colour for every
+	// place a colour of a picture of one place a colour can take.
+	const file = Buffer.alloc(54 + 256 * 4 + stride * rows, 0x00);
 	file.write("BM", 0, "latin1");
 	file.writeUInt32LE(file.length, 2);
-	file.writeUInt32LE(54, 0x0a);
+	file.writeUInt32LE(54 + 256 * 4, 0x0a);
 	file.writeUInt32LE(40, 0x0e);
 	file.writeInt32LE(2, 0x12);
 	file.writeInt32LE(2, 0x16);
@@ -46,15 +51,10 @@ function bitmap(): Buffer {
 
 /** A portable network graphic of four places of width and three of height. */
 function pngImage(): Buffer {
-	const file = Buffer.alloc(16 + 13 + 4, 0x00);
-	file.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
-	file.writeUInt32BE(13, 8);
-	file.write("IHDR", 12, "latin1");
-	file.writeUInt32BE(4, 16);
-	file.writeUInt32BE(3, 20);
-	file[24] = 8;
-	file[25] = 2;
-	return file;
+	const rows = Array.from({ length: 3 }, (_, y) =>
+		Array.from({ length: 4 * 3 }, (_, at) => (at * 7 + y * 5 + 1) & 0xff),
+	);
+	return pngFile({ width: 4, height: 3, colourType: 2, rows });
 }
 
 async function open(source: Buffer, sourcePath = "picture.png") {
@@ -123,9 +123,13 @@ describe("Bruns system encrypted image", () => {
 		expect(handle.metadata).toEqual({ image: "bmp", bitsPerPixel: 8 });
 		const entry = handle.entries[0];
 		if (!entry) throw new Error("no entry");
-		expect(
-			(await consumeBuffer(await handle.openEntry(entry.id))).equals(bmp),
-		).toBe(true);
+		const picture = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		expect(picture).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			...(readBmpImage(bmp)?.pixels ?? []),
+		]);
 	});
 
 	it("unwraps a packet of the zlib kind", async () => {
@@ -138,9 +142,13 @@ describe("Bruns system encrypted image", () => {
 		const handle = await open(data, "picture.brs");
 		const entry = handle.entries[0];
 		if (!entry) throw new Error("no entry");
-		expect(
-			(await consumeBuffer(await handle.openEntry(entry.id))).equals(bmp),
-		).toBe(true);
+		const picture = readBmpImage(
+			await consumeBuffer(await handle.openEntry(entry.id)),
+		);
+		expect(picture).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			...(readBmpImage(bmp)?.pixels ?? []),
+		]);
 	});
 
 	it("unwraps a portable network graphic", async () => {
