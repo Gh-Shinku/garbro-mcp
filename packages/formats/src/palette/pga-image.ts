@@ -8,7 +8,9 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -82,6 +84,19 @@ async function readLayout(source: ByteSource): Promise<PgaLayout | undefined> {
 	}
 }
 
+/** Restores the PNG of a stored file, decodes it and hands back the picture (`PngFormat.Read`, which the
+ * reference stands of). The reference decodes the picture as well, so this walk hands out a bitmap and not the
+ * portable network graphic it was built from. */
+async function readPicture(source: ByteSource) {
+	if ((await readLayout(source)) === undefined) return undefined;
+	const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
+	const png = Buffer.concat([
+		restore(stored.subarray(0, PNG_HEADER_SIZE)),
+		stored.subarray(PREFIX_SIZE),
+	]);
+	return readPngImage(png);
+}
+
 export const pgaImageDescriptor: FormatDescriptor = {
 	id: "palette-pga-image",
 	name: "Palette obfuscated PNG image",
@@ -114,21 +129,27 @@ export const pgaImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Palette PGA image");
+		const image = await readPicture(source);
+		if (!image)
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Palette PGA image");
 		const fileName = sourcePath.replace(/^.*[/\\]/, "");
 		const entry: FixedEntry = {
 			...createFixedEntry({
 				id: 0,
-				path: changeExtension(fileName, "png"),
+				path: changeExtension(fileName, "bmp"),
 				offset: 0n,
 				size: source.size,
 				encrypted: true,
 				metadata: {
 					type: "image",
-					width: layout.width,
-					height: layout.height,
+					width: image.width,
+					height: image.height,
+					bitsPerPixel: image.bitsPerPixel,
+					// The depth the portable network graphic itself stores, which the reference reports as the
+					// depth of the picture as well.
 					...(layout.bitsPerPixel === undefined
 						? {}
-						: { bitsPerPixel: layout.bitsPerPixel }),
+						: { storedBitsPerPixel: layout.bitsPerPixel }),
 				} as Record<string, unknown>,
 			}),
 			// Eleven stored bytes become the sixteen byte PNG header, so the extraction is longer than the
@@ -138,22 +159,27 @@ export const pgaImageFormat: ArchiveFormat = defineFixedArchive({
 		return {
 			entries: [entry],
 			metadata: {
-				image: "png",
-				width: layout.width,
-				height: layout.height,
+				image: "bmp",
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
 				obfuscation: KEY.toString("latin1"),
 				prefixSize: PREFIX_SIZE,
 			},
 		};
 	},
 	async openEntry(source: ByteSource) {
-		if ((await readLayout(source)) === undefined)
+		const image = await readPicture(source);
+		if (!image)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Palette PGA image");
-		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-		// The header as the reference assembles it, then the body from offset eleven untouched.
-		const header = restore(stored.subarray(0, PNG_HEADER_SIZE));
 		return Readable.from([
-			Buffer.concat([header, stored.subarray(PREFIX_SIZE)]),
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: Buffer.from(image.pixels),
+				palette: Buffer.alloc(0),
+			}),
 		]);
 	},
 });

@@ -1,49 +1,14 @@
-import { BufferByteSource } from "@garbro-mcp/core";
+import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { pgaImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
 
 const SIGNATURE = Buffer.from("PGAP", "ascii");
-const PNG_SIGNATURE = Buffer.from([
-	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-]);
 const KEY = Buffer.from("PGAECODE", "ascii");
 const PREFIX_SIZE = 11;
 const HEADER_SIZE = 26;
-
-function crcBytes(seed: number): Buffer {
-	const crc: Buffer = Buffer.alloc(4);
-	crc.writeUInt32BE(seed >>> 0, 0);
-	return crc;
-}
-
-function chunk(type: string, body: Buffer): Buffer {
-	const header: Buffer = Buffer.alloc(8);
-	header.writeUInt32BE(body.length, 0);
-	header.write(type, 4, "latin1");
-	return Buffer.concat([header, body, crcBytes(body.length * 5 + 3)]);
-}
-
-function buildPng(options: {
-	width: number;
-	height: number;
-	bitDepth?: number;
-	colourType?: number;
-}): Buffer {
-	const ihdr: Buffer = Buffer.alloc(13, 0);
-	ihdr.writeUInt32BE(options.width, 0);
-	ihdr.writeUInt32BE(options.height, 4);
-	ihdr.writeUInt8(options.bitDepth ?? 8, 8);
-	ihdr.writeUInt8(options.colourType ?? 2, 9);
-	const scan: Buffer = Buffer.alloc(96);
-	for (let i = 0; i < scan.length; i += 1) scan[i] = (i * 29 + 7) & 0xff;
-	return Buffer.concat([
-		PNG_SIGNATURE,
-		chunk("IHDR", ihdr),
-		chunk("IDAT", scan),
-		chunk("IEND", Buffer.alloc(0)),
-	]);
-}
 
 /** The reference's writer: three tag bytes, eight obfuscated bytes, then the body from offset sixteen. */
 function obfuscate(png: Buffer): Buffer {
@@ -69,6 +34,41 @@ async function extract(stored: Buffer): Promise<Buffer> {
 	}
 }
 
+/** The places of the file of a picture of a colour of the places of the picture of the format of the two of them of
+ * twenty four places of a colour, of the places of the file of the picture of the format of the numbers of the
+ * picture, of the places of the file: the walk of the project stands of the counts of the head of the format of the
+ * picture of the places of the file of the format of the two of them. */
+function picture(
+	width: number,
+	height: number,
+): {
+	png: Buffer;
+	expected: Buffer;
+} {
+	const rows: number[][] = [];
+	const expected = Buffer.alloc(width * height * 4);
+	for (let y = 0; y < height; y += 1) {
+		const row: number[] = [];
+		for (let x = 0; x < width; x += 1) {
+			const red = (x * 31 + y * 7) & 0xff;
+			const green = (x * 11) & 0xff;
+			const blue = (y * 53) & 0xff;
+			const alpha = 0x40 + ((x + y) & 0x3f);
+			row.push(red, green, blue, alpha);
+			const at = (y * width + x) * 4;
+			expected[at] = blue;
+			expected[at + 1] = green;
+			expected[at + 2] = red;
+			expected[at + 3] = alpha;
+		}
+		rows.push(row);
+	}
+	return {
+		png: pngFile({ width, height, colourType: 6, rows }),
+		expected,
+	};
+}
+
 describe("palette pga image", () => {
 	it("declares the PGAP signature and no extension", () => {
 		expect(pgaImageFormat.detection?.signatures).toEqual([
@@ -78,72 +78,76 @@ describe("palette pga image", () => {
 		expect(pgaImageFormat.descriptor.extensions).toEqual([]);
 	});
 
-	it("restores a whole png from an obfuscated one", async () => {
-		const png = buildPng({ width: 9, height: 4 });
+	it("decodes the restored png into a bitmap", async () => {
+		const { png, expected } = picture(9, 4);
 		const stored = obfuscate(png);
 		expect(await pgaImageFormat.detect(sourceOf(stored), "CG01.PGA")).toBe(
 			true,
 		);
 		const archive = await pgaImageFormat.open(sourceOf(stored), "CG01.PGA");
 		try {
-			expect(archive.entries.map((entry) => entry.path)).toEqual(["CG01.png"]);
+			expect(archive.entries.map((entry) => entry.path)).toEqual(["CG01.bmp"]);
 			expect(archive.entries[0]?.encrypted).toBe(true);
-			// Eleven stored bytes become a sixteen byte header, so the entry is five bytes longer.
+			// Eleven stored bytes become a sixteen byte PNG header, so the extraction is longer than the
+			// source.
 			expect(archive.entries[0]?.sizeKnown).toBe(false);
 			expect(archive.metadata).toMatchObject({
-				image: "png",
+				image: "bmp",
 				width: 9,
 				height: 4,
+				bitsPerPixel: 32,
 				obfuscation: "PGAECODE",
 				prefixSize: PREFIX_SIZE,
 			});
 		} finally {
 			await archive.close();
 		}
-		const output = await extract(stored);
-		expect(output).toEqual(png);
-		expect(output.length).toBe(stored.length + 5);
+		const image = readBmpImage(await extract(stored));
+		if (!image) throw new Error("no bitmap");
+		expect(image.width).toBe(9);
+		expect(image.height).toBe(4);
+		expect(image.pixels.toString("hex")).toBe(expected.toString("hex"));
 	});
 
 	it("has a P as the fourth byte because the chunk length starts with a zero", async () => {
-		const stored = obfuscate(buildPng({ width: 3, height: 3 }));
+		const stored = obfuscate(picture(3, 3).png);
 		expect(stored.subarray(0, 4)).toEqual(SIGNATURE);
 		// The fourth byte is the `IHDR` length's top byte, which is zero, exclusive orred with `P`.
 		expect(stored[3]).toBe(0x00 ^ 0x50);
 	});
 
-	it("reports the dimensions and depth of the image header", async () => {
-		const stored = obfuscate(
-			buildPng({ width: 511, height: 257, bitDepth: 16, colourType: 6 }),
-		);
-		const archive = await pgaImageFormat.open(sourceOf(stored), "CG01.PGA");
-		try {
-			expect(archive.metadata).toMatchObject({ width: 511, height: 257 });
-			expect(archive.entries[0]?.metadata).toMatchObject({
-				type: "image",
-				width: 511,
-				height: 257,
-				bitsPerPixel: 64,
-			});
-		} finally {
-			await archive.close();
-		}
-	});
-
-	it("maps the color types to a pixel depth", async () => {
+	it("reports the depth of the stored png beside the depth of the bitmap", async () => {
 		const cases: Array<[number, number, number]> = [
-			[8, 0, 8],
-			[4, 3, 4],
-			[2, 4, 4],
+			[0, 8, 24],
+			[2, 8, 24],
+			[4, 8, 32],
+			[6, 8, 32],
 		];
-		for (const [bitDepth, colourType, expected] of cases) {
-			const stored = obfuscate(
-				buildPng({ width: 4, height: 4, bitDepth, colourType }),
+		for (const [colourType, stored, depth] of cases) {
+			const channels = (
+				0 === colourType ? 1 : 4 === colourType ? 2 : 6 === colourType ? 4 : 3
+			) as 1 | 2 | 3 | 4;
+			const width = 3;
+			const rows: number[][] = [];
+			for (let y = 0; y < 2; y += 1) {
+				const row: number[] = [];
+				for (let x = 0; x < width * channels; x += 1)
+					row.push((x * 17 + y) & 0xff);
+				rows.push(row);
+			}
+			const png = pngFile({ width, height: 2, colourType, rows });
+			const archive = await pgaImageFormat.open(
+				sourceOf(obfuscate(png)),
+				"CG01.PGA",
 			);
-			const archive = await pgaImageFormat.open(sourceOf(stored), "CG01.PGA");
 			try {
+				expect(archive.metadata).toMatchObject({ bitsPerPixel: depth });
 				expect(archive.entries[0]?.metadata).toMatchObject({
-					bitsPerPixel: expected,
+					type: "image",
+					width,
+					height: 2,
+					bitsPerPixel: depth,
+					storedBitsPerPixel: stored * channels,
 				});
 			} finally {
 				await archive.close();
@@ -151,8 +155,33 @@ describe("palette pga image", () => {
 		}
 	});
 
+	it("reads a sixty four place png into a bitmap of thirty two places", async () => {
+		const width = 3;
+		const rows: number[][] = [];
+		for (let y = 0; y < 2; y += 1) {
+			const row: number[] = [];
+			for (let x = 0; x < width * 4 * 2; x += 1) row.push((x * 9 + y) & 0xff);
+			rows.push(row);
+		}
+		const stored = obfuscate(
+			pngFile({ width, height: 2, colourType: 6, depth: 16, rows }),
+		);
+		const archive = await pgaImageFormat.open(sourceOf(stored), "CG01.PGA");
+		try {
+			expect(archive.metadata).toMatchObject({ bitsPerPixel: 32 });
+			expect(archive.entries[0]?.metadata).toMatchObject({
+				bitsPerPixel: 32,
+				storedBitsPerPixel: 64,
+			});
+		} finally {
+			await archive.close();
+		}
+		const image = readBmpImage(await extract(stored));
+		expect(image?.bitsPerPixel).toBe(32);
+	});
+
 	it("declines a wrong tag and an unrestorable header", async () => {
-		const stored = obfuscate(buildPng({ width: 4, height: 4 }));
+		const stored = obfuscate(picture(4, 4).png);
 		const wrongTag = Buffer.from(stored);
 		wrongTag[2] = 0x58;
 		expect(await pgaImageFormat.detect(sourceOf(wrongTag), "CG01.PGA")).toBe(
@@ -167,24 +196,30 @@ describe("palette pga image", () => {
 	});
 
 	it("declines a short file and zero dimensions", async () => {
-		const stored = obfuscate(buildPng({ width: 4, height: 4 }));
+		const stored = obfuscate(picture(4, 4).png);
 		expect(
 			await pgaImageFormat.detect(
 				sourceOf(stored.subarray(0, HEADER_SIZE - 1)),
 				"CG01.PGA",
 			),
 		).toBe(false);
-		const zero = obfuscate(buildPng({ width: 0, height: 4 }));
+		const zero = Buffer.from(stored);
+		// The file stands five bytes behind the restored picture, and the width of the `IHDR` chunk stands sixteen
+		// bytes into it.
+		const widthAt = 16 - 5;
+		zero[widthAt] = 0;
+		zero[widthAt + 1] = 0;
+		zero[widthAt + 2] = 0;
+		zero[widthAt + 3] = 0;
 		expect(await pgaImageFormat.detect(sourceOf(zero), "CG01.PGA")).toBe(false);
 	});
 
-	it("carries the body through byte for byte", async () => {
-		const png = buildPng({ width: 5, height: 5 });
-		const stored = obfuscate(png);
-		const output = await extract(stored);
-		// Everything from the sixteenth byte of the PNG onward is a straight copy of the file from eleven.
-		expect(output.subarray(16)).toEqual(stored.subarray(PREFIX_SIZE));
-		expect(output.subarray(0, 8)).toEqual(PNG_SIGNATURE);
-		expect(output.subarray(8, 16)).toEqual(png.subarray(8, 16));
+	it("turns away a body that stands of no walk of its own", async () => {
+		const stored = obfuscate(picture(4, 4).png);
+		// The places of the file of the picture of the format of the two of them stand of no counts of the head of
+		// the format of the picture of the places of the file.
+		const broken = Buffer.from(stored);
+		broken.fill(0x11, PREFIX_SIZE + 28, PREFIX_SIZE + 40);
+		await expect(extract(broken)).rejects.toThrow(GarbroError);
 	});
 });
