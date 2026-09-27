@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { pbmImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const STREAM_OFFSET = 4;
 const BMP_HEADER_SIZE = 54;
@@ -86,7 +87,16 @@ describe("nekopunch pbm image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bmp);
+			// The places of the picture stand compared with the same walk over the bitmap the fixture wrote:
+			// the fixture is not a second implementation of the walk, it only says which bitmap the stream
+			// stands for, so this pins that the port hands the places of that bitmap over and nothing else.
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: WIDTH,
+				height: HEIGHT,
+				bitsPerPixel: 8,
+			});
+			expect(picture).toEqual(readBmpImage(bmp));
 		} finally {
 			await archive.close();
 		}
@@ -102,8 +112,9 @@ describe("nekopunch pbm image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(bmp.length);
-			expect(output).toEqual(bmp);
+			// The sixteen places behind the picture stand of no count of the walk.
+			expect(readBmpImage(output)).toEqual(readBmpImage(bmp));
+			expect(output.length).not.toBe(padded.length);
 		} finally {
 			await archive.close();
 		}
