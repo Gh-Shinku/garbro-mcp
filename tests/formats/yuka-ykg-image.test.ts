@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
 	readBmpImage,
 	writeBmp24,
+	writeBmp8Palette,
 } from "../../packages/formats/src/shared/bmp.js";
 import { pngFile } from "../helpers/png.js";
 import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
@@ -176,6 +177,28 @@ describe("Yuka YKG picture", () => {
 		expect(bmpPicture).not.toBeUndefined();
 		expect([...(bmpPicture?.pixels ?? [])]).toEqual([
 			...(readBmpImage(bmp)?.pixels ?? []),
+		]);
+		// A bitmap of one place of a colour a place carries a list of colours of its own, and that list stands
+		// in the picture the port hands over as it stood in the file.
+		const palette = Buffer.alloc(256 * 4);
+		for (let entry = 0; entry < 256; entry += 1) {
+			palette[entry * 4] = entry;
+			palette[entry * 4 + 1] = (entry * 3) & 0xff;
+			palette[entry * 4 + 2] = (entry * 5) & 0xff;
+		}
+		const paletted = writeBmp8Palette(
+			3,
+			2,
+			Buffer.from([1, 2, 3, 4, 5, 6]),
+			palette,
+		);
+		const palettedPicture = readBmpImage(await extract(ykgFile(paletted)));
+		expect(palettedPicture).toMatchObject({ bitsPerPixel: 8 });
+		expect([...(palettedPicture?.pixels ?? [])]).toEqual([
+			...(readBmpImage(paletted)?.pixels ?? []),
+		]);
+		expect([...(palettedPicture?.palette ?? [])]).toEqual([
+			...(readBmpImage(paletted)?.palette ?? []),
 		]);
 		const png = realPng(3, 4);
 		const pngPicture = readBmpImage(await extract(ykgFile(png)));

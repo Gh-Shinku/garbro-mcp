@@ -214,17 +214,26 @@ export const yukaYkgImageFormat: ArchiveFormat = defineFixedArchive({
 		// and `Png.Read` over a portable network graphic, so the picture stands read of the walk of that kind
 		// of this project and handed over as a bitmap of its own. A graphic whose signature stands behind the
 		// tag of the obfuscated kind gets those places of the signature from this project.
-		const image =
-			"bmp" === layout.kind
-				? readBmpImage(body)
-				: await readPngImage(
-						"gnp" === layout.kind ? Buffer.concat([GNP_PREFIX, body]) : body,
-					);
+		if ("bmp" === layout.kind) {
+			const bitmap = readBmpImage(body);
+			if (!bitmap) {
+				throw invalidPicture(
+					`The places of the picture stand of another picture: ${body.length} places of the file`,
+				);
+			}
+			// The walk of the bitmap hands its own list of colours over, which stands as it stands.
+			return Readable.from([writeBmpImage(bitmap)]);
+		}
+		const image = await readPngImage(
+			"gnp" === layout.kind ? Buffer.concat([GNP_PREFIX, body]) : body,
+		);
 		if (!image) {
 			throw invalidPicture(
 				`The places of the picture stand of another picture: ${body.length} places of the file`,
 			);
 		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
 		return Readable.from([
 			writeBmpImage({
 				width: image.width,
