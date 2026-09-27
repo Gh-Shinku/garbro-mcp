@@ -16483,9 +16483,9 @@ export const formatSupportCatalog = {
 				"detect",
 				"list",
 				"extract",
-				"the places of the picture: the walks of the bitmap and of the portable network graphic of this project over the payload",
+				"the places of the picture: the walks of the bitmap, of the portable network graphic and of the jpeg of this project over the payload",
 			],
-			unsupported: ["archive creation", "image writing", "jpeg decoding"],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

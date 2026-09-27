@@ -3,6 +3,7 @@
 
 import { GarbroError } from "@garbro-mcp/core";
 import { readPngImage } from "../shared/png-image.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -191,9 +192,24 @@ export const qlieAbmpImageFormat: ArchiveFormat = defineFixedArchive({
 				}),
 			]);
 		}
+		if ("jpeg" === layout.format) {
+			// The reference hands the stream to the jpeg decoder of its platform; this project carries a walk of
+			// that kind itself, so the places of the picture stand read of it and handed over as a bitmap of its
+			// own. A stream the walk does not carry stands turned away, which is where the platform decoder of
+			// the reference fails as well.
+			const image = readJpegImage(payload);
+			return Readable.from([
+				writeBmpImage({
+					width: image.width,
+					height: image.height,
+					bitsPerPixel: image.bitsPerPixel,
+					pixels: image.pixels,
+					palette: Buffer.alloc(0),
+				}),
+			]);
+		}
 		if ("bmp" !== layout.format) {
-			// The reference decodes a jpeg through its own imaging layer, which this project has no walk of that
-			// kind for here; the port hands it over as it stands.
+			// A kind the container names that this project reads nowhere stands handed over as it stands.
 			return Readable.from([payload]);
 		}
 		const image = readBmpImage(payload);

@@ -40,3 +40,8 @@ network graphic through `PngFormat.Read` and a jpeg through the platform decoder
 the walk of the portable network graphic itself, so a picture of either of those two kinds stands read of that walk and
 handed over as a bitmap of its own, of the counts of its head and of the places its walk yields. A jpeg still stands
 handed over as the container holds it, which the record names.
+
+The jpeg stands of the walk of the jpeg of this project as well: a stream of one kind of sample stands of the places the
+python imaging library decodes it to, which the tests of that walk record, and the container hands the same places over
+as a bitmap of its own. A stream of a kind that walk does not carry stands turned away, which is where the platform
+decoder of the reference fails too.

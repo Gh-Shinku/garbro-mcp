@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 import { pngFile } from "../helpers/png.js";
 import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import { qlieAbmpImageFormat } from "../../packages/formats/src/qlie/abmp-image.js";
@@ -155,9 +156,14 @@ describe("QLIE engine image", () => {
 		expect(handle.entries[0]?.path).toBe("cg.png");
 	});
 
-	it("hands a jpeg over as it is", async () => {
-		const payload = jpegPayload(9, 2);
-		expect(await extract(abmpFile({ payload }))).toEqual(payload);
+	it("reads the places of the picture of the jpeg", async () => {
+		// A whole jpeg as the python imaging library wrote it, with the places that library decodes it to as an
+		// oracle of another implementation: the walk of this project stands of them for a picture of one kind of
+		// sample.
+		const out = await extract(abmpFile({ payload: GREY_JPEG }));
+		const picture = readBmpImage(out);
+		expect(picture).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...(picture?.pixels ?? [])]).toEqual([...GREY_PIXELS]);
 	});
 
 	it("writes a bitmap behind the container as a bitmap of its own", async () => {
