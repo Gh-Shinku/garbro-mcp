@@ -274,6 +274,20 @@ of reason are these, to the row:
   the file turned about as the format of gzip reads them; it stands of the places of the file of the block
   behind the walk of the counts of them. Two streams stood its check: the worked example of the description
   and one written by `bzip2` itself.
+* **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
+  compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in
+  `ArcFormats/KogadoCocotte.cs`. The header of that file states that the original code of juicy.gt stands
+  under the GNU GPL version 2, while GARbro and this project stand under the MIT licence. An attempt that
+  ported the reader of that file - the block loop, the Burrows-Wheeler transform, the move-to-front order and
+  the carryless range coder of Michael Schindler with its quasi static model - read back a stream of stored
+  blocks, built by hand of the standard Burrows-Wheeler transform, but read no stream of coded blocks back:
+  a writer ported from the encoder the same file carries as a comment stood of the same counts of the model
+  as the reader over three thousand counts of a walk of the engine, and yet the two stood apart on coded
+  blocks, the block sizes coming back as a count or two places of the file short, as if the two stood one
+  place of the file apart. That port stood of no count of its own, so it stands turned away; a later attempt
+  should start from the published qscoder of Michael Schindler, or from a real archive of that kind as the
+  count to stand against.
+
 * **something outside the file** - **4 rows**: `DAT/IGS` (an SQLite database beside the archive),
   `DAT/hibiki` (a scheme in a data file of the reference's own installation), and `BYTES/UNITY` with
   `DAT/GX4LIB` (a .NET `BinaryFormatter` graph, of the spec MS-NRBF; the graph of `BYTES/UNITY` is three

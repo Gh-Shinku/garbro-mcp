@@ -19,8 +19,12 @@ and three-byte extension, a data-relative offset, sizes, and—since version 0x2
 Version 0x300 adds a per-entry CRC16 field and file timestamp.
 
 Compression type 1 is Mariel, an offset/count LZ stream controlled by MSB-first 32-bit flag words.
-Type 3 inverts every stored byte. Type 2 is Cocotte, whose GARbro dependency is a separate GPLv2
-range-coder/BWT/MTF module and is not included in this implementation boundary.
+Type 3 inverts every stored byte. Type 2 is Cocotte, which the reference reads through `ArcFormats/KogadoCocotte.cs`: the header of that file
+states that the original code it was ported from is licensed under the GNU GPL version 2, while GARbro and
+this project stand under the MIT licence. A port of the reader of that file, of the block loop, the
+Burrows-Wheeler transform, the move-to-front order and the range coder with its quasi static model, read
+back a hand built stream of stored blocks but not a stream of coded blocks; the record of that attempt
+stands in `docs/deferred-formats.md`.
 
 ## Support
 
