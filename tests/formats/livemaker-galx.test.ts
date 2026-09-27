@@ -12,16 +12,30 @@ import {
 import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 /** The XML of the head of a picture of the engine, of the counts given. */
-function xml(frames: { pixels: Buffer; alpha?: Buffer }[], bits = 32): string {
+function xml(
+	frames: { pixels: Buffer; alpha?: Buffer }[],
+	options: {
+		bits?: number;
+		compType?: number;
+		width?: number;
+		height?: number;
+		version?: number;
+	} = {},
+): string {
+	const bits = options.bits ?? 32;
+	const width = options.width ?? 2;
+	const height = options.height ?? 1;
 	const head =
-		`<Frames Width="2" Height="1" Bpp="${bits}" Version="100" Count="${frames.length}" ` +
-		`Randomized="0" CompType="0" BGColor="0" BlockWidth="0" BlockHeight="0">`;
+		`<Frames Width="${width}" Height="${height}" Bpp="${bits}" Version="${options.version ?? 100}" Count="${frames.length}" ` +
+		`Randomized="0" CompType="${options.compType ?? 0}" BGColor="0" BlockWidth="0" BlockHeight="0">`;
 	const body = frames
 		.map(
 			(frame) =>
-				`<Frame><Layers Count="1" Width="2" Height="1" Bpp="${bits}">` +
+				`<Frame><Layers Count="1" Width="${width}" Height="${height}" Bpp="${bits}">` +
 				`<Layer AlphaOn="${undefined === frame.alpha ? "0" : "1"}"/></Layers></Frame>`,
 		)
 		.join("");
@@ -31,11 +45,15 @@ function xml(frames: { pixels: Buffer; alpha?: Buffer }[], bits = 32): string {
 /** A picture of the shape `GaleX200`, of the counts of the places of its frames. */
 function galxFile(
 	frames: { pixels: Buffer; alpha?: Buffer }[],
-	options: { bits?: number } = {},
+	options: {
+		bits?: number;
+		compType?: number;
+		width?: number;
+		height?: number;
+		version?: number;
+	} = {},
 ): Buffer {
-	const head = deflateSync(
-		Buffer.from(xml(frames, options.bits ?? 32), "utf8"),
-	);
+	const head = deflateSync(Buffer.from(xml(frames, options), "utf8"));
 	const parts: Buffer[] = [];
 	for (const frame of frames) {
 		const size = Buffer.alloc(4, 0x00);
@@ -156,6 +174,39 @@ describe("LiveMaker engine picture of the shape GaleX200", () => {
 			expect([...second.subarray(54, 62)]).toEqual([
 				9, 10, 11, 0x40, 13, 14, 15, 0x40,
 			]);
+		} finally {
+			await handle.close();
+		}
+	});
+
+	it("reads the picture of a file whose XML names the picture of the kind of the engine itself, of the counts of the places of the file of the JPEG", async () => {
+		// The reference hands the places of the file of such a picture to `JpegBitmapDecoder` of its platform; this
+		// port reads them with its own reader of that format.
+		const file = galxFile([{ pixels: GREY_JPEG }], {
+			bits: 24,
+			compType: 2,
+			width: 8,
+			height: 8,
+			version: 107,
+		});
+		const source = new BufferByteSource(file);
+		expect(await galxImageFormat.detect(source, "/tmp/picture.gal")).toBe(true);
+		const handle = await galxImageFormat.open(source, "/tmp/picture.gal");
+		try {
+			const picture = await consumeBuffer(
+				await handle.openEntry(handle.entries[0]?.id ?? "0"),
+			);
+			const image = await readBmpImage(picture);
+			if (!image) throw new Error("no picture");
+			const want: number[] = [];
+			for (let at = 0; at < image.width * image.height; at += 1) {
+				want.push(
+					GREY_PIXELS[at * 4] ?? 0,
+					GREY_PIXELS[at * 4 + 1] ?? 0,
+					GREY_PIXELS[at * 4 + 2] ?? 0,
+				);
+			}
+			expect([...image.pixels]).toEqual(want);
 		} finally {
 			await handle.close();
 		}
