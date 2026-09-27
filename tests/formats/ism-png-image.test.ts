@@ -2,8 +2,12 @@
 // pictures built in the test: a picture of the name `.png` stands of the places of the colours of a place of
 // the file of it turned over, wherever it stands of thirty two places of a colour.
 import { Buffer } from "node:buffer";
-import { BufferByteSource } from "@garbro-mcp/core";
-import { ismPngFormat, readPngIsmPicture } from "@garbro-mcp/formats";
+import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
+import {
+	isaFormat,
+	ismPngFormat,
+	readPngIsmPicture,
+} from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
 import { pngFile } from "../helpers/png.js";
 import { buffer as consumeBuffer } from "node:stream/consumers";
@@ -43,6 +47,64 @@ describe("ISM engine PNG picture", () => {
 		expect([...picture.subarray(54, 60)]).toEqual([30, 20, 10, 220, 210, 200]);
 		// A file of no picture of the name `.png` at all stands of no picture of this format.
 		expect(await readPngIsmPicture(Buffer.alloc(0x40, 0x00))).toBeUndefined();
+	});
+
+	it("reads the pictures of the name `.png` of an archive of the engine", async () => {
+		// An archive of the engine of ISM, of the first layout, with a picture of the name `.png` and a file
+		// of another name behind it.
+		const picture = pngFile({
+			width: 1,
+			height: 1,
+			colourType: 6,
+			rows: [[10, 20, 30, 40]],
+		});
+		const other = Buffer.from("ISM ", "latin1");
+		const nameLength = 0x0c;
+		const recordLength = 0x14;
+		const recordSize = nameLength + recordLength;
+		const dataOffset = 0x10 + recordSize * 2;
+		const archive = Buffer.alloc(
+			dataOffset + picture.length + other.length,
+			0x00,
+		);
+		archive.write("ISM ", 0, "ascii");
+		archive.write("ARCHIVED", 4, "ascii");
+		archive.writeInt16LE(2, 0x0c);
+		archive.writeUInt16LE(2, 0x0e);
+		encodeCp932("picture.png").copy(archive, 0x10);
+		archive.writeUInt32LE(dataOffset, 0x10 + nameLength + 4);
+		archive.writeUInt32LE(picture.length, 0x10 + nameLength + 8);
+		encodeCp932("plain.txt").copy(archive, 0x10 + recordSize);
+		archive.writeUInt32LE(
+			dataOffset + picture.length,
+			0x10 + recordSize + nameLength + 4,
+		);
+		archive.writeUInt32LE(other.length, 0x10 + recordSize + nameLength + 8);
+		picture.copy(archive, dataOffset);
+		other.copy(archive, dataOffset + picture.length);
+		const source = new BufferByteSource(archive);
+		expect(await isaFormat.detect(source, "/tmp/sample.isa")).toBe(true);
+		const handle = await isaFormat.open(source, "/tmp/sample.isa");
+		try {
+			expect(handle.entries.map((entry) => entry.path)).toEqual([
+				"picture.png",
+				"plain.txt",
+			]);
+			// The picture of the name `.png` stands of the walk of that name, of the place of its colour
+			// turned over (`40 ^ 0xFF` stands of `215`).
+			const drawn = await consumeBuffer(
+				await handle.openEntry(handle.entries[0]?.id ?? "0"),
+			);
+			expect(drawn.toString("latin1", 0, 2)).toBe("BM");
+			expect([...drawn.subarray(54, 58)]).toEqual([30, 20, 10, 215]);
+			// Every other file of the archive stands as its places stand.
+			const plain = await consumeBuffer(
+				await handle.openEntry(handle.entries[1]?.id ?? "1"),
+			);
+			expect(plain.equals(other)).toBe(true);
+		} finally {
+			await handle.close();
+		}
 	});
 
 	it("reads the picture of a file of the name `.png` through the format itself", async () => {

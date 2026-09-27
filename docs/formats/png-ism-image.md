@@ -25,9 +25,10 @@ unless the file stands inside an archive whose tag is `ISA` (`VFS.IsVirtual && V
 (`[ExportMetadata("Priority", -1)]`), so a picture of the name `.png` that stands alone stands of the format
 of that name rather than of this one. The port carries both: the last priority (`priority: -1`) and the walk.
 
-The archive of the engine stands in this project as `ism-isa`, which lists the places of its files and hands
-them over as they stand. Routing the pictures of the name `.png` of such an archive here is the step that
-remains, and the record names it.
+The archive of the engine stands in this project as `ism-isa`, and it **takes the walk of this format**: a
+file of the name `.png` of such an archive is handed out by `isaEntryOpener` through `readPngIsmPicture`,
+while every other file of the archive stands as its places stand. That is where the walk is reached, the
+reference answering for a file of that name only inside an archive of the engine.
 
 ## Deviations from the reference
 
@@ -47,4 +48,7 @@ remains, and the record names it.
 * a picture of twenty four places of a colour, whose places stand as they stand (and a file of no picture of
   the name `.png` at all, which stands of no picture of this format);
 * the walk through the format itself: the head of the name `.png` at the places of the file, the name of the
-  one file of the listing, the places handed out as a bitmap, and a file of no such head refused.
+  one file of the listing, the places handed out as a bitmap, and a file of no such head refused;
+* the walk as the archive of the engine takes it: an archive of the engine of ISM (`ism-isa`) of two files,
+  whose picture of the name `.png` stands out as a bitmap of the place of its colour turned over
+  (`40 ^ 0xFF` stands of `215`) and whose other file stands as its places stand.

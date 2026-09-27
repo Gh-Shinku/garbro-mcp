@@ -8,6 +8,8 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
+import { readPngIsmPicture } from "./png-image.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -15,6 +17,7 @@ import {
 	isSaneCount,
 	normalizeEntryPath,
 	type FixedEntry,
+	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
 
 const SIGNATURE = Buffer.from("ISM ", "ascii");
@@ -153,6 +156,26 @@ async function readIsaIndex(
 	return undefined;
 }
 
+/** The name of the pictures of the engine, whose places stand of the walk of `png-ism-image`. */
+const PNG_EXTENSION = "png";
+
+/**
+ * `IsaOpener.OpenEntry`, of the walk of a picture of the engine. The viewer of the reference takes a file of
+ * the name `.png` of such an archive through the format of that name (`PngIsmFormat`, which answers nothing
+ * for a file that stands *outside* such an archive), so this port stands of the same walk for a file of that
+ * name and hands every other file over as its places stand.
+ */
+export const isaEntryOpener: FixedEntryOpener = async (source, entry) => {
+	const data = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.size)),
+	);
+	if (PNG_EXTENSION !== entry.path.replace(/^.*\./, "").toLowerCase()) {
+		return Readable.from([data]);
+	}
+	const picture = await readPngIsmPicture(data);
+	return Readable.from([picture ?? data]);
+};
+
 export const isaFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: isaDescriptor,
 	detection: { signatures: [{ bytes: SIGNATURE }] },
@@ -165,4 +188,5 @@ export const isaFormat: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid ISM ISA layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
+	openEntry: isaEntryOpener,
 });
