@@ -192,6 +192,15 @@ export function createVp8MacroblockState(mbWidth: number): Vp8MacroblockState {
 	};
 }
 
+/** Resets the left neighbours and the left modes at the start of a macroblock row (`VP8InitScanline`): the values to
+ * the left of the first macroblock of a row are the frame border values, not the values left behind by the last
+ * macroblock of the row above. */
+export function resetVp8Scanline(state: Vp8MacroblockState): void {
+	state.leftNonZero = 0;
+	state.leftNonZeroDc = 0;
+	state.leftModes.fill(B_DC_PRED);
+}
+
 /** Reads the counts of the head of the format of the picture of the places of the file of the picture of the format
  * of the walk of the picture of the format of the places of the file square of a place of the file of the picture of
  * the format of four places of the file, of the counts of the head of the format of the picture of the places of the

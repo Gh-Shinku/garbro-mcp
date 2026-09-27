@@ -25,6 +25,7 @@ import {
 	B_VR_PRED,
 	buildVp8Quantisers,
 	createVp8MacroblockState,
+	resetVp8Scanline,
 	type Vp8MacroblockCoefficients,
 	type Vp8MacroblockModes,
 	type Vp8MacroblockState,
@@ -571,10 +572,6 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 			"The picture of the format of the web of the colour of the places of the picture stands of the counts of the head of the format of the picture of the format of the two places of the file of the picture of the format",
 		);
 	const header = readVp8PartitionHeader(frame.partition);
-	if (Math.ceil(frame.height / 16) > 1)
-		throw unsupported(
-			"A picture of the format of the web of the colour of the places of the picture of the counts of the places of the file of their own stands of no walk of this project: the counts of the head of the format of the picture of the places of the file of the picture of the format standing in front of the picture of the format of the counts of the places of the file of the picture of the format stand of counts of their own of this walk",
-		);
 	if (1 !== header.tokenPartitions)
 		throw unsupported(
 			"The picture of the format of the web of the colour of the places of the picture stands of counts of the head of the format of the picture of the places of the file of their own",
@@ -602,6 +599,10 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	);
 	const state: Vp8MacroblockState = createVp8MacroblockState(mbWidth);
 	for (let mbY = 0; mbY < mbHeight; mbY += 1) {
+		// The walk of the library of the picture of the web stands of the counts of the head of the format of the
+		// places of the file of the picture of the format back to their standing places of the file at the head of
+		// each row of the places of the file square (`VP8InitScanline`).
+		resetVp8Scanline(state);
 		const modes: Vp8MacroblockModes[] = [];
 		for (let mbX = 0; mbX < mbWidth; mbX += 1)
 			modes.push(
@@ -627,7 +628,25 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 			);
 			const yOrigin = (16 * mbY + 1) * yStride + (16 * mbX + 1);
 			if (mode.fourByFour) {
-				const lastInRow = mbX >= mbWidth - 1;
+				// The four samples above and to the right of the macroblock (`ReconstructRow`, `top_right`). libwebp
+				// keeps them in the macroblock cache, filled from the row above the macroblock (`top_yuv`): the four
+				// samples following the macroblock in that row, or the last sample of that row repeated for the
+				// rightmost macroblock. The same four values are then copied into the following three 4x4 block rows,
+				// so every block row sees the samples of the row above the macroblock and not the samples above its
+				// own row. For the first macroblock row the cache still holds the frame border value (127) and libwebp
+				// leaves it alone, which is what the border row of the padded plane already holds.
+				const above = yOrigin - yStride;
+				const last = mbX >= mbWidth - 1;
+				const held =
+					0 === mbY ? 127 : last ? (yPlane[above + 15] ?? 0) : undefined;
+				const adjacent = [0, 1, 2, 3].map((i) => yPlane[above + 16 + i] ?? 0);
+				for (let row = 0; row < 16; row += 4) {
+					const cells = above + row * yStride + 16;
+					for (let i = 0; i < 4; i += 1)
+						yPlane[cells + i] = undefined === held ? (adjacent[i] ?? 0) : held;
+				}
+			}
+			if (mode.fourByFour) {
 				let bits = residuals.nonZeroY;
 				for (let block = 0; block < 16; block += 1) {
 					const origin = fourPlaceOrigin(block, yOrigin, yStride);
@@ -642,10 +661,6 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 					// picture of the format of the picture of the format of the count of the head of the format
 					// standing of the places of the file of the picture of the format, of the places of the file of
 					// the picture of the format of the picture of the format of the count of the head of the format of
-					// the picture of the places of the file of the picture of the format itself.
-					if (lastInRow && 3 === (block & 3))
-						for (let i = 0; i < 4; i += 1)
-							yPlane[origin - yStride + 4 + i] = 127;
 					predictFour(yPlane, yStride, origin, mode.modes[block] ?? B_DC_PRED);
 					doTransform(
 						bits,
