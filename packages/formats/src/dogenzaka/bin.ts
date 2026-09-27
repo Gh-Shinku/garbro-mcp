@@ -11,8 +11,6 @@ import {
 } from "@garbro-mcp/core";
 import { basename } from "node:path";
 import { Readable } from "node:stream";
-import { changeExtension } from "../shared/companion.js";
-import { detectFileType } from "../shared/detect-type.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -22,6 +20,7 @@ import {
 	type FixedEntry,
 	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 /** `BinOpener`: a count, then offset/size pairs that point at a second header. */
 const BIN_INDEX_START = 4;
@@ -150,8 +149,7 @@ async function readGameDatIndex(
 
 /**
  * GARbro `Entry.ChangeType`: the entry keeps its generated name and gains the detected extension, and
- * its type comes from the recognized signature. Only the signatures the shared helper knows are
- * recognized; the catalog-wide lookup the reference performs is not reproduced.
+ * its type comes from the recognized signature. Ambiguous catalogue signatures leave it unchanged.
  */
 async function applyDetectedType(
 	source: ByteSource,
@@ -160,10 +158,7 @@ async function applyDetectedType(
 	const available = Number(entry.size < 4n ? entry.size : 4n);
 	if (available < 4) return;
 	const signature = (await source.readAt(entry.offset, 4)).readUInt32LE(0);
-	const detected = detectFileType(signature);
-	if (!detected) return;
-	entry.path = changeExtension(entry.path, detected.extension);
-	entry.metadata = { ...entry.metadata, type: detected.type };
+	applySignatureResourceType(entry, signature);
 }
 
 /** GARbro `BinOpener.OpenEntry`: stored payloads pass through, packed ones decode until input ends. */

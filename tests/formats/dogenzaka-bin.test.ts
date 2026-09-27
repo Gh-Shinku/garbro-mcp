@@ -108,7 +108,20 @@ describe("Dogenzaka BIN audio archives", () => {
 		const handle = await dogenzakaBinFormat.open(source, "BGM.bin");
 		expect(handle.entries[0]).toMatchObject({
 			path: "BGM#00000.ogg",
-			metadata: { type: "audio" },
+			resourceType: "audio",
+		});
+	});
+
+	it("retypes payloads through the catalog-wide signature lookup", async () => {
+		const data = Buffer.alloc(0x20);
+		data.writeUInt32LE(0xe0ffd8ff, 0);
+		const handle = await dogenzakaBinFormat.open(
+			new BufferByteSource(buildBin([{ data }])),
+			"CG.bin",
+		);
+		expect(handle.entries[0]).toMatchObject({
+			path: "CG#00000.jpg",
+			resourceType: "image",
 		});
 	});
 
@@ -165,7 +178,7 @@ describe("Dogenzaka BIN audio archives", () => {
 		const handle = await dogenzakaGameDatFormat.open(source, "GAME.bin");
 		expect(handle.entries[0]).toMatchObject({
 			path: "GAME#0000.wav",
-			metadata: { type: "audio" },
+			resourceType: "audio",
 		});
 	});
 

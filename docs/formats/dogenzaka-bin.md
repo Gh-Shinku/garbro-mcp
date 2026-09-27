@@ -55,9 +55,10 @@ index.
 ## Typing
 
 Both layouts retype entries from their payload signature, which also appends an extension to the generated name. The
-shared helper recognizes the Ogg, RIFF and bitmap signatures; the catalog-wide lookup the reference performs is not
-reproduced, so an unknown signature leaves the name alone. The game data layout hands payloads out as stored, while the
-first layout unpacks compressed ones with the default LZSS stream.
+shared classifier applies GARBro's Ogg, RIFF and bitmap special cases, then its generated catalogue of all exported
+resource signatures. A signature with no match or more than one matching resource leaves the name and type alone. The
+game data layout hands payloads out as stored, while the first layout unpacks compressed ones with the default LZSS
+stream.
 
 ## Support
 
@@ -68,11 +69,10 @@ first layout unpacks compressed ones with the default LZSS stream.
 | Two-bit compression flag and LZSS unpacking | Supported |
 | Cumulative offsets and the leading zero word (`BIN/Dogenzaka/2`) | Supported |
 | Zero-length and out-of-range rejection | Supported |
-| Signature-based retyping for Ogg, RIFF and bitmap | Supported |
+| Signature-based retyping, including the full GARBro catalogue | Supported |
 | Five-digit and four-digit entry numbering | Supported |
 | Placement validation | Supported |
-| Catalog-wide type lookup beyond those signatures | Unsupported |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover both layouts, packed and stored payloads, retyping, an offset inside the index, an inner header
+Synthetic fixtures cover both layouts, packed and stored payloads, special-case and catalogue-wide retyping, an offset inside the index, an inner header
 without a positive word, a table that does not start at zero, a zero-length entry and an out-of-range table.

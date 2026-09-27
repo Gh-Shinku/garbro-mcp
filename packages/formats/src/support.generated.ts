@@ -5876,15 +5876,23 @@ export const formatSupportCatalog = {
 				"two bit compression flag",
 				"default lzss unpacking until input ends",
 				"store pass through",
-				"signature based retyping for ogg riff and bitmap payloads",
+				"signature based retyping through the full GARBro resource catalog",
 				"five digit entry numbering",
 				"placement validation",
 			],
-			unsupported: [
-				"archive creation",
-				"catalog wide type lookup beyond ogg riff and bitmap",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
+			readStatus: "complete",
+			gaps: [
+				{
+					code: "scope.archive-create",
+					disposition: "out-of-scope",
+				},
+				{
+					code: "verification.real-game",
+					disposition: "verification",
+				},
+			],
 		},
 		{
 			reference: {
@@ -5902,15 +5910,23 @@ export const formatSupportCatalog = {
 				"cumulative end offsets relative to the table end",
 				"zero length entry rejection",
 				"raw extraction",
-				"signature based retyping for ogg riff and bitmap payloads",
+				"signature based retyping through the full GARBro resource catalog",
 				"four digit entry numbering",
 				"placement validation",
 			],
-			unsupported: [
-				"archive creation",
-				"catalog wide type lookup beyond ogg riff and bitmap",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
+			readStatus: "complete",
+			gaps: [
+				{
+					code: "scope.archive-create",
+					disposition: "out-of-scope",
+				},
+				{
+					code: "verification.real-game",
+					disposition: "verification",
+				},
+			],
 		},
 		{
 			reference: {
