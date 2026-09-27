@@ -4993,6 +4993,7 @@ export const formatSupportCatalog = {
 				"xor obfuscation",
 				"bitmap pass through",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the surface the codec gives back",
 			],
 			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],

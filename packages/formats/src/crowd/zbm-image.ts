@@ -9,7 +9,11 @@ import type {
 } from "@garbro-mcp/core";
 import { inflateLzss } from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
-import { readBmpHeaderFields } from "../shared/bmp.js";
+import {
+	readBmpHeaderFields,
+	readBmpImage,
+	writeBmpImage,
+} from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -173,7 +177,17 @@ export const crowdZbmImageFormat: ArchiveFormat = defineFixedArchive({
 		for (let index = 0; index < inverted; index += 1) {
 			data[index] = (data[index] ?? 0) ^ 0xff;
 		}
-		// The payload is a bitmap, so it is passed through rather than decoded.
-		return Readable.from([data]);
+		// `ZbmFormat.Read` stands of `Bmp.Read` over the surface the codec gives back, so the picture stands read
+		// of the bitmap walk of this project and handed over as a bitmap of its own, of its list of colours as it
+		// stands. A stream the codec cut short of the places the head names stands turned away, which is where
+		// the reference throws.
+		const image = readBmpImage(data);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Crowd ZBM bitmap data: ${data.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

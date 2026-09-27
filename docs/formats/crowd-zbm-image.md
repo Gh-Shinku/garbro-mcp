@@ -52,3 +52,11 @@ encode.
 * No extension is declared, and detection is by signature plus the inverted header.
 * The port records `encryption: true`, since the reference's obfuscation is not something a reader can ignore.
 * `Write` throws `NotImplementedException` in the reference.
+
+## The places of the picture
+
+The reference stands `Bmp.Read` over the surface its codec gives back, so this port reads that bitmap with the bitmap
+walk of this project and hands the places of the picture over as a bitmap of its own: of the width, the height and the
+depth of the head of the bitmap, of a row of the count of the places a row of the picture holds (so the row padding of
+the file stands of no count), of the rows in the order the head names and of the list of colours as it stands. A stream
+the codec cut short of the places its head names stands turned away, which is where the reference throws.
