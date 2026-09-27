@@ -23213,5 +23213,31 @@ export const formatSupportCatalog = {
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
+		{
+			reference: {
+				type: "image",
+				tag: "WEBP",
+				class: "WebPFormat",
+				source: "Experimental/WebP/ImageWEBP.cs",
+			},
+			localId: "gameres-webp-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"detection by the head of the container of the format",
+				"listing",
+				"extraction",
+				"the counts of the head of the picture of the two kinds of the picture of the web",
+				"the places of the picture of no count of the places of the file of their own (VP8L): the counts of the head of the format of the picture of the web of the picture of the colours of the picture, of the counts of the head of the format of the picture of the web of the colour of the picture of the places of the file, of the counts of the head of the picture of the format, of the counts of the head of the format of the picture of the web of the counts of the head of the format and of the counts of the head of the format of the picture of the web of the list of the colours of the picture",
+			],
+			unsupported: [
+				"archive creation: the reference hands the picture of the web to the library of its platform and this port reads such a picture alone",
+				"the places of the picture of the colour of the places of the picture (VP8) and the counts of the head of the format of the picture of the web of the places of the file of the counts of the head of the format of the picture of the web",
+			],
+			remainingVerification: [
+				"the places of the picture of the colour of the places of the picture (VP8) stand of the library of the picture of the web of this machine alone",
+				"the counts of the head of the format of the picture of the web of the places of the file of the colours of the picture and of the counts of the head of the format of the picture of the web of the colours of the picture of the places of the file stand of the walk of the counts of the head of the format of the picture of the web of the fixtures of the counts of the head of the picture of the format",
+			],
+		},
 	],
 } as const;
