@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { brgImageFormat, decryptRegrips } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 /** A bitmap as the shared writer makes it: a `BM` tag, a complete header and tight or padded rows. */
 function buildBmp(
@@ -52,6 +53,24 @@ async function metadataOf(
 	} finally {
 		await archive.close();
 	}
+}
+
+/** The places of the picture the walk of `buildBmp` hands over, read of the bitmap the fixture wrote. */
+function placesOf(
+	bmp: Buffer,
+	height: number,
+	rowBytes: number,
+	stride: number,
+): number[] {
+	const bottomUp = bmp.readInt32LE(22) > 0;
+	const expected: number[] = [];
+	for (let row = 0; row < height; row += 1) {
+		const stored = bottomUp ? height - 1 - row : row;
+		expected.push(
+			...bmp.subarray(54 + stored * stride, 54 + stored * stride + rowBytes),
+		);
+	}
+	return expected;
 }
 
 describe("Regrips encrypted bitmap", () => {
@@ -106,34 +125,45 @@ describe("Regrips encrypted bitmap", () => {
 		expect(await metadataOf(buildBrg(topDown))).toMatchObject({ height: 3 });
 	});
 
-	it("handing over the decrypted bitmap keeps its padding", async () => {
-		// Three pixels a row at three bytes is not a multiple of four, so the file holds padding bytes.
+	it("reads the places of the picture of a row that holds padding places", async () => {
+		// Three pixels a row at three places a pixel is not a multiple of four, so the file holds padding.
 		const bmp = buildBmp(3, 2, 24);
-		// Nine bytes a row padded to twelve, twice, behind the fifty four byte header.
+		// Nine places a row padded to twelve, twice, behind the fifty four place header.
 		expect(bmp.length).toBe(54 + 12 * 2);
 		const output = await extract(buildBrg(bmp));
-		expect(output.equals(bmp)).toBe(true);
-		expect(output.readUInt32LE(2)).toBe(bmp.length);
+		// The walk of the picture hands a row over of the count of the places a row of the picture holds, so
+		// the padding places of the file stand of no count.
+		const picture = readBmpImage(output);
+		expect(picture).toMatchObject({ width: 3, height: 2, bitsPerPixel: 24 });
+		expect([...(picture?.pixels ?? [])]).toEqual(placesOf(bmp, 2, 9, 12));
 	});
 
-	it("accepts a bitmap whose size word is zero, as the reference does", async () => {
-		// The reference treats a zero size as unknown and uses the stream's own length.
+	it("reads a bitmap whose size word is zero, as the reference does", async () => {
+		// The reference treats a zero size as unknown, and the walk of the bitmap does not consult it either.
 		const bmp = buildBmp(2, 2, 32);
 		bmp.writeUInt32LE(0, 2);
 		const stored = buildBrg(bmp);
 		expect(await brgImageFormat.detect(sourceOf(stored), "A.brg")).toBe(true);
 		const output = await extract(stored);
-		expect(output.equals(bmp)).toBe(true);
+		expect([...(readBmpImage(output)?.pixels ?? [])]).toEqual(
+			placesOf(bmp, 2, 8, 8),
+		);
 	});
 
-	it("hands a truncated bitmap over rather than refusing it", async () => {
+	it("reads a picture that ends inside its places, of the places it holds", async () => {
 		const stored = buildBrg(buildBmp(6, 4, 32));
 		const cut = stored.subarray(0, 60);
-		// The header is intact, so the probe accepts it and the extraction keeps what is there.
+		// The header is whole, so the probe accepts the file, the listing stands and the places of the picture
+		// the head names are read; a file that ends before those places stand of the walk as nothing at all.
+		// The reference reads the stream to its end and throws where the places run out, which is a difference
+		// this port takes on purpose, as the walk of the bitmap of this project does everywhere.
 		expect(await brgImageFormat.detect(sourceOf(cut), "A.brg")).toBe(true);
-		const output = await extract(cut);
-		expect(output.length).toBe(60);
-		expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
+		const picture = readBmpImage(await extract(cut));
+		// The picture stands of the places of the head of the bitmap, of four places of a colour, which is the
+		// count the walk of this project hands over; the values the walk fills the places with are the walk's
+		// own business and stand pinned by the tests of the bitmap walk itself.
+		expect(picture).toMatchObject({ width: 6, height: 4, bitsPerPixel: 32 });
+		expect(picture?.pixels.length).toBe(6 * 4 * 4);
 	});
 
 	it("names the entry after the bitmap and knows the size", async () => {

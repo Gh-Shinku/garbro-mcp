@@ -9,7 +9,11 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpHeaderFields } from "../shared/bmp.js";
+import {
+	readBmpHeaderFields,
+	readBmpImage,
+	writeBmpImage,
+} from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -110,7 +114,16 @@ export const brgImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!readBmpHeaderFields(plain)) {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Regrips bitmap");
 		}
-		// The reference decodes the bitmap; the port hands the decrypted original over, padding and all.
-		return Readable.from([plain]);
+		// `BrgFormat.Read` stands of `Bmp.Read` over the decrypted surface: the bitmap stands read of the bitmap
+		// walk of this project and handed over as a bitmap of its own, so the padding of the file and the places
+		// behind the picture stand of no count, and a picture cut short of its places stands turned away.
+		const image = readBmpImage(plain);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Regrips bitmap data: ${plain.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

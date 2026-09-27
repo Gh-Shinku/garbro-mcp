@@ -39,3 +39,13 @@ Extraction reads the header the same way and hands the **decrypted original** ov
 * a truncated bitmap is handed over as far as it goes, where the reference's own decoder would report what it could
   not read. The port keeps the bytes it has and does not invent the rest;
 * the padding after rows whose width is not a multiple of four is kept, because nothing is re-encoded.
+
+## The places of the picture
+
+The reference reads the decrypted surface with `Bmp.Read`, so this port reads that bitmap with the shared bitmap walk and
+hands the places of the picture over as a bitmap of its own: of the width, the height and the depth of the head of the
+bitmap, of a row of the count of the places a row of the picture holds (so the row padding of the file stands of no
+count) and of the rows in the order the head names, which for a bitmap of a positive height means the last row of the
+file first. The size word of the file stands of no count of the walk. A file that ends before the places its head names
+hands a picture of those places over, where the reference reads the stream to its end and throws: that is a difference
+this port takes on purpose, as the walk of the bitmap of this project does everywhere.
