@@ -815,6 +815,7 @@ import { cp3Format } from "./seraphim/cp3.js";
 import { cp3ImageFormat } from "./seraphim/cp3-image.js";
 import { archangelDatFormat } from "./seraphim/dat.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
+import { seraphimArchFormat } from "./seraphim/archpac.js";
 import { seraphimScn95Format, seraphimScnFormat } from "./seraphim/scnpac.js";
 import {
 	seraphimCbImageFormat,
@@ -1563,6 +1564,7 @@ export function createDefaultRegistry(
 			leafTexFormat,
 			oneUpArcFormat,
 			seraphimMcFormat,
+			seraphimArchFormat,
 			succubusArcFormat,
 			tailPkgFormat,
 			tanakaArc0Format,

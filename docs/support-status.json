@@ -17841,6 +17841,31 @@
 		{
 			"reference": {
 				"type": "archive",
+				"tag": "SERAPH/ARCH",
+				"class": "ArchPacOpener",
+				"source": "ArcFormats/Seraphim/ArcSeraph.cs"
+			},
+			"localId": "seraphim-archpac",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the index of an archive of the engine of the shape that stands of a companion file: where a `ScnPac.dat` stands beside the `ArchPac.dat` of the engine, the place of the index stands in the head of the companion itself, of the counts of the reference (`first_offset` at 4, the place of the index at the four places in front of it)",
+				"the walk of the index of the engine: the runs of the index (at most `0x40` of them), the place of a file and the count of the files of every run, the count of the files of the archive over all of them, and the places of the files of a window of one place more than the runs stand of, walked from the last run of the index",
+				"the names of the files of the engine, of the shape of the reference (`<run>-<%05d>.cts`)",
+				"the places of a file of the engine that stand of zlib, of the two heads the reference names (the word `0x9C78` at the head of the file, and the count one at the head of the file with a place of `0x78` behind it)",
+				"the picture of a file of the engine, of the counts of the place of a picture the head of it names: the counts of the places of a row and of a column and three places of the file for every place of the picture, handed out as a bitmap of twenty four places of a colour"
+			],
+			"unsupported": [
+				"archive creation",
+				"the shape of the archive whose index stands in the archive itself, at a place a scheme of the game names: `KnownSchemes` stands empty in the shipped reference and this port carries no scheme of a game either",
+				"the map of the events of an archive (`EventMap`, of a scheme), and the places of a picture of the engine that stand of the `CT` walk of the same engine: such a file stands handed over as its places stand",
+				"a file of the engine whose head names no counts of a place of a picture the reference stands of: the places of it stand handed over as they stand where the reference stands of the image walk of the engine"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
+				"type": "archive",
 				"tag": "SERAPH/VOICE",
 				"class": "VoiceDatOpener",
 				"source": "ArcFormats/Seraphim/ArcVoice.cs"

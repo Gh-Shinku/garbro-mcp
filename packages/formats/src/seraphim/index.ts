@@ -6,3 +6,4 @@ export * from "./scnpac.js";
 export * from "./voice.js";
 export * from "./cp3-image.js";
 export * from "./seraph-image.js";
+export * from "./archpac.js";

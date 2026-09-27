@@ -161,9 +161,14 @@ open archives that the shipped defaults already cover.
 - `TCD` / `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): this one stood here wrongly - the tables of the archive read **without any key at all**, of the cipher of their own section, which stands in the file. The `KnownKeys` table of the source reaches one place only, `OpenSpdc`, where a picture whose places stand of the cipher of the engine's own stands; a stock build carries no key for it and hands such a picture over as it stands, which is what the reference does as well. **It stands ported now**, as `topcat-tcd3` - see `docs/formats/topcat-tcd3.md`.
 
 
-- `SERAPH/ARCH` (`ArcFormats/Seraphim/ArcSeraph.cs`): the archive stands at a place within a file that is named
-  by a scheme - `KnownSchemes` holds `new Dictionary<string, ArchPacScheme>()` and the reader walks the places
-  the schemes name in the order of their offsets. With no scheme it can tell no archive at all.
+- `SERAPH/ARCH` (`ArcFormats/Seraphim/ArcSeraph.cs`): one shape of the archive stands at a place within a
+  file that is named by a scheme - `KnownSchemes` holds `new Dictionary<string, ArchPacScheme>()` and the
+  reader walks the places the schemes name in the order of their offsets - and that shape indeed reads with
+  no scheme at all. The **second** shape of the same reader stands of a companion file instead: where a
+  `ScnPac.dat` stands beside the `ArchPac.dat` of the engine, the place of the index stands in the head of
+  that companion itself, and the walk behind it is the walk of the reference. **It stands ported now**, as
+  `seraphim-archpac`, of that second shape, of the zlib places of the files of the engine and of the plain
+  picture of the places of a file - see `docs/formats/seraphim-archpac.md`.
 - `YPF` (`ArcFormats/YuRis/ArcYPF.cs`, `QueryEncryptionScheme` at line 192): the key of the index and of every
   entry comes out of a scheme the reader is asked for by the name of the file, out of a table held as
   `new Dictionary<string, YpfScheme>()` in the source; without one it reads nothing.
