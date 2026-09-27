@@ -48,6 +48,12 @@ export interface Vp8Frame {
 	scale: number;
 	/** The places of the file of the picture of the format, of the count of the head of the picture of the format. */
 	partition: Buffer;
+	/** The places of the file of the counts of the head of the picture of the format of the picture of the colour of
+	 * the picture (the places of the file of the picture of the format of the picture of the format itself and of the
+	 * places of the file of the counts of the head of the format of the picture of the places of the file): the counts
+	 * of the head of the format of the picture of the places of the file of the picture of the format stand of the
+	 * count of the head of the format of the picture of the format itself of those places of the file. */
+	payload: Buffer;
 }
 
 /** The counts of the head of the picture of the colour of the places of the picture of the web (VP8), of the counts
@@ -102,6 +108,7 @@ export function readVp8FrameHeader(payload: Buffer): Vp8Frame {
 		height,
 		scale,
 		partition: payload.subarray(10, 10 + firstPartSize),
+		payload: payload.subarray(10),
 	};
 }
 

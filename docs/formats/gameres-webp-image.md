@@ -89,3 +89,56 @@ the format of the picture of the places of the file may stand as no count of the
 library of the picture of the web writes such a count of the head of the format as it stands, and this walk reads it
 as it stands), which the walk of the counts of the head of the format of the picture of the places of the file of the
 places of the file of the picture of the format itself of this project keeps.
+
+## The counts of the head of the format of the picture of the places of the file of the walk of the picture of the format
+
+After the counts of the head of the format of the picture of the places of the file of the picture of the format
+itself, the walk of this project walks the counts of the head of the format of the picture of the places of the file
+of the picture of the format of four places of the file square of the picture of the format of the places of the file
+square (the counts of the head of the format of the picture of the places of the file of the picture of the format of
+the picture of the format of four places of the file square and of the colour of the picture, of the counts of the
+head of the format of the picture of the places of the file of the picture of the format of the number of the picture
+of the format and of the counts of the head of the format of the picture of the places of the file of the number of
+the picture of the format of the colour of the picture) and then the counts of the head of the format of the picture
+of the places of the file of the picture of the format of the places of the file of the picture of the format (the
+counts of the head of the format of the picture of the two places of the file of the picture of the format of four
+places of the file square, of the places of the file of the picture of the format of the count of the head of the
+format of the picture of the format of the two places of the file and of the places of the file of the picture of the
+format of the colour of the picture, of the counts of the head of the format of the picture of the places of the file
+of the picture of the format standing next to them).
+
+`packages/formats/src/shared/webp-vp8-macroblock.ts` carries that walk, of the counts of the head of the format of
+the picture of the colours of the picture of the picture of the format of the places of the file (of the counts of
+the head of the format of the picture of the places of the file of the picture of the format of the picture of the
+format of the two places of the file), of the counts of the head of the format of the picture of the places of the
+file of the picture of the format of the count of the head of the format of the picture of the format of the two
+places of the file (`walkVp8SecondOrder`) and of the counts of the head of the format of the picture of the places
+of the file of the picture of the format standing next to them. The walk stands of the walk of the library of the
+picture of the web (`ParseIntraMode`, `GetCoeffsFast`, `GetLargeValue`, `ParseResiduals`, `VP8DecodeMB`,
+`VP8ParseQuant`, `TransformWHT_C`), of the same counts of the head of the format of the picture of the places of the
+file of that library (BSD 3-Clause).
+
+The walk of the counts of the head of the format of the picture of the places of the file of the picture of the
+format of a picture of the format of the web of the two places of the file of the picture of the format of the
+picture of the format itself (of the picture of the format of the picture of the library of the picture of the web,
+of the counts of the head of the format of the picture of the two places of the file of the picture of the format)
+stands of three kinds of counts of the head of the format: the walk of the places of the file of the picture of the
+format of the picture of the format of the two places of the file (of no count of the head of the format of the
+picture of the places of the file of the picture of the format of the count of the head of the picture of the format
+of sixteen places of the file square and of no count of the head of the format of the picture of the places of the
+file), the walk of the counts of the head of the format of the picture of the places of the file of the picture of the
+format of the places of the file of their own (a picture of the format of the places of the file of no count of the
+head of the format of the picture of the places of the file of the picture of the format of no count of the head of
+the format of the picture of the places of the file stands of no count of the head of the format of the picture of the
+places of the file) and the count of the head of the format of the picture of the places of the file of the picture of
+the format of the places of the file of the picture of the format of the two of them (of no count of the head of the
+format of the picture of the places of the file of the picture of the format of the picture of the format of the
+places of the file of the picture of the format of the picture of the format of the two places of the file).
+
+The places of the file of the picture of the format of the picture of the format of the count of the head of the
+picture of the format of the colour of the picture (the walk of the places of the file of the picture of the format
+of the picture of the format of four places of the file square, of the places of the file of the picture of the
+format of sixteen places of the file square and of the places of the file of the picture of the format of the colour
+of the picture) and the walk of the places of the file of the picture of the format itself do not stand of this walk
+yet, so no place of the picture of the format of the colour of the places of the picture stands of this project at
+this place of the file.
