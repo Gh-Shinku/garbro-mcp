@@ -89,12 +89,13 @@ Every picture is handed over as a bitmap of this project of thirty two places of
 
 ## Deviations
 
-* A picture of the name **`TLG`** (a layer of the archive) of the kinds **nought and one** stands refused:
-  the reference reads it through its own walk of that name (`ArcFormats/Kirikiri/ImageTLG.cs`, of the kinds
-  nought, one and five), and this project carries the kinds **five and six** of it (`kirikiri/tlg-image.ts`).
-  A picture of the kind five therefore stands read of the same walk the row of that name of this project
-  stands of (which the test pins: the places of the same file stand of the same picture through both), and
-  one of the kinds nought and one stands refused rather than read of a walk of another kind.
+* A picture of the name **`TLG`** (a layer of the archive) stands read of the walk of that name of this
+  project (`kirikiri/tlg-image.ts`), which is the walk the reference stands of as well: the reference knows
+  the kinds **five** and **six** of that name alone (`ArcFormats/KiriKiri/ImageTLG.cs` accepts `TLG5.0`,
+  `TLG6.0`, the two masked words and `JKMXE8`, and nothing else), and it knows the head `TLG0.0\0sds\x1a`
+  only as the fifteen places in **front** of such a picture, which both the reference and this port skip.
+  There is therefore no kind of this name that one reader knows and the other does not; the test pins the
+  walk by reading the same bytes through both rows (the places of the same file stand of the same picture).
 * The head of a file of the first flag and the tables of the names behind it stand of **one** walk of the
   cipher, of the key of the game, as the reference stands of them: the places of the head stand of the walk
   first, and the places of the tables after them.
