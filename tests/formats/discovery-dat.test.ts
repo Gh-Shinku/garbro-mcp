@@ -1,6 +1,7 @@
 import { BufferByteSource } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { discoveryDatFormat } from "../../packages/formats/src/discovery/dat.js";
 import { literalLzssStream } from "../helpers/lzss.js";
 
@@ -80,6 +81,13 @@ interface DiscoveryIndexEntry {
 	bodyOffset?: number;
 	headerSize?: number;
 	headerUnpacked?: number;
+	/** The counts of a picture of a bdata entry. */
+	width?: number;
+	height?: number;
+	bpp?: number;
+	isMask?: boolean;
+	colors?: number;
+	extra?: number;
 }
 
 /**
@@ -99,10 +107,15 @@ function buildDiscovery(
 		record[0] = name.length;
 		name.copy(record, nameOffset);
 		if (kind === "bdata") {
-			record[1] = 8;
+			record[1] = entry.bpp ?? 8;
+			record[2] = entry.isMask ? 1 : 0;
 			record.writeUInt32LE(entry.size, 4);
 			record.writeUInt32LE(entry.unpackedSize ?? entry.size, 8);
 			record.writeUInt32LE(entry.offset, 0xc);
+			record.writeUInt32LE(entry.width ?? 0, 0x10);
+			record.writeUInt32LE(entry.height ?? 0, 0x14);
+			record.writeUInt16LE(entry.extra ?? 0, 0x28);
+			record.writeUInt16LE(entry.colors ?? 0, 0x2a);
 		} else if (kind === "edata") {
 			record.writeUInt32LE(entry.bodySize ?? 0, 4);
 			record.writeUInt32LE(entry.bodyUnpacked ?? 0, 8);
@@ -136,37 +149,234 @@ function buildDiscovery(
 	return file;
 }
 
+/** A picture of the engine of a bdata entry: the places of its picture, of the counts of its record. */
+function buildBDataPicture(
+	width: number,
+	height: number,
+	bpp: number,
+	pixels: Buffer,
+	options: { isMask?: boolean; colors?: number; colorMap?: Buffer } = {},
+): { data: Buffer; colors: number; isMask: boolean } {
+	const places = options.isMask || 8 === bpp ? 1 : 3;
+	const stride = (width * places + 3) & ~3;
+	const rows = Buffer.alloc(stride * height);
+	for (let row = 0; row < height; row += 1) {
+		pixels.copy(
+			rows,
+			row * stride,
+			row * width * places,
+			row * width * places + width * places,
+		);
+	}
+	// The reference stands of the whole of the places of the colour map, and of ten places of the file to a
+	// place of a count of the picture and two where the picture stands of such a count.
+	const colors = options.colors ?? 0;
+	const head = Buffer.alloc(colors * 4);
+	(options.colorMap ?? Buffer.alloc(0)).copy(head, 0);
+	return {
+		data: Buffer.concat([head, rows]),
+		colors,
+		isMask: options.isMask ?? false,
+	};
+}
+
+/** A stream of literals alone: one control word of eight places to eight places of the picture. */
+function literalLzss(bytes: Buffer): Buffer {
+	const words: number[] = [];
+	for (let at = 0; at < bytes.length; at += 8) words.push(0xff);
+	return Buffer.concat([Buffer.from(words), bytes]);
+}
+
+/** The picture a bdata entry stands of, read back through the bitmap walk of this project. */
+async function pictureOfEntry(
+	file: Buffer,
+	path: string,
+): Promise<{
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: number[];
+	palette: number[];
+}> {
+	const archive = await discoveryDatFormat.open(sourceOf(file), "BData.dat");
+	const entry = archive.entries.find((value) => value.path === path);
+	if (!entry) throw new Error(`no entry ${path}`);
+	const image = readBmpImage(
+		await consumeBuffer(await archive.openEntry(entry.id)),
+	);
+	if (!image) throw new Error("no bitmap");
+	return {
+		width: image.width,
+		height: image.height,
+		bitsPerPixel: image.bitsPerPixel,
+		pixels: [...image.pixels],
+		palette: [...image.palette],
+	};
+}
+
 function sourceOf(file: Buffer): BufferByteSource {
 	return new BufferByteSource(file);
 }
 
 describe("discovery dat", () => {
-	it("lists and extracts a bdata entry", async () => {
-		const entry = { name: "TITLE.BMP", size: 12, offset: 0x40 };
+	it("lists and reads the places of a bdata entry", async () => {
+		// Two rows of three pixels of three places of a colour: a row of the file stands of the whole of a word
+		// of four places, and the rows of the picture stand of the file turned over.
+		const built = buildBDataPicture(
+			3,
+			2,
+			24,
+			Buffer.from([
+				1, 2, 3, 4, 5, 6, 7, 8, 9, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+				0x18, 0x19,
+			]),
+		);
+		const entry = {
+			name: "TITLE.BMP",
+			size: built.data.length,
+			offset: 0x40,
+			width: 3,
+			height: 2,
+			bpp: 24,
+		};
 		const file = buildDiscovery(
 			"bdata",
 			[entry],
-			[{ offset: 0x40, data: Buffer.from("hello world!") }],
+			[{ offset: 0x40, data: built.data }],
 		);
 		const source = sourceOf(file);
 		expect(await discoveryDatFormat.detect(source, "BData.dat")).toBe(true);
 		const archive = await discoveryDatFormat.open(source, "BData.dat");
 		try {
 			expect(archive.entries.map((value) => value.path)).toEqual(["TITLE.BMP"]);
-			expect(Number(archive.entries[0]?.size)).toBe(12);
 			expect(archive.entries[0]?.compressed).toBe(false);
 			expect(archive.entries[0]?.metadata).toMatchObject({
 				kind: "bdata",
 				type: "image",
+				width: 3,
+				height: 2,
+				bitsPerPixel: 24,
 			});
-			const value = archive.entries[0];
-			if (!value) throw new Error("missing entry");
-			expect(await consumeBuffer(await archive.openEntry(value.id))).toEqual(
-				Buffer.from("hello world!"),
-			);
 		} finally {
 			await archive.close();
 		}
+		expect(await pictureOfEntry(file, "TITLE.BMP")).toEqual({
+			width: 3,
+			height: 2,
+			bitsPerPixel: 24,
+			pixels: [
+				0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 1, 2, 3, 4, 5, 6,
+				7, 8, 9,
+			],
+			palette: [],
+		});
+	});
+
+	it("reads the places of a packed picture of an entry", async () => {
+		const built = buildBDataPicture(2, 1, 24, Buffer.from([1, 2, 3, 4, 5, 6]));
+		const stored = literalLzss(built.data);
+		const entry = {
+			name: "PACKED.BMP",
+			size: stored.length,
+			unpackedSize: built.data.length,
+			offset: 0x40,
+			width: 2,
+			height: 1,
+			bpp: 24,
+		};
+		const file = buildDiscovery(
+			"bdata",
+			[entry],
+			[{ offset: 0x40, data: stored }],
+		);
+		expect(await pictureOfEntry(file, "PACKED.BMP")).toEqual({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+			pixels: [1, 2, 3, 4, 5, 6],
+			palette: [],
+		});
+	});
+
+	it("reads the places of a picture of one place of a colour, of its colour map", async () => {
+		const colorMap = Buffer.from([0, 0, 255, 0, 255, 0, 0, 0]);
+		const built = buildBDataPicture(2, 1, 8, Buffer.from([1, 0]), {
+			colors: 2,
+			colorMap,
+		});
+		const entry = {
+			name: "INDEXED.BMP",
+			size: built.data.length,
+			offset: 0x40,
+			width: 2,
+			height: 1,
+			bpp: 8,
+			colors: 2,
+		};
+		const file = buildDiscovery(
+			"bdata",
+			[entry],
+			[{ offset: 0x40, data: built.data }],
+		);
+		const picture = await pictureOfEntry(file, "INDEXED.BMP");
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 8,
+			pixels: [1, 0],
+		});
+		expect(picture.palette.slice(0, 8)).toEqual([...colorMap]);
+	});
+
+	it("reads the places of a picture of a covering place, of the order of the file", async () => {
+		// A picture of a covering place stands of `ImageData.Create` rather than of `CreateFlipped`, so the rows
+		// of the file stand in the order of the picture.
+		const built = buildBDataPicture(1, 2, 8, Buffer.from([7, 9]), {
+			isMask: true,
+		});
+		const entry = {
+			name: "MASK.BMP",
+			size: built.data.length,
+			offset: 0x40,
+			width: 1,
+			height: 2,
+			bpp: 8,
+			isMask: true,
+		};
+		const file = buildDiscovery(
+			"bdata",
+			[entry],
+			[{ offset: 0x40, data: built.data }],
+		);
+		expect(await pictureOfEntry(file, "MASK.BMP")).toMatchObject({
+			width: 1,
+			height: 2,
+			bitsPerPixel: 8,
+			pixels: [7, 9],
+		});
+	});
+
+	it("turns away a picture of a count of places of a colour the engine knows not", async () => {
+		const built = buildBDataPicture(1, 1, 32, Buffer.alloc(4));
+		const entry = {
+			name: "WIDE.BMP",
+			size: built.data.length,
+			offset: 0x40,
+			width: 1,
+			height: 1,
+			bpp: 32,
+		};
+		const file = buildDiscovery(
+			"bdata",
+			[entry],
+			[{ offset: 0x40, data: built.data }],
+		);
+		const archive = await discoveryDatFormat.open(sourceOf(file), "BData.dat");
+		const value = archive.entries[0];
+		if (!value) throw new Error("missing entry");
+		await expect(archive.openEntry(value.id)).rejects.toThrow(
+			/stands of 32 places of a colour/,
+		);
 	});
 
 	it("unpacks the header and body of an edata entry", async () => {

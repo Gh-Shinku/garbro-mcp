@@ -42,15 +42,27 @@ the sum of the header and body sizes and its unpacked size as the sum of both un
 
 ## Extraction
 
-BData and VData entries are extracted verbatim; the BData image decoder is out of scope. An EData entry
-holds an LZSS compressed header and an LZSS compressed body at separate offsets: the header is decoded to
-its declared unpacked length with a bounded LZSS stream, and the body is decoded to the end of its stored
-range. The header bytes are placed before the body.
+A VData entry is extracted verbatim. A BData entry stands of `BDataDecoder`: the places of its picture stand
+behind a colour map of the count of colours its record names, four places of a colour to a colour, and behind ten
+places of the file to a place of the count of places of the file where the record names such a count and two where it
+does not; a packed entry holds an LZSS compressed picture of the count of places its record declares and takes the
+same walk of the compressed streams an EData body takes. A row of the picture stands of the whole of a word of four
+places in the file and of the count of its own places in a bitmap. A picture of a covering place stands of `Gray8`
+eight bit grey and keeps the order of the file, a picture of eight places of a colour stands of an eight bit picture
+with the colour map of the record and the other pictures stand of twenty four places of a colour with the rows of the
+file turned over, which is what `ImageData.CreateFlipped` stands of. An EData entry holds an LZSS compressed header
+and an LZSS compressed body at separate offsets: the header is decoded to its declared unpacked length with a bounded
+LZSS stream, and the body is decoded to the end of its stored range. The header bytes are placed before the body.
 
 ## Port notes and deviations
 
 - Archive creation is out of scope.
-- The BData image decoder (`BDataDecoder`), including its palette and mask handling, is not ported.
+- A packed BData entry stands of the same walk of the compressed streams as an EData body, which the reference
+  marks through the same `IsPacked` flag; the port records that flag on the entry as well, since the two counts of
+  the record differ either way.
+- A BData picture of a count of places of a colour the reference knows not (everything but eight and twenty four,
+  and one of a covering place) stands turned away, where the reference would hand a picture of twenty four places of
+  a colour over a stride of the count it declares.
 - Because the body decodes to its own end, the extracted size of an EData entry is reported as unknown.
 
 ## References

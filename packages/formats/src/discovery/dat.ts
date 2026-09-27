@@ -9,6 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { inflateLzss, inflateLzssAll } from "@garbro-mcp/codecs";
+import { writeBmp8Palette, writeBmp24 } from "../shared/bmp.js";
 import { basename } from "node:path";
 import { Readable } from "node:stream";
 import {
@@ -49,6 +50,13 @@ interface DiscoveryEntry {
 	unpackedSize: bigint;
 	packed: boolean;
 	kind: "bdata" | "edata" | "vdata";
+	/** `BDataEntry`: the counts of the picture of the entry, of its own record. */
+	width: number;
+	height: number;
+	bpp: number;
+	isMask: boolean;
+	extra: number;
+	colors: number;
 }
 
 /**
@@ -171,6 +179,12 @@ async function readDiscoveryIndex(
 			unpackedSize: 0n,
 			packed: false,
 			kind,
+			width: 0,
+			height: 0,
+			bpp: 0,
+			isMask: false,
+			extra: 0,
+			colors: 0,
 		};
 		if (kind === "bdata") {
 			const stored = BigInt(index.readUInt32LE(position + 4));
@@ -180,6 +194,12 @@ async function readDiscoveryIndex(
 			entry.unpackedSize = unpacked;
 			// The reference marks the entry packed when the two sizes differ.
 			entry.packed = stored !== unpacked;
+			entry.width = index.readUInt32LE(position + 0x10);
+			entry.height = index.readUInt32LE(position + 0x14);
+			entry.bpp = index.readUInt8(position + 1);
+			entry.isMask = index.readUInt8(position + 2) === 1;
+			entry.extra = index.readUInt16LE(position + 0x28);
+			entry.colors = index.readUInt16LE(position + 0x2a);
 		} else if (kind === "edata") {
 			entry.bodySize = BigInt(index.readUInt32LE(position + 4));
 			entry.headerUnpacked = BigInt(index.readUInt32LE(position + 0x14));
@@ -224,6 +244,127 @@ export const discoveryDatDescriptor: FormatDescriptor = {
 	],
 };
 
+/** The places of a colour to a pixel the walks of this engine hand over, of the counts of a record. */
+const BDATA_PLACES = 4;
+/** A picture of one place of a colour stands of grey, which the engine reads as `Gray8`. */
+function greyColourMap(): Buffer {
+	const entries = Buffer.alloc(256 * 4);
+	for (let level = 0; level < 256; level += 1) {
+		entries[level * 4] = level;
+		entries[level * 4 + 1] = level;
+		entries[level * 4 + 2] = level;
+	}
+	return entries;
+}
+
+/**
+ * The rows of a picture of a frame stand bottom up in the file where the picture stands of
+ * `ImageData.CreateFlipped`, which stands of every picture of this engine but one of a covering place.
+ */
+function flipBDataRows(
+	pixels: Buffer,
+	width: number,
+	height: number,
+	places: number,
+): Buffer {
+	const stride = width * places;
+	const rows = Buffer.alloc(stride * height);
+	for (let row = 0; row < height; row += 1) {
+		pixels.copy(
+			rows,
+			row * stride,
+			(height - 1 - row) * stride,
+			(height - row) * stride,
+		);
+	}
+	return rows;
+}
+
+/**
+ * `BDataDecoder`: the places of a picture of a bdata entry stand behind a colour map and a count of places of
+ * the file, of the counts of the record of the entry; the places of a picture of the engine stand of rows whose
+ * count of places of a colour stands of the whole of a word of four places, which this project takes off before
+ * writing a bitmap. A picture of one place of a colour stands of a covering place and keeps the order of the file,
+ * where every other picture stands of `ImageData.CreateFlipped`.
+ */
+async function readBDataPicture(
+	source: ByteSource,
+	entry: FixedEntry,
+	metadata: Record<string, unknown>,
+): Promise<Buffer> {
+	const width = Number(metadata.width ?? 0);
+	const height = Number(metadata.height ?? 0);
+	const bpp = Number(metadata.bitsPerPixel ?? 0);
+	const isMask = metadata.isMask === true;
+	const colors = Number(metadata.colors ?? 0);
+	const extra = Number(metadata.extra ?? 0);
+	if (width <= 0 || height <= 0) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of no places of the file`,
+		);
+	}
+	// The reference stands of three places of a colour for every count of the record but one of eight and one
+	// of a covering place, whose counts stand against the stride it hands over.
+	if (!isMask && 8 !== bpp && 24 !== bpp) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture ${entry.path} stands of ${bpp} places of a colour`,
+		);
+	}
+	const places = isMask || 8 === bpp ? 1 : 3;
+	const stored = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.packedSize)),
+	);
+	let at = 0;
+	let palette: Buffer | undefined;
+	if (colors > 0) {
+		at += colors * BDATA_PLACES;
+		palette = stored.subarray(0, colors * BDATA_PLACES);
+	}
+	if (extra > 0) at += 10 * extra + 2;
+	if (at > stored.length) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of too few places of the file`,
+		);
+	}
+	// `BDataDecoder` stands of a count of places of four to a row of the file.
+	const strideBytes = (width * places + 3) & ~3;
+	const rows = Buffer.alloc(strideBytes * height);
+	if (entry.compressed) {
+		const unpacked = inflateLzss(stored.subarray(at), {
+			outputLength: strideBytes * height,
+		});
+		unpacked.copy(rows);
+	} else {
+		stored.copy(rows, 0, at, at + rows.length);
+	}
+	if (rows.length < strideBytes * height) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The picture ${entry.path} stands of too few places of its picture`,
+		);
+	}
+	// The rows stand of the whole of a word of four places in the file, which a bitmap of this project does not.
+	const pixels = Buffer.alloc(width * height * places);
+	for (let row = 0; row < height; row += 1) {
+		rows.copy(
+			pixels,
+			row * width * places,
+			row * strideBytes,
+			row * strideBytes + width * places,
+		);
+	}
+	if (isMask) {
+		return writeBmp8Palette(width, height, pixels, greyColourMap());
+	}
+	if (8 === bpp) {
+		return writeBmp8Palette(width, height, pixels, palette ?? Buffer.alloc(0));
+	}
+	return writeBmp24(width, height, flipBDataRows(pixels, width, height, 3));
+}
+
 export const discoveryDatFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: discoveryDatDescriptor,
 	detection: { signatures: [] },
@@ -240,7 +381,15 @@ export const discoveryDatFormat: ArchiveFormat = defineFixedArchive({
 				packed: entry.packed,
 				unpackedSize: entry.unpackedSize.toString(),
 			};
-			if (entry.kind === "bdata") metadata.type = "image";
+			if (entry.kind === "bdata") {
+				metadata.type = "image";
+				metadata.width = entry.width;
+				metadata.height = entry.height;
+				metadata.bitsPerPixel = entry.bpp;
+				metadata.isMask = entry.isMask;
+				metadata.colors = entry.colors;
+				metadata.extra = entry.extra;
+			}
 			if (entry.kind === "edata") {
 				metadata.headerSize = entry.headerSize.toString();
 				metadata.headerUnpacked = entry.headerUnpacked.toString();
@@ -254,7 +403,9 @@ export const discoveryDatFormat: ArchiveFormat = defineFixedArchive({
 				offset: entry.offset,
 				size: entry.unpackedSize,
 				packedSize: entry.size,
-				compressed: entry.kind === "edata",
+				// The reference marks an EData entry packed always and a BData entry packed where its two
+				// counts differ, and both stand of the same walk of the compressed streams.
+				compressed: entry.kind === "edata" || entry.packed,
 				encrypted: false,
 				metadata,
 			});
@@ -273,6 +424,9 @@ export const discoveryDatFormat: ArchiveFormat = defineFixedArchive({
 			bodyOffset?: string;
 			bodySize?: string;
 		};
+		if (metadata.kind === "bdata") {
+			return Readable.from([await readBDataPicture(source, entry, metadata)]);
+		}
 		if (metadata.kind !== "edata")
 			return Readable.from([
 				Buffer.from(await source.readAt(entry.offset, Number(entry.size))),

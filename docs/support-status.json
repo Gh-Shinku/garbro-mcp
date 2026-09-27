@@ -5726,9 +5726,10 @@
 				"cp932 names",
 				"packed edata header and body",
 				"lzss header and body streams",
-				"placement checks"
+				"placement checks",
+				"the places of a picture of a bdata entry: the colour map, the count of places of the file, the walk of the compressed streams, the counts of a row and the covering place of a picture"
 			],
-			"unsupported": ["archive creation", "bdata image decoder"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
