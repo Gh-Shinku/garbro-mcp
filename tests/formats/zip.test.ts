@@ -70,6 +70,17 @@ function buildZip(entries: ZipFixtureEntry[]): Buffer {
 	return Buffer.concat(chunks);
 }
 
+// A ZIP archive Python's own `zipfile` wrote, of one stored entry and one of the bzip2 method (twelve): the
+// stream of that method is a bzip2 file of its own, so an implementation of that format other than this
+// project's own stands behind this fixture.
+const BZIP2_ARCHIVE_B64 =
+	"UEsDBBQAAAAAANWAO10J3EOuDwAAAA8AAAAJAAAAcGxhaW4udHh0YSBzdG9yZWQgZW50cnkKUEsDBC4AAAAMANWAO12gPkowVQAAAK4CAAAKAAAAcGFja2VkLnR4dEJaaDkxQVkmU1nBbkduAABTXYBAkEAAEAAgABYh1DAgAHIoaaYAApVIepoNqeUxx40E8iZExc4qjnInYTYnQn0TImxNCa2JxUYEwXckU4UJDBbkduBQSwECFAMUAAAAAADVgDtdCdxDrg8AAAAPAAAACQAAAAAAAAAAAAAAgAEAAAAAcGxhaW4udHh0UEsBAi4DLgAAAAwA1YA7XaA+SjBVAAAArgIAAAoAAAAAAAAAAAAAAIABNgAAAHBhY2tlZC50eHRQSwUGAAAAAAIAAgBvAAAAswAAAAAA";
+const BZIP2_PLAIN = Buffer.from("YSBzdG9yZWQgZW50cnkK", "base64");
+const BZIP2_PACKED = Buffer.from(
+	"QUFBQQdiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IGJ6aXAyIGVudHJ5IGJvZHkgYnppcDIgZW50cnkgYm9keSBiemlwMiBlbnRyeSBib2R5IAo=",
+	"base64",
+);
+
 describe("PKWARE ZIP archive", () => {
 	it("reads stored and deflated entries and skips directory records", async () => {
 		const stored = Buffer.from("stored payload");
@@ -118,6 +129,38 @@ describe("PKWARE ZIP archive", () => {
 		} finally {
 			await handle.close();
 		}
+	});
+
+	it("reads an entry of the bzip2 method, of a stream another tool wrote", async () => {
+		const archive = Buffer.from(BZIP2_ARCHIVE_B64, "base64");
+		const handle = await zipFormat.open(
+			new BufferByteSource(archive),
+			"sample.zip",
+		);
+		const plain = handle.entries.find((entry) => entry.path === "plain.txt");
+		const packed = handle.entries.find((entry) => entry.path === "packed.txt");
+		if (!plain || !packed) throw new Error("entries stand missing");
+		expect(await consumeBuffer(await handle.openEntry(plain.id))).toEqual(
+			BZIP2_PLAIN,
+		);
+		expect(await consumeBuffer(await handle.openEntry(packed.id))).toEqual(
+			BZIP2_PACKED,
+		);
+	});
+
+	it("turns away a bzip2 stream that stands of no count of its own", async () => {
+		const archive = Buffer.from(BZIP2_ARCHIVE_B64, "base64");
+		const at = archive.indexOf(Buffer.from("BZh9", "latin1"));
+		expect(at).toBeGreaterThan(0);
+		// A place of the file of the stream itself, past its head.
+		archive[at + 20] = (archive[at + 20] ?? 0) ^ 0xff;
+		const handle = await zipFormat.open(
+			new BufferByteSource(archive),
+			"sample.zip",
+		);
+		const packed = handle.entries.find((entry) => entry.path === "packed.txt");
+		if (!packed) throw new Error("entry stands missing");
+		await expect(handle.openEntry(packed.id)).rejects.toThrow(/bzip2 stream/);
 	});
 
 	it("reports encrypted entries as unsupported", async () => {

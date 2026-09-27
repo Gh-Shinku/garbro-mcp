@@ -30,6 +30,9 @@ Extraction supports:
 
 - method 0 (stored), streamed directly from the local header payload;
 - method 8 (deflate), streamed through inflate-raw;
+- method 12 (bzip2), read with the walk of that format this project carries (`packages/codecs/src/bzip2.ts`),
+  since the stream a method twelve entry holds is a whole bzip2 file. The count of the places of a file it
+  reads back is checked against the head of the entry, where the reference leaves that to its library;
 - entries whose local header carries a data descriptor, because sizes come from the central
   directory.
 
@@ -48,8 +51,10 @@ Directory records (names ending in `/`) are skipped. Encrypted entries are liste
 | Streaming extraction | Supported |
 | Encrypted entry metadata | Supported |
 | Encrypted entry extraction | Unsupported |
-| Other compression methods (bzip2, LZMA, ...) | Unsupported |
+| bzip2 entries (method 12) | Supported |
+| Other compression methods (LZMA, ...) | Unsupported |
 | Archive creation | Unsupported |
 
-Fixtures cover stored and deflated entries, directory records, CP932 and UTF-8 names, and the
-encrypted-entry rejection path. A PowerShell `Compress-Archive` archive was verified manually.
+Fixtures cover stored and deflated entries, directory records, CP932 and UTF-8 names, the bzip2 method (of an
+archive Python's own `zipfile` wrote, so an implementation of that format outside this project stands behind
+it) and its refusal of a stream that stands of no count of its own, and the encrypted-entry rejection path. A PowerShell `Compress-Archive` archive was verified manually.

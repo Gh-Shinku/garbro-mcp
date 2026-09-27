@@ -2,9 +2,10 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 //
 // GARbro delegates ZIP parsing to SharpZipLib with the default code page 932 for non-UTF-8 names.
-// This port implements the central-directory walk directly and streams entries with Node's
-// inflate-raw.
+// This port implements the central-directory walk directly, streams stored and deflated entries with Node's
+// inflate-raw, and reads method twelve (bzip2) with the walk of that format this project carries.
 
+import { decompressBzip2 } from "@garbro-mcp/codecs";
 import {
 	decodeCp932,
 	GarbroError,
@@ -14,7 +15,7 @@ import {
 	type ByteSource,
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import { createInflateRaw } from "node:zlib";
 
 /**
@@ -45,6 +46,9 @@ const MAXIMUM_ENTRY_COUNT = 0x40000;
 
 const METHOD_STORED = 0;
 const METHOD_DEFLATE = 8;
+// The bzip2 method, which the reference reads through the library it hands every entry to
+// (`SharpZipLib`'s `GetInputStream`) and this port reads with the walk of `@garbro-mcp/codecs`.
+const METHOD_BZIP2 = 12;
 
 const FLAG_ENCRYPTED = 0x0001;
 const FLAG_UTF8 = 0x0800;
@@ -294,7 +298,11 @@ async function openZipEntry(
 			`ZIP entry is encrypted: ${entry.path}`,
 		);
 	}
-	if (entry.method !== METHOD_STORED && entry.method !== METHOD_DEFLATE) {
+	if (
+		entry.method !== METHOD_STORED &&
+		entry.method !== METHOD_DEFLATE &&
+		entry.method !== METHOD_BZIP2
+	) {
 		throw new GarbroError(
 			"UNSUPPORTED_FEATURE",
 			`ZIP compression method ${entry.method} is not supported: ${entry.path}`,
@@ -322,6 +330,29 @@ async function openZipEntry(
 	}
 	if (entry.method === METHOD_STORED) {
 		return source.createReadStream(dataOffset, entry.packedSize);
+	}
+	if (entry.method === METHOD_BZIP2) {
+		// A method twelve entry holds a whole bzip2 stream, and the walk of that format stands of the
+		// count of the places of a file it reads back, which is checked against the head of the entry.
+		const packed = Buffer.from(
+			await source.readAt(dataOffset, Number(entry.packedSize)),
+		);
+		let plain: Buffer;
+		try {
+			plain = decompressBzip2(packed);
+		} catch (error) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`ZIP bzip2 stream of ${entry.path} stands of no count of its own: ${(error as Error).message}`,
+			);
+		}
+		if (BigInt(plain.length) !== entry.size) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`ZIP bzip2 stream of ${entry.path} stands of ${plain.length} places of the file against ${entry.size}`,
+			);
+		}
+		return Readable.from([plain]);
 	}
 	const compressed = source.createReadStream(dataOffset, entry.packedSize);
 	return compressed.pipe(createInflateRaw());
