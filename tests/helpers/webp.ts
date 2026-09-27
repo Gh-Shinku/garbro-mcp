@@ -143,3 +143,27 @@ export const PATTERN_WEBP_PLACES: readonly number[] = [
 	255, 240, 10, 200, 255, 240, 10, 200, 255, 90, 60, 30, 255, 240, 10, 200, 255,
 	240, 10, 200, 255, 90, 60, 30, 255, 240, 10, 200, 255, 240, 10, 200, 255,
 ];
+/** A picture of the colour of the places of the picture of the format of the web of sixteen places of the file
+ * square, written by the python imaging library of the counts of the head of the format of the picture of the two
+ * places of the file of the count of the head of the format 10 place of the file. */
+export const LOSSY_LOW_WEBP = Buffer.from(
+	"UklGRjoAAABXRUJQVlA4IC4AAADQAQCdASoQABAAB0CWJbACsADPgnCWgAD+5CGsQHJUV+3wh7Am3i8b2kveAAAA",
+	"base64",
+);
+
+/** A picture of the colour of the places of the picture of the format of the web of sixteen places of the file
+ * square, written by the python imaging library of the counts of the head of the format of the picture of the two
+ * places of the file of the count of the head of the format 90 place of the file. */
+export const LOSSY_HIGH_WEBP = Buffer.from(
+	"UklGRlwAAABXRUJQVlA4IFAAAACQAgCdASoQABAAAMASJbACdLoA+ABYAAm7lfjqoAD+/+Iu3Y2Tks/5V/lA0Wc61A5ojOCGmEA+apwrreoRQ///Sv/5oL+6//zb/9pb/9vAAA==",
+	"base64",
+);
+
+/** A picture of the colour of the places of the picture of the format of the web of sixty four places of the file
+ * square, written by the python imaging library of the counts of the head of the format of the picture of the two
+ * places of the file of the count of the head of the format 75 of the count of the head of the format of the places
+ * of the file of their own of the library of the picture of the web. */
+export const PILLAR_PLAIN_WEBP = Buffer.from(
+	"UklGRiYBAABXRUJQVlA4IBoBAADwCACdASpAADAAPnksk0emsa8hOrmcAjAPCWwAnTKEen/HeYJSH6frCJdvhWkAG5/HDSciDiBMeIZIFqXF143DRNnw8xeiFUqIv2OBksFfIAD+/4CT3f5HnPfQojqxVjl5erwidLcBZDy+af3hIWvghqdlHQ80m8fFu7j4g9/Wv302DM4S6pGaTeIe0K76bdvHO/gvZlRypiHSQTlb14RWrGpbR9VWk6vjlRr0Oua1bhoWLA9OkSf6YWGWacNU0PI3dL3Z8Gtr/q+8CWx/JZGiV0759TgBNYya3efQIaPZJc5rX9PUSSeJn8UITljzBxPUi72hesC3evY0QoX9pH2XgZ41ffBRmYpZbXGTwn6+E88D9ENrisEAAAA=",
+	"base64",
+);

@@ -2,9 +2,16 @@ import { describe, expect, it } from "vitest";
 import { GarbroError } from "@garbro-mcp/core";
 import {
 	readVp8FrameHeader,
+	readVp8PartitionHeader,
 	Vp8BooleanDecoder,
 } from "../../packages/formats/src/shared/webp-vp8.js";
-import { LOSSY_WEBP } from "../helpers/webp.js";
+import { DEFAULT_COEFFICIENT_PROBABILITIES } from "../../packages/formats/src/shared/webp-vp8-tables.js";
+import {
+	LOSSY_HIGH_WEBP,
+	LOSSY_LOW_WEBP,
+	LOSSY_WEBP,
+	PILLAR_PLAIN_WEBP,
+} from "../helpers/webp.js";
 
 /** The places of the file of the count of the head of the picture of the format of a picture of the web. */
 function partitionOf(data: Buffer): Buffer {
@@ -97,5 +104,89 @@ describe("the walk of the picture of the web of the colour of the places of the 
 		expect(() => readVp8FrameHeader(scaled)).toThrow(
 			/UNSUPPORTED|no walk of this project/,
 		);
+	});
+
+	it("reads the counts of the head of the format of the places of the file of the picture of the format of the counts of the head of the format of the picture of the two places of the file", () => {
+		// The python imaging library wrote the two fixtures of the counts of the head of the format of the picture of
+		// the two places of the file alone, so that the counts of the head of the format of the picture of the
+		// colours of the picture of the two of them stand of counts of their own: a picture of a count of the head
+		// of the format of the picture of the places of the file of the count of the head of the format 10 stands of
+		// no count of the head of the format of the picture of the format beyond the one of a picture of the count of
+		// the head of the format 90.
+		const low = readVp8PartitionHeader(
+			readVp8FrameHeader(partitionOf(LOSSY_LOW_WEBP)).partition,
+		);
+		const high = readVp8PartitionHeader(
+			readVp8FrameHeader(partitionOf(LOSSY_HIGH_WEBP)).partition,
+		);
+		expect(low.quantiser.base).toBeGreaterThanOrEqual(high.quantiser.base);
+		expect(low.walked).toBeGreaterThan(0);
+		expect(high.walked).toBeGreaterThan(0);
+	});
+
+	it("reads the counts of the head of the format of the first partition of the picture of the format", () => {
+		const frame = readVp8FrameHeader(partitionOf(PILLAR_PLAIN_WEBP));
+		const header = readVp8PartitionHeader(frame.partition);
+		expect(header.filter.level).toBeLessThanOrEqual(63);
+		expect(header.filter.sharpness).toBeLessThanOrEqual(7);
+		expect(header.quantiser.base).toBeLessThanOrEqual(127);
+		expect([1, 2, 4, 8]).toContain(header.tokenPartitions);
+		expect(header.walked).toBeLessThanOrEqual(frame.partition.length * 8);
+		expect(header.probabilities.length).toBe(1056);
+		// The python imaging library wrote the fixture of the counts of the head of the format of the picture of the
+		// format itself of the library of the picture of the web (`method` 4, of no counts of their own of the walk of
+		// the places of the file): the counts of the head of the format of the picture of the places of the file stand
+		// of the counts of the head of the format of the picture of the places of the file of their own of that
+		// library (`src/enc/config_enc.c`: the counts of the head of the format of the picture of the places of the
+		// file stand of four, the walk of the picture of the format of the strong kind, the count of the head of the
+		// format of the picture of the sharp places of the file stands of no count, of no counts of the head of the
+		// format of the picture of the places of the file).
+		expect(header.segmentation.use).toBe(true);
+		expect(header.segmentation.updateMap).toBe(true);
+		expect(header.filter.simple).toBe(false);
+		expect(header.filter.sharpness).toBe(0);
+		expect(header.tokenPartitions).toBe(1);
+		expect(header.quantiser.base).toBeGreaterThan(0);
+		expect(
+			header.probabilities.some(
+				(value, at) => value !== DEFAULT_COEFFICIENT_PROBABILITIES[at],
+			),
+		).toBe(true);
+	});
+
+	it("reads the counts of the head of the format of the first partition of the picture of the format of four places of the file", () => {
+		const frame = readVp8FrameHeader(partitionOf(LOSSY_WEBP));
+		const header = readVp8PartitionHeader(frame.partition);
+		expect(header.walked).toBeGreaterThan(0);
+		expect(header.walked).toBeLessThanOrEqual(frame.partition.length * 8);
+		expect([1, 2, 4, 8]).toContain(header.tokenPartitions);
+		expect(header.quantiser.base).toBeLessThanOrEqual(127);
+	});
+
+	it("stands of the counts of the head of the format of the picture of the format itself of a partition of no places of the file", () => {
+		// A first partition of no set places of the file carries no count of the head of the format of the picture of
+		// the places of the file: the walk of the library of the picture of the web reads every such count as the
+		// count of the head of the format of the picture of the format itself.
+		const header = readVp8PartitionHeader(Buffer.alloc(32));
+		expect(header).toMatchObject({
+			colourSpace: 0,
+			clampType: 0,
+			tokenPartitions: 1,
+			refreshEntropy: false,
+			useSkipProbability: false,
+			skipProbability: 128,
+			segmentation: { use: false, updateMap: false, absolute: true },
+			filter: {
+				simple: false,
+				level: 0,
+				sharpness: 0,
+				referenceDeltas: [0, 0, 0, 0],
+				modeDeltas: [0, 0, 0, 0],
+			},
+			quantiser: { base: 0, y1dc: 0, y2dc: 0, y2ac: 0, uvdc: 0, uvac: 0 },
+		});
+		expect([...header.probabilities]).toEqual([
+			...DEFAULT_COEFFICIENT_PROBABILITIES,
+		]);
 	});
 });

@@ -16,6 +16,10 @@
 // project yet, which the record names.
 
 import { GarbroError } from "@garbro-mcp/core";
+import {
+	COEFFICIENT_UPDATE_PROBABILITIES,
+	DEFAULT_COEFFICIENT_PROBABILITIES,
+} from "./webp-vp8-tables.js";
 
 /** The counts of the head of the picture of the format of the picture of the places of the file of their own, of the
  * counts of the head of the picture of the places of the file of the format. */
@@ -186,4 +190,216 @@ function invalid(message: string): GarbroError {
  * this project reads. */
 function unsupported(message: string): GarbroError {
 	return new GarbroError("UNSUPPORTED_FEATURE", message);
+}
+
+/** The counts of the head of the format of the picture of the places of the file of the picture of the format
+ * itself. */
+export const SEGMENT_COUNT = 4;
+const REFERENCE_DELTA_COUNT = 4;
+const MODE_DELTA_COUNT = 4;
+const SEGMENT_TREE_PROBABILITY_COUNT = 3;
+const COEFFICIENT_TYPES = 4;
+const COEFFICIENT_BAND_COUNT = 8;
+const COEFFICIENT_CONTEXT_COUNT = 3;
+const COEFFICIENT_PROBABILITY_COUNT = 11;
+
+/** The counts of the head of the format of the picture of the places of the file of the colour of the picture of a
+ * count of the head of the format of the picture of the format of four places of the file square. */
+export interface Vp8Segmentation {
+	/** Whether the picture of the format itself stands of the counts of the head of the format of the places of the
+	 * file of the colour of the picture. */
+	readonly use: boolean;
+	/** Whether every place of the file of the picture of the format of four places of the file square carries a count
+	 * of the head of the format of the picture of the places of the file. */
+	readonly updateMap: boolean;
+	/** Whether the counts of the head of the format of the picture of the places of the file stand of their own in
+	 * place of standing of no count of the head of the format of the picture of the format itself. */
+	readonly absolute: boolean;
+	/** The counts of the head of the format of the picture of the counts of the head of the picture of the format of
+	 * the places of the file, one a count of the head of the format of the picture of the places of the file. */
+	readonly quantisers: readonly number[];
+	/** The counts of the head of the format of the picture of the walk of the places of the file of the picture of
+	 * the format, one a count of the head of the format of the picture of the places of the file. */
+	readonly filterStrengths: readonly number[];
+	/** The counts of the head of the format of the picture of the two places of the file of the walk of the count of
+	 * the head of the format of the picture of the places of the file. */
+	readonly treeProbabilities: readonly number[];
+}
+
+/** The counts of the head of the format of the picture of the walk of the picture of the format itself. */
+export interface Vp8FilterHeader {
+	/** Whether the simple walk of the places of the file stands of the count of the head of the format itself. */
+	readonly simple: boolean;
+	readonly level: number;
+	readonly sharpness: number;
+	readonly referenceDeltas: readonly number[];
+	readonly modeDeltas: readonly number[];
+}
+
+/** The counts of the head of the format of the picture of the colours of the picture of the format of the picture of
+ * the places of the file of the picture of the format. */
+export interface Vp8Quantiser {
+	readonly base: number;
+	readonly y1dc: number;
+	readonly y2dc: number;
+	readonly y2ac: number;
+	readonly uvdc: number;
+	readonly uvac: number;
+}
+
+/** The counts of the head of the format of the picture of the places of the file of the first partition of the
+ * picture of the format of the web of the colour of the places of the picture. */
+export interface Vp8PartitionHeader {
+	readonly colourSpace: number;
+	readonly clampType: number;
+	readonly segmentation: Vp8Segmentation;
+	readonly filter: Vp8FilterHeader;
+	/** The count of the counts of the head of the format of the picture of the colours of the picture: 1, 2, 4 or 8. */
+	readonly tokenPartitions: number;
+	readonly quantiser: Vp8Quantiser;
+	readonly refreshEntropy: boolean;
+	/** The counts of the head of the format of the picture of the two places of the file of the walk of the counts of
+	 * the head of the format of the picture of the places of the file, of a count of the head of the format: the kind
+	 * of the counts of the head of the format, the count of the head of the format, the count of the head of the
+	 * picture of the format and the count of the head of the format of the two places of the file. */
+	readonly probabilities: Uint8Array;
+	readonly useSkipProbability: boolean;
+	readonly skipProbability: number;
+	/** The count of the counts of the head of the format of the picture of the places of the file of the first
+	 * partition which the walk of this project walked. */
+	readonly walked: number;
+}
+
+/** Reads the counts of the head of the format of the picture of the places of the file of the first partition of a
+ * picture of the format of the web of the colour of the places of the picture. The walk stands of the walk of the
+ * library of the picture of the web (`src/dec/vp8_dec.c`, `src/dec/quant_dec.c`, `src/dec/tree_dec.c`: the counts of
+ * the head of the format of the picture of the places of the file of the two places of the file of the picture of the
+ * format itself, of the counts of the head of the format of the picture of the places of the file of the colour of
+ * the picture, of the walk of the places of the file of the picture of the format and of the counts of the head of
+ * the picture of the format of the places of the file of the picture).
+ *
+ * A picture of the format whose places of the file stand of the counts of the head of the format of the picture of
+ * the two places of the file beyond the count of the head of the format itself stands of no walk of this project
+ * (the counts of the head of the format of the picture of the places of the file of the picture of the format stand
+ * of the count of the head of the format of the picture of the format of four places of the file square alone). */
+export function readVp8PartitionHeader(partition: Buffer): Vp8PartitionHeader {
+	const decoder = new Vp8BooleanDecoder(partition);
+	const colourSpace = decoder.read(128);
+	const clampType = decoder.read(128);
+
+	const useSegmentation = 1 === decoder.read(128);
+	let updateMap = false;
+	let absolute = true;
+	let quantisers: number[] = [0, 0, 0, 0];
+	let filterStrengths: number[] = [0, 0, 0, 0];
+	let treeProbabilities: number[] = [255, 255, 255];
+	if (useSegmentation) {
+		updateMap = 1 === decoder.read(128);
+		if (1 === decoder.read(128)) {
+			absolute = 1 === decoder.read(128);
+			quantisers = [];
+			for (let segment = 0; segment < SEGMENT_COUNT; segment += 1)
+				quantisers.push(
+					1 === decoder.read(128) ? decoder.readSignedLiteral(7) : 0,
+				);
+			filterStrengths = [];
+			for (let segment = 0; segment < SEGMENT_COUNT; segment += 1)
+				filterStrengths.push(
+					1 === decoder.read(128) ? decoder.readSignedLiteral(6) : 0,
+				);
+		}
+		if (updateMap) {
+			treeProbabilities = [];
+			for (
+				let probability = 0;
+				probability < SEGMENT_TREE_PROBABILITY_COUNT;
+				probability += 1
+			)
+				treeProbabilities.push(
+					1 === decoder.read(128) ? decoder.readLiteral(8) : 255,
+				);
+		}
+	}
+
+	const simple = 1 === decoder.read(128);
+	const level = decoder.readLiteral(6);
+	const sharpness = decoder.readLiteral(3);
+	const referenceDeltas = [0, 0, 0, 0];
+	const modeDeltas = [0, 0, 0, 0];
+	if (1 === decoder.read(128)) {
+		if (1 === decoder.read(128)) {
+			for (let i = 0; i < REFERENCE_DELTA_COUNT; i += 1)
+				if (1 === decoder.read(128))
+					referenceDeltas[i] = decoder.readSignedLiteral(6);
+			for (let i = 0; i < MODE_DELTA_COUNT; i += 1)
+				if (1 === decoder.read(128))
+					modeDeltas[i] = decoder.readSignedLiteral(6);
+		}
+	}
+
+	const tokenPartitions = 1 << decoder.readLiteral(2);
+
+	const base = decoder.readLiteral(7);
+	const quantiser: Vp8Quantiser = {
+		base,
+		y1dc: 1 === decoder.read(128) ? decoder.readSignedLiteral(4) : 0,
+		y2dc: 1 === decoder.read(128) ? decoder.readSignedLiteral(4) : 0,
+		y2ac: 1 === decoder.read(128) ? decoder.readSignedLiteral(4) : 0,
+		uvdc: 1 === decoder.read(128) ? decoder.readSignedLiteral(4) : 0,
+		uvac: 1 === decoder.read(128) ? decoder.readSignedLiteral(4) : 0,
+	};
+
+	const refreshEntropy = 1 === decoder.read(128);
+
+	const probabilities = new Uint8Array(
+		COEFFICIENT_TYPES *
+			COEFFICIENT_BAND_COUNT *
+			COEFFICIENT_CONTEXT_COUNT *
+			COEFFICIENT_PROBABILITY_COUNT,
+	);
+	let at = 0;
+	for (let type = 0; type < COEFFICIENT_TYPES; type += 1)
+		for (let band = 0; band < COEFFICIENT_BAND_COUNT; band += 1)
+			for (let context = 0; context < COEFFICIENT_CONTEXT_COUNT; context += 1)
+				for (
+					let probability = 0;
+					probability < COEFFICIENT_PROBABILITY_COUNT;
+					probability += 1
+				) {
+					const index = at;
+					at += 1;
+					probabilities[index] =
+						1 === decoder.read(COEFFICIENT_UPDATE_PROBABILITIES[index] ?? 255)
+							? decoder.readLiteral(8)
+							: (DEFAULT_COEFFICIENT_PROBABILITIES[index] ?? 128);
+				}
+
+	const useSkipProbability = 1 === decoder.read(128);
+	const skipProbability = useSkipProbability ? decoder.readLiteral(8) : 128;
+
+	const walked = decoder.walked;
+	if (walked > partition.length * 8)
+		throw invalid(
+			"The places of the file of the picture of the format of the web of the colour of the places of the picture stand of counts of their own",
+		);
+	return {
+		colourSpace,
+		clampType,
+		segmentation: {
+			use: useSegmentation,
+			updateMap,
+			absolute,
+			quantisers,
+			filterStrengths,
+			treeProbabilities,
+		},
+		filter: { simple, level, sharpness, referenceDeltas, modeDeltas },
+		tokenPartitions,
+		quantiser,
+		refreshEntropy,
+		probabilities,
+		useSkipProbability,
+		skipProbability,
+		walked,
+	};
 }
