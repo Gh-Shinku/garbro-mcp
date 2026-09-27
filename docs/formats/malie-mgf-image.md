@@ -16,12 +16,24 @@ A PNG whose eight byte signature has been overwritten with the engine's tag:
 | width (`u32`) / height (`u32`) | 16 / 20 |
 | bit depth / colour type | 24 / 25 |
 
+
+## The decode
+
+`MgfFormat` extends `PngFormat` and its `Read` decodes the restored PNG into pixels, so this port decodes it as
+well: `openEntry` hands out a **bitmap** (24 or 32 places of a colour per place of the file) rather than the
+portable network graphic it was built from, which is what the reference hands out. The decode uses the PNG reader
+this project carries (`shared/png-image.ts`), which is covered by its own tests against Pillow written files.
+
+The metadata names the bitmap the extraction writes (`image: "bmp"` and the depth of the decoded picture) and
+carries the depth of the stored PNG beside it as `storedBitsPerPixel`, which is what the reference's own metadata
+reports as the depth of the picture.
+
 `ReadMetaData` reads eight bytes, checks that they spell `MalieGF`, replaces them with the PNG signature and
 hands the rest of the file to the PNG reader. **The replacement is exactly as long as what it replaced**, so the
 chunk length, the chunk type and the image header land at the offsets a PNG would have them at — which is why
 detection here is the tag plus a well formed `IHDR`. The port reads the dimensions, the bit depth and the colour
-type and turns the last two into a pixel depth: one channel for greys and palettes, two for grey with alpha,
-three for colour, four for colour with alpha.
+type and turns the last two into the depth of the stored PNG: one channel for greys and palettes, two for grey
+with alpha, three for colour, four for colour with alpha.
 
 ## Passing the image through instead of decoding it
 

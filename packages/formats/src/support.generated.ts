@@ -12596,19 +12596,17 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
-				"detection",
-				"extraction",
-				"png signature restoration",
-				"byte exact passthrough",
-				"IHDR dimensions and depth",
-				"metadata",
+				"detection by the Mali tag and the restored chunk head",
+				"listing",
+				"extraction as a bitmap: the restored PNG is decoded with the PNG reader of this project, which is what the reference does (MgfFormat extends PngFormat)",
+				"the restoration of the eight byte PNG signature the tag replaced",
+				"the metadata of the stored PNG beside the metadata of the bitmap",
 			],
-			unsupported: [
-				"png decoding to bitmap",
-				"image encoding",
-				"archive creation",
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the decode is compared with the fixture's own places of the file, which the writer of the fixtures of this project builds; the PNG reader itself is verified against Pillow elsewhere",
 			],
-			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
