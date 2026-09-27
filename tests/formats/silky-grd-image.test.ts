@@ -3,6 +3,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { grdImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const PREFIX_SIZE = 12;
 const BMP_HEADER_SIZE = 54;
@@ -16,7 +17,7 @@ interface Built {
 }
 
 /** A minimal 24 bit bitmap: header, then the pixel rows verbatim. */
-function buildBmp(width = 0x12, height = 0x6): Buffer {
+function buildBmp(width = 0x10, height = 0x6): Buffer {
 	const pixels: Buffer = Buffer.alloc(width * 3 * height, 0x6b);
 	const header: Buffer = Buffer.alloc(BMP_HEADER_SIZE);
 	header.write("BM", 0, "latin1");
@@ -120,20 +121,31 @@ describe("silky grd bitmap", () => {
 			expect(archive.entries[0]?.compressed).toBe(true);
 			expect(archive.entries[0]?.metadata).toMatchObject({
 				type: "image",
-				width: 0x12,
+				width: 0x10,
 				height: 0x6,
 				bitsPerPixel: 24,
 			});
 			expect(archive.metadata).toMatchObject({
 				image: "bmp",
 				compression: "lzss",
-				width: 0x12,
+				width: 0x10,
 				height: 0x6,
 			});
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
+			// The picture stands read and handed over again, so its places of a colour stand of the places of
+			// the surface of the payload rather than of the bytes of the file of it.
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({
+				width: 0x10,
+				height: 0x6,
+				bitsPerPixel: 24,
+			});
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...Buffer.alloc(0x10 * 3 * 0x6, 0x6b),
+			]);
 		} finally {
 			await archive.close();
 		}
@@ -147,11 +159,13 @@ describe("silky grd bitmap", () => {
 		plain.writeUInt32LE(plain.length, 2);
 		plain.writeUInt32LE(BMP_HEADER_SIZE, 10);
 		plain.writeUInt32LE(40, 14);
-		plain.writeInt32LE(0x12, 18);
-		plain.writeInt32LE(0x6, 22);
+		plain.writeInt32LE(4, 18);
+		plain.writeInt32LE(2, 22);
 		plain.writeUInt16LE(1, 26);
 		plain.writeUInt16LE(24, 28);
-		plain.writeUInt32LE(0x20, 34);
+		// The picture stands of no walk of its own places and of the places of its colours behind the head.
+		plain.writeUInt32LE(0, 30);
+		plain.writeUInt32LE(24, 34);
 		plain[BMP_HEADER_SIZE + 4] = FRAME_FILL;
 		plain[BMP_HEADER_SIZE + 5] = FRAME_FILL;
 		plain[BMP_HEADER_SIZE + 6] = FRAME_FILL;
@@ -177,8 +191,20 @@ describe("silky grd bitmap", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(plain);
+			// The three places of the fill stand of the second row of the picture, which stands first in a
+			// picture whose rows stand bottom up in the file.
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({ width: 4, height: 2, bitsPerPixel: 24 });
+			const places = Buffer.alloc(24, 0x6b);
+			places[4] = FRAME_FILL;
+			places[5] = FRAME_FILL;
+			places[6] = FRAME_FILL;
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...places.subarray(12),
+				...places.subarray(0, 12),
+			]);
 		} finally {
 			await archive.close();
 		}
@@ -192,9 +218,12 @@ describe("silky grd bitmap", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bitmap);
-			expect(output.length).toBe(bitmap.length);
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({ width: 4, height: 2, bitsPerPixel: 24 });
+			// The places behind the count the bitmap states stand of no picture of their own.
+			expect(picture?.pixels.length).toBe(4 * 2 * 3);
 		} finally {
 			await archive.close();
 		}

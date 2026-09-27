@@ -36,4 +36,7 @@ The port exposes the resource as a single entry:
 Decompression is bounded by a 64 MiB cap so that a hostile header cannot demand an unreasonable
 allocation, and a corrupt stream is declined rather than propagated.
 
-Pixel decoding and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `GrdFormat.Read`, which stands of `Bmp.Read` over the
+unpacked surface: the bitmap stands read of the bitmap walk of this project and handed over as a bitmap of its own. Archive
+creation and image writing are out of scope; a head of the picture that names no picture this project reads stands turned
+away on extraction.

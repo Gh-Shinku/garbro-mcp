@@ -18365,8 +18365,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"lzss decompression",
 				"bitmap reassembly",
+				"the walk of the places of the picture: the bitmap walk of this project over the unpacked surface",
 			],
-			unsupported: ["archive creation", "pixel decoding", "os/2 core headers"],
+			unsupported: ["archive creation", "os/2 core headers"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
