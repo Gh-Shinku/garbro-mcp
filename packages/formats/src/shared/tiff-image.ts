@@ -286,16 +286,6 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		const down = Math.ceil(height / tileLength);
 		if (places.length < across * down)
 			throw invalidPicture("The picture stands short of the tiles of its own");
-		console.log("tiles", {
-			places,
-			lengths,
-			tileWidth,
-			tileLength,
-			across,
-			down,
-			length: data.length,
-			rowBytes,
-		});
 		for (let tile = 0; tile < across * down; tile += 1) {
 			const at = places[tile] ?? 0;
 			const length = lengths[tile] ?? 0;
