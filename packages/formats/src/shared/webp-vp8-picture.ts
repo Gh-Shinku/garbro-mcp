@@ -33,6 +33,10 @@ import {
 	readVp8MacroblockResiduals,
 } from "./webp-vp8-macroblock.js";
 import {
+	buildVp8FilterStrengths,
+	filterVp8MacroblockRow,
+} from "./webp-vp8-filter.js";
+import {
 	readVp8FrameHeader,
 	readVp8PartitionHeader,
 	Vp8BooleanDecoder,
@@ -555,16 +559,15 @@ function predictColourMode(
 	return mode;
 }
 
-/** Reads the places of the file of the picture of the format of the colour of the places of the picture of the web of
- * the colour of the places of the picture (VP8) of a picture of the format of the picture of the format itself.
+/** Decodes one lossy WebP picture (the payload of a `VP8 ` chunk) into its three planes.
  *
- * The counts of the head of the format of the picture of the places of the file of the picture of the format of the
- * walk of the places of the file of the picture of the format itself stands of no walk of this project yet, so the
- * places of the file of the picture of the format stand of the counts of the head of the format of the picture of the
- * places of the file of the picture of the format of the walk of the picture of the format of the places of the file
- * square alone (of the counts of the head of the format of the picture of the places of the file of the picture of the
- * format of the walk of the places of the file of the picture of the format of the picture of the format of the two
- * places of the file of the picture of the format). */
+ * The walk follows the decoder of libwebp: the boolean decoder and the bit reader are ports of
+ * `src/utils/bit_reader_inl_utils.h` and `src/utils/bit_reader_utils.c`, the headers, the macroblock modes, the
+ * coefficients and the second order stage follow `src/dec/`, the predictors and the inverse transforms follow
+ * `src/dsp/dec.c`, and the reconstruction of a macroblock row and the in-loop filter that follows it follow
+ * `src/dec/frame_dec.c` (`ReconstructRow`, `FinishRow`, `DoFilter`).
+ *
+ * Only key frames are read, and only when the token data of the picture is not split into several partitions. */
 export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	const frame = readVp8FrameHeader(payload);
 	if (!frame.keyFrame)
@@ -592,12 +595,20 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	yPlane.fill(127, 0, yStride);
 	uPlane.fill(127, 0, uvStride);
 	vPlane.fill(127, 0, uvStride);
+	// The in-loop filter must not feed the prediction: libwebp predicts from the unfiltered reconstruction of the row
+	// above (the `top_yuv` stash, filled in `ReconstructRow` before `FilterRow` runs), and filters a separate row
+	// cache that is what it hands out. These three planes hold the filtered picture; the planes above stay
+	// unfiltered and are what the predictors read.
+	const yOutput = new Uint8Array(yPlane.length);
+	const uOutput = new Uint8Array(uPlane.length);
+	const vOutput = new Uint8Array(vPlane.length);
 
 	const first = header.decoder;
 	const tokens = new Vp8BooleanDecoder(
 		frame.payload.subarray(frame.firstPartSize),
 	);
 	const state: Vp8MacroblockState = createVp8MacroblockState(mbWidth);
+	const strengths = buildVp8FilterStrengths(header);
 	for (let mbY = 0; mbY < mbHeight; mbY += 1) {
 		// The walk of the library of the picture of the web stands of the counts of the head of the format of the
 		// places of the file of the picture of the format back to their standing places of the file at the head of
@@ -740,6 +751,28 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 				vOrigin,
 			);
 		}
+		// Copy the reconstructed row into the planes that the filter works on, then filter it (libwebp copies the row
+		// into the cache in `ReconstructRow` and filters the cache in `FinishRow`).
+		for (let offset = 0; offset < yStride; offset += 1) {
+			const from = (16 * mbY + 1) * yStride + offset;
+			yOutput.set(yPlane.subarray(from, from + 16 * yStride), from);
+		}
+		for (let offset = 0; offset < uvStride; offset += 1) {
+			const from = (8 * mbY + 1) * uvStride + offset;
+			uOutput.set(uPlane.subarray(from, from + 8 * uvStride), from);
+			vOutput.set(vPlane.subarray(from, from + 8 * uvStride), from);
+		}
+		filterVp8MacroblockRow({
+			y: yOutput,
+			u: uOutput,
+			v: vOutput,
+			yStride,
+			uvStride,
+			mbY,
+			simple: header.filter.simple,
+			strengths,
+			macroblocks: modes,
+		});
 	}
 
 	const y = new Uint8Array(frame.width * frame.height);
@@ -750,15 +783,15 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 	for (let row = 0; row < frame.height; row += 1)
 		for (let column = 0; column < frame.width; column += 1)
 			y[row * frame.width + column] =
-				yPlane[(row + 1) * yStride + column + 1] ?? 0;
+				yOutput[(row + 1) * yStride + column + 1] ?? 0;
 	const uvWidth = Math.ceil(frame.width / 2);
 	const uvHeight = Math.ceil(frame.height / 2);
 	for (let row = 0; row < uvHeight; row += 1)
 		for (let column = 0; column < uvWidth; column += 1) {
 			u[row * uvWidth + column] =
-				uPlane[(row + 1) * uvStride + column + 1] ?? 0;
+				uOutput[(row + 1) * uvStride + column + 1] ?? 0;
 			v[row * uvWidth + column] =
-				vPlane[(row + 1) * uvStride + column + 1] ?? 0;
+				vOutput[(row + 1) * uvStride + column + 1] ?? 0;
 		}
 	return { width: frame.width, height: frame.height, y, u, v };
 }

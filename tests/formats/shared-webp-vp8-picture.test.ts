@@ -56,9 +56,10 @@ function planes(decoded: {
 	]);
 }
 
-/** The fixtures whose unfiltered reconstruction is compared byte for byte with the decoder. The expected planes come
- * from `ffmpeg -skip_loop_filter all -f rawvideo -pix_fmt yuv420p`, that is from a decoder library other than this
- * one, so the expectation is not written by the code under test.
+/** The fixtures whose filtered reconstruction is compared byte for byte with the decoder. The expected planes come
+ * from `ffmpeg -f rawvideo -pix_fmt yuv420p`, that is from a decoder library other than this one, so the expectation
+ * is not written by the code under test; libwebp on the machine this was written on (the library the reference
+ * delegates to, read through `WebPDecodeYUV`) writes the same bytes for every one of these fixtures.
  *
  * `SOLID`, `CHECK`, `GRAD`, `LOSSY` (4x3) and `WIDE` (48x16) cover one macroblock row; `TALL` (16x48), `T16_32`,
  * `T16_64`, `NOISE_TALL`, `PILLAR_PLAIN` (64x48) and `RAMP_BIG` (48x32) cover two to four macroblock rows;
