@@ -17,6 +17,32 @@ Only use lawfully obtained game data. Keep copyrighted archives and GARbro outpu
 `fixtures/private/`, which is excluded from version control. Record hashes and provenance rather
 than committing redistributable copies without permission.
 
+## Community-driven verification
+
+This table is an opportunity map, not an acquisition backlog or a release gate. The maintainers do not plan to
+collect every listed game proactively. Synthetic fixtures, published specifications and independent reference
+vectors remain the normal foundation for implementation; real-game differential evidence is added when actual
+use gives a format a concrete reason and sample to investigate.
+
+If a game exposes a detection failure, an unknown encryption scheme, incorrect filenames, extraction errors or
+decoded output that differs from GARbro, open a focused issue containing as much of the following as can be
+shared safely:
+
+* the game title, release or edition, and affected file or format id;
+* the garbro-mcp version and the exact command or MCP operation used;
+* the observed result, the expected result, and relevant error output;
+* file sizes and cryptographic hashes, plus whether GARbro successfully reads the same data;
+* a minimal synthetic reproduction, header dump or privately reproducible procedure when one can be provided
+  lawfully.
+
+Do not attach copyrighted game archives, extracted assets, keys or other material that cannot be redistributed
+to a public issue. A contributor may instead keep the files local and run requested diagnostics or differential
+checks, sharing only hashes and non-copyrightable technical observations. The issue then becomes the
+prioritization and verification record for that compatibility work.
+
+A row remaining `Pending` means that no such real-game evidence has been recorded. It does not block support for
+other games, reduce the usefulness of already implemented readers, or assert that the named game is broken.
+
 Total format rows: **472**.
 
 | # | Files | Signature | Brand / engine | Representative game | Sample |
