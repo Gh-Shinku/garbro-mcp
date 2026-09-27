@@ -3,6 +3,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { mdImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const PREFIX_SIZE = 0xa;
 const BMP_HEADER_SIZE = 54;
@@ -135,8 +136,19 @@ describe("mina md bitmap", () => {
 			});
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
+			// The picture stands read and handed over again, so its places of a colour stand of the places of
+			// the surface of the payload rather than of the bytes of the file of it.
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({
+				width: 0x10,
+				height: 0x8,
+				bitsPerPixel: 24,
+			});
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...Buffer.alloc(0x10 * 3 * 0x8, 0x7e),
+			]);
 		} finally {
 			await archive.close();
 		}
@@ -151,11 +163,13 @@ describe("mina md bitmap", () => {
 		plain.writeUInt32LE(plain.length, 2);
 		plain.writeUInt32LE(BMP_HEADER_SIZE, 10);
 		plain.writeUInt32LE(40, 14);
-		plain.writeInt32LE(0x10, 18);
-		plain.writeInt32LE(0x8, 22);
+		plain.writeInt32LE(4, 18);
+		plain.writeInt32LE(2, 22);
 		plain.writeUInt16LE(1, 26);
 		plain.writeUInt16LE(24, 28);
-		plain.writeUInt32LE(0x20, 34);
+		// The picture stands of no walk of its own places and of the places of its colours behind the head.
+		plain.writeUInt32LE(0, 30);
+		plain.writeUInt32LE(24, 34);
 		plain[BMP_HEADER_SIZE + 8] = 0x42;
 		plain[BMP_HEADER_SIZE + 9] = 0x4d;
 		plain[BMP_HEADER_SIZE + 10] = 0x56;
@@ -172,8 +186,28 @@ describe("mina md bitmap", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(plain);
+			// The picture stands read and handed over again; the match stood of the same places as the
+			// literals of the file, so its places stand of the places of the file.
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({
+				width: 4,
+				height: 2,
+				bitsPerPixel: 24,
+			});
+			// A picture of a count of a row in its own places stands of the rows of the file bottom up, so the
+			// second row of the file stands first in the picture.
+			const places = Buffer.from(
+				plain.subarray(BMP_HEADER_SIZE, BMP_HEADER_SIZE + 24),
+			);
+			places[8] = 0x42;
+			places[9] = 0x4d;
+			places[10] = 0x56;
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...places.subarray(12),
+				...places.subarray(0, 12),
+			]);
 		} finally {
 			await archive.close();
 		}
@@ -187,9 +221,12 @@ describe("mina md bitmap", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bitmap);
-			expect(output.length).toBe(bitmap.length);
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(picture).toMatchObject({ width: 4, height: 2, bitsPerPixel: 24 });
+			// The places behind the count the bitmap states stand of no picture of their own.
+			expect(picture?.pixels.length).toBe(4 * 2 * 3);
 		} finally {
 			await archive.close();
 		}

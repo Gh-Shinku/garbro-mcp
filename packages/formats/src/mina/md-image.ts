@@ -10,6 +10,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -179,6 +180,15 @@ export const mdImageFormat: ArchiveFormat = defineFixedArchive({
 		const bitmap = await readBitmap(source);
 		if (!bitmap)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Mina MD bitmap");
-		return Readable.from([bitmap]);
+		// `MdFormat.Read` stands of `Bmp.Read` over the unpacked surface: the bitmap of the payload stands read
+		// of the bitmap walk of this project and handed over as a bitmap of its own.
+		const image = readBmpImage(bitmap);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Mina MD bitmap data: ${bitmap.length} places of the file, of the words ${bitmap.subarray(0, 2).toString("latin1")}`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

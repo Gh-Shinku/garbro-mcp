@@ -28,4 +28,7 @@ The port exposes the resource as a single entry:
 Two further deviations: the decompression is bounded by a 64 MiB cap so that a hostile header cannot
 demand an unreasonable allocation, and a corrupt stream is declined rather than propagated.
 
-Pixel decoding and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `MdFormat.Read`, which stands of `Bmp.Read` over
+the unpacked surface: the bitmap stands read of the bitmap walk of this project — of the counts of its own head, of one,
+four, eight, sixteen, twenty four or thirty two places of a colour to a pixel, and of the rows of the file in the order
+its head names — and handed over as a bitmap of its own. Archive creation and image writing are out of scope.
