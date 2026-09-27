@@ -6,6 +6,7 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BMP_HEADER_SIZE = 54;
 const TAG = "NG";
@@ -57,9 +58,17 @@ describe("brownie ngw obfuscated bitmap", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
-			expect(output.subarray(2)).toEqual(stored.subarray(2));
-			expect(output.length).toBe(stored.length);
+			// Only the two places of the marker differ from a plain bitmap, and the walk of the picture hands
+			// the places of that bitmap over as a bitmap of its own.
+			const plain = Buffer.from(stored);
+			plain.write("BM", 0, "latin1");
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: 3,
+				height: 2,
+				bitsPerPixel: 24,
+			});
+			expect(picture?.pixels).toEqual(readBmpImage(plain)?.pixels);
 		} finally {
 			await archive.close();
 		}
