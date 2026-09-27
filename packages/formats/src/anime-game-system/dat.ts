@@ -16,6 +16,7 @@ import {
 	normalizeEntryPath,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceType } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("pack", "latin1");
 const INDEX_START = 6;
@@ -50,14 +51,14 @@ async function readAgsDatIndex(
 		const offset = BigInt(index.readUInt32LE(position + 0x10));
 		const size = BigInt(index.readUInt32LE(position + 0x14));
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(name),
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(name),
+			offset,
+			size,
+		});
+		applyExtensionResourceType(entry);
+		entries.push(entry);
 	}
 	if (entries.length === 0) return undefined;
 	return entries;

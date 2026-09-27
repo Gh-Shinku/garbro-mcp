@@ -892,13 +892,28 @@ export const formatSupportCatalog = {
 				"placement validation",
 				"path normalization",
 				"raw payload extraction",
+				"GARBro catalog extension and alias based entry typing",
 			],
 			unsupported: [
 				"archive creation",
-				"extension based entry typing",
 				"archives encrypted through user schemes",
 			],
 			remainingVerification: ["real-game GARbro differential output"],
+			readStatus: "blocked",
+			gaps: [
+				{
+					code: "scope.archive-create",
+					disposition: "out-of-scope",
+				},
+				{
+					code: "external.user-scheme",
+					disposition: "external",
+				},
+				{
+					code: "verification.real-game",
+					disposition: "verification",
+				},
+			],
 		},
 		{
 			reference: {

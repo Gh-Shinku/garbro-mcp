@@ -63,6 +63,28 @@ describe("AnimeGameSystem DAT resource archive", () => {
 		});
 	});
 
+	it("classifies named entries through the GARBro extension catalogue", async () => {
+		const archive = await animeGameSystemDatFormat.open(
+			new BufferByteSource(
+				buildArchive([
+					{ name: "VOICE.OGG", content: Buffer.from("audio") },
+					{ name: "IMAGE.OSA", content: Buffer.from("image alias") },
+					{ name: "UNKNOWN.DAT", content: Buffer.from("ambiguous") },
+				]),
+			),
+			"sample.dat",
+		);
+		try {
+			expect(archive.entries.map((entry) => entry.resourceType)).toEqual([
+				"audio",
+				"image",
+				undefined,
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
+
 	it("stops names at the first null byte of their field", async () => {
 		const content = Buffer.from("payload");
 		const archive = buildArchive([{ name: "NAME.BIN", content }]);
