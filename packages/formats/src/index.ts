@@ -1,6 +1,7 @@
 import { FormatRegistry } from "@garbro-mcp/core";
 
 export { formatSupportCatalog } from "./support.generated.js";
+export * from "./shared/resource-catalog.js";
 
 import { aaruBm2ImageFormat } from "./aaru/bm2-image.js";
 import { fl2Format, fl3Format } from "./aaru/fl2.js";

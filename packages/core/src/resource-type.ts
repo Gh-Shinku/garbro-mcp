@@ -5,6 +5,7 @@ import type { ArchiveEntry } from "./types.js";
  * resource category, not a semantic claim about who or what uses the file.
  */
 export const entryResourceTypes = [
+	"archive",
 	"audio",
 	"image",
 	"script",
@@ -64,6 +65,7 @@ function metadataType(entry: ArchiveEntry): EntryResourceType | undefined {
 
 /** Return a best-effort type, preserving `unknown` when evidence is absent. */
 export function entryResourceType(entry: ArchiveEntry): EntryResourceType {
+	if (entry.resourceType !== undefined) return entry.resourceType;
 	const explicit = metadataType(entry);
 	if (explicit !== undefined) return explicit;
 	const lastDot = entry.path.lastIndexOf(".");

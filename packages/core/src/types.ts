@@ -1,4 +1,5 @@
 import type { Readable } from "node:stream";
+import type { EntryResourceType } from "./resource-type.js";
 import type { ByteSource } from "./source.js";
 
 export interface FormatAttribution {
@@ -47,6 +48,8 @@ export interface ArchiveEntry {
 	packedSize: bigint;
 	compressed: boolean;
 	encrypted: boolean;
+	/** Resource category established by the archive reader or shared GARBro catalogue. */
+	resourceType?: EntryResourceType;
 	checksum?: {
 		algorithm: "adler32";
 		value: string;

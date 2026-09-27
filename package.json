@@ -18,6 +18,7 @@
 		"lint": "biome lint --write .",
 		"lint:check": "biome lint .",
 		"inventory:garbro": "node scripts/generate-garbro-inventory.mjs",
+		"catalog:resources": "node scripts/generate-resource-catalog.mjs",
 		"catalog:formats": "node scripts/generate-format-support.mjs",
 		"support:check": "node scripts/validate-support-status.mjs",
 		"gap:garbro": "node scripts/garbro-gap.mjs",
