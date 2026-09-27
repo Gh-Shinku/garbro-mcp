@@ -4374,7 +4374,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detection", "extraction", "grey bitmap reassembly"],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

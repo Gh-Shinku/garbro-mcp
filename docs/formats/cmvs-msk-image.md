@@ -27,4 +27,7 @@ The port exposes the resource as a single entry:
 * entry metadata carries `type: "image"` plus width, height and bit depth, and the archive metadata
   records the same values with `image: "bmp"`.
 
-Pixel decoding and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `MskFormat.Read`: the places behind the head are
+the places of the picture as they are, of one place of a colour to a pixel, which the reference hands over as a picture
+of grey, and which this port hands over as the same picture through the shared grey bitmap writer. Archive creation and
+image writing are out of scope.
