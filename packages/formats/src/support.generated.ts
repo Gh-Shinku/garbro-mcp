@@ -18080,6 +18080,30 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "WAR",
+				class: "WarOpener",
+				source: "ArcFormats/ShiinaRio/ArcWARC.cs",
+			},
+			localId: "shiina-rio-war",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the head of an archive of the engine of the count of the version one hundred and ten: the word `WARC`, the count of the version of the engine at the fourth place of the file (`X.Y:<digit>`, the digit being the count over ten) and the place of the index, a count of the file exclusive-or'ed with `0xF182AD82`",
+				"the cipher of the index of a count of the version at one hundred and ten and below, which stands of the count of the places of the file of the index over every word of it and of nothing else: `Decoder.DoEncryption` answers at once for a count of the version below one hundred and twenty",
+				"the records of the index: the name of a file of `0x10` places and behind it the place of the file, the count of its places, the count of the places it unpacks to, the count of the time of the file and the flags of it, of a record of `0x28` places",
+				"the walk of a file of no name, of a name of no word of its own and of a name already read, of the counts of the reference",
+				"the places of a file of the engine handed over as they stand, of the count one hundred and ten",
+			],
+			unsupported: [
+				"archive creation",
+				"an archive of a count of the version above one hundred and ten, whose index stands of a scheme of the game (`QueryEncryption`) and of the 1314 lines of `WarcEncryption.cs`, of which this port carries no part: such an archive stands of no walk of this port at all, which is where the reference stands as well where it holds no scheme",
+				"the places of a file of the count one hundred and ten that stand of the walks of the file itself (`UnpackYH1`, `UnpackYPK` and `UnpackYLZ`, named by the word of the head of the file)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "HIM4",
 				class: "Him4Opener",
 				source: "ArcFormats/SHSystem/ArcHXP.cs",

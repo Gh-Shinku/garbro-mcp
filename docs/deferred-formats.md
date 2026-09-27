@@ -151,13 +151,14 @@ open archives that the shipped defaults already cover.
   return null`), so a stock build reads no archive of this engine at all. The index of a scheme is unwrapped
   with a key of the scheme, entries are read through a common cipher and, behind it, a run of their own whose
   first bytes are stepped over as many times as a digest of the key of the entry names.
-- `WAR` (`ArcFormats/ShiinaRio/ArcWARC.cs`, `QueryEncryption` at line 296): the archive opens with `WARC 1.`
-  and a version, and its index stands at a place the head names as the complement of a word of its own. An
-  archive of version beyond the eleventh asks `QueryEncryption (file.Name)` for a scheme - out of a table that
-  stands empty in the source - and gives up without one (`if (null == scheme) return null`). The older
-  archives read through a scheme of the source, but every entry of them is unwrapped by the `Decoder` of the
-  same engine, whose index, names and entries are all read through it. (The older archive of the same engine,
-  `WAR/1.0` of `ArcFormats/ShiinaRio/ArcWARC1.0.cs`, is ported as `shiina-rio-warc`.)
+- `WAR` (`ArcFormats/ShiinaRio/ArcWARC.cs`, class `WarOpener`) stood here as key-gated. The counts of the
+  version of the engine at **one hundred and ten and below** stand of **no scheme and of no walk of the
+  engine's own** at all (`Decoder.DoEncryption` answers at once below one hundred and twenty), so they **are
+  ported now**, as `shiina-rio-war`, of the head, of the cipher of the index and of the walk of its records -
+  see `docs/formats/shiina-rio-war.md`. What stands of a scheme of the game is every count above that, and
+  the walks of the file itself (`UnpackYH1`, `UnpackYPK`, `UnpackYLZ`) behind a file of the count one hundred
+  and ten; the shape of the head `WARC 1.0` is a row of its own (`ArcWARC1.0.cs`), ported as
+  `shiina-rio-warc`.
 - `TCD` / `TCD3` (`ArcFormats/TopCat/ArcTCD3.cs`): this one stood here wrongly - the tables of the archive read **without any key at all**, of the cipher of their own section, which stands in the file. The `KnownKeys` table of the source reaches one place only, `OpenSpdc`, where a picture whose places stand of the cipher of the engine's own stands; a stock build carries no key for it and hands such a picture over as it stands, which is what the reference does as well. **It stands ported now**, as `topcat-tcd3` - see `docs/formats/topcat-tcd3.md`.
 
 

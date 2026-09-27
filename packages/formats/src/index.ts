@@ -831,6 +831,7 @@ import { ogvAudioFormat } from "./shiina-rio/ogv-audio.js";
 import { shiinaRioPadAudioFormat } from "./shiina-rio/pad-audio.js";
 import { s25Format } from "./shiina-rio/s25.js";
 import { shiinaRioWarcFormat } from "./shiina-rio/warc.js";
+import { warFormat } from "./shiina-rio/war.js";
 import { him4Format, him5Format } from "./shsystem/hxp.js";
 import { ai6WinFormat } from "./silky/ai6win.js";
 import { silkyAkbImageFormat } from "./silky/akb-image.js";
@@ -2104,6 +2105,7 @@ export function createDefaultRegistry(
 			nononoNpfFormat,
 			shiinaRioPadAudioFormat,
 			shiinaRioWarcFormat,
+			warFormat,
 			realliveG00Format,
 			realliveG00ImageFormat,
 			nitroplusNitroPakFormat,
