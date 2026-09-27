@@ -9,7 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -151,8 +151,18 @@ export function obfuscatedBitmapFormat(options: {
 					"INVALID_ARCHIVE",
 					`Invalid ${options.descriptor.name}`,
 				);
-			// Only the marker is rewritten, so the bitmap needs no re-encoding.
-			return Readable.from([bitmap]);
+			// The reference of every subclass stands of `Bmp.Read` over the bitmap the marker stands before,
+			// so the bitmap stands read of the bitmap walk of this project and handed over as a bitmap of its
+			// own: of the counts of the head of the bitmap and of the rows in the order that head names, so the
+			// row padding of the file and the places behind the picture stand of no count of the picture.
+			const image = readBmpImage(bitmap);
+			if (!image) {
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					`Invalid ${options.descriptor.name} bitmap data: ${bitmap.length} places of the file`,
+				);
+			}
+			return Readable.from([writeBmpImage(image)]);
 		},
 	});
 }
