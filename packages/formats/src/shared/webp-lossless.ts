@@ -351,11 +351,13 @@ function decodeEntropy(
 			);
 		const code = group.green.read(bits);
 		if (code < LITERAL_CODES) {
-			pixels[at] =
-				(group.alpha.read(bits) << 24) |
-				(group.red.read(bits) << 16) |
-				(code << 8) |
-				group.blue.read(bits);
+			// The counts of the head of the format of the picture of the web of the colour of the picture of the
+			// other, of the colour of the other of the two places of the file and of the counts of the places of the
+			// file of the colour of the picture of the places of the file stand one place of the file behind the other.
+			const red = group.red.read(bits);
+			const blue = group.blue.read(bits);
+			const alpha = group.alpha.read(bits);
+			pixels[at] = ((alpha << 24) | (red << 16) | (code << 8) | blue) >>> 0;
 			at += 1;
 		} else if (code < LITERAL_CODES + LENGTH_CODES) {
 			const length = distance(code - LITERAL_CODES, bits);
@@ -398,6 +400,67 @@ interface Transform {
 	type: number;
 	bits: number;
 	data: number[];
+}
+
+/** The counts of the places of the file of the colours of the picture of the picture of the web, of the counts of the
+ * head of the format of the picture of the web of the places of the file of the counts of the head of the format of
+ * the picture of the colour of the picture. The counts of the places of the file of the colour of the picture of the
+ * list of the colours of the picture stand of the counts of the head of the format of the picture of the web of the
+ * counts of the places of the file of the colour of the picture in front of them. */
+function expandColourMap(
+	numColours: number,
+	data: number[],
+	bits: number,
+): number[] {
+	const total = 1 << (8 >> bits);
+	const bytes = new Uint8Array(total * 4);
+	const first = data[0] ?? 0;
+	for (let index = 0; index < 4; index += 1)
+		bytes[index] = (first >> (index * 8)) & 0xff;
+	for (let at = 4; at < numColours * 4; at += 1) {
+		const colour = data[Math.floor(at / 4)] ?? 0;
+		bytes[at] =
+			(((colour >> ((at % 4) * 8)) & 0xff) + (bytes[at - 4] ?? 0)) & 0xff;
+	}
+	const map: number[] = new Array<number>(total).fill(0);
+	for (let index = 0; index < total; index += 1) {
+		map[index] =
+			((bytes[index * 4] ?? 0) |
+				((bytes[index * 4 + 1] ?? 0) << 8) |
+				((bytes[index * 4 + 2] ?? 0) << 16) |
+				((bytes[index * 4 + 3] ?? 0) << 24)) >>>
+			0;
+	}
+	return map;
+}
+
+/** The counts of the places of the file of the picture of the web of the list of the colours of the picture of the
+ * counts of the head of the format of the picture of the web. The places of the file of the list of the colours of the
+ * picture stand of the counts of the places of the file of the colour of the picture of the picture of the format, one
+ * count of the head of the format of the picture of the web of the colour of the picture behind the other, and the
+ * count of the head of the format of the picture of the web of the colour of the picture of the places of the file
+ * stands of the counts of the head of the format of the picture of the web of the places of the file of the colour of
+ * the picture of the places of the file. */
+function applyIndices(
+	pixels: number[],
+	width: number,
+	height: number,
+	codedWidth: number,
+	transform: Transform,
+): number[] {
+	const out: number[] = new Array<number>(width * height).fill(0);
+	const per = 1 << transform.bits;
+	const mask = (1 << (8 >> transform.bits)) - 1;
+	const colours = transform.data;
+	for (let y = 0; y < height; y += 1) {
+		for (let x = 0; x < width; x += 1) {
+			const at = y * codedWidth + Math.floor(x / per);
+			const shift = (x % per) * (8 >> transform.bits);
+			const index = (((pixels[at] ?? 0) >> 8) >> shift) & mask;
+			out[y * width + x] = colours[index] ?? 0;
+		}
+	}
+	return out;
 }
 
 /** The counts of the places of the file of the picture of the web of the counts of the head of the format of the
@@ -622,7 +685,7 @@ function readImageStream(
 	height: number,
 	level0: boolean,
 ): number[] {
-	const codedWidth = width;
+	let codedWidth = width;
 	const transforms: Transform[] = [];
 	if (level0) {
 		while (0 !== bits.read(1)) {
@@ -643,16 +706,18 @@ function readImageStream(
 				continue;
 			}
 			// The counts of the head of the format of the picture of the web of the list of the colours of the picture
-			// stand turned away: the walk of this project reads the places of the file of the picture of the counts of
-			// the places of the file of their own, of the counts of the head of the format of the picture of the web
-			// of the picture of the counts of the head of the format of the picture of the web of the colour of the
-			// picture and of the counts of the head of the format of the picture of the web of the picture of the
-			// places of the file of the colour of the picture of the counts of the head of the format of the picture
-			// of the web.
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"A picture of the web of the counts of the head of the format of the picture of the web of the list of the colours of the picture stands of no walk of this project",
+			// stand of the counts of the head of the format of the picture of the web of the places of the file of the
+			// colours of the picture of the picture of the format.
+			const numColours = bits.read(8) + 1;
+			const indexBits =
+				numColours > 16 ? 0 : numColours > 4 ? 1 : numColours > 2 ? 2 : 3;
+			codedWidth = subsample(codedWidth, indexBits);
+			const map = expandColourMap(
+				numColours,
+				readImageStream(bits, numColours, 1, false),
+				indexBits,
 			);
+			transforms.push({ type, bits: indexBits, data: map });
 		}
 	}
 	let colorCacheBits = 0;
@@ -671,8 +736,10 @@ function readImageStream(
 		if (!transform) continue;
 		if (SUBTRACT_GREEN === transform.type) pixels = applyGreen(pixels);
 		else if (PREDICTOR === transform.type)
-			pixels = applyPredictor(pixels, width, height, transform);
-		else pixels = applyColour(pixels, width, height, transform);
+			pixels = applyPredictor(pixels, codedWidth, height, transform);
+		else if (CROSS_COLOR === transform.type)
+			pixels = applyColour(pixels, codedWidth, height, transform);
+		else pixels = applyIndices(pixels, width, height, codedWidth, transform);
 	}
 	return pixels;
 }
