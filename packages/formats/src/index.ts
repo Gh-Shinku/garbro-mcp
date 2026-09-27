@@ -816,6 +816,7 @@ import { cp3ImageFormat } from "./seraphim/cp3-image.js";
 import { archangelDatFormat } from "./seraphim/dat.js";
 import { seraphimMcFormat } from "./seraphim/mc.js";
 import { seraphimArchFormat } from "./seraphim/archpac.js";
+import { ismPngFormat } from "./ism/png-image.js";
 import { seraphimScn95Format, seraphimScnFormat } from "./seraphim/scnpac.js";
 import {
 	seraphimCbImageFormat,
@@ -1565,6 +1566,7 @@ export function createDefaultRegistry(
 			oneUpArcFormat,
 			seraphimMcFormat,
 			seraphimArchFormat,
+			ismPngFormat,
 			succubusArcFormat,
 			tailPkgFormat,
 			tanakaArc0Format,

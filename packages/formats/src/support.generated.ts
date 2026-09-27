@@ -9569,6 +9569,28 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "image",
+				tag: "PNG/ISM",
+				class: "PngIsmFormat",
+				source: "ArcFormats/Ism/ImagePNG.cs",
+			},
+			localId: "png-ism-image",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the picture of the name `.png` of the engine, whose places of the colours stand turned over: the place of the colour of every place of a picture of thirty two places of a colour stands of the count of the places of the colour of the reference (a place of no colour stands for a place of colour)",
+				"the picture of a file of the name `.png` that stands of twenty four places of a colour, which the reference hands over as it stands and this port does as well",
+				"the counts of the places of the picture, of the reader of that format this project carries (`shared/png-image.ts`) in place of the decoder of the platform the reference stands of",
+			],
+			unsupported: [
+				"archive creation",
+				"the walk of the places of a picture of a file that stands of no walk of the reader of this project, which the reference stands of the decoder of its platform for",
+				'the reach of the walk inside an archive of the engine: the reference answers nothing for a file of the name `.png` that stands outside an archive whose tag is `ISA` (`VFS.IsVirtual && VFS.CurrentArchive.Tag != "ISA"`) and stands of the last priority of its table, and this port stands of that priority as well; the archive of the engine (`ism-isa`) lists the places of its files and hands them over as they stand rather than routing the pictures of the name `.png` here',
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "image",
 				tag: "MOE/MMD",
 				class: "MmdFormat",
 				source: "ArcFormats/Ivory/ImageMMD.cs",

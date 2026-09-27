@@ -272,14 +272,15 @@ further than the reference's own list of them.
   walk of the places of a sound of that format stands of the format itself, `gameres-aiff-audio`.)
 - `OPUS` (`Experimental/Opus/AudioOPUS.cs`) hands its stream to an Opus library.
 - `PNG/ISM` (`ArcFormats/Ism/ImagePNG.cs`, class `PngIsmFormat`) has no layout of its own to port: it is a
-  **plain PNG**, whose head the reference reads through `Png.ReadMetaData`, and whose picture it takes from
-  the platform's own decoder (`PngBitmapDecoder`), of one twist - where the decoded frame stands of four
-  places a colour its alpha is **inverted**, place by place (`pixels[i] ^= 0xFF`). The picture is gated on
-  the archive it is read out of: `ReadMetaData` returns nothing unless `VFS.CurrentArchive.Tag` reads `ISA`,
-  which is the archive of `ArcFormats/Ism/ArcISA.cs` this project reads (`ism-isa`), and `Write` throws, so
-  the reference never turns the picture into bytes. There is therefore nothing for a port to lay out: the
-  places of a `.png` entry of an ISA archive stand as the file they were, which the general PNG picture of
-  this project (`gameres-png-image`) reads, exactly as `PngFormat` reads them in the reference.
+  **plain PNG**, whose head the reference reads through `Png.ReadMetaData`, whose picture it takes from the
+  platform's own decoder (`PngBitmapDecoder`), of one twist - where the decoded frame stands of four places a
+  colour its alpha is **inverted**, place by place (`pixels[i] ^= 0xFF`) - and whose `Write` throws. The
+  picture is gated on the archive it is read out of (`ReadMetaData` returns nothing unless
+  `VFS.CurrentArchive.Tag` reads `ISA`) and stands of the last priority of the reference's table.
+  **It stands ported now**, as `png-ism-image`: the walk above, of the reader of that format this project
+  carries (`shared/png-image.ts`) in place of the decoder of the platform, and of the same last priority -
+  see `docs/formats/png-ism-image.md`. What remains is the routing of the pictures of the name `.png` of
+  `ism-isa` here, the archive of the engine listing them and handing them over as they stand.
 - `GAL/X200` (`ArcFormats/LiveMaker/ImageGALX.cs`) describes its layers in an XML header (`ReadXml`),
   which would need an XML walk this project does not have. `GAL/X` (`ArcFormats/LiveMaker/ArcGALX.cs`)
   splits one such picture into its frames and layers, so it stands on the same walk and is not a
