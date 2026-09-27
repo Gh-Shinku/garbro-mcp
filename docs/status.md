@@ -6,10 +6,10 @@ numbers come from `scripts/garbro-gap.mjs`; this file only rolls them up, so tre
 regenerate it when the numbers move.
 
 `support-status.json` schema version 2 adds an optional `readStatus` plus taxonomy-backed `gaps`. Migration is
-incremental: records touched by current work receive the structured fields, while the legacy prose fields stay
-available to existing consumers. Run `pnpm support:check` before regenerating the TypeScript catalogue.
+incremental: the ten records touched by this work receive the structured fields, while the legacy prose fields
+stay available to existing consumers. Run `pnpm support:check` before regenerating the TypeScript catalogue.
 
-Written at commit `b69041cc` (2026-09-28). Regenerate the numbers with:
+Written at commit `79ce8f01` (2026-09-28). Regenerate the numbers with:
 
 ```bash
 node scripts/garbro-gap.mjs          # the totals line, plus the largest rows still pending
@@ -80,13 +80,13 @@ calls.
 These are rows where GARbro has a working, self contained implementation of something this port does not do
 yet. They are the honest work list, roughly in the order I would take them.
 
-**1. Entry typing through the format catalogue (~53 rows).** GARbro's `GameRes/FormatCatalog.cs` maps an entry
-extension and an entry signature to a format tag (`LookupExtension`, `LookupSignature`), and 241 files under
-`ArcFormats/` use that catalogue to hand an entry to the right reader. This port lists such entries without
-typing them, so nothing downstream can read them. Records name it as *extension based entry typing*, *entry
-type inference*, *type classification by content signature*, *entry type detection* or *full GARbro
-resource-catalog extension inference*. Examples: `ags-dat`, `artemis-pfs`, `g2-pak`, `dogenzaka-bin`,
-`ail-dat`, `ast-arc`, `ddsystem-ddp2`, `elf-vol`.
+**1. Entry typing through the format catalogue (39 explicitly recorded rows remain).** GARbro's
+`GameRes/FormatCatalog.cs` maps an entry extension and an entry signature to a format tag (`LookupExtension`,
+`LookupSignature`). The shared infrastructure now generates those maps from all 1132 inventory rows, applies
+GARbro's aliases and rejects ambiguous signatures. `ags-dat` and `ast-arc` are the extension-lookup pilots;
+`dogenzaka-bin`, `dogenzaka-bin-2` and `elf-vol` are the signature-lookup pilots. The remaining records include
+`artemis-pfs`, `g2-pak`, `ail-dat` and `ddsystem-ddp2`; they can now adopt the shared classifier without adding
+another format table.
 
 **2. Image payload decoding (~59 rows).** The archive is read, the payload is a picture, and the reference
 decodes it while this port hands the stored surface over. One query over the records (any unsupported item
@@ -150,6 +150,6 @@ design. Aligning writing would be a separate workstream.
 
 1. Establish the community-driven real-game verification policy and issue guidance, without making sample
    acquisition a release gate.
-2. Entry typing through the format catalogue: one infrastructure change that unblocks about 53 rows.
+2. Extend the now-shared entry catalogue classifier to the 39 records that still name this gap.
 3. Then the per format variants in gap 4, and the from-spec codecs (Vorbis, and whatever gap 2 turns out to
    need).
