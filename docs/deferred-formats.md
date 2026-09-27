@@ -221,12 +221,13 @@ open archives that the shipped defaults already cover.
   with three bytes of the *name* (`entry.Offset ^= Extend8Bit (raw_name[raw_name.Length >> 1])` and the two
   beside it), so the places of the file of such an entry cannot be found at all without the listing.
 
-- `ALL/GIGA` (`Legacy/Giga/ArcALL.cs`) carries **no index at all**: `TryOpen` looks the archive's file
-  name up in `FileMap273`, a table of entries written out **inside the reference's own source** (the file
-  is 2090 lines, of which that table is nearly all), and returns `null` for anything else. Its walk of
-  the places of the file of an entry (an LZSS of its own, `LzssUnpack`) is readable and portable, but
-  no entry can be placed without the table that names it.
-
+- `ALL/GIGA` (`Legacy/Giga/ArcALL.cs`, class `AllOpener`) is an archive whose index stands **in the reference
+  itself**: `FileMap273` is a table of five archives over 1948 files - every name, every place of the file,
+  every count of the places of it and whether it stands packed - written out in the source over 2000 lines.
+  Nothing of it stands outside the reference, so **it stands ported now**, as `giga-all-archive`: the table
+  read off the source, the listing it makes and the walk of the places of a file of the engine
+  (`AllOpener.LzssUnpack`) - see `docs/formats/giga-all-archive.md`. The entry that stood here before this
+  said the table "stands nowhere in it", which was wrong: the table *is* the file.
 - `MBM` (`Legacy/Logg/ArcMBM.cs`) selects a listing by archive size (`0x0AB0F5F4` to `logg_pl.lst`,
   `0x0BFFD3DA` to `logg_ak.lst`, `0x09809196` to `logg_th.lst`).
 - `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
@@ -242,8 +243,8 @@ open archives that the shipped defaults already cover.
 
 ## How many rows stand unported, and of what kind
 
-At this writing the deliverable list holds **1129** rows: **1083** of them stand of a port of this project and
-**46** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the kinds
+At this writing the deliverable list holds **1129** rows: **1084** of them stand of a port of this project and
+**45** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the kinds
 of reason are these, to the row:
 
 * **a key the file does not carry, of a table that ships empty** - **25 rows**: `PKZ`, `PKG/2`, `ADS`, `PBZ`,
@@ -251,10 +252,9 @@ of reason are these, to the row:
   `DAT/RepiPack`, `AVC`, `ACV`, `DAT/MINATO`, `ARC/noncolor`, `DPK`, `DXA`, `LIBP`, `NPK`, `YPF`, `PAZ` and
   `PAK/MORNING`. The empty expression of every one of those tables stands read off the reference in the
   entries above; none of those readers holds a guess of its own of the kind `ARC/AI5WIN` does.
-* **a table the reference does not ship at all** - **3 rows**: `MBM` and `PACK/BONK` need a `*.lst` listing
-  that stands nowhere in the reference tree, and `ALL/GIGA` a table of 2090 lines that stands nowhere in it
-  either. `DAT/WEAPON`, which stood here for the same reason, **is** ported: its table stands in the source
-  itself.
+* **a table the reference does not ship at all** - **2 rows**: `MBM` and `PACK/BONK` need a `*.lst` listing
+  that stands nowhere in the reference tree. `DAT/WEAPON` and `ALL/GIGA`, which stood here for the same
+  reason, **are** ported: their tables stand in the source itself.
 * **a walk of the platform rather than of the file** - **10 rows**: `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
   and `BIN/DXLIB`, of which the last four are stubs of the reference that read nothing at all; and of the
   three whose walk stands of a **public** codec or container the reference leaves to its platform - `OPUS`,

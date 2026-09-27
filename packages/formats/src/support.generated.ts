@@ -17928,6 +17928,29 @@ export const formatSupportCatalog = {
 		{
 			reference: {
 				type: "archive",
+				tag: "ALL/GIGA",
+				class: "AllOpener",
+				source: "Legacy/Giga/ArcALL.cs",
+			},
+			localId: "giga-all-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the table of the files of the engine, of the name of the archive: five archives over 1948 files, read off `AllOpener.FileMap273` in the reference itself rather than retyped (`ALLCHP.273` 199 files, `ALLGRP.273` 339, `ALLXXX.273` 366, `ALLMAP.273` 784, `ALLMCP.273` 260)",
+				"the names of the files of an archive, of the counts of their places and of the places of the file of them, of the table of the reference",
+				"the places of a file of the engine, of the walk of the places of the engine (`AllOpener.LzssUnpack`): the count of the counts of the walk of them at the head of the file, a count of nought standing of the places of the file as they stand, and every count behind it standing of the counts of the walk of the engine, of eight of them to a control place of the file and of the counts of a place of the file itself behind them",
+				"the walk of the counts of the places of the file of the engine itself (`count & 0xFFF` places of the file in front of the place of the file, of the counts of the places of the walk of the engine of every count), which this project stands of",
+			],
+			unsupported: [
+				"archive creation",
+				"a file of an archive of the engine whose places stand of no walk of this port, which stands refused",
+				"the pictures and the scripts behind the files of an engine of this name, which stand of their own formats",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
+				type: "archive",
 				tag: "SERAPH/VOICE",
 				class: "VoiceDatOpener",
 				source: "ArcFormats/Seraphim/ArcVoice.cs",

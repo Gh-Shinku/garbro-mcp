@@ -549,6 +549,7 @@ import { imgBmpImageFormat } from "./lilim/img-bmp-image.js";
 import { imgPngImageFormat } from "./lilim/img-png-image.js";
 import { livemakerGalImageFormat } from "./livemaker/gal-image.js";
 import { galxImageFormat, galxArchiveFormat } from "./livemaker/galx.js";
+import { gigaAllFormat } from "./giga/all-archive.js";
 import { livemakerVfFormat } from "./livemaker/vf.js";
 import { loggArfFormat } from "./logg/arf.js";
 import { frmImageFormat } from "./logg/frm-image.js";
@@ -2192,6 +2193,7 @@ export function createDefaultRegistry(
 			livemakerGalImageFormat,
 			galxImageFormat,
 			galxArchiveFormat,
+			gigaAllFormat,
 			livemakerVfFormat,
 			circusVcPacFormat,
 			caramelBoxArc3Format,
