@@ -133,3 +133,20 @@ implementation.
 The counts of the places of the file of the rows of the picture stand of the count of the places of the file of the head
 of the picture, of the count of the places of the file of the head of the row of the picture of the fax itself, so the count of the head of the format of the fax of the end of the picture of the format stands away of the
 walk of this project rather than of a stray row of the picture.
+
+## The counts of the head of the walk of the jpeg that stand apart
+
+The stream of the walk of the jpeg of a strip need not carry the counts of the head of the colour of the picture and of
+the walk of the jpeg of it: such a stream stands of the count of the head of the picture of the format (JPEGTables,
+tag 347), which the walk of this project stands in front of the stream of the strip, of the count of the head of the
+format of the jpeg of the picture itself, as the library of the walk of the jpeg of this machine reads them. The
+python imaging library writes such a file for the compression of the walk of the jpeg of the picture of the format
+(tag 259 of seven, with the tables of the picture of the format in tag 347 and the strip holding the count of the head
+of the picture of the format itself and the places of the file of the walk of the jpeg of the picture alone), and the
+fixture of that walk of this project (`TABLES_TIFF`) was written by that library and read back through libtiff, so the
+places of the picture of the fixture stand of an oracle of another implementation. A stream whose components stand of
+the names of the places of the file of the colours of the picture (R, G, B) holds the places of the colour of the
+picture itself, which the walk of the jpeg of this project reads as well. The counts of the head of the format of the
+jpeg of the picture of the format that stand of the counts of the head of the picture of the format itself (the tags
+519, 520 and 521, of the counts of the places of the file of the tables of the picture of the format in the tags 320,
+321 and 322) stand turned away, which the record names.

@@ -29,6 +29,10 @@ const COMPRESSION_PACKBITS = 32773;
 const COMPRESSION_LZW = 5;
 const COMPRESSION_JPEG = 7;
 
+/** The counts of the head of the format of the picture of the walk of the jpeg of the old kind, whose tables stand
+ * of the counts of the head of the picture of the format itself. */
+const COMPRESSION_JPEG_OLD = 6;
+
 /** The kinds of the places of a colour of a picture. */
 const PHOTOMETRIC_WHITE_IS_ZERO = 0;
 const PHOTOMETRIC_BLACK_IS_ZERO = 1;
@@ -53,6 +57,7 @@ const TAG_COLOUR_MAP = 320;
 const TAG_EXTRA_SAMPLES = 338;
 const TAG_T4_OPTIONS = 292;
 const TAG_T6_OPTIONS = 293;
+const TAG_JPEG_TABLES = 347;
 const TAG_YCBCR_COEFFICIENTS = 529;
 const TAG_YCBCR_SUBSAMPLING = 530;
 const TAG_REFERENCE_BLACK_WHITE = 532;
@@ -97,6 +102,50 @@ interface Entry {
 	count: number;
 	/** Where the value stands: in the four places of the entry itself, or at the places it names. */
 	at: number;
+}
+
+/** The stream of the walk of the jpeg of a strip, of the counts of the places of the file of the tables of the
+ * picture in front of it where the stream of the strip carries none of its own. The stream of the tables and the
+ * stream of the strip each stand of the count of the head of the format of the jpeg of the picture itself, so the
+ * count of the head of the tables and the count of the head of the strip stand away, and the stream of the strip
+ * stands of the count of the head of the tables in front of it. */
+function mergeJpegTables(tables: Buffer, strip: Buffer): Buffer {
+	const head = (buffer: Buffer): boolean =>
+		buffer.length >= 2 && 0xff === buffer[0] && 0xd8 === buffer[1];
+	if (!head(tables) || !head(strip)) return strip;
+	if (carriesTables(strip)) return strip;
+	const tail =
+		0xff === (tables[tables.length - 2] ?? 0) &&
+		0xd9 === (tables[tables.length - 1] ?? 0)
+			? tables.length - 2
+			: tables.length;
+	return Buffer.concat([
+		Buffer.from([0xff, 0xd8]),
+		tables.subarray(2, tail),
+		strip.subarray(2),
+	]);
+}
+
+/** Whether the stream of a strip carries the counts of the head of the color of the picture and of the walk of the
+ * jpeg of the picture itself, of the counts of the head of the format of the jpeg of them. */
+function carriesTables(strip: Buffer): boolean {
+	let at = 2;
+	while (at + 3 < strip.length) {
+		if (0xff !== strip[at]) return false;
+		const marker = strip[at + 1] ?? 0;
+		if (0xdb === marker || 0xc4 === marker) return true;
+		if (
+			0xda === marker ||
+			0xc0 === marker ||
+			0xc1 === marker ||
+			0xc2 === marker
+		)
+			return false;
+		const size = ((strip[at + 2] ?? 0) << 8) | (strip[at + 3] ?? 0);
+		if (size < 2) return false;
+		at += 2 + size;
+	}
+	return false;
 }
 
 /** Reads a tagged image file and hands a bitmap of the picture over. */
@@ -227,7 +276,10 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 	// the walk of the jpeg of this project stands over it. A stream of the kind the reference names as its own
 	// (the tables of it standing apart, of the places of the file the old kind writes) stands turned away, which
 	// is where the platform of the reference fails as well.
-	if (COMPRESSION_JPEG === compression) {
+	if (
+		COMPRESSION_JPEG === compression ||
+		COMPRESSION_JPEG_OLD === compression
+	) {
 		const places = values(TAG_STRIP_OFFSETS) ?? [];
 		const lengths = values(TAG_STRIP_COUNTS) ?? [];
 		if (1 !== places.length || 1 !== lengths.length)
@@ -238,7 +290,15 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		const length = lengths[0] ?? 0;
 		if (at + length > data.length)
 			throw invalidPicture("The places of a strip stand outside the picture");
-		const image = readJpegImage(data.subarray(at, at + length));
+		// The counts of the head of the walk of the jpeg of the picture (the counts of the places of the file of the
+		// tables of it) stand of the counts of the head of the picture of the format itself where the stream of a
+		// strip carries none of them: the walk of this project stands them in front of the stream of the strip, as
+		// the library of the walk of the jpeg of this machine reads them.
+		const tables = values(TAG_JPEG_TABLES);
+		const strip = data.subarray(at, at + length);
+		const image = readJpegImage(
+			tables ? mergeJpegTables(Buffer.from(tables), strip) : strip,
+		);
 		return {
 			width: image.width,
 			height: image.height,

@@ -18,6 +18,8 @@ import {
 	FAX_THREE_TIFF,
 	FAX_TIFF_PLACES,
 	PALETTE_TIFF,
+	TABLES_TIFF,
+	TABLES_TIFF_PLACES,
 	TWO_COLOUR_TIFF,
 	TWO_COLOUR_TIFF_PLACES,
 	PLANAR_TIFF,
@@ -163,6 +165,24 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(FAX_FOUR_TIFF);
 		expect(image).toMatchObject({ width: 16, height: 8, bitsPerPixel: 8 });
 		expect([...image.pixels]).toEqual([...FAX_TIFF_PLACES]);
+	});
+
+	it("reads the places of the walk of the jpeg whose tables stand of the counts of the head of the picture", async () => {
+		// The stream of the strip names no counts of the head of the color of the picture and of the walk of the jpeg
+		// of it: the walk of this project stands the counts of the head of the picture of the format (tag 347) in
+		// front of the stream of the strip, and reads the places of the file of the picture of the format itself.
+		const image = await readTiffImage(TABLES_TIFF);
+		expect(image).toMatchObject({ width: 16, height: 16, bitsPerPixel: 32 });
+		// The walk of the jpeg of this project stands of single precision against the fixed point arithmetic of
+		// libjpeg, so the two pictures differ by no more than two places.
+		let worst = 0;
+		for (let at = 0; at < TABLES_TIFF_PLACES.length; at += 1) {
+			worst = Math.max(
+				worst,
+				Math.abs((image.pixels[at] ?? 0) - (TABLES_TIFF_PLACES[at] ?? 0)),
+			);
+		}
+		expect(worst).toBeLessThanOrEqual(2);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {
