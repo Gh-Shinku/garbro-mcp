@@ -22,7 +22,11 @@ plus that product and the walk advances by it.
 Frames carry no names of their own: `AnmOpenerBase.TryOpen` builds them from the archive name and a
 two-digit index and classifies every frame as an image. The port records each frame's depth, width and
 height as metadata, validates that the derived layout stays inside the file — which the reference leaves
-unchecked — and extracts frames verbatim, since turning them into bitmaps is an image concern.
+unchecked. The picture of a frame stands of the places of the file behind the head of the frame, of one place of a
+colour to a pixel, and of the rows of it turned over: `Pl00Decoder` stands of `ImageData.CreateFlipped` through the
+shared walk of the animation resources of this engine, so the last row of the file is the first row of the picture. The
+reference stands of three places of a colour as a picture of three of them and of every other count as a picture of
+four, whose stride would not stand of the count it declares; a frame of any other count stands turned away here.
 
 The `PL10` variant declared in the same GARbro file is a separate format with its own tag, and it is not part
 of this port: its first frame is stored raw while later frames carry a step byte and a packed size ahead of
@@ -39,8 +43,8 @@ RLE-compressed pixels.
 | Generated two-digit frame names | Supported |
 | Frame metadata (depth, width, height, image size) | Supported |
 | Derived-span bound checking | Supported as a hardening |
-| Verbatim extraction | Supported |
-| Frame decoding to bitmaps | Not ported |
+| Bitmap decoding of a frame: three or four places of a colour to a pixel, rows turned over | Supported |
+| Frames of a count of places of a colour the engine knows not, turned away | Supported |
 | `PL10` variant | Not ported |
 | Archive creation | Unsupported |
 

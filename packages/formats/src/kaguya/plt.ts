@@ -8,6 +8,8 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { basename } from "node:path";
+import { Readable } from "node:stream";
+import { anFrameBitmap } from "./an-bitmap.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -113,6 +115,42 @@ async function readPltIndex(
 	return entries;
 }
 
+/**
+ * GARBro `Pl00Opener.CreateDecoder` and the `Pl00Decoder` behind it: the places of the picture of a frame stand
+ * behind the head of the frame, of one place of a colour to a pixel, and the rows of them stand of the file turned
+ * over. The reference stands of three places of a colour as a picture of three of them and of every other count as
+ * a picture of four, whose stride would not stand of the count it declares; a frame of any other count stands
+ * turned away here.
+ */
+async function openPltEntry(
+	source: ByteSource,
+	entry: FixedEntry,
+): Promise<Readable> {
+	const width = Number(entry.metadata?.width ?? 0);
+	const height = Number(entry.metadata?.height ?? 0);
+	const depth = Number(entry.metadata?.depth ?? 0);
+	if (3 !== depth && 4 !== depth) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`A frame ${entry.path} stands of ${depth} places of a colour`,
+		);
+	}
+	const pixels = Buffer.from(
+		await source.readAt(
+			entry.offset + BigInt(FRAME_HEADER_SIZE),
+			width * height * depth,
+		),
+	);
+	const bitmap = anFrameBitmap(width, height, pixels, depth);
+	if (!bitmap) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`A frame ${entry.path} stands of ${depth} places of a colour`,
+		);
+	}
+	return Readable.from([bitmap]);
+}
+
 export const kaguyaPltFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: kaguyaPltDescriptor,
 	detection: { signatures: [{ bytes: SIGNATURE }] },
@@ -125,4 +163,5 @@ export const kaguyaPltFormat: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Kaguya PLT layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
+	openEntry: openPltEntry,
 });

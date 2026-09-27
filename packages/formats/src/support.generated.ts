@@ -10318,12 +10318,9 @@ export const formatSupportCatalog = {
 				"interleaved rle with simple and extended runs",
 				"frame naming by index",
 				"frame metadata",
-				"zero step and span bound rejection",
+				"the picture of a frame: the places of the frames before it over the places of it, one, three or four places of a colour to a pixel, of the rows of it turned over",
 			],
-			unsupported: [
-				"frame accumulation and bitmap decoding",
-				"archive creation",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -10344,13 +10341,10 @@ export const formatSupportCatalog = {
 				"generated frame names",
 				"frame metadata",
 				"derived span bound checking",
-				"verbatim extraction",
+				"the picture of a frame: three or four places of a colour to a pixel, of the rows of it turned over",
+				"frames of a count of places of a colour the engine knows not, turned away",
 			],
-			unsupported: [
-				"frame decoding to bitmaps",
-				"pl10 variant",
-				"archive creation",
-			],
+			unsupported: ["pl10 variant", "archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
