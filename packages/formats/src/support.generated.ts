@@ -16461,8 +16461,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"png deobfuscation",
 				"the walk of the places of the picture: the walk of the pictures of the portable network graphic kind of this project",
+				"full PNG structure, checksum and compressed stream validation during extraction",
 			],
-			unsupported: ["archive creation", "png validation"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22671,8 +22672,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"png prefix reconstruction",
 				"the walk of the places of the picture: the walk of the pictures of the portable network graphic kind of this project",
+				"full PNG structure, checksum and compressed stream validation during extraction",
 			],
-			unsupported: ["archive creation", "png validation"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -23101,8 +23103,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"png signature reconstruction",
 				"the walk of the places of the picture: the walk of the pictures of the portable network graphic kind of this project",
+				"full PNG structure, checksum and compressed stream validation during extraction",
 			],
-			unsupported: ["archive creation", "png validation"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
