@@ -127,7 +127,7 @@ describe("KaGuYa AN21 animation resource", () => {
 			bitsPerPixel: 8,
 			pixels: new Array(IMAGE_SIZE).fill(0x77),
 		});
-		const second = EXPECTED.map((place, index) => (place + 0x77) & 0xff);
+		const second = [...EXPECTED].map((place) => (place + 0x77) & 0xff);
 		expect(await placesOfFrame(archive, "anim#01")).toMatchObject({
 			pixels: second,
 		});
