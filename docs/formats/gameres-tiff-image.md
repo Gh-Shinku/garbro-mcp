@@ -72,3 +72,15 @@ fixture of that walk (`PREDICTOR_TIFF`) was built by this project, of the counts
 imaging library reads the file itself but stands of the counts of the differences as they stand in the file rather than
 of the places of the picture, so it stands as no oracle for that walk, and the counts of the picture stand of the rule of
 the head of the format alone.
+
+## The places of a picture whose strip holds the walk of the jpeg
+
+A picture whose count of the compression stands of the walk of the jpeg (the count of seven) holds one whole jpeg stream
+in its strip, of the counts of the picture itself, and the walk of the jpeg of this project stands over that strip: the
+places of the picture then stand of the counts of that stream, of the four places a bitmap reads, and the counts of the
+head of the file of the tile and of the strip stand of the walk of the stream rather than of the head. A stream of the
+kind the reference names as its own — the old kind, whose tables stand in a table of their own, which is the kind the
+library of the python imaging library writes — stands turned away with a message of its own, which is where the platform
+of the reference fails as well. The fixture of that walk (`JPEG_TIFF`) was built by this project and read back by the
+python imaging library through libtiff, and the places of the stream of it stand as the oracle of the walk of the jpeg of
+that library.

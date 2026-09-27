@@ -14,6 +14,7 @@
 import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type { BmpImage } from "./bmp.js";
+import { readJpegImage } from "./jpeg-image.js";
 
 /** The two heads the format names, little endian and big endian, each with the count of its own. */
 const LITTLE_SIGNATURE = 0x002a4949;
@@ -25,6 +26,7 @@ const COMPRESSION_DEFLATE = 8;
 const COMPRESSION_OLD_DEFLATE = 32946;
 const COMPRESSION_PACKBITS = 32773;
 const COMPRESSION_LZW = 5;
+const COMPRESSION_JPEG = 7;
 
 /** The kinds of the places of a colour of a picture. */
 const PHOTOMETRIC_WHITE_IS_ZERO = 0;
@@ -202,6 +204,31 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 			"A picture whose rows stand of the difference of the row in front of them of another count stands of no walk of this project",
 		);
 	const compression = one(TAG_COMPRESSION, COMPRESSION_NONE);
+	// A strip of the walk of the jpeg holds one whole stream of that kind, of the counts of the picture itself, so
+	// the walk of the jpeg of this project stands over it. A stream of the kind the reference names as its own
+	// (the tables of it standing apart, of the places of the file the old kind writes) stands turned away, which
+	// is where the platform of the reference fails as well.
+	if (COMPRESSION_JPEG === compression) {
+		const places = values(TAG_STRIP_OFFSETS) ?? [];
+		const lengths = values(TAG_STRIP_COUNTS) ?? [];
+		if (1 !== places.length || 1 !== lengths.length)
+			throw unsupportedPicture(
+				"A picture whose places of the walk of the jpeg stand in strips of their own stands of no walk of this project",
+			);
+		const at = places[0] ?? 0;
+		const length = lengths[0] ?? 0;
+		if (at + length > data.length)
+			throw invalidPicture("The places of a strip stand outside the picture");
+		const image = readJpegImage(data.subarray(at, at + length));
+		return {
+			width: image.width,
+			height: image.height,
+			bitsPerPixel: image.bitsPerPixel,
+			palette: Buffer.alloc(0),
+			pixels: image.pixels,
+		};
+	}
+
 	const photometric = one(TAG_PHOTOMETRIC);
 	const samples = one(TAG_SAMPLES, 1);
 	const bits = values(TAG_BITS) ?? [1];

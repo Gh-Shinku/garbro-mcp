@@ -204,3 +204,35 @@ export const PREDICTOR_TIFF = Buffer.from(
 export const PREDICTOR_TIFF_PLACES: readonly number[] = [
 	0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
 ];
+
+/** Sixteen by eight places of a colour, whose places stand of the walk of the jpeg, in one strip of their own:
+ * the file was built by this project, and the python imaging library reads it back through libtiff. */
+export const JPEG_TIFF = Buffer.from(
+	"SUkqAAgAAAAKAAABBAABAAAAEAAAAAEBBAABAAAACAAAAAIBAwADAAAAhgAAAAMBAwABAAAABwAAAAYBAwABAAAAAgAAABEBBAABAAAAjAAAABUBAwABAAAAAwAAABYBBAABAAAACAAAABcBBAABAAAAoAIAABwBAwABAAAAAQAAAAAAAAAIAAgACAD/2P/gABBKRklGAAEBAAABAAEAAP/bAEMAAgEBAQEBAgEBAQICAgICBAMCAgICBQQEAwQGBQYGBgUGBgYHCQgGBwkHBgYICwgJCgoKCgoGCAsMCwoMCQoKCv/bAEMBAgICAgICBQMDBQoHBgcKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCv/AABEIAAgAEAMBEQACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APyH8Hfs/wD3P9B9P4arB4rY8TI+LtV7x6p4O/Z/4T/Quw/hr6vB4o/Y8k4u294//9k=",
+	"base64",
+);
+
+/** The places the jpeg stream of JPEG_TIFF stands for, blue first, of the four places a bitmap reads: the library
+ * decodes the stream of it, of the walk of the jpeg it stands of. */
+export const JPEG_TIFF_PLACES: readonly number[] = [
+	0, 0, 1, 5, 1, 7, 9, 0, 13, 15, 0, 21, 18, 1, 28, 22, 1, 34, 28, 0, 43, 35, 1,
+	48, 39, 0, 55, 43, 0, 63, 48, 1, 70, 54, 0, 77, 60, 0, 84, 65, 1, 91, 69, 0,
+	97, 74, 1, 104, 5, 10, 1, 10, 11, 9, 16, 10, 15, 20, 10, 22, 25, 11, 29, 29,
+	10, 35, 35, 10, 44, 40, 11, 50, 45, 9, 56, 50, 11, 63, 55, 11, 72, 59, 10, 78,
+	66, 10, 85, 72, 10, 92, 76, 10, 99, 79, 12, 104, 10, 22, 0, 15, 22, 7, 22, 23,
+	14, 26, 22, 21, 30, 23, 28, 35, 23, 35, 41, 22, 43, 45, 23, 48, 50, 20, 55,
+	56, 22, 63, 60, 22, 70, 64, 22, 77, 71, 22, 84, 77, 22, 91, 81, 22, 97, 84,
+	23, 103, 14, 33, 0, 20, 33, 7, 26, 32, 13, 31, 33, 21, 36, 33, 28, 39, 33, 34,
+	46, 32, 43, 51, 34, 48, 55, 31, 55, 59, 34, 62, 66, 33, 70, 69, 33, 77, 76,
+	33, 84, 81, 33, 91, 85, 33, 97, 89, 34, 103, 19, 43, 1, 24, 45, 7, 30, 45, 14,
+	34, 44, 21, 39, 45, 28, 44, 45, 36, 49, 44, 43, 56, 44, 50, 60, 43, 57, 65,
+	45, 64, 69, 44, 70, 75, 44, 77, 79, 44, 84, 86, 44, 91, 90, 43, 99, 95, 44,
+	104, 24, 54, 1, 29, 55, 7, 35, 55, 13, 39, 55, 21, 44, 56, 28, 48, 55, 34, 55,
+	55, 43, 59, 55, 50, 64, 53, 56, 70, 55, 63, 74, 55, 70, 78, 55, 77, 85, 55,
+	84, 91, 55, 91, 95, 55, 97, 98, 56, 104, 30, 66, 0, 34, 67, 6, 41, 67, 13, 45,
+	67, 19, 49, 67, 26, 54, 67, 35, 60, 66, 41, 65, 67, 48, 70, 65, 56, 76, 67,
+	63, 80, 67, 69, 83, 66, 75, 90, 67, 82, 96, 67, 90, 100, 66, 97, 103, 67, 103,
+	35, 76, 1, 41, 77, 7, 48, 77, 14, 52, 77, 21, 55, 77, 28, 61, 78, 35, 65, 76,
+	43, 72, 77, 50, 76, 75, 55, 80, 77, 63, 85, 77, 70, 90, 76, 77, 97, 76, 84,
+	102, 77, 91, 105, 77, 97, 110, 77, 104,
+];

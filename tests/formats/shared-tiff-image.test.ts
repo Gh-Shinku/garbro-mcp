@@ -7,6 +7,8 @@ import {
 	DEFLATE_TIFF,
 	GREY_TIFF,
 	GREY_TIFF_PLACES,
+	JPEG_TIFF,
+	JPEG_TIFF_PLACES,
 	PRESS_TIFF,
 	PRESS_TIFF_PLACES,
 	LZW_TIFF,
@@ -104,6 +106,28 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(PREDICTOR_TIFF);
 		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 8 });
 		expect([...image.pixels]).toEqual([...PREDICTOR_TIFF_PLACES]);
+	});
+
+	it("reads a picture whose places stand of the walk of the jpeg", async () => {
+		// The strip holds one whole jpeg stream, and the library decodes that stream itself, of the walk of the
+		// jpeg it stands of; the two walks of this project differ a little at the edges of a colour change.
+		const image = await readTiffImage(JPEG_TIFF);
+		// The walk of the jpeg of this project hands its places over of the four places a bitmap reads, where the
+		// library hands three over; the blue place of the picture stands first of both of them.
+		expect(image).toMatchObject({ width: 16, height: 8, bitsPerPixel: 32 });
+		let worst = 0;
+		for (let at = 0; at < 16 * 8; at += 1) {
+			for (let place = 0; place < 3; place += 1) {
+				worst = Math.max(
+					worst,
+					Math.abs(
+						(image.pixels[at * 4 + place] ?? 0) -
+							(JPEG_TIFF_PLACES[at * 3 + place] ?? 0),
+					),
+				);
+			}
+		}
+		expect(worst).toBeLessThanOrEqual(8);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {
