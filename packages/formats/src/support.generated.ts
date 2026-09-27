@@ -923,8 +923,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"ags32transform decryption",
 				"zlib inflation",
+				"the places of the picture: three or four places of a colour to a pixel, of the rows of the file turned over",
 			],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

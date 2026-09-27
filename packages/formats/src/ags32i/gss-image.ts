@@ -10,6 +10,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -47,6 +48,8 @@ interface GssLayout {
 	width: number;
 	height: number;
 	bitsPerPixel: number;
+	/** The count of the places of the file the head of the bitmap stands of. */
+	dataOffset: number;
 }
 
 /**
@@ -73,6 +76,7 @@ async function readLayout(source: ByteSource): Promise<GssLayout | undefined> {
 			width: bitmap.readUInt32LE(WIDTH_OFFSET) >>> 0,
 			height: bitmap.readUInt32LE(HEIGHT_OFFSET) >>> 0,
 			bitsPerPixel: bitmap.readInt16LE(BPP_OFFSET),
+			dataOffset: headerLength,
 		};
 	} catch {
 		return undefined;
@@ -148,7 +152,41 @@ export const gssImageFormat: ArchiveFormat = defineFixedArchive({
 				"INVALID_ARCHIVE",
 				"Invalid AGS32i encrypted bitmap",
 			);
-		// The decompressed stream already is a bitmap, header included.
-		return Readable.from([layout.bitmap]);
+		// `GssFormat.Read`: the places of the picture stand behind the head of the bitmap the stream holds, of
+		// three or four places of a colour to a pixel, and the rows of the file stand bottom up, since the
+		// reference stands of `ImageData.CreateFlipped`.
+		const places =
+			32 === layout.bitsPerPixel ? 4 : 24 === layout.bitsPerPixel ? 3 : 0;
+		if (0 === places) {
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				`The picture stands of ${layout.bitsPerPixel} places of a colour`,
+			);
+		}
+		const count = layout.width * layout.height * places;
+		const stored = layout.bitmap.subarray(
+			layout.dataOffset,
+			layout.dataOffset + count,
+		);
+		if (stored.length < count) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The picture stands of too few places of the file: ${stored.length} against ${count}`,
+			);
+		}
+		const rows = Buffer.alloc(count);
+		const stride = layout.width * places;
+		for (let row = 0; row < layout.height; row += 1) {
+			stored.copy(
+				rows,
+				row * stride,
+				(layout.height - 1 - row) * stride,
+				(layout.height - row) * stride,
+			);
+		}
+		if (4 === places) {
+			return Readable.from([writeBmp32(layout.width, layout.height, rows)]);
+		}
+		return Readable.from([writeBmp24(layout.width, layout.height, rows)]);
 	},
 });

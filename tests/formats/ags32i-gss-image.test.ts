@@ -4,6 +4,7 @@ import { gssImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BLOCK_SIZE = 4;
 const PERIOD = 31;
@@ -32,8 +33,12 @@ function crypt(data: Buffer, key: number): Buffer {
 }
 
 /** Builds a bitmap: a header length, the dimensions, the depth and some pixels. */
-function buildBitmap(width = 0x40, height = 0x20, bpp = 32): Buffer {
-	const pixels = Buffer.alloc(width * height * (bpp / 8), 0x5b);
+function buildBitmap(
+	width = 0x40,
+	height = 0x20,
+	bpp = 32,
+	pixels: Buffer = Buffer.alloc(width * height * (bpp / 8), 0x5b),
+): Buffer {
 	const header = Buffer.alloc(0x28, 0);
 	header.writeInt32LE(0x28, 0);
 	header.writeUInt32LE(width, 4);
@@ -90,9 +95,19 @@ describe("ags32i gss image", () => {
 			});
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				bitmap,
+			// The places of the picture stand read and handed over again, of the counts of the head of the
+			// bitmap the stream holds.
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
 			);
+			expect(picture).toMatchObject({
+				width: 0x40,
+				height: 0x20,
+				bitsPerPixel: 32,
+			});
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...Buffer.alloc(0x40 * 0x20 * 4, 0x5b),
+			]);
 		} finally {
 			await archive.close();
 		}
@@ -110,12 +125,39 @@ describe("ags32i gss image", () => {
 			});
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				bitmap,
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
 			);
+			expect(picture).toMatchObject({
+				width: 0x20,
+				height: 0x10,
+				bitsPerPixel: 24,
+			});
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...Buffer.alloc(0x20 * 0x10 * 3, 0x5b),
+			]);
 		} finally {
 			await archive.close();
 		}
+	});
+
+	it("reads the places of a picture whose rows stand bottom up in the file", async () => {
+		// Two rows of two pixels of four places of a colour: the last row of the file stands first in the
+		// picture, since the reference stands of `ImageData.CreateFlipped`.
+		const pixels = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		]);
+		const file = buildGss(buildBitmap(2, 2, 32, pixels));
+		const archive = await gssImageFormat.open(sourceOf(file), "CG03.GSS");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await archive.openEntry(entry.id)),
+		);
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			...pixels.subarray(8),
+			...pixels.subarray(0, 8),
+		]);
 	});
 
 	it("declines a file whose tag does not survive decryption", async () => {

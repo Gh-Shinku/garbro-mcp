@@ -32,8 +32,9 @@ The port exposes the resource as a single entry:
 * the entry is named after the source file with a `bmp` extension and is flagged encrypted;
 * `sizeKnown` is false because the payload is decrypted and inflated, so its length differs from the
   source;
-* extraction returns the **decompressed stream**, which already is a complete bitmap with its header,
-  so no pixel decoder is needed;
+* extraction reads the **places of the picture** out of the decompressed stream behind the count of the places of
+  the file its head names, of three or four places of a colour to a pixel, and turns the rows of the file over,
+  since the reference stands of `ImageData.CreateFlipped`;
 * entry metadata carries `type: "image"` plus the width, height and bit depth, and the archive
   metadata records the same values with `image: "bmp"`.
 
@@ -42,6 +43,11 @@ The port exposes the resource as a single entry:
 * The reference streams the inflation and only ever reads the parts it needs; the port inflates the
   whole payload eagerly (detection runs only for files whose first four bytes match one of the four
   words, so the cost is bounded).
-* The reference validates that the bit depth is 24 or 32 when it builds pixels; the port does not,
-  because it hands the bitmap out as it is.
-* Pixel decoding into an image and archive creation are out of scope.
+* The reference validates that the bit depth is 24 or 32 when it builds pixels; the port stands of the same
+  validation and turns a picture of any other count away on extraction.
+* A picture whose places stand short of the count its head names is turned away on extraction, where the reference
+  throws while reading the pixels.
+`GssFormat.Read` reads the places of the picture: they stand behind the count of the places of the file the head of the
+bitmap names, of three or four places of a colour to a pixel, and the rows of the file stand bottom up, since the
+reference stands of `ImageData.CreateFlipped`. The port hands them over as a bitmap of the count of places of a colour
+the head names, and turns a picture of any other count away. Archive creation and image writing are out of scope.
