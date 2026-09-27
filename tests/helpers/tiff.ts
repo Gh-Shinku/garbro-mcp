@@ -265,3 +265,31 @@ export const TWO_COLOUR_TIFF_PLACES: readonly number[] = [
 	100, 98, 104, 146, 125, 134, 8, 36, 60, 54, 63, 90, 100, 90, 120, 146, 117,
 	150,
 ];
+
+/** Sixteen by eight places of one place of the file whose count of the places of the file of the colour of the
+ * picture (the dark place) stands of the counts of the head of the format of the fax of one place of the file
+ * (group 3 of the format): the file was written by the python imaging library. */
+export const FAX_THREE_TIFF = Buffer.from(
+	"SUkqACgAAAAAGKBgAmtFDABigYAJrRQwAYoGACa0UMAGKBgAmtFDAAkAAAEDAAEAAAAQAAAAAQEDAAEAAAAIAAAAAgEDAAEAAAABAAAAAwEDAAEAAAADAAAABgEDAAEAAAABAAAAEQEEAAEAAAAIAAAAFgEDAAEAAAAIAAAAFwEEAAEAAAAfAAAAHAEDAAEAAAABAAAAAAAAAA==",
+	"base64",
+);
+
+/** The same places of the file, of the counts of the head of the format of the fax of the two places of the file
+ * (group 4 of the format), written by the python imaging library. */
+export const FAX_FOUR_TIFF = Buffer.from(
+	"SUkqACYAAAAxGBggQI0QYIFBAgRogwQKCBAjRBggUECBGiACACAJAAABAwABAAAAEAAAAAEBAwABAAAACAAAAAIBAwABAAAAAQAAAAMBAwABAAAABAAAAAYBAwABAAAAAQAAABEBBAABAAAACAAAABYBAwABAAAACAAAABcBBAABAAAAHgAAABwBAwABAAAAAQAAAAAAAAA=",
+	"base64",
+);
+
+/** The places of the pictures of the fax, of one place of the file a place of the picture: the count of the file of
+ * a place of the colour of the picture (the dark place) and the count of the places of the file of the colour of
+ * the picture of the other, the counts the library hands back. */
+export const FAX_TIFF_PLACES: readonly number[] = [
+	0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+	255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 255, 255,
+	255, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255,
+	255, 255, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255,
+	255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0,
+	255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255,
+	255, 255, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 255,
+];

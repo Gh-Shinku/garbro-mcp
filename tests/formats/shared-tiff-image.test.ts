@@ -14,6 +14,8 @@ import {
 	LZW_TIFF,
 	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
+	FAX_THREE_TIFF,
+	FAX_TIFF_PLACES,
 	PALETTE_TIFF,
 	TWO_COLOUR_TIFF,
 	TWO_COLOUR_TIFF_PLACES,
@@ -148,6 +150,12 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(TWO_COLOUR_TIFF);
 		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
 		expect([...image.pixels]).toEqual([...TWO_COLOUR_TIFF_PLACES]);
+	});
+
+	it("reads a picture of the counts of the head of the format of the fax of one place of the file", async () => {
+		const image = await readTiffImage(FAX_THREE_TIFF);
+		expect(image).toMatchObject({ width: 16, height: 8, bitsPerPixel: 8 });
+		expect([...image.pixels]).toEqual([...FAX_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {

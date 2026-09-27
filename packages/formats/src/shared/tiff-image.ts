@@ -15,6 +15,7 @@ import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
 import type { BmpImage } from "./bmp.js";
 import { readJpegImage } from "./jpeg-image.js";
+import { FaxDecoder, faxCompression } from "./tiff-fax.js";
 
 /** The two heads the format names, little endian and big endian, each with the count of its own. */
 const LITTLE_SIGNATURE = 0x002a4949;
@@ -50,6 +51,8 @@ const TAG_PLANAR = 284;
 const TAG_PREDICTOR = 317;
 const TAG_COLOUR_MAP = 320;
 const TAG_EXTRA_SAMPLES = 338;
+const TAG_T4_OPTIONS = 292;
+const TAG_T6_OPTIONS = 293;
 const TAG_YCBCR_COEFFICIENTS = 529;
 const TAG_YCBCR_SUBSAMPLING = 530;
 const TAG_REFERENCE_BLACK_WHITE = 532;
@@ -272,6 +275,35 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 	// stand in tiles of their own holds its rows of places in as many rows of tiles as its counts name, of the
 	// count of the places of a tile itself, and the right and the lower tiles stand clipped where the picture
 	// ends; every other picture holds its places in strips.
+	// The counts of the head of the format of the fax of the picture of the places of the file of one place of the
+	// picture (group 3 of the format) and of the two places of the file (group 4 of the format). Such a picture
+	// stands of one place of the file a place of the picture, and the walk of this project reads the counts of the
+	// head of the format of the fax itself, since the reference stands its platform over such a file.
+	let fax: FaxDecoder | undefined;
+	if (4 === compression)
+		throw unsupportedPicture(
+			"A picture whose count of the head of the format of the fax stands for the counts of the head of the format of the fax of the two places of the file stands of no walk of this project",
+		);
+	if (faxCompression(compression)) {
+		const options = one(3 === compression ? TAG_T4_OPTIONS : TAG_T6_OPTIONS, 0);
+		if (0 !== (options & 0x2))
+			throw unsupportedPicture(
+				"A picture whose places of the file stand of the counts of the head of the format of the fax of the places of the file of the picture themselves stands of no walk of this project",
+			);
+		if (tiled)
+			throw unsupportedPicture(
+				"A picture of the fax whose places of the file stand in tiles of their own stands of no walk of this project",
+			);
+		if (1 !== samples || 1 !== sampleBits)
+			throw unsupportedPicture(
+				"A picture of the fax of more than one place of the file a place of the picture, or of more than one place of the file a sample, stands of no walk of this project",
+			);
+		if (0 !== (options & 0x1))
+			throw unsupportedPicture(
+				"A picture whose counts of the head of the format of the fax of the two places of the file stand of the counts of the head of the format of the fax of one place of the file as well stands of no walk of this project",
+			);
+		fax = new FaxDecoder(width);
+	}
 	const rowBytes = Math.ceil((width * samples * sampleBits) / 8);
 	const stored: Buffer = Buffer.alloc(rowBytes * height, 0x00);
 	if (tiled) {
@@ -315,12 +347,27 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		// A picture whose places of a colour stand apart holds as many counts of strips as it holds places of a colour,
 		// one count behind the other, and a strip of such a picture holds the places of one place of a colour alone.
 		const stripsPerPlane = Math.max(1, Math.ceil(height / rowsPerStrip));
+		// The counts of the head of the format of the fax of the picture stand for the places of the file of the colour
+		// of the picture (white) themselves: the count of one place of the file stands for the count of the head of the
+		// format of the fax of one place of the file, of no count of the head of the picture, which the library of the
+		// walk of the counts of the head of the format of the fax stands of as well.
+		const dark = 0x01;
 		let row = 0;
 		for (let strip = 0; strip < offsets.length; strip += 1) {
 			const at = offsets[strip] ?? 0;
 			const length = counts[strip] ?? 0;
 			if (at + length > data.length)
 				throw invalidPicture("The places of a strip stand outside the picture");
+			if (fax) {
+				if (row >= height) continue;
+				const walk = fax.read(data.subarray(at, at + length), dark);
+				for (const line of walk) {
+					if (row >= height) break;
+					line.copy(stored, row * rowBytes, 0, rowBytes);
+					row += 1;
+				}
+				continue;
+			}
 			const plain = await unpackStrip(
 				data.subarray(at, at + length),
 				compression,

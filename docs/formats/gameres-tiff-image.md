@@ -108,3 +108,21 @@ places of a colour of the format would read. A picture of such a kind whose samp
 file stands turned away as well. The fixture of that walk (`TWO_COLOUR_TIFF`) was built by this project of the counts of
 the head of the format alone, since the python imaging library of this machine reads no such file of that counting, so
 the places of that fixture stand of no oracle of another implementation.
+
+## The counts of the head of the format of the fax
+
+A picture whose count of the head of the picture stands for the counts of the head of the format of the fax of one
+place of the file (group 3 of the format, T.4) holds its places in the counts of the places of the colour of the
+picture of the head of the format of the fax: a count of the places of the file of a colour of the picture and a count
+of the places of the file of the colour of the other stand one behind the other, and the first count of the head of a row
+of the picture stands of the colour of the picture of the head of the format of the fax itself rather than of the count
+of the head of the picture, which the library of the counts of the head of the format of the fax of this machine stands
+of as well: the walk of this project hands the places of the file of a place of the colour of the picture back of the
+count of one place of the file for the place of the colour of the picture of the head of the format of the fax, of the
+count of the places of the file of the picture of the format itself. The counts of the head of the format of the fax of
+the two places of the file (group 4 of the format, T.6) and the counts of the head of the format of the fax of the two
+places of the file of group 3 stand turned away, each with a message of its own, and so does a picture whose samples
+stand of more than one place of the file or whose places of the file stand of more than one place of the file a place
+of the picture. The fixtures of that walk (`FAX_THREE_TIFF`) were written by the python imaging library, which reads
+them back through libtiff, so the counts of the places of the picture of those fixtures stand of an oracle of another
+implementation.
