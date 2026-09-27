@@ -4,6 +4,7 @@
 
 import { inflateLzssAll } from "@garbro-mcp/codecs";
 import { GarbroError } from "@garbro-mcp/core";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -175,6 +176,16 @@ export const csfImageFormat: ArchiveFormat = defineFixedArchive({
 		const bitmap = await readBitmap(source);
 		if (!bitmap)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Eye CSF bitmap");
-		return Readable.from([bitmap]);
+		// `CsfFormat.Read` stands of `Bmp.Read` over the unpacked surface: the bitmap stands read of the bitmap
+		// walk of this project and handed over as a bitmap of its own, so the counting word of the file and the
+		// places behind the picture stand of no count of the picture.
+		const image = readBmpImage(bitmap);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Eye CSF bitmap data: ${bitmap.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

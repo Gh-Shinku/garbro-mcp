@@ -6866,14 +6866,10 @@ export const formatSupportCatalog = {
 				"detection",
 				"extraction",
 				"lzss decoding",
-				"bitmap passthrough",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the unpacked surface",
 			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22870,13 +22866,13 @@ export const formatSupportCatalog = {
 			localId: "yellowcap-ggf-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "bitmap passthrough", "metadata"],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"image decoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			supported: [
+				"detection",
+				"extraction",
+				"metadata",
+				"the places of the picture: the bitmap walk of this project over the embedded surface",
 			],
+			unsupported: ["archive creation", "image encoding", "image decoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

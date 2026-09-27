@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { csfImageDescriptor, csfImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const PREFIX_SIZE = 0xb;
 const BMP_HEADER_SIZE = 54;
@@ -89,7 +90,9 @@ describe("eye csf bitmap", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(built.bitmap)?.pixels);
 			expect(archive.entries[0]?.size).toBe(
 				BigInt(built.file.length - PREFIX_SIZE),
 			);
@@ -110,7 +113,9 @@ describe("eye csf bitmap", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(built.bitmap)?.pixels);
 		} finally {
 			await archive.close();
 		}
@@ -124,8 +129,10 @@ describe("eye csf bitmap", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
-			expect(output.readUInt32LE(2)).toBe(output.length);
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(built.bitmap)?.pixels);
+			expect(picture?.pixels.length).toBeGreaterThan(0);
 		} finally {
 			await archive.close();
 		}
