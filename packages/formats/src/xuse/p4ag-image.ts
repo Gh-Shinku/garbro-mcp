@@ -8,6 +8,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -137,8 +139,29 @@ export const p4agImageFormat: ArchiveFormat = defineFixedArchive({
 				"INVALID_ARCHIVE",
 				"Invalid Xuse obfuscated PNG image",
 			);
-		// GARbro builds a prefix stream: the missing signature bytes, then the file verbatim.
+		// GARbro builds a prefix stream: the missing signature bytes, then the file verbatim, and stands
+		// `PngFormat.Read` of the picture of that stream, which the walk of the pictures of this project carries.
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
-		return Readable.from([Buffer.concat([PNG_PREFIX, stored])]);
+		const image = await readPngImage(Buffer.concat([PNG_PREFIX, stored]));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"The picture stands of no picture of the kind its head names",
+			);
+		}
+		if (32 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp32(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		if (24 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp24(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture stands of ${image.bitsPerPixel} places of a colour`,
+		);
 	},
 });

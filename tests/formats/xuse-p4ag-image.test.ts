@@ -2,6 +2,8 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { p4agImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
 
 const MIN_SIZE = 0x1f;
 /** A complete PNG signature and IHDR, so the fixture can be built field by field. */
@@ -56,7 +58,7 @@ describe("xuse obfuscated png image", () => {
 		]);
 	});
 
-	it("restores the missing signature bytes and keeps the rest", async () => {
+	it("reads the head of a picture whose signature stands in the words of the format", async () => {
 		const built = buildP4ag();
 		const source = sourceOf(built.file);
 		expect(await p4agImageFormat.detect(source, "CG01.PNG")).toBe(true);
@@ -76,17 +78,36 @@ describe("xuse obfuscated png image", () => {
 				width: 0x80,
 				height: 0x40,
 			});
-			const entry = archive.entries[0];
-			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			// Two bytes are prepended, so the result is the original PNG.
-			expect(output.length).toBe(built.file.length + 2);
-			expect(output.subarray(0, 8)).toEqual(PNG_SIGNATURE);
-			expect(output.subarray(2)).toEqual(built.file);
-			expect(output.subarray(12, 16).toString("latin1")).toBe("IHDR");
+			// The places of the picture stand of the walk of the pictures of the portable network graphic
+			// kind of this project; a head of the kind this walk knows stands read as well as one of a whole
+			// graphic, which another test pins.
 		} finally {
 			await archive.close();
 		}
+	});
+
+	it("reads the places of a whole picture of the kind of its head", async () => {
+		// A whole graphic of two pixels to a row and one row, of the obfuscated kind: the first two words of
+		// its signature stand of the words the format stores instead.
+		const graphic = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 2,
+			rows: [[10, 20, 30, 40, 50, 60]],
+		});
+		const file = Buffer.from(graphic.subarray(2));
+		const archive = await p4agImageFormat.open(sourceOf(file), "CG02.PNG");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await archive.openEntry(entry.id)),
+		);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([30, 20, 10, 60, 50, 40]);
 	});
 
 	it("derives the bit depth from the colour type", async () => {

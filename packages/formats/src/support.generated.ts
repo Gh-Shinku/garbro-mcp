@@ -22553,8 +22553,13 @@ export const formatSupportCatalog = {
 			localId: "xuse-p4ag-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "png prefix reconstruction"],
-			unsupported: ["archive creation", "pixel decoding", "png validation"],
+			supported: [
+				"detection",
+				"extraction",
+				"png prefix reconstruction",
+				"the walk of the places of the picture: the walk of the pictures of the portable network graphic kind of this project",
+			],
+			unsupported: ["archive creation", "png validation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
