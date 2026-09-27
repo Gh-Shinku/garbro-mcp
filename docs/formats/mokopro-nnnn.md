@@ -43,8 +43,11 @@ what the reference's stream wrapper does when it is read to the end.
 
 ## Port notes and deviations
 
-- The bitmap and audio formats in the same reference file (`BMP/NNNN` and `OGG/NNNN`) wrap the same
-  `MokoCrypt` container for images and sound; they are image and audio formats and out of scope here.
+- The bitmap and audio formats in the same reference file (`BMP/NNNN` and `OGG/NNNN`) wrap the same `MokoCrypt`
+  container for images and sound; they stand of rows of their own in this project (`mokopro-bmp-image` and
+  `mokopro-ogg-audio`), and `NNNNOpener` of the reference has no `OpenImage` of its own: it hands the unpacked
+  stream over, which this port does as well, so an entry of this archive carries the places of the picture or of the
+  sound as the file holds them.
 - The reference always lists the entry once the header parses, even when the packed payload is garbage, and the
   port does the same; a decoding failure surfaces when the entry is opened.
 
