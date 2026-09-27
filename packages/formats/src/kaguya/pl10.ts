@@ -17,6 +17,7 @@ import {
 	normalizeEntryPath,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { anFrameBitmap } from "./an-bitmap.js";
 
 /** The signature spells `PL10`. */
 const SIGNATURE = Buffer.from("PL10", "ascii");
@@ -209,18 +210,88 @@ async function readPl10Index(
 	);
 }
 
-/** GARbro `An21Opener.OpenEntry`: packed frames are RLE expanded, the first one is copied verbatim. */
+/** GARBro `An21Opener.OpenEntry`: packed frames are RLE expanded, the first one is copied verbatim. */
+async function readPl10Frame(
+	source: ByteSource,
+	entry: FixedEntry,
+): Promise<Buffer> {
+	const stored = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.packedSize)),
+	);
+	const rleStep =
+		typeof entry.metadata?.rleStep === "number" ? entry.metadata.rleStep : 0;
+	if (rleStep <= 0) return stored;
+	return decompressKaguyaRle(stored, Number(entry.size), rleStep);
+}
+
+/**
+ * `Pl10Opener` stands of `An21Opener` for every frame but the first, so a frame of this format stands of the
+ * places of the frames before it as a frame of the sibling format does: `An21Archive.GetFrame` walks back to the
+ * first frame and stands the places of every frame of the walk over the places of the frame it stands of, one
+ * place of a colour at a time, of the whole of the places of a colour to a place. The reference reaches the frames
+ * before a frame by walking back through them; this port walks forward from the first frame, which stands of the
+ * same counts without a walk of the depth of the count.
+ */
+async function readPl10Pixels(
+	source: ByteSource,
+	index: number,
+): Promise<{
+	depth: number;
+	width: number;
+	height: number;
+	pixels: Buffer;
+}> {
+	const frames = await readPl10Index(source, "");
+	if (!frames || index < 0 || index >= frames.length) {
+		throw new GarbroError("INVALID_ARCHIVE", "Invalid Kaguya PL10 frame");
+	}
+	let pixels: Buffer = Buffer.alloc(0);
+	let depth = 0;
+	let width = 0;
+	let height = 0;
+	for (let at = 0; at <= index; at += 1) {
+		const frame = frames[at];
+		if (!frame) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid Kaguya PL10 frame");
+		}
+		depth = Number(frame.metadata?.depth ?? 0);
+		width = Number(frame.metadata?.width ?? 0);
+		height = Number(frame.metadata?.height ?? 0);
+		const delta = await readPl10Frame(source, frame);
+		if (0 === at) {
+			pixels = delta;
+			continue;
+		}
+		if (delta.length !== pixels.length) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The frames before ${at} stand of ${pixels.length} places of the file against ${delta.length}`,
+			);
+		}
+		const summed = Buffer.alloc(pixels.length);
+		for (let place = 0; place < pixels.length; place += 1) {
+			summed[place] = ((pixels[place] ?? 0) + (delta[place] ?? 0)) & 0xff;
+		}
+		pixels = summed;
+	}
+	return { depth, width, height, pixels };
+}
+
+/** GARBro `Pl10Opener.OpenImage` and the inherited `BitmapDecoder` behind it. */
 async function openPl10Entry(
 	source: ByteSource,
 	entry: FixedEntry,
 ): Promise<Readable> {
-	const stored = await source.readAt(entry.offset, Number(entry.packedSize));
-	const rleStep =
-		typeof entry.metadata?.rleStep === "number" ? entry.metadata.rleStep : 0;
-	if (rleStep <= 0) return Readable.from([stored]);
-	return Readable.from([
-		decompressKaguyaRle(stored, Number(entry.size), rleStep),
-	]);
+	const index = Number(entry.metadata?.frameIndex ?? 0);
+	const { depth, width, height, pixels } = await readPl10Pixels(source, index);
+	const bitmap = anFrameBitmap(width, height, pixels, depth);
+	if (!bitmap) {
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`A frame ${entry.path} stands of ${depth} places of a colour`,
+		);
+	}
+	return Readable.from([bitmap]);
 }
 
 export const kaguyaPl10Format: ArchiveFormat = defineFixedArchive({

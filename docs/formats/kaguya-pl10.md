@@ -34,8 +34,13 @@ always claims at least 128 positions and simply stops at the end of the output. 
 is read when space remains, which seeds the next comparison. The reference reads without checking bounds, while
 the port stops at either end.
 
-The `An21Opener` base class also accumulates each frame onto the previous one, but that happens in its image
-path beyond `OpenEntry`, so it is out of scope here along with decoding frames to bitmaps.
+`Pl10Opener` stands of `An21Opener` for every frame but the first, so the picture of a frame of this format stands of
+the places of the frames before it exactly as a frame of the sibling `AN21` format does: the places of every frame of
+the walk stand over the places of the frame before it, one place of a colour at a time, of the whole of the places of a
+colour to a place. The reference walks back from the frame it stands of through the frames before it; this port walks
+forward from the first frame, which stands of the same counts without a walk of the depth of the count. The places then
+stand handed over as a bitmap of one, three or four places of a colour — one stands of a picture of grey — and the rows
+of the picture stand of the file turned over, since the inherited `BitmapDecoder` stands of `ImageData.CreateFlipped`.
 
 ## Support
 
@@ -49,7 +54,8 @@ path beyond `OpenEntry`, so it is out of scope here along with decoding frames t
 | Frame naming by index | Supported |
 | Frame metadata (depth, size, step, spans) | Supported |
 | Zero step and span bound rejection | Supported as a hardening |
-| Frame accumulation and bitmap decoding | Not ported |
+| Frame accumulation: the places of the frames before a frame over the places of it | Supported |
+| Bitmap decoding of a frame: one, three or four places of a colour to a pixel, rows turned over | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a raw first frame, a packed frame with a simple run, one with an extended run, a zero
