@@ -1141,8 +1141,20 @@ export function readJpegImage(data: Buffer): JpegImage {
 	const third = planes[2];
 	if (!first)
 		throw invalidPicture("The frame of the stream carries no picture");
+	// A stream of three components without the Adobe marker names them itself: one whose components stand of the
+	// counts of the places of the file of the colours of the picture of the places of the file (R, G, B) holds the
+	// places of the colour of the picture itself, and one whose components stand of the counts of the head of the
+	// picture of the format holds the counts of the head of the format of the picture of the two of them, which the
+	// library of the walk of the jpeg of this machine stands of as well.
+	const names = frame.components.map((component) => component.id);
+	const namedRgb =
+		0x52 === (names[0] ?? 0) &&
+		0x47 === (names[1] ?? 0) &&
+		0x42 === (names[2] ?? 0);
 	const direct =
-		undefined !== second && undefined !== third && 0 === (frame.transform ?? 1);
+		undefined !== second &&
+		undefined !== third &&
+		(0 === frame.transform || (undefined === frame.transform && namedRgb));
 	const read = (plane: Plane, x: number, y: number): number =>
 		plane.samples[y * plane.stride + x] ?? 0;
 
