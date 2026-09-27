@@ -10,6 +10,10 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { readBmpImage, writeBmp32 } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readPngImage } from "../shared/png-image.js";
+import { readCgdKToolLayout, writeCgdPicture } from "./cgd-image.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -453,11 +457,91 @@ export const asdKToolFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource, entry: FixedEntry) {
 		if (entry.metadata?.type === "audio") return openKToolAudio(source, entry);
+		if (entry.metadata?.type === "image")
+			return openKToolPicture(source, entry);
 		return Readable.from([
 			Buffer.from(await source.readAt(entry.offset, Number(entry.size))),
 		]);
 	},
 });
+
+/**
+ * `AsdKToolOpener.OpenImage`: the places of a picture of an entry of this archive stand of a picture of the
+ * engine, whose head the walk of the engine pictures reads, or of a picture of a format, which the reference hands
+ * to the walks of the formats. The word at sixteen of such an entry is a word of the engine rather than one of a
+ * format, so the walk of the formats stands of any entry whose head the walk of the engine refuses; a payload
+ * neither walk reads stands turned away on extraction.
+ */
+async function openKToolPicture(
+	source: ByteSource,
+	entry: FixedEntry,
+): Promise<Readable> {
+	const data = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.size)),
+	);
+	const layout = readCgdKToolLayout(data, data.length);
+	if (layout) return Readable.from([writeCgdPicture(data, layout)]);
+	const picture = await readFormatPicture(data);
+	if (picture) return Readable.from([picture]);
+	throw new GarbroError(
+		"INVALID_ARCHIVE",
+		`The entry ${entry.path} stands of no picture this project reads`,
+	);
+}
+
+/** `ImageFormatDecoder.Create`: the walks of the pictures of the formats this project carries. */
+async function readFormatPicture(data: Buffer): Promise<Buffer | undefined> {
+	const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+	const jpeg = Buffer.from([0xff, 0xd8]);
+	if (data.subarray(0, png.length).equals(png)) {
+		const image = await readPngImage(data);
+		return image
+			? writeBmp32(image.width, image.height, toBgra32(image))
+			: undefined;
+	}
+	if (data.subarray(0, jpeg.length).equals(jpeg)) {
+		const image = readJpegImage(data);
+		return writeBmp32(image.width, image.height, Buffer.from(image.pixels));
+	}
+	const image = readBmpImage(data);
+	if (!image) return undefined;
+	return writeBmp32(image.width, image.height, toBgra32(image));
+}
+
+/** The places of a picture of a format as four places of a colour to a pixel, blue first. */
+function toBgra32(image: {
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: Buffer;
+	palette?: Buffer;
+}): Buffer {
+	if (32 === image.bitsPerPixel) return Buffer.from(image.pixels);
+	if (24 === image.bitsPerPixel) {
+		const places = Buffer.alloc(image.width * image.height * 4, 0xff);
+		for (let at = 0, to = 0; to < places.length; at += 3, to += 4) {
+			places[to] = image.pixels[at] ?? 0;
+			places[to + 1] = image.pixels[at + 1] ?? 0;
+			places[to + 2] = image.pixels[at + 2] ?? 0;
+		}
+		return places;
+	}
+	if (8 === image.bitsPerPixel && image.palette) {
+		const places = Buffer.alloc(image.width * image.height * 4, 0x00);
+		for (let at = 0; at < places.length; at += 4) {
+			const entry = (image.pixels[at >> 2] ?? 0) * 4;
+			places[at] = image.palette[entry] ?? 0;
+			places[at + 1] = image.palette[entry + 1] ?? 0;
+			places[at + 2] = image.palette[entry + 2] ?? 0;
+			places[at + 3] = 0xff;
+		}
+		return places;
+	}
+	throw new GarbroError(
+		"UNSUPPORTED_FEATURE",
+		"A picture of this entry stands of no places of a colour this project reads",
+	);
+}
 
 export const asdSpielFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: asdSpielDescriptor,

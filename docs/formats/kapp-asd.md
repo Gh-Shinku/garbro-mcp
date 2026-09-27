@@ -55,7 +55,13 @@ or less is written out as a byte.
 
 ## Port notes and deviations
 
-- Image decoding of the payloads, the `CGD` format, is out of scope, as is archive creation.
+- `AsdKToolOpener.OpenImage` reads an entry the word at 0x0C marks as a picture: a payload whose head the walk of
+  the engine pictures reads stands of the places of that picture through `writeCgdPicture`, and otherwise the payload
+  stands handed to the walks of the pictures of the formats this project carries - a portable network graphic, a JPEG
+  and a bitmap - which stand over as four places of a colour to a pixel. Because the word at 0x0C of such an entry is
+  a word of the engine rather than one of a format, an entry of a format reaches the walk of the formats only where
+  its head also carries that word; a payload neither walk reads stands turned away on extraction.
+- Archive creation is out of scope.
 - Out of range writes and reads are bounded instead of failing, and the huffman walk stops at the last node.
 
 ## References

@@ -10392,8 +10392,9 @@ export const formatSupportCatalog = {
 				"ktool huffman method",
 				"riff wave wrapping",
 				"image marker typing",
+				"the picture of an image entry: the walk of the engine pictures, of the walks of the pictures of the formats of this project",
 			],
-			unsupported: ["archive creation", "ktool image decoding"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

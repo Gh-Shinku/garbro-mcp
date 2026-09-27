@@ -6,6 +6,7 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { expectArchive } from "../helpers/archive.js";
 
 const KTOOL_SIGNATURE = "ktool210";
@@ -107,6 +108,57 @@ function buildAudioEntry(plain: Buffer, method: number): Buffer {
 	header.writeUInt16LE(WAVE_FORMAT.bitsPerSample, AUDIO_FORMAT + 0xe);
 	const data = method === 0 ? plain : encodeRle(plain, method);
 	return Buffer.concat([header, data]);
+}
+
+/** A picture of the engine: the head of the engine, the window of the picture and its places. */
+function buildCgdPicture(
+	width: number,
+	height: number,
+	pixels: Buffer,
+): Buffer {
+	const outer = Buffer.alloc(0x18);
+	Buffer.from("ktool210", "latin1").copy(outer, 0);
+	outer.writeInt32LE(1, 8);
+	outer.writeUInt32LE(0x18, 0x10);
+	// The word at twelve of an entry of this archive is the word the archive types the entry by.
+	outer.writeUInt32LE(IMAGE_MARKER, 0xc);
+	const inner = Buffer.alloc(0x20);
+	inner.writeInt32LE(pixels.length, 0x00);
+	inner.writeUInt16LE(0, 0x08);
+	inner.writeUInt16LE(0x10, 0x0a);
+	inner.writeUInt32LE(IMAGE_MARKER, 0x0c);
+	inner.writeUInt16LE(width, 0x10);
+	inner.writeUInt16LE(height, 0x12);
+	inner.writeUInt16LE(24, 0x14);
+	return Buffer.concat([outer, inner, pixels]);
+}
+
+/** The picture an entry stands of, read back through the bitmap walk of this project. */
+async function pictureOfEntry(
+	file: Buffer,
+	index: number,
+): Promise<{
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: number[];
+}> {
+	const archive = await asdKToolFormat.open(
+		new BufferByteSource(file),
+		"pack.asd",
+	);
+	const entry = archive.entries[index];
+	if (!entry) throw new Error("no entry");
+	const image = readBmpImage(
+		await consumeBuffer(await archive.openEntry(entry.id)),
+	);
+	if (!image) throw new Error("no bitmap");
+	return {
+		width: image.width,
+		height: image.height,
+		bitsPerPixel: image.bitsPerPixel,
+		pixels: [...image.pixels],
+	};
 }
 
 function buildKTool(payloads: readonly Buffer[]): Buffer {
@@ -266,6 +318,30 @@ describe("KApp engine resource archive", () => {
 			"image",
 			"data",
 		]);
+	});
+
+	it("reads the places of a picture of the engine", async () => {
+		// The picture stores its places in the order of its own colours, which stands of the other order in a
+		// bitmap.
+		const picture = buildCgdPicture(
+			2,
+			1,
+			Buffer.from([0x11, 0x22, 0x33, 0x44, 0x55, 0x66]),
+		);
+		expect(await pictureOfEntry(buildKTool([picture]), 0)).toEqual({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+			pixels: [0x33, 0x22, 0x11, 0x66, 0x55, 0x44],
+		});
+	});
+
+	it("turns away a picture of a marker the walks of this project know not", async () => {
+		const picture = Buffer.alloc(0x20, 0x7f);
+		picture.writeUInt32LE(IMAGE_MARKER, 0xc);
+		await expect(pictureOfEntry(buildKTool([picture]), 0)).rejects.toThrow(
+			/no picture this project reads/,
+		);
 	});
 
 	it("rejects a foreign signature", async () => {

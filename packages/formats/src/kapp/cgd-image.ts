@@ -415,18 +415,28 @@ function compressionName(compression: number): string {
 	return "rle";
 }
 
+/**
+ * The places of a picture of the engine, of the head of the picture over them, as a bitmap. The walk stands of
+ * the places of the file the head names, so it takes the whole file of the picture rather than one of its windows.
+ */
+export function writeCgdPicture(
+	data: Buffer,
+	layout: CgdPictureLayout,
+): Buffer {
+	const pixels = unpackCgdPicture(data, layout);
+	// `ImageData.Create` keeps the stored order top down, which a bitmap records with a negative height.
+	if (32 === layout.bitsPerPixel) {
+		return writeBmp32(layout.width, layout.height, pixels);
+	}
+	const ordered = layout.rgbOrder ? swapRedBlue(pixels) : pixels;
+	return writeBmp24(layout.width, layout.height, ordered);
+}
+
 async function openCgdPicture(
 	source: ByteSource,
 	layout: CgdPictureLayout,
 ): Promise<Readable> {
-	const stored = await readStored(source);
-	const pixels = unpackCgdPicture(stored, layout);
-	// `ImageData.Create` keeps the stored order top down, which a bitmap records with a negative height.
-	if (32 === layout.bitsPerPixel) {
-		return Readable.from([writeBmp32(layout.width, layout.height, pixels)]);
-	}
-	const ordered = layout.rgbOrder ? swapRedBlue(pixels) : pixels;
-	return Readable.from([writeBmp24(layout.width, layout.height, ordered)]);
+	return Readable.from([writeCgdPicture(await readStored(source), layout)]);
 }
 
 export const cgdKToolImageDescriptor: FormatDescriptor = {
