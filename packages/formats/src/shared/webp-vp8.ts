@@ -115,48 +115,86 @@ export function readVp8FrameHeader(payload: Buffer): Vp8Frame {
 /** The counts of the places of the file of the picture of the format of the picture of the web of the colour of the
  * places of the picture, of the counts of the head of the format of the picture of the places of the file of their own
  * (the walk of the counts of the head of the format of the picture of the two places of the file). The walk of this
- * project stands of the counts of the head of the format itself: the counts of the head of the path of the two places
- * of the file of the format of the picture of the web (RFC 6386, the walk of the counts of the head of the format of
- * the picture of the format). */
+ * project stands of the walk of the library of the picture of the web (`src/utils/bit_reader_inl_utils.h`,
+ * `VP8GetBit`, `VP8LoadNewBytes`, of the counts of the head of the format of the picture of the places of the file of
+ * `src/utils/bit_reader_utils.c`, `VP8InitBitReader`, `VP8LoadFinalBytes`; BSD 3-Clause): the counts of the head of
+ * the format of the picture of the places of the file of the picture of the format of the two of them stand of the
+ * counts of the head of the format of the picture of the places of the file of the picture of the format of the two
+ * places of the file (the counts of the head of the format of the picture of the places of the file of the picture of
+ * the format of the two places of the file less one of that library), and the counts of the head of the format of the
+ * picture of the places of the file stand of the counts of the head of the format of the picture of the places of the
+ * file of the picture of the format of the two places of the file of the count of the head of the format itself. */
+const MASK_OF_THE_COUNTS = (1n << 64n) - 1n;
+
 export class Vp8BooleanDecoder {
-	private range = 255;
+	private range = 255 - 1;
 
-	private value = 0;
+	private value = 0n;
 
-	private bits = 0;
+	private bits = -8;
 
 	private at = 0;
 
+	private ended = false;
+
 	constructor(private readonly data: Buffer) {
-		this.value = (this.data[this.at] ?? 0) << 8;
-		this.at += 1;
-		this.value |= this.data[this.at] ?? 0;
-		this.at += 1;
-		this.bits = 8;
+		this.load();
+	}
+
+	/** Brings the counts of the head of the format of the picture of the places of the file of the picture of the
+	 * format of the two places of the file of the walk of the counts of the head of the format of the picture of the
+	 * format itself to the counts of the head of the format of the picture of the places of the file of the picture of
+	 * the format of the two of them (`VP8LoadNewBytes`, `VP8LoadFinalBytes`). */
+	private load(): void {
+		if (this.at + 4 <= this.data.length) {
+			let held = 0n;
+			for (let index = 0; index < 4; index += 1)
+				held = (held << 8n) | BigInt(this.data[this.at + index] ?? 0);
+			this.at += 4;
+			this.value = (held | (this.value << 32n)) & MASK_OF_THE_COUNTS;
+			this.bits += 32;
+			return;
+		}
+		if (this.at < this.data.length) {
+			this.value =
+				(BigInt(this.data[this.at] ?? 0) | (this.value << 8n)) &
+				MASK_OF_THE_COUNTS;
+			this.at += 1;
+			this.bits += 8;
+			return;
+		}
+		if (!this.ended) {
+			this.value = (this.value << 8n) & MASK_OF_THE_COUNTS;
+			this.bits += 8;
+			this.ended = true;
+			return;
+		}
+		this.bits = 0;
 	}
 
 	/** The counts of the head of the picture of the colour of the picture of the counts of the head of the format of
-	 * the picture of the two places of the file, of the counts of the places of the file of the picture of the colour
-	 * of the picture of the count of the head. */
+	 * the picture of the two places of the file, of the count of the head of the format of the picture of the places
+	 * of the file of the picture of the colour of the picture (`VP8GetBit`). */
 	read(probability: number): number {
-		const split = 1 + (((this.range - 1) * probability) >> 8);
-		const held = this.value;
-		const bit = held < split << 8 ? 0 : 1;
-		if (0 === bit) this.range = split;
-		else {
-			this.range -= split;
-			this.value = held - (split << 8);
+		if (this.bits < 0) this.load();
+		const place = this.bits;
+		let range = this.range;
+		const split = (range * probability) >> 8;
+		const window = Number((this.value >> BigInt(place)) & 0xffffffffn);
+		const bit = window > split ? 1 : 0;
+		if (1 === bit) {
+			range -= split;
+			this.value =
+				(this.value -
+					((BigInt(split + 1) << BigInt(place)) & MASK_OF_THE_COUNTS)) &
+				MASK_OF_THE_COUNTS;
+		} else {
+			range = split + 1;
 		}
-		while (this.range < 128) {
-			this.range <<= 1;
-			this.value <<= 1;
-			this.bits -= 1;
-			if (0 === this.bits) {
-				this.value |= this.data[this.at] ?? 0;
-				this.at += 1;
-				this.bits = 8;
-			}
-		}
+		const shift = 7 - (31 - Math.clz32(range | 1));
+		range = (range << shift) - 1;
+		this.bits -= shift;
+		this.range = range;
 		return bit;
 	}
 
@@ -272,6 +310,12 @@ export interface Vp8PartitionHeader {
 	readonly probabilities: Uint8Array;
 	readonly useSkipProbability: boolean;
 	readonly skipProbability: number;
+	/** The walk of the counts of the head of the format of the picture of the places of the file of the picture of
+	 * the format which walked the counts of the head of the format of the places of the file of the picture of the
+	 * format itself: the counts of the head of the format of the picture of the places of the file of the picture of
+	 * the format of the places of the file square stand of the places of the file of the picture of the format of
+	 * that walk. */
+	readonly decoder: Vp8BooleanDecoder;
 	/** The count of the counts of the head of the format of the picture of the places of the file of the first
 	 * partition which the walk of this project walked. */
 	readonly walked: number;
@@ -289,8 +333,10 @@ export interface Vp8PartitionHeader {
  * the two places of the file beyond the count of the head of the format itself stands of no walk of this project
  * (the counts of the head of the format of the picture of the places of the file of the picture of the format stand
  * of the count of the head of the format of the picture of the format of four places of the file square alone). */
-export function readVp8PartitionHeader(partition: Buffer): Vp8PartitionHeader {
-	const decoder = new Vp8BooleanDecoder(partition);
+export function readVp8PartitionHeader(
+	partition: Buffer,
+	decoder: Vp8BooleanDecoder = new Vp8BooleanDecoder(partition),
+): Vp8PartitionHeader {
 	const colourSpace = decoder.read(128);
 	const clampType = decoder.read(128);
 
@@ -407,6 +453,7 @@ export function readVp8PartitionHeader(partition: Buffer): Vp8PartitionHeader {
 		probabilities,
 		useSkipProbability,
 		skipProbability,
+		decoder,
 		walked,
 	};
 }

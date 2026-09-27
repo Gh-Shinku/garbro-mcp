@@ -142,3 +142,34 @@ format of sixteen places of the file square and of the places of the file of the
 of the picture) and the walk of the places of the file of the picture of the format itself do not stand of this walk
 yet, so no place of the picture of the format of the colour of the places of the picture stands of this project at
 this place of the file.
+
+## The places of the file of the picture of the format of the colour of the places of the picture (VP8)
+
+The walk of this project now stands of the places of the file of the picture of the format of the colour of the places
+of the picture of a picture of the format of the web of the colour of the places of the picture: the counts of the head
+of the format of the picture of the places of the file of the walk of the picture of the format of the counts of the
+head of the format of the picture of the format of four places of the file square of `webp-vp8-picture.ts`, of the
+counts of the head of the format of the picture of the places of the file of the picture of the format and of the walk
+of the places of the file of the picture of the format (`TransformOne`, `TransformAC3`, `TransformDC`, of the counts
+of the head of the format of the picture of the places of the file of the picture of the format of the colour of the
+picture of `TransformUV`/`TransformDCUV`, and the walk of the places of the file of the picture of the format of the
+places of the file of the picture of the format of `DoTransform`/`DoUVTransform`/`kScan`/`CheckMode` of the library of
+the picture of the web), and the counts of the head of the format of the picture of the places of the file of the
+picture of the format of the two places of the file of the format of the picture of the web stand of the walk of the
+places of the file of the picture of the format of the library of the picture of the web
+(`src/utils/bit_reader_inl_utils.h`, `src/dsp/dec.c`).
+
+The places of the file of the picture of the format stand of counts of the head of the format of the picture of the
+places of the file of the walk of the counts of the head of the format of the picture of the places of the file of
+ffmpeg of the same places of the file (`ffmpeg -skip_loop_filter all -f rawvideo -pix_fmt yuv420p`): the places of
+the file of the picture of the format of the picture of the format of the counts of the head of the format of the
+places of the file of their own stand of counts of their own of the walk of this project yet (the counts of the head
+of the format of the picture of the places of the file of the picture of the format standing in front of the picture
+of the format of the counts of the places of the file of the picture of the format stand of counts of their own), and a
+picture of the format of a count of the head of the format of the places of the file of ninety of the walk of the
+library of the picture of the web of the count of the head of the format stands of counts of their own of the walk of
+this project as well (a picture of the format of the counts of the head of the format of the picture of the places of
+the file of the colour of the picture of the count of the head of the format of the picture of the format of the
+picture of the format itself stands of the counts of the head of the format of the picture of the places of the file of
+the walk of the spaces of the picture of the format), so the two stand of the counts of the head of the format of the
+picture of the places of the file of the picture of the format of their own of this walk at this place of the file.
