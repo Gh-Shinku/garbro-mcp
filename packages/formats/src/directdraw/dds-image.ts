@@ -207,6 +207,23 @@ async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
 }
 
+/**
+ * `DdsFormat.Read` over a whole surface: the places of a picture of a surface, of the counts of the head of the
+ * surface, as a bitmap of four places of a colour to a pixel. The places stand in the order of the file, which a
+ * bitmap records with a height of its own sign.
+ */
+export function readDdsBitmap(stored: Buffer): Buffer {
+	const layout = readDdsLayout(stored, stored.length);
+	if (!layout) throw invalidPicture("Not a Direct Draw surface");
+	if (0 !== (layout.pixelFlags & REFUSED)) {
+		throw invalidPicture(
+			"Direct Draw surface of a colour this project does not read",
+		);
+	}
+	const pixels = readDdsPicture(stored, layout);
+	return writeBmp32(layout.width, layout.height, pixels);
+}
+
 export const directDrawDdsImageDescriptor: FormatDescriptor = {
 	id: "directdraw-dds-image",
 	name: "Direct Draw Surface format",
@@ -277,18 +294,6 @@ export const directDrawDdsImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		const stored = await readStored(source);
-		const layout = readDdsLayout(stored, Number(source.size));
-		if (!layout) {
-			throw invalidPicture("Not a Direct Draw surface");
-		}
-		if (0 !== (layout.pixelFlags & REFUSED)) {
-			throw invalidPicture(
-				"Direct Draw surface of a colour this project does not read",
-			);
-		}
-		const pixels = readDdsPicture(stored, layout);
-		// `ImageData.Create` keeps the stored order top down, which a bitmap records with a negative height.
-		return Readable.from([writeBmp32(layout.width, layout.height, pixels)]);
+		return Readable.from([readDdsBitmap(await readStored(source))]);
 	},
 });

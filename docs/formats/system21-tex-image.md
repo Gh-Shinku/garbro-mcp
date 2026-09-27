@@ -27,11 +27,18 @@ them, and requires `DDS ` at offset four — so the surface starts four bytes in
 the probe and the extraction drop that prefix. The port decompresses exactly the window for detection
 (`inflateLzss` with `outputLength`, which tolerates a short stream and reports what it got) and to the end of the
 stream for extraction (`inflateLzssAll`). DirectDraw header fields, relative to the start of the decompressed
-stream: height at 16, width at 20, the pixel format's four character code at 84 and its bit count at 88.
+stream — which begins with the four byte prefix, so every field of the surface itself stands four bytes further on
+than it does in a surface of its own: height at 16, width at 20, the flags of the places of the picture at 84, the
+four letters of a kind of block at 88, the count of places of a colour at 92 and the places of the colour at 96, 100,
+104 and 108. The port reads the four letters only where those flags name such a kind, as the reference does.
 
-This project has no DirectDraw decoder, so the surface is **passed through** as it stands — the Malie MGF and
-Palette PGA pattern — with the four byte prefix removed. The entry is a `dds` file with `sizeKnown: false`,
-since decompression changes length, and the tests compare it with the fixture byte for byte.
+The surface behind the prefix is a whole DirectDraw surface of its own, so the extraction stands of the walk of the
+surfaces this project carries for the format of those surfaces: the places of the picture stand of the places of the
+colour of the surface, of one, four, eight, sixteen, twenty four or thirty two places of a colour to a pixel, of the
+blocks of the kinds `DXT1`, `DXT3` and `DXT5`, or of no places at all where the surface names a colour this project
+does not read. What stands handed over is a bitmap of four places of a colour to a pixel. The entry is a `dds` file
+with `sizeKnown: false`, since decompression changes length, and the walk of the lists stands of the head of the
+surface rather than of the length of the file.
 
 ## Two formats, one codec, one signature
 

@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { texImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from("SZDD", "ascii");
 const STREAM_OFFSET = 0x0e;
@@ -62,13 +63,29 @@ function buildDds(options: {
 	dds.writeUInt32LE(0x0002100f, 8);
 	dds.writeUInt32LE(options.height, 12);
 	dds.writeUInt32LE(options.width, 16);
-	if (options.fourCC) dds.write(options.fourCC.padEnd(4, "\0"), 80, "latin1");
-	else dds.writeUInt32LE(options.bitCount ?? 0, 84);
+	// The flags of the surface and the places of its colour stand where the head of a surface of the engine
+	// holds them: four letters of a kind of block stand of the flag of such a kind at 0x50.
+	if (options.fourCC) {
+		dds.writeUInt32LE(0x4, 0x50);
+		dds.write(options.fourCC.padEnd(4, "\0"), 0x54, "latin1");
+	} else {
+		dds.writeUInt32LE(0x41, 0x50);
+		dds.writeUInt32LE(options.bitCount ?? 0, 0x58);
+		dds.writeUInt32LE(0x00ff0000, 0x5c);
+		dds.writeUInt32LE(0x0000ff00, 0x60);
+		dds.writeUInt32LE(0x000000ff, 0x64);
+		dds.writeUInt32LE(0xff000000, 0x68);
+	}
 	return dds;
 }
 
 function sourceOf(file: Buffer): BufferByteSource {
 	return new BufferByteSource(file);
+}
+
+/** A surface of the engine whose places stand of four places of a colour to a pixel, blue first. */
+function completeDds(width: number, height: number, pixels: Buffer): Buffer {
+	return Buffer.concat([buildDds({ width, height, bitCount: 32 }), pixels]);
 }
 
 async function extract(stored: Buffer): Promise<Buffer> {
@@ -92,7 +109,7 @@ describe("system21 tex texture", () => {
 	});
 
 	it("unpacks a surface and drops the four byte prefix", async () => {
-		const dds = buildDds({ width: 8, height: 4 });
+		const dds = completeDds(2, 1, Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]));
 		const surface = Buffer.concat([Buffer.alloc(DDS_PREFIX, 0xee), dds]);
 		const stored = buildSzdd(lzssLiterals(surface));
 		const source = sourceOf(stored);
@@ -106,14 +123,21 @@ describe("system21 tex texture", () => {
 			expect(archive.metadata).toMatchObject({
 				image: "dds",
 				compression: "szdd",
-				width: 8,
-				height: 4,
+				width: 2,
+				height: 1,
 			});
 		} finally {
 			await archive.close();
 		}
-		const output = await extract(stored);
-		expect(output).toEqual(dds);
+		// The places of the surface stand behind the four words of the prefix, and the picture stands handed
+		// over as a bitmap of four places of a colour.
+		const picture = readBmpImage(await extract(stored));
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 32,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
 	});
 
 	it("reports the depth of an uncompressed surface", async () => {
@@ -209,34 +233,33 @@ describe("system21 tex texture", () => {
 		// The first hundred and thirty two decompressed bytes are literals — the prefix and a whole surface
 		// header — and the rest are matches into a part of the ring buffer nothing has written, so those bytes
 		// are the pre-fill. The codec's default fill is zero, which would give zeros here.
+		// A picture of four places of a colour of four pixels to a row and one row takes sixteen places of the
+		// file behind the head of the surface.
 		const surface = Buffer.concat([
 			Buffer.alloc(DDS_PREFIX, 0x00),
-			buildDds({ width: 4, height: 4 }),
+			buildDds({ width: 4, height: 1, bitCount: 32 }),
 		]);
 		expect(surface.length).toBe(DDS_PREFIX + DDS_HEADER_SIZE);
 		const items: Item[] = [...surface];
 		for (let i = 0; i < 10; i += 1) items.push("match");
 		const stored = buildSzdd(emit(items));
-		const output = await extract(stored);
-		expect(output.subarray(0, DDS_HEADER_SIZE)).toEqual(
-			surface.subarray(DDS_PREFIX),
-		);
-		// Ten matches of three bytes each, all of them the fill byte.
-		const tail = output.subarray(DDS_HEADER_SIZE);
-		expect(tail.length).toBe(30);
-		expect(tail).toEqual(Buffer.alloc(30, 0x20));
+		// Ten matches of three places each, every one of them the fill place of the ring buffer, stand of the
+		// sixteen places of the picture.
+		const picture = readBmpImage(await extract(stored));
+		expect(picture).toMatchObject({ width: 4, height: 1, bitsPerPixel: 32 });
+		expect([...(picture?.pixels ?? [])]).toEqual(new Array(16).fill(0x20));
 	});
 
 	it("skips the fourteen byte header rather than reading it", async () => {
 		const surface = Buffer.concat([
 			Buffer.alloc(DDS_PREFIX),
-			buildDds({ width: 6, height: 6 }),
+			completeDds(2, 1, Buffer.from([9, 8, 7, 6, 5, 4, 3, 2])),
 		]);
 		const header: Buffer = Buffer.alloc(STREAM_OFFSET, 0xa5);
 		const stored = buildSzdd(lzssLiterals(surface), header);
 		expect(stored.subarray(0, 4)).toEqual(SIGNATURE);
 		expect(stored.subarray(4, STREAM_OFFSET)).toEqual(Buffer.alloc(10, 0xa5));
-		const output = await extract(stored);
-		expect(output).toEqual(surface.subarray(DDS_PREFIX));
+		const picture = readBmpImage(await extract(stored));
+		expect([...(picture?.pixels ?? [])]).toEqual([9, 8, 7, 6, 5, 4, 3, 2]);
 	});
 });

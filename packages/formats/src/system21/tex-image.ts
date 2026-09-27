@@ -8,6 +8,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { inflateLzss, inflateLzssAll } from "@garbro-mcp/codecs";
+import { readDdsBitmap } from "../directdraw/dds-image.js";
 import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -39,8 +40,13 @@ const HEADER_WINDOW = 0x84;
 const DDS_HEADER_SIZE = 128;
 const HEIGHT_OFFSET = 16;
 const WIDTH_OFFSET = 20;
-const FOURCC_OFFSET = 84;
-const BIT_COUNT_OFFSET = 88;
+// The head this reader holds begins at the four words of the prefix, so every count of the head of the surface
+// stands four places behind the count of the surface itself.
+const FOURCC_OFFSET = 88;
+const BIT_COUNT_OFFSET = 92;
+const PIXEL_FLAGS_OFFSET = 84;
+/** `DdsPF.FourCC`. */
+const PIXEL_FLAG_FOUR_CC = 0x4;
 const MAX_DIMENSION = 0x10000;
 const MAX_PIXELS = 256 * 1024 * 1024;
 /** Block compressed surfaces report no bit count, so the four character code stands in for it. */
@@ -98,9 +104,17 @@ async function readLayout(source: ByteSource): Promise<TexLayout | undefined> {
 		if (width === 0 || height === 0) return undefined;
 		if (width > MAX_DIMENSION || height > MAX_DIMENSION) return undefined;
 		if (width * height > MAX_PIXELS) return undefined;
-		const fourCC = head
-			.subarray(FOURCC_OFFSET, FOURCC_OFFSET + 4)
-			.toString("latin1");
+		// A surface names four letters of a kind of block only where the words of the head say so; every other
+		// surface stands of a count of places of a colour and the places of its colour.
+		const flags = head.readUInt32LE(PIXEL_FLAGS_OFFSET);
+		let fourCC = "";
+		if (0 !== (flags & PIXEL_FLAG_FOUR_CC)) {
+			const letters = head.subarray(FOURCC_OFFSET, FOURCC_OFFSET + 4);
+			const end = letters.indexOf(0);
+			fourCC = letters
+				.subarray(0, end < 0 ? letters.length : end)
+				.toString("latin1");
+		}
 		const bitCount = head.readUInt32LE(BIT_COUNT_OFFSET);
 		const layout: TexLayout = { width, height, fourCC };
 		const depth = FOURCC_DEPTHS[fourCC] ?? bitCount;
@@ -192,8 +206,8 @@ export const texImageFormat: ArchiveFormat = defineFixedArchive({
 				"INVALID_ARCHIVE",
 				"Truncated System21 TEX texture",
 			);
-		// This project has no DirectDraw surface decoder, so the surface is passed through as it stands, the
-		// way the Malie MGF reader passes its PNG through; the four byte prefix is the only thing removed.
-		return Readable.from([surface.subarray(DDS_PREFIX)]);
+		// `TexFormat.Read` stands of the walk of the surfaces of the engine over the places of the surface behind
+		// the four words of the prefix, which the walk of the surfaces of this project carries.
+		return Readable.from([readDdsBitmap(surface.subarray(DDS_PREFIX))]);
 	},
 });
