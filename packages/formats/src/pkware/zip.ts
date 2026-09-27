@@ -5,7 +5,7 @@
 // This port implements the central-directory walk directly, streams stored and deflated entries with Node's
 // inflate-raw, and reads method twelve (bzip2) with the walk of that format this project carries.
 
-import { decompressBzip2 } from "@garbro-mcp/codecs";
+import { decompressBzip2, decompressLzmaZip } from "@garbro-mcp/codecs";
 import {
 	decodeCp932,
 	GarbroError,
@@ -49,6 +49,9 @@ const METHOD_DEFLATE = 8;
 // The bzip2 method, which the reference reads through the library it hands every entry to
 // (`SharpZipLib`'s `GetInputStream`) and this port reads with the walk of `@garbro-mcp/codecs`.
 const METHOD_BZIP2 = 12;
+// The LZMA method, which the reference reads through the same library. A method fourteen entry carries a head
+// of its own in front of the stream of LZMA, which `decompressLzmaZip` reads.
+const METHOD_LZMA = 14;
 
 const FLAG_ENCRYPTED = 0x0001;
 const FLAG_UTF8 = 0x0800;
@@ -301,7 +304,8 @@ async function openZipEntry(
 	if (
 		entry.method !== METHOD_STORED &&
 		entry.method !== METHOD_DEFLATE &&
-		entry.method !== METHOD_BZIP2
+		entry.method !== METHOD_BZIP2 &&
+		entry.method !== METHOD_LZMA
 	) {
 		throw new GarbroError(
 			"UNSUPPORTED_FEATURE",
@@ -353,6 +357,19 @@ async function openZipEntry(
 			);
 		}
 		return Readable.from([plain]);
+	}
+	if (entry.method === METHOD_LZMA) {
+		const packed = Buffer.from(
+			await source.readAt(dataOffset, Number(entry.packedSize)),
+		);
+		try {
+			return Readable.from([decompressLzmaZip(packed, Number(entry.size))]);
+		} catch (error) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`ZIP LZMA stream of ${entry.path} stands of no count of its own: ${(error as Error).message}`,
+			);
+		}
 	}
 	const compressed = source.createReadStream(dataOffset, entry.packedSize);
 	return compressed.pipe(createInflateRaw());

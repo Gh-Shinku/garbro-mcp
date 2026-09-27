@@ -81,6 +81,15 @@ const BZIP2_PACKED = Buffer.from(
 	"base64",
 );
 
+// A ZIP archive Python's own `zipfile` wrote of one entry of the LZMA method (fourteen): an implementation of
+// that format other than this project's own stands behind this fixture as well.
+const LZMA_ARCHIVE_B64 =
+	"UEsDBD8AAgAOAKiBO10G4w1zRwAAALYEAAAIAAAAbHptYS50eHQJBAUAXQAAgAAAIOh9zvsVrHBYJIkp/hxJb9FnZDNBzEWqWe8syYlFd6zV0NQcUhW4yaOmgNDm3aaaQ96F60zEr///yz4AAFBLAQI/Az8AAgAOAKiBO10G4w1zRwAAALYEAAAIAAAAAAAAAAAAAACAAQAAAABsem1hLnR4dFBLBQYAAAAAAQABADYAAABtAAAAAAA=";
+const LZMA_PLAIN = Buffer.from(
+	"QUFBQQd0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCB0aGUgcGxhY2VzIG9mIHRoZSBmaWxlIG9mIHRoZSB3YWxrIG9mIHRoZSBlbmdpbmUgb2YgdGhlIHppcCAK",
+	"base64",
+);
+
 describe("PKWARE ZIP archive", () => {
 	it("reads stored and deflated entries and skips directory records", async () => {
 		const stored = Buffer.from("stored payload");
@@ -161,6 +170,19 @@ describe("PKWARE ZIP archive", () => {
 		const packed = handle.entries.find((entry) => entry.path === "packed.txt");
 		if (!packed) throw new Error("entry stands missing");
 		await expect(handle.openEntry(packed.id)).rejects.toThrow(/bzip2 stream/);
+	});
+
+	it("reads an entry of the LZMA method, of a stream another tool wrote", async () => {
+		const archive = Buffer.from(LZMA_ARCHIVE_B64, "base64");
+		const handle = await zipFormat.open(
+			new BufferByteSource(archive),
+			"sample.zip",
+		);
+		const entry = handle.entries.find((item) => item.path === "lzma.txt");
+		if (!entry) throw new Error("entry stands missing");
+		expect(await consumeBuffer(await handle.openEntry(entry.id))).toEqual(
+			LZMA_PLAIN,
+		);
 	});
 
 	it("reports encrypted entries as unsupported", async () => {

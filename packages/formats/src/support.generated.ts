@@ -22955,6 +22955,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"LZMA entries (method 14)",
 				"bzip2 entries (method 12)",
 				"end-of-central-directory detection",
 				"stored and deflate entries",
@@ -22964,11 +22965,7 @@ export const formatSupportCatalog = {
 				"streaming extraction",
 				"encrypted entry metadata",
 			],
-			unsupported: [
-				"encrypted entry extraction",
-				"LZMA entries (method 14)",
-				"archive creation",
-			],
+			unsupported: ["encrypted entry extraction", "archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

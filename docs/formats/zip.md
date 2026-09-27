@@ -33,6 +33,10 @@ Extraction supports:
 - method 12 (bzip2), read with the walk of that format this project carries (`packages/codecs/src/bzip2.ts`),
   since the stream a method twelve entry holds is a whole bzip2 file. The count of the places of a file it
   reads back is checked against the head of the entry, where the reference leaves that to its library;
+- method 14 (LZMA), read with the walk of that format this project carries (`packages/codecs/src/lzma.ts`).
+  A method fourteen entry carries a head of four bytes of its own in front of the stream - a version of two
+  and the count of the properties of two - which that walk reads, of the count of the places of the file the
+  entry's own head names;
 - entries whose local header carries a data descriptor, because sizes come from the central
   directory.
 
@@ -52,9 +56,11 @@ Directory records (names ending in `/`) are skipped. Encrypted entries are liste
 | Encrypted entry metadata | Supported |
 | Encrypted entry extraction | Unsupported |
 | bzip2 entries (method 12) | Supported |
-| Other compression methods (LZMA, ...) | Unsupported |
+| LZMA entries (method 14) | Supported |
+| Other compression methods | Unsupported |
 | Archive creation | Unsupported |
 
-Fixtures cover stored and deflated entries, directory records, CP932 and UTF-8 names, the bzip2 method (of an
-archive Python's own `zipfile` wrote, so an implementation of that format outside this project stands behind
-it) and its refusal of a stream that stands of no count of its own, and the encrypted-entry rejection path. A PowerShell `Compress-Archive` archive was verified manually.
+Fixtures cover stored and deflated entries, directory records, CP932 and UTF-8 names, the bzip2 and LZMA
+methods (of archives Python's own `zipfile` wrote, so an implementation of that format outside this project
+stands behind both of them) with a refusal of a bzip2 stream that stands of no count of its own, and the
+encrypted-entry rejection path. A PowerShell `Compress-Archive` archive was verified manually.
