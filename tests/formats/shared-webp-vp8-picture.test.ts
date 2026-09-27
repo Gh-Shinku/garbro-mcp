@@ -7,6 +7,8 @@ import {
 	GRAD_WEBP_PLANES,
 	LOSSY_WEBP,
 	LOSSY_WEBP_PLANES,
+	NOISE_WEBP,
+	NOISE_WEBP_PLANES,
 	PILLAR_PLAIN_WEBP,
 	SOLID_WEBP,
 	SOLID_WEBP_PLANES,
@@ -73,6 +75,19 @@ describe("the walk of the picture of the format itself of the picture of the web
 		expect(
 			planes(decodeVp8KeyFrame(pictureOf(WIDE_WEBP))).toString("hex"),
 		).toBe(WIDE_WEBP_PLANES.toString("hex"));
+	});
+	it("stands of the counts of the head of the format of the picture of the places of the file of the picture of the format of the counts of the head of the format of the picture of the places of the file of their own", () => {
+		// The counts of the head of the format of the picture of the places of the file of the picture of the format
+		// of the places of the file square of the counts of the head of the format of the picture of the places of the
+		// file: the counts of the head of the format of the picture of the places of the file of the picture of the
+		// format of the places of the file of the colour of the picture of the last block of a count of the head of
+		// the format of the picture of the places of the file of a picture of the format stand of the counts of the
+		// head of the format of the picture of the places of the file of the picture of the format of the count of the
+		// head of the format of the picture of the format itself (the walk of the library of the picture of the web
+		// makes them stand of the same counts of the head of the format).
+		expect(
+			planes(decodeVp8KeyFrame(pictureOf(NOISE_WEBP))).toString("hex"),
+		).toBe(NOISE_WEBP_PLANES.toString("hex"));
 	});
 
 	it("stands of the counts of the head of the format of the picture of the places of the file of the picture of the format of the counts of the places of the file of their own of no walk", () => {

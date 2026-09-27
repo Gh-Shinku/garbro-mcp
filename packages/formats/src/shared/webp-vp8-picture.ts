@@ -627,17 +627,25 @@ export function decodeVp8KeyFrame(payload: Buffer): Vp8Picture {
 			);
 			const yOrigin = (16 * mbY + 1) * yStride + (16 * mbX + 1);
 			if (mode.fourByFour) {
-				const topRight = yOrigin - yStride + 16;
-				if (0 === mbY) {
-					for (let i = 0; i < 4; i += 1)
-						yPlane[topRight + i] = yPlane[yOrigin - yStride + 15] ?? 0;
-				} else if (mbX >= mbWidth - 1) {
-					for (let i = 0; i < 4; i += 1)
-						yPlane[topRight + i] = yPlane[yOrigin - yStride + 15] ?? 0;
-				}
+				const lastInRow = mbX >= mbWidth - 1;
 				let bits = residuals.nonZeroY;
 				for (let block = 0; block < 16; block += 1) {
 					const origin = fourPlaceOrigin(block, yOrigin, yStride);
+					// The counts of the head of the format of the picture of the places of the file of the picture of
+					// the format of the places of the file of the picture of the format of the count of the head of the
+					// format of the picture of the format of the count of the head of the format itself stand of the
+					// count of the head of the format of the picture of the places of the file of the picture of the
+					// format of the picture of the format standing in front of them: of the counts of the places of
+					// the file of the picture of the format of the count of the head of the format of the picture of
+					// the places of the file of the picture of the format of the two of them the walk of this project
+					// stands of the counts of the head of the format of the picture of the places of the file of the
+					// picture of the format of the picture of the format of the count of the head of the format
+					// standing of the places of the file of the picture of the format, of the places of the file of
+					// the picture of the format of the picture of the format of the count of the head of the format of
+					// the picture of the places of the file of the picture of the format itself.
+					if (lastInRow && 3 === (block & 3))
+						for (let i = 0; i < 4; i += 1)
+							yPlane[origin - yStride + 4 + i] = 127;
 					predictFour(yPlane, yStride, origin, mode.modes[block] ?? B_DC_PRED);
 					doTransform(
 						bits,
