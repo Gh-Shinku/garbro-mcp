@@ -946,6 +946,7 @@ import { tcd1Format } from "./topcat/tcd1.js";
 import { topcatTcd3Format } from "./topcat/tcd3.js";
 import { yskFormat } from "./gplay/ysk.js";
 import { spdImageFormat } from "./topcat/spd-image.js";
+import { eaglsPakFormat } from "./eagls/pak-archive.js";
 import { weaponDatFormat } from "./weapon/dat-archive.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
 import { iafImageFormat } from "./triangle/iaf-image.js";
@@ -1425,6 +1426,7 @@ export * from "./valkyria/index.js";
 export * from "./vitamin/index.js";
 export * from "./vn-engine/index.js";
 export * from "./vnsystem/index.js";
+export * from "./eagls/index.js";
 export * from "./weapon/index.js";
 export * from "./weapon/index.js";
 export * from "./webp/index.js";
@@ -1489,6 +1491,7 @@ export function createDefaultRegistry(
 			emotePsbFormat,
 			emoteDrefFormat,
 			weaponDatFormat,
+			eaglsPakFormat,
 			cmvsPb3ImageFormat,
 			sviuJbpImageFormat,
 			gbpImageFormat,

@@ -1,1 +1,1 @@
-export * from "./gr-image.js";
+export * from "./pak-archive.js";

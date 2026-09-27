@@ -91,7 +91,11 @@ open archives that the shipped defaults already cover.
   ported now**, as `stack-gpk-archive`, of the walk of the two directories the reference stands of and of the
   reader of a portable executable this project already carried - see `docs/formats/stack-gpk-archive.md`.
 - `PAK/EAGLS` (`ArcFormats/Eagls/ArcEAGLS.cs`) asks for its encryption through `Query<EaglsOptions>` and
-  then calls `DetectEncryptionScheme` on what the answer holds.
+  then calls `DetectEncryptionScheme` on what the answer holds. The question stands only for the *scripts*
+  of the engine: the index cipher, the two counts of the engine and the walk of a picture of the name `.gr`
+  all stand in the reference's own source, and **the format stands ported now**, as `eagls-pak-archive` -
+  see `docs/formats/eagls-pak-archive.md`. Its other two schemes (`EaglsEncryption`, `AdvSysEncryption`)
+  stand of the question alone and are written down there rather than carried as code.
 - `BIN/PAC` (`ArcFormats/DigitalWorks/ArcBIN.cs`) reaches its key through a `Scheme` whose `DefaultScheme`
   ships without one.
 - `CRZ` (`ArcFormats/Crowd/ImageCRZ.cs`) is an `SZDD` stream, which this project can already walk

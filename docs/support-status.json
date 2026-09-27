@@ -13732,6 +13732,30 @@
 		},
 		{
 			"reference": {
+				"type": "archive",
+				"tag": "PAK/EAGLS",
+				"class": "PakOpener",
+				"source": "ArcFormats/Eagls/ArcEAGLS.cs"
+			},
+			"localId": "eagls-pak-archive",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"the index of an archive of the engine, which stands in a companion file of the same name with the `.idx` extension, of the cipher of the engine (`IndexKey`, of the count of the engine of the places of the file of the index): every place of the index stands of a count of the places of the file, the count beginning of the count of the last four places of the file, which stand as they stand",
+				"the walk of the index of the engine, of the two shapes of it (a name of `0x14` places and eight places of the places of an entry against a name of `0x18` places and sixteen of them, of the count of the places of the index over the counts of the reference), of a name of a place of the engine and of the places of the entry behind it, of the places of the file of the archive",
+				"the counts of the engine of the places of the pictures of it, of the two walks of the reference (`CRuntimeRandomGenerator` and `LehmerRandomGenerator`)",
+				"the scheme of the places of a picture archive (an archive whose first entry stands of the name `.gr`), which the engine's first count names: the walk of the counts of the engine of the first entry of the archive (`DetectEncryptionScheme`) and the places of the picture of it (`CgEncryption`)",
+				"a file of the name `.dat` of an archive of the engine, which stands of a script of the engine"
+			],
+			"unsupported": [
+				"archive creation",
+				"the places of the scripts of an archive of the engine, of the schemes `EaglsEncryption` and `AdvSysEncryption`, which the reference reaches only through a question put to the person reading the file (`Query<EaglsOptions>`), whose shipped answer holds no scheme at all: with no answer the reference hands the places of such a file over as they stand, and so does this port",
+				"an archive of the engine whose first entry stands of a picture of the name `.gr` and whose places stand of neither of the two counts of the engine, which the reference stands of a throw of its own"
+			],
+			"remainingVerification": ["real-game GARbro differential output"]
+		},
+		{
+			"reference": {
 				"type": "image",
 				"tag": "GRA",
 				"class": "GraFormat",
