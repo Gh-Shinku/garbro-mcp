@@ -36,3 +36,12 @@ The port exposes the resource as a single entry:
 Unlike most ports in this repository, GARbro *can* write this format: `PmpFormat.Write` masks a level nine zlib
 stream produced from `Bmp.Write`. Encoding is out of scope here, so `create` stays false, but the reader is the
 complete half of a symmetric pair.
+
+## The places of the picture
+
+`PmpFormat.Read` stands of `Bmp.Read` over the inflated surface, so this port reads the bitmap of the payload with the
+shared bitmap walk and hands the places of the picture over as a bitmap of its own, of the counts of the head of the
+bitmap and of its rows in the order that head names. Where the payload holds places behind the picture, or behind a
+declared size of the file, those places stand of no count of the walk; where the payload ends inside the places the head
+names, the walk stands turned away, which is where the reference throws.
+

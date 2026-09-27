@@ -10,7 +10,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, writeBmpImage, readBmpMetaData } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -136,6 +136,16 @@ export const pmpImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid ScenePlayer PMP image");
-		return Readable.from([layout.bmp]);
+		// `PmpFormat.Read` stands of `Bmp.Read` over the inflated surface: the bitmap stands read of the
+		// bitmap walk of this project and handed over as a bitmap of its own, so the padding of the file and
+		// the places behind the picture stand of no count.
+		const image = readBmpImage(layout.bmp);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid ScenePlayer PMP bitmap: ${layout.bmp.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

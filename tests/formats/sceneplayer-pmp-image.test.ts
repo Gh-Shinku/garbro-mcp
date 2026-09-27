@@ -3,6 +3,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { pmpImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const XOR_KEY = 0x21;
 const BMP_HEADER_SIZE = 54;
@@ -80,13 +81,26 @@ describe("sceneplayer pmp image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bmp);
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: WIDTH,
+				height: HEIGHT,
+				bitsPerPixel: 8,
+			});
+			// A bitmap stores its rows bottom up, so the walk of the picture hands the last row of the file
+			// over first.
+			const expected: number[] = [];
+			for (let row = HEIGHT - 1; row >= 0; row -= 1) {
+				for (let i = 0; i < STRIDE; i += 1)
+					expected.push((row * STRIDE * 17 + i * 17 + 3) & 0xff);
+			}
+			expect([...(picture?.pixels ?? [])]).toEqual(expected);
 		} finally {
 			await archive.close();
 		}
 	});
 
-	it("trims data past the declared bitmap size", async () => {
+	it("reads the places of the picture of the head of the bitmap alone", async () => {
 		const bmp = buildBmp(16);
 		const stored = buildPmp(bmp);
 		const archive = await pmpImageFormat.open(sourceOf(stored), "CG01.PMP");
@@ -94,8 +108,9 @@ describe("sceneplayer pmp image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(bmp.length - 16);
-			expect(output).toEqual(bmp.subarray(0, bmp.length - 16));
+			// The sixteen places behind the picture stand of no count of the walk, so the picture stands of the
+			// same places as the one of a file that ends with it.
+			expect(readBmpImage(output)).toEqual(readBmpImage(bmp));
 		} finally {
 			await archive.close();
 		}
