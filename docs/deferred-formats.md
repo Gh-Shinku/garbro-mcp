@@ -53,7 +53,15 @@ open archives that the shipped defaults already cover.
   `ADS` (`ArcFormats/BlackRainbow/ArcADS.cs`), `PBZ` (`ArcFormats/Cmvs/ArcPBZ.cs`),
   `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`) and
   `CG/ACTGS` with `CG/ACTGS/2` (`ArcFormats/Actgs/ArcCG.cs`) all reach their key through a `Scheme` with
-  a `KnownKeys` table. (`ARC/AI5WIN` stood here as well, but its shape of the index **stands read now without a key**: the reference falls back on `Ai5ArcIndexReader.GuessSchemes`, which reads the count of a name and the three ciphers out of the index itself, and the port `elf-ai5win` stands of that guess, so the empty table of the reference costs it nothing - see `docs/formats/elf-ai5win.md`.)
+  a `KnownKeys` table, and every one of those tables is **empty in the shipped reference**, read off the
+  sources one by one: `PkzScheme.KnownSchemes` and `CrzScheme.KnownKeys` stand of `new Dictionary<string,
+  byte[]>()`, `Pkg2Opener.KnownKeys` of `new Dictionary<string, uint[]>()`, `AdsScheme.KnownKeys` of
+  `new Dictionary<string, byte[]>()`, `PbzOpener.KnownSchemes` of `new Dictionary<string, PbzKeys>()`,
+  `Is9Scheme.KnownSchemes` of `new Dictionary<string, IDictionary<string, uint>>()`, and
+  `ActressScheme.KnownKeys` - the table both ACTGS readers stand of, through `DatOpener` - of
+  `Array.Empty<byte[]>()`. `DpkOpener.KnownSchemes` stands of `new DpkScheme[0]` and
+  `AdvReader.KnownSchemes` of `new ArchiveScheme[0]`. None of these readers holds a guess of its own, the
+  way `ARC/AI5WIN` does, so none of them can place a file without a key the file does not carry. (`ARC/AI5WIN` stood here as well, but its shape of the index **stands read now without a key**: the reference falls back on `Ai5ArcIndexReader.GuessSchemes`, which reads the count of a name and the three ciphers out of the index itself, and the port `elf-ai5win` stands of that guess, so the empty table of the reference costs it nothing - see `docs/formats/elf-ai5win.md`.)
 - `ARC/FOMA` (`Legacy/StudioFoma/ArcARC.cs`, the `ARC/FOMA` opener) cannot read a file on its own at all:
   its index is not in the archive but in a **separate executable** that stands beside it, and where in that
   executable is a number the engine keeps **per archive name per executable name**. `Is9Scheme.KnownSchemes`

@@ -65,7 +65,10 @@ stand of this name", not the answer to "which format opened this file".
 * Three of the kinds the table names stand of nothing in this project, and the reason is the reference rather
   than the port: `TXT` (`TextScriptFormat`), `SCR` (`BinScriptFormat`) and `DAT/GENERIC` (`DataFileFormat`)
   are `GenericScriptFormat`s (`GameRes/ScriptText.cs`), whose `Signature` is nought, whose `IsScript` answers
-  `false` and whose `Read` and `Write` throw. `ScriptFormat.FindFormat` keeps only the formats whose
+  `false` and whose `Read` and `Write` throw. `BinScriptFormat` declares the extensions `scr` and `bin`
+  while `TextScriptFormat` declares no extension of its own at all, so the one can be looked up by name
+  where the other cannot even be that; neither reaches `ScriptFormat.FindFormat` all the same, that walk
+  keeping only the formats whose `IsScript` answers `true`. `ScriptFormat.FindFormat` keeps only the formats whose
   `IsScript` answers `true`, so the reference itself never identifies a file as any of these three; they are
   registry entries for the alias table, and `DAT/GENERIC` even answers an empty `Type`. A port of them would
   be a row nothing could ever be detected as, so they are left alone. `AMP/LEAF` (`ArcFormats/Leaf/ArcPAK.cs`,
