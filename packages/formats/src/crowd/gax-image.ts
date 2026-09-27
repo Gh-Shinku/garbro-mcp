@@ -3,6 +3,8 @@
 // b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { writeBmpImage } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -241,6 +243,22 @@ export const crowdGaxImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!plain.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
 			throw invalidPicture("Not an ANIM encrypted picture");
 		}
-		return Readable.from([plain]);
+		// `GaxFormat.Read` stands of `Png.Read` over the turned back picture, so the graphic stands read of the
+		// walk of the portable network graphic of this project and handed over as a bitmap of its own.
+		const image = await readPngImage(plain);
+		if (!image) {
+			throw invalidPicture("Not an ANIM encrypted picture");
+		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

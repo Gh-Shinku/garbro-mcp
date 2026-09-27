@@ -1,6 +1,9 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import {
 	crowdGaxImageFormat,
 	decryptGax,
@@ -117,9 +120,25 @@ describe("ANIM encrypted image", () => {
 		expect(handle.metadata).toMatchObject({ image: "png", encrypted: true });
 	});
 
-	it("hands the picture out as it stood before it was turned over", async () => {
-		const png = pngBytes(4, 3, 40);
-		expect((await extract(gaxFile(png))).equals(png)).toBe(true);
+	it("reads the places of the picture it turned back", async () => {
+		// A whole portable network graphic, of the four places of a colour a place, so the walk of the graphic
+		// reads its places and the walk of the bitmap hands them over as a bitmap of its own.
+		const rows = [
+			Array.from({ length: 4 * 4 }, (_, at) => (at * 7 + 3) & 0xff),
+			Array.from({ length: 4 * 4 }, (_, at) => (at * 5 + 9) & 0xff),
+			Array.from({ length: 4 * 4 }, (_, at) => (at * 3 + 1) & 0xff),
+		];
+		const png = pngFile({ width: 4, height: 3, colourType: 6, rows });
+		const output = await extract(gaxFile(png));
+		const picture = readBmpImage(output);
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({
+			width: 4,
+			height: 3,
+			bitsPerPixel: 32,
+		});
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("turns a picture over block by block, whatever its length", () => {

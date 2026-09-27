@@ -34,3 +34,12 @@ The tests cover the signature and a picture that is not turned over into a porta
 measurements the reference's own reader reports, the measurements and the encryption the entry carries, the
 picture handed out as it stood before it was turned over, the transform of pictures of many lengths, each of
 the seven key steps, and a file that is not all there.
+
+## The places of the picture
+
+The reference reads the picture it turned back with the walk of the portable network graphic, so this port reads that
+graphic with the walk of the portable network graphic of this project and hands the places of the picture over as a
+bitmap of its own: of the width, the height and the depth the head of the graphic names, of the rows in the order the
+head names and of the places the walk of the graphic yields. A graphic whose places run out before the places its head
+names, or whose places of a colour stand behind a kind the walk does not carry, stands turned away, which is where the
+reference throws.
