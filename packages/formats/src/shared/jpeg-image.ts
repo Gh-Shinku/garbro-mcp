@@ -269,7 +269,7 @@ function readFrame(body: Buffer): {
 	if (count < 1 || count > MAX_COMPONENTS) {
 		throw invalidPicture("A frame of the stream names no places of a colour");
 	}
-	if (1 !== count && 3 !== count) {
+	if (1 !== count && 3 !== count && 4 !== count) {
 		throw unsupportedPicture(
 			"A frame of the stream names a count of places of a colour this reader does not read",
 		);
@@ -1139,6 +1139,38 @@ export function readJpegImage(data: Buffer): JpegImage {
 		undefined !== second && undefined !== third && 0 === (frame.transform ?? 1);
 	const read = (plane: Plane, x: number, y: number): number =>
 		plane.samples[y * plane.stride + x] ?? 0;
+
+	const fourth = planes[3];
+	if (fourth) {
+		// Four components are the colour of the press, which the Adobe marker names a kind of: the counts of the
+		// places of the colour stand turned over in the stream of that kind, so a place of the picture stands of
+		// the count of the places of the colour of its own times the count of the places of the black of it. The
+		// kind of the two of them (four components behind a count of the places of the colour of the two) and a
+		// stream of four components with no marker of its own stand turned away.
+		if (!second || !third)
+			throw invalidPicture("The frame of the stream carries no picture");
+		if (0 !== frame.transform)
+			throw unsupportedPicture(
+				"A stream of four places of a colour stands of a kind this reader does not read",
+			);
+		const press = (x: number, y: number): [number, number, number] => {
+			const c = (read(first, x, y) * read(fourth, x, y)) / 255;
+			const m = (read(second, x, y) * read(fourth, x, y)) / 255;
+			const yellow = (read(third, x, y) * read(fourth, x, y)) / 255;
+			return [c, m, yellow];
+		};
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const at = (y * width + x) * PLACES_ALPHA;
+				const [c, m, yellow] = press(x, y);
+				pixels[at] = clampColour(yellow);
+				pixels[at + 1] = clampColour(m);
+				pixels[at + 2] = clampColour(c);
+				pixels[at + 3] = FULL_ALPHA;
+			}
+		}
+		return { width, height, bitsPerPixel: 32, pixels };
+	}
 	for (let y = 0; y < height; y += 1) {
 		for (let x = 0; x < width; x += 1) {
 			const at = (y * width + x) * PLACES_ALPHA;

@@ -94,3 +94,25 @@ export const PROGRESSIVE_TALL_PIXELS = Buffer.from(
 	"AAUG/wAEC/8DABn/EgAn/xICOP8OA0n/CgVa/wkDaP8UAHn/IACK/y8An/82ALH/NgDC/yoA0f8SAd7/Bwbm/wARC/8AEhT/FBMj/yITMv8lE0L/JhNS/yYTYv8qEnH/OhWJ/0YSm/9TEK3/Vg29/1QLzf9MDt7/Pxjw/zog/P8NGgr/FiAU/yIkJP8vJTX/OyNF/0UhVf9PImf/WiB4/2Uahv91HJv/hiGz/4wjyP+II9n/gSXq/30q+/99L///GigG/yEtD/8tMyL/PTQx/1UxQv9mMFX/dzNq/4A0fP+OO5f/kDqm/5c3uf+XNcn/kS/V/4wr3/+IJ+n/hibu/xs+Bf8nQw7/O0Yg/1ZFMP96QUL/kkNY/6BHbv+eTIH/i1CU/3tLnf9zRKr/c0C5/39AzP+KQN7/j0Dr/5FA8f8aUwT/KVUO/0VWHf9pVjD/kVVF/6hXWv+nW23/m1x8/3RKef9tS4v/c0+h/3xWuv+GXNP/j13l/5ZZ7/+YVfL/FGUE/yhmDP9OZx3/d2k0/51qSv+ma1z/jGto/39nc/+DZIH/kmWW/6dpr/+la8P/jGzR/4Fm2/+KXuH/j1vl/xZ2BP8rdg7/WXYg/4B7Nv+af03/mX5c/394ZP9zb2r/jHqH/5t4mv+pdav/oW64/4hsxf+Dc9j/kYHx/56O//8ehQb/PIsW/2SDIP+BiDf/jptX/256Rv99gmL/h4d3/5SPkP+WkKH/j4ir/5CBuv+khtL/monk/3CI6P9diuz/JZAE/0aaFv90lSb/iZ08/3ulUP9qkU3/j5lq/5mbff+UoZP/eJSU/2SRn/99ncD/q57c/5eS3f9fl+b/Va36/y+dA/9SqRn/gKkq/5GyQP9oqUP/baZR/6Crbf+mqXz/iaWH/2usl/9ErKX/Tqq3/5Co0v+WquP/X7Dt/0q69v82rQT/WbkY/4W8K/+UxEL/Y685/3S9V/+aumv/mbBy/460hP99wp3/VMKq/1C3sv+Ct8z/k77l/3HC7/9ewPD/OMAC/1TKE/+D0Cv/ktU+/2/BOP+B1lz/htFp/4XCbP+m0Y7/oMiY/4nFpv+Jzr//kNXY/4zM3v+Ux+f/pNP5/yzRAP9I2A3/feIp/4zdNP9+1jz/iudc/4HgZ/+A12//l9uG/5zdmP+S26n/j9u7/5Xi1P+b4OP/qNrs/7Xe9/8Z5wD/OuwP/3v3L/+G4yz/jOhB/5LwVv+O6mP/jPB4/2nmef9u+p3/afqv/23ps/+b6M3/tPPp/6Xz8v+U6+//GfwL/z3/G/+F/zr/iOwu/5b4SP+Y9Vb/mvFl/5f/hP9o/Yf/VP+Z/07/rP9t/8L/r/za/7jz5P+a9ez/k//5/w==",
 	"base64",
 );
+
+/** Eight places square, four components of the colour of the press, as the library writes a jpeg of them. */
+export const PRESS_JPEG = Buffer.from(
+	"/9j/7gAOQWRvYmUAZAAAAAAA/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU/8AAFAgACAAIBEMRAE0RAFkRAEsRAP/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/aAA4EQwBNAFkASwAAPwDsf+Cjf/MU/wCBV6J/w8I/6iX/AI/Wr+03+03/AMff+l+v8VfcfxA8Xf6z5/XvX//Z",
+	"base64",
+);
+
+/** The places of the picture of the press, three a pixel, red first, as the library decodes them. */
+export const PRESS_PIXELS = Buffer.from([
+	255, 254, 255, 219, 247, 232, 182, 241, 209, 149, 234, 188, 115, 225, 166, 87,
+	219, 147, 57, 213, 128, 31, 205, 110, 250, 223, 233, 214, 215, 211, 178, 210,
+	189, 146, 205, 169, 113, 197, 147, 85, 191, 130, 55, 185, 111, 30, 179, 94,
+	246, 190, 212, 210, 184, 190, 175, 179, 169, 143, 174, 150, 110, 167, 129, 83,
+	162, 112, 54, 158, 94, 29, 151, 78, 241, 160, 193, 206, 154, 172, 171, 150,
+	151, 140, 146, 133, 108, 141, 113, 81, 136, 96, 53, 132, 80, 28, 127, 64, 235,
+	127, 171, 200, 123, 151, 166, 120, 132, 137, 116, 115, 105, 111, 95, 79, 108,
+	80, 51, 104, 64, 28, 100, 49, 230, 99, 153, 196, 96, 134, 163, 93, 115, 133,
+	91, 98, 102, 87, 80, 77, 84, 66, 50, 81, 50, 27, 78, 36, 226, 71, 136, 192,
+	68, 116, 160, 67, 98, 130, 64, 82, 100, 61, 65, 75, 60, 51, 49, 58, 36, 26,
+	55, 23, 220, 46, 117, 187, 44, 99, 155, 43, 82, 127, 42, 67, 97, 40, 51, 73,
+	38, 37, 47, 37, 23, 25, 36, 11,
+]);

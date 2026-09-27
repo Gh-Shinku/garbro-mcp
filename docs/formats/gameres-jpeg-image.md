@@ -38,3 +38,12 @@ that does not walk as a picture, the depth as the product of the bits and the co
 of eight bits — the picture decoded into a bitmap (a grey stream exactly as the Python imaging library decodes it, and a
 stream of three components within two places of the same), and a file that is not a picture. The tests of the
 JPEG reader pin a progressive stream of three components within two places of the same library as well.
+
+## A picture of four places of a colour of the press
+
+The walk reads a stream of four components of the kind the Adobe marker names by a transform of nothing: the counts of
+the places of the colour stand of the count of the places of a colour of its own times the count of the places of the
+black of it, which stands of the places the python imaging library hands over as well (see the `PRESS_JPEG` and
+`PRESS_PIXELS` places of `tests/helpers/jpeg.ts`). The kind of the two of them (YCCK, a transform of two) and a stream of
+four components that carries no marker of its own still stand turned away, and so do streams of twelve bits a sample and
+streams of arithmetic coding.

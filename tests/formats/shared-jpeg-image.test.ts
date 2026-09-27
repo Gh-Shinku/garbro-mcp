@@ -10,6 +10,8 @@ import {
 	COLOUR_PIXELS,
 	GREY_JPEG,
 	GREY_PIXELS,
+	PRESS_JPEG,
+	PRESS_PIXELS,
 	PROGRESSIVE_COLOUR_JPEG,
 	PROGRESSIVE_COLOUR_PIXELS,
 	PROGRESSIVE_GREY_JPEG,
@@ -496,5 +498,29 @@ describe("JPEG reader", () => {
 			blocks: [8 * 20, 8 * 30, -8 * 10, 8 * 60],
 		});
 		expect(() => readJpegImage(cut.subarray(0, 40))).toThrow(GarbroError);
+	});
+
+	it("reads a picture of four places of a colour of the press", () => {
+		// The stream stands of the library as an oracle of another implementation: its places of the picture
+		// stand three a pixel, red first, where this reader hands blue first.
+		const image = readJpegImage(PRESS_JPEG);
+		expect(image).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		let worst = 0;
+		for (let at = 0; at < 8 * 8; at += 1) {
+			const blue = image.pixels[at * 4] ?? 0;
+			const green = image.pixels[at * 4 + 1] ?? 0;
+			const red = image.pixels[at * 4 + 2] ?? 0;
+			const alpha = image.pixels[at * 4 + 3] ?? 0;
+			worst = Math.max(
+				worst,
+				Math.abs(red - (PRESS_PIXELS[at * 3] ?? 0)),
+				Math.abs(green - (PRESS_PIXELS[at * 3 + 1] ?? 0)),
+				Math.abs(blue - (PRESS_PIXELS[at * 3 + 2] ?? 0)),
+			);
+			expect(alpha).toBe(255);
+		}
+		// Both readers run their own inverse transform of the same counts, so they differ a little at the edges
+		// of a colour change; every other place stands of the same count.
+		expect(worst).toBeLessThanOrEqual(8);
 	});
 });
