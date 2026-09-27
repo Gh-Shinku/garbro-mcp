@@ -5,6 +5,13 @@ import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
+// The places of the file of the walk of bzip2 of the count of the places of the file below, and the places
+// of the file of it as they stand.
+const PLAIN_B64 =
+	"dXJhbiBwYXlsb2FkCkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpa";
+const BZ2_B64 =
+	"QlpoOTFBWSZTWW6puB0AAA7XgKAQQCAgAAAQJAXSIAAIIAAiNTRpoYahTAATRn66IdqGGeKIqpOLsnU++LuSKcKEg3VNwOg=";
+
 const STREAM_KEY = 10;
 
 interface Record {
@@ -117,17 +124,26 @@ describe("Uran resource archive", () => {
 		});
 	});
 
-	it("reports bzip2 payloads as unsupported", async () => {
+	it("reads a payload of the walk of bzip2", async () => {
+		// The places of the file of the walk of bzip2 as `bzip2` itself writes them, of a file of the places
+		// of the walk of the counts of them (the count of the places of the file `A` and of the places of
+		// the file `Z`).
+		const plain = Buffer.from(PLAIN_B64, "base64");
 		const archive = buildNcl([
-			{ name: "one.bin", content: Buffer.from("bzip2 payload"), method: 3 },
+			{ name: "one.bin", content: Buffer.from(BZ2_B64, "base64"), method: 3 },
 		]);
 		const source = new BufferByteSource(archive);
 		expect(await uranNclFormat.detect(source, "sample.ncl")).toBe(true);
 		const handle = await uranNclFormat.open(source, "sample.ncl");
-		const entry = handle.entries[0];
-		if (!entry) throw new Error("missing entry");
-		await expect(handle.openEntry(entry.id)).rejects.toThrow(/bzip2/);
-		await handle.close();
+		try {
+			const entry = handle.entries[0];
+			if (!entry) throw new Error("missing entry");
+			expect(await consumeBuffer(await handle.openEntry(entry.id))).toEqual(
+				plain,
+			);
+		} finally {
+			await handle.close();
+		}
 	});
 
 	it("rejects a file whose extension is not ncl", async () => {

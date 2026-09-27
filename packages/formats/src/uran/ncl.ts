@@ -1,7 +1,7 @@
 // Format reference: GARBro Legacy/Uran/ArcNCL.cs, class `NclOpener`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { inflateZlibBuffer } from "@garbro-mcp/codecs";
+import { decompressBzip2, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
 	GarbroError,
 	type ArchiveFormat,
@@ -137,10 +137,9 @@ class NclArchiveHandle implements ArchiveHandle {
 		if (method === METHOD_ZLIB)
 			return Readable.from([await inflateZlibBuffer(data)]);
 		if (method === METHOD_BZIP2)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"Uran NCL bzip2 payloads are not supported",
-			);
+			// The reference hands the places of a file of this method over to `BZip2InputStream` of
+			// `ICSharpCode.SharpZipLib`; this port carries that walk itself (`@garbro-mcp/codecs`).
+			return Readable.from([decompressBzip2(data)]);
 		// Any other packed method falls through to the decoded stream, like the reference.
 		return Readable.from([data]);
 	}

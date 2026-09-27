@@ -36,7 +36,7 @@ well.
 | --- | --- | --- |
 | 1 | Payload stored as is | Supported |
 | 2 | zlib stream | Supported |
-| 3 | bzip2 stream | Unsupported |
+| 3 | bzip2 stream | Supported |
 | other | The reference falls through and returns the decoded stream | Supported |
 
 Because the method byte is shifted like the payload, a stored method byte of 12 reads as method 2. Packed entries
@@ -55,11 +55,11 @@ entries report the stored length twice.
 | Method 1 stored payloads and method 2 zlib payloads | Supported |
 | Other packed methods falling through to the decoded stream | Supported |
 | Placement checks against the file size | Supported |
-| bzip2 method 3 payloads | Unsupported |
+| bzip2 method 3 payloads | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a stored and a zlib entry, a record whose tail declares extra bytes, a method that falls
-through to the decoded stream, a walk ended by a zero size word with trailing junk behind it, a bzip2 payload that
-reports an unsupported error, a non-`.ncl` name, a zero and an over-long name length, a payload outside the
+through to the decoded stream, a walk ended by a zero size word with trailing junk behind it, a bzip2 payload that decodes
+to the places of the file it holds, a non-`.ncl` name, a zero and an over-long name length, a payload outside the
 archive, an archive without records, a truncated record header, and a payload whose bytes wrap around the stream
 key.

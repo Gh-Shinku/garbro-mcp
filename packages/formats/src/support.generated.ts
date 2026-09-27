@@ -21502,6 +21502,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"bzip2 method 3 payloads",
 				"ncl extension gate",
 				"4 GiB file size limit",
 				"sequential record walk from the start of the file",
@@ -21517,7 +21518,7 @@ export const formatSupportCatalog = {
 				"other packed methods falling through to the decoded stream",
 				"placement checks against the file size",
 			],
-			unsupported: ["archive creation", "bzip2 method 3 payloads"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
