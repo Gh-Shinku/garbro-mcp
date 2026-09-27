@@ -8008,6 +8008,39 @@
 		},
 		{
 			"reference": {
+				"type": "image",
+				"tag": "TIFF",
+				"class": "TifFormat",
+				"source": "GameRes/ImageTIFF.cs"
+			},
+			"localId": "gameres-tiff-image",
+			"status": "partial",
+			"verification": "synthetic-fixtures",
+			"supported": [
+				"detection by either of the two heads of the format",
+				"listing",
+				"extraction",
+				"the counts of the picture of the head of the file",
+				"the places of a grey picture of one, two, four, eight and sixteen places of the file a sample",
+				"the places of a picture of a list of colours",
+				"the places of a picture of three or four places of a colour",
+				"the places of a picture of the colour of the press",
+				"the strips of the counts of nothing, of the pack of bytes and of the walk of the zlib kind",
+				"the rows that stand of the difference of the row in front of them"
+			],
+			"unsupported": [
+				"archive creation: the reference writes such a file on its platform and this port reads them alone",
+				"the places of a picture that stand in tiles of their own",
+				"the kinds of the fax family, the walk of the counts of twelve places of the file (LZW) and the walks of the jpeg and of the jpeg of the two thousand",
+				"the places of a picture whose places of a colour stand apart",
+				"the kinds of the places of a colour and of the counts of the samples of it beyond the ones this walk reads"
+			],
+			"remainingVerification": [
+				"the kinds of such a file the platform of the reference reads and this walk turns away: they stand named in the record and in the note"
+			]
+		},
+		{
+			"reference": {
 				"type": "archive",
 				"tag": "GPK/STACK",
 				"class": "GpkOpener",

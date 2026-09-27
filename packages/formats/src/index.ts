@@ -98,6 +98,7 @@ import { dacDgcImageFormat } from "./dac/dgc-image.js";
 import { izumiMai2ImageFormat } from "./izumi/mai2-image.js";
 import { liarWcgImageFormat } from "./liar/wcg-image.js";
 import { gameresPngImageFormat } from "./gameres/png-image.js";
+import { gameresTiffImageFormat } from "./gameres/tiff-image.js";
 import { liarLimImageFormat } from "./liar/lim-image.js";
 import { pfsFormat } from "./artemis/pfs.js";
 import { astArcFormat } from "./ast/arc.js";
@@ -1604,6 +1605,7 @@ export function createDefaultRegistry(
 			izumiMai2ImageFormat,
 			liarWcgImageFormat,
 			gameresPngImageFormat,
+			gameresTiffImageFormat,
 			liarLimImageFormat,
 			mifFormat,
 			bishopPkFormat,

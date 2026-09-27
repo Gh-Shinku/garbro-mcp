@@ -1,0 +1,46 @@
+# The tagged image file format
+
+* Reference: GARbro `GameRes/ImageTIFF.cs`, class `TifFormat`, `GameRes` namespace (tag `TIFF`, the two
+  signatures `II*\0` and `MM\0*`, the names `tif` and `tiff`).
+* GARbro commit `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT License.
+* Port: `packages/formats/src/gameres/tiff-image.ts` (the descriptor) and
+  `packages/formats/src/shared/tiff-image.ts` (the walk of the file).
+
+## What the reference does
+
+`TifFormat` reads the head of the file itself, and then hands the whole stream to the decoder of its platform:
+`Read` stands of `TiffBitmapDecoder` of WPF, of the first frame of the file, of the places of the file the platform
+keeps. The walk of the reference therefore reads every kind of tagged image file its platform reads, and names none of
+them. What the class writes is the place of the picture on its platform as well.
+
+## What this port does
+
+The head of the file stands of this project: the descriptor reads the counts of the picture with the walk of the
+tagged image file of this project (`shared/tiff-image.ts`) and hands a bitmap of its own over, of the counts of the
+file. The walk reads:
+
+* both byte orders of the head, and one or more strips of the places of the picture;
+* the counts of a strip of nothing, of the pack of bytes and of the walk of the zlib kind;
+* a picture of a grey place (of one, two, four, eight and sixteen places of the file a sample, of the kind the head
+  names the brighter count of), of a list of colours, of the three or four places of a colour, and of the colour of
+  the press, of the same counting of the places of a colour of its own as the walk of the jpeg of this project;
+* the rows that stand of the difference of the row in front of them (the count of the predictor of two).
+
+A picture whose places stand in tiles, whose places of a colour stand apart, whose strips stand of the kinds of the
+fax family, of the walk of the counts of twelve places of the file (LZW) or of the walks of the jpeg and of the jpeg
+of the two thousand, stands turned away with a message that names the kind: those are the kinds the platform of the
+reference reads and this walk does not carry, and they stand named in the record as well.
+
+## What stands of the head of the picture
+
+The counts of a picture of this port stand of the places of the file of the samples themselves and of the count of the
+places of the file of a sample, which is how a bitmap of this project stands of its own: a grey picture stands of one
+place of a colour, a picture of a list of colours of the list of the head, and a picture of a colour of the three or
+four places of a colour. A picture of sixteen places of the file a sample stands of the high place of the file, of the
+order the file stands in.
+
+## The fixtures
+
+Every fixture of the tests was written by the Python imaging library (Pillow 11.1.0) during this port, together with
+the places that library hands over for it, which stand as an oracle of another implementation:
+`tests/helpers/tiff.ts`, and `tests/formats/gameres-tiff-image.test.ts` for the descriptor above them.
