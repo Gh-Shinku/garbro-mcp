@@ -9,7 +9,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -145,7 +145,17 @@ export const htfImageFormat: ArchiveFormat = defineFixedArchive({
 		} catch {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Jam HTF image");
 		}
-		// A bitmap may declare less than the stream holds; the reference reads it by its own length.
-		return Readable.from([bmp.subarray(0, layout.fileSize)]);
+		// A bitmap may declare less than the stream holds, and the reference reads the surface by the length its
+		// head declares alone. `HtfFormat.Read` stands of `Bmp.Read` over that surface, so the bitmap stands read
+		// of the bitmap walk of this project and handed over as a bitmap of its own: of the counts of its own
+		// head, so the padding of the file and the places behind the picture stand of no count of the picture.
+		const image = readBmpImage(bmp.subarray(0, layout.fileSize));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Jam HTF bitmap data: ${layout.fileSize} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

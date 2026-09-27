@@ -9887,12 +9887,14 @@ export const formatSupportCatalog = {
 			localId: "jam-htf-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "huffman decoding", "metadata"],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			supported: [
+				"detection",
+				"extraction",
+				"huffman decoding",
+				"metadata",
+				"the places of the picture: the bitmap walk of this project over the huffman surface",
 			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
