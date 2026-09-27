@@ -62,3 +62,13 @@ its right and lower tiles stand clipped where the picture ends. The walk reads t
 counts of a strip as every other picture, so the compressions stand of the same walk. The fixture of the tests
 (`TILED_TIFF`) was built by this project and then read back by the python imaging library, whose places stand as the
 oracle of another implementation for it.
+
+## The rows that stand of a difference, of a sample of sixteen places of the file
+
+The count of the predictor of two stands for every counting of the places of the file of a sample: a sample of sixteen
+places of the file stands of the count of the sample itself, of the count of the sample in front of it of the same row,
+of the count of the counts of that kind of sample, and of the order of the two places of the file the head names. The
+fixture of that walk (`PREDICTOR_TIFF`) was built by this project, of the counts the builder wrote down: the python
+imaging library reads the file itself but stands of the counts of the differences as they stand in the file rather than
+of the places of the picture, so it stands as no oracle for that walk, and the counts of the picture stand of the rule of
+the head of the format alone.

@@ -13,6 +13,8 @@ import {
 	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
 	PALETTE_TIFF,
+	PREDICTOR_TIFF,
+	PREDICTOR_TIFF_PLACES,
 	SIXTEEN_TIFF,
 	TILED_TIFF,
 	TILED_TIFF_PLACES,
@@ -96,6 +98,12 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(TILED_TIFF);
 		expect(image).toMatchObject({ width: 5, height: 5, bitsPerPixel: 24 });
 		expect([...image.pixels]).toEqual([...TILED_TIFF_PLACES]);
+	});
+
+	it("reads the rows of a picture of sixteen places of the file a sample that stand of a difference", async () => {
+		const image = await readTiffImage(PREDICTOR_TIFF);
+		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 8 });
+		expect([...image.pixels]).toEqual([...PREDICTOR_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {

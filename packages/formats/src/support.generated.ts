@@ -8021,7 +8021,7 @@ export const formatSupportCatalog = {
 				"the places of a picture of three or four places of a colour",
 				"the places of a picture of the colour of the press",
 				"the strips of the counts of nothing, of the pack of bytes and of the walk of the zlib kind",
-				"the rows that stand of the difference of the row in front of them",
+				"the rows that stand of the difference of the row in front of them, of a sample of one or of sixteen places of the file",
 				"the strips of the walk of the counts of twelve places of the file (LZW), of the kind of the early count of that walk that this format names",
 				"the places of a picture that stand in tiles of their own, of the right and the lower tile clipped where the picture ends",
 			],

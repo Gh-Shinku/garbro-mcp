@@ -192,3 +192,15 @@ export const TILED_TIFF_PLACES: readonly number[] = [
 	10, 30, 20, 10, 60, 50, 40, 30, 20, 10, 30, 20, 10, 30, 20, 10, 30, 20, 10,
 	60, 50, 40, 90, 80, 70, 90, 80, 70, 90, 80, 70, 90, 80, 70, 120, 110, 100,
 ];
+
+/** Four by three places of sixteen places of the file a sample, whose rows stand of the difference of the row in
+ * front of them. The python imaging library reads no such file of this walk, so the counts of the places of the picture stand as the counts the builder wrote down, of the rule of the head of the format. */
+export const PREDICTOR_TIFF = Buffer.from(
+	"SUkqAAgAAAAKAAABBAABAAAABAAAAAEBBAABAAAAAwAAAAIBAwABAAAAEAAAAAMBAwABAAAAAQAAAAYBAwABAAAAAQAAABEBBAABAAAAiAAAABUBAwABAAAAAQAAABYBBAABAAAAAwAAABcBBAABAAAAGAAAAD0BAwABAAAAAgAAAAAAAAAQAAAABQIFAgUCFAgFAgUCBQIoEAUCBQIFAg==",
+	"base64",
+);
+
+/** The places of PREDICTOR_TIFF, of the high place of the file of every sample. */
+export const PREDICTOR_TIFF_PLACES: readonly number[] = [
+	0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
+];

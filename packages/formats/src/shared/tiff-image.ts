@@ -303,6 +303,7 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 						rowBytes,
 						samples,
 						sampleBits,
+						little,
 					);
 				}
 			}
@@ -568,11 +569,31 @@ function undoDifference(
 	rowBytes: number,
 	samples: number,
 	bits: number,
+	little: boolean,
 ): void {
-	if (8 !== bits) return;
-	for (let index = samples; index < rowBytes; index += 1) {
-		stored[at + index] =
-			((stored[at + index] ?? 0) + (stored[at + index - samples] ?? 0)) & 0xff;
+	if (8 === bits) {
+		for (let index = samples; index < rowBytes; index += 1) {
+			stored[at + index] =
+				((stored[at + index] ?? 0) + (stored[at + index - samples] ?? 0)) &
+				0xff;
+		}
+		return;
+	}
+	if (16 !== bits) return;
+	// A sample of sixteen places of the file stands of two places of it, and the difference stands of the count
+	// of the sample itself, of the count of the sample in front of it of the same row, of the count of the counts
+	// of that kind of sample. The order of the two places of a sample stands of the file.
+	const high = little ? 1 : 0;
+	const low = little ? 0 : 1;
+	const count = Math.floor(rowBytes / 2);
+	for (let index = samples; index < count; index += 1) {
+		const here = at + index * 2;
+		const before = at + (index - samples) * 2;
+		const value =
+			(((stored[here + high] ?? 0) << 8) | (stored[here + low] ?? 0)) +
+			(((stored[before + high] ?? 0) << 8) | (stored[before + low] ?? 0));
+		stored[here + high] = (value >> 8) & 0xff;
+		stored[here + low] = value & 0xff;
 	}
 }
 
