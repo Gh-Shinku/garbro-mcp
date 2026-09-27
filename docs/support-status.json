@@ -10910,12 +10910,9 @@
 				"xor decryption",
 				"offset rule",
 				"png header metadata",
-				"pass-through output"
+				"the places of the picture: the walk of the portable network graphic of this project over the decrypted region"
 			],
-			"unsupported": [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it"
-			],
+			"unsupported": ["image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -23025,12 +23022,13 @@
 			"localId": "yuka-ykg-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
-			"unsupported": [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it"
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the places of the picture: the walks of the bitmap and of the portable network graphic of this project over the wrapped picture"
 			],
+			"unsupported": ["archive creation", "image encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

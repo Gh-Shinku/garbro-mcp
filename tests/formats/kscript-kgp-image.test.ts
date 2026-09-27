@@ -2,6 +2,9 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { kgpImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 const HEADER_SIZE = 0x1c;
 const BASE_OFFSET = 0x14;
@@ -19,6 +22,8 @@ interface KgpOptions {
 	colourType?: number;
 	depth?: number;
 	headerSize?: number;
+	/** A graphic of the test's own, whole and readable, in place of the header the fixture writes. */
+	payload?: Buffer;
 }
 
 function chunk(type: string, body: Buffer): Buffer {
@@ -33,6 +38,15 @@ function chunk(type: string, body: Buffer): Buffer {
 }
 
 /** A graphic whose header the format will read once it has been xored back. */
+
+/** A whole portable network graphic of the four places of a colour a place. */
+function realPng(width: number, height: number): Buffer {
+	const rows = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width * 4 }, (_, at) => (at * 7 + y * 5 + 3) & 0xff),
+	);
+	return pngFile({ width, height, colourType: 6, rows });
+}
+
 function buildPng(options: KgpOptions = {}): Buffer {
 	const ihdr: Buffer = Buffer.alloc(13, 0x00);
 	ihdr.writeUInt32BE(options.width ?? 4, 0);
@@ -50,7 +64,7 @@ function buildPng(options: KgpOptions = {}): Buffer {
 /** The stored file is the graphic xored with the single byte key the header carries. */
 function buildKgp(options: KgpOptions = {}): Buffer {
 	const key = options.key ?? 0x5a;
-	const png = buildPng(options);
+	const png = options.payload ?? buildPng(options);
 	const region: Buffer = Buffer.from(png.map((x) => x ^ key));
 	const header: Buffer = Buffer.alloc(options.headerSize ?? HEADER_SIZE, 0x00);
 	if (header.length >= HEADER_SIZE) {
@@ -122,11 +136,15 @@ describe("KScript image", () => {
 			[0x14, BASE_OFFSET + 0x18],
 			[0x1f, BASE_OFFSET + 0x18],
 		] as [number, number][]) {
-			const file = buildKgp({ hasOffset: true, offsetField });
+			const file = buildKgp({
+				hasOffset: true,
+				offsetField,
+				payload: realPng(4, 3),
+			});
 			expect(await kgpImageFormat.detect(sourceOf(file), "A.kgp")).toBe(true);
-			const output = await extract(file);
-			expect(output.length).toBe(file.length - offset);
-			expect(output[0]).toBe(0x89);
+			const picture = readBmpImage(await extract(file));
+			expect(picture).toMatchObject({ width: 4, height: 3, bitsPerPixel: 32 });
+			expect(offset).toBeLessThan(file.length);
 		}
 	});
 
@@ -164,16 +182,17 @@ describe("KScript image", () => {
 		}
 	});
 
-	it("hands nothing but the graphic over, decrypted", async () => {
-		const file = buildKgp({ width: 3, height: 2 });
-		const png = buildPng({ width: 3, height: 2 });
+	it("reads the places of the picture of the graphic, decrypted", async () => {
+		const png = realPng(3, 2);
+		const file = buildKgp({ payload: png });
 		const output = await extract(file);
 		// The header stays behind: the entry is the region the header points at, and nothing of the junk that
 		// separates the two reaches the caller.
-		expect(output.equals(png)).toBe(true);
-		expect(output.length).toBe(png.length);
-		expect(output.length).toBeLessThan(file.length);
-		expect(output.subarray(0, 8).toString("latin1")).toBe("\x89PNG\r\n\x1a\n");
+		const picture = readBmpImage(output);
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({ width: 3, height: 2, bitsPerPixel: 32 });
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 		// The unreadable region before the graphic is still in the file, xored.
 		expect(file.subarray(0, 4).toString("latin1")).toBe("GRPH");
 	});

@@ -2,6 +2,8 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readPngImage } from "../shared/png-image.js";
+import { writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -156,8 +158,23 @@ export const kgpImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!readPngHeaderFields(plain)) {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid KScript image");
 		}
-		// The reference decodes the graphic; the port hands the decrypted original over, which keeps every
-		// chunk. The offset fields the reference reads are not carried: the port's image metadata has none.
-		return Readable.from([plain]);
+		// `KgpFormat.Read` stands of `Png.Read` over the decrypted region, so the graphic stands read of the
+		// walk of the portable network graphic of this project and handed over as a bitmap of its own.
+		const image = await readPngImage(plain);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid KScript graphic data: ${plain.length} places of the file`,
+			);
+		}
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });
