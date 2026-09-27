@@ -9212,7 +9212,12 @@ export const formatSupportCatalog = {
 			localId: "ikura-ggp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"the places of the picture: the walk of the portable network graphic of this project over the decrypted region",
+			],
 			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},

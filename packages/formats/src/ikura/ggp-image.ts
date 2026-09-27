@@ -1,4 +1,6 @@
 import { GarbroError } from "@garbro-mcp/core";
+import { writeBmpImage } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -179,6 +181,24 @@ export const ikuraGgpImageFormat: ArchiveFormat = defineFixedArchive({
 				"GGP picture does not hold a portable network graphic",
 			);
 		}
-		return Readable.from([decryptGgp(region, layout.key)]);
+		// `GgpFormat` stands of `PngFormat`, so the graphic stands read of the walk of the portable network
+		// graphic of this project and handed over as a bitmap of its own.
+		const image = await readPngImage(decryptGgp(region, layout.key));
+		if (!image) {
+			throw invalidPicture(
+				"GGP picture does not hold a portable network graphic",
+			);
+		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

@@ -1,6 +1,9 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import {
 	decryptGgp,
 	ikuraGgpImageFormat,
@@ -11,6 +14,15 @@ const HEADER_SIZE = 0x24;
 const KEY = Buffer.from([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88]);
 
 /** A portable network graphic header, which is all of one this project reads. */
+
+/** A whole portable network graphic of the four places of a colour a place. */
+function realPng(width: number, height: number): Buffer<ArrayBuffer> {
+	const rows = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width * 4 }, (_, at) => (at * 7 + y * 5 + 3) & 0xff),
+	);
+	return Buffer.from(pngFile({ width, height, colourType: 6, rows }));
+}
+
 function pngHeader(
 	width: number,
 	height: number,
@@ -166,34 +178,36 @@ describe("Digital Romance System encrypted picture format", () => {
 	});
 
 	it("lays the picture over with the key, walking the key round and round", async () => {
-		const payload = Buffer.alloc(100, 0x5a);
-		for (let index = 0; index < payload.length; index += 1) {
-			payload[index] = index & 0xff;
-		}
-		const png = pngHeader(4, 2);
-		Buffer.concat([payload]).copy(png, 33, 0, 0);
-		const data = ggpFile({
-			payload: Buffer.concat([png, payload.subarray(0, 67)]),
-		});
-		const out = await extract(data);
-		expect(out.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
-		// The bytes behind the header come back exactly as they stood before the key was laid over them.
-		expect(out.subarray(33).toString("hex")).toBe(
-			Buffer.concat([payload.subarray(0, 67)]).toString("hex"),
-		);
+		// A picture of more places of the file than the key holds, so the key stands over it round and round;
+		// what the walk of the graphic reads back is the picture the file holds.
+		const png = realPng(32, 8);
+		const picture = readBmpImage(await extract(ggpFile({ payload: png })));
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({ width: 32, height: 8, bitsPerPixel: 32 });
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
-
 	it("reads a picture that stands behind a gap in the file", async () => {
-		const data = ggpFile({ padding: 0x20 });
+		const png = realPng(4, 2);
+		const data = ggpFile({ padding: 0x20, payload: png });
 		expect(await ikuraGgpImageFormat.detect(sourceOf(data), "cg.ggp")).toBe(
 			true,
 		);
-		expect(await extract(data)).toEqual(pngHeader(4, 2));
+		const picture = readBmpImage(await extract(data));
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({ width: 4, height: 2, bitsPerPixel: 32 });
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
-	it("gives back the picture the file holds", async () => {
-		const data = ggpFile({ width: 4, height: 2 });
-		expect(await extract(data)).toEqual(pngHeader(4, 2));
+	it("reads the places of the picture the file holds", async () => {
+		const png = realPng(4, 2);
+		const data = ggpFile({ payload: png });
+		const picture = readBmpImage(await extract(data));
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({ width: 4, height: 2, bitsPerPixel: 32 });
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("refuses a picture that is not a portable network graphic where it is extracted", async () => {
