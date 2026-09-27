@@ -36,7 +36,15 @@ Every record is:
 
 - The reference finds the companion through the virtual file system and compares part names literally; the port
   reads the sibling file and keeps the same literal comparison.
-- Image decoding of the payloads, `NCMP` and `RCB`, is out of scope, as is archive creation.
+- `DatOpener.OpenImage` reads a payload of the archive: a payload opening with `NCMP` stands of a picture of this
+  engine whose places stand of three places of a colour to a pixel as the file holds them, a payload opening with
+  `RCB\0` stands of a run of three places of a colour and the count of the times they stand again, and a payload
+  opening with a picture of a format stands of a walk of the formats. Both pictures of the engine carry their width
+  and height at eight, the count of the places of their picture at sixteen and the count of the places of the file
+  at twenty. The port stands of the picture walks of the formats this project carries - a portable network graphic,
+  a JPEG and a bitmap - and hands a picture of three places of a colour over, so a picture of four places of a
+  colour stands of its three places of colour alone; a payload of none of them stands turned away on extraction.
+- Archive creation is out of scope.
 - An archive whose companion is missing cannot be listed, so it is not detected at all.
 
 ## References

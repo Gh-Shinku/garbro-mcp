@@ -8286,8 +8286,9 @@ export const formatSupportCatalog = {
 				"part table entry ranges",
 				"short and long name fields",
 				"relative payload offsets",
+				"the picture of a payload: the walks of the pictures of this project, of the places of a picture of the engine or of a run of them",
 			],
-			unsupported: ["archive creation", "ncmp and rcb image decoding"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

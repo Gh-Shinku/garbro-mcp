@@ -9,6 +9,10 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24 } from "../shared/bmp.js";
+import { readBmpImage } from "../shared/bmp.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
+import { readPngImage } from "../shared/png-image.js";
 import { readCompanionFile } from "../shared/companion.js";
 import {
 	checkPlacement,
@@ -137,6 +141,152 @@ function toFixedEntries(entries: readonly GrooverEntry[]): FixedEntry[] {
 	);
 }
 
+/** The head of a picture of this engine: two words of counts, a count of places and a count of the file. */
+const PCG_HEADER_SIZE = 0x18;
+/** `DatOpener.OpenImage` stands of these words to tell a picture of the engine from a picture of a format. */
+const NCMP_SIGNATURE = Buffer.from("NCMP", "latin1");
+const RCB_SIGNATURE = Buffer.from([0x52, 0x43, 0x42, 0x00]);
+/** The words every picture of a format a payload may stand of opens with. */
+const PNG_SIGNATURE = Buffer.from([
+	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+]);
+const JPEG_SIGNATURE = Buffer.from([0xff, 0xd8]);
+const BMP_SIGNATURE = Buffer.from("BM", "latin1");
+
+function invalidPcg(message: string): GarbroError {
+	return new GarbroError("INVALID_ARCHIVE", message);
+}
+
+/**
+ * `PcgReaderBase`: a picture of this engine carries its width and height at eight, the count of the places of its
+ * picture at sixteen and the count of the places of the file at twenty, every one of them a word. Both readers
+ * stand of three places of a colour to a pixel.
+ */
+function readPcgHead(
+	data: Buffer,
+	path: string,
+): { width: number; height: number; unpackedSize: number; packedSize: number } {
+	if (data.length < PCG_HEADER_SIZE) {
+		throw invalidPcg(
+			`The picture ${path} stands of too few places of the file`,
+		);
+	}
+	const width = data.readUInt32LE(8);
+	const height = data.readUInt32LE(0xc);
+	const unpackedSize = data.readInt32LE(0x10);
+	const packedSize = data.readInt32LE(0x14);
+	const pixels = width * height * 3;
+	if (width <= 0 || height <= 0 || unpackedSize < pixels) {
+		throw invalidPcg(`The picture ${path} stands of no picture of this engine`);
+	}
+	return { width, height, unpackedSize, packedSize };
+}
+
+/**
+ * `RcbReader.Unpack`: a run of a picture stands of three places of a colour and a count of the times they stand
+ * again, the count standing behind them. A count of nought stands of nothing at all, which is what the reference
+ * stands of as well.
+ */
+function unpackRcb(
+	data: Buffer,
+	unpackedSize: number,
+	packedSize: number,
+	path: string,
+): Buffer {
+	const output = Buffer.alloc(unpackedSize);
+	let at = PCG_HEADER_SIZE;
+	let dst = 0;
+	for (let run = 0; run < packedSize && dst < unpackedSize; run += 1) {
+		if (at + 4 > data.length || dst + 3 > unpackedSize) {
+			throw invalidPcg(`The picture ${path} stands of a run past its places`);
+		}
+		data.copy(output, dst, at, at + 3);
+		const count = data.readUInt8(at + 3);
+		at += 4;
+		if (count > 0) {
+			// `Binary.CopyOverlapped` copies the places of the colour just written over the places behind them,
+			// one place at a time, so a run of them stands of the same colour.
+			const places = (count - 1) * 3;
+			if (dst + 3 + places > unpackedSize) {
+				throw invalidPcg(`The picture ${path} stands of a run past its places`);
+			}
+			for (let place = 0; place < places; place += 1) {
+				output[dst + 3 + place] = output[dst + place] ?? 0;
+			}
+			dst += count * 3;
+		}
+	}
+	return output;
+}
+
+/**
+ * `DatOpener.OpenImage`: a payload of this archive is either a picture of the engine, which stands of its own
+ * head, or a picture of a format, which the reference hands to the walks of the formats; anything else stands
+ * turned away.
+ */
+async function readPcgPicture(data: Buffer, path: string): Promise<Buffer> {
+	if (data.subarray(0, 4).equals(NCMP_SIGNATURE)) {
+		const { width, height, unpackedSize } = readPcgHead(data, path);
+		// `NcmpReader.Unpack` reads the places of the picture as they stand.
+		const pixels = data.subarray(
+			PCG_HEADER_SIZE,
+			PCG_HEADER_SIZE + width * height * 3,
+		);
+		if (pixels.length < width * height * 3) {
+			throw invalidPcg(
+				`The picture ${path} stands of too few places of the file`,
+			);
+		}
+		return writeBmp24(width, height, Buffer.from(pixels));
+	}
+	if (data.subarray(0, 4).equals(RCB_SIGNATURE)) {
+		const { width, height, unpackedSize, packedSize } = readPcgHead(data, path);
+		return writeBmp24(
+			width,
+			height,
+			unpackRcb(data, unpackedSize, packedSize, path),
+		);
+	}
+	if (data.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
+		const image = await readPngImage(data);
+		if (image) return writePcgPicture(image);
+	}
+	if (data.subarray(0, JPEG_SIGNATURE.length).equals(JPEG_SIGNATURE)) {
+		return writePcgPicture(readJpegImage(data));
+	}
+	if (data.subarray(0, BMP_SIGNATURE.length).equals(BMP_SIGNATURE)) {
+		const image = readBmpImage(data);
+		if (image) return writePcgPicture(image);
+	}
+	throw invalidPcg(
+		`The payload ${path} stands of no picture this project reads`,
+	);
+}
+
+/** The places of a picture of a format, of the counts of that picture, as a picture of this project. */
+function writePcgPicture(image: {
+	width: number;
+	height: number;
+	bitsPerPixel: number;
+	pixels: Buffer;
+}): Buffer {
+	if (32 === image.bitsPerPixel) {
+		const places = Buffer.alloc(image.width * image.height * 4);
+		for (let at = 0, to = 0; to < places.length; at += 4, to += 3) {
+			places[to] = image.pixels[at] ?? 0;
+			places[to + 1] = image.pixels[at + 1] ?? 0;
+			places[to + 2] = image.pixels[at + 2] ?? 0;
+		}
+		return writeBmp24(image.width, image.height, places);
+	}
+	if (24 === image.bitsPerPixel) {
+		return writeBmp24(image.width, image.height, Buffer.from(image.pixels));
+	}
+	throw invalidPcg(
+		"A picture of this payload stands of no three places of a colour",
+	);
+}
+
 export const grooverPcgDescriptor: FormatDescriptor = {
 	id: "groover-pcg",
 	name: "Groover resource archive",
@@ -175,7 +325,10 @@ export const grooverPcgFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource, entry: FixedEntry) {
 		return Readable.from([
-			Buffer.from(await source.readAt(entry.offset, Number(entry.size))),
+			await readPcgPicture(
+				Buffer.from(await source.readAt(entry.offset, Number(entry.size))),
+				entry.path,
+			),
 		]);
 	},
 });
