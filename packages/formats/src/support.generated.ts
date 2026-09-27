@@ -3125,12 +3125,9 @@ export const formatSupportCatalog = {
 				"bitmap validation",
 				"bitmap trimming",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the surface the head gives back",
 			],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

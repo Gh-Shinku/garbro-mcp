@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { bbmImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const XOR_KEY = 0xff;
 const META_SIZE = 0x20;
@@ -49,6 +50,14 @@ function maskAll(bmp: Buffer): Buffer {
 	return stored;
 }
 
+/** The surface the reference's own walk of the head gives back: a hundred places restored, the rest as stored. */
+function referenceSurface(stored: Buffer): Buffer {
+	return Buffer.concat([
+		maskAll(stored.subarray(0, UNMASK_SIZE)),
+		stored.subarray(UNMASK_SIZE),
+	]);
+}
+
 function sourceOf(file: Buffer): BufferByteSource {
 	return new BufferByteSource(file);
 }
@@ -83,15 +92,12 @@ describe("blue-gale bbm image", () => {
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
 			// The bitmap is a little longer than the prefix, so its first hundred bytes are restored and the two
-			// past them keep the mask the file stored.
+			// past them keep the mask the file stored; the picture stands read of that surface.
 			expect(bmp.length).toBe(102);
-			expect(output.subarray(0, UNMASK_SIZE)).toEqual(
-				bmp.subarray(0, UNMASK_SIZE),
-			);
-			expect(output.subarray(UNMASK_SIZE)).toEqual(
-				Buffer.from(
-					[...bmp.subarray(UNMASK_SIZE)].map((byte) => byte ^ XOR_KEY),
-				),
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({ width: 8, height: 2, bitsPerPixel: 24 });
+			expect(picture?.pixels).toEqual(
+				readBmpImage(referenceSurface(stored))?.pixels,
 			);
 		} finally {
 			await archive.close();
@@ -109,14 +115,18 @@ describe("blue-gale bbm image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(bmp.length);
-			// Restored inside the prefix and still masked beyond it.
-			expect(output.subarray(0, UNMASK_SIZE)).toEqual(
-				bmp.subarray(0, UNMASK_SIZE),
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({ bitsPerPixel: 8 });
+			expect(picture?.pixels).toEqual(
+				readBmpImage(referenceSurface(stored))?.pixels,
 			);
-			const paletteOffset = BMP_HEADER_SIZE + 200 * 4;
-			expect(paletteOffset).toBeGreaterThan(UNMASK_SIZE);
-			expect(output[paletteOffset]).toBe((bmp[paletteOffset] ?? 0) ^ XOR_KEY);
+			// Restored inside the prefix and still masked beyond it, which the list of colours of the picture
+			// still shows: the walk of the bitmap hands that list over as it stands.
+			const paletteOffset = 200 * 4;
+			expect(BMP_HEADER_SIZE + paletteOffset).toBeGreaterThan(UNMASK_SIZE);
+			expect(picture?.palette[paletteOffset]).toBe(
+				(bmp[BMP_HEADER_SIZE + paletteOffset] ?? 0) ^ XOR_KEY,
+			);
 		} finally {
 			await archive.close();
 		}

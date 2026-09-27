@@ -252,7 +252,7 @@ of reason are these, to the row:
   `DAT/RepiPack`, `AVC`, `ACV`, `DAT/MINATO`, `ARC/noncolor`, `DPK`, `DXA`, `LIBP`, `NPK`, `YPF`, `PAZ` and
   `PAK/MORNING`. The empty expression of every one of those tables stands read off the reference in the
   entries above; none of those readers holds a guess of its own of the kind `ARC/AI5WIN` does.
-* **a table the reference does not ship at all** - **1 row**: `MBM` and `PACK/BONK` need a `*.lst` listing
+* **a table the reference does not ship at all** - **0 rows**: `MBM` and `PACK/BONK` need a `*.lst` listing
   that stands nowhere in the reference tree. `DAT/WEAPON` and `ALL/GIGA`, which stood here for the same
   reason, **are** ported: their tables stand in the source itself.
 * **a walk of the platform rather than of the file** - **2 rows**: `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
@@ -294,7 +294,8 @@ family at ten. The walks of `lilim-img-bmp-image`, `eye-csf-image` and `yellowca
 this family at seven. The walks of `regrips-prg-image` and `yellowcap-gef-image` have since been taken over in the same
 way, over the walk of the portable network graphic of this project, which stands it at five. The walk of `lilim-img-png-image` has since been taken over, which stands it at four. The walk of `crowd-gax-image` has since been taken over, which stands it at three. The walks of `kscript-kgp-image` and `yuka-ykg-image` have since been taken over, which stands
 this family at two: the record of `pisckiss-bm1-image` named this place though its port already handed a bitmap of its own over, which has
-since been corrected in its record and its note, and the walk of `blue-gale-bbm-image` stands of its tests of the mask.
+since been corrected in its record and its note, and the walk of `blue-gale-bbm-image` has since been taken over as well, which stands this family at nothing: every row
+that named this place either stands of a corrected record or of a walk now taken over.
 
 * **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
   compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in

@@ -8,7 +8,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -156,6 +156,16 @@ export const bbmImageFormat: ArchiveFormat = defineFixedArchive({
 		const bmp = await readBitmap(source);
 		if (!bmp)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid BlueGale BBM image");
-		return Readable.from([bmp]);
+		// `BbmFormat.Read` stands of `Bmp.Read` over the surface its own walk of the head gives back — the first
+		// hundred places restored and the rest as the file holds them — so the picture stands read of the bitmap
+		// walk of this project and handed over as a bitmap of its own, of its list of colours as it stands.
+		const image = readBmpImage(bmp);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid BlueGale BBM bitmap data: ${bmp.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

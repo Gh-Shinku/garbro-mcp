@@ -52,3 +52,12 @@ bytes. Both made the tests fail against a correct port: the short image is one t
 and masking only the prefix meant the tail was never obfuscated, so the assertions that expected masked bytes
 there were checking a property the fixture had never established. The fixtures now clear a hundred bytes and
 mask the **whole** file, which is what makes the hundred byte boundary observable at all.
+
+## The places of the picture
+
+The reference reads the surface its own walk of the head gives back — the first hundred places restored and the rest as
+the file holds them — with `Bmp.Read`, so this port reads that surface with the bitmap walk of this project and hands the
+places of the picture over as a bitmap of its own: of the width, the height and the depth of the head of the bitmap, of a
+row of the count of the places a row of the picture holds, of the rows in the order the head names and of the list of
+colours as it stands. Where the places behind the hundredth place of the file still stand under the mask, they stand
+under it in the picture too, which is what the reference reads as well.
