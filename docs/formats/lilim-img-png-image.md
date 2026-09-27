@@ -39,3 +39,14 @@ would reject.
 
 The port hands the deobfuscated original over instead of decoding and re-encoding it. Every chunk survives, the
 compression stays lossless, and the entry is named after the graphic with a `.png` extension.
+
+## The places of the picture
+
+The reference reads the deobfuscated surface with the walk of the portable network graphic, so this port reads that
+graphic with the walk of the portable network graphic of this project and hands the places of the picture over as a
+bitmap of its own: of the width, the height and the depth the head of the graphic names, of the rows in the order the
+head names and of the places the walk of the graphic yields. A graphic whose places run out before the places its head
+names, or whose places of a colour stand behind a kind the walk does not carry, stands turned away, which is where the
+reference throws. The obfuscation stops after the thirty second place of the file, which is what tells this format from
+the Regrips graphic: both readers walk the same graphic when it is handed to them, and both hand the same places of the
+picture over.

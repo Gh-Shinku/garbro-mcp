@@ -11789,13 +11789,10 @@ export const formatSupportCatalog = {
 				"extraction",
 				"prefix deobfuscation",
 				"png header metadata",
-				"pass-through output",
 				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
+				"the places of the picture: the walk of the portable network graphic of this project over the deobfuscated surface",
 			],
-			unsupported: [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

@@ -3,6 +3,8 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readPngImage } from "../shared/png-image.js";
+import { writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -102,8 +104,25 @@ export const imgPngImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!readPngHeaderFields(plain)) {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Lilim image");
 		}
-		// The reference decodes the graphic; the port hands the deobfuscated original over, which is a graphic
-		// again and keeps every chunk.
-		return Readable.from([plain]);
+		// `ImgPngFormat.Read` stands of `Png.Read` over the deobfuscated surface, so the graphic stands read of
+		// the walk of the portable network graphic of this project and handed over as a bitmap of its own.
+		const image = await readPngImage(plain);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Lilim graphic data: ${plain.length} places of the file`,
+			);
+		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

@@ -6,6 +6,9 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 const PREFIX = 0x20;
 
@@ -46,6 +49,28 @@ function buildPng(options: PngOptions = {}): Buffer {
 }
 
 /** The stored file is the graphic with its first thirty two bytes xored; the tail is untouched. */
+
+/** A whole portable network graphic of the four places of a colour a place. */
+function realPng(): Buffer {
+	const rows = [
+		Array.from({ length: 3 * 4 }, (_, at) => (at * 7 + 3) & 0xff),
+		Array.from({ length: 3 * 4 }, (_, at) => (at * 11 + 5) & 0xff),
+	];
+	return pngFile({ width: 3, height: 2, colourType: 6, rows });
+}
+
+/** The same graphic read through the reader of the other obfuscated format. */
+async function extractRegrips(file: Buffer): Promise<Buffer> {
+	const archive = await prgImageFormat.open(sourceOf(file), "A.prg");
+	try {
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		return await consumeBuffer(await archive.openEntry(entry.id));
+	} finally {
+		await archive.close();
+	}
+}
+
 function buildImg(png: Buffer): Buffer {
 	return deobfuscateLilim(png);
 }
@@ -110,12 +135,18 @@ describe("Lilim obfuscated image", () => {
 		expect(await imgPngImageFormat.detect(sourceOf(regrips), "A.img")).toBe(
 			true,
 		);
-		// What tells them apart is where the obfuscation stops, which the extraction is faithful to: this format
-		// leaves the body alone, so the result is a readable graphic.
-		const output = await extract(lilim);
-		expect(output.subarray(PREFIX).equals(buildPng().subarray(PREFIX))).toBe(
-			true,
+		// What tells them apart is where the obfuscation stops, which the extraction is faithful to: the body of
+		// this format stands alone, so both readers stand before the same graphic and hand the same places of
+		// the picture over.
+		const real = realPng();
+		const fromLilim = readBmpImage(await extract(buildImg(real)));
+		const fromRegrips = readBmpImage(
+			await extractRegrips(Buffer.from(real.map((x) => x ^ 0xff))),
 		);
+		expect(fromLilim).not.toBeUndefined();
+		expect([...(fromLilim?.pixels ?? [])]).toEqual([
+			...(fromRegrips?.pixels ?? []),
+		]);
 	});
 
 	it("maps the colour type and the bit depth the way the reference does", async () => {
@@ -140,13 +171,18 @@ describe("Lilim obfuscated image", () => {
 		}
 	});
 
-	it("hands the deobfuscated graphic over whole", async () => {
-		const png = buildPng({ width: 3, height: 2 });
+	it("reads the places of the picture the graphic holds", async () => {
+		const png = realPng();
 		const output = await extract(buildImg(png));
-		expect(output.equals(png)).toBe(true);
-		expect(output.length).toBe(png.length);
-		// The chunks behind the prefix were never touched, so they survive byte for byte.
-		expect(output.subarray(PREFIX).equals(png.subarray(PREFIX))).toBe(true);
+		const picture = readBmpImage(output);
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({
+			width: 3,
+			height: 2,
+			bitsPerPixel: 32,
+		});
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("names the entry after the graphic, with its size and its depth", async () => {
