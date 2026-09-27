@@ -2,6 +2,7 @@
 // bytes that repeat its dimensions). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -146,10 +147,20 @@ export const ggfImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid YellowCap GGF image");
-		// Everything from offset 8 to the end of the file is the bitmap, so a copy is enough.
+		// Everything from offset 8 to the end of the file is the bitmap.
 		const bitmap = Buffer.from(
 			await source.readAt(BigInt(layout.dataOffset), layout.dataSize),
 		);
-		return Readable.from([bitmap]);
+		// `GgfFormat.Read` stands of `Bmp.Read` over that surface: the bitmap stands read of the bitmap walk of
+		// this project and handed over as a bitmap of its own, so the places behind the picture stand of no
+		// count of the picture.
+		const image = readBmpImage(bitmap);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid YellowCap GGF bitmap data: ${bitmap.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

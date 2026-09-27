@@ -42,3 +42,11 @@ One defensive deviation is worth naming: a `bfSize` outside the file is declined
 would go on to read the pixels according to the dimensions. No file that decodes in GARbro is affected.
 
 Encoding and archive creation are out of scope.
+
+## The places of the picture
+
+The reference reads the surface with `Bmp.Read`, so this port reads that bitmap with the shared bitmap walk and hands the
+places of the picture over as a bitmap of its own: of the width, the height and the depth of the head of the bitmap, of a
+row of the count of the places a row of the picture holds (so the row padding of the file stands of no count) and of the
+rows in the order the head names, which for a bitmap of a positive height means the last row of the file first. The
+places the file holds behind the picture stand of no count of the walk.

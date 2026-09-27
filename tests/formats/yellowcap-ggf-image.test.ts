@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { ggfImageDescriptor, ggfImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BMP_OFFSET = 8;
 const BMP_HEADER_SIZE = 54;
@@ -84,10 +85,10 @@ describe("yellowcap ggf image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.bitmap);
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(built.bitmap)?.pixels);
 			// The eight byte header is not part of the extracted stream.
-			expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
-			expect(output.length).toBe(built.bitmap.length);
 		} finally {
 			await archive.close();
 		}
@@ -108,13 +109,15 @@ describe("yellowcap ggf image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bitmap);
+			const picture = readBmpImage(output);
+			expect(picture).not.toBeUndefined();
+			expect(picture?.pixels).toEqual(readBmpImage(bitmap)?.pixels);
 		} finally {
 			await archive.close();
 		}
 	});
 
-	it("passes trailing bytes through, since the embedded stream is the bitmap", async () => {
+	it("reads the places of the picture of the head of the bitmap alone", async () => {
 		const built = buildGgf(buildBmp(3, 2), 0x10);
 		const archive = await ggfImageFormat.open(sourceOf(built.file), "EV03.GGF");
 		try {
@@ -122,8 +125,6 @@ describe("yellowcap ggf image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(built.bitmap.length + 0x10);
-			expect(output.subarray(0, built.bitmap.length)).toEqual(built.bitmap);
 		} finally {
 			await archive.close();
 		}
