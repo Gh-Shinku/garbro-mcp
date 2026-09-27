@@ -45,3 +45,11 @@ order the file stands in.
 Every fixture of the tests was written by the Python imaging library (Pillow 11.1.0) during this port, together with
 the places that library hands over for it, which stand as an oracle of another implementation:
 `tests/helpers/tiff.ts`, and `tests/formats/gameres-tiff-image.test.ts` for the descriptor above them.
+
+## The counts of the colour of the press
+
+The counts of the places of the colour of the press of this format are the counts of the places of the colour of their
+own: a count of nothing stands for no place of a colour at all, so a place of the picture stands of the place of its
+colour times the place of the black of it, each of them counted of what the head of the file leaves of it. That is the
+other way round from the streams of the jpeg of the same kind, whose counts stand turned over; the fixture of the
+library (`PRESS_TIFF`, of `tests/helpers/tiff.ts`) stands of an oracle of another implementation for both of them.

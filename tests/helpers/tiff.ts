@@ -165,3 +165,16 @@ export const LZW_TIFF = Buffer.from(
 export const LZW_TIFF_PLACES: readonly number[] = [
 	0, 0, 0, 30, 10, 40, 60, 20, 80, 5, 50, 20, 35, 60, 60, 65, 70, 100,
 ];
+
+/** Four by three places of the colour of the press, of the four places of a colour a place. */
+export const PRESS_TIFF = Buffer.from(
+	"SUkqAAgAAAAKAAABBAABAAAABAAAAAEBBAABAAAAAwAAAAIBAwAEAAAAhgAAAAMBAwABAAAAAQAAAAYBAwABAAAABQAAABEBBAABAAAAjgAAABUBAwABAAAABAAAABYBBAABAAAAAwAAABcBBAABAAAAMAAAABwBAwABAAAAAQAAAAAAAAAIAAgACAAIAAAAAAAfABEHPgAiDl0AMxUAHREFHx0iDD4dMxNdHUQaADoiCh86MxE+OkQYXTpVHw==",
+	"base64",
+);
+
+/** The places of PRESS_TIFF, blue first, of the four places a bitmap reads. */
+export const PRESS_TIFF_PLACES: readonly number[] = [
+	255, 255, 255, 231, 248, 218, 209, 241, 182, 187, 234, 149, 233, 222, 250,
+	211, 215, 213, 189, 209, 179, 168, 203, 145, 212, 189, 245, 190, 184, 209,
+	169, 178, 175, 149, 173, 142,
+];

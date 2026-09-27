@@ -300,10 +300,18 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 			for (let x = 0; x < width; x += 1) {
 				const at = (y * width + x) * (hasAlpha ? 4 : 3);
 				if (PHOTOMETRIC_CMYK === photometric) {
-					const black = sample(x, y, 3);
-					pixels[at] = Math.round((sample(x, y, 2) * black) / 255) & 0xff;
-					pixels[at + 1] = Math.round((sample(x, y, 1) * black) / 255) & 0xff;
-					pixels[at + 2] = Math.round((sample(x, y, 0) * black) / 255) & 0xff;
+					// The counts of the places of the colour of the press of this format are the counts of the
+					// places of the colour of their own: a count of nothing stands for no place of a colour at
+					// all, where the streams of the jpeg of this kind hold the counts turned over. A place of the
+					// picture therefore stands of the place of its colour times the place of the black of it,
+					// each of them counted of what the head of the file leaves of it.
+					const black = 255 - sample(x, y, 3);
+					pixels[at] =
+						Math.round(((255 - sample(x, y, 2)) * black) / 255) & 0xff;
+					pixels[at + 1] =
+						Math.round(((255 - sample(x, y, 1)) * black) / 255) & 0xff;
+					pixels[at + 2] =
+						Math.round(((255 - sample(x, y, 0)) * black) / 255) & 0xff;
 				} else {
 					pixels[at] = sample(x, y, 2);
 					pixels[at + 1] = sample(x, y, 1);

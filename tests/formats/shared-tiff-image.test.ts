@@ -7,6 +7,8 @@ import {
 	DEFLATE_TIFF,
 	GREY_TIFF,
 	GREY_TIFF_PLACES,
+	PRESS_TIFF,
+	PRESS_TIFF_PLACES,
 	LZW_TIFF,
 	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
@@ -75,6 +77,14 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(LZW_TIFF);
 		expect(image).toMatchObject({ width: 3, height: 2, bitsPerPixel: 24 });
 		expect([...image.pixels]).toEqual([...LZW_TIFF_PLACES]);
+	});
+
+	it("reads a picture of the colour of the press", async () => {
+		// The library wrote the file and hands the picture of the colour of the press over as the places of a
+		// picture of three of them, which stand as an oracle of another implementation.
+		const image = await readTiffImage(PRESS_TIFF);
+		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual([...PRESS_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {
