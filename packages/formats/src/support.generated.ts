@@ -10829,8 +10829,10 @@ export const formatSupportCatalog = {
 				"dds image metadata",
 				"ova inline headers",
 				"hierarchical entry names",
+				"the places of a picture of a dds entry: the walk of the compressed streams, of the counts the index names",
+				"the places of an ova entry: the places of the file behind the header of the index",
 			],
-			unsupported: ["archive creation", "dds image decoding"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

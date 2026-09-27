@@ -3,6 +3,7 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { inflateLzss } from "@garbro-mcp/codecs";
+import { writeBmp32 } from "../shared/bmp.js";
 import {
 	GarbroError,
 	type ArchiveFormat,
@@ -334,13 +335,27 @@ export const kogadoArcFormat: ArchiveFormat = defineFixedArchive({
 		const stored = Buffer.from(await source.readAt(offset, size));
 		for (let index = 0; index < stored.length; index += 1)
 			stored[index] = (stored[index] ?? 0) ^ 0xff;
+		const metadata = entry.metadata as
+			| { ovaHeader?: Buffer; dds?: { width: number; height: number } }
+			| undefined;
+		// `ArcOpener.OpenEntry` stands of the places of an entry of this kind as the file holds them for a
+		// picture of the engine of the kind OVA, whose header of its own stands in the index and whose places
+		// stand of no walk of the compressed streams; every other entry stands of such a walk, of the count of
+		// places the index names for it.
+		const header = metadata?.ovaHeader;
+		if (header && header.length > 0) {
+			return Readable.from([Buffer.concat([header, stored])]);
+		}
 		const decoded = inflateLzss(stored, {
 			outputLength: Number(entry.size),
 		});
-		const metadata = entry.metadata as { ovaHeader?: Buffer } | undefined;
-		const header = metadata?.ovaHeader;
-		if (!header || header.length === 0)
-			return Readable.from([Buffer.from(decoded)]);
-		return Readable.from([Buffer.concat([header, Buffer.from(decoded)])]);
+		const dds = metadata?.dds;
+		if (!dds) return Readable.from([Buffer.from(decoded)]);
+		// `ImageDecoder`: the places of a picture of the engine stand of four places of a colour to a pixel,
+		// of the counts the index names for it, of the whole of the places of the colour to a place. The
+		// reference stands of the places behind the picture as places of no count of their own.
+		const pixels = Buffer.alloc(dds.width * dds.height * 4, 0x00);
+		decoded.copy(pixels, 0, 0, Math.min(decoded.length, pixels.length));
+		return Readable.from([writeBmp32(dds.width, dds.height, pixels)]);
 	},
 });

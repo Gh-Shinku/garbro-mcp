@@ -55,22 +55,28 @@ Three layouts exist.
 | `DDS`   | a 32 bit header count, then per header flags/width/height, then 20 byte records: offset, stored size, unused word, unpacked size, header id |
 | `OVA`   | two words, then per header a 12 byte prefix holding a length and the header bytes, then 12 byte records: offset, unpacked size, header id |
 
-Offsets are relative to the payload base offset. Every entry is an LZSS stream that is XOR 0xFF masked,
-so the stored payload has to be unmasked first.
+Offsets are relative to the payload base offset. Every entry is XOR 0xFF masked, so the stored payload has to be
+unmasked first.
 
-`DDS` entries carry their image metadata in the index; the port exposes it as `dds` metadata with 32 bits
-per pixel. `OVA` entries carry an inline header in the index that is prepended to the decoded payload,
-and the stored size is derived as `unpackedSize - headerLength` rather than read from the archive.
+`DDS` entries carry their image metadata in the index; the port exposes it as `dds` metadata with 32 bits per pixel.
+`OVA` entries carry an inline header in the index that is prepended to the payload, and the stored size is derived as
+`unpackedSize - headerLength` rather than read from the archive. Every section kind marks its entries packed, but
+`ArcOpener.OpenEntry` stands of a walk of the compressed streams for `DDS` entries and for entries of a section of no
+kind of its own alone: the places of an `OVA` entry stand of the file as they are, with the inline header before them.
+`ArcOpener.OpenImage` then hands the places of a `DDS` entry over as four places of a colour to a pixel, of the counts
+the index names for it, which the port writes as a bitmap; the reference stands of the places behind the picture as
+places of no count of their own, which the port stands of as well.
 
 ## Port notes and deviations
 
 - The reference allows an entry to run up to `0x14` bytes past the end of the archive and rejects the
   archive otherwise. The port reproduces that relaxed bound, as well as the two different bounds for
   `OVA` entries, which are checked without the relaxation.
-- The reference limits the decoded stream to the entry's unpacked size, which for `OVA` entries includes
-  the inline header, so the decoded payload can be longer than the payload itself. The port keeps that
-  behaviour and marks such entries as having an unknown size.
-- The DDS image decoder and archive creation are out of scope.
+- The reference limits the decoded stream to the entry's unpacked size. The port keeps that behaviour and marks the
+  entries of a walk of the compressed streams as having an unknown size.
+- `OVA` entries are **not** a walk of the compressed streams: the reference hands their places over as the file holds
+  them, behind the header of the index, so the port does so too.
+- Archive creation is out of scope.
 - Entry types are taken from the format catalog in the reference. The port leaves the type unset and
   reports the DDS metadata instead.
 

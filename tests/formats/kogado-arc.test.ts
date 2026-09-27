@@ -1,6 +1,7 @@
 import { BufferByteSource } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { kogadoArcFormat } from "../../packages/formats/src/kogado/arc.js";
 import { expectArchive } from "../helpers/archive.js";
 import { literalLzssStream } from "../helpers/lzss.js";
@@ -151,26 +152,6 @@ function payloadOf(data: Buffer): Buffer {
 	return xorFf(literalLzssStream(data));
 }
 
-/**
- * Builds an LZSS stream that only uses matches against the zero filled frame, which compresses a run
- * of zero bytes into fewer bytes than the payload itself. Real entries rely on matches in the same
- * way, and the reference's stored size for OVA entries is the *unpacked* payload length.
- */
-function zeroMatchStream(length: number): Buffer {
-	const parts: Buffer[] = [Buffer.from([0x00])];
-	let remaining = length;
-	while (remaining > 0) {
-		const count = Math.min(18, remaining);
-		if (count < 3) throw new Error("count too small for a match");
-		const pair = Buffer.alloc(2);
-		pair[0] = 0;
-		pair[1] = (count - 3) & 0x0f;
-		parts.push(pair);
-		remaining -= count;
-	}
-	return Buffer.concat(parts);
-}
-
 function sourceOf(archive: Buffer): BufferByteSource {
 	return new BufferByteSource(archive);
 }
@@ -243,9 +224,9 @@ describe("kogado ARC", () => {
 		});
 	});
 
-	it("prepends the ova header to the decoded payload", async () => {
+	it("prepends the ova header to the payload of the entry", async () => {
 		const header = Buffer.from("OVAHEADER!");
-		const payload = Buffer.alloc(33);
+		const payload = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
 		const stored = payload.length;
 		const { offsets } = nameTable(["movie.ova"]);
 		const built = buildKogado({
@@ -267,9 +248,9 @@ describe("kogado ARC", () => {
 					),
 				),
 			],
-			payloads: [xorFf(zeroMatchStream(payload.length))],
-			// The stored size of an OVA entry is the unpacked payload size, so the entry needs room
-			// for the placement check even though the compressed stream is shorter.
+			payloads: [xorFf(payload)],
+			// The stored size of an OVA entry is the unpacked payload size, so the entry needs room for the
+			// placement check even though the payload of the entry is shorter than its header.
 			trailer: 8,
 		});
 		const archive = await kogadoArcFormat.open(sourceOf(built), "sample.arc");
@@ -287,11 +268,11 @@ describe("kogado ARC", () => {
 				stored: BigInt(stored),
 				sizeKnown: false,
 			});
-			// The reference limits the decoded stream to the entry's unpacked size, which for an OVA
-			// entry includes the inline header, so the decoded payload is longer than the payload
-			// itself. The extra bytes come from the trailing region of the archive.
+			// The places of an entry of the kind OVA stand of the file as they are: the walk of the
+			// compressed streams stands of the other kinds of section alone, and the header of the entry
+			// stands before those places.
 			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				Buffer.concat([header, Buffer.alloc(header.length + payload.length)]),
+				Buffer.concat([header, payload]),
 			);
 		} finally {
 			await archive.close();
@@ -299,7 +280,18 @@ describe("kogado ARC", () => {
 	});
 
 	it("reads the dds header table", async () => {
-		const data = Buffer.from("dds payload");
+		// Four pixels to a row and one row of four places of a colour, of the walk of the compressed streams.
+		const data = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		]);
+		// The walk of the compressed streams stands of one control word of eight places to every eight places
+		// of the picture, so the words stand between the groups of places rather than before all of them.
+		const stream = Buffer.concat([
+			Buffer.from([0xff]),
+			data.subarray(0, 8),
+			Buffer.from([0xff]),
+			data.subarray(8),
+		]);
 		const { offsets } = nameTable(["image.dds"]);
 		const built = buildKogado({
 			names: ["image.dds"],
@@ -308,11 +300,11 @@ describe("kogado ARC", () => {
 					"DDS\0",
 					[offsets[0] ?? 0],
 					ddsLayout(
-						[{ flags: 0x41, width: 320, height: 240 }],
+						[{ flags: 0x41, width: 4, height: 1 }],
 						[
 							{
 								offset: 0,
-								storedSize: payloadOf(data).length,
+								storedSize: stream.length,
 								unpackedSize: data.length,
 								headerId: 0,
 							},
@@ -320,26 +312,78 @@ describe("kogado ARC", () => {
 					),
 				),
 			],
-			payloads: [payloadOf(data)],
+			payloads: [xorFf(stream)],
 		});
 		const archive = await kogadoArcFormat.open(sourceOf(built), "sample.arc");
 		try {
 			expect(archive.entries[0]?.metadata).toMatchObject({
-				dds: { flags: 0x41, width: 320, height: 240, bpp: 32 },
+				dds: { flags: 0x41, width: 4, height: 1, bpp: 32 },
 			});
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				data,
+			const picture = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
 			);
+			expect(picture).toMatchObject({ width: 4, height: 1, bitsPerPixel: 32 });
+			expect([...(picture?.pixels ?? [])]).toEqual([...data]);
 		} finally {
 			await archive.close();
 		}
 	});
 
+	it("reads the places of a picture of the engine of the kind DDS", async () => {
+		// A picture of four pixels to a row and one row stands of four places of a colour to a pixel, and its
+		// places stand of the walk of the compressed streams behind a mask of the whole of the places of a
+		// colour.
+		const pixels = Buffer.from([
+			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		]);
+		const stream = Buffer.concat([
+			Buffer.from([0xff]),
+			pixels.subarray(0, 8),
+			Buffer.from([0xff]),
+			pixels.subarray(8),
+		]);
+		const { offsets } = nameTable(["image.dds"]);
+		const built = buildKogado({
+			names: ["image.dds"],
+			sections: [
+				sectionOf(
+					"DDS\0",
+					[offsets[0] ?? 0],
+					ddsLayout(
+						[{ flags: 0x41, width: 4, height: 1 }],
+						[
+							{
+								offset: 0,
+								storedSize: stream.length,
+								unpackedSize: pixels.length,
+								headerId: 0,
+							},
+						],
+					),
+				),
+			],
+			payloads: [xorFf(stream)],
+		});
+		const archive = await kogadoArcFormat.open(sourceOf(built), "sample.arc");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await archive.openEntry(entry.id)),
+		);
+		expect(picture).toMatchObject({
+			width: 4,
+			height: 1,
+			bitsPerPixel: 32,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([...pixels]);
+	});
+
 	it("walks consecutive sections of different kinds", async () => {
 		const plain = Buffer.from("first");
-		const ova = Buffer.alloc(18);
+		// The places of an entry of the kind OVA stand of the file as they are.
+		const ova = Buffer.alloc(18, 0x5a);
 		const header = Buffer.from("HEAD");
 		const { offsets } = nameTable(["a.bin", "b.ova"]);
 		const built = buildKogado({
@@ -372,7 +416,7 @@ describe("kogado ARC", () => {
 					),
 				),
 			],
-			payloads: [payloadOf(plain), xorFf(zeroMatchStream(ova.length))],
+			payloads: [payloadOf(plain), xorFf(ova)],
 		});
 		const archive = await kogadoArcFormat.open(sourceOf(built), "sample.arc");
 		try {
