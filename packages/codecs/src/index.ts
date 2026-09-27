@@ -42,3 +42,4 @@ export * from "./erisa-matrix.js";
 export * from "./erisa-nemesis.js";
 export * from "./erisa-bshf.js";
 export * from "./lzx.js";
+export * from "./bzip2.js";
