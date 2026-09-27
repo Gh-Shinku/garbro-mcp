@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { gdfImageDescriptor, gdfImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BMP_HEADER_SIZE = 54;
 const TAG = "GD";
@@ -54,10 +55,18 @@ describe("mink gdf obfuscated bitmap", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
-			expect(output.subarray(2)).toEqual(stored.subarray(2));
-			// The negative height survives untouched, since only the marker is rewritten.
-			expect(output.readInt32LE(22)).toBe(-2);
+			// Only the two places of the marker differ from a plain bitmap, and the walk of the picture hands
+			// the places of that bitmap over as a bitmap of its own. The stored height is negative, so the rows
+			// stand in the order the file holds them; the walk reports the magnitude of that height.
+			const plain = Buffer.from(stored);
+			plain.write("BM", 0, "latin1");
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: 2,
+				height: 2,
+				bitsPerPixel: 32,
+			});
+			expect(picture?.pixels).toEqual(readBmpImage(plain)?.pixels);
 		} finally {
 			await archive.close();
 		}
