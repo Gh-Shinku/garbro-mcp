@@ -500,7 +500,13 @@ export function readVp8MacroblockResiduals(
 		for (let y = 0; y < 2; y += 1) {
 			let local = l & 1;
 			for (let x = 0; x < 2; x += 1) {
-				const at = 256 + 16 * (4 * channel + 2 * y + x);
+				// The counts of the head of the format of the picture of the places of the file of the picture of the
+				// colour of the picture stand of the places of the file of the picture of the format of the two places of
+				// the file of the places of the file: the counts of the head of the format of the picture of the places of
+				// the file of the picture of the format of the colour of the picture stand of the count of the head of
+				// the format of the picture of the places of the file of the picture of the format of the colour of the
+				// picture of the count of the head of the format itself.
+				const at = 256 + 16 * ((channel >> 1) * 4 + 2 * y + x);
 				const count = readCoefficients(
 					decoder,
 					probabilities,
