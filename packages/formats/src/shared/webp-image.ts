@@ -4,12 +4,12 @@
 //
 // Read here: the container head (RIFF, with `WEBP` at offset 8), the `VP8X`, `ALPH`, `VP8 ` and `VP8L` chunk heads and
 // the three kinds of payload the format carries: the lossless bit stream (VP8L), the lossy key frame bit stream (VP8)
-// converted to the BGRA places of the file the way the platform library the reference calls writes them, and the
-// alpha plane of a lossy picture, which stands turned away with a message of its own (a picture whose alpha stands in
-// its own chunk is not read yet).
+// converted to the BGRA places of the file the way the platform library the reference calls writes them, and the alpha
+// plane of a lossy picture (`webp-alpha.ts`), which the alpha channel of those places of the file carries.
 
 import { GarbroError } from "@garbro-mcp/core";
 import type { BmpImage } from "./bmp.js";
+import { readWebpAlpha } from "./webp-alpha.js";
 import { walkVp8Bgra } from "./webp-vp8-bgra.js";
 import { decodeVp8KeyFrame } from "./webp-vp8-picture.js";
 import { readVp8lPicture } from "./webp-lossless.js";
@@ -273,26 +273,30 @@ function invalid(message: string): GarbroError {
 export function readWebpImage(data: Buffer): BmpImage {
 	let picture: Buffer | undefined;
 	let lossy: Buffer | undefined;
+	let alpha: Buffer | undefined;
 	for (const chunk of walkChunks(data)) {
 		if (VP8L === chunk.type)
 			picture = data.subarray(chunk.at, chunk.at + chunk.size);
 		else if (VP8 === chunk.type)
 			lossy = data.subarray(chunk.at, chunk.at + chunk.size);
 		else if (ALPH === chunk.type)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"A picture of the web of the counts of the places of the file of the colour of the picture stands of no walk of this project",
-			);
+			alpha = data.subarray(chunk.at, chunk.at + chunk.size);
 	}
 	if (picture) return readVp8lPicture(picture);
 	if (lossy) {
 		const decoded = decodeVp8KeyFrame(lossy);
+		const pixels = walkVp8Bgra(decoded);
+		if (alpha) {
+			const plane = readWebpAlpha(alpha, decoded.width, decoded.height);
+			for (let at = 3; at < pixels.length; at += 4)
+				pixels[at] = plane[(at - 3) / 4] ?? 0;
+		}
 		return {
 			width: decoded.width,
 			height: decoded.height,
 			bitsPerPixel: 32,
 			palette: Buffer.alloc(0),
-			pixels: walkVp8Bgra(decoded),
+			pixels,
 		};
 	}
 	throw invalid(

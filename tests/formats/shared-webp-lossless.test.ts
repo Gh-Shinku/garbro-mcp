@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { GarbroError } from "@garbro-mcp/core";
 import { readWebpImage } from "../../packages/formats/src/shared/webp-image.js";
 import {
 	FLAT_WEBP,
@@ -8,7 +7,6 @@ import {
 	GRADIENT_WEBP_PLACES,
 	PATTERN_WEBP,
 	PATTERN_WEBP_PLACES,
-	PLACES_WEBP,
 } from "../helpers/webp.js";
 
 describe("the walk of the places of the picture of the web", () => {
@@ -29,11 +27,5 @@ describe("the walk of the places of the picture of the web", () => {
 		const pattern = readWebpImage(PATTERN_WEBP);
 		expect(pattern).toMatchObject({ width: 12, height: 6, bitsPerPixel: 32 });
 		expect([...pattern.pixels]).toEqual([...PATTERN_WEBP_PLACES]);
-	});
-
-	it("turns away a picture whose alpha stands in a chunk of its own", () => {
-		// The lossy places of the file of the colour of the picture stand of the walk of this project now (see the tests
-		// of the colour walk and of the format itself), but an alpha plane of its own chunk is not read yet.
-		expect(() => readWebpImage(PLACES_WEBP)).toThrow(GarbroError);
 	});
 });

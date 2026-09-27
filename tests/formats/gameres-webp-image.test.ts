@@ -4,10 +4,23 @@ import { describe, expect, it } from "vitest";
 import { gameresWebpImageFormat } from "../../packages/formats/src/gameres/webp-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import {
+	ALPHA_FILTER_BGRA,
+	ALPHA_FILTER_WEBP,
+	ALPHA_GRADIENT_BGRA,
+	ALPHA_GRADIENT_WEBP,
+	ALPHA_LEVEL_BGRA,
+	ALPHA_LEVEL_WEBP,
+	ALPHA_LOSSLESS_BGRA,
+	ALPHA_LOSSLESS_WEBP,
+	ALPHA_ODD_BGRA,
+	ALPHA_ODD_WEBP,
+	ALPHA_VERTICAL_BGRA,
+	ALPHA_VERTICAL_WEBP,
 	GRADIENT_WEBP,
 	GRADIENT_WEBP_PLACES,
 	MULTI_PARTITION_BGRA,
 	MULTI_PARTITION_WEBP,
+	PLACES_BGRA,
 	PLACES_WEBP,
 	SOLID_BGRA,
 	SOLID_WEBP,
@@ -73,11 +86,30 @@ describe("the picture of the web of the walk of the places of the picture", () =
 		);
 	});
 
-	it("turns away a picture whose counts of the places of the file of the colour of the picture stand of their own", async () => {
-		const source = new BufferByteSource(PLACES_WEBP);
-		const archive = await gameresWebpImageFormat.open(source, "image.webp");
-		const entry = archive.entries[0];
-		if (!entry) throw new Error("no entry");
-		await expect(archive.openEntry(entry.id)).rejects.toThrow(GarbroError);
+	it("writes the places of the file of the colour of the picture of the places of the picture of the head of the format of the picture of the web", async () => {
+		const cases: [number, number, Buffer, Buffer][] = [
+			[4, 3, PLACES_WEBP, PLACES_BGRA],
+			[24, 20, ALPHA_LOSSLESS_WEBP, ALPHA_LOSSLESS_BGRA],
+			[24, 20, ALPHA_FILTER_WEBP, ALPHA_FILTER_BGRA],
+			[24, 20, ALPHA_LEVEL_WEBP, ALPHA_LEVEL_BGRA],
+			[24, 20, ALPHA_VERTICAL_WEBP, ALPHA_VERTICAL_BGRA],
+			[24, 20, ALPHA_GRADIENT_WEBP, ALPHA_GRADIENT_BGRA],
+			[5, 7, ALPHA_ODD_WEBP, ALPHA_ODD_BGRA],
+		];
+		for (const [width, height, file, bgra] of cases) {
+			const picture = await pictureOf(file);
+			expect(picture.width).toBe(width);
+			expect(picture.height).toBe(height);
+			expect(picture.pixels.toString("hex")).toBe(bgra.toString("hex"));
+		}
+	});
+
+	it("turns away the places of the picture of the colour of the picture of the places of the file of their own", async () => {
+		const moved = Buffer.from(SOLID_WEBP);
+		moved.write("ANIM", 12, "latin1");
+		const source = new BufferByteSource(moved);
+		await expect(
+			gameresWebpImageFormat.open(source, "image.webp"),
+		).rejects.toThrow(GarbroError);
 	});
 });

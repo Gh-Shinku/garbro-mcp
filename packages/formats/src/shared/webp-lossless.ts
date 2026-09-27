@@ -744,6 +744,19 @@ function readImageStream(
 	return pixels;
 }
 
+/** Reads the pixels of a lossless stream that carries no head of its own (`readVp8lStream`), which is how the lossless
+ * alpha plane of the `ALPH` chunk stands: the head of the format of the picture of the web of the places of the file
+ * of the picture of the format of the head of the format of the picture of the web stands of the counts of the places
+ * of the file of the picture of the format itself, so the stream starts at its transforms. The pixels come back the
+ * way the picture walk packs them, `a << 24 | r << 16 | g << 8 | b`. */
+export function readVp8lStream(
+	data: Buffer,
+	width: number,
+	height: number,
+): number[] {
+	return readImageStream(new BitReader(data), width, height, true);
+}
+
 /** The places of the picture of the picture of the web of no count of the places of the file of their own, of the
  * counts of the head of the format of the picture of the web of the colour of the places of the file. */
 export function readVp8lPicture(payload: Buffer): BmpImage {
