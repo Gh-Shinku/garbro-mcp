@@ -6,6 +6,9 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 interface PngOptions {
 	width?: number;
@@ -127,13 +130,24 @@ describe("Regrips encrypted image", () => {
 		}
 	});
 
-	it("handing over the decrypted graphic keeps every chunk", async () => {
-		const png = buildPng({ width: 3, height: 2, depth: 8, colourType: 2 });
+	it("reads the places of the picture the graphic holds", async () => {
+		// A whole portable network graphic, of the four places of a colour a place, so the walk of the graphic
+		// reads its places and the walk of the bitmap hands them over as a bitmap of its own.
+		const rows = [
+			Array.from({ length: 3 * 4 }, (_, at) => (at * 7 + 3) & 0xff),
+			Array.from({ length: 3 * 4 }, (_, at) => (at * 11 + 5) & 0xff),
+		];
+		const png = pngFile({ width: 3, height: 2, colourType: 6, rows });
 		const output = await extract(buildRegrips(png));
-		expect(output.equals(png)).toBe(true);
-		// Nothing is dropped and nothing is added: the port does not re-encode the image.
-		expect(output.length).toBe(png.length);
-		expect(output.subarray(0, 8).equals(PNG_SIGNATURE)).toBe(true);
+		const picture = readBmpImage(output);
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({
+			width: 3,
+			height: 2,
+			bitsPerPixel: 32,
+		});
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("names the entry after the graphic and knows the size", async () => {

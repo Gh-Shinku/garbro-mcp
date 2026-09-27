@@ -16967,12 +16967,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"xor decryption",
 				"png header metadata",
-				"pass-through output",
+				"the places of the picture: the walk of the portable network graphic of this project over the decrypted surface",
 			],
-			unsupported: [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22847,13 +22844,13 @@ export const formatSupportCatalog = {
 			localId: "yellowcap-gef-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "png passthrough", "metadata"],
-			unsupported: [
-				"archive creation",
-				"image encoding",
-				"image decoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			supported: [
+				"detection",
+				"extraction",
+				"metadata",
+				"the places of the picture: the walk of the portable network graphic of this project over the embedded stream",
 			],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

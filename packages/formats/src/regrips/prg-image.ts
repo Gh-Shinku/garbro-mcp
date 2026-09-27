@@ -2,6 +2,7 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -10,6 +11,7 @@ import type {
 import { Readable } from "node:stream";
 import { changeExtension } from "../shared/companion.js";
 import { PNG_SIGNATURE, readPngHeaderFields } from "../shared/png.js";
+import { readPngImage } from "../shared/png-image.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -115,8 +117,26 @@ export const prgImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!readPngHeaderFields(plain)) {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Regrips image");
 		}
-		// The reference decodes the graphic and re-encodes it; the port hands the decrypted original over, which
-		// keeps every chunk it holds.
-		return Readable.from([plain]);
+		// `PrgFormat.Read` stands of `Png.Read` over the decrypted surface, so the graphic stands read of the
+		// walk of the portable network graphic of this project and handed over as a bitmap of its own: of the
+		// places of the picture and of the rows in the order the head names.
+		const image = await readPngImage(plain);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Regrips graphic data: ${plain.length} places of the file`,
+			);
+		}
+		// The walk of the portable network graphic hands no list of colours over, and a bitmap of a whole count
+		// of places of a colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });
