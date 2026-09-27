@@ -21369,6 +21369,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the walk of a stream of the LZMA kind, of the five bytes of properties in front of the stream",
 				"the word `UnityFS` behind a place of no name at the head of a file, of the kind six of the head of it alone, of the extensions `unity3d`, `asset` and `bundle`",
 				"the head of the file: the counts of the engine and of the walk of it, the count of the places of the file, the counts of the index as it stands and as it stands of the walk of it, and the flags of the file (the walk of the index, and the index standing at the head of the file or at the end of it)",
 				"the index of the file: the streams of the places of it (the counts of them as they stand and as they stand of the walk of them) and the bundles over them (the places, the counts, the flags and the names of them)",
@@ -21383,7 +21384,7 @@ export const formatSupportCatalog = {
 			],
 			unsupported: [
 				"archive creation",
-				"the walk of an index or of a stream of the LZMA kind, which the reference reaches through a library of its own",
+				"the walk of an index of the LZMA kind, which the reference itself leaves unwritten",
 				"a picture of the objects of the kind `Texture2D` of the kinds of the places of a colour of seven places (25), of four places of a place (13) and of the kinds of a fruit (28, 29)",
 				"the places of a sound of the objects of the kind `AudioClip`",
 			],

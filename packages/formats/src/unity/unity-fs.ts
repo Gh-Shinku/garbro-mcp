@@ -22,7 +22,11 @@ import type {
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { decompressLz4Block } from "@garbro-mcp/codecs";
+import {
+	decompressLz4Block,
+	decompressLzmaRaw,
+	readLzmaProperties,
+} from "@garbro-mcp/codecs";
 import { Readable } from "node:stream";
 import {
 	createFixedEntry,
@@ -205,8 +209,10 @@ export function readUnityFsIndexData(
 	const kind = head.flags & INDEX_KIND_MASK;
 	if (KIND_STORED === kind) return packed;
 	if (KIND_LZMA === kind) {
+		// `ArcUnityFS.UnpackLzma` stands of no walk at all: the reference throws there, so this port turns
+		// an index of that kind away rather than reading it.
 		throw unsupportedArchive(
-			"The index of the archive stands of the LZMA walk",
+			"The index of the archive stands of the LZMA walk, which the reference leaves unwritten",
 		);
 	}
 	if (KIND_LZ4 === kind || KIND_LZ4_HIGH === kind) {
@@ -237,7 +243,18 @@ export function unpackUnityFsSegments(
 			continue;
 		}
 		if (KIND_LZMA === kind) {
-			throw unsupportedArchive("A stream of the file stands of the LZMA walk");
+			// `BundleStream.LzmaDecompressBlock`: five bytes of properties of a stream of LZMA stand in
+			// front of it, and the count of the places of the file of the stream stands in the table.
+			const properties = readLzmaProperties(packed);
+			if (!properties) {
+				throw invalidArchive(
+					"A stream of the file stands of no counts of a stream of LZMA of its own",
+				);
+			}
+			parts.push(
+				decompressLzmaRaw(packed.subarray(5), properties, segment.unpackedSize),
+			);
+			continue;
 		}
 		if (KIND_LZ4 === kind || KIND_LZ4_HIGH === kind) {
 			parts.push(decompressLz4Block(packed, segment.unpackedSize));

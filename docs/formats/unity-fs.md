@@ -85,7 +85,11 @@ well, so that a bitmap of this project stands of the picture the right way up.
   rather than of the places of the bundle of it: the reference names the places of an object within the
   stream of its own bundle, which stands of the places of the file behind the first bundle where the file
   holds more than one.
-* A stream, and an index, standing of the **LZMA** walk stands refused (`UNSUPPORTED_FEATURE`), where the
+* A **stream** standing of the **LZMA** walk is read (`packages/codecs/src/lzma.ts`), of the five bytes of
+  properties that stand in front of the stream and of the count of the places of the file the table of the
+  streams names, which is what `BundleStream.LzmaDecompressBlock` of the reference does. An **index** of that
+  kind stands refused (`UNSUPPORTED_FEATURE`), because the reference itself does nothing there
+  (`ArcUnityFS.UnpackLzma` throws), where the
   reference reaches a library of its own for it; a stream standing of a walk of no name stands refused as
   well, as the reference refuses it.
 * An object of the kind `AudioClip` stands of no place of the walk at all, where the reference stands of it

@@ -19,6 +19,7 @@ import {
 	readUnityFsIndex,
 	shortenUnityPath,
 	unityFsDescriptor,
+	unpackUnityFsSegments,
 } from "../../packages/formats/src/unity/unity-fs.js";
 
 function be16(value: number): Buffer {
@@ -271,6 +272,13 @@ function readPicture(places: Buffer) {
 	return picture;
 }
 
+// The places of the file of a stream of LZMA of the engine: five bytes of the properties of that stream and
+// then the stream itself, as Python's own `lzma` module wrote them, of `lc` one, `lp` one and `pb` nought.
+const UNITY_LZMA_PAYLOAD_B64 =
+	"CgAAAQAAOhrZ/z1AWmrbwDmGwxkfuTLaY5UGa6SutJ9AmgLoFTx5YbiyEADD2se0siwwClGAZR43vJY9LQ//+SxAAA==";
+const UNITY_LZMA_PLAIN_B64 =
+	"dGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUKdGhlIHBsYWNlcyBvZiB0aGUgZmlsZSBvZiB0aGUgd2FsayBvZiB0aGUgZW5naW5lIG9mIHRoZSBidW5kbGUK";
+
 describe("Unity asset archive", () => {
 	it("reads the head of the file and the table of the streams of it", () => {
 		const asset = serializedAsset("hello script");
@@ -350,6 +358,24 @@ describe("Unity asset archive", () => {
 		} finally {
 			await archive.close();
 		}
+	});
+
+	it("reads a stream of the file standing of the walk of LZMA", () => {
+		// The walk of the streams of the file alone, of a stream of LZMA: the places of the file of the stream
+		// stand of five bytes of their own properties and then the stream, as another tool wrote them.
+		const payload = Buffer.from(UNITY_LZMA_PAYLOAD_B64, "base64");
+		const plain = Buffer.from(UNITY_LZMA_PLAIN_B64, "base64");
+		const head = Buffer.alloc(0x40, 0x00);
+		const place = unpackUnityFsSegments(Buffer.concat([head, payload]), [
+			{
+				offset: head.length,
+				packedSize: payload.length,
+				unpackedOffset: 0,
+				unpackedSize: plain.length,
+				compression: 1,
+			},
+		]);
+		expect(place.equals(plain)).toBe(true);
 	});
 
 	it("reads a picture of an object of the kind Texture2D", async () => {
