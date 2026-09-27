@@ -59,3 +59,14 @@ The first version of the port had the two dimensions reading from each other's h
 expectation in the test caught it at once. The same test file's own packer had a second, subtler fault — it
 decided which half to write by comparing the two nibble *values*, which is ambiguous when they are equal — so
 the rule is now written out per byte in both the port and the fixture.
+
+## The places of the picture
+
+The reference reads the places of the picture itself: `Bm1Format.Read` stands `ImageData.CreateFlipped` of the places
+behind the five place head, of three places of a colour a place and of the stride of the file. Its writer stands of
+`NotImplementedException`, so encoding a file back stands outside this format, as the record says. This port hands a
+bitmap of its own over rather than the surface of the file: a head of the counts of the reference, a positive height
+(which is a bitmap's way of naming rows that stand from the foot of the picture up, the way `CreateFlipped` names them)
+and the places of the file behind it, stride and padding included. What the walk of the bitmap of this project reads
+back is therefore the picture the reference hands over, which is why the record names no gap of a walk of the picture
+here.

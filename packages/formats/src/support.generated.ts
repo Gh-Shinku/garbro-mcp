@@ -16056,11 +16056,9 @@ export const formatSupportCatalog = {
 				"stored stride pass through",
 				"24bpp bitmap output",
 				"metadata",
+				"the places of the picture: a bitmap of this project of its own, of the rows of the file bottom up",
 			],
-			unsupported: [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
