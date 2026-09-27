@@ -154,3 +154,14 @@ export const SIXTEEN_TIFF = Buffer.from(
 export const SIXTEEN_TIFF_PLACES: readonly number[] = [
 	18, 86, 154, 222, 17, 34,
 ];
+
+/** Three by two places of a colour, of the walk of the counts of twelve places of the file. */
+export const LZW_TIFF = Buffer.from(
+	"SUkqAB4AAACAACBCgFB4oBQeBQZAUeDwRmQjEGAgCgAAAQMAAQAAAAMAAAABAQMAAQAAAAIAAAACAQMAAwAAAJwAAAADAQMAAQAAAAUAAAAGAQMAAQAAAAIAAAARAQQAAQAAAAgAAAAVAQMAAQAAAAMAAAAWAQMAAQAAAAIAAAAXAQQAAQAAABYAAAAcAQMAAQAAAAEAAAAAAAAACAAIAAgA",
+	"base64",
+);
+
+/** The places of LZW_TIFF, blue first, of the four places a bitmap reads. */
+export const LZW_TIFF_PLACES: readonly number[] = [
+	0, 0, 0, 30, 10, 40, 60, 20, 80, 5, 50, 20, 35, 60, 60, 65, 70, 100,
+];

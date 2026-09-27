@@ -20,7 +20,8 @@ tagged image file of this project (`shared/tiff-image.ts`) and hands a bitmap of
 file. The walk reads:
 
 * both byte orders of the head, and one or more strips of the places of the picture;
-* the counts of a strip of nothing, of the pack of bytes and of the walk of the zlib kind;
+* the counts of a strip of nothing, of the pack of bytes, of the walk of the zlib kind and of the walk of the
+  counts of twelve places of the file (LZW, of the kind of the early count that this format names);
 * a picture of a grey place (of one, two, four, eight and sixteen places of the file a sample, of the kind the head
   names the brighter count of), of a list of colours, of the three or four places of a colour, and of the colour of
   the press, of the same counting of the places of a colour of its own as the walk of the jpeg of this project;

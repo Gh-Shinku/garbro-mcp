@@ -24,6 +24,7 @@ const COMPRESSION_NONE = 1;
 const COMPRESSION_DEFLATE = 8;
 const COMPRESSION_OLD_DEFLATE = 32946;
 const COMPRESSION_PACKBITS = 32773;
+const COMPRESSION_LZW = 5;
 
 /** The kinds of the places of a colour of a picture. */
 const PHOTOMETRIC_WHITE_IS_ZERO = 0;
@@ -387,6 +388,8 @@ async function unpackStrip(
 		}
 		case COMPRESSION_PACKBITS:
 			return unpackPackBits(stored, expected);
+		case COMPRESSION_LZW:
+			return unpackLzw(stored, expected);
 		default:
 			throw unsupportedPicture(
 				"A picture whose strips stand of a kind of count of the places of their own stands of no walk of this project",
@@ -419,6 +422,69 @@ function unpackPackBits(stored: Buffer, expected: number): Buffer {
 			out[to] = place;
 			to += 1;
 		}
+	}
+	return out;
+}
+
+/**
+ * The walk of the counts of twelve places of the file, of the kind this format names: a count of the places of
+ * the file themselves, a count that clears the table, a count that ends the picture, and counts of the strings
+ * of the table, whose count of the places of the file stands of nine counts at the start and of one more at
+ * every count of the table that passes a count of the places of the file itself, one count early (which is
+ * what this format names as its own kind of that walk).
+ */
+function unpackLzw(stored: Buffer, expected: number): Buffer {
+	const out: Buffer = Buffer.alloc(expected, 0x00);
+	const CLEAR = 256;
+	const END = 257;
+	let table: number[][] = [];
+	const reset = (): void => {
+		table = [];
+		for (let index = 0; index < 256; index += 1) table.push([index]);
+		table.push([], []);
+	};
+	reset();
+	let at = 0;
+	let bits = 0;
+	let count = 0;
+	const readCode = (width: number): number => {
+		while (count < width) {
+			if (at >= stored.length) return -1;
+			bits = (bits << 8) | (stored[at] ?? 0);
+			at += 1;
+			count += 8;
+		}
+		count -= width;
+		return (bits >> count) & ((1 << width) - 1);
+	};
+	let to = 0;
+	let width = 9;
+	let previous: number[] | undefined;
+	while (to < expected) {
+		const code = readCode(width);
+		if (code < 0) break;
+		if (CLEAR === code) {
+			reset();
+			width = 9;
+			previous = undefined;
+			continue;
+		}
+		if (END === code) break;
+		let entry: number[];
+		if (code < table.length) entry = table[code] ?? [];
+		else if (previous) entry = [...previous, previous[0] ?? 0];
+		else
+			throw invalidPicture("A count of a strip stands of no string of its own");
+		for (const place of entry) {
+			if (to < expected) out[to] = place;
+			to += 1;
+		}
+		if (previous) {
+			table.push([...previous, entry[0] ?? 0]);
+			// The count of the counts of the table grows one count early, which is this format's own kind.
+			if (table.length + 1 >= 1 << width && width < 12) width += 1;
+		}
+		previous = entry;
 	}
 	return out;
 }

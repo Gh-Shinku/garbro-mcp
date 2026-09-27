@@ -7,6 +7,8 @@ import {
 	DEFLATE_TIFF,
 	GREY_TIFF,
 	GREY_TIFF_PLACES,
+	LZW_TIFF,
+	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
 	PALETTE_TIFF,
 	SIXTEEN_TIFF,
@@ -67,6 +69,12 @@ describe("the walk of the tagged image file", () => {
 		const plain = await readTiffImage(COLOUR_TIFF);
 		expect([...deflated.pixels]).toEqual([...plain.pixels]);
 		expect([...packed.pixels]).toEqual([...plain.pixels]);
+	});
+
+	it("reads the strips of the walk of the counts of twelve places of the file", async () => {
+		const image = await readTiffImage(LZW_TIFF);
+		expect(image).toMatchObject({ width: 3, height: 2, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual([...LZW_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {
