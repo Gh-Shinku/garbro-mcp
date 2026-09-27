@@ -9,6 +9,8 @@
 // the two kinds of it stand of no walk of this project yet, each with a message of its own.
 
 import { GarbroError } from "@garbro-mcp/core";
+import type { BmpImage } from "./bmp.js";
+import { readVp8lPicture } from "./webp-lossless.js";
 
 /** The count of the head of the format of the picture of the web. */
 const RIFF = 0x46464952;
@@ -259,4 +261,32 @@ export function readWebpHeader(data: Buffer): WebpHeader {
  * stand of no counts of the head of the format of the picture of the web of the picture of the web itself. */
 function invalid(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
+}
+
+/** The places of the picture of the web of the places of the file of the picture, of the counts of the head of the
+ * format of the picture of the web of the colour of the places of the file: the counts of the head of the format of
+ * the picture of the web of the counts of the places of the file of their own stand of the walk of this project, and
+ * the places of the picture of the colour of the picture (of the places of the file of the colour of the picture of
+ * the places of the file) stand turned away, which the record names. */
+export function readWebpImage(data: Buffer): BmpImage {
+	let picture: Buffer | undefined;
+	for (const chunk of walkChunks(data)) {
+		if (VP8L === chunk.type)
+			picture = data.subarray(chunk.at, chunk.at + chunk.size);
+		else if (VP8 === chunk.type)
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				"A picture of the web of the colour of the places of the picture stands of no walk of this project",
+			);
+		else if (ALPH === chunk.type)
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				"A picture of the web of the counts of the places of the file of the colour of the picture stands of no walk of this project",
+			);
+	}
+	if (!picture)
+		throw invalid(
+			"The picture of the web names no places of the file of the picture of the counts of the places of the file of their own",
+		);
+	return readVp8lPicture(picture);
 }
