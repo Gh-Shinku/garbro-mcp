@@ -6,10 +6,9 @@ import {
 	hexenhausImgdImageFormat,
 	readImgdLayout,
 } from "../../packages/formats/src/hexenhaus/imgd-image.js";
-import {
-	PNG_SIGNATURE,
-	readPngHeaderFields,
-} from "../../packages/formats/src/shared/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { PNG_SIGNATURE } from "../../packages/formats/src/shared/png.js";
+import { pngFile } from "../helpers/png.js";
 
 const HEAD_SIZE = 0x10;
 
@@ -36,6 +35,29 @@ function buildPicture(withTrailer = true): Buffer {
 	trailer.writeInt32LE(7, 4);
 	trailer.writeInt32LE(9, 8);
 	return Buffer.concat([head, png(), trailer, Buffer.alloc(2, 0x00)]);
+}
+
+/** A complete portable network graphic of the counts the caller names, of four places of a colour. */
+function completePng(
+	width: number,
+	height: number,
+	rows: readonly (readonly number[])[],
+): Buffer {
+	return pngFile({ width, height, colourType: 6, rows });
+}
+
+/** A picture of the game whose places stand of a complete graphic behind the words of its head. */
+function buildCompletePicture(withTrailer = false): Buffer {
+	const head = Buffer.alloc(HEAD_SIZE, 0x00);
+	head.write("IMGD", 0, "latin1");
+	const graphic = completePng(2, 1, [[10, 20, 30, 255, 40, 50, 60, 255]]);
+	if (!withTrailer) return Buffer.concat([head, graphic]);
+	const trailer = Buffer.alloc(12, 0x00);
+	trailer.write("CNTR", 0, "latin1");
+	trailer.writeInt32LE(3, 4);
+	trailer.writeInt32LE(4, 8);
+	// The words of the trailer stand twelve places before the end of the file, which the reference stands of.
+	return Buffer.concat([head, graphic, trailer, Buffer.alloc(2, 0x00)]);
 }
 
 async function extract(data: Buffer): Promise<Buffer> {
@@ -78,17 +100,23 @@ describe("WAG archive PNG image", () => {
 		expect(readImgdLayout(Buffer.alloc(8), 8)).toBeUndefined();
 	});
 
-	it("hands the places of the picture out as they stand", async () => {
-		const data = buildPicture();
+	it("reads the places of the picture behind the words of its head", async () => {
+		const data = buildCompletePicture();
 		const out = await extract(data);
-		// The reference hands the places behind the words of its own head to the reader of the pictures of the
-		// kind this one stands as, which this project reads no places of.
-		expect(out.subarray(0, 8)).toEqual(PNG_SIGNATURE);
-		expect(readPngHeaderFields(out)).toEqual({
-			width: 0x18,
-			height: 0x18,
+		// The places of a picture of four places of a colour stand of the same places in a bitmap of four.
+		const picture = readBmpImage(out);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
 			bitsPerPixel: 32,
 		});
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			30, 20, 10, 255, 60, 50, 40, 255,
+		]);
+	});
+
+	it("reads the places of a picture whose head names a place within a picture of the game", async () => {
+		const data = buildCompletePicture(true);
 		const handle = await hexenhausImgdImageFormat.open(
 			new BufferByteSource(data),
 			"picture.png",
@@ -96,11 +124,14 @@ describe("WAG archive PNG image", () => {
 		expect(handle.entries[0]?.path).toBe("picture.png");
 		expect(handle.metadata).toMatchObject({
 			image: "png",
-			width: 0x18,
-			height: 0x18,
-			offsetX: 7,
-			offsetY: 9,
+			width: 2,
+			height: 1,
+			offsetX: 3,
+			offsetY: 4,
 		});
+		// The places of the picture stand behind the words the head names, the words of the trailer standing
+		// behind the picture itself.
+		expect(await extract(data)).toEqual(await extract(buildCompletePicture()));
 	});
 
 	it("turns a picture cut short of its places away", async () => {

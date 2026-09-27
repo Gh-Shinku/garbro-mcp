@@ -8698,8 +8698,9 @@ export const formatSupportCatalog = {
 				"extract",
 				"the head of a picture",
 				"the words that name where a picture stands within a picture of the game",
+				"the places of the picture: the walk of the pictures of the portable network graphic kind of this project, as a bitmap of the count of places of a colour of the picture",
 			],
-			unsupported: ["archive creation", "image encoding", "picture decoding"],
+			unsupported: ["archive creation", "image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
