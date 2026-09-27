@@ -129,3 +129,16 @@ places of it stand refused.
   `GalReader.ReadJpeg`, `GalReader.Flatten`, `GalReader.ShuffleBlocks`, `GalReader.RandomSequence`
 - `GARbro/ArcFormats/LiveMaker/ArcVF.cs` — `TpRandom`
 - `GARbro/GameRes/Image.cs` — `ImageFormat.ReadColorMap`
+
+## The picture of the engine of the kind of the engine itself
+
+A picture whose head names the compression of two holds a JPEG stream in the place of the count of the places of its
+first count: the reference hands those places to `JpegBitmapDecoder` of its platform, and this port reads them with its
+own reader of that format (`shared/jpeg-image.ts`), standing them of the counts of the frame of the picture (three
+places of the file a place of the picture of the frame of three, or the four places of the file of the reader of the
+JPEG of four). Where the count stands of the colour of the picture of the places of the file (the walk of the counts
+of the head of the format of the picture of the two of them), the count holds a stream of the zlib kind whose places
+are the places of the colour of the picture of the places of the file, which the walk of the engine of this project
+reads as well. A JPEG whose counts of the places of the file stand of the counts of the frame of the picture of their
+own, or whose counts of the head stand beyond the ones the reader of this project reads, stands turned away, which
+the record names.

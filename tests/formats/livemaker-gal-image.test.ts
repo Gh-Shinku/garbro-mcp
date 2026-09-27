@@ -1,11 +1,11 @@
 // The picture of the LiveMaker engine, against pictures built in the test: the head of the two shapes of it,
 // the counts of the frame of it, the counts of the places of it (the walk of the engine of every count and
 // the walk of the places of the picture itself), the walk of the counts of the places of the picture of the
-// engine (`TpRandom`) and the refusal of the places of a picture of the kind of the engine itself.
+// engine (`TpRandom`) and the places of a picture of the kind of the engine itself.
 import { Buffer } from "node:buffer";
 import { deflateSync } from "node:zlib";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { BufferByteSource } from "@garbro-mcp/core";
 import {
 	livemakerGalImageFormat,
 	readGalHeader,
@@ -15,8 +15,11 @@ import {
 import { describe, expect, it } from "vitest";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
+
 const HEAD_SIZE = 0x28;
 const GREETING_SIZE = 11;
+
 const OLD_HEAD_SIZE = 0x10;
 
 interface LayerInput {
@@ -330,34 +333,29 @@ describe("LiveMaker engine picture", () => {
 		expect(readGalPicture(noLayer)).toBeUndefined();
 	});
 
-	it("stands of the places of a picture of the engine of the kind of the engine itself unported", async () => {
-		const pixels = Buffer.from([1, 2, 3, 4]);
-		const data = rawLayer(
-			{ width: 4, height: 2, bitsPerPixel: 24, compression: 2 },
-			pixels,
+	it("reads the places of a picture of the engine of the kind of the engine itself, of the counts of the places of the file of the JPEG", async () => {
+		// The reference hands the places of the file of such a picture to `JpegBitmapDecoder` of its platform; this
+		// port reads them with its own reader of that format.
+		const out = await extract(
+			rawLayer(
+				{ width: 8, height: 8, bitsPerPixel: 24, compression: 2 },
+				GREY_JPEG,
+			),
 		);
-		// The reference reads the counts of the head and of the frame of the picture before it stands of the
-		// places of it, so a picture of a kind it has not taken stands detected all the same.
-		expect(
-			await livemakerGalImageFormat.detect(new BufferByteSource(data), "p.gal"),
-		).toBe(true);
-		const handle = await livemakerGalImageFormat.open(
-			new BufferByteSource(data),
-			"picture.gal",
-		);
-		try {
-			expect(handle.entries).toHaveLength(1);
-			const entry = handle.entries[0];
-			if (!entry) throw new Error("no entry");
-			await expect(handle.openEntry(entry.id)).rejects.toThrowError(
-				GarbroError,
+		const image = await readBmpImage(out);
+		if (!image) throw new Error("no picture");
+		// The frame of the picture of the engine stands of three places of the file a place of the picture, so the
+		// places of the walk of this project stand of the counts of the head of the format of the picture of the JPEG
+		// of three of the four counts of the head of it.
+		const want: number[] = [];
+		for (let at = 0; at < image.width * image.height; at += 1) {
+			want.push(
+				GREY_PIXELS[at * 4] ?? 0,
+				GREY_PIXELS[at * 4 + 1] ?? 0,
+				GREY_PIXELS[at * 4 + 2] ?? 0,
 			);
-			await expect(handle.openEntry(entry.id)).rejects.toMatchObject({
-				code: "UNSUPPORTED_FEATURE",
-			});
-		} finally {
-			await handle.close();
 		}
+		expect([...image.pixels]).toEqual(want);
 	});
 
 	it("reads the counts of the places of a picture of the engine of the walk of the engine itself", async () => {

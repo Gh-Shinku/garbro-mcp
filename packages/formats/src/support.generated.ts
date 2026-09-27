@@ -11893,12 +11893,13 @@ export const formatSupportCatalog = {
 				"the places of a picture of the engine of the counts of the walk of the engine of the places of the picture itself: the walk of the counts of the places of the picture of the engine of the counts of the places of the picture and the walk of the engine of the places of the picture of the engine of the counts of the places of the picture of it, of the counts of the places of a picture of the engine of no sign at all",
 				"the places of a picture of the engine of the counts of the places of a picture of the engine of four, eight, sixteen, twenty four and thirty two places of a colour, of the counts of the places of the picture of the engine of the engine itself and of the counts of the places of the picture of it",
 				"the places of a picture of the engine handed out as a bitmap of the project",
+				"a picture of the engine of the kind of the engine itself (compression of two, of the counts of the places of the file of the JPEG), read with the reader of the JPEG of this project",
 			],
 			unsupported: [
-				"the places of a picture of the engine of the kind of the engine itself (the reference hands the counts of the places of the picture to `JpegBitmapDecoder` of WPF, which this project has no walk of the engine of the counts of the places of the picture of it for)",
 				"the key of the walk of the counts of the places of the picture of the engine, which the reference stands of the counts of the engine of its own rather than of the head of a picture (a picture of the engine of a key stands of the counts of the places of the picture in the order of the file rather than of the counts of the walk of the engine of them)",
 				"the frames of a picture of the engine behind the first one, which the reference reads and stands of the places of the first frame alone",
 				"the creation of a picture of the engine (the walk of the engine of this project stands of no counts of the places of a picture at all, as the reference's `Write` stands of no counts of them)",
+				"a picture of the engine of the kind of the engine itself whose JPEG stands of counts the reader of this project does not read, or whose counts of the places of the file stand of the counts of the frame of the picture of their own",
 			],
 			remainingVerification: [
 				"real-game GARbro differential output",

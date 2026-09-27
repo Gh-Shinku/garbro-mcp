@@ -29,6 +29,7 @@ import {
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
 import { TpRandom } from "./vf.js";
+import { readJpegImage } from "../shared/jpeg-image.js";
 
 /** 'Gale', the word every picture of the engine begins with. */
 const SIGNATURE = Buffer.from("Gale", "latin1");
@@ -378,12 +379,27 @@ export async function unpackGalLayer(
 		);
 	}
 	if (COMPRESSION_JPEG === header.compression) {
-		// The reference hands the count of the places of the picture to the decoder of pictures of the
-		// place of the counts of the walk of the engine itself (`JpegBitmapDecoder`), which this port has
-		// not taken.
-		throw unsupportedPicture(
-			"The places of a picture of the engine of the kind of the engine itself",
-		);
+		// The reference hands the places of the file of the picture to the decoder of pictures of its platform
+		// (`JpegBitmapDecoder`); this port reads them with its own reader of that format (`shared/jpeg-image.ts`) and
+		// stands the places of the picture of the walk of this project of the counts of the frame of it.
+		const image = readJpegImage(region);
+		if (image.width !== frame.width || image.height !== frame.height) {
+			throw unsupportedPicture(
+				"A picture of the engine of the kind of the engine itself whose counts of the places of the file stand of the counts of the frame of the picture of their own",
+			);
+		}
+		if (32 === frame.bitsPerPixel) return Buffer.from(image.pixels);
+		const places = Buffer.alloc(frame.stride * frame.height, 0x00);
+		for (let y = 0; y < frame.height; y += 1) {
+			for (let x = 0; x < frame.width; x += 1) {
+				const from = (y * frame.width + x) * 4;
+				const to = y * frame.stride + x * 3;
+				places[to] = image.pixels[from] ?? 0;
+				places[to + 1] = image.pixels[from + 1] ?? 0;
+				places[to + 2] = image.pixels[from + 2] ?? 0;
+			}
+		}
+		return places;
 	}
 	return await readGalPlaces(frame, region, isAlpha, layers, header);
 }
