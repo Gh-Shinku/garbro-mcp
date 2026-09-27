@@ -178,3 +178,17 @@ export const PRESS_TIFF_PLACES: readonly number[] = [
 	211, 215, 213, 189, 209, 179, 168, 203, 145, 212, 189, 245, 190, 184, 209,
 	169, 178, 175, 149, 173, 142,
 ];
+
+/** Five by five places of a colour, whose places stand in four tiles of four by four, a colour a tile. */
+export const TILED_TIFF = Buffer.from(
+	"SUkqAAgAAAALAAABAwABAAAABQAAAAEBAwABAAAABQAAAAIBAwADAAAAkgAAAAMBAwABAAAAAQAAAAYBAwABAAAAAgAAABUBAwABAAAAAwAAABwBAwABAAAAAQAAAEIBAwABAAAABAAAAEMBAwABAAAABAAAAEQBBAAEAAAAmAAAAEUBBAAEAAAAqAAAAAAAAAAIAAgACAC4AAAA6AAAABgBAABIAQAAMAAAADAAAAAwAAAAMAAAAAoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHgoUHigyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPCgyPEZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWkZQWmRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueGRueA==",
+	"base64",
+);
+
+/** The places of TILED_TIFF, blue first: a count of a colour a tile, of the right and the lower tile clipped. */
+export const TILED_TIFF_PLACES: readonly number[] = [
+	30, 20, 10, 30, 20, 10, 30, 20, 10, 30, 20, 10, 60, 50, 40, 30, 20, 10, 30,
+	20, 10, 30, 20, 10, 30, 20, 10, 60, 50, 40, 30, 20, 10, 30, 20, 10, 30, 20,
+	10, 30, 20, 10, 60, 50, 40, 30, 20, 10, 30, 20, 10, 30, 20, 10, 30, 20, 10,
+	60, 50, 40, 90, 80, 70, 90, 80, 70, 90, 80, 70, 90, 80, 70, 120, 110, 100,
+];

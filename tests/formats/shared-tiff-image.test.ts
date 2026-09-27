@@ -14,6 +14,8 @@ import {
 	PACKBITS_TIFF,
 	PALETTE_TIFF,
 	SIXTEEN_TIFF,
+	TILED_TIFF,
+	TILED_TIFF_PLACES,
 } from "../helpers/tiff.js";
 
 describe("the walk of the tagged image file", () => {
@@ -85,6 +87,15 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(PRESS_TIFF);
 		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
 		expect([...image.pixels]).toEqual([...PRESS_TIFF_PLACES]);
+	});
+
+	it("reads a picture whose places stand in tiles of their own", async () => {
+		// A count of a colour a tile, of the right and the lower tile clipped where the picture ends. The file of
+		// the fixture was built by this project, and the places of the picture were read out of it by the python
+		// imaging library, which stands as an oracle of another implementation for it.
+		const image = await readTiffImage(TILED_TIFF);
+		expect(image).toMatchObject({ width: 5, height: 5, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual([...TILED_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {

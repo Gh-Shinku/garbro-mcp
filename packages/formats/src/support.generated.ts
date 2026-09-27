@@ -8023,10 +8023,10 @@ export const formatSupportCatalog = {
 				"the strips of the counts of nothing, of the pack of bytes and of the walk of the zlib kind",
 				"the rows that stand of the difference of the row in front of them",
 				"the strips of the walk of the counts of twelve places of the file (LZW), of the kind of the early count of that walk that this format names",
+				"the places of a picture that stand in tiles of their own, of the right and the lower tile clipped where the picture ends",
 			],
 			unsupported: [
 				"archive creation: the reference writes such a file on its platform and this port reads them alone",
-				"the places of a picture that stand in tiles of their own",
 				"the kinds of the fax family and the walks of the jpeg and of the jpeg of the two thousand",
 				"the places of a picture whose places of a colour stand apart",
 				"the kinds of the places of a colour and of the counts of the samples of it beyond the ones this walk reads",

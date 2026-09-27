@@ -53,3 +53,12 @@ own: a count of nothing stands for no place of a colour at all, so a place of th
 colour times the place of the black of it, each of them counted of what the head of the file leaves of it. That is the
 other way round from the streams of the jpeg of the same kind, whose counts stand turned over; the fixture of the
 library (`PRESS_TIFF`, of `tests/helpers/tiff.ts`) stands of an oracle of another implementation for both of them.
+
+## The places of a picture that stand in tiles
+
+A picture whose places stand in tiles of their own (`TileWidth`, `TileLength`, `TileOffsets` and `TileByteCounts`)
+carries its rows of places in as many rows of tiles as its counts name, of the count of the places of a tile itself, and
+its right and lower tiles stand clipped where the picture ends. The walk reads the places of such a picture of the same
+counts of a strip as every other picture, so the compressions stand of the same walk. The fixture of the tests
+(`TILED_TIFF`) was built by this project and then read back by the python imaging library, whose places stand as the
+oracle of another implementation for it.

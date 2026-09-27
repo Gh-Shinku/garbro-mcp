@@ -50,6 +50,8 @@ const TAG_EXTRA_SAMPLES = 338;
 const TAG_SAMPLE_FORMAT = 339;
 const TAG_TILE_WIDTH = 322;
 const TAG_TILE_LENGTH = 323;
+const TAG_TILE_OFFSETS = 324;
+const TAG_TILE_COUNTS = 325;
 
 /** The counts of the places of the file of a value of every kind the format names. */
 const TYPE_SIZES: readonly number[] = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
@@ -123,15 +125,17 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		if (0 === size || entry.count <= 0)
 			throw invalidPicture("An entry of the picture names no value");
 		const places = entry.count * size;
+		// The places of a value of more than four places of the file stand at the places the entry names; the
+		// entry itself stands as it was read, so a tag the walk asks for twice stands of the same counts twice.
+		let from = entry.at;
 		if (places > 4) {
-			const at = u32(entry.at);
-			if (at + places > data.length)
+			from = u32(entry.at);
+			if (from + places > data.length)
 				throw invalidPicture("A value of the picture stands outside it");
-			entry.at = at;
 		}
 		const out: number[] = [];
 		for (let index = 0; index < entry.count; index += 1) {
-			const at = entry.at + index * size;
+			const at = from + index * size;
 			switch (entry.type) {
 				case TYPE_BYTE:
 				case TYPE_UNDEFINED:
@@ -170,12 +174,20 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 		return list[0] ?? 0;
 	};
 
+	const tileWidth = values(TAG_TILE_WIDTH)?.[0];
+	const tileLength = values(TAG_TILE_LENGTH)?.[0];
+	const tiled = undefined !== tileWidth && undefined !== tileLength;
+	if (tiled && (0 === tileWidth || 0 === tileLength))
+		throw invalidPicture(
+			"The picture names no count of the places of a tile of its own",
+		);
 	if (
-		undefined !== values(TAG_TILE_WIDTH) ||
-		undefined !== values(TAG_TILE_LENGTH)
+		tiled &&
+		(undefined === values(TAG_TILE_OFFSETS) ||
+			undefined === values(TAG_TILE_COUNTS))
 	)
-		throw unsupportedPicture(
-			"A picture whose places stand in tiles of their own stands of no walk of this project",
+		throw invalidPicture(
+			"The tiles of the picture stand of no places of their own",
 		);
 	const width = one(TAG_WIDTH);
 	const height = one(TAG_HEIGHT);
@@ -206,44 +218,96 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 	const rowsPerStrip = one(TAG_ROWS_PER_STRIP, height);
 	const offsets = values(TAG_STRIP_OFFSETS) ?? [];
 	const counts = values(TAG_STRIP_COUNTS) ?? [];
-	if (0 === offsets.length)
+	if (!tiled && 0 === offsets.length)
 		throw invalidPicture("The picture names no places of its strips");
-	if (offsets.length !== counts.length)
+	if (!tiled && offsets.length !== counts.length)
 		throw invalidPicture(
 			"The strips of the picture stand of counts of their own",
 		);
 
-	// The places of the file of every sample, of a row of the picture one behind the other.
+	// The places of the file of every sample, of a row of the picture one behind the other. A picture whose places
+	// stand in tiles of their own holds its rows of places in as many rows of tiles as its counts name, of the
+	// count of the places of a tile itself, and the right and the lower tiles stand clipped where the picture
+	// ends; every other picture holds its places in strips.
 	const rowBytes = Math.ceil((width * samples * sampleBits) / 8);
 	const stored: Buffer = Buffer.alloc(rowBytes * height, 0x00);
-	let row = 0;
-	for (let strip = 0; strip < offsets.length; strip += 1) {
-		const at = offsets[strip] ?? 0;
-		const length = counts[strip] ?? 0;
-		if (at + length > data.length)
-			throw invalidPicture("The places of a strip stand outside the picture");
-		const plain = await unpackStrip(
-			data.subarray(at, at + length),
-			compression,
-			rowBytes * rowsPerStrip,
-		);
-		const rows = Math.min(rowsPerStrip, height - row);
-		for (let index = 0; index < rows; index += 1) {
-			const from = index * rowBytes;
-			plain.copy(stored, (row + index) * rowBytes, from, from + rowBytes);
-		}
-		if (2 === one(TAG_PREDICTOR, 1)) {
-			for (let index = 0; index < rows; index += 1) {
-				undoDifference(
+	if (tiled) {
+		const places = values(TAG_TILE_OFFSETS) ?? [];
+		const lengths = values(TAG_TILE_COUNTS) ?? [];
+		if (places.length !== lengths.length)
+			throw invalidPicture(
+				"The tiles of the picture stand of counts of their own",
+			);
+		const tileRowBytes = Math.ceil((tileWidth * samples * sampleBits) / 8);
+		const across = Math.ceil(width / tileWidth);
+		const down = Math.ceil(height / tileLength);
+		if (places.length < across * down)
+			throw invalidPicture("The picture stands short of the tiles of its own");
+		console.log("tiles", {
+			places,
+			lengths,
+			tileWidth,
+			tileLength,
+			across,
+			down,
+			length: data.length,
+			rowBytes,
+		});
+		for (let tile = 0; tile < across * down; tile += 1) {
+			const at = places[tile] ?? 0;
+			const length = lengths[tile] ?? 0;
+			if (at + length > data.length)
+				throw invalidPicture("The places of a tile stand outside the picture");
+			const plain = await unpackStrip(
+				data.subarray(at, at + length),
+				compression,
+				tileRowBytes * tileLength,
+			);
+			const column = (tile % across) * tileWidth;
+			const from = Math.floor(tile / across) * tileLength;
+			const places8 = Math.min(tileWidth, width - column);
+			const bytes = Math.ceil((places8 * samples * sampleBits) / 8);
+			for (let index = 0; index < tileLength; index += 1) {
+				const row = from + index;
+				if (row >= height) break;
+				plain.copy(
 					stored,
-					(row + index) * rowBytes,
-					rowBytes,
-					samples,
-					sampleBits,
+					row * rowBytes + Math.floor((column * samples * sampleBits) / 8),
+					index * tileRowBytes,
+					index * tileRowBytes + bytes,
 				);
 			}
 		}
-		row += rows;
+	} else {
+		let row = 0;
+		for (let strip = 0; strip < offsets.length; strip += 1) {
+			const at = offsets[strip] ?? 0;
+			const length = counts[strip] ?? 0;
+			if (at + length > data.length)
+				throw invalidPicture("The places of a strip stand outside the picture");
+			const plain = await unpackStrip(
+				data.subarray(at, at + length),
+				compression,
+				rowBytes * rowsPerStrip,
+			);
+			const rows = Math.min(rowsPerStrip, height - row);
+			for (let index = 0; index < rows; index += 1) {
+				const from = index * rowBytes;
+				plain.copy(stored, (row + index) * rowBytes, from, from + rowBytes);
+			}
+			if (2 === one(TAG_PREDICTOR, 1)) {
+				for (let index = 0; index < rows; index += 1) {
+					undoDifference(
+						stored,
+						(row + index) * rowBytes,
+						rowBytes,
+						samples,
+						sampleBits,
+					);
+				}
+			}
+			row += rows;
+		}
 	}
 
 	if (PHOTOMETRIC_PALETTE === photometric) {
