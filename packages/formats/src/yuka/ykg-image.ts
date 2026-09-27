@@ -3,6 +3,8 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readPngImage } from "../shared/png-image.js";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -208,9 +210,29 @@ export const yukaYkgImageFormat: ArchiveFormat = defineFixedArchive({
 		const start = layout.dataOffset + ("gnp" === layout.kind ? TAG_SIZE : 0);
 		const length = layout.dataSize - ("gnp" === layout.kind ? TAG_SIZE : 0);
 		const body = Buffer.from(await source.readAt(BigInt(start), length));
-		if ("gnp" === layout.kind) {
-			return Readable.from([Buffer.concat([GNP_PREFIX, body])]);
+		// The reference stands the walk of the kind the head names over the surface: `Bmp.Read` over a bitmap
+		// and `Png.Read` over a portable network graphic, so the picture stands read of the walk of that kind
+		// of this project and handed over as a bitmap of its own. A graphic whose signature stands behind the
+		// tag of the obfuscated kind gets those places of the signature from this project.
+		const image =
+			"bmp" === layout.kind
+				? readBmpImage(body)
+				: await readPngImage(
+						"gnp" === layout.kind ? Buffer.concat([GNP_PREFIX, body]) : body,
+					);
+		if (!image) {
+			throw invalidPicture(
+				`The places of the picture stand of another picture: ${body.length} places of the file`,
+			);
 		}
-		return Readable.from([body]);
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

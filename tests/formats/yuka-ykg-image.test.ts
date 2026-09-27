@@ -1,7 +1,12 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
-import { writeBmp24 } from "../../packages/formats/src/shared/bmp.js";
+import {
+	readBmpImage,
+	writeBmp24,
+} from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import {
 	readYkgLayout,
 	yukaYkgImageFormat,
@@ -14,6 +19,15 @@ const PNG_SIGNATURE = Buffer.from([
 ]);
 
 /** A portable network graphic header, which is all the wrapper's own reader looks at. */
+
+/** A whole portable network graphic of the four places of a colour a place. */
+function realPng(width: number, height: number): Buffer {
+	const rows = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width * 4 }, (_, at) => (at * 7 + y * 5 + 3) & 0xff),
+	);
+	return pngFile({ width, height, colourType: 6, rows });
+}
+
 function pngBytes(width: number, height: number): Buffer {
 	const png = Buffer.alloc(29);
 	PNG_SIGNATURE.copy(png, 0);
@@ -154,18 +168,36 @@ describe("Yuka YKG picture", () => {
 		});
 	});
 
-	it("hands a bitmap and a portable network graphic out as they stand", async () => {
+	it("reads the places of the pictures of both kinds", async () => {
+		// A bitmap and a whole portable network graphic of the counts the head of each names, so each stands
+		// read of the walk of its kind and handed over as a bitmap of its own.
 		const bmp = bmpBytes(2, 2);
-		expect((await extract(ykgFile(bmp))).equals(bmp)).toBe(true);
-		const png = pngBytes(3, 4);
-		expect((await extract(ykgFile(png))).equals(png)).toBe(true);
+		const bmpPicture = readBmpImage(await extract(ykgFile(bmp)));
+		expect(bmpPicture).not.toBeUndefined();
+		expect([...(bmpPicture?.pixels ?? [])]).toEqual([
+			...(readBmpImage(bmp)?.pixels ?? []),
+		]);
+		const png = realPng(3, 4);
+		const pngPicture = readBmpImage(await extract(ykgFile(png)));
+		const expected = await readPngImage(png);
+		expect(pngPicture).toMatchObject({
+			width: 3,
+			height: 4,
+			bitsPerPixel: 32,
+		});
+		expect(expected).not.toBeUndefined();
+		expect([...(pngPicture?.pixels ?? [])]).toEqual([
+			...(expected?.pixels ?? []),
+		]);
 	});
 
 	it("puts the signature back in front of an obfuscated picture", async () => {
-		const png = pngBytes(3, 4);
+		const png = realPng(3, 4);
 		const gnp = Buffer.concat([GNP_TAG, png.subarray(4)]);
-		const out = await extract(ykgFile(gnp));
-		expect(out.equals(png)).toBe(true);
+		const picture = readBmpImage(await extract(ykgFile(gnp)));
+		const expected = await readPngImage(png);
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 		const handle = await yukaYkgImageFormat.open(
 			new BufferByteSource(ykgFile(gnp)),
 			"dir/pic.ykg",

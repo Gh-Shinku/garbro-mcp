@@ -32,3 +32,13 @@ the rest of the file, the measurements of a wrapped bitmap and of a wrapped port
 bytes handed out for a bitmap and for a portable network graphic, the signature put back in front of an
 obfuscated picture, a declared size that leaves what stands behind it, and a picture that does not lie where
 the head says.
+
+## The places of the picture
+
+The reference reads the surface with the walk of the kind its head names: `Bmp.Read` over a bitmap and the walk of the
+portable network graphic over a graphic, whose signature stands behind the tag of the obfuscated kind and gets those
+places of the signature from this project. Either way the places of the picture stand read of the walk of that kind of
+this project and handed over as a bitmap of its own: of the counts of the head of the picture, of a row of the count of
+the places a row of the picture holds (so the row padding of the file stands of no count) and of the rows in the order
+that head names. A picture whose places run out before the places its head names stands turned away, which is where the
+reference throws.
