@@ -30,4 +30,4 @@ The port exposes the first frame as a single entry:
 * the entry is named after the source file with a `bmp` extension, `sizeKnown` is false because a
   bitmap header is prepended, and metadata carries `type: "image"` plus width, height and bit depth.
 
-Pixel decoding and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `Cp3Format.Read`: the places stand of fifteen words of the head, of four places of a colour to a pixel, and the rows of the file stand bottom up, which the reference stands of `ImageData.CreateFlipped` and which this port stands of the same way. Archive creation and image writing are out of scope.

@@ -3713,8 +3713,13 @@ export const formatSupportCatalog = {
 			localId: "carriere-cgd-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "bitmap reassembly"],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			supported: [
+				"detection",
+				"extraction",
+				"bitmap reassembly",
+				"the walk of the places of the picture, of the counts of the reference",
+			],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -7201,8 +7206,13 @@ export const formatSupportCatalog = {
 			localId: "fc01-wmk-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "grey bitmap reassembly"],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			supported: [
+				"detection",
+				"extraction",
+				"grey bitmap reassembly",
+				"the walk of the places of the picture, of the counts of the reference",
+			],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -15425,8 +15435,13 @@ export const formatSupportCatalog = {
 			localId: "pan-tbl-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "grey bitmap reassembly"],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			supported: [
+				"detection",
+				"extraction",
+				"grey bitmap reassembly",
+				"the walk of the places of the picture, of the counts of the reference",
+			],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -15847,8 +15862,13 @@ export const formatSupportCatalog = {
 			localId: "pinesoft-bpd-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "bitmap reassembly"],
-			unsupported: ["archive creation", "pixel decoding", "image writing"],
+			supported: [
+				"detection",
+				"extraction",
+				"bitmap reassembly",
+				"the walk of the places of the picture, of the counts of the reference",
+			],
+			unsupported: ["archive creation", "image writing"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -17801,12 +17821,13 @@ export const formatSupportCatalog = {
 			localId: "seraphim-cp3-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detection", "extraction", "bitmap reassembly"],
-			unsupported: [
-				"archive creation",
-				"pixel decoding",
-				"multi-frame traversal",
+			supported: [
+				"detection",
+				"extraction",
+				"bitmap reassembly",
+				"the walk of the places of the picture, of the counts of the reference",
 			],
+			unsupported: ["archive creation", "multi-frame traversal"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

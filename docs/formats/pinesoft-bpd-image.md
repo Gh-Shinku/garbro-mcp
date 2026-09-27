@@ -24,7 +24,7 @@ The port exposes the resource as a single entry:
 * entry metadata carries `type: "image"` plus width, height and bit depth, and the archive metadata
   records the same values with `image: "bmp"`.
 
-Pixel decoding and archive creation are out of scope.
+The walk of the places of this picture stands of the same counts as `BpdFormat.Read`: two words of the head, then the places as they are, of four places of a colour to a pixel, which the reference hands over as a picture of four places of a colour and which this port hands over as such a bitmap. Archive creation and image writing are out of scope.
 
 ## Follow-up
 
