@@ -266,9 +266,16 @@ of reason are these, to the row:
   `Legacy/Uran/ArcNCL.cs` and `Legacy/Witch/ArcPCD.cs` all hand their streams to
   `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream`, a library rather than a walk of the reference. A port
   would have to stand of the format documentation instead (of which there is none official; the readable
-  description of the wire format stands with `google/wuffs`, `std/bzip2`, which speaks of an `EOB` symbol
-  where the wire format itself holds `RUNA` and `RUNB` alone: the end of the sequence of the symbols of a
-  block is the one detail a from-spec walk has to settle first).
+  description of the wire format stands with `google/wuffs`, `std/bzip2`, whose worked example fixes the
+  counts of the walk of the engine exactly: the counts of a walk of the engine of a block stand of six
+  counts where four places of the file stand of it (`RUNA`, `RUNB`, `EOB` and three counts of the walk of the
+  places of the file), and the sequence of the counts ends of `EOB`. A walk of that description read the
+  block of the worked example of the format down to its end in one attempt; what did not stand of that
+  attempt was the **count of the places of the file of the block** - the count the format checks at the end
+  of a stream - which stood of no count of the places of the file of `abraca` under either the count of the
+  walk of the engine of the places of the file that gzip uses, of that count read of the places of the file
+  the other way about, or of the count of the places of the file behind the walk of the places of the file
+  itself. That count is the one detail to settle before a walk of this format is carried.
 * **something outside the file** - **4 rows**: `DAT/IGS` (an SQLite database beside the archive),
   `DAT/hibiki` (a scheme in a data file of the reference's own installation), and `BYTES/UNITY` with
   `DAT/GX4LIB` (a .NET `BinaryFormatter` graph, of the spec MS-NRBF; the graph of `BYTES/UNITY` is three
