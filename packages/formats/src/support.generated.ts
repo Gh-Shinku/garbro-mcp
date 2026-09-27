@@ -15447,20 +15447,17 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
-				"detection",
-				"extraction",
-				"png signature restoration",
-				"keyed prefix deobfuscation",
-				"byte exact passthrough beyond the prefix",
-				"IHDR dimensions and depth",
-				"metadata",
+				"detection by the PGAP signature and the restored chunk head",
+				"listing",
+				"extraction as a bitmap: the restored PNG is decoded with the PNG reader of this project, which is what the reference does (PgaFormat extends PngFormat)",
+				"the obfuscation of the head: the tag bytes are discarded and the eight bytes behind them are exclusive orred with PGAECODE",
+				"the metadata of the stored PNG beside the metadata of the bitmap",
 			],
-			unsupported: [
-				"png decoding to bitmap",
-				"image encoding",
-				"archive creation",
+			unsupported: ["archive creation", "image encoding"],
+			remainingVerification: [
+				"real-game GARbro differential output",
+				"the decode is compared with the fixture's own places of the file, which the writer of the fixtures of this project builds; the PNG reader itself is verified against Pillow elsewhere",
 			],
-			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
 			reference: {
