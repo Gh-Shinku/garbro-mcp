@@ -274,7 +274,7 @@ of reason are these, to the row:
   the file turned about as the format of gzip reads them; it stands of the places of the file of the block
   behind the walk of the counts of them. Two streams stood its check: the worked example of the description
   and one written by `bzip2` itself.
-* **a place of a picture handed over as the file holds it** - **24 rows**, of which the walks of the pictures of this
+* **a place of a picture handed over as the file holds it** - **22 rows**, of which the walks of the pictures of this
   project stand of no writer of a bitmap: the port reads the surface the picture of the format holds (a bitmap, a
   portable network graphic or another surface behind a head of its own) and hands it over as it stands, where the
   reference decodes it through the walk of that kind and hands the places of the picture over. The records of those rows
@@ -283,7 +283,9 @@ of reason are these, to the row:
   network graphic the pictures a caller reads stand of the same places either way, so the gap stands of the *walk* and
   not of the picture; a later attempt stands of the walk of the pictures of this project over the surface, which is the
   change the walk of the pictures of `will-pna`, `black-rainbow-imp`, `mina-md-image`, `silky-grd-image`,
-  `mokopro-bmp-image`, `xuse-p4ag-image`, `psm-image` and `zenos-pnx-image` already stand of.
+  `mokopro-bmp-image`, `xuse-p4ag-image`, `psm-image` and `zenos-pnx-image` already stand of. The walks of the
+  pictures of `yaneurao-gto-image` and `sceneplayer-pmp-image` have since been taken over in that way, which stands the
+  count of this family at twenty two.
 
 * **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
   compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in
