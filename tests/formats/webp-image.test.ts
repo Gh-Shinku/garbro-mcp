@@ -6,6 +6,8 @@ import {
 	readWebpLayout,
 	webpImageFormat,
 } from "../../packages/formats/src/webp/webp-image.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GRADIENT_WEBP, GRADIENT_WEBP_PLACES } from "../helpers/webp.js";
 
 function chunk(mark: string, body: Buffer, size = body.length): Buffer {
 	const head = Buffer.alloc(8);
@@ -209,20 +211,21 @@ describe("Google WebP image format", () => {
 		expect(layout?.dataSize).toBe(4);
 	});
 
-	it("stands the places of the picture out as the places of the picture of their own", async () => {
-		const file = riff([
-			chunk("VP8L", Buffer.concat([losslessHead(4, 2), Buffer.alloc(2)])),
-		]);
+	it("stands the places of the picture out as a bitmap", async () => {
+		const file = GRADIENT_WEBP;
 		const handle = await webpImageFormat.open(
 			new BufferByteSource(file),
 			"art/orig.webp",
 		);
 		const entry = handle.entries[0];
 		if (!entry) throw new Error("no entry");
-		expect(entry.path).toBe("orig.webp");
+		expect(entry.path).toBe("orig.bmp");
 		expect(Number(entry.size)).toBe(file.length);
+		expect(entry.sizeKnown).toBe(false);
 		const out = await consumeBuffer(await handle.openEntry(entry.id));
-		expect(out).toEqual(file);
+		const image = readBmpImage(out);
+		expect(image).toMatchObject({ width: 16, height: 12, bitsPerPixel: 32 });
+		expect([...(image?.pixels ?? [])]).toEqual(GRADIENT_WEBP_PLACES);
 	});
 
 	it("is told by the words of the picture of the walk of the places of the pictures of the engine", async () => {

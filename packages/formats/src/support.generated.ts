@@ -21908,8 +21908,14 @@ export const formatSupportCatalog = {
 			localId: "webp-image",
 			status: "partial",
 			verification: "synthetic-fixtures",
-			supported: ["detect", "list", "extract"],
-			unsupported: ["image decoding", "image encoding"],
+			supported: [
+				"detect",
+				"list",
+				"extract",
+				"lossless, lossy and alpha image decoding through the shared WebP reader",
+				"32bpp bitmap output",
+			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

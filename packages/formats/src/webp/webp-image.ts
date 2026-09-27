@@ -5,11 +5,14 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { readWebpImage } from "../shared/webp-image.js";
 
 const RIFF_MARK = Buffer.from("RIFF", "latin1");
 const WEBP_MARK = Buffer.from("WEBP", "latin1");
@@ -167,30 +170,34 @@ export const webpImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = readWebpLayout(stored, Number(source.size));
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Not a picture of this kind");
+		const entry: FixedEntry = {
+			...createFixedEntry({
+				id: 0,
+				path: changeExtension(sourcePath.replace(/^.*[/\\]/, ""), "bmp"),
+				offset: 0n,
+				size: source.size,
+				compressed: true,
+				metadata: {
+					type: "image",
+					width: layout.width,
+					height: layout.height,
+					bitsPerPixel: 32,
+					isLossless: layout.isLossless,
+					hasAlpha: layout.hasAlpha,
+					flags: layout.flags,
+					dataOffset: layout.dataOffset,
+					dataSize: layout.dataSize,
+				},
+			}),
+			sizeKnown: false,
+		};
 		return {
-			entries: [
-				createFixedEntry({
-					id: 0,
-					path: changeExtension(sourcePath.replace(/^.*[/\\]/, ""), "webp"),
-					offset: 0n,
-					size: source.size,
-					compressed: false,
-					metadata: {
-						type: "image",
-						width: layout.width,
-						height: layout.height,
-						isLossless: layout.isLossless,
-						hasAlpha: layout.hasAlpha,
-						flags: layout.flags,
-						dataOffset: layout.dataOffset,
-						dataSize: layout.dataSize,
-					},
-				}),
-			],
+			entries: [entry],
 			metadata: {
-				image: "webp",
+				image: "bmp",
 				width: layout.width,
 				height: layout.height,
+				bitsPerPixel: 32,
 				isLossless: layout.isLossless,
 				hasAlpha: layout.hasAlpha,
 				flags: layout.flags,
@@ -198,8 +205,7 @@ export const webpImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		return Readable.from([
-			Buffer.from(await source.readAt(0n, Number(source.size))),
-		]);
+		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
+		return Readable.from([writeBmpImage(readWebpImage(stored))]);
 	},
 });
