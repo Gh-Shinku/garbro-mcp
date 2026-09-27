@@ -7721,6 +7721,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the place of a picture of the table of the layers of the engine beside it (`info`)",
 				"detect",
 				"list",
 				"extract",
@@ -7730,14 +7731,10 @@ export const formatSupportCatalog = {
 				"the block of the engine's own information, stepped over where it stands in front of the picture",
 				"a picture of three and of four bytes a pixel, written as bitmaps",
 			],
-			unsupported: [
-				"create",
-				"the sibling .stx file of the engine, whose layer offsets this port leaves at nothing",
-			],
+			unsupported: ["create"],
 			remainingVerification: [
 				"real-game GARbro differential output",
 				"the packed size the head carries, which this port does not check against the run",
-				"the sibling .stx layer offsets, which only move a picture about",
 			],
 		},
 		{

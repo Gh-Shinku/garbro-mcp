@@ -1,11 +1,20 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import {
+	BufferByteSource,
+	FileByteSource,
+	GarbroError,
+} from "@garbro-mcp/core";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { afterEach } from "vitest";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { unpackGlibLzss } from "../../packages/formats/src/glib/glib-lzss.js";
 import {
 	g2PgxImageFormat,
 	readPgxLayout,
+	readStxLayer,
 } from "../../packages/formats/src/g2/pgx-image.js";
 import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
@@ -81,6 +90,85 @@ function pixels(out: Buffer): Buffer {
 	const image = readBmpImage(out);
 	if (!image) throw new Error("the picture is not a bitmap");
 	return image.pixels;
+}
+
+const temporaryDirectories: string[] = [];
+
+afterEach(async () => {
+	await Promise.all(
+		temporaryDirectories
+			.splice(0)
+			.map((path) => rm(path, { recursive: true, force: true })),
+	);
+});
+
+/** A directory of its own for a picture and the table of the layers beside it. */
+async function temporaryDirectory(): Promise<string> {
+	const directory = await mkdtemp(resolve(tmpdir(), "garbro-pgx-test-"));
+	temporaryDirectories.push(directory);
+	return directory;
+}
+
+/**
+ * The table of the layers of the engine, of one layer: a place of the table for the layer itself, the name of
+ * the picture of the layer, and the place of the picture within its frame.
+ */
+function stxFile(options: {
+	layer: string;
+	picture: string;
+	left: number;
+	top: number;
+	right: number;
+	bottom: number;
+}): Buffer {
+	const names = Buffer.from(
+		`${options.layer}\u0000filename\u0000rect\u0000`,
+		"latin1",
+	);
+	const layerName = 0;
+	const filenameName = options.layer.length + 1;
+	const rectName = filenameName + "filename".length + 1;
+	// The places of the file of the fields of the layer stand behind the whole of the places of the table.
+	const filenameData = Buffer.alloc(4 + options.picture.length, 0x00);
+	filenameData.writeUInt32LE(options.picture.length, 0);
+	filenameData.write(options.picture, 4, "latin1");
+	const rectData = Buffer.alloc(0x14, 0x00);
+	rectData.writeInt32LE(options.left, 4);
+	rectData.writeInt32LE(options.top, 8);
+	rectData.writeInt32LE(options.right, 12);
+	rectData.writeInt32LE(options.bottom, 16);
+	const info = Buffer.concat([filenameData, rectData]);
+	const count = 3;
+	const entries = Buffer.alloc(count * 0x18, 0x00);
+	entries.writeUInt32LE(layerName, 0x00);
+	entries.writeInt32LE(-1, 0x08);
+	entries.writeInt32LE(-1, 0x0c);
+	entries.writeUInt32LE(filenameName, 0x18);
+	entries.writeInt32LE(0, 0x20);
+	entries.writeInt32LE(0, 0x24);
+	entries.writeUInt32LE(0, 0x28);
+	entries.writeUInt32LE(filenameData.length, 0x2c);
+	entries.writeUInt32LE(rectName, 0x30);
+	entries.writeInt32LE(0, 0x38);
+	entries.writeInt32LE(0, 0x3c);
+	entries.writeUInt32LE(filenameData.length, 0x40);
+	entries.writeUInt32LE(rectData.length, 0x44);
+	const head = Buffer.alloc(0x10, 0x00);
+	head.write("CDBD", 0, "latin1");
+	head.writeInt32LE(count, 4);
+	// The count of the places of the file the table of the layers itself stands of: the places of the table
+	// of it and then the names of the places of it, of the places of the fields of the layers behind them.
+	head.writeUInt32LE(count * 0x18 + names.length, 8);
+	head.writeUInt32LE(info.length, 12);
+	return Buffer.concat([head, entries, names, info]);
+}
+
+/** A picture of the engine of four bytes a pixel, all of one colour. */
+function plainPicture(width: number, height: number): Buffer {
+	const body = walk(
+		literals(Array.from({ length: width * height * 4 }, () => 0x33)),
+	);
+	return buildPgx({ width, height, bits: 32, body });
 }
 
 describe("Glib2 engine image format", () => {
@@ -173,6 +261,61 @@ describe("Glib2 engine image format", () => {
 		noSize.writeUInt32LE(0, 8);
 		expect(readPgxLayout(noSize)).toBeUndefined();
 		expect(readPgxLayout(good.subarray(0, HEADER_SIZE - 1))).toBeUndefined();
+	});
+
+	it("reads the place of a picture of the table of the layers beside it", () => {
+		const table = stxFile({
+			layer: "cg",
+			picture: "cg.pgx",
+			left: 7,
+			top: 9,
+			right: 40,
+			bottom: 30,
+		});
+		expect(readStxLayer(table, "cg.pgx")).toEqual({ offsetX: 7, offsetY: 9 });
+		// A picture the table names no layer of stands of no place of its own.
+		expect(readStxLayer(table, "other.pgx")).toBeUndefined();
+		// A table that stands of no word of its own stands of no place at all.
+		const wrong = Buffer.from(table);
+		wrong.write("XXXX", 0, "latin1");
+		expect(readStxLayer(wrong, "cg.pgx")).toBeUndefined();
+	});
+
+	it("reads a picture of the engine of the place the table of the layers names", async () => {
+		const directory = await temporaryDirectory();
+		const picturePath = resolve(directory, "cg.pgx");
+		await writeFile(picturePath, plainPicture(2, 2));
+		await writeFile(
+			resolve(directory, "info"),
+			stxFile({
+				layer: "cg",
+				picture: "cg.pgx",
+				left: 11,
+				top: 13,
+				right: 30,
+				bottom: 20,
+			}),
+		);
+		const handle = await g2PgxImageFormat.open(
+			await FileByteSource.open(picturePath),
+			picturePath,
+		);
+		expect(handle.entries[0]?.metadata).toMatchObject({
+			offsetX: 11,
+			offsetY: 13,
+		});
+	});
+
+	it("reads a picture of no table of the layers beside it of no place of its own", async () => {
+		const directory = await temporaryDirectory();
+		const picturePath = resolve(directory, "cg.pgx");
+		await writeFile(picturePath, plainPicture(2, 2));
+		const handle = await g2PgxImageFormat.open(
+			await FileByteSource.open(picturePath),
+			picturePath,
+		);
+		expect(handle.entries[0]?.metadata?.offsetX).toBeUndefined();
+		expect(handle.entries[0]?.metadata?.offsetY).toBeUndefined();
 	});
 
 	it("is told by the word of the picture", async () => {

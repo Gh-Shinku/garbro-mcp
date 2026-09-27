@@ -38,7 +38,13 @@ it ends at matters, and the picture's run is read from there.
 
 * The reference reads a **sibling file** of the engine (`InfoReader.GetInfo`) to learn where a layer stands,
   and sets the picture's own offsets from it. That file only moves the picture about, never changes a byte of
-  it, so this port leaves it be and the offsets stand at nothing.
+  it, so the offsets this port reports are the only thing that file stands of: they stand in the entry of the
+  picture as `offsetX` and `offsetY`, read off the `rect` of the layer that names the picture. The table
+  stands of the word `CDBD` at its head, of a count of its places and a count of the places of its table at 4
+  and 8, and of places of 0x18 bytes behind them; the name and the places of the file of a field of a layer
+  stand behind the whole of the places of the table of the layers themselves. The reference reads the field
+  `effect` and the field `blend` as well, of a warning alone where they stand of other than `norm` and
+  `0xFF`, so this port steps over them.
 * A picture of three bytes a pixel is unpacked into four and this port draws its rows together again before
   writing a bitmap, where the reference hands the four byte rows on with a three byte format.
 * Every read is bounded to the file, a picture larger than this project will hold is refused, and so is an
@@ -54,6 +60,6 @@ where the first of those bytes still stands. The other four cover the head (both
 bytes a pixel, one of three bytes whose rows are drawn together, the information block stepped over - with the
 picture's own run read from behind it - and the refusals.
 
-What stands on the reference alone: the sibling `.stx` file of the engine and the offsets it carries are not
+What stands on the reference alone: no archive of this engine of real data is on hand to compare
 read here, the packed size in the head is carried but not checked against the run, and no real picture is on
 hand to compare against GARbro's output.
