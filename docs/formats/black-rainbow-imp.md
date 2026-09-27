@@ -38,7 +38,11 @@ therefore yields a zero or wrapped size, which the size filter drops or keeps ex
 ## Extraction
 
 The archive layer stores frames as they are, so payloads are handed out as raw ranges. Decoding a frame — XOR with the
-scheme key, then LZSS, then a BGRA/BGR pixel grid — belongs to the image layer and is out of scope. The scheme key is
+scheme key, then LZSS, then a BGRA/BGR pixel grid — **is carried**: the head of a frame at its start names the width,
+the height and the count of the places of the file of the run of it, the run behind that head stands of the key of
+the scheme (a repeating xor of the four places of the file of the key, taken from the place behind the head) and
+then of the walk of the places of the file of the engine, and the places of the picture stand of four places of a
+colour to a pixel. The scheme key is
 exposed in the archive metadata for that future step, together with the frame count.
 
 ## Support
@@ -52,7 +56,7 @@ exposed in the archive metadata for that future step, together with the frame co
 | Archive-name frame numbering and image typing | Supported |
 | 0x10-byte frame size filter | Supported |
 | Raw frame extraction and key metadata | Supported |
-| IMP pixel decoding (image layer) | Unsupported |
+| IMP pixel decoding (image layer) | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover both schemes, frame listing and extraction, the skipped small frame, an archive without frames,

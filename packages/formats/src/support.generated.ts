@@ -3041,6 +3041,7 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: [
+				"the picture of a frame: its head, the cipher of the key of the scheme, the walk of the places of the file and the places of a colour of it",
 				"0x3D66 and 0x59E8 scheme signatures",
 				"per-scheme xor keys",
 				"offset table of 0xFF frames from 0x04",
@@ -3048,10 +3049,9 @@ export const formatSupportCatalog = {
 				"archive-name frame numbering",
 				"0x10 byte frame size filter",
 				"image typing",
-				"raw frame extraction",
 				"key exposed in archive metadata",
 			],
-			unsupported: ["archive creation", "IMP pixel decoding (image layer)"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

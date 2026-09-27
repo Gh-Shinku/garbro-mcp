@@ -8,6 +8,9 @@ import {
 	GarbroError,
 } from "@garbro-mcp/core";
 import { basename } from "node:path";
+import { Readable } from "node:stream";
+import { inflateLzss } from "@garbro-mcp/codecs";
+import { writeBmp32 } from "../shared/bmp.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -31,6 +34,15 @@ const ENTRY_COUNT = 0xff;
 const NAME_WIDTH = 3;
 /** Ranges of this size or less are treated as absent frames. */
 const MIN_ENTRY_SIZE = 0x10n;
+/** The head of a frame: the counts of the picture of it and the count of the places of the packed run. */
+const FRAME_HEAD_SIZE = 0x10;
+const WIDTH_AT = 0x00;
+const HEIGHT_AT = 0x04;
+const PACKED_SIZE_AT = 0x08;
+/** The places of a colour of a picture of the engine, of four places of the file to a pixel. */
+const PIXEL_SIZE = 4;
+/** A picture this project is willing to hold. */
+const MOST_PIXELS = 1 << 28;
 
 function schemeBytes(value: number): Buffer {
 	const buffer = Buffer.alloc(4);
@@ -73,7 +85,7 @@ async function readImpIndex(
 					),
 					offset: BigInt(FIRST_PAYLOAD_OFFSET) + BigInt(offset),
 					size,
-					metadata: { type: "image" },
+					metadata: { type: "image", key },
 				}),
 			);
 		}
@@ -83,9 +95,65 @@ async function readImpIndex(
 	return { entries, key };
 }
 
-/** The reference archive has no opener of its own, so frames are handed out as stored. */
-const impEntryOpener: FixedEntryOpener = async (source, entry) =>
-	source.createReadStream(entry.offset, entry.packedSize);
+/**
+ * `ImpOpener.OpenImage` and the `ImpDecoder` behind it. The head of a frame names the counts of the picture,
+ * the count of the places of the packed run of it and whether the covering place of a pixel stands of its
+ * own; the run behind the head stands of the cipher of the archive and then of the walk of the places of the
+ * file of the engine.
+ */
+const impEntryOpener: FixedEntryOpener = async (source, entry) => {
+	const head = Buffer.from(await source.readAt(entry.offset, FRAME_HEAD_SIZE));
+	if (head.length < FRAME_HEAD_SIZE) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"An IMP frame stands short of its head",
+		);
+	}
+	const width = head.readUInt32LE(WIDTH_AT);
+	const height = head.readUInt32LE(HEIGHT_AT);
+	const packedSize = head.readUInt32LE(PACKED_SIZE_AT);
+	if (0 === width || 0 === height || width * height > MOST_PIXELS) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`An IMP frame stands of ${width}x${height} places of a picture`,
+		);
+	}
+	const pixels = width * height * PIXEL_SIZE;
+	const length = FRAME_HEAD_SIZE + packedSize;
+	if (entry.offset + BigInt(length) > source.size) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			"An IMP frame reaches past the archive",
+		);
+	}
+	const stored = Buffer.from(await source.readAt(entry.offset, length));
+	// `ByteStringEncryptedStream`: every place of the file of the run stands of the key of the archive, of
+	// the places of the file of the key taken in turn. The reference reads the run from the place behind the
+	// head, so the places of the file of the key stand of that place taken against the count of the key.
+	const key = Buffer.alloc(PIXEL_SIZE, 0x00);
+	key.writeUInt32LE(Number(entry.metadata?.key ?? 0) >>> 0, 0);
+	const phase = FRAME_HEAD_SIZE % key.length;
+	for (let at = FRAME_HEAD_SIZE; at < stored.length; at += 1) {
+		stored[at] =
+			(stored[at] ?? 0) ^
+			(key[(phase + at - FRAME_HEAD_SIZE) % key.length] ?? 0);
+	}
+	let plain: Buffer;
+	try {
+		plain = inflateLzss(stored.subarray(FRAME_HEAD_SIZE), {
+			outputLength: pixels,
+		});
+	} catch (error) {
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`The run of an IMP frame stands of no count of its own: ${(error as Error).message}`,
+		);
+	}
+	// The reference hands the places of the picture over as four places of a colour to a pixel, of the
+	// covering place of the pixel standing of its own where the head names one and of no count of its own
+	// where it does not; this port keeps the places of the file of the frame either way.
+	return Readable.from([writeBmp32(width, height, plain)]);
+};
 
 export const blackRainbowImpDescriptor: FormatDescriptor = {
 	id: "black-rainbow-imp",
