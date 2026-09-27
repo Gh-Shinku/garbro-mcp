@@ -8,14 +8,13 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
-import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import { decodeIkeSize, unpackIke } from "./ike.js";
 
 /** `0x6B69899D` little endian, the same tag the ike audio format registers. */
