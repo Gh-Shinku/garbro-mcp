@@ -16581,8 +16581,9 @@ export const formatSupportCatalog = {
 				"szdd detection",
 				"lzss extraction with overridden fill and ring position",
 				"verbatim extraction",
+				"the places of a picture of the engine: the head of the picture, its table of blocks, its colour maps and its places",
 			],
-			unsupported: ["cgd image decoding", "archive creation"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

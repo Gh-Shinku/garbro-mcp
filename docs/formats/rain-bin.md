@@ -24,8 +24,18 @@ data offset, which must land behind the index, and the size.
 with a ring fill of 0x20 and an initial ring position of 0xFF0 rather than the defaults. The port passes
 both overrides to the shared decoder, reads the unpacked length that a SZDD header stores at +8 for
 listing (the reference never reads it), and marks those entries as having an inexact size because the
-decoder stops at the end of the stored stream. The reference also routes `*.cgd` entries to its CG
-decoder, which is an image concern outside the archive layer.
+decoder stops at the end of the stored stream.
+
+`BinOpener.OpenImage` routes an entry whose extension is `cgd` to the picture walk of that engine, over the payload
+the extraction stands of, whether the payload stands of the file as it is or behind the `SZDD` walk. The head of such a
+picture, of eleven words, names the count of the places of the picture, its width and height and the places of two
+colour maps, and either the place of a table of blocks or none at all. Where it names a table, every block of eight
+pixels to a row and eight rows stands of two words of the table, of which the first names the count of the places of a
+row of the block in its high places — nought, twenty four or thirty two — and the count of the blocks of a run in the
+places behind them; the places of a run stand behind the colour maps, of the rows of the first row of the blocks
+followed by a run of the seven rows behind them. Where it names no table, the places of the picture stand behind the
+colour maps as they are, of the count the head names for them. The places of a picture of this engine stand of three
+places of a colour to a pixel, of the rows of the file as they are, which a bitmap records the same way.
 
 ## Support
 
@@ -40,7 +50,7 @@ decoder, which is an image concern outside the archive layer.
 | `SZDD` detection with the twelve-byte skip | Supported |
 | LZSS extraction with fill 0x20 and ring position 0xFF0 | Supported |
 | Verbatim extraction for other payloads | Supported |
-| `*.cgd` image decoding | Not ported |
+| `*.cgd` picture decoding: head, block table and colour maps | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a plain and an `SZDD` payload, the name pattern requirement, a duplicate entry
