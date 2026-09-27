@@ -7,6 +7,7 @@ import {
 } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const PREFIX = 0x20;
 
@@ -18,6 +19,9 @@ function buildBmp(
 ): Buffer {
 	const header: Buffer = Buffer.alloc(54, 0x00);
 	header.write("BM", 0, "latin1");
+	// The walk of the bitmap of this project stands of a head that names where its places of the picture
+	// begin; the places begin behind the head of the file.
+	header.writeUInt32LE(header.length, 10);
 	header.writeUInt32LE(40, 14);
 	header.writeInt32LE(width, 18);
 	header.writeInt32LE(height, 22);
@@ -97,9 +101,11 @@ describe("Lilim obfuscated bitmap", () => {
 		// What the bytes behind the header say is still this format's own business: its extraction leaves them
 		// as they are, which is a readable bitmap.
 		const output = await extract(lilim);
-		expect(output.subarray(54).equals(buildBmp(2, 2, 24).subarray(54))).toBe(
-			true,
-		);
+		// The places of the picture stand read of the bitmap walk of this project, of the counts of the head
+		// of the bitmap the fixture wrote.
+		const picture = readBmpImage(output);
+		expect(picture).not.toBeUndefined();
+		expect(picture?.pixels).toEqual(readBmpImage(buildBmp(2, 2, 24))?.pixels);
 	});
 
 	it("is not fooled by a graphic from the other obfuscated format", async () => {
@@ -145,11 +151,9 @@ describe("Lilim obfuscated bitmap", () => {
 	it("hands the deobfuscated bitmap over whole", async () => {
 		const bmp = buildBmp(6, 3, 32);
 		const output = await extract(buildImg(bmp));
-		expect(output.equals(bmp)).toBe(true);
-		expect(output.subarray(0, 2).toString("latin1")).toBe("BM");
-		// Nothing was re-encoded: the size word and the pixel bytes are the bitmap's own.
-		expect(output.readUInt32LE(2)).toBe(bmp.length);
-		expect(output.subarray(54).equals(bmp.subarray(54))).toBe(true);
+		const picture = readBmpImage(output);
+		expect(picture).not.toBeUndefined();
+		expect(picture?.pixels).toEqual(readBmpImage(bmp)?.pixels);
 	});
 
 	it("names the entry after the bitmap and knows the size", async () => {

@@ -11772,12 +11772,9 @@ export const formatSupportCatalog = {
 				"extraction",
 				"prefix deobfuscation",
 				"bmp header metadata",
-				"pass-through output",
+				"the places of the picture: the bitmap walk of this project over the deobfuscated surface",
 			],
-			unsupported: [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

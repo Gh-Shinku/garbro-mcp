@@ -38,3 +38,11 @@ down in both directions instead of pretending to a distinction the reference doe
 The port hands the deobfuscated original over rather than decoding and re-encoding it. That is a bitmap again, with
 its size word and its row padding intact, and it keeps every pixel byte as the writer left it. A caller that wants
 pixels can read the result with any bitmap decoder.
+
+## The places of the picture
+
+The reference reads the deobfuscated surface with `Bmp.Read`, so this port reads that bitmap with the shared bitmap walk
+and hands the places of the picture over as a bitmap of its own: of the width, the height and the depth of the head of the
+bitmap, of a row of the count of the places a row of the picture holds (so the row padding of the file stands of no
+count) and of the rows in the order the head names. The places the file holds behind the picture stand of no count of the
+walk.
