@@ -3,13 +3,14 @@
 // commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readJpegImage } from "../shared/jpeg-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { writeBmp24, writeBmp32, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -291,13 +292,17 @@ export const cottonClubLmgImageFormat: ArchiveFormat = defineFixedArchive({
 		if (!layout) {
 			throw invalidPicture("Not a Cotton Club picture");
 		}
-		if (3 === layout.method) {
-			throw invalidPicture(
-				"Cotton Club picture behind a JPEG is not supported",
-			);
-		}
 		const data = Buffer.from(stored.subarray(HEADER_SIZE));
 		decryptLmg(data, sourcePath);
+		// The reference hands the places of the file of the method of the third to `JpegBitmapDecoder`, so the walk
+		// of this project reads them with its own reader of that format, of the counts of the head of the picture of
+		// the format itself.
+		if (3 === layout.method) {
+			const jpeg = readJpegImage(data);
+			return Readable.from([
+				writeBmpImage({ ...jpeg, palette: Buffer.alloc(0) }),
+			]);
+		}
 		// `ImageData.Create` keeps the stored order top down, which a bitmap records with a negative height.
 		if (2 === layout.method) {
 			return Readable.from([

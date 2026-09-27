@@ -4562,8 +4562,17 @@
 			"localId": "cotton-club-lmg-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
-			"unsupported": ["archive creation", "image encoding", "JPEG method"],
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"a picture of the method of the JPEG, of the counts of the places of the file of the picture of the format of the JPEG itself"
+			],
+			"unsupported": [
+				"archive creation",
+				"image encoding",
+				"a JPEG of four places of the file a place of the colour of the two of them, of more than eight places of the file a sample, of arithmetic coding or of no count of the places of the file of its own"
+			],
 			"remainingVerification": [
 				"real-game GARbro differential output",
 				"JPEG method"

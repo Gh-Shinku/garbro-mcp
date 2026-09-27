@@ -31,3 +31,12 @@ throws `NotImplementedException`, so this is a read only format.
 The tests cover the head of both depths, the fields the reader is turned away for, a run of opaque pixels,
 pixels that stand as they are, the fourth byte of a pixel taken from the stream, both pictures written out,
 the refusal of the JPEG method, and a file that is not signed.
+
+## The method of the JPEG
+
+A picture whose head names the method of the third (`header[3]` of three) holds a JPEG stream behind the head, of the
+counts of the head of the file of the format itself: the reference hands the places of the file of the picture to
+`JpegBitmapDecoder` of its platform, and this port reads them with its own reader of that format
+(`shared/jpeg-image.ts`), so the places of the picture stand of the walk of this project. A JPEG whose samples stand
+of more than one place of the file, whose places of a colour stand of four places (the colour of the press), or whose
+counts of the head stand of arithmetic coding, stands turned away, which the record names.

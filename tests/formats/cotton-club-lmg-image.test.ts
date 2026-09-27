@@ -1,6 +1,8 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { GREY_JPEG, GREY_PIXELS } from "../helpers/jpeg.js";
 import {
 	cottonClubLmgImageFormat,
 	readLmgLayout,
@@ -185,21 +187,16 @@ describe("Cotton Club encrypted image", () => {
 		);
 	});
 
-	it("refuses a picture behind a JPEG", async () => {
-		const data = lmgFile({
-			width: 2,
-			height: 1,
-			method: 3,
-			plain: Buffer.alloc(6),
-		});
-		const handle = await cottonClubLmgImageFormat.open(
-			new BufferByteSource(data),
-			NAME,
+	it("reads a picture behind a JPEG, which the reader of this project walks itself", async () => {
+		// The reference hands the places of the file of this method to `JpegBitmapDecoder` of its platform; this
+		// port reads them with its own reader of that format.
+		const out = await extract(
+			lmgFile({ width: 8, height: 8, method: 3, plain: GREY_JPEG }),
 		);
-		await expect(handle.openEntry("0")).rejects.toThrow(GarbroError);
-		await expect(handle.openEntry("0")).rejects.toThrow(
-			"behind a JPEG is not supported",
-		);
+		const image = await readBmpImage(out);
+		if (!image) throw new Error("no picture");
+		expect(image).toMatchObject({ width: 8, height: 8, bitsPerPixel: 32 });
+		expect([...image.pixels]).toEqual([...GREY_PIXELS]);
 	});
 
 	it("declines a file that does not hold a picture", async () => {
