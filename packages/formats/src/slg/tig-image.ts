@@ -2,6 +2,8 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { writeBmpImage } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -118,7 +120,27 @@ export const slgTigImageFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const file = Buffer.from(await source.readAt(0n, Number(source.size)));
-		// One generator from the first byte covers the whole stream.
-		return Readable.from([decryptTig(file)]);
+
+		// The reader stands of `PngFormat`, so the graphic stands read of the walk of the portable network
+		// graphic of this project and handed over as a bitmap of its own: of the counts of the head of the
+		// graphic and of the places the walk yields.
+		const image = await readPngImage(decryptTig(file));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid TIG picture: ${file.length} places of the file`,
+			);
+		}
+		// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of a
+		// colour holds none: the list stands empty, as the shared walks of this project hand it.
+		return Readable.from([
+			writeBmpImage({
+				width: image.width,
+				height: image.height,
+				bitsPerPixel: image.bitsPerPixel,
+				pixels: image.pixels,
+				palette: Buffer.alloc(0),
+			}),
+		]);
 	},
 });

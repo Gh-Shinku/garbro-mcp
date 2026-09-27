@@ -3,6 +3,9 @@ import { MsvcRandom } from "@garbro-mcp/codecs";
 import { slgTigImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 const PNG_SIGNATURE = Buffer.from([
 	0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
@@ -18,6 +21,15 @@ interface PngOptions {
 }
 
 /** A portable network graphic down to its header: the chunk's checksum is never read. */
+
+/** A whole portable network graphic of the four places of a colour a place. */
+function realPng(width: number, height: number): Buffer {
+	const rows = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width * 4 }, (_, at) => (at * 7 + y * 5 + 3) & 0xff),
+	);
+	return pngFile({ width, height, colourType: 6, rows });
+}
+
 function buildPng(options: PngOptions = {}): Buffer {
 	const header: Buffer = Buffer.alloc(13, 0x00);
 	header.writeUInt32BE(options.width ?? 32, 0);
@@ -107,13 +119,19 @@ describe("SLG system encrypted PNG image", () => {
 		}
 	});
 
-	it("hands the decrypted graphic back", async () => {
-		const png = buildPng({ width: 7, height: 5 });
+	it("reads the places of the picture of the graphic", async () => {
+		const png = realPng(7, 5);
 		const stored = encrypt(png);
 		const output = await extract(stored);
-		expect(output.equals(png)).toBe(true);
-		// Scrambling the entry's bytes again gives back exactly what the file held.
-		expect(encrypt(output).equals(stored)).toBe(true);
+		const picture = readBmpImage(output);
+		const expected = await readPngImage(png);
+		expect(picture).toMatchObject({
+			width: 7,
+			height: 5,
+			bitsPerPixel: 32,
+		});
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 	});
 
 	it("refuses a head that is not a graphic after decryption", async () => {
