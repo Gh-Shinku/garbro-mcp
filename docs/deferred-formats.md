@@ -82,10 +82,15 @@ open archives that the shipped defaults already cover.
   then stops on `// decrypt-2` and `// decompress` and returns nothing, so the reference reads no such file
   at all.
 - `PP/ILLUSION` (`ArcFormats/Illusion/ArcPP.cs`) keys its index with two hard-coded eight byte keys, so a
-  listing would read without any input, but `QueryEncryptionScheme` asks the game catalogue for a title and
-  then looks that title up in `PpScheme.KnownKeys`, which ships as an empty dictionary: a stock build
-  returns nothing from `TryOpen` for every file of this engine. Its entries would need the scheme as well,
-  and the fourth method it names (`UnpackData`) is a stub that hands the bytes back as they stand.
+  listing reads without any input, but `QueryEncryptionScheme` asks the game catalogue for a title and then
+  looks that title up in `PpScheme.KnownKeys`, which ships as an empty dictionary: a stock build returns
+  nothing from `TryOpen` for every file of this engine. **It stands ported now**, as `illusion-pp-archive`:
+  the word of the head, the cipher of the head and of the index of the engine and the index itself all stand
+  in the reference's own source, so the port lists the files of such an archive and answers for their places
+  of the walk the archive itself names - no walk of a scheme at the counts 0, 2 and 4 (the fourth standing
+  of the reference's own stub, `UnpackData`, which hands the bytes back as they stand) and a named refusal
+  at the counts 1 and 3, where a scheme of the game would be asked for - see
+  `docs/formats/illusion-pp-archive.md`.
 - `GPK/STACK` (`ArcFormats/Stack/ArcGPK.cs`) reads the resource `CIPHERCODE` out of an executable placed
   beside the archive, so the key **is** in the reach of the reader rather than in the archive: **it stands
   ported now**, as `stack-gpk-archive`, of the walk of the two directories the reference stands of and of the

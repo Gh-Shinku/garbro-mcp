@@ -13747,6 +13747,30 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "archive",
+				tag: "PP/ILLUSION",
+				class: "PpOpener",
+				source: "ArcFormats/Illusion/ArcPP.cs",
+			},
+			localId: "illusion-pp-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the word of the head of an archive of the engine (`[PPVER]`) and the nine places behind it: the count of the version of the engine, the count of the walk of the places of an entry and the count of the entries of the index, every one of them read of its own call of the cipher of the engine (`DecryptIndex`)",
+				"the cipher of the head and of the index of the engine, of the two keys the reference holds in its own source (the first key standing of the second one, of the places of the file as they stand)",
+				"the index of an archive of the engine: the name of a file of the engine, of the counts of the places of it and of the count of the places of it in the file, of a record of `0x120` places",
+				"the files of an archive whose count of the places of an entry stands at nought or at two, which the reference hands over as they stand",
+				"the files of an archive whose count of the places of an entry stands at four, of the stub of the reference itself (`UnpackData`, which hands the places of the file back as they stand)",
+			],
+			unsupported: [
+				"archive creation",
+				"the files of an archive whose count of the places of an entry stands at one or at three, whose places stand of a scheme of the game the reference looks up by the name of the game in `KnownKeys`, a table that stands empty in the shipped reference",
+				"an archive of the engine where the reference holds no scheme for the game, which the reference refuses whole and which this port lists (a departure written down in `docs/formats/illusion-pp-archive.md`)",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GRA",
 				class: "GraFormat",

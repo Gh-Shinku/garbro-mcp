@@ -947,6 +947,7 @@ import { topcatTcd3Format } from "./topcat/tcd3.js";
 import { yskFormat } from "./gplay/ysk.js";
 import { spdImageFormat } from "./topcat/spd-image.js";
 import { eaglsPakFormat } from "./eagls/pak-archive.js";
+import { illusionPpFormat } from "./illusion/pp-archive.js";
 import { weaponDatFormat } from "./weapon/dat-archive.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
 import { iafImageFormat } from "./triangle/iaf-image.js";
@@ -1158,6 +1159,7 @@ export * from "./dmotion/index.js";
 export * from "./dogenzaka/index.js";
 export * from "./dxlib/index.js";
 export * from "./eagls/index.js";
+export * from "./illusion/index.js";
 export * from "./ebg-system/index.js";
 export * from "./ebisu/index.js";
 export * from "./electriciteit/index.js";
@@ -1492,6 +1494,7 @@ export function createDefaultRegistry(
 			emoteDrefFormat,
 			weaponDatFormat,
 			eaglsPakFormat,
+			illusionPpFormat,
 			cmvsPb3ImageFormat,
 			sviuJbpImageFormat,
 			gbpImageFormat,
