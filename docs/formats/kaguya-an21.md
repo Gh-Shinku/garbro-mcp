@@ -29,8 +29,16 @@ accounts for neighbouring frame data, and the port mirrors the formula while rec
 separately. A step byte of zero rejects the archive, and packed frames use the same interleaved RLE as the
 sibling `PL10` format, whose decoder this port shares.
 
-`An21Opener` also accumulates each frame onto the previous one and decodes frames to bitmaps; both happen in
-its image path beyond `OpenEntry` and are out of scope here.
+The picture of a frame stands of the places of the frames before it: `An21Archive.GetFrame` walks back to the first
+frame and stands the places of every frame of the walk over the places of the frame it stands of, one place of a colour
+at a time, of the whole of the places of a colour to a place. The reference reaches the frames before a frame by
+walking back through them; this port walks forward from the first frame, which stands of the same counts without a walk
+of the depth of the count. The places then stand handed over as a bitmap of one, three or four places of a colour —
+one stands of a picture of grey, which this port hands over as an eight bit bitmap with a colour map of grey — and the
+rows of the picture stand of the file turned over, since `BitmapDecoder` stands of `ImageData.CreateFlipped` as the
+sibling formats do. A picture whose place in the file itself stands of a count makes the frames before a frame stand of
+a different count of places of the file than the frame itself; the reference reads past the shorter of them, so such a
+frame stands turned away here.
 
 ## Support
 
@@ -44,7 +52,9 @@ its image path beyond `OpenEntry` and are out of scope here.
 | Later frames with step, packed size and the declared output formula | Supported |
 | Shared interleaved RLE with simple and extended runs | Supported |
 | Frame naming by index and metadata | Supported |
-| Frame accumulation and bitmap decoding | Not ported |
+| Frame accumulation: the places of the frames before a frame over the places of it | Supported |
+| Bitmap decoding of a frame: one, three or four places of a colour to a pixel, rows turned over | Supported |
+| Frames that stand of a different count of places of the file than the frames before them, turned away | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover the preamble walk with two table types, a raw and a packed frame, an unknown table

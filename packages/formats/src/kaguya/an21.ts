@@ -16,6 +16,8 @@ import {
 	normalizeEntryPath,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { flipAnRows, greyColourMap } from "./an-bitmap.js";
 import { decompressKaguyaRle } from "./pl10.js";
 
 /** The signature spells `AN21`. */
@@ -39,6 +41,8 @@ const HEIGHT_OFFSET = 0x0c;
 const CHANNELS_OFFSET = 0x10;
 const PACKED_HEADER_SIZE = 5;
 const FRAME_DIGITS = 2;
+/** The counts of places of a colour a picture of this engine stands of. */
+const AN21_PLACES = new Set([1, 3, 4]);
 
 export const kaguyaAn21Descriptor: FormatDescriptor = {
 	id: "kaguya-an21",
@@ -212,16 +216,98 @@ async function readAn21Index(
 }
 
 /** GARBro `An21Opener.OpenEntry`: packed frames are RLE expanded, the first one is copied verbatim. */
+async function readAn21Frame(
+	source: ByteSource,
+	entry: FixedEntry,
+): Promise<Buffer> {
+	const stored = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.packedSize)),
+	);
+	const rleStep =
+		typeof entry.metadata?.rleStep === "number" ? entry.metadata.rleStep : 0;
+	if (rleStep <= 0) return stored;
+	return decompressKaguyaRle(stored, Number(entry.size), rleStep);
+}
+
+/**
+ * GARBro `An21Archive.GetFrame`: a frame of this format stands of the places of the frames before it, of the
+ * places of the frame itself over them one place of a colour at a time, of the whole of the places of a colour to
+ * a place. The reference reaches the frames before a frame by walking back through them; this port walks forward
+ * from the first frame instead, which stands of the same counts without a walk of the depth of the count.
+ */
+async function readAn21Pixels(
+	source: ByteSource,
+	index: number,
+): Promise<{
+	channels: number;
+	width: number;
+	height: number;
+	pixels: Buffer;
+}> {
+	const frames = await readAn21Index(source, "");
+	if (!frames || index < 0 || index >= frames.length) {
+		throw new GarbroError("INVALID_ARCHIVE", "Invalid KaguYa AN21 frame");
+	}
+	let pixels: Buffer = Buffer.alloc(0);
+	let channels = 0;
+	let width = 0;
+	let height = 0;
+	for (let at = 0; at <= index; at += 1) {
+		const frame = frames[at];
+		if (!frame) {
+			throw new GarbroError("INVALID_ARCHIVE", "Invalid KaguYa AN21 frame");
+		}
+		channels = Number(frame.metadata?.channels ?? 0);
+		const places = channels;
+		if (!AN21_PLACES.has(places)) {
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				`A frame ${frame.path} stands of ${places} places of a colour`,
+			);
+		}
+		width = Number(frame.metadata?.width ?? 0);
+		height = Number(frame.metadata?.height ?? 0);
+		const delta = await readAn21Frame(source, frame);
+		if (0 === at) {
+			pixels = delta;
+			continue;
+		}
+		// The reference stands of the places of the frames before this one over the places of this one, of the
+		// same count; frames of different counts of places of the file stand side by side in the reference only
+		// as far as the shorter of them reaches, so they stand turned away here.
+		if (delta.length !== pixels.length) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The frames before ${at} stand of ${pixels.length} places of the file against ${delta.length}`,
+			);
+		}
+		const summed = Buffer.alloc(pixels.length);
+		for (let place = 0; place < pixels.length; place += 1) {
+			summed[place] = ((pixels[place] ?? 0) + (delta[place] ?? 0)) & 0xff;
+		}
+		pixels = summed;
+	}
+	return { channels, width, height, pixels };
+}
+
+/**
+ * GARBro `An21Opener.OpenImage` and the `BitmapDecoder` behind it: the places of the frame, of the frames before
+ * it over them, stand handed over as a bitmap whose rows stand of the file turned over.
+ */
 async function openAn21Entry(
 	source: ByteSource,
 	entry: FixedEntry,
 ): Promise<Readable> {
-	const stored = await source.readAt(entry.offset, Number(entry.packedSize));
-	const rleStep =
-		typeof entry.metadata?.rleStep === "number" ? entry.metadata.rleStep : 0;
-	if (rleStep <= 0) return Readable.from([stored]);
+	const index = Number(entry.metadata?.frameIndex ?? 0);
+	const { channels, width, height, pixels } = await readAn21Pixels(
+		source,
+		index,
+	);
+	const rows = flipAnRows(pixels, width, height, channels);
+	if (4 === channels) return Readable.from([writeBmp32(width, height, rows)]);
+	if (3 === channels) return Readable.from([writeBmp24(width, height, rows)]);
 	return Readable.from([
-		decompressKaguyaRle(stored, Number(entry.size), rleStep),
+		writeBmp8Palette(width, height, rows, greyColourMap()),
 	]);
 }
 

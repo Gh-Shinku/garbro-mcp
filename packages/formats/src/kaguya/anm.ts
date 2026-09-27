@@ -11,6 +11,7 @@ import {
 import { basename } from "node:path";
 import { Readable } from "node:stream";
 import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { flipAnRows, greyColourMap } from "./an-bitmap.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
@@ -302,40 +303,6 @@ function anFramePlaces(version: number, depth: number): number | undefined {
 	}
 	if (1 === depth) return 1;
 	return 3 === depth || 4 === depth ? depth : undefined;
-}
-
-/** The colour map of a picture of one place of a colour, which the engine reads as a picture of grey. */
-function greyColourMap(): Buffer {
-	const entries = Buffer.alloc(256 * 4);
-	for (let level = 0; level < 256; level += 1) {
-		entries[level * 4] = level;
-		entries[level * 4 + 1] = level;
-		entries[level * 4 + 2] = level;
-	}
-	return entries;
-}
-
-/**
- * The rows of a picture of a frame stand bottom up in the file, which `ImageData.CreateFlipped` turns over: the
- * last row of the file is the first row of the picture.
- */
-export function flipAnRows(
-	pixels: Buffer,
-	width: number,
-	height: number,
-	places: number,
-): Buffer {
-	const stride = width * places;
-	const rows = Buffer.alloc(stride * height);
-	for (let row = 0; row < height; row += 1) {
-		pixels.copy(
-			rows,
-			row * stride,
-			(height - 1 - row) * stride,
-			(height - row) * stride,
-		);
-	}
-	return rows;
 }
 
 /**

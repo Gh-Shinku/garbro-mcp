@@ -10033,11 +10033,9 @@ export const formatSupportCatalog = {
 				"later frames with step and declared output formula",
 				"shared interleaved rle",
 				"frame naming and metadata",
+				"the picture of a frame: the places of the frames before it over the places of it, one, three or four places of a colour to a pixel, of the rows of it turned over",
 			],
-			unsupported: [
-				"frame accumulation and bitmap decoding",
-				"archive creation",
-			],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
