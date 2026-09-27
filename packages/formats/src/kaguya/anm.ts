@@ -9,13 +9,15 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { basename } from "node:path";
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
+import { writeBmp8Palette, writeBmp24, writeBmp32 } from "../shared/bmp.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
 	isSaneCount,
 	normalizeEntryPath,
 	type FixedEntry,
+	type FixedEntryOpener,
 } from "../shared/fixed-archive.js";
 import { skipKaguyaFrameTable } from "./an21.js";
 
@@ -32,8 +34,11 @@ const FRAME_TABLE_HEADER = 0x18;
 const FRAME_TABLE_STRIDE = 4;
 const COUNT_SIZE = 2;
 /** Their frame headers end at 0x10, or 0x14 when a channel word is present. */
+const AN_BASE_SIZE = 0x0c;
 const AN00_FRAME_HEADER = 0x10;
 const AN10_FRAME_HEADER = 0x14;
+const X_OFFSET = 0x00;
+const Y_OFFSET = 0x04;
 const WIDTH_OFFSET = 8;
 const HEIGHT_OFFSET = 0x0c;
 const CHANNELS_OFFSET = 0x10;
@@ -103,6 +108,8 @@ function buildFrames(
 		width: number;
 		height: number;
 		depth: number;
+		x: number;
+		y: number;
 	}[],
 	sourcePath: string,
 ): FixedEntry[] {
@@ -118,6 +125,8 @@ function buildFrames(
 			metadata: {
 				inferredType: "image",
 				frameIndex: id,
+				x: frame.x,
+				y: frame.y,
 				width: frame.width,
 				height: frame.height,
 				depth: frame.depth,
@@ -149,12 +158,15 @@ async function readAnFrames(
 	const count = (await source.readAt(tableEnd, COUNT_SIZE)).readInt16LE(0);
 	if (!isSaneCount(count)) return undefined;
 
+	const base = await readAnBaseOffset(source);
 	const frames: {
 		offset: bigint;
 		size: bigint;
 		width: number;
 		height: number;
 		depth: number;
+		x: number;
+		y: number;
 	}[] = [];
 	let cursor = tableEnd + BigInt(COUNT_SIZE);
 	for (let id = 0; id < count; id += 1) {
@@ -166,7 +178,17 @@ async function readAnFrames(
 		const imageSize = BigInt(channels) * BigInt(width) * BigInt(height);
 		const size = BigInt(frameHeaderSize) + imageSize;
 		if (cursor + size > source.size) return undefined;
-		frames.push({ offset: cursor, size, width, height, depth: channels });
+		frames.push({
+			offset: cursor,
+			size,
+			width,
+			height,
+			depth: channels,
+			// `AnmOpenerBase.GetBaseInfo` and the frame's own place stand together: the place of a frame of the
+			// picture of a file is that of the file itself, of the place of the frame in it.
+			x: base.x + frame.readInt32LE(X_OFFSET),
+			y: base.y + frame.readInt32LE(Y_OFFSET),
+		});
 		cursor += size;
 	}
 	return buildFrames(frames, sourcePath);
@@ -225,12 +247,15 @@ async function readAn20Index(
 	const count = (await source.readAt(tableEnd, COUNT_SIZE)).readInt16LE(0);
 	if (!isSaneCount(count)) return undefined;
 
+	const base = await readAnBaseOffset(source);
 	const frames: {
 		offset: bigint;
 		size: bigint;
 		width: number;
 		height: number;
 		depth: number;
+		x: number;
+		y: number;
 	}[] = [];
 	let cursor = tableEnd + BigInt(COUNT_SIZE) + BigInt(AN20_FRAME_GAP);
 	for (let id = 0; id < count; id += 1) {
@@ -242,18 +267,113 @@ async function readAn20Index(
 		const imageSize = BigInt(depth) * BigInt(width) * BigInt(height);
 		const size = BigInt(AN20_FRAME_HEADER) + imageSize;
 		if (cursor + size > source.size) return undefined;
-		frames.push({ offset: cursor, size, width, height, depth });
+		frames.push({
+			offset: cursor,
+			size,
+			width,
+			height,
+			depth,
+			x: base.x + frame.readInt32LE(X_OFFSET),
+			y: base.y + frame.readInt32LE(Y_OFFSET),
+		});
 		cursor += size;
 	}
 	return buildFrames(frames, sourcePath);
 }
 
-/** All three layouts store their frames verbatim; turning them into bitmaps is an image concern. */
-async function openAnEntry(
+/** `AnmOpenerBase.GetBaseInfo`: the place of the picture of the file itself, read at four. */
+async function readAnBaseOffset(
 	source: ByteSource,
-	entry: FixedEntry,
-): Promise<Readable> {
-	return source.createReadStream(entry.offset, entry.size);
+): Promise<{ x: number; y: number }> {
+	if (source.size < BigInt(AN_BASE_SIZE)) return { x: 0, y: 0 };
+	const head = await source.readAt(0n, AN_BASE_SIZE);
+	return { x: head.readInt32LE(4), y: head.readInt32LE(8) };
+}
+
+/** The ways of the colours of a frame, of the version of the engine and of the count of its places. */
+function anFramePlaces(version: number, depth: number): number | undefined {
+	if (0 === version) return 4;
+	if (10 === version) {
+		// `An10Decoder` stands of three places of a colour as a picture of three of them and of everything else
+		// as a picture of four, which of a count of one place of a colour would hand over the wrong number of
+		// places, so a frame of any other count stands turned away here.
+		if (3 === depth) return 3;
+		return 4 === depth ? 4 : undefined;
+	}
+	if (1 === depth) return 1;
+	return 3 === depth || 4 === depth ? depth : undefined;
+}
+
+/** The colour map of a picture of one place of a colour, which the engine reads as a picture of grey. */
+function greyColourMap(): Buffer {
+	const entries = Buffer.alloc(256 * 4);
+	for (let level = 0; level < 256; level += 1) {
+		entries[level * 4] = level;
+		entries[level * 4 + 1] = level;
+		entries[level * 4 + 2] = level;
+	}
+	return entries;
+}
+
+/**
+ * The rows of a picture of a frame stand bottom up in the file, which `ImageData.CreateFlipped` turns over: the
+ * last row of the file is the first row of the picture.
+ */
+export function flipAnRows(
+	pixels: Buffer,
+	width: number,
+	height: number,
+	places: number,
+): Buffer {
+	const stride = width * places;
+	const rows = Buffer.alloc(stride * height);
+	for (let row = 0; row < height; row += 1) {
+		pixels.copy(
+			rows,
+			row * stride,
+			(height - 1 - row) * stride,
+			(height - row) * stride,
+		);
+	}
+	return rows;
+}
+
+/**
+ * `AnmOpenerBase.OpenImage` and the decoder each version stands of: the places of the picture of a frame stand
+ * behind the head of the frame, of one place of a colour to a pixel, and stand handed over as a bitmap.
+ */
+function anOpener(version: number): FixedEntryOpener {
+	return async (source: ByteSource, entry: FixedEntry): Promise<Readable> => {
+		const width = Number(entry.metadata?.width ?? 0);
+		const height = Number(entry.metadata?.height ?? 0);
+		const depth = Number(entry.metadata?.depth ?? 0);
+		const places = anFramePlaces(version, depth);
+		if (!places) {
+			throw new GarbroError(
+				"UNSUPPORTED_FEATURE",
+				`A frame ${entry.path} of this version stands of ${depth} places of a colour`,
+			);
+		}
+		const head = 0 === version ? AN00_FRAME_HEADER : AN10_FRAME_HEADER;
+		const need = head + width * height * places;
+		if (BigInt(need) > entry.size) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`The frame ${entry.path} stands of too few places of the file`,
+			);
+		}
+		const data = Buffer.from(await source.readAt(entry.offset, need));
+		const pixels = flipAnRows(data.subarray(head, need), width, height, places);
+		if (4 === places) {
+			return Readable.from([writeBmp32(width, height, pixels)]);
+		}
+		if (3 === places) {
+			return Readable.from([writeBmp24(width, height, pixels)]);
+		}
+		return Readable.from([
+			writeBmp8Palette(width, height, pixels, greyColourMap()),
+		]);
+	};
 }
 
 export const anmFormat: ArchiveFormat = defineFixedArchive({
@@ -268,7 +388,7 @@ export const anmFormat: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid KaGuYa AN00 layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
-	openEntry: openAnEntry,
+	openEntry: anOpener(0),
 });
 
 export const an10Format: ArchiveFormat = defineFixedArchive({
@@ -283,7 +403,7 @@ export const an10Format: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid KaGuYa AN10 layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
-	openEntry: openAnEntry,
+	openEntry: anOpener(10),
 });
 
 export const an20Format: ArchiveFormat = defineFixedArchive({
@@ -298,5 +418,5 @@ export const an20Format: ArchiveFormat = defineFixedArchive({
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid KaGuYa AN20 layout");
 		return { entries, metadata: { entryCount: entries.length } };
 	},
-	openEntry: openAnEntry,
+	openEntry: anOpener(20),
 });

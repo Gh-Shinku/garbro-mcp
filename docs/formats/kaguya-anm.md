@@ -21,7 +21,13 @@ This version is always thirty-two bits per pixel, so a frame's span is its heade
 height, and that product is the only way to find the next frame. The reference checks no bounds on the derived
 spans while the port does, and neither version carries per-frame names: `AnmOpenerBase` builds them from the
 archive name and a two-digit index, which the port reproduces along with the depth, width and height as
-metadata. Frames are extracted verbatim, since turning them into bitmaps is an image concern.
+metadata.
+
+The picture of a frame stands of the places of the file of the frame behind the head of it, of one place of a
+colour to a pixel, and of the rows of it turned over: `ImageData.CreateFlipped` is what the reference stands of, which
+means the last row of the file is the first row of the picture. This port reads the places, turns the rows over and
+hands a bitmap over. The place of a frame in the picture of the file itself stands of the place of the file (read at
+four) together with the place the frame carries (read at nought). The picture of a version 00 frame always stands of four places of a colour.
 
 ## Support
 
@@ -33,8 +39,7 @@ metadata. Frames are extracted verbatim, since turning them into bitmaps is an i
 | Fixed thirty-two-bit pixels | Supported |
 | Derived spans with bound checking | Supported as a hardening |
 | Generated two-digit frame names and metadata | Supported |
-| Verbatim extraction | Supported |
-| Bitmap decoding | Not ported |
+| Bitmap decoding of a frame: four places of a colour to a pixel, rows turned over | Supported |
 | Archive creation | Unsupported |
 
-Synthetic fixtures cover two frames, a foreign signature, and a frame whose declared width leaves the file.
+Synthetic fixtures cover two frames, the place a frame takes in the picture of the file itself, the rows of its picture turned over, a foreign signature, and a frame whose declared width leaves the file.
