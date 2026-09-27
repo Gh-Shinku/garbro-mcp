@@ -13700,6 +13700,29 @@ export const formatSupportCatalog = {
 		},
 		{
 			reference: {
+				type: "archive",
+				tag: "DAT/WEAPON",
+				class: "DatOpener",
+				source: "Legacy/Weapon/ArcDAT.cs",
+			},
+			localId: "weapon-dat-archive",
+			status: "partial",
+			verification: "synthetic-fixtures",
+			supported: [
+				"the place list of an archive of the engine: the reference carries one list of picture dimensions per archive name, and every picture of the list stands behind the previous one from the head of the file, of two bytes for every pixel",
+				"the eight lists of the reference, read off it verbatim: `eventcg.dat` (69 pictures), `buy.dat` (149), `heyacg.dat` (14), `kigaecg.dat` (148), `chibicg.dat` (464), `omake.dat` (219), `result.dat` (6), `title.dat` (2)",
+				"the names of the pictures of an archive, of the shape of the reference: `<base>#0000` and on",
+				"the picture walk of `CgDecoder.GetImageData`: two bytes per pixel repacked into the five bits of each colour of a `Bgr555` picture, written out as a 16bpp bitmap",
+				"the refusal of an archive whose name stands in no list of the reference, and of one whose lists do not fit within the file",
+			],
+			unsupported: [
+				"archive creation",
+				"an archive of a name the reference itself holds no list of: its index stands in no place of the file, so nothing about it can be read",
+			],
+			remainingVerification: ["real-game GARbro differential output"],
+		},
+		{
+			reference: {
 				type: "image",
 				tag: "GRA",
 				class: "GraFormat",

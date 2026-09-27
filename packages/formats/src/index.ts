@@ -946,6 +946,7 @@ import { tcd1Format } from "./topcat/tcd1.js";
 import { topcatTcd3Format } from "./topcat/tcd3.js";
 import { yskFormat } from "./gplay/ysk.js";
 import { spdImageFormat } from "./topcat/spd-image.js";
+import { weaponDatFormat } from "./weapon/dat-archive.js";
 import { triangleBmxFormat } from "./triangle/bmx.js";
 import { iafImageFormat } from "./triangle/iaf-image.js";
 import { cgfFormat } from "./triangle/cgf.js";
@@ -1425,6 +1426,7 @@ export * from "./vitamin/index.js";
 export * from "./vn-engine/index.js";
 export * from "./vnsystem/index.js";
 export * from "./weapon/index.js";
+export * from "./weapon/index.js";
 export * from "./webp/index.js";
 export * from "./westgate/index.js";
 export * from "./wild-bug/index.js";
@@ -1486,6 +1488,7 @@ export function createDefaultRegistry(
 			cmvsPsbImageFormat,
 			emotePsbFormat,
 			emoteDrefFormat,
+			weaponDatFormat,
 			cmvsPb3ImageFormat,
 			sviuJbpImageFormat,
 			gbpImageFormat,

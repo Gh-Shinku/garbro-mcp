@@ -209,10 +209,13 @@ open archives that the shipped defaults already cover.
 - `PACK/BONK` (`ArcFormats/Bonk/ArcPACK.cs`) reads `bonk_ntr_1.lst` the same way.
 
 - `DAT/WEAPON` (`Legacy/Weapon/ArcDAT.cs`, class `DatOpener`, no mark of its own): the archive carries no
-  index at all. Its entries come out of `KnownFileTables`, a table of **274** hand written sizes keyed by
-  the name of the file itself (`eventcg.dat` and its like), and the walk of a picture behind them is a
-  plain sixteen bit one. A port would carry that table of sizes as it stands, the way the port of
-  `ALL/GIGA` would carry the file map of that engine.
+  index at all. Its entries come out of `KnownFileTables`, a table of hand written picture sizes keyed by the
+  name of the file itself (`eventcg.dat` and its like), and the walk of a picture behind them is a plain
+  sixteen bit one. The table stands in the reference's own source rather than in a resource file, so a port
+  can carry it as it stands - and **it stands ported now**, as `weapon-dat-archive`, of the eight lists of
+  the reference (1071 pictures over them) and of the walk of `CgDecoder.GetImageData` - see
+  `docs/formats/weapon-dat-archive.md`. The count of `274` that stood here was wrong: the lists hold 1071
+  pictures over eight names.
 
 ## The payload needs a decoder this project does not have
 
