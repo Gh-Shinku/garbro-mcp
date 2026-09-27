@@ -15,6 +15,8 @@ import {
 	LZW_TIFF_PLACES,
 	PACKBITS_TIFF,
 	PALETTE_TIFF,
+	TWO_COLOUR_TIFF,
+	TWO_COLOUR_TIFF_PLACES,
 	PLANAR_TIFF,
 	PLANAR_TIFF_PLACES,
 	PREDICTOR_TIFF,
@@ -138,6 +140,14 @@ describe("the walk of the tagged image file", () => {
 		const image = await readTiffImage(PLANAR_TIFF);
 		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
 		expect([...image.pixels]).toEqual([...PLANAR_TIFF_PLACES]);
+	});
+
+	it("reads a picture of the colour of the two of them", async () => {
+		// One place of the file a place of the picture, of the counts of the head of the format of the two of them:
+		// the file stands of this project alone, since the library reads no such file of that counting.
+		const image = await readTiffImage(TWO_COLOUR_TIFF);
+		expect(image).toMatchObject({ width: 4, height: 3, bitsPerPixel: 24 });
+		expect([...image.pixels]).toEqual([...TWO_COLOUR_TIFF_PLACES]);
 	});
 
 	it("reads a picture of sixteen places of the file a sample", async () => {

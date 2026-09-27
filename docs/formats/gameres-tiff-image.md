@@ -94,3 +94,17 @@ colour behind the other, of one place of the file a sample. A picture of such a 
 place of the file stands turned away, which the record names. The fixture of that walk (`PLANAR_TIFF`) was built by this
 project and read back by the python imaging library through libtiff, whose places stand as an oracle of another
 implementation for it.
+
+## The colour of the two of them
+
+A picture of the colour of the two of them (`PhotometricInterpretation` of six) holds the places of the colour of the
+two of them, three of them a place of the picture, of the counts of the head of the format of the two of them, and the
+walk of this project stands those places into the places of a bitmap of the counts of the two of them of the format of
+the jpeg walk. The counts of the head of the format of the two of them of the picture stand of the counts of the head of
+the format itself: a picture whose counts of the colour of the two of them (529) or whose counts of the black of the
+picture and of the white of it (532) stand of a head of their own stands turned away, and so does a picture whose places
+of the file of a place of a colour (530) stand in clumps of their own, which the walk of the counts of a clump of the
+places of a colour of the format would read. A picture of such a kind whose samples stand of more than one place of the
+file stands turned away as well. The fixture of that walk (`TWO_COLOUR_TIFF`) was built by this project of the counts of
+the head of the format alone, since the python imaging library of this machine reads no such file of that counting, so
+the places of that fixture stand of no oracle of another implementation.

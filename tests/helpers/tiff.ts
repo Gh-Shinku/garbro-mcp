@@ -250,3 +250,18 @@ export const PLANAR_TIFF_PLACES: readonly number[] = [
 	0, 0, 0, 30, 5, 40, 60, 10, 80, 90, 15, 120, 3, 60, 7, 33, 65, 47, 63, 70, 87,
 	93, 75, 127, 6, 120, 14, 36, 125, 54, 66, 130, 94, 96, 135, 134,
 ];
+
+/** Four by three places of the colour of the two of them, one place of the file a place: the file was built by this
+ * project, of the counts of the head of the format of the two of them rather than of another implementation, since
+ * the library of this machine reads no such file of that counting. */
+export const TWO_COLOUR_TIFF = Buffer.from(
+	"SUkqAAgAAAAKAAABBAABAAAABAAAAAEBBAABAAAAAwAAAAIBAwADAAAAhgAAAAMBAwABAAAAAQAAAAYBAwABAAAABgAAABEBBAABAAAAjAAAABUBAwABAAAAAwAAABYBBAABAAAAAwAAABcBBAABAAAAJAAAABICAwACAAAAAQABAAAAAAAIAAgACAAobnhGd3hkgHiCiXgoboNGd4NkgIOCiYMobo5Gd45kgI6CiY4=",
+	"base64",
+);
+
+/** The places of TWO_COLOUR_TIFF, blue first, of the counts of the walk of the colour of the two of them. */
+export const TWO_COLOUR_TIFF_PLACES: readonly number[] = [
+	8, 52, 29, 54, 79, 59, 100, 106, 89, 146, 133, 119, 8, 44, 44, 54, 71, 74,
+	100, 98, 104, 146, 125, 134, 8, 36, 60, 54, 63, 90, 100, 90, 120, 146, 117,
+	150,
+];

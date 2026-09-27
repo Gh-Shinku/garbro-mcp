@@ -34,6 +34,7 @@ const PHOTOMETRIC_BLACK_IS_ZERO = 1;
 const PHOTOMETRIC_RGB = 2;
 const PHOTOMETRIC_PALETTE = 3;
 const PHOTOMETRIC_CMYK = 5;
+const PHOTOMETRIC_YCBCR = 6;
 
 /** The tags this walk reads. */
 const TAG_WIDTH = 256;
@@ -49,6 +50,9 @@ const TAG_PLANAR = 284;
 const TAG_PREDICTOR = 317;
 const TAG_COLOUR_MAP = 320;
 const TAG_EXTRA_SAMPLES = 338;
+const TAG_YCBCR_COEFFICIENTS = 529;
+const TAG_YCBCR_SUBSAMPLING = 530;
+const TAG_REFERENCE_BLACK_WHITE = 532;
 const TAG_SAMPLE_FORMAT = 339;
 const TAG_TILE_WIDTH = 322;
 const TAG_TILE_LENGTH = 323;
@@ -71,6 +75,13 @@ const ALPHA = 0xff;
 
 function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
+}
+
+/** A count of a place of a colour of a picture of eight places of the file, of the counts of the walk of them. */
+function clampColour(value: number): number {
+	if (value < 0) return 0;
+	if (value > 255) return 255;
+	return Math.round(value) & 0xff;
 }
 
 function unsupportedPicture(message: string): GarbroError {
@@ -379,6 +390,52 @@ export async function readTiffImage(data: Buffer): Promise<BmpImage> {
 			bitsPerPixel: 8,
 			palette: colours,
 			pixels: expandIndices(stored, rowBytes, width, height, sampleBits),
+		};
+	}
+	if (PHOTOMETRIC_YCBCR === photometric) {
+		// The places of the colour of the two of them stand three a place of the picture, of the counts of the head
+		// of the format of the two of them. The walk of this project reads the count of the places of the file a
+		// place of one, and the counts of the head that name a count of the places of the file of their own (the
+		// walk of the counts of a clump of the places of a colour) and the counts of the colour of the two of them
+		// of the head stand turned away, which the record names.
+		const subsampling = values(TAG_YCBCR_SUBSAMPLING) ?? [2, 2];
+		if (1 !== subsampling[0] || 1 !== subsampling[1])
+			throw unsupportedPicture(
+				"A picture whose places of the colour of the two of them stand in clumps of their own stands of no walk of this project",
+			);
+		if (
+			undefined !== values(TAG_YCBCR_COEFFICIENTS) ||
+			undefined !== values(TAG_REFERENCE_BLACK_WHITE)
+		)
+			throw unsupportedPicture(
+				"A picture whose counts of the colour of the two of them stand of a head of their own stands of no walk of this project",
+			);
+		if (8 !== sampleBits)
+			throw unsupportedPicture(
+				"A picture whose places of the colour of the two of them stand of more than one place of the file a sample stands of no walk of this project",
+			);
+		if (samples < 3)
+			throw invalidPicture(
+				"The picture stands short of the places of the colour of the two of them",
+			);
+		const pixels: Buffer = Buffer.alloc(width * height * 3, 0x00);
+		for (let y = 0; y < height; y += 1) {
+			for (let x = 0; x < width; x += 1) {
+				const at = (y * width + x) * 3;
+				const luma = stored[y * rowBytes + x * samples] ?? 0;
+				const blue = (stored[y * rowBytes + x * samples + 1] ?? 0) - 128;
+				const red = (stored[y * rowBytes + x * samples + 2] ?? 0) - 128;
+				pixels[at] = clampColour(luma + 1.772 * blue);
+				pixels[at + 1] = clampColour(luma - 0.344136 * blue - 0.714136 * red);
+				pixels[at + 2] = clampColour(luma + 1.402 * red);
+			}
+		}
+		return {
+			width,
+			height,
+			bitsPerPixel: 24,
+			palette: Buffer.alloc(0),
+			pixels,
 		};
 	}
 	if (PHOTOMETRIC_RGB === photometric || PHOTOMETRIC_CMYK === photometric) {
