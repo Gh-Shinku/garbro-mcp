@@ -28,7 +28,10 @@ a byte that cancels that key ends the stream. Copies overlap and run forward.
 
 The port performs the packed inspection while reading the index so listing and extraction agree. Entries without the
 `fACE` marker are emitted verbatim, including the ones that are too short to carry the header. GARBro's content-based
-type inference (`AutoEntry.DetectFileType`) is not reproduced, and TRI bitmap decoding is not implemented.
+type inference (`AutoEntry.DetectFileType`) is not reproduced. `BmxOpener` has no `OpenImage` of its own: the archive
+hands the unpacked payload over, and a payload of a picture of the engine stands read by the walk of the pictures of
+that kind - the `TRI` picture of this engine stands read by `triangle-tri-image` of this project, whose own tests pin its
+places. Archive creation is out of scope.
 
 ## Support
 
@@ -42,7 +45,7 @@ type inference (`AutoEntry.DetectFileType`) is not reproduced, and TRI bitmap de
 | Triangle LZ extraction | Supported |
 | Verbatim extraction | Supported |
 | Entry type inference by content | Unsupported |
-| TRI bitmap decoding | Unsupported |
+| TRI bitmap decoding, which stands of the walk of the `TRI` pictures of this project | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover stored and packed entries, literal and match decoding across two control words, filename type

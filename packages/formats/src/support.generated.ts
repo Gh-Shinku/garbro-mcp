@@ -20649,12 +20649,9 @@ export const formatSupportCatalog = {
 				"fACE marker with xor masked unpacked size",
 				"triangle lz extraction",
 				"verbatim extraction",
+				"the unpacked payload of a TRI picture, which the walk of the pictures of this project reads",
 			],
-			unsupported: [
-				"entry type inference by content",
-				"TRI bitmap decoding",
-				"archive creation",
-			],
+			unsupported: ["entry type inference by content", "archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
