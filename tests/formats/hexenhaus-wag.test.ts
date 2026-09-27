@@ -1,7 +1,10 @@
 import { BufferByteSource } from "@garbro-mcp/core";
 import { wagFormat } from "@garbro-mcp/formats";
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 import { expectArchive } from "../helpers/archive.js";
+import { pngFile } from "../helpers/png.js";
 
 const INDEX_OFFSET = 0x4a;
 const IMGD_FILLER = 6;
@@ -99,14 +102,12 @@ describe("Hexenhaus WAG resource archive", () => {
 			]),
 			entries: [
 				{
-					path: "first.png",
+					path: "first.bmp",
 					size: first.content.length,
-					content: first.content,
 				},
 				{
-					path: "second.png",
+					path: "second.bmp",
 					size: second.content.length,
-					content: second.content,
 				},
 			],
 			metadata: { entryCount: 2 },
@@ -124,9 +125,8 @@ describe("Hexenhaus WAG resource archive", () => {
 			]),
 			entries: [
 				{
-					path: "kept.dat",
+					path: "kept.bmp",
 					size: entry.content.length,
-					content: entry.content,
 				},
 			],
 		});
@@ -143,9 +143,8 @@ describe("Hexenhaus WAG resource archive", () => {
 			]),
 			entries: [
 				{
-					path: "kept.dat",
+					path: "kept.bmp",
 					size: entry.content.length,
-					content: entry.content,
 				},
 			],
 		});
@@ -162,9 +161,8 @@ describe("Hexenhaus WAG resource archive", () => {
 			]),
 			entries: [
 				{
-					path: "kept.dat",
+					path: "kept.bmp",
 					size: entry.content.length,
-					content: entry.content,
 				},
 			],
 		});
@@ -185,9 +183,8 @@ describe("Hexenhaus WAG resource archive", () => {
 			]),
 			entries: [
 				{
-					path: "kept.dat",
+					path: "kept.bmp",
 					size: entry.content.length,
-					content: entry.content,
 				},
 			],
 		});
@@ -202,12 +199,47 @@ describe("Hexenhaus WAG resource archive", () => {
 			archive: buildWag([record([fnne(name), entry.section])]),
 			entries: [
 				{
-					path: name,
+					path: name.replace(/\.png$/, ".bmp"),
 					size: entry.content.length,
-					content: entry.content,
 				},
 			],
 		});
+	});
+
+	it("decodes an IMGD section through the shared image reader", async () => {
+		const png = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 6,
+			rows: [[10, 20, 30, 255, 40, 50, 60, 255]],
+		});
+		const wrapped = imgd(Buffer.concat([Buffer.alloc(8), png]));
+		const source = new BufferByteSource(
+			buildWag([record([fnne("picture.png"), wrapped.section])]),
+		);
+		const archive = await wagFormat.open(source, "sample.wag");
+		try {
+			const entry = archive.entries[0];
+			if (!entry) throw new Error("no entry");
+			expect(entry).toMatchObject({
+				path: "picture.bmp",
+				sizeKnown: false,
+				metadata: {
+					type: "image",
+					originalPath: "picture.png",
+					embeddedFormat: "hexenhaus-imgd-image",
+				},
+			});
+			const bitmap = readBmpImage(
+				await consumeBuffer(await archive.openEntry(entry.id)),
+			);
+			expect(bitmap).toMatchObject({ width: 2, height: 1, bitsPerPixel: 32 });
+			expect([...(bitmap?.pixels ?? [])]).toEqual([
+				30, 20, 10, 255, 60, 50, 40, 255,
+			]);
+		} finally {
+			await archive.close();
+		}
 	});
 
 	it("rejects an archive without a usable count", async () => {

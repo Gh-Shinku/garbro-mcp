@@ -97,8 +97,9 @@ Some of those need nothing new, because the reader already exists in the project
 
 * `webp-image` (the `ArcFormats/WebP` row) now uses the same lossless, lossy and alpha reader as the
   `Experimental/WebP` row (`gameres-webp-image`) and writes the decoded picture as a 32-bit bitmap.
-* `psm-image`, `xuse-p4ag-image` and `zenos-pnx-image` name *png validation*; `hexenhaus-wag` names an IMGD
-  PNG payload. The PNG reader (`shared/png-image.ts`) is in place, so these are wiring, not new codecs.
+* `hexenhaus-wag` now decrypts its IMGD entries and passes them to the existing IMGD/PNG reader, producing
+  24-bit or 32-bit bitmaps. The `psm-image`, `xuse-p4ag-image` and `zenos-pnx-image` records still need their
+  stale *png validation* limitations reconciled with their existing PNG decoding tests.
 * `palette-pga-image` and `malie-mgf-image` stood in this family until this week and **are fixed now**: both
   decode their PNG payload into a bitmap, which is what `PgaFormat : PngFormat` and `MgfFormat : PngFormat` do.
 
@@ -144,8 +145,7 @@ design. Aligning writing would be a separate workstream.
 
 1. Establish the community-driven real-game verification policy and issue guidance, without making sample
    acquisition a release gate.
-2. Reconcile the three stale *png validation* records and wire `hexenhaus-wag` through the existing IMGD
-   reader.
+2. Reconcile the three stale *png validation* records with their existing PNG decoding tests.
 3. Entry typing through the format catalogue: one infrastructure change that unblocks about 53 rows.
 4. Then the per format variants in gap 4, and the from-spec codecs (Vorbis, and whatever gap 2 turns out to
    need).

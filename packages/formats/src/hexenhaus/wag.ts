@@ -9,6 +9,7 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { changeExtension } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -17,6 +18,7 @@ import {
 	normalizeEntryPath,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { decodeImgdImage } from "./imgd-image.js";
 
 const SIGNATURE = Buffer.from("IAF_", "ascii");
 const COUNT_FIELD = 6;
@@ -125,14 +127,22 @@ async function readWagIndex(
 			cursor += SECTION_HEADER_SIZE + sectionSize + SECTION_PADDING;
 		}
 		if (offset === undefined || size === 0n || !name) continue;
-		entries.push(
-			createFixedEntry({
+		const entry: FixedEntry = {
+			...createFixedEntry({
 				id: entries.length,
-				...normalizeEntryPath(name),
+				...normalizeEntryPath(changeExtension(name, "bmp")),
 				offset,
 				size,
+				compressed: true,
+				metadata: {
+					type: "image",
+					originalPath: name,
+					embeddedFormat: "hexenhaus-imgd-image",
+				},
 			}),
-		);
+			sizeKnown: false,
+		};
+		entries.push(entry);
 	}
 	if (entries.length === 0) return undefined;
 	return entries;
@@ -174,6 +184,7 @@ export const wagFormat: ArchiveFormat = defineFixedArchive({
 	/** `WagOpener.OpenEntry` reads the stored region and rotates it back, like every index read does. */
 	async openEntry(source: ByteSource, entry: FixedEntry) {
 		const stored = await source.readAt(entry.offset, Number(entry.size));
-		return Readable.from([decrypt(Buffer.from(stored))]);
+		const decrypted = decrypt(Buffer.from(stored));
+		return Readable.from([(await decodeImgdImage(decrypted)).bitmap]);
 	},
 });

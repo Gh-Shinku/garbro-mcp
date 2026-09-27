@@ -31,6 +31,11 @@ export interface ImgdLayout {
 	pictureOffset: number;
 }
 
+export interface DecodedImgdImage {
+	layout: ImgdLayout;
+	bitmap: Buffer;
+}
+
 function invalidPicture(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
@@ -65,6 +70,35 @@ export function readImgdLayout(
 
 async function readStored(source: ByteSource): Promise<Buffer> {
 	return Buffer.from(await source.readAt(0n, Number(source.size)));
+}
+
+/** Decode the complete decrypted IMGD entry to the bitmap returned by the standalone image format. */
+export async function decodeImgdImage(
+	stored: Buffer,
+): Promise<DecodedImgdImage> {
+	const layout = readImgdLayout(stored, stored.length);
+	if (!layout) throw invalidPicture("Not a WAG picture");
+	const image = await readPngImage(stored.subarray(layout.pictureOffset));
+	if (!image) {
+		throw invalidPicture(
+			"The picture stands of no picture of the kind its head names",
+		);
+	}
+	if (32 === image.bitsPerPixel) {
+		return {
+			layout,
+			bitmap: writeBmp32(image.width, image.height, Buffer.from(image.pixels)),
+		};
+	}
+	if (24 === image.bitsPerPixel) {
+		return {
+			layout,
+			bitmap: writeBmp24(image.width, image.height, Buffer.from(image.pixels)),
+		};
+	}
+	throw invalidPicture(
+		`The picture stands of ${image.bitsPerPixel} places of a colour`,
+	);
 }
 
 export const hexenhausImgdImageDescriptor: FormatDescriptor = {
@@ -137,30 +171,10 @@ export const hexenhausImgdImageFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async openEntry(source: ByteSource) {
 		const stored = await readStored(source);
-		const layout = readImgdLayout(stored, Number(source.size));
-		if (!layout) throw invalidPicture("Not a WAG picture");
 		// `ImgdFormat.Read` stands of the walk of the pictures of the kind this picture stands as, over the
 		// places behind the words of the head of the picture. The places of a picture of this kind stand of
 		// three or four places of a colour to a pixel, of the rows of the file turned over, which a bitmap of
 		// this project holds the same way.
-		const image = await readPngImage(stored.subarray(layout.pictureOffset));
-		if (!image) {
-			throw invalidPicture(
-				"The picture stands of no picture of the kind its head names",
-			);
-		}
-		if (32 === image.bitsPerPixel) {
-			return Readable.from([
-				writeBmp32(image.width, image.height, Buffer.from(image.pixels)),
-			]);
-		}
-		if (24 === image.bitsPerPixel) {
-			return Readable.from([
-				writeBmp24(image.width, image.height, Buffer.from(image.pixels)),
-			]);
-		}
-		throw invalidPicture(
-			`The picture stands of ${image.bitsPerPixel} places of a colour`,
-		);
+		return Readable.from([(await decodeImgdImage(stored)).bitmap]);
 	},
 });

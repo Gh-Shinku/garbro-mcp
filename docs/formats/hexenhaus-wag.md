@@ -48,8 +48,9 @@ the PNG behind an `IMGD` section starts at 0x10 from the entry and the extra byt
 
 `Ror4EncryptedStream` rotates every byte it reads right by four bits, which is a nibble swap and therefore its
 own inverse. The index offsets and sizes are stored in plain form inside that stream, so they can be used as
-positions in the file as they are. Extraction reads the stored region and rotates it back, which turns an
-`IMGD` payload into the same bytes the reference hands to its image reader.
+positions in the file as they are. Extraction reads the stored region and rotates it back, then passes the
+resulting `IMGD` payload to the shared Hexenhaus image reader. The entry is exposed with a `.bmp` name and
+decoded to a 24-bit or 32-bit bitmap; its original archive name remains in entry metadata.
 
 ## Port notes and deviations
 
@@ -57,7 +58,8 @@ positions in the file as they are. Extraction reads the stored region and rotate
 - The reference seeks to each record offset without bounds checking and lets an out of range read fail; the
   port skips a record whose offset or section walk leaves the file.
 - An `IMGD` section whose reported size leaves the file declines the archive.
-- `IMGD/WAG` image decoding and archive creation stay out of scope.
+- The output size is unknown until the PNG payload has been decoded, so IMGD entries set `sizeKnown: false`.
+- Archive creation stays out of scope.
 
 ## References
 

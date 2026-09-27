@@ -8822,8 +8822,10 @@ export const formatSupportCatalog = {
 				"IMGD payload sections",
 				"unknown section skipping",
 				"MOZA section skipping",
+				"IMGD PNG payload decoding through the shared image reader",
+				"24bpp and 32bpp bitmap output",
 			],
-			unsupported: ["archive creation", "IMGD png payload decoding"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
