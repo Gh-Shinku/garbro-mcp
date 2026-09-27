@@ -274,7 +274,7 @@ of reason are these, to the row:
   the file turned about as the format of gzip reads them; it stands of the places of the file of the block
   behind the walk of the counts of them. Two streams stood its check: the worked example of the description
   and one written by `bzip2` itself.
-* **a place of a picture handed over as the file holds it** - **14 rows**, of which the walks of the pictures of this
+* **a place of a picture handed over as the file holds it** - **13 rows**, of which the walks of the pictures of this
   project stand of no writer of a bitmap: the port reads the surface the picture of the format holds (a bitmap, a
   portable network graphic or another surface behind a head of its own) and hands it over as it stands, where the
   reference decodes it through the walk of that kind and hands the places of the picture over. The records of those rows
@@ -288,7 +288,9 @@ of reason are these, to the row:
   count of this family at twenty two. The walks of `bef-alo-image`, `kurumi-gra-image`, `advgsys-bmp-image`,
   `nekopunch-pbm-image` and `misc-lz-bmp-image` have since been taken over in the same way, which stands the count of
   this family at seventeen, and the walk of `jam-htf-image` after them, which stands it at sixteen. The walks of `regrips-brg-image` and `black-rainbow-bmz-image` have since been taken over,
-which stands this family at fourteen.
+which stands this family at fourteen. The walk of `ice-ibm-image` has since been taken over, which stands it at
+thirteen; the walk of the factory `mb/image.ts` stands of two rows at once (`bmp-mb-image` and `brownie-ngw-image`),
+so both of their tests stand of the same change and are taken on together.
 
 * **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
   compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in

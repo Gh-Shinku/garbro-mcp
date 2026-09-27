@@ -9,7 +9,11 @@ import type {
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
 import { unpackTpw } from "../ankh/grp-unpack.js";
-import { readBmpHeaderFields } from "../shared/bmp.js";
+import {
+	readBmpHeaderFields,
+	readBmpImage,
+	writeBmpImage,
+} from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -131,14 +135,23 @@ export const ibmImageFormat: ArchiveFormat = defineFixedArchive({
 		const stored = Buffer.from(await source.readAt(0n, Number(source.size)));
 		const output: Buffer = Buffer.alloc(layout.unpackedSize, 0x00);
 		unpackTpw(stored, output);
-		// The reference decodes the result as a bitmap, which fails on anything else. The pixels themselves are
-		// not checked here, since the port carries the bitmap over rather than decoding it.
+		// The reference decodes the result as a bitmap, which fails on anything else. `IbmFormat.Read` stands of
+		// `Bmp.Read` over the unpacked surface, so the bitmap stands read of the bitmap walk of this project and
+		// handed over as a bitmap of its own; the padding of the file and the places behind the picture stand of
+		// no count of the picture.
 		if (!readBmpHeaderFields(output)) {
 			throw new GarbroError(
 				"INVALID_ARCHIVE",
 				"Invalid Ice Soft bitmap header",
 			);
 		}
-		return Readable.from([output]);
+		const image = readBmpImage(output);
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid Ice Soft bitmap data: ${output.length} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });

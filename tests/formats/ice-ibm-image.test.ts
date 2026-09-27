@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { ibmImageFormat, isdScriptFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const HEADER_SIZE = 8;
 const BMP_HEADER_SIZE = 54;
@@ -157,7 +158,9 @@ describe("ice soft compressed bitmap", () => {
 
 	it("extracts the bitmap the stream carries", async () => {
 		const bmp = buildBmp24(4, 3);
-		expect(await extract(buildIbm(bmp))).toEqual(bmp);
+		const picture = readBmpImage(await extract(buildIbm(bmp)));
+		expect(picture).not.toBeUndefined();
+		expect(picture?.pixels).toEqual(readBmpImage(bmp)?.pixels);
 	});
 
 	it("accepts a header whose palette lies past the probe", async () => {
@@ -174,7 +177,9 @@ describe("ice soft compressed bitmap", () => {
 		} finally {
 			await archive.close();
 		}
-		expect(await extract(buildIbm(bmp))).toEqual(bmp);
+		const picture = readBmpImage(await extract(buildIbm(bmp)));
+		expect(picture).not.toBeUndefined();
+		expect(picture?.pixels).toEqual(readBmpImage(bmp)?.pixels);
 	});
 
 	it("leaves an early end as zeroes", async () => {
@@ -188,8 +193,20 @@ describe("ice soft compressed bitmap", () => {
 		const output = await extract(
 			buildIbm(bmp, { unpackedSize: bmp.length, body }),
 		);
-		expect(output.subarray(0, 60)).toEqual(bmp.subarray(0, 60));
-		expect(output.subarray(60)).toEqual(Buffer.alloc(bmp.length - 60, 0x00));
+		const picture = readBmpImage(output);
+		expect(picture).toMatchObject({
+			width: 4,
+			height: 3,
+			bitsPerPixel: 24,
+		});
+		// The walk hands a row over of the count of the places a row of the picture holds and of the rows in
+		// the order the head names: the row the codec stood at when the control byte stopped it holds the six
+		// places of the file, and every other place of the picture stands of the buffer as it was allocated.
+		expect([...(picture?.pixels ?? [])]).toEqual([
+			...Buffer.alloc(24, 0x00),
+			...bmp.subarray(54, 60),
+			...Buffer.alloc(6, 0x00),
+		]);
 	});
 
 	it("keeps the two TPW formats apart", async () => {

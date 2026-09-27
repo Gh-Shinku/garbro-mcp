@@ -9056,13 +9056,10 @@ export const formatSupportCatalog = {
 				"listing",
 				"extraction",
 				"tpw decompression",
-				"bitmap pass through",
 				"metadata",
+				"the places of the picture: the bitmap walk of this project over the unpacked surface",
 			],
-			unsupported: [
-				"image encoding",
-				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
-			],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
