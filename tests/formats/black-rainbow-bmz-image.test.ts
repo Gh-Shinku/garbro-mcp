@@ -3,6 +3,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { bmzImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from([0x5a, 0x4c, 0x43, 0x33]);
 const HEADER_SIZE = 8;
@@ -76,7 +77,26 @@ describe("black rainbow bmz image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bmp);
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: WIDTH,
+				height: HEIGHT,
+				bitsPerPixel: 8,
+			});
+			// The picture stands of the rows of the walk in the order the head of the bitmap names, and of a row
+			// of the count of the places a row of the picture holds.
+			const bottomUp = bmp.readInt32LE(22) > 0;
+			const expected: number[] = [];
+			for (let row = 0; row < HEIGHT; row += 1) {
+				const stored = bottomUp ? HEIGHT - 1 - row : row;
+				expected.push(
+					...bmp.subarray(
+						DATA_OFFSET + stored * STRIDE,
+						DATA_OFFSET + (stored + 1) * STRIDE,
+					),
+				);
+			}
+			expect([...(picture?.pixels ?? [])]).toEqual(expected);
 		} finally {
 			await archive.close();
 		}
@@ -91,9 +111,10 @@ describe("black rainbow bmz image", () => {
 		try {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
-			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
-				bmp,
-			);
+			const output = await consumeBuffer(await archive.openEntry(entry.id));
+			// The size word of the header stands of no count of the walk, so the picture stands of the same
+			// places as the one of a header that names the length of the bitmap.
+			expect(readBmpImage(output)).toEqual(readBmpImage(bmp));
 			expect(archive.metadata).toMatchObject({ declaredSize: 0xdeadbeef });
 		} finally {
 			await archive.close();
@@ -108,8 +129,9 @@ describe("black rainbow bmz image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(bmp.length - 24);
-			expect(output).toEqual(bmp.subarray(0, bmp.length - 24));
+			// The twenty four places behind the picture stand of no count of the walk.
+			expect(readBmpImage(output)).toEqual(readBmpImage(bmp));
+			expect(output.length).not.toBe(bmp.length);
 		} finally {
 			await archive.close();
 		}
