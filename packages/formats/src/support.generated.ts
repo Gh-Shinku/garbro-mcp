@@ -21050,10 +21050,10 @@ export const formatSupportCatalog = {
 				"extraction",
 				"ike unpacking",
 				"bitmap header probe",
-				"bitmap passthrough",
+				"the picture of the surface: the bitmap walk of this project over the unpacked surface",
 				"metadata",
 			],
-			unsupported: ["bitmap decoding to pixels", "image encoding"],
+			unsupported: ["image encoding"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{

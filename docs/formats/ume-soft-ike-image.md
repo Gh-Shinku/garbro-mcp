@@ -36,12 +36,15 @@ same: the probe is parsed for width, height and depth, and the extraction decomp
 That split has a visible consequence, and a test pins it. The probe does not depend on the declared size, so a
 file whose declared size covers only the fifty four byte header **lists successfully** with correct metadata and
 **fails on extraction**, which is where the reference's `Bmp.Read` first notices. The port fails there too,
-because it re-reads the metadata with the shared bitmap reader before handing the bytes out.
+because it reads the unpacked surface with the shared bitmap reader before handing it out.
 
 ## Notes
 
-* This project has no bitmap decoder to hand, so the surface is **passed through** as it stands — the Malie MGF
-  and Palette PGA pattern — and the test compares the extraction with the fixture byte for byte.
+* The extraction stands of `IkeFormat.Read`, which is `Bmp.Read` over the unpacked surface: the surface stands
+  read with the shared bitmap walk of this project — one, four, eight, sixteen, twenty four or thirty two places
+  of a colour to a pixel, top down — and handed over as a bitmap of its own, so the places of a colour of the
+  picture stand of the surface rather than of the bytes of the file. A surface the shared walk cannot read fails
+  on extraction. The test reads the extraction back and compares its places of a colour with those of the fixture.
 * The probe checks the DIB size is at least forty, the width and height are non-zero, and the height is taken as
   an absolute value, since a bitmap records a top-down image with a negative one.
 * Zero dimensions, a DIB size below forty, a wrong marker, a wrong signature, a header shorter than seventeen

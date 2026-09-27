@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { ikeAudioFormat, ikeImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from([0x9d, 0x89, 0x69, 0x6b]);
 const STREAM_OFFSET = 0x0d;
@@ -156,8 +157,16 @@ describe("ume-soft ike bitmap", () => {
 		} finally {
 			await archive.close();
 		}
+		// The picture stands read and handed over again, so its places of a colour stand of the places of the
+		// surface of the payload rather than of the bytes of the file of it.
 		const output = await extract(stored);
-		expect(output).toEqual(bmp);
+		const picture = readBmpImage(output);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 2,
+			bitsPerPixel: 24,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([...pixels]);
 	});
 
 	it("tells itself apart from the audio format by the byte at 0x0F", async () => {

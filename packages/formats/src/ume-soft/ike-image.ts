@@ -15,6 +15,7 @@ import {
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { readBmpImage, writeBmpImage } from "../shared/bmp.js";
 import { decodeIkeSize, unpackIke } from "./ike.js";
 
 /** `0x6B69899D` little endian, the same tag the ike audio format registers. */
@@ -166,11 +167,14 @@ export const ikeImageFormat: ArchiveFormat = defineFixedArchive({
 			),
 		);
 		const decoded = unpackIke(stored, layout.unpackedSize);
-		// This project has no bitmap decoder to hand, so the surface is passed through as it stands, the way
-		// the Malie MGF and Palette PGA readers pass theirs through. The metadata check is what the reference's
-		// `Bmp.Read` does first, so a declared size that stops inside the header fails here.
-		if (!readBmpMetaData(decoded))
+		// `IkeFormat.Read` stands of `Bmp.Read` over the unpacked surface: the bitmap of the payload stands read
+		// of the bitmap walk of this project and handed over as a bitmap of its own, of the same places of a
+		// colour and the same rows. A surface the bitmap walk of this project cannot read fails here, which is
+		// where the reference would fail as well.
+		const image = readBmpImage(decoded);
+		if (!image) {
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid Ike bitmap data");
-		return Readable.from([decoded]);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });
