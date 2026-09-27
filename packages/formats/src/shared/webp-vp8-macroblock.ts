@@ -455,8 +455,17 @@ export function readVp8MacroblockResiduals(
 	}
 
 	const kind = modes.fourByFour ? 3 : 0;
-	let top = state.topNonZero[mbX] ?? 0;
-	const tnz = top & 0x0f;
+	// The counts of the head of the format of the picture of the places of the file of the picture of the format of
+	// the picture of the format standing in front of the picture of the format stand of the counts of the head of the
+	// format of the picture of the places of the file of the picture of the format of the pictures of the format
+	// themselves, and the walk of this project stands of the counts of the head of the format of the picture of the
+	// places of the file of the picture of the format of the picture of the format of the picture of the format
+	// standing next to it of its own: the count of the head of the format of the picture of the places of the file of
+	// the picture of the format of the picture of the format itself stands of the count of the head of the format of
+	// the picture of the places of the file of the picture of the format of the picture of the format standing in
+	// front of it (the walk of the library of the picture of the web stands of one count of the head of the format of
+	// the picture of the places of the file of the picture of the format for the two of them).
+	let tnz = (state.topNonZero[mbX] ?? 0) & 0x0f;
 	const left = state.leftNonZero;
 	let lnz = left & 0x0f;
 	let nonZeroY = 0;
@@ -477,17 +486,17 @@ export function readVp8MacroblockResiduals(
 				at,
 			);
 			l = count > first ? 1 : 0;
-			top = (top >> 1) | (l << 7);
+			tnz = (tnz >> 1) | (l << 7);
 			codes =
 				((codes << 2) |
 					(count > 3 ? 3 : count > 1 ? 2 : 0 !== coefficients[at] ? 1 : 0)) >>>
 				0;
 		}
-		top >>= 4;
+		tnz >>= 4;
 		lnz = (lnz >> 1) | (l << 7);
 		nonZeroY = ((nonZeroY << 8) | codes) >>> 0;
 	}
-	const topNonZero = top;
+	const topNonZero = tnz;
 	const leftNonZero = lnz >> 4;
 
 	let nonZeroUv = 0;
