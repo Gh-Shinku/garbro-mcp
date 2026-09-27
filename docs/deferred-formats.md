@@ -243,9 +243,10 @@ open archives that the shipped defaults already cover.
 
 ## How many rows stand unported, and of what kind
 
-At this writing the deliverable list holds **1129** rows: **1084** of them stand of a port of this project and
-**45** stand unported. Every one of the 49 is named in this file or in `docs/format-aliases.md`, and the kinds
-of reason are these, to the row:
+At this writing the deliverable list holds **1129** rows: **1086** of them stand of a port of this project and
+**43** stand unported. Every one of the 43 is named in this file or in `docs/format-aliases.md`, and the kinds
+of reason are these, to the row. (The rollup of those numbers, and the gaps that stand inside the ported rows
+rather than here, stand in `docs/status.md`.)
 
 * **a key the file does not carry, of a table that ships empty** - **25 rows**: `PKZ`, `PKG/2`, `ADS`, `PBZ`,
   `ARC/FOMA`, `CG/ACTGS`, `CG/ACTGS/2`, `PCK/TAMAMO`, `AIR`, `BIN/IDX`, `ASSETS/UNITY`, `OGG/TINK`, `CRZ`,
@@ -296,7 +297,12 @@ way, over the walk of the portable network graphic of this project, which stands
 this family at two: the record of `pisckiss-bm1-image` named this place though its port already handed a bitmap of its own over, which has
 since been corrected in its record and its note, and the walk of `blue-gale-bbm-image` has since been taken over as well, which stands this family at nothing: every row
 that named this place either stands of a corrected record or of a walk now taken over. The last of them,
-`rpg-maker-rpgmvp-image`, has since been taken over as well, so this family stands complete.
+`rpg-maker-rpgmvp-image`, has since been taken over as well, so no record names this place in this wording any
+more. **The behaviour itself still stands under other wordings**, in the records that name *image decoding*,
+*png validation* or a payload a picture stands behind: `palette-pga-image` and `malie-mgf-image` named it as
+"png decoding to bitmap" and stood of a pass-through until they were taken over in the same way (both decode
+now), while `hexenhaus-wag` (an IMGD PNG payload), `psm-image`, `xuse-p4ag-image` and `zenos-pnx-image` still
+stand it, as do the rows listed as gap 2 of `docs/status.md`.
 
 * **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
   compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in
