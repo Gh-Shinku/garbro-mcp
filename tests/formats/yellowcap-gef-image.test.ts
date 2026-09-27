@@ -2,6 +2,9 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { gefImageDescriptor, gefImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 
 // The reference's own header is twelve bytes; the PNG signature follows immediately at 0xC.
 const HEADER_SIZE = 0xc;
@@ -53,8 +56,27 @@ describe("yellowcap gef image", () => {
 		expect(gefImageDescriptor.extensions).toEqual(["gef"]);
 	});
 
-	it("extracts the embedded png unchanged", async () => {
-		const built = buildGef();
+	it("reads the places of the picture the embedded graphic holds", async () => {
+		// A whole portable network graphic, of three places of a colour a place, of the counts of the header.
+		const rows = Array.from({ length: 0x20 }, (_, y) =>
+			Array.from({ length: 0x30 * 3 }, (_, at) => (at * 5 + y * 3 + 1) & 0xff),
+		);
+		const png = pngFile({
+			width: 0x30,
+			height: 0x20,
+			colourType: 2,
+			rows,
+		});
+		const head: Buffer = Buffer.alloc(HEADER_SIZE, 0x21);
+		head.writeUInt32LE(0x00010100, 0);
+		head.writeUInt32LE(0x30, 4);
+		head.writeUInt32LE(0x20, 8);
+		const built = {
+			file: Buffer.concat([head, png]),
+			png,
+			width: 0x30,
+			height: 0x20,
+		};
 		const source = sourceOf(built.file);
 		expect(await gefImageFormat.detect(source, "EV01.GEF")).toBe(true);
 		const archive = await gefImageFormat.open(source, "EV01.GEF");
@@ -81,9 +103,19 @@ describe("yellowcap gef image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(built.png);
-			// The sixteen byte header is not part of the extracted stream.
-			expect(output.subarray(0, 4)).toEqual(PNG_SIGNATURE.subarray(0, 4));
+			// The sixteen byte header is not part of the extracted stream, and the places of the picture stand
+			// read of the walk of the graphic and handed over as a bitmap of its own.
+			const picture = readBmpImage(output);
+			const expected = await readPngImage(built.png);
+			expect(picture).toMatchObject({
+				width: 0x30,
+				height: 0x20,
+				bitsPerPixel: 24,
+			});
+			expect(expected).not.toBeUndefined();
+			expect([...(picture?.pixels ?? [])]).toEqual([
+				...(expected?.pixels ?? []),
+			]);
 		} finally {
 			await archive.close();
 		}

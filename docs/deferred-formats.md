@@ -255,7 +255,7 @@ of reason are these, to the row:
 * **a table the reference does not ship at all** - **2 rows**: `MBM` and `PACK/BONK` need a `*.lst` listing
   that stands nowhere in the reference tree. `DAT/WEAPON` and `ALL/GIGA`, which stood here for the same
   reason, **are** ported: their tables stand in the source itself.
-* **a walk of the platform rather than of the file** - **7 rows**: `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
+* **a walk of the platform rather than of the file** - **5 rows**: `WMA`, `WBC`, `EMS`, `AF2`, `MCP`, `LPC`
   and `BIN/DXLIB`, of which the last four are stubs of the reference that read nothing at all (`EMS` and
   `WBC` do not even compile: `EmsacDecoder.Decode` reads `m_buffer` and `m_lappedSubband`, neither of which
   the class holds); and of the three whose walk stands of a **public** codec or container the reference
@@ -291,7 +291,8 @@ of reason are these, to the row:
 which stands this family at fourteen. The walks of `ice-ibm-image` and of the three descriptors of the factory
 `mb/image.ts` (`bmp-mb-image`, `brownie-ngw-image` and `mink-gdf-image`) have since been taken over, which stands this
 family at ten. The walks of `lilim-img-bmp-image`, `eye-csf-image` and `yellowcap-ggf-image` have since been taken over, which stands
-this family at seven.
+this family at seven. The walks of `regrips-prg-image` and `yellowcap-gef-image` have since been taken over in the same
+way, over the walk of the portable network graphic of this project, which stands it at five.
 
 * **a codec whose original stands under another licence** - **Cocotte**, which the reference reads for the
   compression type 2 entries of `PAK/HyPack` (`ArcFormats/Hypatia/ArcKogado.cs`) and carries in full in

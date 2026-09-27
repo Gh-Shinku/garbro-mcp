@@ -38,3 +38,11 @@ The PNG colour-type to channel-count mapping is now duplicated in three ports (`
 commit.
 
 Encoding and archive creation are out of scope.
+
+## The places of the picture
+
+The reference reads the surface with the walk of the portable network graphic, so this port reads that graphic with the
+walk of the portable network graphic of this project and hands the places of the picture over as a bitmap of its own: of
+the width, the height and the depth the head of the graphic names, of the rows in the order the head names and of the
+places the walk of the graphic yields. A graphic whose places run out before the places its head names, or whose places
+of a colour stand behind a kind the walk does not carry, stands turned away, which is where the reference throws.
