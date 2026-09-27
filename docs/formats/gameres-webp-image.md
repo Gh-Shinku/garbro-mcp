@@ -3,173 +3,73 @@
 Reference: `Experimental/WebP/ImageWEBP.cs` (tag `WEBP`, class `WebPFormat`) of GARbro, commit
 `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`, MIT License.
 
-The reference hands the stream to the library of the picture of the web of its platform (`libwebp`), which this
-project does not carry, so this port walks the counts of the picture itself.
+The reference hands the stream to the platform library (`libwebp`), which this project does not carry, so this port
+decodes the image itself.
 
-Read here:
+This port reads:
 
-* the count of the head of the format of the picture of the web (RIFF, with the head of the picture of the web at
-  the eighth place of the file) and the counts of the head of the picture of it of the two kinds of the format;
-* the counts of the head of the picture of the picture of the web of the counts of the head of the format of the
-  picture of the web (VP8L): the counts of the head of the format of the picture of the web of the picture of the
-  colour of the picture, of the counts of the head of the picture of the format, of the counts of the head of the
-  format of the picture of the web of the counts of the head of the format, of the counts of the head of the format
-  of the picture of the web of the picture of the colours of the picture, of the counts of the head of the format of
-  the picture of the web of the list of the colours of the picture, and of the counts of the head of the format of
-  the picture of the web of the places of the file of the colour of the picture of the counts of the head of the
-  format of the picture of the web.
+* the container (RIFF, with the `WEBP` four character code at offset 8) and the `VP8X`, `ALPH`, `VP8 ` and `VP8L`
+  chunk headers; `EXIF`, `XMP ` and `ICCP` chunks are ignored;
+* lossless images (`VP8L`): the transforms, the meta-Huffman codes, the LZ77 stage with the distance plane map, the
+  colour cache and colour indexing, including the alpha channel;
+* lossy images (`VP8`) that are key frames whose token data is not split into several partitions, for any picture
+  size: the frame and partition headers, the macroblock modes, the coefficients, the second-order (WHT) stage, all
+  intra predictors, the inverse transforms and the unfiltered reconstruction.
 
-Turned away, each with a message of its own: the places of the picture of the colour of the places of the picture
-(VP8) and the pictures of the counts of the head of the format of the picture of the web of the places of the file
-(the places of the file of the picture of the colour of the picture of the places of the picture of the head of the
-format) and of the places of the file of the picture of the colour of the picture of the two places of the file
-behind the other.
+Refused, each with a message of its own: animation (`ANIM`/`ANMF`); an alpha channel carried in a separate `ALPH`
+chunk; lossy images whose token data is split into more than one partition. A partially supported image is detected
+and refused when it is extracted; the refusal is not a detection failure.
 
-The fixtures of the walk of this project were written by the python imaging library (which reads them back through
-`libwebp`), so the places of the picture of those fixtures stand of an oracle of another implementation.
+## Fixtures and oracle
 
-## The places of the file of the picture of the format itself of the colour of the places of the picture (VP8)
+The lossless fixtures were written by Pillow and read back through `libwebp`, so their expected pixels come from
+another implementation. The lossy fixtures are compared **byte for byte** with the planes written by
+`ffmpeg -skip_loop_filter all -f rawvideo -pix_fmt yuv420p`, that is with an independent decoder asked to skip the
+in-loop filter. `tests/helpers/webp.ts` holds the fixtures and their expected planes; the single macroblock row cases
+are 16x16 (solid, chequerboard, gradient, noise), 4x3 and 48x16, and the multi row cases are 16x32, 16x48, 16x64,
+32x48, 48x32 and 64x48. `NOISE_WEBP` and `NOISE_BIG_WEBP` are noise, which the encoder codes as 4x4 blocks, so they
+also cover the 4x4 predictors in later columns and macroblock rows.
 
-The lossy places of the picture of the format of the web follow the counts of the head of the format of the picture
-of the format of the two places of the file of the web (VP8, RFC 6386, of the counts of the head of the format of the
-picture of the places of the file of their own of the library of the picture of the web): after the counts of the
-head of the format of the picture of the format itself stand of the places of the file of the picture of the format
-of the eight places of the file of the head of the picture of the format, the first partition of the picture of the
-format carries the counts of the head of the format of the picture of the places of the file of the colour of the
-picture, of the counts of the head of the format of the picture of the counts of the head of the picture of the
-format of the places of the file, of the walk of the places of the file of the picture of the format, of the counts
-of the head of the format of the picture of the colours of the picture of the format of the picture of the places of
-the file and of the counts of the head of the format of the picture of the places of the file of the walk of the
-places of the file.
+## The lossy stage (VP8)
 
-The walk of this project stands of the walk of the counts of the head of the format of the picture of the places of
-the file of the library of the picture of the web (`src/dec/vp8_dec.c`: `ParseSegmentHeader`, `ParseFilterHeader`,
-`ParsePartitions`, `VP8ParseQuant`, `VP8ParseProba`, of the counts of the head of the format of the picture of the
-places of the file of the counts of the head of the picture of the format of `src/dec/quant_dec.c` and of the counts
-of the head of the format of the picture of the two places of the file of `src/dec/tree_dec.c`). The counts of the
-head of the format of the picture of the two places of the file of the walk of the counts of the head of the format
-of the picture of the places of the file of the picture of the format and the counts of the head of the format of
-the picture of the two places of the file of the walk of the picture of the format itself were written into
-`packages/formats/src/shared/webp-vp8-tables.ts` from that library by the walk of this project itself, of the
-counts of the head of the format of the picture of the places of the file of that library (BSD 3-Clause).
+The lossy decoder follows libwebp's decoder (`src/dec/vp8_dec.c`: `VP8GetHeaders`, `ParseSegmentHeader`,
+`ParseFilterHeader`, `ParsePartitions`; `src/dec/quant_dec.c`: `VP8ParseQuant`; `src/dec/tree_dec.c`:
+`VP8ParseProba`, `ParseIntraMode`; `ParseResiduals`, `GetCoeffsFast`, `GetLargeValue`; `src/dsp/dec.c`: the inverse
+transforms; `src/dec/frame_dec.c`: `ReconstructRow`), and the bit reader is a port of
+`src/utils/bit_reader_inl_utils.h` / `src/utils/bit_reader_utils.c` rather than an equivalent RFC 6386 formulation,
+because an equivalent formulation silently diverges from libwebp on real streams.
 
-The counts of the head of the format of the picture of the places of the file of this walk stand of three kinds of
-counts of the head of the format:
+The three generated constant tables (`DEFAULT_COEFFICIENT_PROBABILITIES`, `COEFFICIENT_UPDATE_PROBABILITIES`,
+`FOUR_PLACE_MODE_PROBABILITIES`), the coefficient bands and the two quantiser lookup tables in
+`packages/formats/src/shared/webp-vp8-tables.ts` were produced from that library by a script of this project and were
+checked value by value against the C sources (BSD 3-Clause, credited in the file header).
 
-* the counts of the head of the format of the picture of the format itself of the library of the picture of the web
-  (`src/enc/config_enc.c`), of which the picture of the python imaging library of the counts of the head of the
-  format of the picture of the two places of the file (of the count of the head of the format 75 of `method` 4, of no
-  counts of their own) stands of counts of the head of the format of the picture of the places of the file of four,
-  of the walk of the picture of the format of the strong kind, of the count of the head of the format of the picture
-  of the sharp places of the file of no count and of no counts of the head of the format of the picture of the places
-  of the file;
-* the walk of the counts of the head of the format of the picture of the places of the file of a partition of no set
-  places of the file, which stands of the counts of the head of the format of the picture of the format itself of the
-  counts of the head of the format of the picture of the places of the file of the walk of the count of the head of
-  the format, of no count of the head of the format of the picture of the places of the file of the walk of the
-  picture of the format of the colour of the picture (which is the walk of the library of the picture of the web);
-* the counts of the head of the format of the picture of the places of the file of the picture of the format of a
-  picture of a count of the head of the format of the places of the file of ten and of a picture of a count of the
-  head of the format of the places of the file of ninety, of which the count of the head of the format of the
-  pictures of the colours of the picture of the picture of the count of the head of the format of the places of the
-  file of ten stands of no count of the head of the format of the picture of the format beyond the one of the picture
-  of the count of the head of the format of the places of the file of ninety.
+Evidence used while porting: libwebp's own encoder defaults (`src/enc/config_enc.c`) match the parsed values of a
+Pillow 64x48 `method=4/quality=75` fixture five for five; the quantisers of a q10 image are never larger than those
+of a q90 image; an all-zero partition reproduces the default probability table exactly; and the pixel output of the
+decoder is compared byte for byte with ffmpeg, as described above.
 
-The places of the file of the walk of the picture of the format itself (the walk of the picture of the format of the
-places of the file of the picture of the format of the two places of the file square, of the places of the file of
-the picture of the format of four places of the file square and of the places of the file of the picture of the
-format of the places of the file of the picture of the format itself) do not stand of this walk yet, so the picture
-of the format of the colour of the places of the picture stands of no place of the picture of the format which this
-project writes at this place of the file. The counts of the head of the format of the picture of the places of the
-file of a picture of the format whose counts of the head of the format itself stand beyond four stand of no walk of
-this project.
+### The in-loop filter
 
-A count of the head of the format of the picture of the places of the file of the walk of the counts of the head of
-the format of the picture of the places of the file may stand as no count of the head of the format itself (the
-library of the picture of the web writes such a count of the head of the format as it stands, and this walk reads it
-as it stands), which the walk of the counts of the head of the format of the picture of the places of the file of the
-places of the file of the picture of the format itself of this project keeps.
+The in-loop filter is not implemented. The port reconstructs pictures without it, which is exactly what
+`ffmpeg -skip_loop_filter all` writes, so the comparison above is meaningful, but a picture decoded by a normal
+decoder (including libwebp, which the reference uses) passes through the filter and will differ near block edges.
+This is the main remaining gap of the lossy stage.
 
-## The counts of the head of the format of the picture of the places of the file of the walk of the picture of the format
+### The four samples above and to the right of a macroblock
 
-After the counts of the head of the format of the picture of the places of the file of the picture of the format
-itself, the walk of this project walks the counts of the head of the format of the picture of the places of the file
-of the picture of the format of four places of the file square of the picture of the format of the places of the file
-square (the counts of the head of the format of the picture of the places of the file of the picture of the format of
-the picture of the format of four places of the file square and of the colour of the picture, of the counts of the
-head of the format of the picture of the places of the file of the picture of the format of the number of the picture
-of the format and of the counts of the head of the format of the picture of the places of the file of the number of
-the picture of the format of the colour of the picture) and then the counts of the head of the format of the picture
-of the places of the file of the picture of the format of the places of the file of the picture of the format (the
-counts of the head of the format of the picture of the two places of the file of the picture of the format of four
-places of the file square, of the places of the file of the picture of the format of the count of the head of the
-format of the picture of the format of the two places of the file and of the places of the file of the picture of the
-format of the colour of the picture, of the counts of the head of the format of the picture of the places of the file
-of the picture of the format standing next to them).
+For 4x4 blocks the predictor needs four samples to the right of the block's top row. libwebp fills them from the
+macroblock's stash of the row above (`ReconstructRow`, `top_right`): the four samples that follow the macroblock in
+that row, or the last sample of that row repeated for the rightmost macroblock; for the first macroblock row the
+stash still holds the frame border value (127) and the write is skipped. The same four values are then copied down
+into the following three 4x4 block rows, so every block row sees the samples of the row **above the macroblock**, not
+the samples above its own row. Reading them from the per-row plane instead (which is what this port did at first) is
+wrong for every 4x4 macroblock that is not in the first macroblock row and not in the last column, because the
+samples of the next macroblock in the current row have not been reconstructed yet.
 
-`packages/formats/src/shared/webp-vp8-macroblock.ts` carries that walk, of the counts of the head of the format of
-the picture of the colours of the picture of the picture of the format of the places of the file (of the counts of
-the head of the format of the picture of the places of the file of the picture of the format of the picture of the
-format of the two places of the file), of the counts of the head of the format of the picture of the places of the
-file of the picture of the format of the count of the head of the format of the picture of the format of the two
-places of the file (`walkVp8SecondOrder`) and of the counts of the head of the format of the picture of the places
-of the file of the picture of the format standing next to them. The walk stands of the walk of the library of the
-picture of the web (`ParseIntraMode`, `GetCoeffsFast`, `GetLargeValue`, `ParseResiduals`, `VP8DecodeMB`,
-`VP8ParseQuant`, `TransformWHT_C`), of the same counts of the head of the format of the picture of the places of the
-file of that library (BSD 3-Clause).
+### Scan line state
 
-The walk of the counts of the head of the format of the picture of the places of the file of the picture of the
-format of a picture of the format of the web of the two places of the file of the picture of the format of the
-picture of the format itself (of the picture of the format of the picture of the library of the picture of the web,
-of the counts of the head of the format of the picture of the two places of the file of the picture of the format)
-stands of three kinds of counts of the head of the format: the walk of the places of the file of the picture of the
-format of the picture of the format of the two places of the file (of no count of the head of the format of the
-picture of the places of the file of the picture of the format of the count of the head of the picture of the format
-of sixteen places of the file square and of no count of the head of the format of the picture of the places of the
-file), the walk of the counts of the head of the format of the picture of the places of the file of the picture of the
-format of the places of the file of their own (a picture of the format of the places of the file of no count of the
-head of the format of the picture of the places of the file of the picture of the format of no count of the head of
-the format of the picture of the places of the file stands of no count of the head of the format of the picture of the
-places of the file) and the count of the head of the format of the picture of the places of the file of the picture of
-the format of the places of the file of the picture of the format of the two of them (of no count of the head of the
-format of the picture of the places of the file of the picture of the format of the picture of the format of the
-places of the file of the picture of the format of the picture of the format of the two places of the file).
-
-The places of the file of the picture of the format of the picture of the format of the count of the head of the
-picture of the format of the colour of the picture (the walk of the places of the file of the picture of the format
-of the picture of the format of four places of the file square, of the places of the file of the picture of the
-format of sixteen places of the file square and of the places of the file of the picture of the format of the colour
-of the picture) and the walk of the places of the file of the picture of the format itself do not stand of this walk
-yet, so no place of the picture of the format of the colour of the places of the picture stands of this project at
-this place of the file.
-
-## The places of the file of the picture of the format of the colour of the places of the picture (VP8)
-
-The walk of this project now stands of the places of the file of the picture of the format of the colour of the places
-of the picture of a picture of the format of the web of the colour of the places of the picture: the counts of the head
-of the format of the picture of the places of the file of the walk of the picture of the format of the counts of the
-head of the format of the picture of the format of four places of the file square of `webp-vp8-picture.ts`, of the
-counts of the head of the format of the picture of the places of the file of the picture of the format and of the walk
-of the places of the file of the picture of the format (`TransformOne`, `TransformAC3`, `TransformDC`, of the counts
-of the head of the format of the picture of the places of the file of the picture of the format of the colour of the
-picture of `TransformUV`/`TransformDCUV`, and the walk of the places of the file of the picture of the format of the
-places of the file of the picture of the format of `DoTransform`/`DoUVTransform`/`kScan`/`CheckMode` of the library of
-the picture of the web), and the counts of the head of the format of the picture of the places of the file of the
-picture of the format of the two places of the file of the format of the picture of the web stand of the walk of the
-places of the file of the picture of the format of the library of the picture of the web
-(`src/utils/bit_reader_inl_utils.h`, `src/dsp/dec.c`).
-
-The places of the file of the picture of the format stand of counts of the head of the format of the picture of the
-places of the file of the walk of the counts of the head of the format of the picture of the places of the file of
-ffmpeg of the same places of the file (`ffmpeg -skip_loop_filter all -f rawvideo -pix_fmt yuv420p`): the places of
-the file of the picture of the format of the picture of the format of the counts of the head of the format of the
-places of the file of their own stand of counts of their own of the walk of this project yet (the counts of the head
-of the format of the picture of the places of the file of the picture of the format standing in front of the picture
-of the format of the counts of the places of the file of the picture of the format stand of counts of their own), and a
-picture of the format of a count of the head of the format of the places of the file of ninety of the walk of the
-library of the picture of the web of the count of the head of the format stands of counts of their own of the walk of
-this project as well (a picture of the format of the counts of the head of the format of the picture of the places of
-the file of the colour of the picture of the count of the head of the format of the picture of the format of the
-picture of the format itself stands of the counts of the head of the format of the picture of the places of the file of
-the walk of the spaces of the picture of the format), so the two stand of the counts of the head of the format of the
-picture of the places of the file of the picture of the format of their own of this walk at this place of the file.
+Every macroblock row starts with the left neighbours reset (`VP8InitScanline`): the non-zero context and the left
+intra modes are the frame border values, not the values left behind by the last macroblock of the row above. Missing
+this reset decodes the first macroblock row correctly and diverges in the third row and later, because the left
+context of a row only differs once the row above has stored a non-zero value there.
