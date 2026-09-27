@@ -1,6 +1,8 @@
 import { Buffer } from "node:buffer";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { pngFile } from "../helpers/png.js";
+import { readPngImage } from "../../packages/formats/src/shared/png-image.js";
 import { qlieAbmpImageFormat } from "../../packages/formats/src/qlie/abmp-image.js";
 import {
 	readBmpImage,
@@ -133,10 +135,19 @@ describe("QLIE engine image", () => {
 		});
 	});
 
-	it("hands a portable network graphic over as it is", async () => {
-		const payload = pngPayload(5, 7);
+	it("reads the places of the picture of the portable network graphic", async () => {
+		const rows = Array.from({ length: 7 }, (_, y) =>
+			Array.from({ length: 5 * 4 }, (_, at) => (at * 7 + y * 5 + 3) & 0xff),
+		);
+		const payload = Buffer.from(
+			pngFile({ width: 5, height: 7, colourType: 6, rows }),
+		);
 		const out = await extract(abmpFile({ payload }));
-		expect(out).toEqual(payload);
+		const picture = readBmpImage(out);
+		const expected = await readPngImage(payload);
+		expect(picture).toMatchObject({ width: 5, height: 7, bitsPerPixel: 32 });
+		expect(expected).not.toBeUndefined();
+		expect([...(picture?.pixels ?? [])]).toEqual([...(expected?.pixels ?? [])]);
 		const handle = await qlieAbmpImageFormat.open(
 			sourceOf(abmpFile({ payload })),
 			"cg.abmp",

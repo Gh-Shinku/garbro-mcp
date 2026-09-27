@@ -2,6 +2,7 @@
 // (QLIE engine image format). GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { GarbroError } from "@garbro-mcp/core";
+import { readPngImage } from "../shared/png-image.js";
 import type {
 	ArchiveFormat,
 	ByteSource,
@@ -167,8 +168,32 @@ export const qlieAbmpImageFormat: ArchiveFormat = defineFixedArchive({
 		const payload = Buffer.from(
 			stored.subarray(layout.offset, layout.offset + layout.size),
 		);
+		if ("png" === layout.format) {
+			// The reference decodes the graphic through `PngFormat.Read` of its own imaging layer, so the places
+			// of the picture stand read of the walk of the portable network graphic of this project and handed
+			// over as a bitmap of its own.
+			const graphic = await readPngImage(payload);
+			if (!graphic) {
+				throw new GarbroError(
+					"INVALID_ARCHIVE",
+					"QLIE picture holds no portable network graphic",
+				);
+			}
+			// The walk of the graphic hands no list of colours over, and a bitmap of a whole count of places of
+			// a colour holds none: the list stands empty, as the shared walks of this project hand it.
+			return Readable.from([
+				writeBmpImage({
+					width: graphic.width,
+					height: graphic.height,
+					bitsPerPixel: graphic.bitsPerPixel,
+					pixels: graphic.pixels,
+					palette: Buffer.alloc(0),
+				}),
+			]);
+		}
 		if ("bmp" !== layout.format) {
-			// The reference decodes these two through its own imaging layer; the port hands them over as they are.
+			// The reference decodes a jpeg through its own imaging layer, which this project has no walk of that
+			// kind for here; the port hands it over as it stands.
 			return Readable.from([payload]);
 		}
 		const image = readBmpImage(payload);

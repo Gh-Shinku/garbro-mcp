@@ -16484,12 +16484,13 @@
 			"localId": "qlie-abmp-image",
 			"status": "partial",
 			"verification": "synthetic-fixtures",
-			"supported": ["detect", "list", "extract"],
-			"unsupported": [
-				"archive creation",
-				"image writing",
-				"png and jpeg decoding"
+			"supported": [
+				"detect",
+				"list",
+				"extract",
+				"the places of the picture: the walks of the bitmap and of the portable network graphic of this project over the payload"
 			],
+			"unsupported": ["archive creation", "image writing", "jpeg decoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

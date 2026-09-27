@@ -32,3 +32,11 @@ holding a word no reader of this format reads, what the picture behind the heade
 portable network graphic and a JPEG handed over unchanged, a bitmap rewritten as a bitmap, the length of a
 bitmap taken from the bitmap itself where the container disagrees with it, and a container with no picture
 behind it.
+
+## The places of the picture
+
+The reference decodes each kind through the imaging layer it stands on: a bitmap through `BmpFormat.Read`, a portable
+network graphic through `PngFormat.Read` and a jpeg through the platform decoder. This port carries the bitmap walk and
+the walk of the portable network graphic itself, so a picture of either of those two kinds stands read of that walk and
+handed over as a bitmap of its own, of the counts of its head and of the places its walk yields. A jpeg still stands
+handed over as the container holds it, which the record names.
