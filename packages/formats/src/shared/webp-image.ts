@@ -2,14 +2,16 @@
 // to the library of the picture of the web of its platform (libwebp.dll), which this project does not carry, so this
 // module walks the counts of the picture itself. GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 //
-// Read here: the counts of the head of the container of the format (RIFF, of the counts of the head of the format of
-// the picture of the web) and the counts of the head of the picture of the two kinds of it, of the places of the
-// picture of the counts of the head of the format of the picture of the web and of the counts of the head of the
-// picture of the walk of the jpeg of the counts of the head of the format of the web. The places of the picture of
-// the two kinds of it stand of no walk of this project yet, each with a message of its own.
+// Read here: the container head (RIFF, with `WEBP` at offset 8), the `VP8X`, `ALPH`, `VP8 ` and `VP8L` chunk heads and
+// the three kinds of payload the format carries: the lossless bit stream (VP8L), the lossy key frame bit stream (VP8)
+// converted to the BGRA places of the file the way the platform library the reference calls writes them, and the
+// alpha plane of a lossy picture, which stands turned away with a message of its own (a picture whose alpha stands in
+// its own chunk is not read yet).
 
 import { GarbroError } from "@garbro-mcp/core";
 import type { BmpImage } from "./bmp.js";
+import { walkVp8Bgra } from "./webp-vp8-bgra.js";
+import { decodeVp8KeyFrame } from "./webp-vp8-picture.js";
 import { readVp8lPicture } from "./webp-lossless.js";
 
 /** The count of the head of the format of the picture of the web. */
@@ -270,23 +272,30 @@ function invalid(message: string): GarbroError {
  * the places of the file) stand turned away, which the record names. */
 export function readWebpImage(data: Buffer): BmpImage {
 	let picture: Buffer | undefined;
+	let lossy: Buffer | undefined;
 	for (const chunk of walkChunks(data)) {
 		if (VP8L === chunk.type)
 			picture = data.subarray(chunk.at, chunk.at + chunk.size);
 		else if (VP8 === chunk.type)
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				"A picture of the web of the colour of the places of the picture stands of no walk of this project",
-			);
+			lossy = data.subarray(chunk.at, chunk.at + chunk.size);
 		else if (ALPH === chunk.type)
 			throw new GarbroError(
 				"UNSUPPORTED_FEATURE",
 				"A picture of the web of the counts of the places of the file of the colour of the picture stands of no walk of this project",
 			);
 	}
-	if (!picture)
-		throw invalid(
-			"The picture of the web names no places of the file of the picture of the counts of the places of the file of their own",
-		);
-	return readVp8lPicture(picture);
+	if (picture) return readVp8lPicture(picture);
+	if (lossy) {
+		const decoded = decodeVp8KeyFrame(lossy);
+		return {
+			width: decoded.width,
+			height: decoded.height,
+			bitsPerPixel: 32,
+			palette: Buffer.alloc(0),
+			pixels: walkVp8Bgra(decoded),
+		};
+	}
+	throw invalid(
+		"The picture of the web names no places of the file of the picture of the counts of the places of the file of their own",
+	);
 }

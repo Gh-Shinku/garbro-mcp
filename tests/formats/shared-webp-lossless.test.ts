@@ -5,7 +5,6 @@ import {
 	FLAT_WEBP,
 	FLAT_WEBP_PLACES,
 	GRADIENT_WEBP,
-	LOSSY_WEBP,
 	GRADIENT_WEBP_PLACES,
 	PATTERN_WEBP,
 	PATTERN_WEBP_PLACES,
@@ -32,8 +31,9 @@ describe("the walk of the places of the picture of the web", () => {
 		expect([...pattern.pixels]).toEqual([...PATTERN_WEBP_PLACES]);
 	});
 
-	it("turns away the places of the picture of the colour of the places of the picture", () => {
-		expect(() => readWebpImage(LOSSY_WEBP)).toThrow(GarbroError);
+	it("turns away a picture whose alpha stands in a chunk of its own", () => {
+		// The lossy places of the file of the colour of the picture stand of the walk of this project now (see the tests
+		// of the colour walk and of the format itself), but an alpha plane of its own chunk is not read yet.
 		expect(() => readWebpImage(PLACES_WEBP)).toThrow(GarbroError);
 	});
 });
