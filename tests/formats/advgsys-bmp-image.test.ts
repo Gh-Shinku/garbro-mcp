@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { advgImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const BMP_HEADER_SIZE = 54;
 const PALETTE_SIZE = 1024;
@@ -93,8 +94,25 @@ describe("advgsys bmp image", () => {
 			if (!entry) throw new Error("missing entry");
 			expect(entry.size).toBe(BigInt(stored.length - STREAM_OFFSET));
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output).toEqual(bmp);
-			expect(output.readUInt16LE(0)).toBe(0x4d42);
+			// The picture stands of the rows of the walk in the order the head of the bitmap names, so the last
+			// row of the file stands first, and of a row of the count of the places a row of the picture holds.
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: WIDTH,
+				height: HEIGHT,
+				bitsPerPixel: 8,
+			});
+			const stride = (WIDTH + 3) & ~3;
+			// The fixture writes a height of its own sign, and the walk hands a bitmap of a positive height
+			// over bottom up, so the sign the fixture wrote decides which row of the file stands first.
+			const bottomUp = bmp.readInt32LE(22) > 0;
+			const expected: number[] = [];
+			for (let row = 0; row < HEIGHT; row += 1) {
+				const stored = bottomUp ? HEIGHT - 1 - row : row;
+				for (let i = 0; i < stride; i += 1)
+					expected.push(((stored * stride + i) * 5) & 0xff);
+			}
+			expect([...(picture?.pixels ?? [])]).toEqual(expected);
 		} finally {
 			await archive.close();
 		}
@@ -112,8 +130,10 @@ describe("advgsys bmp image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(declared);
-			expect(output).toEqual(bmp.subarray(0, declared));
+			// The thirty two places behind the picture stand of no count of the walk, so the picture stands of
+			// the same places as the one of a stream that ends with it.
+			expect(readBmpImage(output)).toEqual(readBmpImage(bmp));
+			expect(output.length).not.toBe(bmp.length);
 		} finally {
 			await archive.close();
 		}

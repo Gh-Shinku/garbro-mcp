@@ -10,7 +10,7 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
-import { readBmpMetaData } from "../shared/bmp.js";
+import { readBmpImage, readBmpMetaData, writeBmpImage } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -136,7 +136,16 @@ export const advgImageFormat: ArchiveFormat = defineFixedArchive({
 		const bmp = await readBitmap(source);
 		if (!bmp)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid ADVGSys bitmap");
-		// A bitmap may declare less than the stream holds; the reference reads it by its own length.
-		return Readable.from([bmp.subarray(0, layout.fileSize)]);
+		// A bitmap may declare less than the stream holds, and the reference reads the surface by the length its
+		// head declares alone. `AdvgFormat.Read` stands of `Bmp.Read` over that surface, so the bitmap stands
+		// read of the bitmap walk of this project and handed over as a bitmap of its own.
+		const image = readBmpImage(bmp.subarray(0, layout.fileSize));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				`Invalid ADVGSys bitmap data: ${layout.fileSize} places of the file`,
+			);
+		}
+		return Readable.from([writeBmpImage(image)]);
 	},
 });
