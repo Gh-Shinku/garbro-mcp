@@ -124,8 +124,8 @@ open archives that the shipped defaults already cover.
   `KnownKeys`, which the shipped `DefaultScheme` holds as `new Dictionary<string, byte[]>()`, and `TryOpen`
   gives up when there is no key (`if (null == key) return null`). A build without the runtime scheme a game
   was shipped with reads no archive of this engine at all - not even its listing. What a key would unlock is
-  an index of two words an entry, every entry a **bzip2** stream behind it, which this project has no decoder
-  for either. The keys stand in GARbro's `Formats.dat`, not in its source.
+  an index of two words an entry, every entry a **bzip2** stream behind it, which this project **reads now**
+  (of `packages/codecs/src/bzip2.ts`); what stands of no walk is the key alone. The keys stand in GARbro's `Formats.dat`, not in its source.
 - `DAT/RepiPack` (`ArcFormats/Littlewitch/ArcDAT.cs`, `RepiScheme` at line 192): `Repi` followed by `Pack`,
   version five and nothing else, a length of the name at 0xC and a key of the name at 0x10. The key comes out
   of `FindKey (file.Name, name_key)`, which walks `KnownSchemes` - held as `new Dictionary<string, uint[]>()`
@@ -173,7 +173,7 @@ open archives that the shipped defaults already cover.
 - `YPF` (`ArcFormats/YuRis/ArcYPF.cs`, `QueryEncryptionScheme` at line 192): the key of the index and of every
   entry comes out of a scheme the reader is asked for by the name of the file, out of a table held as
   `new Dictionary<string, YpfScheme>()` in the source; without one it reads nothing.
-- `NSA` (`ArcFormats/NScripter/ArcNSA.cs`): this one stood here wrongly as well - the index of such an archive reads **without any key at all**, and `KnownKeys` reaches only the encrypted variant of the same format (`NsaEncryptedArchive`, behind `QueryPassword`), which the reference itself cannot read without a password from the user. **It stands ported now**, as `nscripter-nsa-archive`: the index, the walk of the places of the file of the engine, and the picture of the name `spb`, which the reference stands of as a bitmap of twenty four places of a colour. What stands unread of it is a file of the walk of **bzip2** (the kind `4` and the name `nbz`), of which this project carries no walk - see `docs/formats/nscripter-nsa-archive.md`.
+- `NSA` (`ArcFormats/NScripter/ArcNSA.cs`): this one stood here wrongly as well - the index of such an archive reads **without any key at all**, and `KnownKeys` reaches only the encrypted variant of the same format (`NsaEncryptedArchive`, behind `QueryPassword`), which the reference itself cannot read without a password from the user. **It stands ported now**, as `nscripter-nsa-archive`: the index, the walk of the places of the file of the engine, and the picture of the name `spb`, which the reference stands of as a bitmap of twenty four places of a colour. A file of the walk of **bzip2** (the kind `4` and the name `nbz`) stands read as well, of `packages/codecs/src/bzip2.ts` - see `docs/formats/nscripter-nsa-archive.md`.
 
 
 
@@ -261,21 +261,19 @@ of reason are these, to the row:
   the class holds); and of the three whose walk stands of a **public** codec or container the reference
   leaves to its platform - `OPUS`, `WEBP` and `TIFF` - which stand of no key at all and are the rows a
   from-spec walk could carry.
-* **a codec outside the rows as well** - **bzip2**, which four readers of the reference stand of and none of
-  them walks: `ArcFormats/NScripter/ArcNSA.cs` (the kind `4` and the name `nbz`), `ArcFormats/Tamamo/ArcPCK.cs`,
-  `Legacy/Uran/ArcNCL.cs` and `Legacy/Witch/ArcPCD.cs` all hand their streams to
-  `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream`, a library rather than a walk of the reference. A port
-  would have to stand of the format documentation instead (of which there is none official; the readable
-  description of the wire format stands with `google/wuffs`, `std/bzip2`, whose worked example fixes the
-  counts of the walk of the engine exactly: the counts of a walk of the engine of a block stand of six
-  counts where four places of the file stand of it (`RUNA`, `RUNB`, `EOB` and three counts of the walk of the
-  places of the file), and the sequence of the counts ends of `EOB`. A walk of that description read the
-  block of the worked example of the format down to its end in one attempt; what did not stand of that
-  attempt was the **count of the places of the file of the block** - the count the format checks at the end
-  of a stream - which stood of no count of the places of the file of `abraca` under either the count of the
-  walk of the engine of the places of the file that gzip uses, of that count read of the places of the file
-  the other way about, or of the count of the places of the file behind the walk of the places of the file
-  itself. That count is the one detail to settle before a walk of this format is carried.
+* **a codec outside the rows as well** - **bzip2**, which four readers of the reference stand of and
+  none of them walks: `ArcFormats/NScripter/ArcNSA.cs` (the kind `4` and the name `nbz`),
+  `ArcFormats/Tamamo/ArcPCK.cs`, `Legacy/Uran/ArcNCL.cs` and `Legacy/Witch/ArcPCD.cs` all hand their streams
+  to `ICSharpCode.SharpZipLib.BZip2.BZip2InputStream`, a library rather than a walk of the reference.
+  **It stands carried now**, as `packages/codecs/src/bzip2.ts`, of the description of the wire format with
+  `google/wuffs`, `std/bzip2`, whose worked example fixed the counts of the walk of the engine: the counts of
+  a walk of an engine of a block stand of six counts where four places of the file stand of it (`RUNA`,
+  `RUNB`, `EOB` and three counts of the walk of the places of the file), and the sequence of the counts ends
+  of `EOB`. The **count of the places of the file of a block** stands of the counts of the places of the file
+  of that format read from their most significant place (of `crc32Normal`), and of no count of the places of
+  the file turned about as the format of gzip reads them; it stands of the places of the file of the block
+  behind the walk of the counts of them. Two streams stood its check: the worked example of the description
+  and one written by `bzip2` itself.
 * **something outside the file** - **4 rows**: `DAT/IGS` (an SQLite database beside the archive),
   `DAT/hibiki` (a scheme in a data file of the reference's own installation), and `BYTES/UNITY` with
   `DAT/GX4LIB` (a .NET `BinaryFormatter` graph, of the spec MS-NRBF; the graph of `BYTES/UNITY` is three
