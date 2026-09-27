@@ -48,3 +48,12 @@ The port exposes the resource as a single entry:
   signature and a zero sized image are all declined. The reference would build an empty image for the last case.
 
 GARbro's `CanWrite` is false, so encoding is out of scope.
+
+## The places of the picture
+
+The reference reads the surface it gives back with `Bmp.Read`, so this port reads that bitmap with the shared bitmap
+walk and hands the places of the picture over as a bitmap of its own: of the width, the height and the depth of the head
+of the bitmap, of a row of the count of the places a row of the picture holds (so the row padding of the file stands of
+no count) and of the rows in the order the head names, which for a bitmap of a positive height means the last row of the
+file first. Where the surface holds places behind the picture those places stand of no count of the walk; where it ends
+inside the places the head names, the walk stands turned away, which is where the reference throws.

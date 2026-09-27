@@ -2,6 +2,7 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { lzBmpImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const SIGNATURE = Buffer.from([0x53, 0x5a, 0x44, 0x44]);
 const STREAM_OFFSET = 0x0e;
@@ -101,13 +102,19 @@ describe("misc lz bmp image", () => {
 			const entry = archive.entries[0];
 			if (!entry) throw new Error("missing entry");
 			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			expect(output.length).toBe(buildBmp().length);
-			expect(output.subarray(0, BMP_HEADER_SIZE)).toEqual(
-				buildBmp().subarray(0, BMP_HEADER_SIZE),
-			);
+			const picture = readBmpImage(output);
+			expect(picture).toMatchObject({
+				width: 2,
+				height: 3,
+				bitsPerPixel: 24,
+			});
 			// The pixel bytes come from an untouched part of the ring buffer, so they are the reference's
-			// pre-fill byte rather than zeros.
-			expect(output.subarray(BMP_HEADER_SIZE)).toEqual(Buffer.alloc(24, 0x20));
+			// pre-fill byte rather than zeros; the walk hands a row over of the count of the places a row of the
+			// picture holds, so the padding of the file stands of no count, and of the rows of the file in the
+			// order the head names.
+			expect([...(picture?.pixels ?? [])]).toEqual(
+				Array.from({ length: 3 * 2 * 3 }, () => 0x20),
+			);
 		} finally {
 			await archive.close();
 		}
