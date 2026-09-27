@@ -574,7 +574,11 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detection", "extraction", "lzss decoding", "metadata"],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -2573,7 +2577,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -2962,7 +2970,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -3118,7 +3130,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -3193,7 +3209,11 @@ export const formatSupportCatalog = {
 				"bitmap marker restoration",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -4906,7 +4926,11 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -6851,7 +6875,11 @@ export const formatSupportCatalog = {
 				"bitmap passthrough",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -9035,7 +9063,10 @@ export const formatSupportCatalog = {
 				"bitmap pass through",
 				"metadata",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -9858,7 +9889,11 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detection", "extraction", "huffman decoding", "metadata"],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -10882,7 +10917,10 @@ export const formatSupportCatalog = {
 				"png header metadata",
 				"pass-through output",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -10942,7 +10980,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -11742,7 +11784,10 @@ export const formatSupportCatalog = {
 				"bmp header metadata",
 				"pass-through output",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -11764,7 +11809,10 @@ export const formatSupportCatalog = {
 				"pass-through output",
 				"an interlaced picture (`interlace` of one, the seven walks of Adam7), read by `packages/formats/src/shared/png-image.ts`",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -13486,7 +13534,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -14448,7 +14500,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -16028,7 +16084,10 @@ export const formatSupportCatalog = {
 				"24bpp bitmap output",
 				"metadata",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -16892,7 +16951,10 @@ export const formatSupportCatalog = {
 				"bmp header metadata",
 				"pass-through output",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -16932,7 +16994,10 @@ export const formatSupportCatalog = {
 				"png header metadata",
 				"pass-through output",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -17150,7 +17215,11 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -17548,7 +17617,11 @@ export const formatSupportCatalog = {
 				"bitmap trimming",
 				"metadata",
 			],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22723,7 +22796,10 @@ export const formatSupportCatalog = {
 				"bitmap pass through",
 				"metadata",
 			],
-			unsupported: ["image encoding"],
+			unsupported: [
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22803,7 +22879,12 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detection", "extraction", "png passthrough", "metadata"],
-			unsupported: ["archive creation", "image encoding", "image decoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"image decoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22817,7 +22898,12 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detection", "extraction", "bitmap passthrough", "metadata"],
-			unsupported: ["archive creation", "image encoding", "image decoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"image decoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
@@ -22958,7 +23044,11 @@ export const formatSupportCatalog = {
 			status: "partial",
 			verification: "synthetic-fixtures",
 			supported: ["detect", "list", "extract"],
-			unsupported: ["archive creation", "image encoding"],
+			unsupported: [
+				"archive creation",
+				"image encoding",
+				"the places of the picture decoded and handed over as a bitmap of this project, where the port hands the surface over as the file holds it",
+			],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
