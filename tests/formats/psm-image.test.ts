@@ -2,6 +2,8 @@ import { BufferByteSource } from "@garbro-mcp/core";
 import { psmImageFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { pngFile } from "../helpers/png.js";
 
 const IHDR_END = 0x21;
 
@@ -63,20 +65,36 @@ describe("obfuscated png image", () => {
 				width: 0x40,
 				height: 0x30,
 			});
-			const entry = archive.entries[0];
-			if (!entry) throw new Error("missing entry");
-			const output = await consumeBuffer(await archive.openEntry(entry.id));
-			// Only the first byte differs, so the output is as long as the stored file.
-			expect(output.length).toBe(built.file.length);
-			expect(output[0]).toBe(0x89);
-			expect(output.subarray(1)).toEqual(built.file.subarray(1));
-			expect(output.subarray(0, 8)).toEqual(
-				Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-			);
-			expect(output.subarray(12, 16).toString("latin1")).toBe("IHDR");
+			// The places of a whole graphic stand read of the walk of the pictures of this project, behind
+			// the word of the signature the walk of the file restores.
 		} finally {
 			await archive.close();
 		}
+	});
+
+	it("reads the places of a whole picture of the kind of its head", async () => {
+		// A whole graphic of two pixels to a row and one row, of the obfuscated kind: the first word of its
+		// signature stands of the word the format stores instead.
+		const graphic = pngFile({
+			width: 2,
+			height: 1,
+			colourType: 2,
+			rows: [[10, 20, 30, 40, 50, 60]],
+		});
+		const file = Buffer.from(graphic);
+		file[0] = 0xed;
+		const archive = await psmImageFormat.open(sourceOf(file), "CG02.PSM");
+		const entry = archive.entries[0];
+		if (!entry) throw new Error("missing entry");
+		const picture = readBmpImage(
+			await consumeBuffer(await archive.openEntry(entry.id)),
+		);
+		expect(picture).toMatchObject({
+			width: 2,
+			height: 1,
+			bitsPerPixel: 24,
+		});
+		expect([...(picture?.pixels ?? [])]).toEqual([30, 20, 10, 60, 50, 40]);
 	});
 
 	it("derives the bit depth from the colour type", async () => {

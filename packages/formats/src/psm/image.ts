@@ -9,6 +9,8 @@ import type {
 	FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { writeBmp24, writeBmp32 } from "../shared/bmp.js";
+import { readPngImage } from "../shared/png-image.js";
 import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
@@ -145,13 +147,34 @@ export const psmImageFormat: ArchiveFormat = defineFixedArchive({
 		const layout = await readLayout(source);
 		if (!layout)
 			throw new GarbroError("INVALID_ARCHIVE", "Invalid obfuscated PNG image");
-		// GARbro builds a prefix stream: the four byte header with the repaired signature, then the
-		// body verbatim, so the result is the original PNG at the original length.
+		// GARbro builds a prefix stream: the four byte header with the repaired signature, then the body
+		// verbatim, so the result is the original PNG at the original length. `PngFormat.Read` then stands of
+		// the walk of the pictures of that kind, which this project carries.
 		const head = Buffer.from(await source.readAt(0n, layout.payloadOffset));
 		head[0] = PNG_SIGNATURE[0] ?? 0x89;
 		const body = Buffer.from(
 			await source.readAt(BigInt(layout.payloadOffset), layout.payloadSize),
 		);
-		return Readable.from([Buffer.concat([head, body])]);
+		const image = await readPngImage(Buffer.concat([head, body]));
+		if (!image) {
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"The picture stands of no picture of the kind its head names",
+			);
+		}
+		if (32 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp32(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		if (24 === image.bitsPerPixel) {
+			return Readable.from([
+				writeBmp24(image.width, image.height, Buffer.from(image.pixels)),
+			]);
+		}
+		throw new GarbroError(
+			"UNSUPPORTED_FEATURE",
+			`The picture stands of ${image.bitsPerPixel} places of a colour`,
+		);
 	},
 });
