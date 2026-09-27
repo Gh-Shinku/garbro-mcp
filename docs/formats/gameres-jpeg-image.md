@@ -47,3 +47,24 @@ black of it, which stands of the places the python imaging library hands over as
 `PRESS_PIXELS` places of `tests/helpers/jpeg.ts`). The kind of the two of them (YCCK, a transform of two) and a stream of
 four components that carries no marker of its own still stand turned away, and so do streams of twelve bits a sample and
 streams of arithmetic coding.
+
+## The names of the places of the file of the colours of the picture
+
+A stream of three components that carries no marker of the Adobe kind names its components itself: where those names
+stand of the places of the file of the colours of the picture (`R`, `G` and `B`), the components hold the colours of
+the picture of the places of the file themselves and no count of the head of the format of the two of them stands
+between them, which the library of the walk of the jpeg of this machine stands of as well. Such streams stand in the
+abbreviated streams of the picture of the format of the file of the walk of the jpeg (see
+`docs/formats/gameres-tiff-image.md`), whose counts of the head of the color of the picture and of the walk of the jpeg
+of it stand of the count of the head of the picture of the format.
+
+## The counts of the places of the file of the colour of the picture of the row of the picture
+
+The counts of the places of the file of a component that samples the picture twice as coarsely in both directions stand
+of the counts of the places of the file of the colour of the picture of its own row and of the row of the picture in
+front of it, every place of the file of the row of the picture of the counts of the head of the format: the walk
+stands of the count of the places of the file of the colour of the picture of the farther row of the two, of a quarter
+of the weight of the nearer, of the counts of the places of the file of the colour of the picture of its own row of
+four of those places. The places of the file of the row of the picture that stand at the ends of the row of the
+picture stand of the counts of the head of the format of the picture of the left and of the right of the row of the
+picture alone (`tests/helpers/jpeg.ts`, the wideness of `WIDE_JPEG` and `TALL_JPEG`).
