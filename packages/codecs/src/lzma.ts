@@ -40,7 +40,6 @@ const MID_LEN_BITS = 3;
 const HIGH_LEN_BITS = 8;
 const LOW_LEN_SYMBOLS = 1 << LOW_LEN_BITS;
 const MID_LEN_SYMBOLS = 1 << MID_LEN_BITS;
-const LEN_SYMBOLS = LOW_LEN_SYMBOLS + MID_LEN_SYMBOLS + (1 << HIGH_LEN_BITS);
 const LITERAL_CODERS = 0x300;
 /** The count of the places of the file a stream that stands of no count of its own may reach here. */
 const MOST_OUTPUT = 1 << 30;
@@ -208,10 +207,8 @@ class LengthDecoder {
 	readonly #low: Uint16Array;
 	readonly #mid: Uint16Array;
 	readonly #high = new Uint16Array(1 << HIGH_LEN_BITS);
-	readonly #posStates: number;
 
 	constructor(posStates: number) {
-		this.#posStates = posStates;
 		this.#low = new Uint16Array(posStates * (1 << LOW_LEN_BITS));
 		this.#mid = new Uint16Array(posStates * (1 << MID_LEN_BITS));
 		this.init();
@@ -254,12 +251,10 @@ class LengthDecoder {
 class LiteralDecoder {
 	readonly #coders: Uint16Array;
 	readonly #lc: number;
-	readonly #lp: number;
 	readonly #posMask: number;
 
 	constructor(lc: number, lp: number) {
 		this.#lc = lc;
-		this.#lp = lp;
 		this.#posMask = (1 << lp) - 1;
 		this.#coders = new Uint16Array((1 << (lc + lp)) * LITERAL_CODERS);
 		this.#coders.fill(PROBABILITY_WHOLE >> 1);
