@@ -7,6 +7,9 @@ import {
 	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
+import { inflateLzssAll } from "@garbro-mcp/codecs";
+import { Readable } from "node:stream";
+import { writeBmp32 } from "../shared/bmp.js";
 import {
 	checkPlacement,
 	createFixedEntry,
@@ -77,9 +80,36 @@ async function readEp1Index(
 	return entries;
 }
 
-/** The reference decodes pixels in `OpenImage`; the archive layer emits the stored range. */
-const ep1EntryOpener: FixedEntryOpener = async (source, entry) =>
-	source.createReadStream(entry.offset, entry.packedSize);
+/** `LzssStream` of the reference: only the position of the ring stands of a count of its own. */
+const LZSS_FRAME_INIT_POSITION = 0xff0;
+
+/** `Ep1BitmapDecoder`: the places of a picture of this engine stand of four places of a colour to a pixel, of the
+ * counts of the record of the entry, behind the head of the entry, of the walk the method of the record names. */
+const ep1EntryOpener: FixedEntryOpener = async (source, entry) => {
+	const metadata = entry.metadata as
+		| { width?: number; height?: number; method?: number }
+		| undefined;
+	const width = Number(metadata?.width ?? 0);
+	const height = Number(metadata?.height ?? 0);
+	const method = Number(metadata?.method ?? 0);
+	if (width <= 0 || height <= 0) {
+		return source.createReadStream(entry.offset, entry.packedSize);
+	}
+	const pixels = width * height * 4;
+	const stored = Buffer.from(
+		await source.readAt(entry.offset, Number(entry.packedSize)),
+	);
+	// The reference reads the whole picture through the codec for the methods of four to seven, and the places
+	// of the file as they are for every other method.
+	const places =
+		method >= 4 && method <= 7
+			? inflateLzssAll(stored, { frameInitPosition: LZSS_FRAME_INIT_POSITION })
+			: stored;
+	const picture = Buffer.alloc(pixels, 0x00);
+	places.copy(picture, 0, 0, Math.min(places.length, pixels));
+	// `ImageData.Create` keeps the stored order top down, which a bitmap records with a height of its own sign.
+	return Readable.from([writeBmp32(width, height, picture)]);
+};
 
 export const ebisuEp1Descriptor: FormatDescriptor = {
 	id: "ebisu-ep1",

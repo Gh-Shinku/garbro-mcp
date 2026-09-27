@@ -1,7 +1,8 @@
 import { BufferByteSource } from "@garbro-mcp/core";
 import { ebisuEp1Format } from "@garbro-mcp/formats";
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
-import { expectArchive } from "../helpers/archive.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const IMAGE_INDEX_START = 8;
 const HEADER_SIZE = 0x30;
@@ -39,27 +40,40 @@ function buildEp1(entries: readonly Entry[]): Buffer {
 
 describe("Studio Ebisu EP1 resource archive", () => {
 	it("reads a chain of image records", async () => {
+		// Every picture stands of four places of a colour to a pixel, of the counts of its own record.
 		const first = Buffer.alloc(0x40, 0x11);
 		const second = Buffer.alloc(0x20, 0x22);
 		const archive = buildEp1([
-			{ name: "first.bmp", payload: first, width: 8, height: 8, method: 5 },
+			{ name: "first.bmp", payload: first, width: 4, height: 4, method: 0 },
 			{
 				name: "second.bmp",
 				payload: second,
-				width: 16,
-				height: 4,
+				width: 8,
+				height: 1,
 				method: 0,
 			},
 		]);
-		await expectArchive({
-			format: ebisuEp1Format,
-			archive,
-			metadata: { entryCount: 2 },
-			entries: [
-				{ path: "first.bmp", size: first.length, content: first },
-				{ path: "second.bmp", size: second.length, content: second },
-			],
-		});
+		const listing = await ebisuEp1Format.open(
+			new BufferByteSource(archive),
+			"sample.ep1",
+		);
+		expect(listing.metadata).toEqual({ entryCount: 2 });
+		expect(
+			listing.entries.map((entry) => ({
+				path: entry.path,
+				size: entry.size,
+			})),
+		).toEqual([
+			{ path: "first.bmp", size: BigInt(first.length) },
+			{ path: "second.bmp", size: BigInt(second.length) },
+		]);
+		const picture = readBmpImage(
+			await consumeBuffer(
+				await listing.openEntry(listing.entries[0]?.id ?? "0"),
+			),
+		);
+		expect(picture).toMatchObject({ width: 4, height: 4, bitsPerPixel: 32 });
+		expect([...(picture?.pixels ?? [])]).toEqual([...first]);
 	});
 
 	it("exposes the image geometry and method", async () => {
@@ -81,15 +95,28 @@ describe("Studio Ebisu EP1 resource archive", () => {
 	});
 
 	it("stops at the end of the file", async () => {
+		// The record declares one pixel of four places of a colour, which stands of the four words of the file
+		// that the walk of the places reads; the places behind them stand of no count of their own.
 		const payload = Buffer.from("payload");
 		const archive = buildEp1([
-			{ name: "only.bmp", payload, width: 2, height: 2, method: 1 },
+			{ name: "only.bmp", payload, width: 1, height: 1, method: 1 },
 		]);
-		await expectArchive({
-			format: ebisuEp1Format,
-			archive,
-			entries: [{ path: "only.bmp", size: payload.length, content: payload }],
-		});
+		const listing = await ebisuEp1Format.open(
+			new BufferByteSource(archive),
+			"sample.ep1",
+		);
+		expect(
+			listing.entries.map((entry) => ({
+				path: entry.path,
+				size: entry.size,
+			})),
+		).toEqual([{ path: "only.bmp", size: BigInt(payload.length) }]);
+		const picture = readBmpImage(
+			await consumeBuffer(
+				await listing.openEntry(listing.entries[0]?.id ?? "0"),
+			),
+		);
+		expect([...(picture?.pixels ?? [])]).toEqual([...payload.subarray(0, 4)]);
 	});
 
 	it("rejects a foreign signature", async () => {

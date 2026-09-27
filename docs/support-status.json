@@ -5973,12 +5973,10 @@
 				"image width height and method metadata",
 				"payload size and placement validation",
 				"image typing",
-				"verbatim extraction"
+				"verbatim extraction",
+				"the places of a picture of a record: four places of a colour to a pixel, of the walk the method of the record names"
 			],
-			"unsupported": [
-				"archive creation",
-				"gui bitmap decoding (32bpp bgra rows with lzss for methods four to seven)"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

@@ -25,10 +25,12 @@ the reference assumes.
 ## Extraction
 
 The archive layer emits each stored payload as a plain byte range, which is what the reference's base `OpenEntry` does.
-Pixel decoding lives in the reference's `OpenImage`: it reads `width * height * 4` bytes as 32-bit BGRA rows, inflating
-them with GARbro's LZSS stream — with a frame start of 0xFF0 — when the method is between four and seven and copying them
-verbatim otherwise. That image-layer behaviour is not part of this port and is recorded as an unsupported capability.
-
+`Ep1Opener.OpenImage` reads the places of a picture of this engine: its record names the width and height, so the
+places stand of four places of a colour to a pixel, of the counts of the record, behind the head of the entry — of the
+walk of the compressed streams for the methods of four to seven, and of the file as it stands for every other method —
+and the port hands them over as a bitmap of four places of a colour, of the order of the file. The places behind the
+count the record names stand of no count of their own, which the reference stands of as well. Archive creation and image
+writing are out of scope.
 ## Support
 
 | Capability | Status |
@@ -40,7 +42,7 @@ verbatim otherwise. That image-layer behaviour is not part of this port and is r
 | Payload size and placement validation | Supported |
 | Image typing | Supported |
 | Verbatim extraction | Supported |
-| GUI bitmap decoding (32bpp BGRA rows, LZSS for methods 4–7) | Unsupported |
+| The places of a picture of a record: four places of a colour to a pixel, of the walk the method names | Supported |
 | Archive creation | Unsupported |
 
 Synthetic fixtures cover a two-record chain, the image geometry metadata, a single-record archive, a foreign signature, a
