@@ -1,6 +1,7 @@
 // Format reference: GARBro ArcFormats/NekoSDK/ArcPAK.cs, class `PakOpener` (NEKOPACK/4).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { createZlibInflateStream } from "@garbro-mcp/codecs";
 import {
 	type ArchiveFormat,
@@ -8,16 +9,16 @@ import {
 	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceType } from "../shared/resource-catalog.js";
 
 const MARKER = Buffer.from("NEKOPACK4", "ascii");
 const VERSION_OFFSET = 9;
@@ -111,6 +112,9 @@ async function readPakIndex(
 		} else {
 			entry.sizeKnown = false;
 		}
+		// GARBro deliberately clears the catalog type for ALP payloads.
+		if (!entry.path.toLowerCase().endsWith(".alp"))
+			applyExtensionResourceType(entry);
 		entries.push(entry);
 	}
 	if (entries.length === 0) return undefined;

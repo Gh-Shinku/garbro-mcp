@@ -2,10 +2,10 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
@@ -14,6 +14,7 @@ import {
 	defineFixedArchive,
 	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** 'am00' */
 const SIGNATURE = Buffer.from("am00", "latin1");
@@ -68,6 +69,7 @@ async function readLeafAmIndex(
 		);
 		indexOffset += RECORD_TAIL_SIZE;
 	}
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

@@ -1,23 +1,24 @@
 // Format reference: GARBro ArcFormats/FrontWing/ArcFLT.cs, class `FltOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
+import { createZlibInflateStream } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { createZlibInflateStream } from "@garbro-mcp/codecs";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** 'LIB_PACKDATA0000' */
 const SIGNATURE = Buffer.from("LIB_PACKDATA0000", "latin1");
@@ -130,7 +131,9 @@ async function readFltIndex(
 			}),
 		);
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /**

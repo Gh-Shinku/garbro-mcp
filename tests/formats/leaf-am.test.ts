@@ -56,8 +56,18 @@ describe("Leaf AM video resources archive", () => {
 			]),
 			sourcePath: "sample.am",
 			entries: [
-				{ path: "op.am", size: first.length, content: first },
-				{ path: "ed.am", size: second.length, content: second },
+				{
+					path: "op.am",
+					size: first.length,
+					resourceType: "archive",
+					content: first,
+				},
+				{
+					path: "ed.am",
+					size: second.length,
+					resourceType: "archive",
+					content: second,
+				},
 			],
 			metadata: { entryCount: 2 },
 		});

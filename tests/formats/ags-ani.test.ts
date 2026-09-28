@@ -94,23 +94,53 @@ describe("Anime Game System ANI animation resource", () => {
 		expect(
 			handle.entries.map((entry) => ({
 				path: entry.path,
+				resourceType: entry.resourceType,
 				frameType: entry.metadata?.frameType,
 				keyFrame: entry.metadata?.keyFrame,
 				frameIndex: entry.metadata?.frameIndex,
 				type: entry.metadata?.type,
 			})),
 		).toEqual([
-			{ path: "0000", frameType: 0, keyFrame: 0, frameIndex: 0, type: "image" },
-			{ path: "0001", frameType: 3, keyFrame: 0, frameIndex: 1, type: "image" },
+			{
+				path: "0000",
+				resourceType: "image",
+				frameType: 0,
+				keyFrame: 0,
+				frameIndex: 0,
+				type: "image",
+			},
+			{
+				path: "0001",
+				resourceType: "image",
+				frameType: 3,
+				keyFrame: 0,
+				frameIndex: 1,
+				type: "image",
+			},
 			{
 				path: "0002",
+				resourceType: "image",
 				frameType: 0xa,
 				keyFrame: 2,
 				frameIndex: 2,
 				type: "image",
 			},
-			{ path: "0003", frameType: 4, keyFrame: 2, frameIndex: 3, type: "image" },
-			{ path: "0005", frameType: 5, keyFrame: 2, frameIndex: 4, type: "image" },
+			{
+				path: "0003",
+				resourceType: "image",
+				frameType: 4,
+				keyFrame: 2,
+				frameIndex: 3,
+				type: "image",
+			},
+			{
+				path: "0005",
+				resourceType: "image",
+				frameType: 5,
+				keyFrame: 2,
+				frameIndex: 4,
+				type: "image",
+			},
 		]);
 	});
 

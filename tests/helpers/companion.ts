@@ -1,8 +1,12 @@
-import { FileByteSource, type ArchiveFormat } from "@garbro-mcp/core";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import {
+	type ArchiveFormat,
+	type EntryResourceType,
+	FileByteSource,
+} from "@garbro-mcp/core";
 import { expect } from "vitest";
 
 /** Writes a set of companion files into a temporary directory and runs the callback. */
@@ -25,6 +29,7 @@ export async function withCompanionFiles(
 export interface CompanionEntry {
 	path: string;
 	size: number;
+	resourceType?: EntryResourceType;
 	content?: Buffer;
 }
 
@@ -54,6 +59,10 @@ export async function expectCompanionArchive(options: {
 			expect(archive.metadata).toMatchObject(options.metadata);
 		}
 		for (const [index, expected] of options.entries.entries()) {
+			if (expected.resourceType !== undefined)
+				expect(archive.entries[index]?.resourceType).toBe(
+					expected.resourceType,
+				);
 			if (expected.content === undefined) continue;
 			const entry = archive.entries[index];
 			if (!entry) throw new Error(`Missing entry at index ${index}`);

@@ -1,24 +1,25 @@
 // Format reference: GARbro ArcFormats/Carriere/ArcARC.cs, classes `ArcOpener` and `ScenarioArcOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { inflateLzssAll } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** The first format's two-word magic. */
 const ARC_SIGNATURE = Buffer.from([0x87, 0x9b, 0x94, 0x8f]);
@@ -85,7 +86,9 @@ async function readCarriereIndex(
 			}),
 		);
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /** GARbro `ArcOpener.OpenEntry`: packed entries run through GARbro's default LZSS variant. */
@@ -193,7 +196,9 @@ async function readCarriereScenarioIndex(
 			}),
 		);
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /** GARbro `ScenarioArcOpener.OpenEntry`, which decodes the entry's own data stream header. */

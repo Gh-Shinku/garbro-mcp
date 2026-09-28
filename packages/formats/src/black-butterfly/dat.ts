@@ -1,20 +1,21 @@
 // Format reference: GARbro Legacy/BlackButterfly/ArcDAT.cs, class `DatOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("PITA", "latin1");
 const INDEX_START = 0x10;
@@ -139,6 +140,7 @@ async function readPitaIndex(
 		);
 	}
 	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

@@ -1,21 +1,22 @@
 // Format reference: GARbro ArcFormats/VnEngine/ArcAXR.cs, class `AxrOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
 	type ArchiveFormat,
 	type ArchiveHandle,
 	type ByteSource,
-	type FormatDescriptor,
 	decodeCp932,
+	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
-	normalizeEntryPath,
 	type FixedEntry,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("AXRe", "latin1");
 const HEADER_SIZE = 0x10;
@@ -122,6 +123,7 @@ async function readAxrIndex(source: ByteSource): Promise<AxrIndex | undefined> {
 		cursor += (nameLength + 4) & ~3;
 	}
 	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
 	return { entries, key };
 }
 

@@ -10,11 +10,12 @@ import {
 import {
 	checkPlacement,
 	createFixedEntry,
-	defineFixedArchive,
 	decodeCStringField,
+	defineFixedArchive,
 	isSaneCount,
 	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 import {
 	type Mk2Entry,
 	openMk2Entry,
@@ -144,6 +145,7 @@ async function readMk2Index(
 		groupOffset += BigInt(GROUP_HEADER_SIZE);
 	}
 	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

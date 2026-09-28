@@ -1,6 +1,6 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { type ArchiveEntry, BufferByteSource } from "@garbro-mcp/core";
 import { buildAxrKeyTable, vnEngineAxrFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -159,12 +159,17 @@ describe("vnengine AXR resource archive", () => {
 		await expectArchive({
 			format: vnEngineAxrFormat,
 			archive: buildArchive([
-				{ name: "FIRST.BIN", content: first },
+				{ name: "FIRST.OGG", content: first },
 				{ name: "DIR\\SECOND.BIN", content: second },
 			]),
 			sourcePath: "sample.axr",
 			entries: [
-				{ path: "FIRST.BIN", size: first.length, content: first },
+				{
+					path: "FIRST.OGG",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "DIR/SECOND.BIN", size: second.length, content: second },
 			],
 		});

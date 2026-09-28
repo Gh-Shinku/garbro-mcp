@@ -2,18 +2,19 @@
 // GARbro references: GameRes/ArchiveFormat.cs (IsSaneCount), GameRes/GameRes.cs (Entry.CheckPlacement).
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { extname } from "node:path";
+import type { Readable } from "node:stream";
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveDetectionHints,
 	type ArchiveEntry,
 	type ArchiveFormat,
 	type ArchiveHandle,
 	type ByteSource,
+	decodeCp932,
+	type EntryResourceType,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { extname } from "node:path";
-import type { Readable } from "node:stream";
 
 /** GARbro `ArchiveFormat.IsSaneCount`: `count > 0 && count < 0x40000`. */
 export function isSaneCount(count: number): boolean {
@@ -105,6 +106,7 @@ export function createFixedEntry(input: {
 	packedSize?: bigint;
 	compressed?: boolean;
 	encrypted?: boolean;
+	resourceType?: EntryResourceType;
 	metadata?: Record<string, unknown>;
 }): FixedEntry {
 	const entry: FixedEntry = {
@@ -117,6 +119,7 @@ export function createFixedEntry(input: {
 		offset: input.offset,
 	};
 	if (input.rawPath !== undefined) entry.rawPath = input.rawPath;
+	if (input.resourceType !== undefined) entry.resourceType = input.resourceType;
 	if (input.metadata !== undefined) entry.metadata = input.metadata;
 	return entry;
 }

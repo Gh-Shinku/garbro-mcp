@@ -861,11 +861,11 @@
 				"image entry metadata",
 				"frame type and key frame and frame index metadata",
 				"offset ordered size assignment",
-				"shared offset extents"
+				"shared offset extents",
+				"image resource typing for generated frame names"
 			],
 			"unsupported": [
 				"archive creation",
-				"extension based entry typing",
 				"CG image decoding and key frame chaining"
 			],
 			"remainingVerification": ["real-game GARbro differential output"]
@@ -2170,13 +2170,10 @@
 				"payload remainder after the key length",
 				"pf2 count in the file header",
 				"pf2 index header and twelve-byte record gap",
-				"hierarchical path normalization"
+				"hierarchical path normalization",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": [
-				"archive creation",
-				"alternate UTF-8 name encoding",
-				"extension based entry typing"
-			],
+			"unsupported": ["archive creation", "alternate UTF-8 name encoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -2867,9 +2864,10 @@
 				"repeated byte runs",
 				"interleaved zero and literal pairs",
 				"seven bit end marker",
-				"output bounds checks"
+				"output bounds checks",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -3744,9 +3742,10 @@
 				"packed flag from the size difference",
 				"placement checks",
 				"LZSS decoding of packed entries",
-				"hierarchical path normalization"
+				"hierarchical path normalization",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -3790,9 +3789,10 @@
 				"record stored size placement check",
 				"stream header placement check",
 				"per-entry stream decoding at list time",
-				"hierarchical path normalization"
+				"hierarchical path normalization",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5437,9 +5437,10 @@
 				"unpacked and stored sizes",
 				"raw deflate payload extraction",
 				"depth limit for hostile indexes",
-				"placement validation"
+				"placement validation",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5465,9 +5466,10 @@
 				"packed flag at +0x14",
 				"placement checks",
 				"hierarchical path normalization",
-				"zlib inflation of packed payloads"
+				"zlib inflation of packed payloads",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5494,9 +5496,10 @@
 				"packed flag at +0x30",
 				"placement checks",
 				"hierarchical path normalization",
-				"zlib inflation of packed payloads"
+				"zlib inflation of packed payloads",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -7658,9 +7661,10 @@
 				"placement checks",
 				"offset-folded payload key",
 				"exclusive-or before zlib inflation",
-				"hierarchical path normalization"
+				"hierarchical path normalization",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -8329,9 +8333,10 @@
 				"stored sizes and four byte entry headers",
 				"placement validation",
 				"payload substitution from the fifth byte",
-				"entry header restoration"
+				"entry header restoration",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -10432,9 +10437,10 @@
 				"shared match count nibble between consecutive matches",
 				"overlapping copies through the 0x100-byte ring",
 				"clean end of stream with a zeroed remainder",
-				"truncation errors"
+				"truncation errors",
+				"GARBro catalog extension and alias based entry typing with numeric audio type override"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -11276,13 +11282,10 @@
 				"placement checks",
 				"walk to the end of the index",
 				"empty index handling",
-				"verbatim names without hierarchical normalization"
+				"verbatim names without hierarchical normalization",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": [
-				"archive creation",
-				"user scheme decryption tables",
-				"extension based entry typing"
-			],
+			"unsupported": ["archive creation", "user scheme decryption tables"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -11306,9 +11309,10 @@
 				"offset rebasing after the index walk",
 				"placement checks",
 				"hierarchical path normalization",
-				"payload exclusive-or with the 512-byte key table"
+				"payload exclusive-or with the 512-byte key table",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -12502,9 +12506,10 @@
 				"E1 prefix descrambling",
 				"default and AR scramble schemes",
 				"LZSS decoding to end of stream",
-				"BPR01 and BPR02 expansion"
+				"BPR01 and BPR02 expansion",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -14658,9 +14663,10 @@
 				"payload middle range",
 				"zlib payload decompression",
 				"path normalization",
-				"placement validation"
+				"placement validation",
+				"GARBro catalog extension and alias based entry typing with untyped ALP payloads"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -19890,9 +19896,10 @@
 				"0x1000-byte ring with a write position starting at one",
 				"overlapping copies",
 				"short decodes returned as shorter entries",
-				"match overflow errors"
+				"match overflow errors",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -21942,9 +21949,10 @@
 				"payload keystream table",
 				"keystream xor at absolute offsets",
 				"keystream wrap at 0x400 bytes",
-				"placement validation"
+				"placement validation",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "extension based entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

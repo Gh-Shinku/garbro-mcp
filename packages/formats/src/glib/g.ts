@@ -1,22 +1,23 @@
 // Format reference: GARbro ArcFormats/GLib/ArcG.cs, class `GOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
+import { inflateLzss } from "@garbro-mcp/codecs";
 import {
 	type ArchiveEntry,
 	type ArchiveFormat,
 	type ArchiveHandle,
 	type ByteSource,
-	type FormatDescriptor,
 	decodeCp932,
+	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { inflateLzss } from "@garbro-mcp/codecs";
-import { Readable } from "node:stream";
 import {
 	createFixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("GML_", "latin1");
 const HEADER_SIZE = 0x14;
@@ -211,6 +212,7 @@ export const glibGFormat: ArchiveFormat = {
 				size: record.size,
 			}),
 		);
+		applyExtensionResourceTypes(entries);
 		return new GmlArchiveHandle(source, sourcePath, entries, index);
 	},
 };

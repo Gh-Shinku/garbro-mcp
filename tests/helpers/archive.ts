@@ -1,5 +1,9 @@
-import { BufferByteSource, type ArchiveFormat } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import {
+	type ArchiveFormat,
+	BufferByteSource,
+	type EntryResourceType,
+} from "@garbro-mcp/core";
 import { expect } from "vitest";
 
 /**
@@ -18,6 +22,7 @@ function firstDifference(actual: Buffer, expected: Buffer): number {
 export interface ExpectedEntry {
 	path: string;
 	size: number;
+	resourceType?: EntryResourceType;
 	content?: Buffer | undefined;
 }
 
@@ -56,6 +61,10 @@ export async function expectArchive(options: {
 		if (options.metadata !== undefined)
 			expect(archive.metadata).toMatchObject(options.metadata);
 		for (const [index, expected] of options.entries.entries()) {
+			if (expected.resourceType !== undefined)
+				expect(archive.entries[index]?.resourceType).toBe(
+					expected.resourceType,
+				);
 			if (expected.content === undefined) continue;
 			const entry = archive.entries[index];
 			if (!entry) throw new Error(`Missing entry at index ${index}`);

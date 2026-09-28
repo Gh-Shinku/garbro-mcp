@@ -3,21 +3,22 @@
 
 import { createZlibInflateStream, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** 'DAF1' and 'DAF2'; the second layout scrambles its words with a key byte from each of four offsets. */
 const DAF1_SIGNATURE = Buffer.from("DAF1", "latin1");
@@ -110,7 +111,9 @@ async function readDaf1Index(
 		);
 		cursor += entrySize;
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /**
@@ -190,7 +193,9 @@ async function readDaf2Index(
 		);
 		cursor += entrySize;
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /** GARBro `Daf1Opener.OpenEntry`, which both layouts share: packed payloads are zlib streams. */

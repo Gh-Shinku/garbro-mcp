@@ -124,7 +124,12 @@ describe("KaGuYa script engine resource archive", () => {
 			]),
 			entries: [
 				{ path: "raw.bin", size: raw.length, content: raw },
-				{ path: "sound.ogg", size: audio.length, content: audio },
+				{
+					path: "sound.ogg",
+					size: audio.length,
+					resourceType: "audio",
+					content: audio,
+				},
 				{ path: "packed.bin", size: packed.length, content: packed },
 			],
 			metadata: { entryCount: 3 },

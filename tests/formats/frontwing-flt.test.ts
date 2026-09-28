@@ -1,6 +1,6 @@
+import { deflateSync } from "node:zlib";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { frontWingFltFormat } from "@garbro-mcp/formats";
-import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -100,7 +100,7 @@ describe("FrontWing resource archive", () => {
 		await expectArchive({
 			format: frontWingFltFormat,
 			archive: buildFlt([
-				{ name: "raw.bin", content: raw },
+				{ name: "raw.ogg", content: raw },
 				{
 					name: "packed.bin",
 					content,
@@ -109,7 +109,12 @@ describe("FrontWing resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: raw.length, content: raw },
+				{
+					path: "raw.ogg",
+					size: raw.length,
+					resourceType: "audio",
+					content: raw,
+				},
 				{ path: "packed.bin", size: content.length, content },
 			],
 			metadata: { entryCount: 2 },

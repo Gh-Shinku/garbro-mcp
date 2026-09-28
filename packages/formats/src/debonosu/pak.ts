@@ -1,23 +1,24 @@
 // Format reference: GARbro ArcFormats/Debonosu/ArcPAK.cs, class `PakOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
+import { createRawInflateStream, inflateRawBuffer } from "@garbro-mcp/codecs";
 import {
 	type ArchiveFormat,
 	type ByteSource,
-	type FormatDescriptor,
 	decodeCp932,
+	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { createRawInflateStream, inflateRawBuffer } from "@garbro-mcp/codecs";
-import { Readable } from "node:stream";
 import {
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("PAK\0", "latin1");
 const HEADER_READ_SIZE = 0x0c;
@@ -159,6 +160,7 @@ async function readDebonosuIndex(
 	};
 	const end = readDirectory(state, 0, rootCount, "", 0);
 	if (end === undefined || state.entries.length === 0) return undefined;
+	applyExtensionResourceTypes(state.entries);
 	return state.entries;
 }
 

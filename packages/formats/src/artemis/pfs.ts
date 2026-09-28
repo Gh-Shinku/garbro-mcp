@@ -3,20 +3,21 @@
 
 import { createHash } from "node:crypto";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ArchiveHandle,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** Every layout starts with `pf` and a version digit. */
 const SIGNATURE = Buffer.from("pf", "latin1");
@@ -105,6 +106,7 @@ async function readPfIndex(
 		);
 	}
 	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
 	return version === VERSION_PF8
 		? { entries, key: indexKey(index) }
 		: { entries };
@@ -152,7 +154,9 @@ async function readPf2Index(
 			}),
 		);
 	}
-	return entries.length > 0 ? entries : undefined;
+	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
+	return entries;
 }
 
 /**

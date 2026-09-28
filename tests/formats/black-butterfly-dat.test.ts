@@ -1,6 +1,6 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { blackButterflyDatFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -105,7 +105,12 @@ describe("Black Butterfly DAT/PITA resource archive", () => {
 			archive: buildArchive([payload(first, expected.length)]),
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "00000.bmp", size: expected.length, content: expected },
+				{
+					path: "00000.bmp",
+					size: expected.length,
+					resourceType: "image",
+					content: expected,
+				},
 			],
 		});
 	});

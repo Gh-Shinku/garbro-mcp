@@ -1,6 +1,6 @@
+import { createHash } from "node:crypto";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { pfsFormat } from "@garbro-mcp/formats";
-import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -100,8 +100,18 @@ describe("Artemis engine resource archive", () => {
 				6,
 			),
 			entries: [
-				{ path: "first.txt", size: first.length, content: first },
-				{ path: "second.txt", size: second.length, content: second },
+				{
+					path: "first.txt",
+					size: first.length,
+					resourceType: "script",
+					content: first,
+				},
+				{
+					path: "second.txt",
+					size: second.length,
+					resourceType: "script",
+					content: second,
+				},
 			],
 			metadata: { entryCount: 2, version: 6 },
 		});
@@ -122,7 +132,14 @@ describe("Artemis engine resource archive", () => {
 		await expectArchive({
 			format: pfsFormat,
 			archive: buildPf2([{ name: "script.scr", content }]),
-			entries: [{ path: "script.scr", size: content.length, content }],
+			entries: [
+				{
+					path: "script.scr",
+					size: content.length,
+					resourceType: "script",
+					content,
+				},
+			],
 			metadata: { entryCount: 1, version: 2 },
 		});
 	});

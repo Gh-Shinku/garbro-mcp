@@ -10,9 +10,9 @@ import {
 import {
 	createFixedEntry,
 	defineFixedArchive,
-	sourceExtension,
 	type FixedEntry,
 	type FixedEntryOpener,
+	sourceExtension,
 } from "../shared/fixed-archive.js";
 
 const HEADER_SIZE = 4;
@@ -137,6 +137,7 @@ async function readAniIndex(
 		createFixedEntry({
 			id: index,
 			path: frame.name,
+			resourceType: "image",
 			offset: frame.offset,
 			size: sizes[index] ?? 0n,
 			metadata: {

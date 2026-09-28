@@ -134,7 +134,7 @@ describe("Carriere resource archive", () => {
 		await expectArchive({
 			format: carriereArcFormat,
 			archive: buildCarriere([
-				{ name: "raw.bin", content: raw },
+				{ name: "raw.ogg", content: raw },
 				{
 					name: "packed.bin",
 					content,
@@ -142,7 +142,12 @@ describe("Carriere resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: raw.length, content: raw },
+				{
+					path: "raw.ogg",
+					size: raw.length,
+					resourceType: "audio",
+					content: raw,
+				},
 				{ path: "packed.bin", size: content.length, content },
 			],
 			metadata: { entryCount: 2 },
@@ -210,13 +215,18 @@ describe("Carriere scripts archive", () => {
 		await expectArchive({
 			format: carriereScenarioFormat,
 			archive: buildCarriereScenario([
-				{ name: "raw.sc", content: raw, flags: 0 },
+				{ name: "raw.txt", content: raw, flags: 0 },
 				{ name: "xor.sc", content: xored, flags: 1 },
 				{ name: "packed.sc", content: packed, flags: 2 },
 				{ name: "both.sc", content: combined, flags: 3 },
 			]),
 			entries: [
-				{ path: "raw.sc", size: raw.length, content: raw },
+				{
+					path: "raw.txt",
+					size: raw.length,
+					resourceType: "script",
+					content: raw,
+				},
 				{ path: "xor.sc", size: xored.length, content: xored },
 				{ path: "packed.sc", size: packed.length, content: packed },
 				{ path: "both.sc", size: combined.length, content: combined },

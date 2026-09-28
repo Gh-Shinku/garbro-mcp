@@ -109,7 +109,7 @@ describe("GLib resource archive", () => {
 			format: glibGFormat,
 			archive: buildArchive(
 				[
-					{ name: "FIRST.BIN", stored: first, header: firstHeader },
+					{ name: "FIRST.OGG", stored: first, header: firstHeader },
 					{ name: "DIR\\SECOND.BIN", stored: second },
 				],
 				{ key },
@@ -117,8 +117,9 @@ describe("GLib resource archive", () => {
 			sourcePath: "sample.g",
 			entries: [
 				{
-					path: "FIRST.BIN",
+					path: "FIRST.OGG",
 					size: first.length,
+					resourceType: "audio",
 					content: substitute(first, firstHeader, key),
 				},
 				{

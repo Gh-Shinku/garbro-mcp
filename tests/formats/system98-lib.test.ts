@@ -1,11 +1,11 @@
 import { BufferByteSource, FileByteSource } from "@garbro-mcp/core";
 import { system98LibFormat } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
-import { literalLzssStream } from "../helpers/lzss.js";
 import {
 	expectCompanionArchive,
 	withCompanionFiles,
 } from "../helpers/companion.js";
+import { literalLzssStream } from "../helpers/lzss.js";
 
 const RECORD_SIZE = 0x16;
 /** Packed payloads carry a 10-byte prefix with their unpacked size at +6. */
@@ -113,7 +113,7 @@ describe("System-98 engine resource archive", () => {
 		const raw = Buffer.from("stored payload");
 		const content = Buffer.from("packed payload");
 		const entries: Entry[] = [
-			{ name: "raw.bin", content: raw },
+			{ name: "raw.ogg", content: raw },
 			{
 				name: "packed.bin",
 				content,
@@ -130,7 +130,12 @@ describe("System-98 engine resource archive", () => {
 					format: system98LibFormat,
 					mainPath,
 					entries: [
-						{ path: "raw.bin", size: raw.length, content: raw },
+						{
+							path: "raw.ogg",
+							size: raw.length,
+							resourceType: "audio",
+							content: raw,
+						},
 						{ path: "packed.bin", size: content.length, content },
 					],
 					metadata: { entryCount: 2 },

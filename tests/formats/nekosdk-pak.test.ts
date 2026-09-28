@@ -100,12 +100,17 @@ describe("NekoSDK NEKOPACK4 resource archive", () => {
 		await expectArchive({
 			format: nekoSdkPakFormat,
 			archive: buildPak([
-				{ name: "FIRST.BIN", unpacked: first },
+				{ name: "FIRST.OGG", unpacked: first },
 				{ name: "DIR\\SECOND.BIN", unpacked: second },
 			]),
 			sourcePath: "sample.pak",
 			entries: [
-				{ path: "FIRST.BIN", size: first.length, content: first },
+				{
+					path: "FIRST.OGG",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "DIR/SECOND.BIN", size: second.length, content: second },
 			],
 		});
@@ -119,6 +124,16 @@ describe("NekoSDK NEKOPACK4 resource archive", () => {
 			sourcePath: "sample.pak",
 			entries: [{ path: "ONLY.BIN", size: unpacked.length, content: unpacked }],
 		});
+	});
+
+	it("keeps ALP entries untyped like GARBro", async () => {
+		const unpacked = Buffer.from("alpha payload");
+		const archive = await nekoSdkPakFormat.open(
+			new BufferByteSource(buildPak([{ name: "IMAGE.ALP", unpacked }])),
+			"sample.pak",
+		);
+		expect(archive.entries[0]?.resourceType).toBeUndefined();
+		await archive.close();
 	});
 
 	it("derives the index key from signed name bytes", async () => {

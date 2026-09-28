@@ -141,12 +141,17 @@ describe("MAIKA MK2 resource archive", () => {
 		await expectArchive({
 			format: maikaMk2Format,
 			archive: buildMk2([
-				{ name: "FIRST.BIN", payload: first },
+				{ name: "FIRST.OGG", payload: first },
 				{ name: "DIR\\SECOND.BIN", payload: second },
 			]),
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "FIRST.BIN", size: first.length, content: first },
+				{
+					path: "FIRST.OGG",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "DIR/SECOND.BIN", size: second.length, content: second },
 			],
 		});

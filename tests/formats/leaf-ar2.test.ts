@@ -1,6 +1,6 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { leafAr2Format } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -134,7 +134,14 @@ describe("Leaf AR2 resource archive", () => {
 		await expectArchive({
 			format: leafAr2Format,
 			archive: buildAr2([{ name: "スクリプト.txt", content, key: 3 }]),
-			entries: [{ path: "スクリプト.txt", size: content.length, content }],
+			entries: [
+				{
+					path: "スクリプト.txt",
+					size: content.length,
+					resourceType: "script",
+					content,
+				},
+			],
 		});
 	});
 

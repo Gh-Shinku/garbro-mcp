@@ -1,24 +1,25 @@
 // Format reference: GARbro Legacy/System98/ArcLIB.cs, class `LibOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename } from "node:path";
+import { Readable } from "node:stream";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename } from "node:path";
-import { Readable } from "node:stream";
 import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** 'Lib0' */
 const LIB_SIGNATURE = Buffer.from("Lib0", "latin1");
@@ -178,6 +179,7 @@ async function readLibIndex(
 			}),
 		);
 	}
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

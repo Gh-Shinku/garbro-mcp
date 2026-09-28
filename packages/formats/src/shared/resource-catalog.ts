@@ -4,7 +4,12 @@ import { changeExtension } from "./companion.js";
 import { garbroResourceCatalog } from "./resource-catalog.generated.js";
 
 type CatalogType = Exclude<EntryResourceType, "unknown">;
-type CatalogRecord = (typeof garbroResourceCatalog)[number];
+interface CatalogRecord {
+	type: CatalogType;
+	tag: string | null;
+	extensions: readonly string[];
+	signatures: readonly number[];
+}
 
 export interface ResourceClassification {
 	resourceType: CatalogType;
@@ -52,16 +57,17 @@ function classification(resource: CatalogRecord): ResourceClassification {
 function uniquelyTyped(
 	resources: readonly CatalogRecord[],
 ): ResourceClassification | undefined {
-	if (resources.length === 0) return undefined;
+	const first = resources[0];
+	if (!first) return undefined;
 	const types = new Set(resources.map((resource) => resource.type));
 	if (types.size !== 1) return undefined;
-	return classification(resources[0]!);
+	return classification(first);
 }
 
 function exactTag(tag: string): ResourceClassification | undefined {
 	const resources = byTag.get(tag);
-	if (!resources || resources.length !== 1) return undefined;
-	return classification(resources[0]!);
+	const resource = resources?.length === 1 ? resources[0] : undefined;
+	return resource ? classification(resource) : undefined;
 }
 
 /** Classify a named entry through GARBro's extension catalogue and alias table. */
@@ -88,14 +94,21 @@ export function classifyResourceSignature(
 	if (normalized === 0x46464952) return exactTag("WAV");
 	if ((normalized & 0xffff) === 0x4d42) return exactTag("BMP");
 	const resources = bySignature.get(normalized) ?? [];
-	if (resources.length !== 1) return undefined;
-	return classification(resources[0]!);
+	const resource = resources.length === 1 ? resources[0] : undefined;
+	return resource ? classification(resource) : undefined;
 }
 
 /** Apply extension evidence without changing the stored entry name. */
 export function applyExtensionResourceType(entry: ArchiveEntry): void {
 	const detected = classifyResourceExtension(entry.path);
 	if (detected) entry.resourceType = detected.resourceType;
+}
+
+/** Apply extension evidence to every entry in an archive index. */
+export function applyExtensionResourceTypes(
+	entries: readonly ArchiveEntry[],
+): void {
+	for (const entry of entries) applyExtensionResourceType(entry);
 }
 
 /** Apply signature evidence and give generated names the detected format's primary extension. */

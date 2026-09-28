@@ -1,6 +1,6 @@
+import { deflateSync } from "node:zlib";
 import { BufferByteSource } from "@garbro-mcp/core";
 import { densdkDaf1Format, densdkDaf2Format } from "@garbro-mcp/formats";
-import { deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -134,7 +134,7 @@ describe("DenSDK resource archive", () => {
 		await expectArchive({
 			format: densdkDaf1Format,
 			archive: buildDaf1([
-				{ name: "raw.bin", content: raw },
+				{ name: "raw.ogg", content: raw },
 				{
 					name: "packed.bin",
 					content,
@@ -143,7 +143,12 @@ describe("DenSDK resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: raw.length, content: raw },
+				{
+					path: "raw.ogg",
+					size: raw.length,
+					resourceType: "audio",
+					content: raw,
+				},
 				{ path: "packed.bin", size: content.length, content },
 			],
 			metadata: { entryCount: 2 },
@@ -187,7 +192,7 @@ describe("DenSDK resource archive", () => {
 		await expectArchive({
 			format: densdkDaf2Format,
 			archive: buildDaf2([
-				{ name: "raw.bin", content: raw },
+				{ name: "raw.png", content: raw },
 				{
 					name: "packed.bin",
 					content,
@@ -196,7 +201,12 @@ describe("DenSDK resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: raw.length, content: raw },
+				{
+					path: "raw.png",
+					size: raw.length,
+					resourceType: "image",
+					content: raw,
+				},
 				{ path: "packed.bin", size: content.length, content },
 			],
 			metadata: { entryCount: 2 },

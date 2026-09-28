@@ -17,6 +17,7 @@ import {
 	type FixedEntryOpener,
 	isSaneCount,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceType } from "../shared/resource-catalog.js";
 
 /** 'LIN2' */
 const SIGNATURE = Buffer.from("LIN2", "latin1");
@@ -151,19 +152,18 @@ async function readLin2Index(
 			: storedSize;
 		const metadata: Lin2Metadata = {};
 		if (type === TYPE_AUDIO) metadata.type = "audio";
-		entries.push(
-			createFixedEntry({
-				id,
-				path: name,
-				offset: packed ? offset + BigInt(PACKED_PREFIX_SIZE) : offset,
-				size: unpackedSize,
-				packedSize: packed
-					? storedSize - BigInt(PACKED_PREFIX_SIZE)
-					: storedSize,
-				compressed: packed,
-				...(Object.keys(metadata).length > 0 ? { metadata } : {}),
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			path: name,
+			offset: packed ? offset + BigInt(PACKED_PREFIX_SIZE) : offset,
+			size: unpackedSize,
+			packedSize: packed ? storedSize - BigInt(PACKED_PREFIX_SIZE) : storedSize,
+			compressed: packed,
+			...(Object.keys(metadata).length > 0 ? { metadata } : {}),
+		});
+		applyExtensionResourceType(entry);
+		if (type === TYPE_AUDIO) entry.resourceType = "audio";
+		entries.push(entry);
 	}
 	return entries.length > 0 ? entries : undefined;
 }

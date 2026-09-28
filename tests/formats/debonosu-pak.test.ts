@@ -100,12 +100,17 @@ describe("Debonosu PAK resource archive", () => {
 		await expectArchive({
 			format: debonosuPakFormat,
 			archive: buildArchive([
-				{ kind: "file", name: "FIRST.BIN", content: first },
+				{ kind: "file", name: "FIRST.OGG", content: first },
 				{ kind: "file", name: "SECOND.BIN", content: second },
 			]),
 			sourcePath: "sample.pak",
 			entries: [
-				{ path: "FIRST.BIN", size: first.length, content: first },
+				{
+					path: "FIRST.OGG",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "SECOND.BIN", size: second.length, content: second },
 			],
 		});
