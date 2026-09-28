@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { BufferByteSource } from "@garbro-mcp/core";
+import { describe, expect, it } from "vitest";
 import { g2PakFormat } from "../../packages/formats/src/g2/pak.js";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -215,7 +215,7 @@ describe("g2 PAK", () => {
 		const packed = Buffer.from("packed body");
 		const built = buildGcex({
 			entries: [
-				{ name: "A", data: Buffer.from("stored") },
+				{ name: "A.OGG", data: Buffer.from("stored") },
 				{
 					name: "B",
 					data: gce0Segment(packed),
@@ -227,7 +227,12 @@ describe("g2 PAK", () => {
 			format: g2PakFormat,
 			archive: built.archive,
 			entries: [
-				{ path: "A", size: 6, content: Buffer.from("stored") },
+				{
+					path: "A.OGG",
+					size: 6,
+					resourceType: "audio",
+					content: Buffer.from("stored"),
+				},
 				{ path: "B", size: packed.length, content: packed },
 			],
 			metadata: { indexPacked: false },

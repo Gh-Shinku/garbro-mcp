@@ -59,12 +59,17 @@ describe("Terios PAC resource archive", () => {
 		await expectArchive({
 			format: entisPacFormat,
 			archive: buildPac([
-				{ name: "raw.dat", payload: raw },
+				{ name: "raw.ogg", payload: raw },
 				{ name: "hidden.dat", payload: encryptedPayload(plain) },
 			]),
 			sourcePath: "sample.pac",
 			entries: [
-				{ path: "raw.dat", size: raw.length, content: raw },
+				{
+					path: "raw.ogg",
+					size: raw.length,
+					resourceType: "audio",
+					content: raw,
+				},
 				{ path: "hidden.dat", size: plain.length, content: plain },
 			],
 			metadata: { entryCount: 2, encryption: "password-xor" },

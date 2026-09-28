@@ -74,7 +74,7 @@ describe("Sogna DAT resource archive", () => {
 		await expectArchive({
 			format: sognaDatFormat,
 			archive: buildSgs([
-				{ name: "raw.bin", payload: stored },
+				{ name: "raw.ogg", payload: stored },
 				{
 					name: "lz.bin",
 					payload: compressed,
@@ -83,7 +83,12 @@ describe("Sogna DAT resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: stored.length, content: stored },
+				{
+					path: "raw.ogg",
+					size: stored.length,
+					resourceType: "audio",
+					content: stored,
+				},
 				{
 					path: "lz.bin",
 					size: 9,

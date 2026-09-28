@@ -1,25 +1,26 @@
 // Format reference: GARBro ArcFormats/Nexas/ArcTPF.cs, class `TpfOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { decompressHuffman, inflateLzssAll } from "@garbro-mcp/codecs";
 import {
-	bigintToBufferLength,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	bigintToBufferLength,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** `Signature` reads as `TPF ` and `AsciiEqual (4, "FILE")`. */
 const SIGNATURE = Buffer.from("TPF FILE", "ascii");
@@ -115,6 +116,7 @@ async function readTpfIndex(
 		if (compressed) entry.sizeKnown = false;
 		entries.push(entry);
 	}
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

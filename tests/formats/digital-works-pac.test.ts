@@ -83,7 +83,7 @@ describe("Digital Works PAC resource archive", () => {
 		const nested = Buffer.from("nested lzss payload");
 		const nestedEntry = nestedLzsPayload(nested);
 		const entries: Entry[] = [
-			{ name: "raw.bin", payload: raw },
+			{ name: "raw.ogg", payload: raw },
 			{ name: "one.lzs", payload: lzsPayload(single) },
 			{ name: "two.lzs", payload: nestedEntry.payload },
 		];
@@ -98,7 +98,12 @@ describe("Digital Works PAC resource archive", () => {
 					format: digitalWorksPacFormat,
 					mainPath,
 					entries: [
-						{ path: "raw.bin", size: raw.length, content: raw },
+						{
+							path: "raw.ogg",
+							size: raw.length,
+							resourceType: "audio",
+							content: raw,
+						},
 						{ path: "one.lzs", size: single.length, content: single },
 						{
 							path: "two.lzs",

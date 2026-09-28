@@ -87,7 +87,7 @@ describe("Giga TPF resource archive", () => {
 		await expectArchive({
 			format: gigaTpfFormat,
 			archive: buildTpf([
-				{ name: "raw.dat", compression: 0, payload: stored },
+				{ name: "raw.ogg", compression: 0, payload: stored },
 				{
 					name: "lz.dat",
 					compression: 1,
@@ -105,7 +105,12 @@ describe("Giga TPF resource archive", () => {
 				{ name: "odd.dat", compression: 3, payload: stored },
 			]),
 			entries: [
-				{ path: "raw.dat", size: stored.length, content: stored },
+				{
+					path: "raw.ogg",
+					size: stored.length,
+					resourceType: "audio",
+					content: stored,
+				},
 				{ path: "lz.dat", size: lzss.length, content: lzss },
 				{ path: "huff.dat", size: huffman.length, content: huffman },
 				{ path: "odd.dat", size: stored.length, content: stored },

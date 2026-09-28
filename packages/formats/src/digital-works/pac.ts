@@ -1,27 +1,28 @@
 // Format reference: GARbro ArcFormats/DigitalWorks/ArcPAC.cs, class `PacOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { inflateLzssAll } from "@garbro-mcp/codecs";
-import {
-	bigintToBufferLength,
-	GarbroError,
-	type ArchiveFormat,
-	type ByteSource,
-	type FormatDescriptor,
-} from "@garbro-mcp/core";
 import { basename } from "node:path";
 import { Readable } from "node:stream";
+import { inflateLzssAll } from "@garbro-mcp/codecs";
+import {
+	type ArchiveFormat,
+	type ByteSource,
+	bigintToBufferLength,
+	type FormatDescriptor,
+	GarbroError,
+} from "@garbro-mcp/core";
 import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("PPAC-PAC", "ascii");
 const INDEX_SIGNATURE = Buffer.from("PPAC-HED", "ascii");
@@ -130,6 +131,7 @@ async function readDigitalWorksIndex(
 		if (compressed) entry.sizeKnown = false;
 		entries.push(entry);
 	}
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

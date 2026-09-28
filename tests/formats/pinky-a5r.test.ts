@@ -1,6 +1,6 @@
-import { BufferByteSource } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { deflateSync } from "node:zlib";
+import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import { pinkyA5rFormat } from "../../packages/formats/src/pinky/a5r.js";
 import { expectArchive } from "../helpers/archive.js";
@@ -166,6 +166,7 @@ describe("pinky A5R", () => {
 		const archive = await pinkyA5rFormat.open(sourceOf(built), "GAME.A5R");
 		try {
 			expect(archive.entries[0]?.metadata).toMatchObject({ type: "image" });
+			expect(archive.entries[0]?.resourceType).toBe("image");
 		} finally {
 			await archive.close();
 		}
@@ -215,6 +216,7 @@ describe("pinky A5R", () => {
 			if (!entry) throw new Error("missing entry");
 			expect(entry.path).toBe("GAME#00000.wav");
 			expect(entry.metadata).toMatchObject({ type: "audio" });
+			expect(entry.resourceType).toBe("audio");
 			expect(await consumeBuffer(await archive.openEntry(entry.id))).toEqual(
 				Buffer.concat([head, Buffer.from("tail of the wave")]),
 			);

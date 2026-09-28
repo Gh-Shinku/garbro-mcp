@@ -1,22 +1,23 @@
 // Format reference: GARbro "ArcFormats/Will/ArcPulltop.cs", classes `Arc2Opener` and `PspFormat`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
 	sourceExtension,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const HEADER_SIZE = 8;
 const FRAME_SIZE = 0x1000;
@@ -186,6 +187,7 @@ export const willArc2Format: ArchiveFormat = defineFixedArchive({
 			});
 			return packed ? { ...created, sizeKnown: false } : created;
 		});
+		applyExtensionResourceTypes(entries);
 		return { entries, metadata: { entryCount: entries.length } };
 	},
 	async openEntry(source: ByteSource, entry: FixedEntry, sourcePath: string) {

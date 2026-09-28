@@ -5622,9 +5622,10 @@
 				"cp932 names and relative payload offsets",
 				"packed flag with stored and unpacked sizes",
 				"dice lz extraction with an absolute position frame",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5678,9 +5679,10 @@
 				"LZS marker with declared unpacked size",
 				"default lzss extraction",
 				"nested LZS double decoding",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -6550,9 +6552,10 @@
 				"offsets relative to 0x40000",
 				"entry placement validation",
 				"default password xor extraction",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -7803,13 +7806,10 @@
 				"lz77 with context table",
 				"implicit payload offsets",
 				"cp932 names",
-				"zero sized record skipping"
+				"zero sized record skipping",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": [
-				"archive creation",
-				"entry type detection",
-				"image decoding"
-			],
+			"unsupported": ["archive creation", "image decoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -8307,9 +8307,10 @@
 				"entry placement validation",
 				"default lzss extraction",
 				"huffman then lzss extraction",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -12060,9 +12061,10 @@
 				"stored size compared against unpacked size",
 				"LSB-first bit codec with match ladders",
 				"eight to twelve bit distances",
-				"overlapping copies"
+				"overlapping copies",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["archive creation", "entry typing"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -16119,15 +16121,12 @@
 				"overlapping segment table",
 				"segment types and compression flag",
 				"generated numbered entry names",
-				"riff audio segment merging",
+				"riff audio segment merging and audio entry typing",
 				"segment concatenation",
-				"zlib segments"
+				"zlib segments",
+				"bitmap segment image entry typing"
 			],
-			"unsupported": [
-				"archive creation",
-				"image decoding",
-				"entry type detection"
-			],
+			"unsupported": ["archive creation", "image decoding"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -16570,12 +16569,9 @@
 				"back-filled stored sizes",
 				"CZL zlib extraction",
 				"verbatim extraction",
-				"image typing for TGA archives"
+				"image typing for TGA archives matching GARBro"
 			],
-			"unsupported": [
-				"entry type inference beyond TGA names",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -19117,9 +19113,10 @@
 				"cp932 names and placement validation",
 				"packed flag with stored and unpacked sizes",
 				"sogna lz extraction with overlapped copies",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog extension and alias based entry typing"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -22257,11 +22254,11 @@
 				"exact index consumption check",
 				"script byte rotation",
 				"model archive exception",
-				"psp ring buffer lzss"
+				"psp ring buffer lzss",
+				"GARBro catalog extension and alias based entry typing"
 			],
 			"unsupported": [
 				"archive creation",
-				"entry type detection",
 				"psp to psb resource alias",
 				"image decoding"
 			],

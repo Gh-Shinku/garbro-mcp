@@ -80,7 +80,7 @@ describe("DiceSystem RLZ resource archive", () => {
 		await expectArchive({
 			format: diceRlzFormat,
 			archive: buildRlz([
-				{ name: "raw.bin", payload: stored },
+				{ name: "raw.ogg", payload: stored },
 				{
 					name: "lz.bin",
 					payload: compressed,
@@ -89,7 +89,12 @@ describe("DiceSystem RLZ resource archive", () => {
 				},
 			]),
 			entries: [
-				{ path: "raw.bin", size: stored.length, content: stored },
+				{
+					path: "raw.ogg",
+					size: stored.length,
+					resourceType: "audio",
+					content: stored,
+				},
 				{ path: "lz.bin", size: 9, content: Buffer.from("ABCABCABC") },
 			],
 			metadata: { entryCount: 2 },

@@ -1,22 +1,23 @@
 // Format reference: GARBro Legacy/Logg/ArcARF.cs, class `ArfOpener`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
 	type ArchiveFormat,
 	type ByteSource,
-	type FormatDescriptor,
 	decodeCp932,
+	type FormatDescriptor,
 	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	normalizeEntryPath,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const INDEX_START = 4;
 /** Every record is an offset, an unpacked size, a name length and the name itself. */
@@ -212,6 +213,7 @@ async function readArfIndex(
 		);
 	}
 	if (entries.length === 0) return undefined;
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 

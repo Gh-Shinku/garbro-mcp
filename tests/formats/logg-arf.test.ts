@@ -1,6 +1,5 @@
 import { BufferByteSource, encodeCp932 } from "@garbro-mcp/core";
 import { loggArfFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -133,11 +132,16 @@ describe("Logg ARF resource archive", () => {
 		await expectArchive({
 			format: loggArfFormat,
 			archive: buildArf([
-				{ name: "FIRST.BIN", unpacked: first, stored: first },
+				{ name: "FIRST.OGG", unpacked: first, stored: first },
 				{ name: "DIR\\SECOND.BIN", unpacked: second, stored: second },
 			]),
 			entries: [
-				{ path: "FIRST.BIN", size: first.length, content: first },
+				{
+					path: "FIRST.OGG",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "DIR/SECOND.BIN", size: second.length, content: second },
 			],
 		});

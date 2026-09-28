@@ -2,21 +2,21 @@
 // and `A5rStream`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
+import { inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { inflateZlibBuffer } from "@garbro-mcp/codecs";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
 const SIGNATURES = ["PCRS", "PLIB"];
@@ -246,6 +246,9 @@ export const pinkyA5rFormat: ArchiveFormat = defineFixedArchive({
 				size: BigInt(sizes.size),
 				packedSize: BigInt(sizes.packedSize),
 				compressed: sizes.compressed,
+				...(entry.type === "audio" || entry.type === "image"
+					? { resourceType: entry.type }
+					: {}),
 				metadata: {
 					segments: entry.segments.map(recordOf),
 					type: entry.type,

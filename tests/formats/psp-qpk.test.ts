@@ -96,6 +96,7 @@ describe("PSP QPK resource archive", () => {
 						"TGA#00002.tga",
 					]);
 					expect(listing.entries[0]?.metadata).toEqual({ type: "image" });
+					expect(listing.entries[0]?.resourceType).toBe("image");
 					expect(listing.metadata).toEqual({ entryCount: 1 });
 				} finally {
 					await listing.close();

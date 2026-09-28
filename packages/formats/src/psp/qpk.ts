@@ -1,21 +1,21 @@
 // Format reference: GARbro ArcFormats/Psp/ArcQPK.cs, class `PakOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename } from "node:path";
 import { createZlibInflateStream } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename } from "node:path";
 import { changeExtension, readCompanionFile } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 
 const SIGNATURE = Buffer.from("QPK\0", "ascii");
@@ -165,6 +165,7 @@ async function readIndex(
 			size,
 			packedSize,
 			compressed,
+			...(record.isImage ? { resourceType: "image" as const } : {}),
 			...(metadata === undefined ? {} : { metadata }),
 		});
 		if (clamped) entry.sizeKnown = false;

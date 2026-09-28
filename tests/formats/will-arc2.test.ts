@@ -1,5 +1,5 @@
-import { BufferByteSource } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
+import { BufferByteSource } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
 import { willArc2Format } from "../../packages/formats/src/will/arc2.js";
 import { expectArchive } from "../helpers/archive.js";
@@ -201,8 +201,18 @@ describe("will AR2", () => {
 			format: willArc2Format,
 			archive: built,
 			entries: [
-				{ path: "NAME.TXT", size: 5, content: Buffer.from("first") },
-				{ path: "\u540d\u524d.TXT", size: 6, content: Buffer.from("second") },
+				{
+					path: "NAME.TXT",
+					size: 5,
+					resourceType: "script",
+					content: Buffer.from("first"),
+				},
+				{
+					path: "\u540d\u524d.TXT",
+					size: 6,
+					resourceType: "script",
+					content: Buffer.from("second"),
+				},
 			],
 		});
 	});

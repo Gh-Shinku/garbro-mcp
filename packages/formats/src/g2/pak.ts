@@ -1,22 +1,23 @@
 // Format reference: GARbro "ArcFormats/G2/ArcGCEX.cs", classes `PakOpener` and `GceReader`.
 // GARBro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	GarbroError,
-	decodeCp932,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 const SIGNATURE = "GCEX";
 const INDEX_SIGNATURE = "GCE3";
@@ -268,6 +269,7 @@ export const g2PakFormat: ArchiveFormat = defineFixedArchive({
 			});
 			return packed ? { ...created, sizeKnown: false } : created;
 		});
+		applyExtensionResourceTypes(entries);
 		return {
 			entries,
 			metadata: {

@@ -1,25 +1,26 @@
 // Format reference: GARbro ArcFormats/Entis/ArcPAC.cs, class `PacOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	bigintToBufferLength,
-	encodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	bigintToBufferLength,
+	encodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
-	normalizeEntryPath,
-	sourceExtension,
 	type FixedEntry,
 	type FixedEntryOpener,
+	normalizeEntryPath,
+	sourceExtension,
 } from "../shared/fixed-archive.js";
+import { applyExtensionResourceTypes } from "../shared/resource-catalog.js";
 
 /** The format only opens files named `.pac`. */
 const EXTENSION = "pac";
@@ -104,6 +105,7 @@ async function readEntisIndex(
 		indexOffset += BigInt(NAME_SIZE + 8);
 	}
 	if (entries.length === 0 || entries.length === MAX_ENTRIES) return undefined;
+	applyExtensionResourceTypes(entries);
 	return entries;
 }
 
