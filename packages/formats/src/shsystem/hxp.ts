@@ -2,21 +2,23 @@
 // `ShsCompression`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { changeExtension } from "../shared/companion.js";
 import {
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const EXTENSION = "hxp";
 /** Every payload begins with a stored size and an unpacked size, and its data follows that pair. */
@@ -183,6 +185,34 @@ export function decompressShs(input: Buffer, outputLength: number): Buffer {
 	return output;
 }
 
+/** Apply GARBro's post-decompression signature typing to one SH System payload. */
+export async function applyShsEntryResourceType(
+	source: ByteSource,
+	entry: FixedEntry,
+	ddSystemScript = false,
+): Promise<void> {
+	if (entry.size < 4n || entry.packedSize < 4n) return;
+	let signature: number;
+	if (entry.compressed) {
+		const probeSize = Number(
+			entry.packedSize < 0x20n ? entry.packedSize : 0x20n,
+		);
+		const probe = await source.readAt(entry.offset, probeSize);
+		signature = decompressShs(Buffer.from(probe), 4).readUInt32LE(0);
+	} else {
+		signature = (await source.readAt(entry.offset, 4)).readUInt32LE(0);
+	}
+	if (ddSystemScript && signature === 0x78534444) {
+		entry.resourceType = "script";
+		entry.path = changeExtension(entry.path, "hxb");
+	} else if (signature === 0x00020000 || signature === 0x000a0000) {
+		entry.resourceType = "image";
+		entry.path = changeExtension(entry.path, "tga");
+	} else {
+		applySignatureResourceType(entry, signature);
+	}
+}
+
 /**
  * GARBro `Him4Opener.DetectFileTypes`, shared by both versions. Every payload starts with a stored size and an
  * unpacked size, and the data begins behind that pair. A stored size of zero means the payload is plain, in
@@ -263,6 +293,7 @@ async function readHim4Index(
 		const entry = await buildShsEntry(source, id, offset, source.size);
 		if (!entry) return undefined;
 		entry.path = String(id).padStart(GENERATED_NAME_DIGITS, "0");
+		await applyShsEntryResourceType(source, entry);
 		entries.push(entry);
 		offset =
 			id + 1 === count
@@ -327,6 +358,7 @@ async function readHim5Index(
 			);
 			if (!entry) return undefined;
 			Object.assign(entry, normalizeEntryPath(name));
+			await applyShsEntryResourceType(source, entry);
 			entries.push(entry);
 			position += entrySize;
 			remaining -= entrySize;

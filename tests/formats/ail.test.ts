@@ -1,8 +1,8 @@
-import { ailDatFormat, lnk2Format } from "@garbro-mcp/formats";
-import { BufferByteSource } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { literalLzssStream } from "../helpers/lzss.js";
+import { BufferByteSource } from "@garbro-mcp/core";
+import { ailDatFormat, lnk2Format } from "@garbro-mcp/formats";
 import { describe, expect, it } from "vitest";
+import { literalLzssStream } from "../helpers/lzss.js";
 
 interface AilFixtureEntry {
 	content: Buffer;
@@ -47,6 +47,7 @@ describe("Ail resource archive", () => {
 		const archive = buildAil([
 			{ content: Buffer.from("plain") },
 			{ content: packedContent, packed: true },
+			{ content: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a]) },
 		]);
 		const format = ailDatFormat;
 		const source = new BufferByteSource(archive);
@@ -56,10 +57,12 @@ describe("Ail resource archive", () => {
 			expect(handle.entries.map((entry) => entry.path)).toEqual([
 				"data#00000",
 				"data#00001.ogg",
+				"data#00002.png",
 			]);
 			expect(handle.entries[1]).toMatchObject({
 				size: BigInt(literalLzssStream(packedContent, 0).length),
 				compressed: true,
+				resourceType: "audio",
 				metadata: { packed: true, unpackedSize: "11" },
 			});
 			expect(await consumeBuffer(await handle.openEntry("0"))).toEqual(
@@ -68,6 +71,7 @@ describe("Ail resource archive", () => {
 			expect(await consumeBuffer(await handle.openEntry("1"))).toEqual(
 				packedContent,
 			);
+			expect(handle.entries[2]?.resourceType).toBe("image");
 		} finally {
 			await handle.close();
 		}

@@ -1,5 +1,5 @@
-import { yoxDatFormat } from "@garbro-mcp/formats";
 import { deflateSync } from "node:zlib";
+import { yoxDatFormat } from "@garbro-mcp/formats";
 import { describe, it } from "vitest";
 import { expectArchive } from "../helpers/archive.js";
 
@@ -42,17 +42,23 @@ function packedYox(data: Buffer): Buffer {
 
 describe("YOX DAT resource archive", () => {
 	it("reads narrow records and unpacks zlib entries", async () => {
-		const raw = Buffer.from("raw payload");
-		const packed = Buffer.from("packed payload");
+		const raw = Buffer.from("OggSraw payload");
+		const packed = Buffer.from("OggSpacked payload");
 		await expectArchive({
 			format: yoxDatFormat,
 			archive: buildYox([{ payload: raw }, { payload: packedYox(packed) }], 8),
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "00000", size: raw.length, content: raw },
 				{
-					path: "00001",
+					path: "00000.ogg",
+					size: raw.length,
+					resourceType: "audio",
+					content: raw,
+				},
+				{
+					path: "00001.ogg",
 					size: packed.length,
+					resourceType: "audio",
 					content: packed,
 				},
 			],

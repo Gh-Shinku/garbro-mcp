@@ -1,22 +1,23 @@
 // Format reference: GARbro ArcFormats/AdvSys/ArcAdvSys3.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename } from "node:path";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename } from "node:path";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
+	type FixedEntry,
 	normalizeEntryPath,
 	sourceExtension,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const EXTENSION = "dat";
 const FILE_PREFIX = "arc";
@@ -95,7 +96,14 @@ async function readAdvSys3Index(
 			marker?.equals(GWD_MARKER) === true
 				? `${normalized.path.replace(/\.[^./\\]*$/, "")}.gwd`
 				: normalized.path;
-		entries.push(createFixedEntry({ id: entries.length, path, offset, size }));
+		const entry = createFixedEntry({ id: entries.length, path, offset, size });
+		if (marker?.equals(GWD_MARKER) === true) entry.resourceType = "image";
+		else if (size >= 4n)
+			applySignatureResourceType(
+				entry,
+				(await source.readAt(offset, 4)).readUInt32LE(0),
+			);
+		entries.push(entry);
 		current = offset + size;
 	}
 	if (entries.length === 0) return undefined;

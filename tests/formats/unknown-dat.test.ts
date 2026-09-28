@@ -44,7 +44,7 @@ function buildDat(entries: readonly Entry[]): Buffer {
 
 describe("'Unknown' DAT resource archive", () => {
 	it("decrypts the index and payloads", async () => {
-		const first = Buffer.from("first payload");
+		const first = Buffer.from("OggSfirst payload");
 		const second = Buffer.from("second payload");
 		await expectArchive({
 			format: unknownDatFormat,
@@ -54,7 +54,12 @@ describe("'Unknown' DAT resource archive", () => {
 			]),
 			sourcePath: "no_reality.dat",
 			entries: [
-				{ path: "no_reality#0007", size: first.length, content: first },
+				{
+					path: "no_reality#0007.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "no_reality#0042", size: second.length, content: second },
 			],
 			metadata: { entryCount: 2, encryption: "nibble-rotation" },

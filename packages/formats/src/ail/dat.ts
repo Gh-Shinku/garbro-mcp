@@ -1,25 +1,26 @@
 // Format reference: GARbro ArcFormats/Ail/ArcAil.cs and ArcFormats/Ail/ArcLNK2.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename, extname } from "node:path";
+import { Readable } from "node:stream";
 import { inflateLzss } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveDetectionHints,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename, extname } from "node:path";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
-	sourceExtension,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
+	sourceExtension,
 } from "../shared/fixed-archive.js";
+import { classifyResourceSignature } from "../shared/resource-catalog.js";
 
 const LNK2_SIGNATURE = Buffer.from("LNK2", "ascii");
 const TRAILING_LIMIT = 0x80000n;
@@ -34,26 +35,6 @@ const AIL_LZSS = {
 	frameInitPosition: 0xfee,
 	literalBit: 0 as const,
 };
-
-const SIGNATURE_EXTENSIONS: readonly {
-	signature: Buffer;
-	extension: string;
-}[] = [
-	{ signature: Buffer.from("OggS", "ascii"), extension: "ogg" },
-	{ signature: Buffer.from("RIFF", "ascii"), extension: "wav" },
-	{ signature: Buffer.from([0x89, 0x50, 0x4e, 0x47]), extension: "png" },
-	{ signature: Buffer.from("BM", "ascii"), extension: "bmp" },
-];
-
-function inferExtension(signature: Buffer): string | undefined {
-	if (signature.length >= 4 && signature.readUInt32LE(0) === 0xba010000)
-		return "mpg";
-	return SIGNATURE_EXTENSIONS.find((candidate) =>
-		signature
-			.subarray(0, candidate.signature.length)
-			.equals(candidate.signature),
-	)?.extension;
-}
 
 function descriptor(
 	id: string,
@@ -188,7 +169,20 @@ async function detectFileTypes(
 			const previewLength = Number(dataSize > 4n ? 4n : dataSize);
 			typeSignature = await source.readAt(dataOffset, previewLength);
 		}
-		const extension = inferExtension(typeSignature);
+		const signatureValue =
+			typeSignature.length >= 4 ? typeSignature.readUInt32LE(0) : undefined;
+		const detected =
+			signatureValue === undefined
+				? undefined
+				: classifyResourceSignature(signatureValue);
+		const extension =
+			signatureValue === 0xba010000
+				? "mpg"
+				: signatureValue === 0x474e5089
+					? "png"
+					: detected?.extension;
+		const resourceType =
+			signatureValue === 0x474e5089 ? "image" : detected?.resourceType;
 		const metadata: Record<string, unknown> = { packed };
 		if (packed) metadata.unpackedSize = unpackedSize.toString();
 		if (extension) metadata.extension = extension;
@@ -199,6 +193,7 @@ async function detectFileTypes(
 			offset: dataOffset,
 			size: dataSize,
 			compressed: packed,
+			...(resourceType ? { resourceType } : {}),
 			metadata,
 		});
 		if (entry.rawPath !== undefined) updated.rawPath = entry.rawPath;

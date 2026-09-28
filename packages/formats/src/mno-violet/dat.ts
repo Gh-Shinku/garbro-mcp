@@ -2,21 +2,23 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
+import { changeExtension } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
 	decodeCStringField,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
 	sourceExtension,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const COUNT_OFFSET = 0;
 const INDEX_OFFSET = 4;
@@ -97,14 +99,20 @@ async function readMnvIndex(
 				valid = false;
 				break;
 			}
-			entries.push(
-				createFixedEntry({
-					id,
-					...normalizeEntryPath(name),
-					offset,
-					size,
-				}),
-			);
+			const entry = createFixedEntry({
+				id,
+				...normalizeEntryPath(name),
+				offset,
+				size,
+			});
+			if (size >= 4n) {
+				const signature = (await source.readAt(offset, 4)).readUInt32LE(0);
+				if (signature === 1) {
+					entry.resourceType = "image";
+					entry.path = changeExtension(entry.path, "gra");
+				} else applySignatureResourceType(entry, signature);
+			}
+			entries.push(entry);
 		}
 		if (valid) return entries;
 	}

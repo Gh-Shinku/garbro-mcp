@@ -2,22 +2,22 @@
 // `Him4Opener.DetectFileTypes` from ArcFormats/SHSystem/ArcHXP.cs.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import {
-	decodeCp932,
-	GarbroError,
-	type ArchiveFormat,
-	type ByteSource,
-	type FormatDescriptor,
-} from "@garbro-mcp/core";
 import { Readable } from "node:stream";
 import {
-	createFixedEntry,
+	type ArchiveFormat,
+	type ByteSource,
+	decodeCp932,
+	type FormatDescriptor,
+	GarbroError,
+} from "@garbro-mcp/core";
+import {
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
 import {
+	applyShsEntryResourceType,
 	buildShsEntry,
 	decompressShs,
 	readShsSections,
@@ -25,7 +25,6 @@ import {
 
 const EXTENSION = "dat";
 const COUNT_OFFSET = 4;
-const WORD_SIZE = 4;
 const GENERATED_NAME_DIGITS = 5;
 
 const DDP2_SIGNATURE = Buffer.from("DDP2", "ascii");
@@ -125,6 +124,7 @@ async function readDdp2Index(
 			indexUnpackedSize: index.readUInt32LE(record + DDP2_UNPACKED_FIELD),
 			indexSize: index.readUInt32LE(record + DDP2_SIZE_FIELD),
 		};
+		await applyShsEntryResourceType(source, entry, true);
 		entries.push(entry);
 	}
 	return entries;
@@ -185,6 +185,7 @@ async function readDdp3Index(
 				indexUnpackedSize: body.readUInt32LE(DDP3_ENTRY_UNPACKED_FIELD),
 				indexSize: body.readUInt32LE(DDP3_ENTRY_SIZE_FIELD),
 			};
+			await applyShsEntryResourceType(source, entry, true);
 			entries.push(entry);
 			position += entrySize;
 			remaining -= entrySize;

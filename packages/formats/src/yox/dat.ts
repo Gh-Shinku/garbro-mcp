@@ -1,22 +1,23 @@
 // Format reference: GARbro ArcFormats/Yox/ArcYOX.cs, class `DatOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import type { Readable } from "node:stream";
 import { createZlibInflateStream } from "@garbro-mcp/codecs";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 /** `Signature` is the three-byte `YOX` read as a 32-bit word, so the fourth byte is zero. */
 const SIGNATURE = Buffer.from("YOX\0", "ascii");
@@ -30,6 +31,19 @@ const SIZE_FIELD = 4;
 const PACKED_HEADER_SIZE = 0x10;
 /** The packed flag GARbro tests with `0 != (2 & flags)`. */
 const PACKED_FLAG = 2;
+
+async function readStreamSignature(
+	input: Readable,
+): Promise<number | undefined> {
+	const prefix = Buffer.alloc(4);
+	let length = 0;
+	for await (const value of input) {
+		const chunk = Buffer.from(value as Uint8Array);
+		length += chunk.copy(prefix, length, 0, 4 - length);
+		if (length === 4) break;
+	}
+	return length === 4 ? prefix.readUInt32LE(0) : undefined;
+}
 
 export const yoxDatDescriptor: FormatDescriptor = {
 	id: "yox-dat",
@@ -116,6 +130,23 @@ async function probeEntries(
 		entry.packedSize -= BigInt(PACKED_HEADER_SIZE);
 		entry.compressed = true;
 		entry.sizeKnown = false;
+	}
+	for (const entry of entries) {
+		if (entry.packedSize < 4n) continue;
+		let signature: number | undefined;
+		if (entry.compressed) {
+			signature = await readStreamSignature(
+				createZlibInflateStream(
+					source.createReadStream(entry.offset, entry.packedSize),
+				),
+			);
+		} else {
+			signature = (await source.readAt(entry.offset, 4)).readUInt32LE(0);
+			// An unpacked YOX wrapper is not itself classified by the reference.
+			if (signature === SIGNATURE_VALUE) continue;
+		}
+		if (signature === undefined) continue;
+		applySignatureResourceType(entry, signature);
 	}
 }
 

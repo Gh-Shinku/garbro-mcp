@@ -1,6 +1,6 @@
 import { keyPakFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const BLOCK_SIZE = 0x40;
 const DATA_OFFSET = 0x100;
@@ -50,7 +50,7 @@ function buildPak(
 
 describe("Key PAK resource archive", () => {
 	it("reads a names pool behind the index", async () => {
-		const first = Buffer.from("first body");
+		const first = Buffer.from("OggSfirst body");
 		const second = Buffer.from("second body");
 		const { archive } = buildPak(
 			[
@@ -64,7 +64,12 @@ describe("Key PAK resource archive", () => {
 			archive,
 			sourcePath: "sample.pak",
 			entries: [
-				{ path: "one.dat", size: first.length, content: first },
+				{
+					path: "one.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "two.dat", size: second.length, content: second },
 			],
 		});

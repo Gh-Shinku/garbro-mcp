@@ -1,6 +1,6 @@
 import { hotFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const HEADER_SIZE = 0x20;
 
@@ -27,7 +27,7 @@ function buildHot(entries: readonly Buffer[]): Buffer {
 
 describe("HDL HOT archive", () => {
 	it("derives sizes from the trailing offset table", async () => {
-		const first = Buffer.from("first payload");
+		const first = Buffer.from("OggSfirst payload");
 		const second = Buffer.from("second");
 		const archive = buildHot([first, second]);
 		// The last entry runs to the end of the offset table, so its payload covers the table bytes.
@@ -37,7 +37,12 @@ describe("HDL HOT archive", () => {
 			archive,
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "sample#00000", size: first.length, content: first },
+				{
+					path: "sample#00000.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{
 					path: "sample#00001",
 					size: lastSize,

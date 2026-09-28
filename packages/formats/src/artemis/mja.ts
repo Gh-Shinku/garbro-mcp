@@ -1,46 +1,26 @@
 // Format reference: GARbro ArcFormats/Artemis/ArcMJA.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename, extname } from "node:path";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
+import { changeExtension } from "../shared/companion.js";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
-import { basename, extname } from "node:path";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("MJA0", "ascii");
 const COUNT_OFFSET = 4;
 const DATA_OFFSET = 8;
-
-/**
- * GARbro resolves entry extensions through the full resource catalog. This port only maps
- * signatures that belong to resources the toolkit already understands.
- */
-const SIGNATURE_EXTENSIONS: readonly {
-	signature: Buffer;
-	extension: string;
-}[] = [
-	{ signature: Buffer.from("OggS", "ascii"), extension: "ogg" },
-	{ signature: Buffer.from("RIFF", "ascii"), extension: "wav" },
-	{ signature: Buffer.from([0x89, 0x50, 0x4e, 0x47]), extension: "png" },
-	{ signature: Buffer.from("BM", "ascii"), extension: "bmp" },
-];
-
-function inferExtension(signature: Buffer): string | undefined {
-	return SIGNATURE_EXTENSIONS.find((candidate) =>
-		signature
-			.subarray(0, candidate.signature.length)
-			.equals(candidate.signature),
-	)?.extension;
-}
 
 export const mjaDescriptor: FormatDescriptor = {
 	id: "artemis-mja",
@@ -105,16 +85,26 @@ async function readMja(
 			);
 		}
 		const preview = await source.readAt(offset, Number(size > 4n ? 4n : size));
-		const extension = inferExtension(preview);
 		const name = `${baseName}#${String(entries.length).padStart(4, "0")}`;
-		entries.push(
-			createFixedEntry({
-				id: entries.length,
-				path: extension ? `${name}.${extension}` : name,
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id: entries.length,
+			path: name,
+			offset,
+			size,
+		});
+		if (preview.length === 4)
+			applySignatureResourceType(entry, preview.readUInt32LE(0));
+		// The catalog contains two PNG rows with the same signature. Preserve the
+		// reference format's deterministic PNG result after the shared classifier
+		// conservatively rejects that ambiguity.
+		if (
+			entry.resourceType === undefined &&
+			preview.equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]))
+		) {
+			entry.resourceType = "image";
+			entry.path = changeExtension(entry.path, "png");
+		}
+		entries.push(entry);
 		offset += size;
 	}
 	if (entries.length === 0) {

@@ -1,6 +1,6 @@
 import { xuseBinFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const INDEX_OFFSET = 4;
 const RECORD_SIZE = 0x10;
@@ -27,14 +27,19 @@ function buildXuseBin(entries: readonly Buffer[]): Buffer {
 
 describe("Xuse audio archive", () => {
 	it("walks 0x10-byte records with generated stems", async () => {
-		const first = Buffer.from("audio one");
+		const first = Buffer.from("OggSaudio one");
 		const second = Buffer.from("audio two!");
 		await expectArchive({
 			format: xuseBinFormat,
 			archive: buildXuseBin([first, second]),
 			sourcePath: "se.bin",
 			entries: [
-				{ path: "se#0000", size: first.length, content: first },
+				{
+					path: "se#0000.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "se#0001", size: second.length, content: second },
 			],
 			metadata: { entryCount: 2 },

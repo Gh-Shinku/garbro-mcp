@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { mgdFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const INDEX_OFFSET = 0x22;
 const NAME_KEY = Buffer.from("Powerd by Masys", "ascii");
@@ -51,7 +51,7 @@ function buildMgd(entries: readonly MgdEntry[], encrypted = false): Buffer {
 
 describe("Masys MGD resource archive", () => {
 	it("reads length-prefixed name records", async () => {
-		const first = Buffer.from("first payload");
+		const first = Buffer.from("OggSfirst payload");
 		const second = Buffer.from("second");
 		await expectArchive({
 			format: mgdFormat,
@@ -61,7 +61,12 @@ describe("Masys MGD resource archive", () => {
 			]),
 			sourcePath: "sample.mgd",
 			entries: [
-				{ path: "data/one.bin", size: first.length, content: first },
+				{
+					path: "data/one.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "two.bin", size: second.length, content: second },
 			],
 			metadata: { entryCount: 2 },

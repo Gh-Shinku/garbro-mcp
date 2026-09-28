@@ -1,20 +1,21 @@
 // Format reference: GARbro ArcFormats/Xuse/ArcBIN.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename } from "node:path";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename } from "node:path";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	normalizeEntryPath,
 	type FixedEntry,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const FIRST_OFFSET_OFFSET = 8;
 const INDEX_OFFSET = 4;
@@ -79,14 +80,18 @@ async function readXuseBinIndex(
 		if (offset <= lastOffset) return undefined;
 		const size = BigInt(index.readUInt32LE(record));
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(`${baseName}#${String(id).padStart(4, "0")}`),
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(`${baseName}#${String(id).padStart(4, "0")}`),
+			offset,
+			size,
+		});
+		if (size >= 4n)
+			applySignatureResourceType(
+				entry,
+				(await source.readAt(offset, 4)).readUInt32LE(0),
+			);
+		entries.push(entry);
 		lastOffset = offset;
 	}
 	if (entries.length === 0) return undefined;

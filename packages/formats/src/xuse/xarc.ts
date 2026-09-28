@@ -2,20 +2,21 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const SIGNATURE = Buffer.from("XARC", "ascii");
 const COUNT_OFFSET = 4;
@@ -24,7 +25,6 @@ const INDEX_OFFSET = 8;
 const FIRST_OFFSET_BIAS = 10;
 const DATA_MARKER = Buffer.from("DATA", "ascii");
 const NAME_LENGTH_OFFSET = 0x18;
-const SIZE_OFFSET = 0x1c;
 const NAME_OFFSET = 0x20;
 /** GARbro advances the data offset past the name field plus a two-byte gap. */
 const DATA_PREFIX = 0x22;
@@ -99,14 +99,18 @@ async function readXarcIndex(
 		);
 		const offset = recordOffset + BigInt(DATA_PREFIX) + BigInt(nameLength);
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(decryptName(nameBytes)),
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(decryptName(nameBytes)),
+			offset,
+			size,
+		});
+		if (size >= 4n)
+			applySignatureResourceType(
+				entry,
+				(await source.readAt(offset, 4)).readUInt32LE(0),
+			);
+		entries.push(entry);
 	}
 	return entries;
 }

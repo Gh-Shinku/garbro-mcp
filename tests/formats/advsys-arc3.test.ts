@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { advSys3Format } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 interface Arc3Entry {
 	name: string;
@@ -31,7 +31,7 @@ function gwdPayload(body: string): Buffer {
 describe("AdvSys3 resource archive", () => {
 	it("walks a record chain and renames GWD payloads", async () => {
 		const image = gwdPayload("image data");
-		const text = Buffer.from("script body");
+		const text = Buffer.from("OggSscript body");
 		await expectArchive({
 			format: advSys3Format,
 			archive: buildArc3([
@@ -41,7 +41,12 @@ describe("AdvSys3 resource archive", () => {
 			sourcePath: "arc01.dat",
 			entries: [
 				{ path: "graphic.gwd", size: image.length, content: image },
-				{ path: "main.adv", size: text.length, content: text },
+				{
+					path: "main.ogg",
+					size: text.length,
+					resourceType: "audio",
+					content: text,
+				},
 			],
 			metadata: { entryCount: 2 },
 		});

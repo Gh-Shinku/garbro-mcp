@@ -1,18 +1,20 @@
 // Format reference: GARbro ArcFormats/Favorite/ArcBIN.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename, extname } from "node:path";
+import type { Readable } from "node:stream";
 import {
-	bigintToBufferLength,
-	BufferCursor,
-	GarbroError,
 	type ArchiveEntry,
 	type ArchiveFormat,
 	type ArchiveHandle,
+	BufferCursor,
 	type ByteSource,
+	bigintToBufferLength,
+	type EntryResourceType,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename, extname } from "node:path";
-import type { Readable } from "node:stream";
+import { classifyResourceSignature } from "../shared/resource-catalog.js";
 
 const HEADER_SIZE = 8;
 const RECORD_SIZE = 12;
@@ -29,7 +31,7 @@ interface FavoriteBinDirectory {
 
 interface InferredResource {
 	extension: string;
-	type: "audio" | "image";
+	type: Exclude<EntryResourceType, "unknown">;
 	signature: string;
 }
 
@@ -79,7 +81,14 @@ async function inferResource(
 	if (probe.subarray(0, 4).equals(Buffer.from("hzc1"))) {
 		return { extension: "hzc", type: "image", signature: "hzc1" };
 	}
-	return undefined;
+	const signature = probe.readUInt32LE(0);
+	const detected = classifyResourceSignature(signature);
+	if (!detected?.extension) return undefined;
+	return {
+		extension: detected.extension,
+		type: detected.resourceType,
+		signature: `0x${signature.toString(16).padStart(8, "0")}`,
+	};
 }
 
 async function readDirectory(
@@ -164,7 +173,10 @@ async function readDirectory(
 	if (inferTypes) {
 		const archiveName = basename(sourcePath, extname(sourcePath)).toLowerCase();
 		if (archiveName === "voice" || archiveName === "bgm") {
-			for (const entry of entries) entry.metadata = { inferredType: "audio" };
+			for (const entry of entries) {
+				entry.resourceType = "audio";
+				entry.metadata = { inferredType: "audio" };
+			}
 		} else {
 			await Promise.all(
 				entries.map(async (entry) => {
@@ -175,6 +187,7 @@ async function readDirectory(
 					);
 					if (!inferred) return;
 					entry.path += `.${inferred.extension}`;
+					entry.resourceType = inferred.type;
 					entry.metadata = {
 						inferredType: inferred.type,
 						contentSignature: inferred.signature,

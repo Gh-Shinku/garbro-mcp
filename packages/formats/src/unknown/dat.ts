@@ -1,23 +1,24 @@
 // Format reference: GARbro Legacy/Unknown/ArcDAT.cs, class `DatOpener`.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import {
-	bigintToBufferLength,
-	GarbroError,
-	type ArchiveFormat,
-	type ByteSource,
-	type FormatDescriptor,
-} from "@garbro-mcp/core";
 import { basename, extname } from "node:path";
 import { Readable } from "node:stream";
+import {
+	type ArchiveFormat,
+	type ByteSource,
+	bigintToBufferLength,
+	type FormatDescriptor,
+	GarbroError,
+} from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	isSaneCount,
 	type FixedEntry,
 	type FixedEntryOpener,
+	isSaneCount,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const HEADER_SIZE = 12;
 /** A record needs all three words and GARbro caps the stride at 0x10. */
@@ -96,14 +97,19 @@ async function readUnknownDatIndex(
 		const offset = BigInt(index.readUInt32LE(record + OFFSET_FIELD));
 		if (offset < BigInt(dataOffset)) return undefined;
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id: position,
-				path: `${baseName}#${String(id).padStart(4, "0")}`,
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id: position,
+			path: `${baseName}#${String(id).padStart(4, "0")}`,
+			offset,
+			size,
+		});
+		if (size >= 4n) {
+			const signature = rotateNibbles(
+				Buffer.from(await source.readAt(offset, 4)),
+			).readUInt32LE(0);
+			applySignatureResourceType(entry, signature);
+		}
+		entries.push(entry);
 	}
 	return entries;
 }

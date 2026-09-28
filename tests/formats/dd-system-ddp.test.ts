@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { ddp2Format, ddp3Format } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const SIZE_PAIR = 8;
 
@@ -76,7 +76,7 @@ function buildDdp3(
 
 describe("DDSystem DDP resource archives", () => {
 	it("reads version two with a plain and a compressed payload", async () => {
-		const plain = Buffer.from("plain body");
+		const plain = Buffer.from("OggSplain body");
 		const archive = buildDdp2([
 			payload(plain, false),
 			payload(PACKED_STREAM, true),
@@ -86,7 +86,12 @@ describe("DDSystem DDP resource archives", () => {
 			archive,
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "sample#00000", size: plain.length, content: plain },
+				{
+					path: "sample#00000.ogg",
+					size: plain.length,
+					resourceType: "audio",
+					content: plain,
+				},
 				{
 					path: "sample#00001",
 					size: PACKED_EXPANDED.length,
@@ -97,7 +102,7 @@ describe("DDSystem DDP resource archives", () => {
 	});
 
 	it("reads version three through its section walk", async () => {
-		const plain = Buffer.from("section body");
+		const plain = Buffer.from("OggSsection body");
 		const archive = buildDdp3([
 			{ name: "one.dat", payload: payload(plain, false) },
 			{ name: "two.dat", payload: payload(PACKED_STREAM, true) },
@@ -107,11 +112,35 @@ describe("DDSystem DDP resource archives", () => {
 			archive,
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "one.dat", size: plain.length, content: plain },
+				{
+					path: "one.ogg",
+					size: plain.length,
+					resourceType: "audio",
+					content: plain,
+				},
 				{
 					path: "two.dat",
 					size: PACKED_EXPANDED.length,
 					content: PACKED_EXPANDED,
+				},
+			],
+		});
+	});
+
+	it("applies the DDSystem script signature override", async () => {
+		const script = Buffer.from("DDSxscript body");
+		await expectArchive({
+			format: ddp3Format,
+			archive: buildDdp3([
+				{ name: "script.dat", payload: payload(script, false) },
+			]),
+			sourcePath: "sample.dat",
+			entries: [
+				{
+					path: "script.hxb",
+					size: script.length,
+					resourceType: "script",
+					content: script,
 				},
 			],
 		});

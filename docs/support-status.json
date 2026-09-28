@@ -813,11 +813,12 @@
 				"zero-size terminator",
 				"truncated final record",
 				"gwd extension rewrite",
+				"GARBro catalog signature based entry typing and extension rename",
 				"entry placement validation",
 				"cp932 filenames",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -1089,13 +1090,10 @@
 				"half-count slot table",
 				"absent-slot skipping",
 				"Ail LZSS decompression",
-				"common signature extension inference",
+				"GARBro catalog signature based entry typing and extension inference",
 				"entry listing and extraction"
 			],
-			"unsupported": [
-				"full GARbro resource-catalog extension inference",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -1112,12 +1110,10 @@
 				"signature detection",
 				"half-count slot table",
 				"Ail LZSS decompression",
+				"GARBro catalog signature based entry typing and extension inference",
 				"entry listing and extraction"
 			],
-			"unsupported": [
-				"full GARbro resource-catalog extension inference",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -2138,13 +2134,10 @@
 				"signature detection",
 				"size-prefixed record walk",
 				"generated names",
-				"common signature extension inference",
+				"GARBro catalog signature based entry typing and extension inference",
 				"entry listing and extraction"
 			],
-			"unsupported": [
-				"full GARbro resource-catalog extension inference",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5382,12 +5375,10 @@
 				"payload driven size pair",
 				"plain and compressed payloads through the shared codec",
 				"index size hints as metadata",
-				"generated names"
+				"generated names",
+				"GARBro catalog signature based entry typing with DDSx script override"
 			],
-			"unsupported": [
-				"type classification by content signature",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -5407,12 +5398,10 @@
 				"names from the index",
 				"payload driven size pair",
 				"plain and compressed payloads through the shared codec",
-				"index size hints as metadata"
+				"index size hints as metadata",
+				"GARBro catalog signature based entry typing with DDSx script override"
 			],
-			"unsupported": [
-				"type classification by content signature",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -7036,12 +7025,10 @@
 				"CP932 filename table",
 				"entry listing",
 				"entry extraction",
-				"RIFF/WAVE and HZC extension inference"
+				"RIFF/WAVE and HZC extension inference",
+				"GARBro catalog signature based entry typing and extension inference"
 			],
-			"unsupported": [
-				"full GARbro resource-catalog extension inference",
-				"archive creation"
-			]
+			"unsupported": ["archive creation"]
 		},
 		{
 			"reference": {
@@ -8734,9 +8721,10 @@
 				"derived entry sizes",
 				"entry placement validation",
 				"generated entry names",
+				"GARBro catalog signature based entry typing with HOT image override",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -10820,12 +10808,10 @@
 				"utf8 null terminated names",
 				"block number records with sizes",
 				"entry placement validation",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog signature based entry typing and extension rename"
 			],
-			"unsupported": [
-				"type classification by content signature",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -13008,9 +12994,10 @@
 				"zero name length rejection",
 				"entry placement validation",
 				"cp932 filenames",
+				"GARBro catalog signature based entry typing and extension rename",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -13853,9 +13840,10 @@
 				"per-record validation with candidate retry",
 				"entry placement validation",
 				"cp932 filenames",
+				"GARBro catalog signature based entry typing with GRA image override",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -18403,12 +18391,10 @@
 				"size pair per payload",
 				"plain and compressed payloads",
 				"shs lz codec",
-				"generated five digit names"
+				"generated five digit names",
+				"GARBro catalog signature based entry typing with TGA image overrides"
 			],
-			"unsupported": [
-				"type classification by content signature",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -18428,7 +18414,8 @@
 				"big endian entry offsets",
 				"names from the archive",
 				"size pair per payload",
-				"plain and compressed payloads through the shared codec"
+				"plain and compressed payloads through the shared codec",
+				"GARBro catalog signature based entry typing with TGA image overrides"
 			],
 			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
@@ -21673,9 +21660,10 @@
 				"nibble rotated index",
 				"derived archive hash id names",
 				"payload placement validation",
-				"nibble rotated payload extraction"
+				"nibble rotated payload extraction",
+				"GARBro catalog typing from decrypted payload signatures"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -22695,9 +22683,10 @@
 				"monotonic offset validation",
 				"entry placement validation",
 				"generated entry stems",
+				"GARBro catalog signature based entry typing and extension rename",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -22857,9 +22846,10 @@
 				"nibble-rotated names",
 				"entry placement validation",
 				"cp932 filenames",
+				"GARBro catalog signature based entry typing and extension rename",
 				"entry listing and extraction"
 			],
-			"unsupported": ["entry type inference", "archive creation"],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{
@@ -23141,12 +23131,10 @@
 				"zero size and placement validation",
 				"packed YOX header detection with a 0x10 header skip",
 				"zlib extraction",
-				"verbatim extraction"
+				"verbatim extraction",
+				"GARBro catalog typing from decoded payload signatures with extension rename"
 			],
-			"unsupported": [
-				"entry type inference and extension rename",
-				"archive creation"
-			],
+			"unsupported": ["archive creation"],
 			"remainingVerification": ["real-game GARbro differential output"]
 		},
 		{

@@ -1,7 +1,7 @@
 import { BufferByteSource } from "@garbro-mcp/core";
 import { mjaFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, expect, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 function buildMja(chunks: Buffer[]): Buffer {
 	const total = 8 + chunks.reduce((sum, chunk) => sum + 4 + chunk.length, 0);
@@ -27,8 +27,8 @@ describe("Artemis MJA archive", () => {
 			]),
 			sourcePath: "scene.mja",
 			entries: [
-				{ path: "scene#0000.ogg", size: 11 },
-				{ path: "scene#0001.png", size: 6 },
+				{ path: "scene#0000.ogg", size: 11, resourceType: "audio" },
+				{ path: "scene#0001.png", size: 6, resourceType: "image" },
 			],
 		});
 	});

@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { mnvFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const INDEX_OFFSET = 4;
 
@@ -33,7 +33,7 @@ function buildMnv(entries: readonly MnvEntry[], nameSize = 100): Buffer {
 
 describe("M no Violet DAT archive", () => {
 	it("reads a 100-byte name index", async () => {
-		const first = Buffer.from("first entry");
+		const first = Buffer.from("OggSfirst entry");
 		const second = Buffer.from("second");
 		await expectArchive({
 			format: mnvFormat,
@@ -43,7 +43,12 @@ describe("M no Violet DAT archive", () => {
 			]),
 			sourcePath: "sample.dat",
 			entries: [
-				{ path: "data/one.bin", size: first.length, content: first },
+				{
+					path: "data/one.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "two.bin", size: second.length, content: second },
 			],
 			metadata: { entryCount: 2 },
@@ -57,6 +62,24 @@ describe("M no Violet DAT archive", () => {
 			archive: buildMnv([{ name: "a.bin", content }], 44),
 			sourcePath: "sample.dat",
 			entries: [{ path: "a.bin", size: content.length, content }],
+		});
+	});
+
+	it("applies the engine GRA signature override", async () => {
+		const content = Buffer.alloc(8);
+		content.writeUInt32LE(1, 0);
+		await expectArchive({
+			format: mnvFormat,
+			archive: buildMnv([{ name: "image.bin", content }]),
+			sourcePath: "sample.dat",
+			entries: [
+				{
+					path: "image.gra",
+					size: content.length,
+					resourceType: "image",
+					content,
+				},
+			],
 		});
 	});
 

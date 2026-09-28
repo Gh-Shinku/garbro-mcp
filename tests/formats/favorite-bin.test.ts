@@ -1,3 +1,6 @@
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import {
 	BufferByteSource,
 	encodeCp932,
@@ -5,9 +8,6 @@ import {
 	GarbroError,
 } from "@garbro-mcp/core";
 import { FavoriteBinFormat } from "@garbro-mcp/formats";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 const temporaryDirectories: string[] = [];
@@ -73,10 +73,12 @@ describe("Favorite View Point BIN", () => {
 			expect(archive.entries).toMatchObject([
 				{
 					path: "音声.wav",
+					resourceType: "audio",
 					metadata: { inferredType: "audio", contentSignature: "RIFF/WAVE" },
 				},
 				{
 					path: "背景.hzc",
+					resourceType: "image",
 					metadata: { inferredType: "image", contentSignature: "hzc1" },
 				},
 				{ path: "config.dat" },

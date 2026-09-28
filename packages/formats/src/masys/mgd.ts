@@ -2,19 +2,20 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	decodeCp932,
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
+	decodeCp932,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
-	normalizeEntryPath,
 	type FixedEntry,
+	normalizeEntryPath,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const SIGNATURE_MASK = 0x00ffffff;
 const SIGNATURE = 0x0044474d;
@@ -95,15 +96,19 @@ async function readMgdIndex(
 		const size = BigInt(tail.readUInt32LE(SIZE_OFFSET));
 		const offset = BigInt(tail.readUInt32LE(OFFSET_OFFSET));
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(decodeCp932(nameBytes)),
-				offset,
-				size,
-				encrypted,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(decodeCp932(nameBytes)),
+			offset,
+			size,
+			encrypted,
+		});
+		if (size >= 4n)
+			applySignatureResourceType(
+				entry,
+				(await source.readAt(offset, 4)).readUInt32LE(0),
+			);
+		entries.push(entry);
 		position += BigInt(ENTRY_TAIL_SIZE);
 	}
 	return entries;

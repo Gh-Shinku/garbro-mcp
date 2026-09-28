@@ -1,21 +1,22 @@
 // Format reference: GARbro Legacy/Hdl/ArcHOT.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { basename } from "node:path";
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { basename } from "node:path";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const SIGNATURE = 0x00544f48;
 const RESERVED_OFFSET = 4;
@@ -82,14 +83,24 @@ async function readHotIndex(
 		const size = next - offset;
 		if (size < 0n || !checkPlacement(offset, size, source.size))
 			return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(`${baseName}#${String(id).padStart(5, "0")}`),
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(`${baseName}#${String(id).padStart(5, "0")}`),
+			offset,
+			size,
+		});
+		if (size >= 4n) {
+			const probe = await source.readAt(offset, Number(size < 8n ? size : 8n));
+			const signature = probe.readUInt32LE(0);
+			if (
+				(signature & 0x00ffffff) === 0x00544f48 &&
+				probe.length >= 8 &&
+				((probe[7] ?? 0) & 0x21) === 0x21
+			)
+				entry.resourceType = "image";
+			else applySignatureResourceType(entry, signature);
+		}
+		entries.push(entry);
 	}
 	return entries;
 }

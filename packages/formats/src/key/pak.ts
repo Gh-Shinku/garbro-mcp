@@ -2,19 +2,20 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import {
-	GarbroError,
 	type ArchiveFormat,
 	type ByteSource,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
 import {
 	checkPlacement,
 	createFixedEntry,
 	defineFixedArchive,
+	type FixedEntry,
 	isSaneCount,
 	normalizeEntryPath,
-	type FixedEntry,
 } from "../shared/fixed-archive.js";
+import { applySignatureResourceType } from "../shared/resource-catalog.js";
 
 const COUNT_OFFSET = 4;
 const DATA_OFFSET_FIELD = 0;
@@ -150,14 +151,18 @@ async function readKeyIndex(
 			BigInt(recordArea.readUInt32LE(record + BLOCK_OFFSET_FIELD)) * blockSize;
 		const size = BigInt(recordArea.readUInt32LE(record + SIZE_FIELD));
 		if (!checkPlacement(offset, size, source.size)) return undefined;
-		entries.push(
-			createFixedEntry({
-				id,
-				...normalizeEntryPath(names[id] ?? String(id)),
-				offset,
-				size,
-			}),
-		);
+		const entry = createFixedEntry({
+			id,
+			...normalizeEntryPath(names[id] ?? String(id)),
+			offset,
+			size,
+		});
+		if (size >= 4n)
+			applySignatureResourceType(
+				entry,
+				(await source.readAt(offset, 4)).readUInt32LE(0),
+			);
+		entries.push(entry);
 	}
 	return entries;
 }

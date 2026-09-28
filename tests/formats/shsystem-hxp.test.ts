@@ -1,7 +1,7 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { him4Format, him5Format } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const SIZE_PAIR = 8;
 
@@ -15,6 +15,14 @@ function payload(data: Buffer, packed: boolean): Buffer {
 	header.writeUInt32LE(packed ? data.length : 0, 0);
 	header.writeUInt32LE(packed ? PACKED_EXPANDED.length : data.length, 4);
 	return Buffer.concat([header, data]);
+}
+
+function packedLiteralPayload(data: Buffer): Buffer {
+	const stream = Buffer.concat([Buffer.from([data.length - 1]), data]);
+	const header = Buffer.alloc(SIZE_PAIR);
+	header.writeUInt32LE(stream.length, 0);
+	header.writeUInt32LE(data.length, 4);
+	return Buffer.concat([header, stream]);
 }
 
 /** Version four: a count, the first offset, then an index of the later offsets only. */
@@ -62,7 +70,7 @@ function buildHim5(
 
 describe("SH System HXP resource archives", () => {
 	it("reads version four with a plain and a compressed payload", async () => {
-		const plain = Buffer.from("plain body");
+		const plain = Buffer.from("OggSplain body");
 		const archive = buildHim4([
 			payload(plain, false),
 			payload(PACKED_STREAM, true),
@@ -72,7 +80,12 @@ describe("SH System HXP resource archives", () => {
 			archive,
 			sourcePath: "sample.hxp",
 			entries: [
-				{ path: "00000", size: plain.length, content: plain },
+				{
+					path: "00000.ogg",
+					size: plain.length,
+					resourceType: "audio",
+					content: plain,
+				},
 				{
 					path: "00001",
 					size: PACKED_EXPANDED.length,
@@ -83,7 +96,7 @@ describe("SH System HXP resource archives", () => {
 	});
 
 	it("reads version five through its section descriptors", async () => {
-		const plain = Buffer.from("section body");
+		const plain = Buffer.from("OggSsection body");
 		const entries: { name: string; offset: number }[] = [
 			{ name: "one.dat", offset: 0 },
 			{ name: "two.dat", offset: 0 },
@@ -107,11 +120,33 @@ describe("SH System HXP resource archives", () => {
 			archive,
 			sourcePath: "sample.hxp",
 			entries: [
-				{ path: "one.dat", size: plain.length, content: plain },
+				{
+					path: "one.ogg",
+					size: plain.length,
+					resourceType: "audio",
+					content: plain,
+				},
 				{
 					path: "two.dat",
 					size: PACKED_EXPANDED.length,
 					content: PACKED_EXPANDED,
+				},
+			],
+		});
+	});
+
+	it("classifies a signature decoded from a compressed payload", async () => {
+		const content = Buffer.from("OggS");
+		await expectArchive({
+			format: him4Format,
+			archive: buildHim4([packedLiteralPayload(content)]),
+			sourcePath: "sample.hxp",
+			entries: [
+				{
+					path: "00000.ogg",
+					size: content.length,
+					resourceType: "audio",
+					content,
 				},
 			],
 		});

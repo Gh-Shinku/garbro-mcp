@@ -1,11 +1,10 @@
 import { encodeCp932 } from "@garbro-mcp/core";
 import { xarcFormat } from "@garbro-mcp/formats";
-import { expectArchive } from "../helpers/archive.js";
 import { describe, it } from "vitest";
+import { expectArchive } from "../helpers/archive.js";
 
 const INDEX_OFFSET = 8;
 const NAME_OFFSET = 0x20;
-const DATA_PREFIX = 0x22;
 
 function rotateName(name: string): Buffer {
 	const bytes = encodeCp932(name);
@@ -44,7 +43,7 @@ function buildXarc(
 
 describe("Xuse XARC archive", () => {
 	it("reads nibble-rotated names and data offsets", async () => {
-		const first = Buffer.from("first payload");
+		const first = Buffer.from("OggSfirst payload");
 		const second = Buffer.from("second");
 		await expectArchive({
 			format: xarcFormat,
@@ -54,7 +53,12 @@ describe("Xuse XARC archive", () => {
 			]),
 			sourcePath: "sample.arc",
 			entries: [
-				{ path: "data/one.bin", size: first.length, content: first },
+				{
+					path: "data/one.ogg",
+					size: first.length,
+					resourceType: "audio",
+					content: first,
+				},
 				{ path: "音声.bin", size: second.length, content: second },
 			],
 			metadata: { entryCount: 2 },
