@@ -9,7 +9,7 @@ regenerate it when the numbers move.
 incremental: the ten records touched by this work receive the structured fields, while the legacy prose fields
 stay available to existing consumers. Run `pnpm support:check` before regenerating the TypeScript catalogue.
 
-Written at commit `79ce8f01` (2026-09-28). Regenerate the numbers with:
+Written at commit `0ca0dbd2` (2026-09-29). Regenerate the numbers with:
 
 ```bash
 node scripts/garbro-gap.mjs          # the totals line, plus the largest rows still pending
@@ -75,18 +75,18 @@ The rows *not* named above are the ones a from-spec walk could carry without a k
 stood in that family and **are ported now**, from their published formats rather than from the library GARbro
 calls.
 
-## Real functional gaps inside the ported rows
+## Functional gap ledger inside the ported rows
 
-These are rows where GARbro has a working, self contained implementation of something this port does not do
-yet. They are the honest work list, roughly in the order I would take them.
+These are rows where GARbro has a working, self contained implementation worth tracking in this port. Closed
+work stays here briefly so the change in counts is explicit; the open items remain the honest work list.
 
-**1. Entry typing through the format catalogue (39 explicitly recorded rows remain).** GARbro's
+**1. Entry typing through the format catalogue (closed: 0 of the 39 recorded rows remain).** GARbro's
 `GameRes/FormatCatalog.cs` maps an entry extension and an entry signature to a format tag (`LookupExtension`,
-`LookupSignature`). The shared infrastructure now generates those maps from all 1132 inventory rows, applies
-GARbro's aliases and rejects ambiguous signatures. `ags-dat` and `ast-arc` are the extension-lookup pilots;
-`dogenzaka-bin`, `dogenzaka-bin-2` and `elf-vol` are the signature-lookup pilots. The remaining records include
-`artemis-pfs`, `g2-pak`, `ail-dat` and `ddsystem-ddp2`; they can now adopt the shared classifier without adding
-another format table.
+`LookupSignature`). The shared infrastructure generates those maps from all 1132 inventory rows, applies
+GARbro's aliases and rejects ambiguous signatures. All 39 originally recorded archive gaps now use it for
+extension or payload-signature classification. The rollout also retired the equivalent full-catalog gaps on
+`ail-lnk2`, `artemis-mja` and `favorite-bin`; format-specific rules such as GWD/GRA/HOT/TGA/DDSx and ambiguous
+PNG/HZC signatures remain explicit beside the shared lookup.
 
 **2. Image payload decoding (~59 rows).** The archive is read, the payload is a picture, and the reference
 decodes it while this port hands the stored surface over. One query over the records (any unsupported item
@@ -150,6 +150,5 @@ design. Aligning writing would be a separate workstream.
 
 1. Establish the community-driven real-game verification policy and issue guidance, without making sample
    acquisition a release gate.
-2. Extend the now-shared entry catalogue classifier to the 39 records that still name this gap.
-3. Then the per format variants in gap 4, and the from-spec codecs (Vorbis, and whatever gap 2 turns out to
-   need).
+2. Continue with the per format variants in gap 4, and the from-spec codecs (Vorbis, and whatever gap 2 turns
+   out to need).
