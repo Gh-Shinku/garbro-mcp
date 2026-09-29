@@ -29,10 +29,17 @@ Extraction uses isolated, expiring directories below the operating system's temp
 `--temp-dir` overrides that location. Use `--expected-build-id ID` to refuse to start a stale or
 different bundle.
 
-The optional `.tgz` installs locally with `npm install --global /path/to/garbro-mcp-VERSION.tgz`.
-It contains the same self-contained server and requires no registry downloads for runtime
-dependencies. Configure the client with `command: "garbro-mcp-server"` (or the installed absolute
-executable path).
+Install a published version directly from npm, preferably pinned to an exact version:
+
+```shell
+npx --yes garbro-mcp@VERSION --version
+npx --yes garbro-mcp@VERSION
+```
+
+The second command starts the MCP server on stdio. Alternatively, install it globally with
+`npm install --global garbro-mcp@VERSION` and configure the client with `command: "garbro-mcp"`.
+The optional release `.tgz` contains the same self-contained server and can still be installed
+offline with `npm install --global /path/to/garbro-mcp-VERSION.tgz`.
 
 To update or roll back, download a specific version and change the configured bundle path; restart
 the MCP client. Do not replace a running server automatically.

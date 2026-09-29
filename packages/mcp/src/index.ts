@@ -22,7 +22,7 @@ async function main(): Promise<void> {
 	});
 
 	if (values.help) {
-		console.error(`Usage: garbro-mcp-server [options]
+		console.error(`Usage: garbro-mcp [options]
 
 Options:
   --temp-dir <path>         Override the OS temporary workspace directory

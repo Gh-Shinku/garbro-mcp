@@ -10,7 +10,7 @@
 		}
 	},
 	"bin": {
-		"garbro-mcp-server": "./dist/index.js"
+		"garbro-mcp": "./dist/index.js"
 	},
 	"dependencies": {
 		"@garbro-mcp/core": "workspace:*",

@@ -1,12 +1,24 @@
-# Experimental distribution
+# Distribution
 
-Registry publication is not enabled. Workspace packages and the independent release manifest in
-`distribution/package.json` remain private. GitHub prereleases distribute a fixed-version,
-self-contained Node.js server while the interfaces are still evolving.
+The independent release manifest in `distribution/package.json` publishes a self-contained npm
+package. Internal workspace packages remain private and are bundled into the release artifact.
+GitHub prereleases also distribute the same fixed-version server while the interfaces are still
+evolving.
 
 ## User installation
 
-Install Node.js 24 or newer. Download the portable ZIP and matching `SHA256SUMS` from a specific
+Install Node.js 24 or newer. For the shortest setup, run a pinned npm version:
+
+```shell
+npx --yes garbro-mcp@<version> --version
+npx --yes garbro-mcp@<version>
+```
+
+The second command starts the MCP server on stdio and waits for an MCP client. A client
+configuration can use `npx` with `--yes` and `garbro-mcp@<version>` as arguments. On Windows, use
+`npx.cmd` if the client does not resolve command shims. Pinning avoids unreviewed automatic updates.
+
+Alternatively, download the portable ZIP and matching `SHA256SUMS` from a specific
 [GitHub release](https://github.com/Gh-Shinku/garbro-mcp/releases). These assets must be uploaded by a
 maintainer first; GitHub's automatically generated source archives are not portable builds.
 
@@ -30,16 +42,23 @@ installation or registry access is needed. All three desktop operating systems u
 bundle. Optional temporary-workspace settings are documented in
 [configuration.md](configuration.md).
 
-Alternatively, download the `.tgz` and install it locally:
+The package can also be installed globally from npm:
+
+```shell
+npm install --global garbro-mcp@<version>
+garbro-mcp --version --json
+```
+
+Alternatively, download the `.tgz` and install it offline:
 
 ```shell
 npm install --global /absolute/path/garbro-mcp-<version>.tgz
-garbro-mcp-server --version --json
+garbro-mcp --version --json
 ```
 
 The tarball contains the same bundle, has no runtime dependencies or installation scripts, and
 can be installed offline. Global installation requires a writable npm prefix. Configure the MCP
-client with `garbro-mcp-server` (or its absolute executable path).
+client with `garbro-mcp` (or its absolute executable path).
 
 Keep versions in separate directories. Updating or rolling back is an explicit path change and
 client restart; the server does not download updates or follow `main` automatically.
@@ -85,7 +104,15 @@ Run **Experimental release** in GitHub Actions with a new prerelease version suc
    macOS artifact smoke checks pass does the workflow create a GitHub prerelease at the tested
    commit. Existing tags are rejected rather than overwritten or reused.
 
-The workflow never invokes registry publication. For eventual registry distribution, review the
-package name and license metadata, remove the release manifest's private guard deliberately, and
-publish the same built package through a separately authorized workflow. Internal workspace
-packages need not be published independently.
+The workflow never invokes registry publication. Publish the already tested `.tgz` separately with
+an npm account protected by two-factor authentication:
+
+```shell
+npm login --registry=https://registry.npmjs.org/
+npm publish dist/release/garbro-mcp-<version>.tgz --access public --tag next
+```
+
+Use the `next` tag for prereleases and omit `--tag next` for a stable release. Internal workspace
+packages do not need to be published independently. After the first manual release, configure npm
+Trusted Publishing for a dedicated GitHub Actions workflow instead of storing a long-lived npm
+token.

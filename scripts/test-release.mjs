@@ -250,8 +250,13 @@ try {
 	const portableManifest = JSON.parse(
 		await readFile(resolve(portable, "package.json"), "utf8"),
 	);
+	assert.equal(portableManifest.name, "garbro-mcp");
 	assert.equal(portableManifest.version, version);
+	assert.equal(portableManifest.private, undefined);
 	assert.equal(portableManifest.dependencies, undefined);
+	assert.deepEqual(portableManifest.bin, {
+		"garbro-mcp": "./garbro-mcp.cjs",
+	});
 	await smoke(
 		resolve(portable, "garbro-mcp.cjs"),
 		resolve(sandbox, "portable-output"),
@@ -277,7 +282,7 @@ try {
 	const installed = resolve(installation, "node_modules/garbro-mcp");
 	const executable = resolve(
 		installation,
-		`node_modules/.bin/garbro-mcp-server${process.platform === "win32" ? ".cmd" : ""}`,
+		`node_modules/.bin/garbro-mcp${process.platform === "win32" ? ".cmd" : ""}`,
 	);
 	assert.equal(run(executable, ["--version"], { cwd }).trim(), version);
 	for (const file of expectedFiles)
