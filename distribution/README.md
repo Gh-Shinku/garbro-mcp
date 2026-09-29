@@ -1,48 +1,51 @@
 # garbro-mcp experimental distribution
 
 This is an experimental build, not a stable release. Keep a backup of your input data. Install
-Node.js 24 or newer; no Git, pnpm, or dependency installation is needed for the portable ZIP.
+Node.js 24 or newer; no Git, pnpm, or repository checkout is needed.
 
 The server handles supported resource formats. It does not reverse-engineer game logic, infer
 character or voice ownership, or automatically support unknown engines. Clients should keep those
 tasks with the user or an external analysis workflow.
 
-Extract the ZIP and configure your MCP client:
+Run the published package directly:
+
+```shell
+npx --yes garbro-mcp@latest --version
+npx --yes garbro-mcp@latest --doctor --json
+```
+
+Configure your MCP client to start it over stdio:
 
 ```json
 {
   "mcpServers": {
     "garbro": {
-      "command": "node",
-      "args": ["/absolute/path/garbro-mcp/garbro-mcp.cjs"]
+      "command": "npx",
+      "args": ["--yes", "garbro-mcp@latest"]
     }
   }
 }
 ```
 
-On Windows, use paths such as `C:/Tools/garbro-mcp/garbro-mcp.cjs`.
-Use an absolute Node executable path if your client cannot find `node` on PATH.
+On Windows, use `npx.cmd` if the MCP client does not resolve command shims. For reproducible
+environments, replace `@latest` with an exact version. Pinning makes updates and rollbacks explicit.
 
-Check the exact build with `node garbro-mcp.cjs --version --json`, then run
-`node garbro-mcp.cjs --doctor --json`. Game paths are provided as absolute paths in submitted tasks.
-Extraction uses isolated, expiring directories below the operating system's temporary directory;
-`--temp-dir` overrides that location. Use `--expected-build-id ID` to refuse to start a stale or
-different bundle.
+Game paths are provided as absolute paths in submitted tasks. Extraction uses isolated, expiring
+directories below the operating system's temporary directory; `--temp-dir` overrides that
+location. Use `--expected-build-id ID` to refuse to start a stale or different bundle.
 
-Install a published version directly from npm, preferably pinned to an exact version:
+Alternatively, install the command globally:
 
 ```shell
-npx --yes garbro-mcp@VERSION --version
-npx --yes garbro-mcp@VERSION
+npm install --global garbro-mcp@latest
+garbro-mcp --version
 ```
 
-The second command starts the MCP server on stdio. Alternatively, install it globally with
-`npm install --global garbro-mcp@VERSION` and configure the client with `command: "garbro-mcp"`.
-The optional release `.tgz` contains the same self-contained server and can still be installed
-offline with `npm install --global /path/to/garbro-mcp-VERSION.tgz`.
+For offline use, install the release `.tgz` with
+`npm install --global /path/to/garbro-mcp-VERSION.tgz`, or extract the portable ZIP and configure
+the client to run `node /absolute/path/garbro-mcp/garbro-mcp.cjs`.
 
-To update or roll back, download a specific version and change the configured bundle path; restart
-the MCP client. Do not replace a running server automatically.
+Restart the MCP client after changing versions. Do not replace a running server automatically.
 
 Source, tool contracts, and known limitations:
 https://github.com/Gh-Shinku/garbro-mcp

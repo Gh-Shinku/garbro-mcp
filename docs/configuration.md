@@ -40,12 +40,29 @@ Extraction always goes to server-managed temporary storage first.
 
 ## MCP client configuration
 
-Portable ZIP example on Windows:
+npx example using a fixed version:
 
 ```json
 {
   "mcpServers": {
     "garbro": {
+      "command": "npx",
+      "args": ["--yes", "garbro-mcp@0.1.0-beta.1"]
+    }
+  }
+}
+```
+
+Use `npx.cmd` on Windows if the MCP client does not resolve command shims. Pinning an exact package
+version makes updates explicit. Use `garbro-mcp@latest` only when automatically following the npm
+`latest` tag is intentional.
+
+Portable ZIP example on Windows:
+
+```json
+{
+  "mcpServers": {
+    "garbro-portable": {
       "command": "node",
       "args": ["C:/Tools/garbro-mcp/garbro-mcp.cjs"]
     }
@@ -70,8 +87,8 @@ Source checkout example with a custom temporary directory:
 }
 ```
 
-Use absolute paths for the server and custom temporary directory. If the MCP client cannot find
-`node`, use the absolute path to the Node.js executable.
+Use absolute paths for portable bundles, source checkouts, and custom temporary directories. If
+the MCP client cannot find `node`, use the absolute path to the Node.js executable.
 
 ## Filesystem policy
 
@@ -100,14 +117,14 @@ prepared. Files should not be expected to remain available after `expiresAt`.
 Record the exact build and validate the temporary workspace:
 
 ```powershell
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --doctor --json
+npx --yes garbro-mcp@0.1.0-beta.1 --version --json
+npx --yes garbro-mcp@0.1.0-beta.1 --doctor --json
 ```
 
 When overriding temporary storage, pass the same option used by the MCP client:
 
 ```powershell
-node C:/Tools/garbro-mcp/garbro-mcp.cjs `
+npx --yes garbro-mcp@0.1.0-beta.1 `
   --temp-dir D:/garbro-temporary `
   --doctor --json
 ```

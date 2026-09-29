@@ -2,14 +2,15 @@
 
 ## The server does not start
 
-Run the exact configured bundle manually:
+Run the exact configured package manually:
 
 ```powershell
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
+npx --yes garbro-mcp@0.1.0-beta.1 --version --json
 ```
 
-garbro-mcp requires Node.js 24 or newer. Use an absolute Node executable path when the MCP client
-does not inherit your terminal's `PATH`.
+garbro-mcp requires Node.js 24 or newer. On Windows, use `npx.cmd` if the MCP client does not resolve
+command shims. For a portable bundle, run its `garbro-mcp.cjs` with an absolute Node executable
+path when the client does not inherit your terminal's `PATH`.
 
 ## The temporary workspace is rejected
 

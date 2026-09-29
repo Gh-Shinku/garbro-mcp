@@ -1,5 +1,7 @@
 # GARBro formats for agents
 
+[![npm version](https://img.shields.io/npm/v/garbro-mcp.svg)](https://www.npmjs.com/package/garbro-mcp)
+
 garbro-mcp lets coding agents inspect and extract supported ADV/Galgame resource files. It is a
 Model Context Protocol (MCP) server backed by independent TypeScript implementations of formats and
 codecs documented by [GARBro](https://github.com/morkt/GARBro).
@@ -36,34 +38,37 @@ resource's role in the game. When the available evidence is insufficient, the se
 ## Requirements
 
 - Node.js 24 or newer
-- A portable release bundle, or a source checkout built with pnpm 11.26.0
 - Read access to the game directory selected in the conversation
 
 ## Getting started
 
-Download a versioned `garbro-mcp-<version>-portable.zip` from
-[GitHub Releases](https://github.com/Gh-Shinku/garbro-mcp/releases) and extract it. Configure your
-MCP client with absolute paths:
+Run the published package directly with npx; no repository checkout or global installation is
+required:
+
+```shell
+npx --yes garbro-mcp@latest --version
+npx --yes garbro-mcp@latest --doctor --json
+```
+
+Configure your MCP client to start the same command over stdio:
 
 ```json
 {
   "mcpServers": {
     "garbro": {
-      "command": "node",
-      "args": [
-        "C:/Tools/garbro-mcp/garbro-mcp.cjs"
-      ]
+      "command": "npx",
+      "args": ["--yes", "garbro-mcp@latest"]
     }
   }
 }
 ```
 
-Before connecting the client, verify the bundle and temporary workspace:
+On Windows, use `npx.cmd` if the MCP client does not resolve command shims. For reproducible
+environments, pin an exact release such as `garbro-mcp@0.1.0-beta.1` instead of following the
+`latest` tag.
 
-```powershell
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --version --json
-node C:/Tools/garbro-mcp/garbro-mcp.cjs --doctor --json
-```
+Global npm installation and versioned portable bundles remain available for offline or
+centrally-managed environments. See [distribution](docs/distribution.md) for those alternatives.
 
 See [configuration](docs/configuration.md) for temporary-directory overrides, source-checkout
 setup, and the filesystem policy.
