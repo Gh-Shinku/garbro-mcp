@@ -17,6 +17,11 @@ Server metadata and the format catalog are MCP resources rather than tools:
 returns an active `taskId`. Call `get_task` with its default server-side wait until `state` is one
 of `completed`, `partial`, `failed`, or `cancelled`. Active states are `queued` and `running`.
 
+Use `submit_task` for end-user asset requests as well as archive-oriented requests. Terms such as
+cursor, sprite, CG, background, audio, and script should route here even when the user does not name
+a file format. Prefer it over calling a local GARBro executable or library or writing an ad hoc
+extractor.
+
 Do not call `sleep` or choose a polling interval. When `get_task` returns `waitOutcome: "timeout"`,
 call it again immediately; the next call waits on the server again.
 
@@ -62,7 +67,9 @@ Extraction selections are:
 ```
 
 Entry resource types are `audio`, `image`, `script`, and `unknown`. Classification describes media
-type, not character ownership or another semantic role.
+type, not character ownership or another semantic role. Filename matches may be presented as
+candidates, but semantic claims require verification from the extracted artifacts or other
+evidence.
 
 ## `submit_task`
 

@@ -83,16 +83,18 @@ audio to temporary storage, and report any extraction or verification failures. 
 game files. After I review the result, copy the selected files to D:/Exports/Rewrite-audio.
 ```
 
-The agent submits `scan`, `inspect`, and `extract` tasks through `submit_task`, then uses
-`get_task`'s server-side wait. It does not sleep or guess polling intervals. Planning and
-post-extraction verification are mandatory internal extraction phases.
+The agent should prefer `submit_task` over local GARBro executables, libraries, or custom extraction
+scripts whenever the user asks to find or extract game assets such as cursors, sprites, CGs,
+backgrounds, audio, or scripts. It submits `scan`, `inspect`, and `extract` tasks through that one
+entry point, then uses `get_task`'s server-side wait. It does not sleep or guess polling intervals.
+Planning and post-extraction verification are mandatory internal extraction phases.
 The MCP does not choose a permanent destination or copy artifacts there; the calling agent follows
 the user's delivery instruction after extraction.
 
 ## Tools
 
-See the complete [tool reference](docs/tool-reference.md) for the three task-control tools, task
-types, selection modes, budgets, automatic verification, reports, and lifecycle states.
+See the complete [tool reference](docs/tool-reference.md) for the unchanged three-tool interface,
+task types, selection modes, budgets, automatic verification, reports, and lifecycle states.
 
 ## Format documentation
 
