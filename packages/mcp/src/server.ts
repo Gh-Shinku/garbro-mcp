@@ -30,7 +30,7 @@ import { toolResult } from "./context.js";
 
 export const SERVER_VERSION = BUILD_IDENTITY.version;
 export const SERVER_PURPOSE =
-	"Run bounded asynchronous jobs that detect, inspect, extract, and verify supported game resources.";
+	"Find, inspect, extract, and verify supported game resources such as cursors, sprites, CGs, backgrounds, audio, and scripts.";
 export const SERVER_SCOPE = [
 	"known archive and resource formats",
 	"bounded asynchronous discovery and inspection",
@@ -46,11 +46,11 @@ export const SERVER_NON_CAPABILITIES = [
 ] as const;
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
-Use submit_task for scan, inspect, and extract work. Paths are absolute local paths supplied from the user's current request; no readable roots are configured at server startup. Submission waits briefly for fast work, then returns a taskId if work remains active. Call get_task with its default server-side terminal wait until the task reaches completed, partial, failed, or cancelled. If that wait times out, call get_task again immediately. Never use sleep or choose a polling delay. Use cancel_task to request cooperative cancellation.
+Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
-Extraction always writes to an isolated expiring task directory below the server's temporary directory, performs an internal preflight, and independently reopens every written artifact for size, SHA-256, and supported structural validation before it can complete. Do not submit a separate verification step. The agent, not this server, decides whether and where verified artifacts are delivered to the user.
+Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
-Do not delegate game-logic reverse engineering, executable decompilation, unknown-engine adaptation, or character/dialogue/voice/sprite inference to this server. If a request needs a semantic relationship, report that the resource bytes may be extractable but the relationship requires external analysis or user input. Never infer semantic ownership from filenames alone.`;
+The server extracts resource bytes, not game logic or semantic relationships. Filename matches are candidates, not proof of character, dialogue, voice, sprite, or other ownership; verify such claims from the artifacts or other evidence.`;
 
 const resourceTypes = ["archive", "image", "audio", "script"] as const;
 const terminalStates = ["completed", "partial", "failed", "cancelled"] as const;
@@ -88,47 +88,76 @@ const extractionBudgetsSchema = z.object({
 	maxDecodedBytesPerResource: decimalBytesSchema.optional(),
 	timeoutMs: z.number().int().positive().max(3_600_000).optional(),
 });
-const scanTaskSchema = z.object({
-	type: z.literal("scan"),
-	path: absolutePathSchema,
-	recursive: z.boolean().default(true),
-	includeGlobs: z.array(z.string()).max(32).optional(),
-	excludeGlobs: z.array(z.string()).max(32).optional(),
-	maxDepth: z.number().int().min(0).max(64).default(8),
-	cursor: z.string().min(1).optional(),
-	limit: z.number().int().positive().max(200).default(50),
-	includeUnrecognized: z.boolean().default(false),
-	resourceTypes: z.array(z.enum(resourceTypes)).max(4).optional(),
-	formatIds: z.array(z.string().min(1)).max(128).optional(),
-});
-const inspectTaskSchema = z.object({
-	type: z.literal("inspect"),
-	source: sourceSchema,
-	includeEntries: z.boolean().default(true),
-	includeMetadata: z.boolean().default(false),
-	includeGlobs: z.array(z.string()).max(32).optional(),
-	excludeGlobs: z.array(z.string()).max(32).optional(),
-	caseSensitive: z.boolean().default(false),
-	compressed: z.boolean().optional(),
-	encrypted: z.boolean().optional(),
-	resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
-	offset: z.number().int().nonnegative().default(0),
-	limit: z.number().int().positive().max(200).default(50),
-});
+const scanTaskSchema = z
+	.object({
+		type: z.literal("scan"),
+		path: absolutePathSchema,
+		recursive: z.boolean().default(true),
+		includeGlobs: z.array(z.string()).max(32).optional(),
+		excludeGlobs: z.array(z.string()).max(32).optional(),
+		maxDepth: z.number().int().min(0).max(64).default(8),
+		cursor: z.string().min(1).optional(),
+		limit: z.number().int().positive().max(200).default(50),
+		includeUnrecognized: z.boolean().default(false),
+		resourceTypes: z.array(z.enum(resourceTypes)).max(4).optional(),
+		formatIds: z.array(z.string().min(1)).max(128).optional(),
+	})
+	.describe(
+		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
+	);
+const inspectTaskSchema = z
+	.object({
+		type: z.literal("inspect"),
+		source: sourceSchema,
+		includeEntries: z.boolean().default(true),
+		includeMetadata: z.boolean().default(false),
+		includeGlobs: z.array(z.string()).max(32).optional(),
+		excludeGlobs: z.array(z.string()).max(32).optional(),
+		caseSensitive: z.boolean().default(false),
+		compressed: z.boolean().optional(),
+		encrypted: z.boolean().optional(),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
+		offset: z.number().int().nonnegative().default(0),
+		limit: z.number().int().positive().max(200).default(50),
+	})
+	.describe(
+		'Identify one game-resource file and list or filter its entries. Example: {"type":"inspect","source":{"path":"D:/Games/Title/data.bin"},"includeEntries":true}.',
+	);
 const extractSourceSchema = z.object({
 	source: sourceSchema,
 	selection: extractionSelectionSchema.default({ mode: "all" }),
 });
-const extractTaskSchema = z.object({
-	type: z.literal("extract"),
-	sources: z.array(extractSourceSchema).min(1).max(32),
-	budgets: extractionBudgetsSchema.optional(),
-});
+const extractTaskSchema = z
+	.object({
+		type: z.literal("extract"),
+		sources: z.array(extractSourceSchema).min(1).max(32),
+		budgets: extractionBudgetsSchema.optional(),
+	})
+	.describe(
+		'Extract selected entries into isolated temporary storage and verify them. Example: {"type":"extract","sources":[{"source":{"path":"D:/Games/Title/data.bin"},"selection":{"mode":"all","resourceTypes":["image"]}}]}.',
+	);
 const taskSchema = z.discriminatedUnion("type", [
 	scanTaskSchema,
 	inspectTaskSchema,
 	extractTaskSchema,
 ]);
+const submissionControlSchema = {
+	idempotencyKey: z
+		.string()
+		.min(1)
+		.max(128)
+		.optional()
+		.describe("Return the existing task when the same key is retried."),
+	waitMs: z
+		.number()
+		.int()
+		.min(0)
+		.max(5000)
+		.default(1000)
+		.describe(
+			"Fast-completion wait in milliseconds; must be between 0 and 5000.",
+		),
+};
 
 type TaskInput = z.infer<typeof taskSchema>;
 type TaskKind = TaskInput["type"];
@@ -851,11 +880,10 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"submit_task",
 		{
 			description:
-				"Submit a bounded scan, inspect, or extract task. Waits briefly for fast completion, otherwise returns an active taskId. Extract tasks always preflight and verify written artifacts.",
+				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Supports bounded scan, inspect, and extract tasks. Extraction always preflights and verifies artifacts in isolated temporary storage. waitMs accepts 0–5000.",
 			inputSchema: z.object({
 				task: taskSchema,
-				idempotencyKey: z.string().min(1).max(128).optional(),
-				waitMs: z.number().int().min(0).max(5000).default(1000),
+				...submissionControlSchema,
 			}),
 			annotations: {
 				readOnlyHint: false,
@@ -913,7 +941,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Wait server-side for a submitted task. Defaults to terminal completion for 30 seconds; on timeout call again immediately without sleeping.",
+				"Wait server-side for a submitted task. Defaults to terminal completion for 30 seconds; on timeout call it again immediately. Never call sleep or guess a polling interval.",
 			inputSchema: z.object({
 				taskId: z.string().uuid(),
 				waitUntil: z.enum(["none", "change", "terminal"]).default("terminal"),

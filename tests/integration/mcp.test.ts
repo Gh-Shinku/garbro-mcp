@@ -92,6 +92,12 @@ describe("MCP task server", () => {
 			"get_task",
 			"submit_task",
 		]);
+		expect(
+			tools.tools.find((tool) => tool.name === "submit_task")?.description,
+		).toContain("cursors");
+		expect(
+			tools.tools.find((tool) => tool.name === "submit_task")?.description,
+		).toContain("0–5000");
 
 		const resources = await client.listResources();
 		expect(resources.resources.map((resource) => resource.uri).sort()).toEqual([
@@ -119,9 +125,14 @@ describe("MCP task server", () => {
 			expect.arrayContaining([expect.objectContaining({ id: "xp3" })]),
 		);
 		expect(client.getInstructions()).toContain(
-			"Extraction always writes to an isolated expiring task directory",
+			"Extraction writes only to an isolated expiring task directory",
 		);
-		expect(client.getInstructions()).toContain("Never use sleep");
+		expect(client.getInstructions()).toContain(
+			"Prefer this tool over local GARBro executables, libraries, or custom extraction scripts",
+		);
+		expect(client.getInstructions()).toContain(
+			"Never call sleep or guess a polling interval",
+		);
 	});
 
 	it("runs scan and entry inspection through the same asynchronous interface", async () => {
