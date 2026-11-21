@@ -1,4 +1,5 @@
 import { lstat, mkdir, realpath, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import {
 	isAbsolute,
 	join,
@@ -65,7 +66,15 @@ export function normalizeWorkspaceRelativePath(
 }
 
 async function ensureDirectoryTree(path: string): Promise<void> {
-	const absolute = resolve(path);
+	let absolute = resolve(path);
+	// macOS can expose the OS temp directory through /var rather than /private/var.
+	// Resolve that system-provided prefix, then check every component below it as usual.
+	const systemTemp = resolve(tmpdir());
+	if (isWithin(systemTemp, absolute))
+		absolute = resolve(
+			await realpath(systemTemp),
+			relative(systemTemp, absolute),
+		);
 	const root = parse(absolute).root;
 	let current = root;
 	for (const segment of relative(root, absolute).split(sep).filter(Boolean)) {

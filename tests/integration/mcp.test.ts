@@ -4,6 +4,7 @@ import {
 	readFile,
 	rm,
 	stat,
+	symlink,
 	writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,7 +12,7 @@ import { resolve } from "node:path";
 import type { BuildServerOptions } from "@garbro-mcp/mcp/server";
 import { buildServer } from "@garbro-mcp/mcp/server";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const closers: Array<() => Promise<void>> = [];
 const temporaryDirectories: string[] = [];
@@ -249,6 +250,32 @@ describe("MCP task server", () => {
 			status: "verified",
 			verification: { level: "manifest", matched: true },
 		});
+	});
+
+	it("extracts and verifies an XP3 under an aliased OS temp directory", async () => {
+		const parent = await mkdtemp(resolve(tmpdir(), "garbro-temp-alias-"));
+		const alias = resolve(parent, "alias");
+		try {
+			const target = await mkdtemp(resolve(parent, "physical-"));
+			await symlink(target, alias, "junction");
+			for (const name of ["TMPDIR", "TEMP", "TMP"]) vi.stubEnv(name, alias);
+			const { client, root, output } = await connect();
+			const id = await submit(client, {
+				type: "extract",
+				sources: [{ source: { path: resolve(root, "basic.xp3") } }],
+			});
+			const task = await waitForTask(client, id);
+			expect(task).toMatchObject({
+				state: "completed",
+				result: { extracted: 3, sources: [{ verification: { verified: 3 } }] },
+			});
+			expect(
+				await readFile(resolve(output, id, "artifacts/0001/hello.txt"), "utf8"),
+			).toBe("hello xp3\n");
+		} finally {
+			vi.unstubAllEnvs();
+			await rm(parent, { recursive: true, force: true });
+		}
 	});
 
 	it("deduplicates retried submissions by idempotency key", async () => {
