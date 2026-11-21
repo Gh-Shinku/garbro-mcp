@@ -92,10 +92,24 @@ command. It also invokes npm's generated executable and compares the installed f
 
 ## CI releases
 
-On pushes to `main`, **Prepare or publish releases** reuses a successful PR check when the
-merged tree matches. A push following a failed check includes changes since the last verified commit on main. Release
-Please uses Conventional Commits across the repository to open or update one version PR for
-`garbro-mcp`. Review the version, changelog, and checks before merging that PR. The first
+On pushes to `main`, **Publish releases** reuses a successful PR check when the merged
+tree matches. After a failed main check, CI checks changes since the last verified commit.
+Only a main commit that changes `.release-please-manifest.json` can start
+the release job.
+
+### Prepare and merge a version PR
+
+When ready to release, use your authenticated GitHub CLI account to run Release Please
+locally. Run this command in PowerShell from the repository root.
+
+```powershell
+npx --yes release-please@17.6.0 release-pr --repo-url=Gh-Shinku/garbro-mcp --target-branch=main --token (gh auth token)
+```
+
+This creates or refreshes the version PR from Conventional Commits using the repository's
+release configuration. Keep the generated PR description and release label so the release
+job can recognize it. Review its version, changelog and checks, then merge it using
+`gh pr merge <number> --squash` or the GitHub web interface. The first
 release on the npm `latest` channel under this policy is `0.1.0`. Each subsequent release
 increments the patch number by one, including releases with features or breaking changes.
 For example, `0.1.99` is followed by `0.1.100`. Moving to another version line requires
@@ -103,15 +117,11 @@ a maintainer decision and an update to the publish script's version check.
 
 ### Set up publication
 
-1. Allow GitHub Actions to create pull requests in the repository's Actions settings, or provide
-   a repository secret named `PAT_TOKEN` with repository contents, issues, and pull request
-   write access. The workflow falls back to `GITHUB_TOKEN`. If the bot PR has no checks,
-   dispatch **Check** on its head branch and verify the tested SHA.
-2. In npm's Trusted Publisher settings for `garbro-mcp`, select GitHub Actions and enter owner
+1. In npm's Trusted Publisher settings for `garbro-mcp`, select GitHub Actions and enter owner
    `Gh-Shinku`, repository `garbro-mcp`, and workflow filename `publish.yml`. Leave the environment
    blank. The publish job authenticates through OIDC.
-3. Set the Actions **variable** `NPM_PUBLISH_ENABLED` to `true` before merging the version PR
-   intended for publication. With the variable unset, CI still prepares the version PR.
+2. Set the Actions **variable** `NPM_PUBLISH_ENABLED` to `true` before merging the version PR
+   intended for publication.
 
 Merging the version PR with publication enabled creates a tag such as `v0.1.0` and a
 draft GitHub release. CI builds once at the tagged commit, then tests the same ZIP and npm

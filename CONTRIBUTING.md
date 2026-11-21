@@ -36,10 +36,11 @@ checks to the exact artifacts it publishes.
 
 ### Version PRs
 
-Release Please collects releasable changes on `main` into a separate version PR. Leave
+When ready to publish, a maintainer runs the Release Please CLI locally with their GitHub
+login to collect releasable changes on `main` into a separate version PR. Leave
 package version updates and changelog generation to that PR. The maintainer reviews its
-version and release notes and decides when to publish. Merging an ordinary PR delivers the
-change to `main`. Merging the version PR with publication enabled starts the release workflow.
+version and release notes and merges it with `gh pr merge` or the GitHub web interface.
+Merging an ordinary PR delivers the change to `main`. Merging the version PR with publication enabled starts the release workflow.
 See the [distribution guide](docs/distribution.md) for the release workflow.
 
 ## Commits
