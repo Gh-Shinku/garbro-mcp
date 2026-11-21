@@ -1,20 +1,13 @@
-# garbro-mcp experimental distribution
+# garbro-mcp
 
-This is an experimental build, not a stable release. Keep a backup of your input data. Install
-Node.js 24 or newer; no Git, pnpm, or repository checkout is needed.
+Give your MCP client access to the files inside supported visual novel game archives.
+You can ask it to find a voice clip, list the images in an archive, or extract a selection
+of files. The server opens the game files read-only.
 
-The server handles supported resource formats. It does not reverse-engineer game logic, infer
-character or voice ownership, or automatically support unknown engines. Clients should keep those
-tasks with the user or an external analysis workflow.
+## Connect your MCP client
 
-Run the published package directly:
-
-```shell
-npx --yes garbro-mcp@latest --version
-npx --yes garbro-mcp@latest --doctor --json
-```
-
-Configure your MCP client to start it over stdio:
+Install Node.js 24 or newer on the machine that holds the game files. Add this entry to
+a client that uses `mcpServers` for stdio servers, then restart the client.
 
 ```json
 {
@@ -27,28 +20,33 @@ Configure your MCP client to start it over stdio:
 }
 ```
 
-On Windows, use `npx.cmd` if the MCP client does not resolve command shims. For reproducible
-environments, replace `@latest` with an exact version. Pinning makes updates and rollbacks explicit.
+On Windows, use `npx.cmd` if your client cannot find `npx`.
 
-Game paths are provided as absolute paths in submitted tasks. Extraction uses isolated, expiring
-directories below the operating system's temporary directory; `--temp-dir` overrides that
-location. Use `--expected-build-id ID` to refuse to start a stale or different bundle.
+## Try it on a game
 
-Alternatively, install the command globally:
+Give the client an absolute path to a game directory or an archive. For example, replace
+the path in this request with your own.
+
+> Scan D:/Games/MyGame for archives containing audio. Show me the archive names and a
+> few audio entry paths so I can choose a file to extract.
+
+Once you choose an entry, ask the client to extract it and show you the output path.
+The server checks the extracted file's size and SHA-256 and returns a verification
+report. Outputs go into a temporary directory and expire after 24 hours by default.
+Ask your client to copy any files you want to keep to a folder of your choice.
+
+## Check the installation
+
+If the client cannot start the server, run the same package from a terminal to check
+the build and its access to temporary storage.
 
 ```shell
-npm install --global garbro-mcp@latest
-garbro-mcp --version
+npx --yes garbro-mcp@latest --doctor --json
 ```
 
-For offline use, install the release `.tgz` with
-`npm install --global /path/to/garbro-mcp-VERSION.tgz`, or extract the portable ZIP and configure
-the client to run `node /absolute/path/garbro-mcp/garbro-mcp.cjs`.
+[Supported formats](https://github.com/Gh-Shinku/garbro-mcp/blob/main/docs/support.md)
+· [Client configuration](https://github.com/Gh-Shinku/garbro-mcp/blob/main/docs/configuration.md)
+· [Offline installation](https://github.com/Gh-Shinku/garbro-mcp/blob/main/docs/distribution.md#user-installation)
 
-Restart the MCP client after changing versions. Do not replace a running server automatically.
-
-Source, tool contracts, and known limitations:
-https://github.com/Gh-Shinku/garbro-mcp
-
-The bundled dependency license texts are included in `THIRD_PARTY_NOTICES.md`. GARbro attribution
-and its MIT license are retained in `LICENSE`.
+The format readers use [GARBro](https://github.com/morkt/GARBro) as a reference. The
+package includes the project license and bundled dependency notices.
