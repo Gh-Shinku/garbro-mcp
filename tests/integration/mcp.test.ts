@@ -179,6 +179,62 @@ describe("MCP task server", () => {
 		});
 	});
 
+	it("searches the full archive index by literal, glob or regex with optional types", async () => {
+		const { client, root } = await connect();
+		async function search(filters: Record<string, unknown>) {
+			return waitForTask(
+				client,
+				await submit(client, {
+					type: "search",
+					path: root,
+					samplesPerArchive: 1,
+					...filters,
+				}),
+			);
+		}
+		for (const entryPath of [
+			{ mode: "literal", pattern: "SCRIPTS\\START" },
+			{ mode: "glob", pattern: "**/*.TJS" },
+			{ mode: "regex", pattern: "(^|/)start(up|menu)[.]tjs$" },
+		]) {
+			expect(await search({ entryPath })).toMatchObject({
+				state: "completed",
+				result: {
+					archives: [
+						{
+							matchedTotal: 1,
+							entries: [
+								{
+									path: "scripts/startup.tjs",
+									extractSource: {
+										selection: { mode: "ids", entryIds: ["1"] },
+									},
+								},
+							],
+						},
+					],
+				},
+			});
+		}
+		for (const filters of [
+			{ entryPath: { mode: "literal", pattern: "START", caseSensitive: true } },
+			{ entryPath: { mode: "glob", pattern: "**/*.TJS", caseSensitive: true } },
+			{
+				entryPath: { mode: "regex", pattern: "startup" },
+				resourceTypes: ["audio"],
+			},
+		])
+			expect(await search(filters)).toMatchObject({
+				state: "completed",
+				result: { archives: [] },
+			});
+		for (const filters of [{}, { entryPath: { mode: "regex", pattern: "(" } }])
+			expect(await search(filters)).toMatchObject({
+				state: "failed",
+				error: { code: "INVALID_ARGUMENT" },
+			});
+	});
+
 	it("pages through files and extracts an entry directly from search results", async () => {
 		const { client, root } = await connect();
 		await writeFile(resolve(root, "00.bin"), "unrecognized");
