@@ -4,16 +4,21 @@ export const DEFAULT_RESPONSE_BYTES = 16 * 1024;
 export const MAX_RESPONSE_BYTES = 64 * 1024;
 const MAX_INLINE_TEXT_BYTES = 1024;
 
-export function toolResult<T extends Record<string, unknown>>(payload: T) {
+function inlineText(payload: Record<string, unknown>): string {
 	const serialized = JSON.stringify(payload);
-	const text =
-		Buffer.byteLength(serialized, "utf8") <= MAX_INLINE_TEXT_BYTES
-			? serialized
-			: JSON.stringify({
-					notice: "Full result is available in structuredContent.",
-				});
+	return Buffer.byteLength(serialized, "utf8") <= MAX_INLINE_TEXT_BYTES
+		? serialized
+		: JSON.stringify({
+				notice: "Full result is available in structuredContent.",
+			});
+}
+
+export function toolResult<T extends Record<string, unknown>>(
+	payload: T,
+	text?: string,
+) {
 	return {
-		content: [{ type: "text" as const, text }],
+		content: [{ type: "text" as const, text: text ?? inlineText(payload) }],
 		structuredContent: payload,
 	};
 }

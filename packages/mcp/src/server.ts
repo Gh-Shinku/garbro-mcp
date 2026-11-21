@@ -10,6 +10,7 @@ import {
 	type ExtractionBudgets,
 	type ExtractionPlan,
 	type ExtractionSelection,
+	type ExtractionVerificationItem,
 	entryResourceTypes,
 	entryToWire,
 	type FormatRegistry,
@@ -166,7 +167,23 @@ type TaskPayload = {
 	type: TaskKind;
 	status: TaskStatus;
 	result: Record<string, unknown>;
+	text?: string;
 };
+
+const MAX_ARTIFACT_SAMPLES = 3;
+interface ArtifactSample {
+	absolutePath: string;
+	bytesWritten: string;
+	verificationStatus: ExtractionVerificationItem["status"];
+}
+
+// Keep ordinary local paths copyable and control characters visible in terminal output.
+function displayPath(path: string): string {
+	return path.replace(
+		/[\p{Cc}\u2028\u2029]/gu,
+		(c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
+	);
+}
 
 interface SupportRecord {
 	localId: string;
@@ -194,8 +211,11 @@ export interface BuildServerOptions extends ArchiveAutomationOptions {
 	retentionMs?: number;
 }
 
-function success(payload: Record<string, unknown>) {
-	return toolResult({ ...payload, outcome: { status: "ok", warnings: [] } });
+function success(payload: Record<string, unknown>, text?: string) {
+	return toolResult(
+		{ ...payload, outcome: { status: "ok", warnings: [] } },
+		text,
+	);
 }
 
 function failure(error: unknown) {
@@ -410,16 +430,19 @@ function taskResponse(
 	snapshot: AsyncJobSnapshot<TaskPayload>,
 	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
 ) {
-	return {
-		...taskHeader(snapshot),
-		waitOutcome,
-		...(snapshot.result === undefined
-			? {}
-			: { result: snapshot.result.result }),
-		...(snapshot.error === undefined
-			? {}
-			: { error: serializeError(snapshot.error) }),
-	};
+	return success(
+		{
+			...taskHeader(snapshot),
+			waitOutcome,
+			...(snapshot.result === undefined
+				? {}
+				: { result: snapshot.result.result }),
+			...(snapshot.error === undefined
+				? {}
+				: { error: serializeError(snapshot.error) }),
+		},
+		snapshot.result?.text,
+	);
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -759,6 +782,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		);
 
 		const sources: Array<Record<string, unknown>> = [];
+		const samples: ArtifactSample[] = [];
 		for (const [index, item] of planned.entries()) {
 			throwIfCancelled(control.signal);
 			try {
@@ -786,6 +810,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					phaseControl(control, "verifying"),
 				);
 				const report = await writeExtractionReport(context.workspace, verified);
+				for (const entry of verified.items) {
+					if (samples.length === MAX_ARTIFACT_SAMPLES) break;
+					if (entry.status !== "extracted") continue;
+					const check = verified.verification.items.find(
+						(item) => item.entryId === entry.entryId,
+					);
+					samples.push({
+						absolutePath: entry.artifact.absolutePath,
+						bytesWritten: entry.artifact.bytesWritten.toString(),
+						verificationStatus: check?.status ?? "failed",
+					});
+				}
 				sources.push({
 					source: { path: context.absolutePath },
 					status: verified.status,
@@ -843,7 +879,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			: extracted > 0 || skipped > 0
 				? "partial"
 				: "failed";
-		return {
+		const payload: TaskPayload = {
 			type: "extract",
 			status,
 			result: {
@@ -852,6 +888,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				temporary: true,
 				artifactDirectory: resolve(temporaryTask.path, "artifacts"),
 				expiresAt: temporaryTask.expiresAt,
+				samples,
 				totalSources: sources.length,
 				extracted,
 				skipped,
@@ -859,6 +896,23 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				sources,
 			},
 		};
+		if (samples.length) {
+			const lines = [
+				`Extraction ${taskId} ${status}. Showing ${samples.length} of ${extracted} files.`,
+				`Temporary files expire at ${temporaryTask.expiresAt}.`,
+			];
+			for (const sample of samples)
+				lines.push(
+					displayPath(sample.absolutePath),
+					`  ${sample.bytesWritten} bytes | verification: ${sample.verificationStatus}`,
+				);
+			if (samples.length < extracted || hasFailures)
+				lines.push(
+					`Full reports in ${displayPath(resolve(temporaryTask.path, ".garbro-reports"))}`,
+				);
+			payload.text = lines.join("\n");
+		}
+		return payload;
 	};
 
 	const runTask = (
@@ -901,8 +955,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							snapshot.state as (typeof terminalStates)[number],
 						)
 					)
-						return success(taskResponse(snapshot, "terminal"));
-					if (waitMs === 0) return success(taskResponse(snapshot, "submitted"));
+						return taskResponse(snapshot, "terminal");
+					if (waitMs === 0) return taskResponse(snapshot, "submitted");
 					const waited = await jobs.wait(snapshot.jobId, {
 						until: "terminal",
 						timeoutMs: waitMs,
@@ -913,7 +967,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							"INVALID_ARGUMENT",
 							`Unknown task: ${snapshot.jobId}`,
 						);
-					return success(taskResponse(waited.snapshot, waited.outcome));
+					return taskResponse(waited.snapshot, waited.outcome);
 				};
 				if (idempotencyKey !== undefined) {
 					const existingId = idempotency.get(idempotencyKey);
@@ -968,7 +1022,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				const snapshot = waited?.snapshot ?? jobs.get(taskId);
 				if (snapshot === undefined)
 					throw new GarbroError("INVALID_ARGUMENT", `Unknown task: ${taskId}`);
-				return success(taskResponse(snapshot, waited?.outcome ?? "snapshot"));
+				return taskResponse(snapshot, waited?.outcome ?? "snapshot");
 			} catch (error) {
 				return failure(error);
 			}
