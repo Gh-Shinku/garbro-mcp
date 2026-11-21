@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
 import {
-	searchBodyBudget,
-	searchResultPage,
-	searchSnapshot,
-} from "../../packages/mcp/src/search-page.js";
+	responseBodyBudget,
+	savedResultPage,
+} from "../../packages/mcp/src/result-page.js";
+import { searchSnapshot } from "../../packages/mcp/src/search-page.js";
 
 it("retains a multibyte record that exceeds a page and resumes at the same cursor", () => {
 	const source = { path: "/data/game.xp3" };
@@ -36,25 +36,25 @@ it("retains a multibyte record that exceeds a page and resumes at the same curso
 		waitOutcome: "snapshot",
 		outcome: { status: "ok", warnings: [] },
 	};
-	const small = searchBodyBudget(4096, 1);
-	const first = searchResultPage(taskId, header, snapshot, {}, small);
+	const small = responseBodyBudget(4096, 1);
+	const first = savedResultPage(taskId, header, snapshot, {}, small);
 	const result = JSON.parse(first.content[0]?.text ?? "");
 	expect(result.result.archives[0].entries).toEqual(entries.slice(0, 1));
 	const resultCursor = result.result.resultCursor;
 	expect(() =>
-		searchResultPage(taskId, header, snapshot, { resultCursor }, small),
+		savedResultPage(taskId, header, snapshot, { resultCursor }, small),
 	).toThrow(
 		expect.objectContaining({
 			code: "LIMIT_EXCEEDED",
 			details: { taskId, resultCursor },
 		}),
 	);
-	const response = searchResultPage(
+	const response = savedResultPage(
 		taskId,
 		header,
 		snapshot,
 		{ resultCursor },
-		searchBodyBudget(16384, 2),
+		responseBodyBudget(16384, 2),
 	);
 	expect(response.structuredContent).toMatchObject({
 		result: { resultCursor: null, archives: [{ entries: entries.slice(1) }] },
