@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
 import { extname, matchesGlob, relative, resolve, sep } from "node:path";
+import { Minimatch } from "minimatch";
+import { RE2JS } from "re2js";
 import {
 	type EntryBrowseOptions,
 	entryBrowseOverview,
@@ -61,6 +63,48 @@ export interface EntryFilter {
 	compressed?: boolean;
 	encrypted?: boolean;
 	resourceTypes?: readonly EntryResourceType[];
+}
+
+export interface EntryPathFilter {
+	mode: "literal" | "glob" | "regex";
+	pattern: string;
+	caseSensitive?: boolean;
+}
+
+function compileEntryPath(filter: EntryPathFilter): (path: string) => boolean {
+	const { mode, pattern, caseSensitive } = filter;
+	if (!pattern.length || pattern.length > 4096)
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			"Entry path pattern must contain 1 to 4096 characters",
+		);
+	if (mode === "regex") {
+		try {
+			const regex = RE2JS.compile(
+				pattern,
+				caseSensitive ? 0 : RE2JS.CASE_INSENSITIVE,
+			);
+			return (path) => regex.test(path);
+		} catch (cause) {
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				`Invalid entry path regex: ${cause instanceof Error ? cause.message : String(cause)}`,
+				{ cause },
+			);
+		}
+	}
+	const normalized = pattern.replaceAll("\\", "/");
+	const fold = (text: string) => (caseSensitive ? text : text.toLowerCase());
+	const needle = fold(normalized);
+	if (mode === "literal") return (path) => fold(path).includes(needle);
+	validateGlobs([normalized]);
+	const glob = new Minimatch(normalized, {
+		platform: "linux",
+		nocase: !caseSensitive,
+		nonegate: true,
+		nocomment: true,
+	});
+	return (path) => glob.match(path);
 }
 
 export interface ArchiveSummary {
@@ -632,7 +676,8 @@ export class ArchiveAutomationService {
 	async searchEntries(
 		rootId: string,
 		options: DirectoryPageOptions & {
-			resourceTypes: readonly EntryResourceType[];
+			resourceTypes?: readonly EntryResourceType[];
+			entryPath?: EntryPathFilter;
 			samplesPerArchive?: number;
 		},
 		control: AutomationControl = {},
@@ -644,11 +689,13 @@ export class ArchiveAutomationService {
 				"LIMIT_EXCEEDED",
 				"samplesPerArchive exceeds entryPageMax",
 			);
-		if (options.resourceTypes.length === 0)
+		if (!options.resourceTypes?.length && !options.entryPath)
 			throw new GarbroError(
 				"INVALID_ARGUMENT",
-				"Select at least one entry resource type",
+				"Provide an entryPath or at least one resource type",
 			);
+		const matchesPath =
+			options.entryPath && compileEntryPath(options.entryPath);
 		const { items, page, earlierFiles } = await this.#visitDirectoryPage(
 			rootId,
 			options,
@@ -661,7 +708,13 @@ export class ArchiveAutomationService {
 					let matchedTotal = 0;
 					for (const entry of archive.entries) {
 						const resourceType = entryResourceType(entry);
-						if (!options.resourceTypes.includes(resourceType)) continue;
+						if (
+							options.resourceTypes &&
+							!options.resourceTypes.includes(resourceType)
+						)
+							continue;
+						if (matchesPath && !matchesPath(entry.path.replaceAll("\\", "/")))
+							continue;
 						matchedTotal++;
 						if (entries.length < sampleLimit)
 							entries.push({ id: entry.id, path: entry.path, resourceType });

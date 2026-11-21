@@ -54,7 +54,7 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
-To find entries of a resource type inside files under a game directory, submit a search task. Follow nextCursor for more files. Pass a matching entry's extractSource directly in extract.sources.
+To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Follow nextCursor for more files. Pass a matching entry's extractSource directly in extract.sources.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -123,11 +123,18 @@ const searchTaskSchema = scanTaskSchema
 	})
 	.extend({
 		type: z.literal("search"),
-		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1).optional(),
+		entryPath: z
+			.object({
+				mode: z.enum(["literal", "glob", "regex"]),
+				pattern: z.string().min(1).max(4096),
+				caseSensitive: z.boolean().default(false),
+			})
+			.optional(),
 		samplesPerArchive: z.number().int().min(1).max(10).default(1),
 	})
 	.describe(
-		"Search inside supported files under a game directory by entry resource type. limit caps files per page. Each matching archive returns a total and samples with extractSource for extract.sources.",
+		"Search inside supported files by entryPath, resourceTypes, or both. Literal and RE2 regex match substrings of the slash-separated entry path; glob matches the whole path. limit caps files per page. Samples have extractSource for extract.sources.",
 	);
 const inspectTaskSchema = z
 	.object({
@@ -721,7 +728,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			await context.automation.searchEntries(
 				"source",
 				{
-					resourceTypes: input.resourceTypes,
+					...(input.resourceTypes && { resourceTypes: input.resourceTypes }),
+					...(input.entryPath && { entryPath: input.entryPath }),
 					samplesPerArchive: input.samplesPerArchive,
 					onUnrecognized: (file) => unrecognized.push(file),
 					recursive: input.recursive,
@@ -1056,7 +1064,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"submit_task",
 		{
 			description:
-				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Use search to find entries by resource type across a directory, scan to identify files, inspect to list one file, and extract to write verified artifacts in isolated temporary storage. waitMs accepts 0–5000.",
+				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Use search to find entries by path or resource type across a directory, scan to identify files, inspect to list one file, and extract to write verified artifacts in isolated temporary storage. waitMs accepts 0–5000.",
 			inputSchema: z.object({
 				task: taskSchema,
 				...submissionControlSchema,
