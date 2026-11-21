@@ -123,9 +123,10 @@ describe("MCP task server", () => {
 		const formatContent = formats.contents[0];
 		if (!formatContent || !("text" in formatContent))
 			throw new Error("Missing format catalog");
-		expect(JSON.parse(formatContent.text)).toEqual(
-			expect.arrayContaining([expect.objectContaining({ id: "xp3" })]),
-		);
+		const first = JSON.parse(formatContent.text);
+		expect(first.formats.length).toBeGreaterThan(0);
+		expect(first.formats.length).toBeLessThan(first.total);
+		expect(first.nextUri).toBeTruthy();
 		expect(client.getInstructions()).toContain(
 			"Extraction writes only to an isolated expiring task directory",
 		);
@@ -135,6 +136,58 @@ describe("MCP task server", () => {
 		expect(client.getInstructions()).toContain(
 			"Never call sleep or guess a polling interval",
 		);
+	});
+
+	it("pages the format catalog and resolves extension and ID lookups", async () => {
+		const { client } = await connect();
+		expect(
+			(await client.listResourceTemplates()).resourceTemplates.map(
+				(row) => row.uriTemplate,
+			),
+		).toContain("garbro://formats/by-id/{id}");
+		async function read(uri: string, budget = 4096) {
+			const result = await client.readResource({ uri });
+			expect(Buffer.byteLength(JSON.stringify(result))).toBeLessThanOrEqual(
+				budget,
+			);
+			const row = result.contents[0];
+			if (!row || !("text" in row)) throw new Error("Missing catalog page");
+			return JSON.parse(row.text);
+		}
+		const first = await read("garbro://formats/by-extension/.DAT");
+		expect(first.total).toBeGreaterThan(first.formats.length);
+		const ids = new Set<string>();
+		let page = first;
+		while (true) {
+			for (const row of page.formats) {
+				expect(ids.has(row.id)).toBe(false);
+				ids.add(row.id);
+			}
+			if (!page.nextUri) break;
+			page = await read(page.nextUri);
+		}
+		expect(ids.size).toBe(first.total);
+		const xp3 = await read("garbro://formats/by-extension/XP3");
+		const detail = await read(
+			xp3.formats.find((row: { id: string }) => row.id === "xp3").detailUri,
+			65536,
+		);
+		expect(detail).toMatchObject({
+			id: "xp3",
+			capabilities: expect.any(Object),
+			support: expect.any(Object),
+		});
+		expect(await read("garbro://formats/by-extension/unknown-ext")).toEqual({
+			formats: [],
+			total: 0,
+			nextUri: null,
+		});
+		await expect(
+			client.readResource({ uri: "garbro://formats/by-id/unknown-format" }),
+		).rejects.toThrow();
+		await expect(
+			client.readResource({ uri: "garbro://formats/page/1.5" }),
+		).rejects.toThrow();
 	});
 
 	it("runs scan and entry inspection through the same asynchronous interface", async () => {
