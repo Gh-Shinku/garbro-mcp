@@ -108,6 +108,19 @@ when no extension is available.
 ### Search task
 
 Use `search` when the starting point is a directory and the desired resource is inside a file.
+Supply `entryPath`, `resourceTypes`, or both. Each matching entry must satisfy every supplied
+filter. For example, a path-only search can find `**/*.tft` before a reader classifies it:
+
+```json
+{"task":{"type":"search","path":"D:/Games/MyGame","entryPath":{"mode":"glob","pattern":"**/*.tft"}}}
+```
+
+`literal` finds a substring. `glob` matches a whole archive-relative path. `regex` searches for
+a substring using RE2JS syntax, for example `(^|/)Yoruko_[0-9]{4}\.ogg$`. Paths use forward
+slashes on every platform. Matching defaults to case-insensitive. Set `entryPath.caseSensitive`
+to `true` for a case-sensitive search. Patterns accept 1–4096 characters. Unsupported regex
+syntax such as backreferences returns an argument error. Counts include all matches before sampling.
+
 It applies the requested types to archive entries. The `scan` task applies its type filter to
 files in the directory.
 
