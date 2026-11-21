@@ -19,6 +19,10 @@ records are respectively 0x20, 0x28, and 0x30 bytes. Each record combines a 0x15
 and three-byte extension, a data-relative offset, sizes, and—since version 0x200—a compression type.
 Version 0x300 adds a per-entry CRC16 field and file timestamp.
 
+The reader checks the decoded header of `.adp` entries for Hypatia ADP1 audio. It validates
+the signature, sample count, rate, and channel count using the standalone reader's rules.
+The probe reads a prefix or the first Cocotte block. Extraction preserves the stored resource format.
+
 Compression type 1 is Mariel, an offset/count LZ stream controlled by MSB-first 32-bit flag words.
 Type 3 inverts every stored byte. Type 2 is Cocotte, which the reference reads through
 `ArcFormats/KogadoCocotte.cs`. A Cocotte stream is a run of blocks; every block opens with its packed

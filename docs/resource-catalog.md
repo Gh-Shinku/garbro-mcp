@@ -1,6 +1,6 @@
 # Entry resource catalogue
 
-Archive entries carry an optional `resourceType` (`archive`, `audio`, `image`, `script`, or `unknown`). The
+Archive entries carry an optional `resourceType` (`archive`, `audio`, `font`, `image`, `script`, `video`, or `unknown`). The
 shared classifier mirrors the two GARbro catalogue lookups used by archive readers:
 
 - file-name extensions, including the aliases recorded in [`format-aliases.md`](format-aliases.md);
@@ -24,3 +24,7 @@ Extension classification succeeds only when all matching resources have the same
 classification is stricter and requires exactly one matching resource, matching `AutoEntry.DetectFileType`;
 its Ogg, RIFF/WAVE, and bitmap special cases are applied before the general table. Ambiguous or absent evidence
 leaves an entry unclassified.
+
+The core classifier also recognizes common video and font extensions. The XP3 reader checks
+the TVP signature in candidate pre-rendered fonts, and the HyPack reader checks ADP1 audio headers.
+These entry categories can be used in search, inspection, and extraction filters.
