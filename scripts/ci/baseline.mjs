@@ -40,22 +40,31 @@ function previousCheck() {
 		)
 			continue;
 		const { jobs } = api(`actions/runs/${run.id}/jobs?per_page=100`);
+		const verified = jobs.find(
+			(j) => j.name === "Verified" && j.conclusion === "success",
+		);
+		if (!verified) continue;
+		const sameTree = {
+			base: head,
+			reason: `identical tree verified in run ${run.id}`,
+		};
+		if (
+			verified.steps?.some(
+				(s) => s.name === `Verified tree ${tree}` && s.conclusion === "success",
+			)
+		)
+			return sameTree;
 		const name = jobs.find(
 			(j) => j.conclusion === "success" && /^Plan [0-9a-f]{40}$/.test(j.name),
 		)?.name;
-		if (
-			!name ||
-			!jobs.some((j) => j.name === "Verified" && j.conclusion === "success")
-		)
-			continue;
+		if (!name) continue;
 		const commit = name.slice(5);
 		try {
 			git("cat-file", "-e", commit);
 		} catch {
 			git("fetch", "--no-tags", "origin", commit);
 		}
-		if (tree === git("rev-parse", `${commit}^{tree}`))
-			return { base: head, reason: `identical tree verified in run ${run.id}` };
+		if (tree === git("rev-parse", `${commit}^{tree}`)) return sameTree;
 		if (event.pull_request)
 			return {
 				base: commit,
@@ -64,24 +73,57 @@ function previousCheck() {
 	}
 }
 
+function lastVerifiedMain() {
+	const { workflow_runs } = api(
+		"actions/workflows/publish.yml/runs?branch=main&per_page=30",
+	);
+	for (const run of workflow_runs) {
+		if (run.id === Number(env.GITHUB_RUN_ID) || !sha.test(run.head_sha))
+			continue;
+		if (git("merge-base", head, run.head_sha) !== run.head_sha) continue;
+		const { jobs } = api(`actions/runs/${run.id}/jobs?per_page=100`);
+		const passed = new Set(
+			jobs.filter((job) => job.conclusion === "success").map((job) => job.name),
+		);
+		if (
+			passed.has("checks / Verified") ||
+			// Recognize the two required checks from before affected CI was introduced.
+			["ubuntu-latest", "windows-latest"].every((os) =>
+				passed.has(`checks / check (${os})`),
+			)
+		)
+			return run.head_sha;
+	}
+}
+
 let base;
 let reason;
 if (env.CI_FULL !== "true") {
 	try {
-		({ base, reason } = previousCheck() ?? {});
+		if (env.GITHUB_REF === "refs/heads/main") {
+			const verifiedMain = lastVerifiedMain();
+			// A direct push can follow a failed or cancelled push. Include everything
+			// since the last green main check before admitting the next release.
+			if (
+				verifiedMain === head ||
+				(event.before && verifiedMain !== event.before)
+			) {
+				base = verifiedMain;
+				reason = "changes since verified main";
+			} else {
+				({ base, reason } = previousCheck() ?? {
+					base: verifiedMain,
+					reason: "changes since verified main",
+				});
+			}
+		} else ({ base, reason } = previousCheck() ?? {});
 	} catch (error) {
 		console.warn("Could not reuse check history:", error.message);
 	}
-	if (!base) {
-		if (event.pull_request) base = git("rev-parse", "HEAD^1");
-		else if (
-			event.before &&
-			sha.test(event.before) &&
-			!/^0+$/.test(event.before)
-		)
-			base = event.before;
-		else if (env.GITHUB_REF !== "refs/heads/main")
-			base = git("merge-base", "origin/main", head);
+	if (!base && env.GITHUB_REF !== "refs/heads/main") {
+		base = event.pull_request
+			? git("rev-parse", "HEAD^1")
+			: git("merge-base", "origin/main", head);
 		reason = "changes against base";
 	}
 }
@@ -96,5 +138,8 @@ const paths = base
 	? git("diff", "--name-only", "--no-renames", "-z", base, head).split("\0")
 	: [];
 const graph = paths.some((p) => /^(packages|tests)\/.*\.ts$/.test(p));
-appendFileSync(env.GITHUB_OUTPUT, `base=${base ?? ""}\ngraph=${graph}\n`);
+appendFileSync(
+	env.GITHUB_OUTPUT,
+	`base=${base ?? ""}\ngraph=${graph}\ntree=${tree}\n`,
+);
 console.log(base ? `${reason}: ${base} → ${head}` : "Full verification");

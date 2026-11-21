@@ -93,7 +93,7 @@ command. It also invokes npm's generated executable and compares the installed f
 ## CI releases
 
 On pushes to `main`, **Prepare or publish releases** reuses a successful PR check when the
-merged tree matches. Otherwise it checks the changes introduced by the push. Release
+merged tree matches. A push following a failed check includes changes since the last verified commit on main. Release
 Please uses Conventional Commits across the repository to open or update one version PR for
 `garbro-mcp`. Review the version, changelog, and checks before merging that PR. The first
 release on the npm `latest` channel under this policy is `0.1.0`. Each subsequent release

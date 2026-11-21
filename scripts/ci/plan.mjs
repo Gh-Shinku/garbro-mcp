@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { isDeepStrictEqual } from "node:util";
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { posix } from "node:path";
@@ -45,18 +46,14 @@ const lint = changed.filter(
 		p !== "docs/garbro-inventory.json",
 );
 for (const path of changed) {
+	if (/^packages\/mcp\/src\/(index|build)\.ts$/.test(path)) packaging = true;
 	if (["package.json", "distribution/package.json"].includes(path)) {
 		versions = true;
 		const current = read(path);
 		const previous = JSON.parse(git("show", `${base}:${path}`));
 		delete current.version;
 		delete previous.version;
-		try {
-			assert.deepEqual(current, previous);
-			continue;
-		} catch {
-			/* substantive manifest change */
-		}
+		if (isDeepStrictEqual(current, previous)) continue;
 	}
 	if (path === ".release-please-manifest.json") {
 		versions = true;
@@ -84,11 +81,22 @@ for (const path of changed) {
 		continue;
 	}
 	if (
-		/^(docs\/(support-status|garbro-inventory|support-gap-codes)\.json|packages\/formats\/src\/support\.generated\.ts|scripts\/(generate-format-support|validate-support-status)\.mjs)$/.test(
+		[
+			"docs/garbro-inventory.json",
+			"scripts/generate-resource-catalog.mjs",
+			"scripts/generate-garbro-inventory.mjs",
+		].includes(path)
+	) {
+		tests.add("tests/unit/resource-catalog.test.ts");
+		continue;
+	}
+	if (
+		/^(docs\/(support-status|support-gap-codes)\.json|packages\/formats\/src\/support\.generated\.ts|scripts\/(generate-format-support|validate-support-status)\.mjs)$/.test(
 			path,
 		)
 	) {
 		catalog = true;
+		if (path.endsWith("/support.generated.ts")) source.push(path);
 		tests.add("tests/unit/catalog.test.ts");
 		tests.add("tests/unit/support-status.test.ts");
 		continue;

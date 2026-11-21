@@ -24,7 +24,9 @@ export function affectedTests(files, changed, previousSource) {
 				specifier.replace(/\.js$/, ".ts"),
 			);
 		} else if (specifier.startsWith("@garbro-mcp/")) {
-			const [pkg, entry = "index"] = specifier.slice(12).split("/");
+			const [pkg, entry = "index"] = specifier
+				.slice("@garbro-mcp/".length)
+				.split("/");
 			target = `packages/${pkg}/src/${entry}.ts`;
 		} else return;
 		if (sources.has(target)) return target;
@@ -33,6 +35,7 @@ export function affectedTests(files, changed, previousSource) {
 	}
 	for (const file of sources) {
 		const source = readFileSync(file, "utf8");
+		if (/\bprocess\.(platform|arch)\b/.test(source)) platformFiles.add(file);
 		const parsed = parseSync(file, source);
 		if (parsed.errors.length) throw Error(`Cannot parse ${file}`);
 		const { staticImports, staticExports, dynamicImports } = parsed.module;
@@ -87,6 +90,8 @@ export function affectedTests(files, changed, previousSource) {
 			const expr = source.slice(moduleRequest.start, moduleRequest.end).trim();
 			const literal = /^(["'])([^"'\n]+)\1$/.exec(expr);
 			if (!literal) throw Error(`Computed import in ${file}`);
+			if (/^node:(fs|path|os|child_process)(\/|$)/.test(literal[2]))
+				platformFiles.add(file);
 			const target = resolve(file, literal[2]);
 			if (target) imports.push([target, "*"]);
 		}
@@ -135,7 +140,7 @@ export function affectedTests(files, changed, previousSource) {
 			edge(binding, symbol(file, "*"));
 		}
 	}
-	// These tests spawn built entry points or open fixture paths at runtime.
+	// The CLI and differential tests spawn built code. Cover the MCP executable with its server integration suite as well.
 	for (const [input, test] of [
 		["packages/cli/src/index.ts", "tests/integration/cli.test.ts"],
 		["packages/mcp/src/index.ts", "tests/integration/mcp.test.ts"],

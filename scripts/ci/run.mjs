@@ -1,6 +1,5 @@
 import { sync } from "cross-spawn";
 import { execFileSync } from "node:child_process";
-
 import { readFileSync } from "node:fs";
 
 const plan = JSON.parse(readFileSync(process.env.CI_PLAN_FILE, "utf8"));

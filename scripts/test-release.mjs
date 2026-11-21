@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+	mkdir,
+	mkdtemp,
+	readFile,
+	readdir,
+	rm,
+	writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -145,6 +152,7 @@ try {
 	assert.equal(portableManifest.version, version);
 	assert.equal(portableManifest.private, undefined);
 	assert.equal(portableManifest.dependencies, undefined);
+	assert.equal(portableManifest.scripts, undefined);
 	assert.deepEqual(portableManifest.bin, {
 		"garbro-mcp": "./garbro-mcp.cjs",
 	});
@@ -171,6 +179,7 @@ try {
 		},
 	);
 	const installed = resolve(installation, "node_modules/garbro-mcp");
+	assert.deepEqual((await readdir(installed)).sort(), expectedFiles.toSorted());
 	const executable = resolve(
 		installation,
 		`node_modules/.bin/garbro-mcp${process.platform === "win32" ? ".cmd" : ""}`,
