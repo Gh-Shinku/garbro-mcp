@@ -235,6 +235,104 @@ describe("MCP task server", () => {
 			});
 	});
 
+	it("pages saved samples within the wire budget independently of the directory cursor", async () => {
+		const { client, root } = await connect();
+		const fixture = await readFile(resolve(root, "basic.xp3"));
+		const paths: string[] = [];
+		for (let i = 0; i < 12; i++) {
+			const path = resolve(root, `日本語-${i}.xp3`);
+			await writeFile(path, Buffer.concat([fixture, Buffer.from([i])]));
+			paths.push(path);
+		}
+		const search = {
+			type: "search",
+			path: root,
+			resourceTypes: ["script"],
+			limit: 10,
+			samplesPerArchive: 2,
+			maxResponseBytes: 3072,
+		};
+		const response = await client.callTool({
+			name: "submit_task",
+			arguments: { task: search, waitMs: 5000 },
+		});
+		const taskId = structured(response).taskId as string;
+		function page(r: typeof response) {
+			expect(r.content).toEqual([
+				{ type: "text", text: JSON.stringify(r.structuredContent) },
+			]);
+			expect(Buffer.byteLength(JSON.stringify(r))).toBeLessThanOrEqual(3072);
+			return structured(r).result as {
+				resultCursor: string | null;
+				nextCursor: string;
+				archives: Array<{
+					entries: Array<{
+						id: string;
+						extractSource: { source: { path: string } };
+					}>;
+				}>;
+			};
+		}
+		const first = page(response);
+		expect(first).toMatchObject({
+			archiveCount: 10,
+			matchedTotal: 20,
+			sampleCount: 20,
+			complete: false,
+		});
+		expect(
+			first.archives[0]?.entries[0]?.extractSource.source.path,
+		).toBeTruthy();
+		const cursor = first.resultCursor;
+		if (!cursor) throw new Error("Expected a saved-result cursor");
+		expect(first.nextCursor).toBeTruthy();
+		async function read(id: string, cursor: string, limit = 1) {
+			return client.callTool({
+				name: "get_task",
+				arguments: { taskId: id, resultCursor: cursor, limit },
+			});
+		}
+		const secondTask = await submit(client, search);
+		await waitForTask(client, secondTask);
+		expect(structured(await read(secondTask, cursor))).toMatchObject({
+			error: { code: "INVALID_ARGUMENT" },
+		});
+		expect(structured(await read(taskId, first.nextCursor))).toMatchObject({
+			error: { code: "INVALID_ARGUMENT" },
+		});
+		const badDirectoryCursor = await submit(client, {
+			...search,
+			cursor: first.resultCursor,
+		});
+		expect(await waitForTask(client, badDirectoryCursor)).toMatchObject({
+			state: "failed",
+			error: { code: "INVALID_ARGUMENT" },
+		});
+		// A saved page must survive changes to the scanned directory.
+		for (const path of paths) await writeFile(path, "changed");
+		expect(page(await read(taskId, cursor))).toEqual(
+			page(await read(taskId, cursor)),
+		);
+		const seen = new Set<string>();
+		let current = first;
+		for (;;) {
+			for (const archive of current.archives)
+				for (const entry of archive.entries) {
+					const key = JSON.stringify([
+						entry.extractSource.source.path,
+						entry.id,
+					]);
+					expect(seen.has(key)).toBe(false);
+					seen.add(key);
+				}
+			if (!current.resultCursor) break;
+			current = page(await read(taskId, current.resultCursor));
+			expect(current.archives.flatMap((a) => a.entries)).toHaveLength(1);
+			expect(current.nextCursor).toBe(first.nextCursor);
+		}
+		expect(seen.size).toBe(20);
+	});
+
 	it("pages through files and extracts an entry directly from search results", async () => {
 		const { client, root } = await connect();
 		await writeFile(resolve(root, "00.bin"), "unrecognized");
@@ -589,10 +687,16 @@ describe("MCP task server", () => {
 					],
 				},
 			});
-			expect(response.content).toContainEqual({
-				type: "text",
-				text: expect.stringContaining("2 × No registered format"),
-			});
+			if (type === "search") {
+				expect(response.content).toEqual([
+					{ type: "text", text: JSON.stringify(response.structuredContent) },
+				]);
+			} else {
+				expect(response.content).toContainEqual({
+					type: "text",
+					text: expect.stringContaining("2 × No registered format"),
+				});
+			}
 		},
 	);
 });

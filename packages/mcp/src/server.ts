@@ -28,11 +28,21 @@ import {
 import { McpServer } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import { BUILD_IDENTITY } from "./build.js";
-import { toolResult } from "./context.js";
+import { MAX_RESPONSE_BYTES, toolResult } from "./context.js";
 import {
 	directoryDiagnostics,
 	directoryDiagnosticText,
 } from "./diagnostics.js";
+import {
+	DEFAULT_SEARCH_BYTES,
+	MIN_SEARCH_BYTES,
+	mirroredResult,
+	type SearchReadOptions,
+	type SearchSnapshot,
+	searchBodyBudget,
+	searchResultPage,
+	searchSnapshot,
+} from "./search-page.js";
 
 export const SERVER_VERSION = BUILD_IDENTITY.version;
 export const SERVER_PURPOSE =
@@ -54,7 +64,7 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
-To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Follow nextCursor for more files. Pass a matching entry's extractSource directly in extract.sources.
+To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. To scan more files submit the search with cursor set to nextCursor.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -113,6 +123,11 @@ const scanTaskSchema = z
 	.describe(
 		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
 	);
+const searchBytesSchema = z
+	.number()
+	.int()
+	.min(MIN_SEARCH_BYTES)
+	.max(MAX_RESPONSE_BYTES);
 const searchTaskSchema = scanTaskSchema
 	.pick({
 		path: true,
@@ -132,6 +147,7 @@ const searchTaskSchema = scanTaskSchema
 			})
 			.optional(),
 		samplesPerArchive: z.number().int().min(1).max(10).default(1),
+		maxResponseBytes: searchBytesSchema.default(DEFAULT_SEARCH_BYTES),
 	})
 	.describe(
 		"Search inside supported files by entryPath, resourceTypes, or both. Literal and RE2 regex match substrings of the slash-separated entry path; glob matches the whole path. limit caps files per page. Samples have extractSource for extract.sources.",
@@ -206,11 +222,12 @@ type TaskKind = TaskInput["type"];
 type TaskStatus = "completed" | "partial" | "failed";
 type TaskPayload = {
 	diagnosticText?: string;
-	type: TaskKind;
 	status: TaskStatus;
-	result: Record<string, unknown>;
 	text?: string;
-};
+} & (
+	| { type: "search"; result: SearchSnapshot }
+	| { type: Exclude<TaskKind, "search">; result: Record<string, unknown> }
+);
 
 const MAX_ARTIFACT_SAMPLES = 3;
 interface ArtifactSample {
@@ -471,7 +488,49 @@ function taskHeader(snapshot: AsyncJobSnapshot<TaskPayload>) {
 function taskResponse(
 	snapshot: AsyncJobSnapshot<TaskPayload>,
 	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
+	requestId: number | string,
+	options: SearchReadOptions = {},
 ) {
+	if (snapshot.kind === "search") {
+		const saved =
+			snapshot.result?.type === "search" ? snapshot.result.result : undefined;
+		const budget = searchBodyBudget(
+			options.maxResponseBytes ?? saved?.maxResponseBytes ?? MIN_SEARCH_BYTES,
+			requestId,
+		);
+		const { message: _progressPath, ...header } = taskHeader(snapshot);
+		const base = {
+			...header,
+			waitOutcome,
+			outcome: { status: "ok", warnings: [] },
+		};
+		if (saved)
+			return searchResultPage(snapshot.jobId, base, saved, options, budget);
+		if (options.resultCursor !== undefined)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				"No saved search results for this task",
+			);
+		const error = snapshot.error && serializeError(snapshot.error);
+		const response = mirroredResult({ ...base, ...(error && { error }) });
+		if (Buffer.byteLength(JSON.stringify(response)) <= budget) return response;
+		return mirroredResult({
+			...base,
+			error: {
+				code: error?.code ?? "LIMIT_EXCEEDED",
+				message: "Search details exceed the response budget.",
+			},
+		});
+	}
+	if (
+		options.resultCursor !== undefined ||
+		options.limit !== undefined ||
+		options.maxResponseBytes !== undefined
+	)
+		throw new GarbroError(
+			"INVALID_ARGUMENT",
+			"Result paging options apply only to search tasks",
+		);
 	const response = success(
 		{
 			...taskHeader(snapshot),
@@ -746,33 +805,35 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		);
 		return {
 			type: "search",
-			diagnosticText: directoryDiagnosticText(diagnostics),
 			status: failures.length ? "partial" : "completed",
-			result: {
-				...page,
-				diagnostics,
-				archives: archives.map((archive) => {
-					const source = {
-						path: resolve(context.absolutePath, archive.source.path),
-					};
-					return {
-						source,
-						formatId: archive.formatId,
-						matchedTotal: archive.matchedTotal,
-						entries: archive.entries.map((entry) => ({
-							...entry,
-							extractSource: {
-								source,
-								selection: { mode: "ids", entryIds: [entry.id] },
-							},
-						})),
-					};
-				}),
-				failures: failures.map(({ source, error }) => ({
-					source: { path: resolve(context.absolutePath, source.path) },
-					error: serializeError(error),
-				})),
-			},
+			result: searchSnapshot(
+				{
+					...page,
+					diagnostics,
+					archives: archives.map((archive) => {
+						const source = {
+							path: resolve(context.absolutePath, archive.source.path),
+						};
+						return {
+							source,
+							formatId: archive.formatId,
+							matchedTotal: archive.matchedTotal,
+							entries: archive.entries.map((entry) => ({
+								...entry,
+								extractSource: {
+									source,
+									selection: { mode: "ids", entryIds: [entry.id] },
+								},
+							})),
+						};
+					}),
+					failures: failures.map(({ source, error }) => ({
+						source: { path: resolve(context.absolutePath, source.path) },
+						error: serializeError(error),
+					})),
+				},
+				input.maxResponseBytes,
+			),
 		};
 	};
 
@@ -1085,8 +1146,9 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							snapshot.state as (typeof terminalStates)[number],
 						)
 					)
-						return taskResponse(snapshot, "terminal");
-					if (waitMs === 0) return taskResponse(snapshot, "submitted");
+						return taskResponse(snapshot, "terminal", context.mcpReq.id);
+					if (waitMs === 0)
+						return taskResponse(snapshot, "submitted", context.mcpReq.id);
 					const waited = await jobs.wait(snapshot.jobId, {
 						until: "terminal",
 						timeoutMs: waitMs,
@@ -1097,7 +1159,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							"INVALID_ARGUMENT",
 							`Unknown task: ${snapshot.jobId}`,
 						);
-					return taskResponse(waited.snapshot, waited.outcome);
+					return taskResponse(
+						waited.snapshot,
+						waited.outcome,
+						context.mcpReq.id,
+					);
 				};
 				if (idempotencyKey !== undefined) {
 					const existingId = idempotency.get(idempotencyKey);
@@ -1125,9 +1191,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Wait server-side for a submitted task. Defaults to terminal completion for 30 seconds; on timeout call it again immediately. Never call sleep or guess a polling interval.",
+				"Wait server-side for a submitted task. For search, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
 			inputSchema: z.object({
 				taskId: z.string().uuid(),
+				resultCursor: z.string().min(1).max(128).optional(),
+				limit: z.number().int().positive().max(2000).optional(),
+				maxResponseBytes: searchBytesSchema.optional(),
 				waitUntil: z.enum(["none", "change", "terminal"]).default("terminal"),
 				afterRevision: z.number().int().min(0).optional(),
 				timeoutMs: z.number().int().min(0).max(55_000).default(30_000),
@@ -1138,10 +1207,21 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				idempotentHint: true,
 			},
 		},
-		async ({ taskId, waitUntil, afterRevision, timeoutMs }, context) => {
+		async (
+			{
+				taskId,
+				waitUntil,
+				afterRevision,
+				timeoutMs,
+				resultCursor,
+				limit,
+				maxResponseBytes,
+			},
+			context,
+		) => {
 			try {
 				const waited =
-					waitUntil === "none"
+					waitUntil === "none" || resultCursor !== undefined
 						? undefined
 						: await jobs.wait(taskId, {
 								until: waitUntil,
@@ -1152,7 +1232,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				const snapshot = waited?.snapshot ?? jobs.get(taskId);
 				if (snapshot === undefined)
 					throw new GarbroError("INVALID_ARGUMENT", `Unknown task: ${taskId}`);
-				return taskResponse(snapshot, waited?.outcome ?? "snapshot");
+				return taskResponse(
+					snapshot,
+					waited?.outcome ?? "snapshot",
+					context.mcpReq.id,
+					{ resultCursor, limit, maxResponseBytes },
+				);
 			} catch (error) {
 				return failure(error);
 			}
