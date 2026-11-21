@@ -1,5 +1,6 @@
 import {
 	copyFile,
+	mkdir,
 	mkdtemp,
 	readFile,
 	rm,
@@ -112,7 +113,7 @@ describe("MCP task server", () => {
 		expect(JSON.parse(infoContent.text)).toMatchObject({
 			temporaryWorkspace: { path: output },
 			capabilities: {
-				taskTypes: ["scan", "inspect", "extract"],
+				taskTypes: ["scan", "search", "inspect", "extract"],
 				mandatoryExtractionVerification: true,
 				dynamicAbsolutePaths: true,
 				temporaryExtraction: true,
@@ -175,6 +176,74 @@ describe("MCP task server", () => {
 					entries: [{ path: "scripts/startup.tjs", resourceType: "script" }],
 				},
 			},
+		});
+	});
+
+	it("pages through files and extracts an entry directly from search results", async () => {
+		const { client, root } = await connect();
+		await writeFile(resolve(root, "00.bin"), "unrecognized");
+		await mkdir(resolve(root, "sys"));
+		const nested = resolve(root, "sys", "resources");
+		await copyFile(resolve(root, "basic.xp3"), nested);
+		const search = {
+			type: "search",
+			path: root,
+			resourceTypes: ["script"],
+			limit: 1,
+		};
+		const page = async (options: Record<string, unknown> = {}) => {
+			const task = await waitForTask(
+				client,
+				await submit(client, { ...search, ...options }),
+			);
+			expect(task.state).toBe("completed");
+			return task.result as {
+				nextCursor: string | null;
+				archives: Array<{ entries: Array<{ extractSource: unknown }> }>;
+			};
+		};
+		const first = await page();
+		expect(first).toMatchObject({
+			scanned: 1,
+			archives: [],
+			nextCursor: expect.any(String),
+			complete: false,
+		});
+		const second = await page({ cursor: first.nextCursor });
+		expect(second).toMatchObject({
+			archives: [{ source: { path: resolve(root, "basic.xp3") } }],
+			nextCursor: expect.any(String),
+		});
+		const last = await page({ cursor: second.nextCursor });
+		expect(last).toMatchObject({
+			complete: true,
+			nextCursor: null,
+			archives: [
+				{
+					source: { path: nested },
+					formatId: "xp3",
+					matchedTotal: 2,
+					entries: [{ path: "hello.txt", resourceType: "script" }],
+				},
+			],
+		});
+		const extracted = await waitForTask(
+			client,
+			await submit(client, {
+				type: "extract",
+				sources: [last.archives[0]?.entries[0]?.extractSource],
+			}),
+		);
+		expect(extracted).toMatchObject({
+			state: "completed",
+			result: {
+				extracted: 1,
+				sources: [{ source: { path: nested }, verification: { verified: 1 } }],
+			},
+		});
+		expect(await page({ resourceTypes: ["audio"], limit: 10 })).toMatchObject({
+			archives: [],
+			complete: true,
 		});
 	});
 
