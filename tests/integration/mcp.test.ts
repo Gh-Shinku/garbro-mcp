@@ -185,6 +185,12 @@ describe("MCP task server", () => {
 		await mkdir(resolve(root, "sys"));
 		const nested = resolve(root, "sys", "resources");
 		await copyFile(resolve(root, "basic.xp3"), nested);
+		const distinct = await readFile(nested);
+		const payload = distinct.indexOf("hello xp3");
+		expect(payload).toBeGreaterThan(0);
+		distinct[payload] = 0x48;
+		await writeFile(resolve(root, "basic.xp3"), distinct);
+		await writeFile(resolve(root, "sys", "backup.xp3"), distinct);
 		const search = {
 			type: "search",
 			path: root,
@@ -214,7 +220,13 @@ describe("MCP task server", () => {
 			archives: [{ source: { path: resolve(root, "basic.xp3") } }],
 			nextCursor: expect.any(String),
 		});
-		const last = await page({ cursor: second.nextCursor });
+		const backup = await page({ cursor: second.nextCursor });
+		expect(backup).toMatchObject({
+			archives: [],
+			complete: false,
+			nextCursor: expect.any(String),
+		});
+		const last = await page({ cursor: backup.nextCursor });
 		expect(last).toMatchObject({
 			complete: true,
 			nextCursor: null,
@@ -245,6 +257,7 @@ describe("MCP task server", () => {
 			archives: [],
 			complete: true,
 		});
+		expect((await page({ limit: 10 })).archives).toHaveLength(2);
 	});
 
 	it("browses filtered groups beyond the flat entry page and extracts a returned sample", async () => {
