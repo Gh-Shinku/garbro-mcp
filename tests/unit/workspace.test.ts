@@ -3,6 +3,7 @@ import {
 	access,
 	mkdir,
 	mkdtemp,
+	realpath,
 	rm,
 	symlink,
 	writeFile,
@@ -44,7 +45,7 @@ describe("WorkspacePolicy", () => {
 				"file",
 			),
 		).resolves.toMatchObject({
-			absolutePath: resolve(directory, "assets/game.xp3"),
+			absolutePath: await realpath(resolve(directory, "assets/game.xp3")),
 			relativePath: "assets/game.xp3",
 		});
 	});
