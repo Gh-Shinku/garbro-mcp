@@ -9,7 +9,7 @@ import {
 	writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import type { BuildServerOptions } from "@garbro-mcp/mcp/server";
 import { buildServer } from "@garbro-mcp/mcp/server";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
@@ -510,6 +510,7 @@ describe("MCP task server", () => {
 			client,
 			await submit(client, {
 				type: "extract",
+				maxResponseBytes: 16384,
 				sources: [last.archives[0]?.entries[0]?.extractSource],
 			}),
 		);
@@ -568,6 +569,7 @@ describe("MCP task server", () => {
 			client,
 			await submit(client, {
 				type: "extract",
+				maxResponseBytes: 16384,
 				sources: [group.entries.overview.samples[0]?.extractSource],
 			}),
 		);
@@ -724,6 +726,7 @@ describe("MCP task server", () => {
 		const { client, root, output } = await connect();
 		const taskId = await submit(client, {
 			type: "extract",
+			maxResponseBytes: 16384,
 			sources: [
 				{
 					source: { path: resolve(root, "basic.xp3") },
@@ -800,19 +803,20 @@ describe("MCP task server", () => {
 			}>;
 			expiresAt: string;
 		};
-		expect(samples).toHaveLength(3);
+		expect(samples.length).toBeGreaterThan(0);
+		expect(samples.length).toBeLessThanOrEqual(3);
 		expect(samples[0]).toMatchObject({
 			absolutePath: resolve(output, String(taskId), "artifacts/0001/hello.txt"),
 			bytesWritten: "10",
 			verificationStatus: "verified",
 		});
-		expect(
-			Buffer.byteLength(JSON.stringify(response.structuredContent)),
-		).toBeGreaterThan(1024);
+		expect(Buffer.byteLength(JSON.stringify(response))).toBeLessThanOrEqual(
+			4096,
+		);
 		const text = response.content[0];
 		if (text?.type !== "text")
 			throw new Error("Expected a plain-text extraction summary");
-		expect(text.text).toContain("Showing 3 of 6 files");
+		expect(text.text).toContain(`Showing ${samples.length} of 6 files`);
 		expect(text.text).toContain(expiresAt);
 		for (const sample of samples) {
 			expect(text.text).toContain(sample.absolutePath);
@@ -828,6 +832,88 @@ describe("MCP task server", () => {
 		expect(structured(read).result).toEqual(result);
 	});
 
+	it("reads all 32 saved extraction reports after the input is removed", async () => {
+		const { client, root } = await connect();
+		const path = resolve(root, "basic.xp3");
+		const source = {
+			source: { path },
+			selection: { mode: "ids", entryIds: ["0"] },
+		};
+		const taskId = await submit(client, {
+			type: "extract",
+			sources: Array(32).fill(source),
+		});
+		const read = (resultCursor?: string) =>
+			client.callTool({
+				name: "get_task",
+				arguments: { taskId, resultCursor },
+			});
+		let response = await read();
+		const first = structured(response);
+		expect(first).toMatchObject({
+			state: "completed",
+			result: {
+				totalSources: 32,
+				extracted: 32,
+				samples: expect.arrayContaining([
+					{
+						absolutePath: expect.any(String),
+						bytesWritten: "10",
+						verificationStatus: "verified",
+					},
+				]),
+				sources: [],
+				resultCursor: expect.any(String),
+			},
+		});
+		await rm(path);
+		const reportPaths = new Set<string>();
+		const samples = new Set<string>();
+		const cursors = new Set<string>();
+		while (true) {
+			expect(Buffer.byteLength(JSON.stringify(response))).toBeLessThanOrEqual(
+				4096,
+			);
+			const json = response.content.at(-1);
+			if (json?.type !== "text") throw new Error("Missing extraction result");
+			expect(JSON.parse(json.text)).toEqual(response.structuredContent);
+			const page = structured(response).result as {
+				samples: { absolutePath: string }[];
+				sources: {
+					source: { path: string };
+					verification: { verified: number };
+					report: { absolutePath: string };
+					artifactDirectory: string;
+				}[];
+				resultCursor: string | null;
+			};
+			for (const sample of page.samples) {
+				expect(samples.has(sample.absolutePath)).toBe(false);
+				samples.add(sample.absolutePath);
+			}
+			for (const row of page.sources) {
+				expect(row.source.path).toBe(path);
+				expect(row.verification.verified).toBe(1);
+				expect(basename(row.artifactDirectory)).toBe(
+					String(reportPaths.size + 1).padStart(4, "0"),
+				);
+				expect(reportPaths.has(row.report.absolutePath)).toBe(false);
+				reportPaths.add(row.report.absolutePath);
+				expect(
+					JSON.parse(await readFile(row.report.absolutePath, "utf8"))
+						.verification.verified,
+				).toBe(1);
+			}
+			if (!page.resultCursor) break;
+			expect(cursors.has(page.resultCursor)).toBe(false);
+			cursors.add(page.resultCursor);
+			response = await read(page.resultCursor);
+		}
+		expect(reportPaths.size).toBe(32);
+		expect(samples.size).toBe(3);
+		expect(structured(await read()).result).toEqual(first.result);
+	});
+
 	it("extracts and verifies an XP3 under an aliased OS temp directory", async () => {
 		const parent = await mkdtemp(resolve(tmpdir(), "garbro-temp-alias-"));
 		const alias = resolve(parent, "alias");
@@ -838,6 +924,7 @@ describe("MCP task server", () => {
 			const { client, root, output } = await connect();
 			const id = await submit(client, {
 				type: "extract",
+				maxResponseBytes: 16384,
 				sources: [{ source: { path: resolve(root, "basic.xp3") } }],
 			});
 			const task = await waitForTask(client, id);
