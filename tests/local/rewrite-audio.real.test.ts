@@ -219,12 +219,25 @@ describe.skipIf(!corpusAvailable)("Rewrite private audio validation", () => {
 					limit: 200,
 					...(cursor === undefined ? {} : { cursor }),
 				});
-				const page = response.result as {
+				type ScanPage = {
+					resultCursor: string | null;
 					archives: Array<{ source: { path: string } }>;
 					nextCursor: string | null;
 					complete: boolean;
 				};
-				for (const item of page.archives) seen.add(item.source.path);
+				let page = response.result as ScanPage;
+				for (;;) {
+					for (const item of page.archives) seen.add(item.source.path);
+					if (!page.resultCursor) break;
+					const next = await client.callTool({
+						name: "get_task",
+						arguments: {
+							taskId: response.taskId,
+							resultCursor: page.resultCursor,
+						},
+					});
+					page = structured(next).result as ScanPage;
+				}
 				if (page.complete) break;
 				if (!page.nextCursor) throw new Error("incomplete scan has no cursor");
 				cursor = page.nextCursor;

@@ -179,6 +179,66 @@ describe("MCP task server", () => {
 		});
 	});
 
+	it("reads a saved scan window after its source directory changes", async () => {
+		const { client, root } = await connect();
+		const path = resolve(root, "basic.xp3");
+		for (let i = 0; i < 9; i++)
+			await copyFile(path, resolve(root, `資源-${i}.xp3`));
+		await writeFile(resolve(root, "a.dat"), "unknown");
+		const taskId = await submit(client, {
+			type: "scan",
+			path: root,
+			limit: 10,
+			includeUnrecognized: true,
+			maxResponseBytes: 3072,
+		});
+		const read = (options: Record<string, unknown>) =>
+			client.callTool({ name: "get_task", arguments: { taskId, ...options } });
+		const full = structured(await read({ maxResponseBytes: 65536 })).result as {
+			archives: unknown[];
+		};
+		await writeFile(path, "changed");
+		let cursor: string | null = null;
+		const archives: unknown[] = [],
+			unknown: unknown[] = [];
+		do {
+			const r = await read(cursor ? { resultCursor: cursor } : {});
+			expect(r.content).toEqual([
+				{ type: "text", text: JSON.stringify(r.structuredContent) },
+			]);
+			expect(Buffer.byteLength(JSON.stringify(r))).toBeLessThanOrEqual(3072);
+			const p = structured(r).result as {
+				resultCursor: string | null;
+				archives: unknown[];
+				unrecognized: unknown[];
+			};
+			expect(p).toMatchObject({
+				scanned: 10,
+				archiveCount: 9,
+				recognizedCount: 9,
+				unrecognizedCount: 1,
+				nextCursor: expect.any(String),
+			});
+			if (!cursor) {
+				expect(p.archives.length).toBeGreaterThan(0);
+				expect(p.resultCursor).toBeTruthy();
+			}
+			archives.push(...p.archives);
+			unknown.push(...p.unrecognized);
+			cursor = p.resultCursor;
+		} while (cursor);
+		expect(archives).toEqual(full.archives);
+		expect(unknown).toHaveLength(1);
+		const { diagnosis } = unknown[0] as {
+			diagnosis: {
+				candidateFormatIds: string[];
+				candidateFormatIdCount: number;
+			};
+		};
+		expect(diagnosis.candidateFormatIds).toHaveLength(8);
+		expect(diagnosis.candidateFormatIdCount).toBeGreaterThan(8);
+	});
+
 	it("searches the full archive index by literal, glob or regex with optional types", async () => {
 		const { client, root } = await connect();
 		async function search(filters: Record<string, unknown>) {
@@ -813,16 +873,9 @@ describe("MCP task server", () => {
 					],
 				},
 			});
-			if (type === "search") {
-				expect(response.content).toEqual([
-					{ type: "text", text: JSON.stringify(response.structuredContent) },
-				]);
-			} else {
-				expect(response.content).toContainEqual({
-					type: "text",
-					text: expect.stringContaining("2 × No registered format"),
-				});
-			}
+			expect(response.content).toEqual([
+				{ type: "text", text: JSON.stringify(response.structuredContent) },
+			]);
 		},
 	);
 });

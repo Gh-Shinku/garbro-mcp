@@ -28,10 +28,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import { BUILD_IDENTITY } from "./build.js";
 import { MAX_RESPONSE_BYTES, toolResult } from "./context.js";
-import {
-	directoryDiagnostics,
-	directoryDiagnosticText,
-} from "./diagnostics.js";
+import { directoryDiagnostics } from "./diagnostics.js";
 import { inspectSnapshot, unrecognizedSnapshot } from "./inspect-page.js";
 import {
 	DEFAULT_PAGE_BYTES,
@@ -41,6 +38,7 @@ import {
 	responseBodyBudget,
 	type SavedResult,
 	savedResultPage,
+	sectionedResult,
 } from "./result-page.js";
 import { searchSnapshot } from "./search-page.js";
 
@@ -64,7 +62,7 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
-To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. To scan more files submit the search with cursor set to nextCursor. For inspect, use get_task with resultCursor to read the saved inspection page before using nextOffset or nextGroupOffset to inspect more entries or groups.
+To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. For scan and search, submit another task with cursor set to nextCursor to examine more files. Use get_task with resultCursor to read more saved results from either task. For inspect, use get_task with resultCursor to read the saved inspection page before using nextOffset or nextGroupOffset to inspect more entries or groups.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -106,9 +104,15 @@ const extractionBudgetsSchema = z.object({
 	maxDecodedBytesPerResource: decimalBytesSchema.optional(),
 	timeoutMs: z.number().int().positive().max(3_600_000).optional(),
 });
+const pageBytesSchema = z
+	.number()
+	.int()
+	.min(MIN_PAGE_BYTES)
+	.max(MAX_RESPONSE_BYTES);
 const scanTaskSchema = z
 	.object({
 		type: z.literal("scan"),
+		maxResponseBytes: pageBytesSchema.default(DEFAULT_PAGE_BYTES),
 		path: absolutePathSchema,
 		recursive: z.boolean().default(true),
 		includeGlobs: z.array(z.string()).max(32).optional(),
@@ -123,11 +127,6 @@ const scanTaskSchema = z
 	.describe(
 		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
 	);
-const pageBytesSchema = z
-	.number()
-	.int()
-	.min(MIN_PAGE_BYTES)
-	.max(MAX_RESPONSE_BYTES);
 const searchTaskSchema = scanTaskSchema
 	.pick({
 		path: true,
@@ -222,13 +221,12 @@ type TaskInput = z.infer<typeof taskSchema>;
 type TaskKind = TaskInput["type"];
 type TaskStatus = "completed" | "partial" | "failed";
 type TaskPayload = {
-	diagnosticText?: string;
 	status: TaskStatus;
 	text?: string;
 } & (
-	| { type: "search" | "inspect"; result: SavedResult }
+	| { type: "search" | "inspect" | "scan"; result: SavedResult }
 	| {
-			type: Exclude<TaskKind, "search" | "inspect">;
+			type: Exclude<TaskKind, "search" | "inspect" | "scan">;
 			result: Record<string, unknown>;
 	  }
 );
@@ -495,9 +493,9 @@ function taskResponse(
 	requestId: number | string,
 	options: PageReadOptions = {},
 ) {
-	if (snapshot.kind === "search" || snapshot.kind === "inspect") {
+	if (snapshot.kind !== "extract") {
 		const saved =
-			snapshot.result?.type === "search" || snapshot.result?.type === "inspect"
+			snapshot.result && snapshot.result.type !== "extract"
 				? snapshot.result.result
 				: undefined;
 		const budget = responseBodyBudget(
@@ -535,7 +533,7 @@ function taskResponse(
 	)
 		throw new GarbroError(
 			"INVALID_ARGUMENT",
-			"Result paging options apply only to search and inspect tasks",
+			"Result paging options apply only to scan, search and inspect tasks",
 		);
 	const response = success(
 		{
@@ -552,10 +550,9 @@ function taskResponse(
 	);
 	const error = snapshot.error;
 	const diagnostics =
-		snapshot.result?.diagnosticText ??
-		(typeof error?.details?.nextAction === "string"
+		typeof error?.details?.nextAction === "string"
 			? `${error.message} ${error.details.nextAction}`
-			: undefined);
+			: undefined;
 	if (diagnostics) response.content.push({ type: "text", text: diagnostics });
 	return response;
 }
@@ -753,32 +750,38 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			result.failures,
 			result.unrecognized,
 		);
+		const unrecognized = input.includeUnrecognized
+			? result.unrecognized.map((item) => ({
+					source: { path: resolve(context.absolutePath, item.source.path) },
+					diagnosis: {
+						...item.diagnosis,
+						candidateFormatIdCount: item.diagnosis.candidateFormatIds.length,
+						candidateFormatIds: item.diagnosis.candidateFormatIds.slice(0, 8),
+					},
+				}))
+			: [];
+		const failures = result.failures.map((item) => ({
+			source: { path: resolve(context.absolutePath, item.source.path) },
+			error: serializeError(item.error),
+		}));
 		return {
 			type: "scan",
-			diagnosticText: directoryDiagnosticText(diagnostics),
-			status: result.failures.length > 0 ? "partial" : "completed",
-			result: {
-				scanned: result.scanned,
-				diagnostics,
-				archives,
-				unrecognized: input.includeUnrecognized
-					? result.unrecognized.map((item) => ({
-							source: {
-								path: resolve(context.absolutePath, item.source.path),
-							},
-							diagnosis: item.diagnosis,
-						}))
-					: [],
-				unrecognizedCount: result.unrecognizedCount,
-				failures: result.failures.map((item) => ({
-					source: {
-						path: resolve(context.absolutePath, item.source.path),
-					},
-					error: serializeError(item.error),
-				})),
-				nextCursor: result.nextCursor,
-				complete: result.complete,
-			},
+			status: failures.length ? "partial" : "completed",
+			result: sectionedResult(
+				input.maxResponseBytes,
+				{
+					scanned: result.scanned,
+					recognizedCount: result.archives.length,
+					archiveCount: archives.length,
+					unrecognizedCount: result.unrecognizedCount,
+					failureCount: failures.length,
+					diagnosticGroupCount: diagnostics.length,
+					nextCursor: result.nextCursor,
+					complete: result.complete,
+				},
+				{ archives, diagnostics, unrecognized, failures },
+				archives.length,
+			),
 		};
 	};
 
@@ -1167,7 +1170,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Wait server-side for a submitted task. For search and inspect, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
+				"Wait server-side for a submitted task. For scan, search and inspect, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
 			inputSchema: z.object({
 				taskId: z.string().uuid(),
 				resultCursor: z.string().min(1).max(128).optional(),

@@ -61,15 +61,3 @@ export function directoryDiagnostics(
 	}
 	return Array.from(groups.values());
 }
-
-export function directoryDiagnosticText(
-	groups: ReturnType<typeof directoryDiagnostics>,
-) {
-	return groups
-		.slice(0, 5)
-		.map(
-			(g) =>
-				`${g.count} × ${g.message} ${g.nextAction} Example: ${JSON.stringify(g.exampleSource.path)}`,
-		)
-		.join("\n");
-}

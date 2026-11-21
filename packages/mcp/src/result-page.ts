@@ -10,6 +10,33 @@ export interface SavedResult {
 	firstPagePriorityCount?: number;
 	compose(start: number, count: number): Record<string, unknown>;
 }
+/** Page ordered arrays while retaining a single summary for the task window. */
+export function sectionedResult(
+	maxResponseBytes: number,
+	summary: Record<string, unknown>,
+	sections: Record<string, readonly unknown[]>,
+	firstPagePriorityCount = 0,
+): SavedResult {
+	const lists = Object.entries(sections);
+	return {
+		maxResponseBytes,
+		firstPagePriorityCount,
+		recordCount: lists.reduce((total, [, items]) => total + items.length, 0),
+		compose(start, count) {
+			const result = { ...summary };
+			let offset = 0;
+			for (const [name, items] of lists) {
+				result[name] = items.slice(
+					Math.max(0, start - offset),
+					Math.max(0, start + count - offset),
+				);
+				offset += items.length;
+			}
+			return result;
+		},
+	};
+}
+
 export interface PageReadOptions {
 	resultCursor?: string | undefined;
 	limit?: number | undefined;
