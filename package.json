@@ -1,6 +1,6 @@
 {
 	"name": "garbro-mcp",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": true,
 	"description": "Modern TypeScript toolkit for detecting and extracting ADV/Galgame resource archives",
 	"packageManager": "pnpm@11.26.0",
