@@ -102,6 +102,16 @@ export class FormatRegistry {
 	}
 
 	async openArchive(inputPath: string): Promise<ArchiveHandle> {
+		const handle = await this.tryOpenArchive(inputPath);
+		if (handle) return handle;
+		throw new GarbroError(
+			"INVALID_ARCHIVE",
+			`No supported archive format detected: ${resolve(inputPath)}`,
+		);
+	}
+
+	/** The caller owns the handle when a format recognizes the file. */
+	async tryOpenArchive(inputPath: string): Promise<ArchiveHandle | undefined> {
 		const sourcePath = resolve(inputPath);
 		for (const { format } of await this.#candidateFormats(sourcePath)) {
 			const source = await FileByteSource.open(sourcePath);
@@ -114,10 +124,7 @@ export class FormatRegistry {
 				if (!isInvalidCandidate(error)) throw error;
 			}
 		}
-		throw new GarbroError(
-			"INVALID_ARCHIVE",
-			`No supported archive format detected: ${sourcePath}`,
-		);
+		return undefined;
 	}
 
 	async #candidateFormats(sourcePath: string): Promise<DetectionCandidate[]> {

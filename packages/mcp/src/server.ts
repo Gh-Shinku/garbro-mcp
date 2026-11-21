@@ -48,6 +48,8 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
+To find entries of a resource type inside files under a game directory, submit a search task. Follow nextCursor for more files. Pass a matching entry's extractSource directly in extract.sources.
+
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
 The server extracts resource bytes, not game logic or semantic relationships. Filename matches are candidates, not proof of character, dialogue, voice, sprite, or other ownership; verify such claims from the artifacts or other evidence.`;
@@ -105,6 +107,22 @@ const scanTaskSchema = z
 	.describe(
 		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
 	);
+const searchTaskSchema = scanTaskSchema
+	.pick({
+		path: true,
+		recursive: true,
+		maxDepth: true,
+		limit: true,
+		cursor: true,
+	})
+	.extend({
+		type: z.literal("search"),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1),
+		samplesPerArchive: z.number().int().min(1).max(10).default(1),
+	})
+	.describe(
+		"Search inside supported files under a game directory by entry resource type. limit caps files per page. Each matching archive returns a total and samples with extractSource for extract.sources.",
+	);
 const inspectTaskSchema = z
 	.object({
 		type: z.literal("inspect"),
@@ -138,6 +156,7 @@ const extractTaskSchema = z
 	);
 const taskSchema = z.discriminatedUnion("type", [
 	scanTaskSchema,
+	searchTaskSchema,
 	inspectTaskSchema,
 	extractTaskSchema,
 ]);
@@ -502,7 +521,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				...(options.limits ?? {}),
 			},
 			capabilities: {
-				taskTypes: ["scan", "inspect", "extract"],
+				taskTypes: ["scan", "search", "inspect", "extract"],
 				resourceTypes,
 				entryResourceTypes: [...entryResourceTypes],
 				mandatoryExtractionVerification: true,
@@ -633,6 +652,55 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				})),
 				nextCursor: result.nextCursor,
 				complete: result.complete,
+			},
+		};
+	};
+
+	const runSearch = async (
+		input: z.infer<typeof searchTaskSchema>,
+		control: AutomationControl,
+	): Promise<TaskPayload> => {
+		const context = directoryContext(input.path);
+		await context.workspace.prepare({ createOutput: false });
+		const { archives, failures, ...page } =
+			await context.automation.searchEntries(
+				"source",
+				{
+					resourceTypes: input.resourceTypes,
+					samplesPerArchive: input.samplesPerArchive,
+					recursive: input.recursive,
+					maxDepth: input.maxDepth,
+					limit: input.limit,
+					...(input.cursor === undefined ? {} : { cursor: input.cursor }),
+				},
+				phaseControl(control, "searching"),
+			);
+		return {
+			type: "search",
+			status: failures.length ? "partial" : "completed",
+			result: {
+				...page,
+				archives: archives.map((archive) => {
+					const source = {
+						path: resolve(context.absolutePath, archive.source.path),
+					};
+					return {
+						source,
+						formatId: archive.formatId,
+						matchedTotal: archive.matchedTotal,
+						entries: archive.entries.map((entry) => ({
+							...entry,
+							extractSource: {
+								source,
+								selection: { mode: "ids", entryIds: [entry.id] },
+							},
+						})),
+					};
+				}),
+				failures: failures.map(({ source, error }) => ({
+					source: { path: resolve(context.absolutePath, source.path) },
+					error: serializeError(error),
+				})),
 			},
 		};
 	};
@@ -869,6 +937,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		switch (task.type) {
 			case "scan":
 				return runScan(task, control);
+			case "search":
+				return runSearch(task, control);
 			case "inspect":
 				return runInspect(task, control);
 			case "extract":
@@ -880,7 +950,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"submit_task",
 		{
 			description:
-				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Supports bounded scan, inspect, and extract tasks. Extraction always preflights and verifies artifacts in isolated temporary storage. waitMs accepts 0–5000.",
+				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Use search to find entries by resource type across a directory, scan to identify files, inspect to list one file, and extract to write verified artifacts in isolated temporary storage. waitMs accepts 0–5000.",
 			inputSchema: z.object({
 				task: taskSchema,
 				...submissionControlSchema,
