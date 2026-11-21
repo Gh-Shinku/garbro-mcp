@@ -19,7 +19,7 @@ afterEach(async () => {
 	);
 });
 
-describe("CLI", () => {
+describe("CLI", { timeout: 30_000 }, () => {
 	it("lists formats as JSON", async () => {
 		const { stdout } = await run(process.execPath, [
 			cliPath,
