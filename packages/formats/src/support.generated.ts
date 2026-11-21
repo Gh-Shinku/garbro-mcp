@@ -9002,8 +9002,9 @@ export const formatSupportCatalog = {
 				"raw entry extraction",
 				"Mariel LZ decompression",
 				"XOR-FF entry decoding",
+				"Cocotte decompression",
 			],
-			unsupported: ["Cocotte decompression", "archive creation"],
+			unsupported: ["archive creation"],
 			remainingVerification: ["real-game GARbro differential output"],
 		},
 		{
