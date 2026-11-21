@@ -292,15 +292,17 @@ extraction or verification; verification failures are never reduced to warnings.
 delivery is deliberately outside the MCP: the calling agent copies or transforms selected
 artifacts only when instructed by the user.
 
-When extraction writes files, both `submit_task` and `get_task` show the first three written
-files across all sources in the terminal result. The text block lists each sample's absolute
-path on the server, byte count and verification status, plus the shared expiration time in UTC.
-For larger extractions it also gives the directory containing the full reports.
-
-Structured clients can read the same values from `result.samples[]` (`absolutePath`,
+Extraction saves up to three artifact samples across all sources. The first page prioritizes
+these samples. Its plain-text summary gives a copyable absolute path, byte count, verification
+status and UTC expiration for each sample shown. The same page is available as JSON in text
+and in `structuredContent`. Read the values from `result.samples[]` (`absolutePath`,
 `bytesWritten` as a decimal string, and `verificationStatus`) and `result.expiresAt`.
-`result.extracted` counts all files written. Check each sample's verification status before
-using it, including when a task finishes with partial success.
+
+The default 4096-byte limit covers the whole response. Use `maxResponseBytes` (2048–65536) to
+change it. Follow `result.resultCursor` with `get_task({ taskId, resultCursor })` for remaining
+samples and then `result.sources[]` in submission order. Each successful source includes its
+report path and SHA-256. Reading a saved page leaves the files and reports as written.
+Counts on every page cover the whole extraction. Check each sample's verification status before use.
 
 Formats that can identify media bytes behind an extensionless archive name may provide a safe
 `outputExtension`. Planning exposes the resulting `outputEntryPath`, and extraction uses that same
@@ -323,11 +325,11 @@ state, so the calling agent does not need a timer.
   avoid missed-update races.
 - **timeoutMs** (integer, 0–55000) optional: Maximum server-side wait; defaults to `30000`.
 
-For scan, search and inspect tasks, pass the returned `resultCursor` to read a saved page immediately. You can
+For all four task types, pass the returned `resultCursor` to read a saved page immediately. You can
 also set `limit` (1–2000 records) or override `maxResponseBytes` for that read. Omitting the
 cursor reads the first page. A search record is one entry sample, diagnostic group, or failure.
 An inspect record is one overview sample, archive detail record, group, listed entry, warning,
-metadata field, or candidate reader ID.
+metadata field, or candidate reader ID. An extract record is one artifact sample or one source summary.
 For example, `get_task({ taskId, resultCursor, limit: 1 })` reads one more record.
 The same cursor and options return the same records while the server retains the task.
 If a single record exceeds the budget, the tool returns `LIMIT_EXCEEDED` with the task ID and
@@ -335,8 +337,7 @@ current cursor so the caller can retry that position with a larger budget. Paths
 selectors are kept intact.
 
 Every snapshot includes a monotonically increasing `revision` and a `waitOutcome`: `snapshot`,
-`changed`, `terminal`, `timeout`, or `submitted`. Active snapshots include progress, total, phase,
-and the current path when available. Terminal snapshots include a compact result. Extraction
+`changed`, `terminal`, `timeout`, or `submitted`. Active snapshots include progress, total and phase when available. Terminal snapshots include a compact result. Extraction
 results contain counts, verification totals, output directories, and report artifacts; detailed
 per-entry evidence is stored in the report.
 
