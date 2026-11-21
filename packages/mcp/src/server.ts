@@ -28,6 +28,10 @@ import { McpServer } from "@modelcontextprotocol/server";
 import * as z from "zod/v4";
 import { BUILD_IDENTITY } from "./build.js";
 import { toolResult } from "./context.js";
+import {
+	directoryDiagnostics,
+	directoryDiagnosticText,
+} from "./diagnostics.js";
 
 export const SERVER_VERSION = BUILD_IDENTITY.version;
 export const SERVER_PURPOSE =
@@ -193,6 +197,7 @@ type TaskInput = z.infer<typeof taskSchema>;
 type TaskKind = TaskInput["type"];
 type TaskStatus = "completed" | "partial" | "failed";
 type TaskPayload = {
+	diagnosticText?: string;
 	type: TaskKind;
 	status: TaskStatus;
 	result: Record<string, unknown>;
@@ -459,7 +464,7 @@ function taskResponse(
 	snapshot: AsyncJobSnapshot<TaskPayload>,
 	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
 ) {
-	return success(
+	const response = success(
 		{
 			...taskHeader(snapshot),
 			waitOutcome,
@@ -472,6 +477,14 @@ function taskResponse(
 		},
 		snapshot.result?.text,
 	);
+	const error = snapshot.error;
+	const diagnostics =
+		snapshot.result?.diagnosticText ??
+		(typeof error?.details?.nextAction === "string"
+			? `${error.message} ${error.details.nextAction}`
+			: undefined);
+	if (diagnostics) response.content.push({ type: "text", text: diagnostics });
+	return response;
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -662,11 +675,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				confidence: item.confidence,
 				warnings: [...item.warnings],
 			}));
+		const diagnostics = directoryDiagnostics(
+			context.absolutePath,
+			result.failures,
+			result.unrecognized,
+		);
 		return {
 			type: "scan",
+			diagnosticText: directoryDiagnosticText(diagnostics),
 			status: result.failures.length > 0 ? "partial" : "completed",
 			result: {
 				scanned: result.scanned,
+				diagnostics,
 				archives,
 				unrecognized: input.includeUnrecognized
 					? result.unrecognized.map((item) => ({
@@ -695,7 +715,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	): Promise<TaskPayload> => {
 		const context = directoryContext(input.path);
 		await context.workspace.prepare({ createOutput: false });
-		const { archives, failures, ...page } =
+		const { archives, failures, unrecognized, ...page } =
 			await context.automation.searchEntries(
 				"source",
 				{
@@ -708,11 +728,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				},
 				phaseControl(control, "searching"),
 			);
+		const diagnostics = directoryDiagnostics(
+			context.absolutePath,
+			failures,
+			unrecognized,
+		);
 		return {
 			type: "search",
+			diagnosticText: directoryDiagnosticText(diagnostics),
 			status: failures.length ? "partial" : "completed",
 			result: {
 				...page,
+				diagnostics,
 				archives: archives.map((archive) => {
 					const source = {
 						path: resolve(context.absolutePath, archive.source.path),
@@ -756,6 +783,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					source: { path: context.absolutePath },
 					diagnosis: inspection.diagnosis,
 				},
+				diagnosticText: `${inspection.diagnosis.message} ${inspection.diagnosis.nextAction}`,
 			};
 		const entries = input.includeEntries
 			? await automation.listEntries(context.reference, {

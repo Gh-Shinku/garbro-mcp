@@ -83,6 +83,8 @@ export interface ArchiveInspection {
 }
 
 export interface UnrecognizedFormatDiagnosis {
+	stage: "detection";
+	nextAction: string;
 	kind:
 		| "registered-extension-no-match"
 		| "no-registered-format"
@@ -671,7 +673,12 @@ export class ArchiveAutomationService {
 		const archives = items.flatMap(({ source, value }) =>
 			value && value.matchedTotal > 0 ? [{ source, ...value }] : [],
 		);
-		return { ...page, archives };
+		const unrecognized = items.flatMap(({ source, value }) =>
+			value === undefined
+				? [{ source, diagnosis: this.#diagnoseUnrecognized(source.path) }]
+				: [],
+		);
+		return { ...page, archives, unrecognized };
 	}
 
 	async #visitDirectoryPage<T>(
@@ -1336,6 +1343,9 @@ export class ArchiveAutomationService {
 		if (extension.length === 0)
 			return {
 				kind: "unknown-format",
+				stage: "detection",
+				nextAction:
+					"Identify the game engine or provide a sample header to identify this file.",
 				extension: null,
 				candidateFormatIds: [],
 				message:
@@ -1346,13 +1356,19 @@ export class ArchiveAutomationService {
 			const candidateFormatIds = candidates.map((format) => format.id);
 			return {
 				kind: "registered-extension-no-match",
+				stage: "detection",
+				nextAction:
+					"Check the game edition and whether this file requires a companion index. Include the file header in a format-support report.",
 				extension,
 				candidateFormatIds,
-				message: `Registered formats for .${extension} did not match this file; it may be an unsupported variant. Candidates: ${candidateFormatIds.join(", ")}.`,
+				message: `No reader recognized this file. Registered candidates for .${extension}: ${candidateFormatIds.length}.`,
 			};
 		}
 		return {
 			kind: "no-registered-format",
+			stage: "detection",
+			nextAction:
+				"Look for a reader for this game's format, or request support with the game edition and a sample header.",
 			extension,
 			candidateFormatIds: [],
 			message: `No registered format supports the .${extension} extension.`,

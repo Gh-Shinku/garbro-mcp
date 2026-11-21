@@ -472,17 +472,35 @@ export const cpzFormat: ArchiveFormat = defineFixedArchive({
 	},
 	async read(source: ByteSource, sourcePath: string) {
 		const pass = await openCpzIndex(source);
+		if (!pass)
+			throw new GarbroError(
+				"INVALID_ARCHIVE",
+				"Invalid CPZ header or index checksum",
+			);
 		// The reference reads the key of an archive out of a `start.ps3` beside it for the layouts above the
 		// sixth alone; every layout below them, and every stock build, stands of a key of nothing.
 		const key =
-			pass !== undefined && pass.header.version > 6
+			pass.header.version > 6
 				? ((await findCpzArchiveKey(sourcePath)) ?? ZERO_KEY)
 				: ZERO_KEY;
-		const index = pass ? await walkCpzIndex(source, pass, key) : undefined;
-		if (!pass || !index) {
+		const index = await walkCpzIndex(source, pass, key);
+		if (!index) {
+			const version = pass.header.version;
 			throw new GarbroError(
 				"UNSUPPORTED_FEATURE",
-				"Unknown encryption scheme of a CVNS archive",
+				`Recognized CPZ${version}. The supported encryption scheme could not decode its archive index.`,
+				{
+					details: {
+						kind: "unsupported-encryption-scheme",
+						stage: "index-decryption",
+						formatId: cpzDescriptor.id,
+						version,
+						nextAction:
+							version > 6
+								? "If the game ships start.ps3, keep it alongside the archive. If decoding still fails, report the game edition and CPZ version."
+								: "Use a reader supporting this game's encryption scheme, or report the game edition and CPZ version.",
+					},
+				},
 			);
 		}
 		return {

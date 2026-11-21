@@ -80,8 +80,10 @@ export class FormatRegistry {
 			const { format } = candidate;
 			const source = await FileByteSource.open(sourcePath);
 			let handle: ArchiveHandle | undefined;
+			let detected = false;
 			try {
-				if (await format.detect(source, sourcePath)) {
+				detected = await format.detect(source, sourcePath);
+				if (detected) {
 					handle = await format.open(source, sourcePath);
 					return {
 						path: sourcePath,
@@ -92,7 +94,8 @@ export class FormatRegistry {
 					};
 				}
 			} catch (error) {
-				if (!isInvalidCandidate(error)) throw error;
+				if (!isInvalidCandidate(error))
+					throw readerError(error, format, detected);
 			} finally {
 				if (handle) await handle.close();
 				else await source.close();
@@ -115,13 +118,15 @@ export class FormatRegistry {
 		const sourcePath = resolve(inputPath);
 		for (const { format } of await this.#candidateFormats(sourcePath)) {
 			const source = await FileByteSource.open(sourcePath);
+			let detected = false;
 			try {
-				if (await format.detect(source, sourcePath))
-					return await format.open(source, sourcePath);
+				detected = await format.detect(source, sourcePath);
+				if (detected) return await format.open(source, sourcePath);
 				await source.close();
 			} catch (error) {
 				await source.close();
-				if (!isInvalidCandidate(error)) throw error;
+				if (!isInvalidCandidate(error))
+					throw readerError(error, format, detected);
 			}
 		}
 		return undefined;
@@ -239,4 +244,19 @@ function detectionConfidence(candidate: DetectionCandidate): {
 
 function isInvalidCandidate(error: unknown): boolean {
 	return error instanceof GarbroError && error.code === "INVALID_ARCHIVE";
+}
+
+function readerError(error: unknown, format: ArchiveFormat, detected: boolean) {
+	if (!(error instanceof GarbroError) || error.code !== "UNSUPPORTED_FEATURE")
+		return error;
+	return new GarbroError(error.code, error.message, {
+		cause: error,
+		details: {
+			kind: "unsupported-feature",
+			stage: detected ? "opening" : "detection",
+			formatId: format.descriptor.id,
+			nextAction: `Check the documented limitations of the ${format.descriptor.id} reader. Include this error and the game edition when reporting this variant.`,
+			...error.details,
+		},
+	});
 }
