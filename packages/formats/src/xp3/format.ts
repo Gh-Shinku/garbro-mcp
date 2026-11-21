@@ -2,6 +2,7 @@
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
 import { Readable } from "node:stream";
+import { constants, inflateSync } from "node:zlib";
 import { createZlibInflateStream, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
 	type ArchiveEntry,
@@ -22,6 +23,7 @@ const INDEX_CONTINUE = 0x80;
 const METHOD_RAW = 0;
 const METHOD_ZLIB = 1;
 const FILE_PROTECTED = 0x80000000;
+const TVP_FONT = Buffer.from("TVP pre-rendered font\x1a", "ascii");
 
 interface Xp3Segment {
 	compressed: boolean;
@@ -32,6 +34,44 @@ interface Xp3Segment {
 
 interface Xp3Entry extends ArchiveEntry {
 	segments: Xp3Segment[];
+}
+
+async function hasFontHeader(
+	source: ByteSource,
+	entry: Xp3Entry,
+): Promise<boolean> {
+	let matched = 0;
+	for (const segment of entry.segments) {
+		if (!segment.size) continue;
+		const remaining = TVP_FONT.length - matched;
+		const needed = Number(
+			segment.size < BigInt(remaining) ? segment.size : BigInt(remaining),
+		);
+		const limit = BigInt(segment.compressed ? 512 : needed);
+		const count = Number(
+			segment.packedSize < limit ? segment.packedSize : limit,
+		);
+		let bytes = await source.readAt(segment.offset, count);
+		if (segment.compressed) {
+			try {
+				bytes = inflateSync(bytes, {
+					finishFlush: constants.Z_SYNC_FLUSH,
+					maxOutputLength: 1024 * 1024,
+				});
+			} catch {
+				return false;
+			}
+		}
+		if (
+			!bytes
+				.subarray(0, needed)
+				.equals(TVP_FONT.subarray(matched, matched + needed))
+		)
+			return false;
+		matched += needed;
+		if (matched === TVP_FONT.length) return true;
+	}
+	return false;
 }
 
 export const xp3Descriptor: FormatDescriptor = {
@@ -417,6 +457,14 @@ export class Xp3Format implements ArchiveFormat {
 			);
 		}
 		const { entries, blockCount } = await readIndices(source);
+		for (const entry of entries) {
+			if (
+				!entry.encrypted &&
+				entry.path.toLowerCase().endsWith(".tft") &&
+				(await hasFontHeader(source, entry))
+			)
+				entry.resourceType = "font";
+		}
 		return new Xp3ArchiveHandle(source, sourcePath, entries, blockCount);
 	}
 }

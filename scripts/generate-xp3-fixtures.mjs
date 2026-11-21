@@ -171,6 +171,20 @@ const protectedArchive = buildArchive([
 ]);
 
 await mkdir(outputDirectory, { recursive: true });
+const font = Buffer.from("TVP pre-rendered font\x1a", "ascii");
+await writeFile(
+	resolve(outputDirectory, "font.xp3"),
+	buildArchive([
+		{
+			path: "split.TFT",
+			content: font,
+			split: [3, font.length - 3],
+			compressedSegments: [1],
+		},
+		{ path: "unknown.tft", content: Buffer.from("another format") },
+		{ path: "protected.tft", content: font, protected: true },
+	]).archive,
+);
 await writeFile(resolve(outputDirectory, "basic.xp3"), basic.archive);
 await writeFile(resolve(outputDirectory, "continued.xp3"), continued.archive);
 await writeFile(
