@@ -18,6 +18,22 @@ Prefer a squash merge using the PR title as the commit subject. The PR
 retains the individual commits for review. If their separate history is useful on `main`,
 use a merge commit and check the individual commit messages for accurate release notes.
 
+### CI checks
+
+Check compares the PR merge candidate with the last successful check on that PR, or with
+its base on the first run. After a squash or merge, the same Git tree can reuse the PR result.
+The **Plan** job lists the selected tests. **Verified** is the aggregate status check.
+
+Named imports are followed through workspace re-exports, so a shared decoder change selects
+its consumers. Linux runs the affected suites. Filesystem and process changes also run the
+affected platform tests on Windows and macOS. Unknown inputs and dependency changes run
+the full suite on Linux and the platform suites on both other systems. To request this scope
+explicitly, dispatch **Check** with **full** selected.
+
+Version-only changes check the manifests. Packaging changes test the ZIP, offline npm
+installation and installed command on all three systems. The release workflow applies those
+checks to the exact artifacts it publishes.
+
 ### Version PRs
 
 Release Please collects releasable changes on `main` into a separate version PR. Leave

@@ -243,6 +243,9 @@ importers:
       iconv-lite:
         specifier: ^0.7.3
         version: 0.7.3
+      rolldown:
+        specifier: 1.2.8
+        version: 1.2.8
       typescript:
         specifier: ^7.0.2
         version: 7.0.2

@@ -16,6 +16,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
+      actions: read
+      pull-requests: read
     uses: ./.github/workflows/check.yml
 
   release-please:
