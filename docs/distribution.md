@@ -2,8 +2,7 @@
 
 The independent release manifest in `distribution/package.json` publishes a self-contained npm
 package. Internal workspace packages remain private and are bundled into the release artifact.
-GitHub prereleases also distribute the same fixed-version server while the interfaces are still
-evolving.
+GitHub releases include a portable ZIP of the same server.
 
 ## User installation
 
@@ -97,8 +96,11 @@ verifies npm's generated executable and identical package contents.
 
 On pushes to `main`, **Prepare or publish releases** runs the Linux and Windows checks. Release
 Please uses Conventional Commits across the repository to open or update one version PR for
-`garbro-mcp`. Review the version, changelog, and checks before merging that PR. The CI release
-line starts from npm's `0.1.0-beta.1` and publishes subsequent betas under `next`.
+`garbro-mcp`. Review the version, changelog, and checks before merging that PR. The first
+release on the npm `latest` channel under this policy is `0.1.0`. Each subsequent release
+increments the patch number by one, including releases with features or breaking changes.
+For example, `0.1.99` is followed by `0.1.100`. Moving to another version line requires
+a maintainer decision and an update to the publish script's version check.
 
 ### Set up publication
 
@@ -112,7 +114,7 @@ line starts from npm's `0.1.0-beta.1` and publishes subsequent betas under `next
 3. Set the Actions **variable** `NPM_PUBLISH_ENABLED` to `true` before merging the version PR
    intended for publication. With the variable unset, CI still prepares the version PR.
 
-Merging the version PR with publication enabled creates a tag such as `v0.1.0-beta.2` and a
+Merging the version PR with publication enabled creates a tag such as `v0.1.0` and a
 draft GitHub release. CI builds once at the tagged commit, then tests the same ZIP and npm
 tarball on Linux, Windows, and macOS. It uploads the four assets to the draft, publishes the
 tested tarball to npm with provenance, and makes the GitHub release public.
@@ -136,4 +138,4 @@ Run **Experimental release** in GitHub Actions with a new prerelease version suc
    commit. Existing tags are rejected rather than overwritten or reused.
 
 Use the `experimental.N` suffix for these GitHub-only builds so their tags stay distinct from the
-automated beta releases.
+automated `0.1.x` releases.

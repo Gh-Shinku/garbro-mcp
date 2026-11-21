@@ -60,7 +60,9 @@ async function main(mode) {
 	const sha = process.env.GITHUB_SHA;
 	assert.equal(run("git", ["rev-parse", "HEAD"]), sha);
 	const version = (await json(".release-please-manifest.json"))["."];
-	assert.match(version, /^\d+\.\d+\.\d+(?:-[\w.-]+)?$/);
+	// Release Please uses 0.0.0 until the first version PR lands.
+	if (mode === "plan" && version === "0.0.0") return;
+	assert.match(version, /^0\.1\.(0|[1-9]\d*)$/);
 	const tag = `v${version}`;
 	const ref = `refs/tags/${tag}`;
 	const refs = run("git", ["ls-remote", "--tags", "origin", ref, `${ref}^{}`]);
@@ -106,7 +108,6 @@ async function main(mode) {
 	if (plan.missing.length)
 		run("gh", ["release", "upload", tag, ...plan.missing]);
 	if (plan.publish) {
-		const distTag = version.includes("-") ? "next" : "latest";
 		run("npm", [
 			"publish",
 			plan.archive,
@@ -115,7 +116,7 @@ async function main(mode) {
 			"--access",
 			"public",
 			"--tag",
-			distTag,
+			"latest",
 			"--provenance",
 			"--ignore-scripts",
 		]);

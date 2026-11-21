@@ -5,12 +5,10 @@
 	"include-component-in-tag": false,
 	"draft": true,
 	"force-tag-creation": true,
-	"versioning": "prerelease",
-	"prerelease-type": "beta",
-	"prerelease": true,
-	"bump-minor-pre-major": true,
+	"versioning": "always-bump-patch",
 	"packages": {
 		".": {
+			"initial-version": "0.1.0",
 			"extra-files": [
 				{
 					"type": "json",

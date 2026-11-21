@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { test } from "node:test";
 import { planPublication, tagAtCommit } from "./publish-release.mjs";
 
-const version = "0.1.0-beta.2";
+const version = "0.1.10000000000";
 const name = `garbro-mcp-${version}.tgz`;
 const bytes = Buffer.from("tested tarball");
 const files = new Map([
