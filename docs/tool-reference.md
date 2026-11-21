@@ -67,7 +67,7 @@ Extraction selections are:
 }
 ```
 
-Entry resource types are `archive`, `audio`, `image`, `script`, and `unknown`. Classification describes media
+Entry resource types are `archive`, `audio`, `font`, `image`, `script`, `video`, and `unknown`. Classification describes media
 type, not character ownership or another semantic role. Filename matches may be presented as
 candidates, but semantic claims require verification from the extracted artifacts or other
 evidence.

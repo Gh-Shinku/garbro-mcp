@@ -1,12 +1,12 @@
-import { entryResourceType, type ArchiveEntry } from "@garbro-mcp/core";
 import { readFile } from "node:fs/promises";
+import { type ArchiveEntry, entryResourceType } from "@garbro-mcp/core";
 import { describe, expect, it } from "vitest";
+import { garbroResourceCatalog } from "../../packages/formats/src/shared/resource-catalog.generated.js";
 import {
 	applySignatureResourceType,
 	classifyResourceExtension,
 	classifyResourceSignature,
 } from "../../packages/formats/src/shared/resource-catalog.js";
-import { garbroResourceCatalog } from "../../packages/formats/src/shared/resource-catalog.generated.js";
 
 function entry(path: string): ArchiveEntry {
 	return {
@@ -20,6 +20,17 @@ function entry(path: string): ArchiveEntry {
 }
 
 describe("GARBro resource catalogue", () => {
+	it("classifies common video and font extensions and preserves reader overrides", () => {
+		for (const path of ["movie/intro.MPG", "ed.webm", "pv.mp4"])
+			expect(entryResourceType(entry(path))).toBe("video");
+		for (const path of ["ui/title.TTF", "ui.otf", "font.woff2"])
+			expect(entryResourceType(entry(path))).toBe("font");
+		for (const path of ["unknown.adp", "unknown.tft"])
+			expect(entryResourceType(entry(path))).toBe("unknown");
+		expect(
+			entryResourceType({ ...entry("movie.mpg"), resourceType: "archive" }),
+		).toBe("archive");
+	});
 	it("is generated from every inventory row", async () => {
 		const inventory = JSON.parse(
 			await readFile("docs/garbro-inventory.json", "utf8"),

@@ -1,10 +1,10 @@
+import { buffer as consumeBuffer } from "node:stream/consumers";
 import {
 	BufferByteSource,
 	encodeCp932,
 	type GarbroError,
 } from "@garbro-mcp/core";
 import { decompressCocotte, HyPackFormat } from "@garbro-mcp/formats";
-import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
 import { encodeCocotte } from "../helpers/cocotte.js";
 
@@ -171,6 +171,50 @@ function rawDefinition(name = "plain", extension = "txt"): Definition {
 }
 
 describe("Kogado HyPack", () => {
+	it("recognizes embedded ADP1 by decoded header across storage methods", async () => {
+		const output = Buffer.alloc(32);
+		output.write("ADP1");
+		output.writeUInt32LE(32, 4);
+		output.writeUInt32LE(22050, 8);
+		output.writeUInt16LE(1, 12);
+		const stored = [
+			output,
+			Buffer.concat([Buffer.alloc(4), output]),
+			encodeCocotte(output),
+			Buffer.from(output.map((byte) => byte ^ 0xff)),
+		];
+		const definitions = stored.map((bytes, compressionType) => ({
+			name: `voice${compressionType}`,
+			extension: "ADP",
+			output,
+			stored: bytes,
+			compressionType,
+		}));
+		const invalid = Buffer.from(output);
+		invalid.writeUInt32LE(0, 8);
+		definitions.push({
+			name: "other",
+			extension: "adp",
+			output: invalid,
+			stored: invalid,
+			compressionType: 0,
+		});
+		const archive = await new HyPackFormat().open(
+			new BufferByteSource(buildHyPack(0x301, definitions)),
+			"sample.pak",
+		);
+		try {
+			expect(archive.entries.map((entry) => entry.resourceType)).toEqual([
+				"audio",
+				"audio",
+				"audio",
+				"audio",
+				undefined,
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
 	for (const version of [0x100, 0x200, 0x300, 0x301]) {
 		it(`reads version 0x${version.toString(16)} indexes`, async () => {
 			const fixture = buildHyPack(version, [rawDefinition("", "dat")]);

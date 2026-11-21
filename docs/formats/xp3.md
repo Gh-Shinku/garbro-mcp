@@ -28,6 +28,10 @@ Each segment can independently use raw or zlib encoding. Only index blocks are l
 and only up to their declared size. File contents are emitted sequentially through bigint range
 reads and zlib streams.
 
+When indexing an unprotected `.tft` entry, the reader checks for the KiriKiri
+`TVP pre-rendered font\x1a` header across its segments. Compressed segment probes use a bounded
+prefix. An inconclusive probe leaves the entry available under its original name.
+
 ## Initial support matrix
 
 | Capability | Status |

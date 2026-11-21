@@ -1,17 +1,18 @@
 // Format reference: GARbro ArcFormats/Hypatia/ArcKogado.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import {
-	bigintToBufferLength,
-	BufferCursor,
-	GarbroError,
 	type ArchiveEntry,
 	type ArchiveFormat,
 	type ArchiveHandle,
+	BufferCursor,
 	type ByteSource,
+	bigintToBufferLength,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { readAdpLayout } from "./adp-audio.js";
 import { decompressCocotte } from "./cocotte.js";
 import { decompressMariel } from "./mariel.js";
 
@@ -56,6 +57,41 @@ export const hyPackDescriptor: FormatDescriptor = {
 		},
 	],
 };
+
+/** Inspect only the part needed for the ADP1 layout, even for large audio entries. */
+async function hasAdpHeader(
+	source: ByteSource,
+	offset: bigint,
+	packed: bigint,
+	method: number,
+): Promise<boolean> {
+	const length = 16;
+	if (method === 2) {
+		if (packed < 4n) return false;
+		const block = await source.readAt(offset, 4);
+		const stored = block.readUInt16LE(0);
+		const decoded = block.readUInt16LE(2);
+		if (stored <= 4 || BigInt(stored) > packed || decoded < length)
+			return false;
+		const bytes = await source.readAt(offset, stored);
+		try {
+			return readAdpLayout(decompressCocotte(bytes, decoded)) !== undefined;
+		} catch (error) {
+			if (error instanceof GarbroError && error.code === "INVALID_ARCHIVE")
+				return false;
+			throw error;
+		}
+	}
+	const maxBytes = method === 1 ? 128 : length;
+	const bytes = await source.readAt(
+		offset,
+		Number(packed < BigInt(maxBytes) ? packed : BigInt(maxBytes)),
+	);
+	if (method === 1)
+		return readAdpLayout(decompressMariel(bytes, length)) !== undefined;
+	const header = method === 3 ? bytes.map((byte) => byte ^ 0xff) : bytes;
+	return readAdpLayout(Buffer.from(header)) !== undefined;
+}
 
 async function readDirectory(source: ByteSource): Promise<HyPackDirectory> {
 	if (source.size < BigInt(HEADER_SIZE)) {
@@ -122,7 +158,7 @@ async function readDirectory(source: ByteSource): Promise<HyPackDirectory> {
 				`HyPack entry points outside the archive: ${name}`,
 			);
 		}
-		entries.push({
+		const entry: HyPackEntry = {
 			id: String(id),
 			path: name,
 			size,
@@ -132,7 +168,15 @@ async function readDirectory(source: ByteSource): Promise<HyPackDirectory> {
 			offset,
 			compressionType,
 			metadata: { ...metadata, compressionType },
-		});
+		};
+		if (
+			extension.toLowerCase() === "adp" &&
+			size >= 16n &&
+			(await hasAdpHeader(source, offset, packedSize, compressionType))
+		) {
+			entry.resourceType = "audio";
+		}
+		entries.push(entry);
 	}
 	return { entries, version };
 }

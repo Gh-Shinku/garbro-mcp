@@ -1,9 +1,9 @@
-import { GarbroError, entryToWire, extractArchive } from "@garbro-mcp/core";
-import { createDefaultRegistry, Xp3Format } from "@garbro-mcp/formats";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import { entryToWire, extractArchive, GarbroError } from "@garbro-mcp/core";
+import { createDefaultRegistry, Xp3Format } from "@garbro-mcp/formats";
 import { afterEach, describe, expect, it } from "vitest";
 
 const fixtureDirectory = resolve("fixtures/xp3");
@@ -58,6 +58,20 @@ async function assertGoldenFixture(
 }
 
 describe("XP3 format", () => {
+	it("recognizes a TVP font across segment boundaries and skips inconclusive headers", async () => {
+		const archive = await createDefaultRegistry().openArchive(
+			resolve(fixtureDirectory, "font.xp3"),
+		);
+		try {
+			expect(archive.entries.map((entry) => entry.resourceType)).toEqual([
+				"font",
+				undefined,
+				undefined,
+			]);
+		} finally {
+			await archive.close();
+		}
+	});
 	it("detects, lists, and extracts raw/zlib multi-segment entries", async () => {
 		await assertGoldenFixture("basic.xp3");
 	});
