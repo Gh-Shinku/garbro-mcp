@@ -107,10 +107,12 @@ describe("ArchiveAutomationService", () => {
 				source: { rootId: "games", path: "archives/readme.txt" },
 				diagnosis: {
 					kind: "registered-extension-no-match",
+					stage: "detection",
+					nextAction: expect.any(String),
 					extension: "txt",
 					candidateFormatIds: ["ugos-txt-image"],
 					message:
-						"Registered formats for .txt did not match this file; it may be an unsupported variant. Candidates: ugos-txt-image.",
+						"No reader recognized this file. Registered candidates for .txt: 1.",
 				},
 			},
 		]);

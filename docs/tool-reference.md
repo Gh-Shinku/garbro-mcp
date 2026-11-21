@@ -188,10 +188,17 @@ if (first) {
 }
 ```
 
-An unrecognized source returns the same structured diagnosis used by scanning. For example, a CPZ
-variant not handled by the implemented CPZ1/CPZ2 readers reports
-`registered-extension-no-match` with both reader IDs; a PAZ file reports `no-registered-format`
-until a PAZ reader is registered. These results are format-support evidence, not generic I/O errors.
+For an unrecognized file, `result.diagnosis` includes the detection stage, reason and suggested
+next action. A DAT with registered readers that could not identify it includes the candidate
+count in the message and the full IDs in `candidateFormatIds`. A PAZ with no registered reader
+reports `no-registered-format`. When a reader encounters an unsupported feature, `error.details`
+identifies the reader and failing stage. For example, a recognized CPZ6 whose index cannot be
+decrypted reports its version and the index decryption failure.
+
+Both `scan` and `search` return per-page `diagnostics` alongside matching files. Each group
+includes the reason, count, next action and one example source. The text response summarizes
+up to five groups, starting with reader errors. Use `inspect` on the example for the individual
+diagnosis.
 
 ### Extract task
 

@@ -501,4 +501,42 @@ describe("MCP task server", () => {
 			},
 		});
 	});
+
+	it.each(["scan", "search"])(
+		"groups detection issues per %s page alongside successful matches",
+		async (type) => {
+			const { client, root } = await connect();
+			await writeFile(resolve(root, "bg.paz"), "unknown");
+			await writeFile(resolve(root, "voice.paz"), "unknown");
+			const id = await submit(client, {
+				type,
+				path: root,
+				...(type === "search" ? { resourceTypes: ["script"] } : {}),
+			});
+			const response = await client.callTool({
+				name: "get_task",
+				arguments: { taskId: id },
+			});
+			expect(structured(response)).toMatchObject({
+				state: "completed",
+				result: {
+					archives: [{ formatId: "xp3" }],
+					diagnostics: [
+						{
+							kind: "no-registered-format",
+							stage: "detection",
+							extension: "paz",
+							count: 2,
+							nextAction: expect.any(String),
+							exampleSource: { path: resolve(root, "bg.paz") },
+						},
+					],
+				},
+			});
+			expect(response.content).toContainEqual({
+				type: "text",
+				text: expect.stringContaining("2 × No registered format"),
+			});
+		},
+	);
 });

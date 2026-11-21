@@ -84,6 +84,8 @@ export interface ArchiveInspection {
 }
 
 export interface UnrecognizedFormatDiagnosis {
+	stage: "detection";
+	nextAction: string;
 	kind:
 		| "registered-extension-no-match"
 		| "no-registered-format"
@@ -117,6 +119,7 @@ export interface ScanFailure {
 }
 
 interface DirectoryPageOptions {
+	onUnrecognized?: (file: UnrecognizedResource) => void;
 	path?: string;
 	recursive?: boolean;
 	includeGlobs?: readonly string[];
@@ -808,7 +811,14 @@ export class ArchiveAutomationService {
 			const source = { rootId, path: file.rootRelative };
 			if (result instanceof GarbroError)
 				failures.push({ source, error: result });
-			else items.push({ source, value: result });
+			else {
+				items.push({ source, value: result });
+				if (result === undefined)
+					options.onUnrecognized?.({
+						source,
+						diagnosis: this.#diagnoseUnrecognized(source.path),
+					});
+			}
 		}
 		const complete = normalizedStart + page.length >= files.length;
 		return {
@@ -1361,6 +1371,9 @@ export class ArchiveAutomationService {
 		if (extension.length === 0)
 			return {
 				kind: "unknown-format",
+				stage: "detection",
+				nextAction:
+					"Identify the game engine or provide a sample header to identify this file.",
 				extension: null,
 				candidateFormatIds: [],
 				message:
@@ -1371,13 +1384,19 @@ export class ArchiveAutomationService {
 			const candidateFormatIds = candidates.map((format) => format.id);
 			return {
 				kind: "registered-extension-no-match",
+				stage: "detection",
+				nextAction:
+					"Check the game edition and whether this file requires a companion index. Include the file header in a format-support report.",
 				extension,
 				candidateFormatIds,
-				message: `Registered formats for .${extension} did not match this file; it may be an unsupported variant. Candidates: ${candidateFormatIds.join(", ")}.`,
+				message: `No reader recognized this file. Registered candidates for .${extension}: ${candidateFormatIds.length}.`,
 			};
 		}
 		return {
 			kind: "no-registered-format",
+			stage: "detection",
+			nextAction:
+				"Look for a reader for this game's format, or request support with the game edition and a sample header.",
 			extension,
 			candidateFormatIds: [],
 			message: `No registered format supports the .${extension} extension.`,

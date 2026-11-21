@@ -582,9 +582,16 @@ describe("CVNS archive of the newer layouts", () => {
 		const { archive } = buildArchive({ breakRecord: true });
 		const source = new BufferByteSource(archive);
 		expect(await cpzFormat.detect(source, "sample.cpz")).toBe(true);
-		await expect(cpzFormat.open(source, "sample.cpz")).rejects.toThrow(
-			/Unknown encryption scheme/,
-		);
+		await expect(cpzFormat.open(source, "sample.cpz")).rejects.toMatchObject({
+			code: "UNSUPPORTED_FEATURE",
+			message: expect.stringContaining("Recognized CPZ5"),
+			details: {
+				stage: "index-decryption",
+				kind: "unsupported-encryption-scheme",
+				version: 5,
+				nextAction: expect.any(String),
+			},
+		});
 	});
 });
 
