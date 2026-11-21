@@ -115,6 +115,22 @@ export interface ScanFailure {
 	error: GarbroError;
 }
 
+interface DirectoryPageOptions {
+	path?: string;
+	recursive?: boolean;
+	includeGlobs?: readonly string[];
+	excludeGlobs?: readonly string[];
+	maxDepth?: number;
+	cursor?: string;
+	limit?: number;
+}
+
+interface EntrySearchSample {
+	id: string;
+	path: string;
+	resourceType: EntryResourceType;
+}
+
 export interface ScanResult {
 	scanned: number;
 	archives: ScanArchiveResult[];
@@ -575,18 +591,95 @@ export class ArchiveAutomationService {
 
 	async scanArchives(
 		rootId: string,
-		options: {
-			path?: string;
-			recursive?: boolean;
-			includeGlobs?: readonly string[];
-			excludeGlobs?: readonly string[];
-			maxDepth?: number;
-			cursor?: string;
-			limit?: number;
-			includeUnrecognized?: boolean;
-		} = {},
+		options: DirectoryPageOptions & { includeUnrecognized?: boolean } = {},
 		control: AutomationControl = {},
 	): Promise<ScanResult> {
+		const { items, ...page } = await this.#visitDirectoryPage(
+			rootId,
+			options,
+			control,
+			(path) => this.registry.detectArchive(path),
+		);
+		const archives: ScanArchiveResult[] = [];
+		const unrecognized: UnrecognizedResource[] = [];
+		let unrecognizedCount = 0;
+		for (const { source, value } of items) {
+			if (value) {
+				archives.push({
+					source,
+					size: value.size,
+					format: value.format,
+					validation: value.validation,
+					confidence: value.confidence,
+					warnings: value.warnings,
+				});
+			} else {
+				unrecognizedCount += 1;
+				if (options.includeUnrecognized)
+					unrecognized.push({
+						source,
+						diagnosis: this.#diagnoseUnrecognized(source.path),
+					});
+			}
+		}
+		return { ...page, archives, unrecognized, unrecognizedCount };
+	}
+
+	async searchEntries(
+		rootId: string,
+		options: DirectoryPageOptions & {
+			resourceTypes: readonly EntryResourceType[];
+			samplesPerArchive?: number;
+		},
+		control: AutomationControl = {},
+	) {
+		const sampleLimit = options.samplesPerArchive ?? 1;
+		validatePositiveLimit("samplesPerArchive", sampleLimit);
+		if (sampleLimit > this.limits.entryPageMax)
+			throw new GarbroError(
+				"LIMIT_EXCEEDED",
+				"samplesPerArchive exceeds entryPageMax",
+			);
+		if (options.resourceTypes.length === 0)
+			throw new GarbroError(
+				"INVALID_ARGUMENT",
+				"Select at least one entry resource type",
+			);
+		const { items, ...page } = await this.#visitDirectoryPage(
+			rootId,
+			options,
+			control,
+			async (path) => {
+				const archive = await this.registry.tryOpenArchive(path);
+				if (!archive) return undefined;
+				try {
+					const entries: EntrySearchSample[] = [];
+					let matchedTotal = 0;
+					for (const entry of archive.entries) {
+						const resourceType = entryResourceType(entry);
+						if (!options.resourceTypes.includes(resourceType)) continue;
+						matchedTotal++;
+						if (entries.length < sampleLimit)
+							entries.push({ id: entry.id, path: entry.path, resourceType });
+					}
+					return { formatId: archive.format.id, matchedTotal, entries };
+				} finally {
+					await archive.close();
+				}
+			},
+		);
+		const archives = items.flatMap(({ source, value }) =>
+			value && value.matchedTotal > 0 ? [{ source, ...value }] : [],
+		);
+		return { ...page, archives };
+	}
+
+	async #visitDirectoryPage<T>(
+		rootId: string,
+		options: DirectoryPageOptions,
+		control: AutomationControl,
+		visit: (path: string) => Promise<T>,
+	) {
 		const relativeBase = options.path ?? ".";
 		const resolved = await this.workspace.resolveInput(
 			{ rootId, path: relativeBase },
@@ -670,10 +763,10 @@ export class ArchiveAutomationService {
 		const inspected = await mapConcurrent(
 			page,
 			this.limits.scanConcurrency,
-			async (file): Promise<DetectionResult | GarbroError | undefined> => {
+			async (file) => {
 				throwIfCancelled(control.signal);
 				try {
-					return await this.registry.detectArchive(file.absolutePath);
+					return await visit(file.absolutePath);
 				} catch (error) {
 					return asGarbroError(error);
 				} finally {
@@ -686,39 +779,20 @@ export class ArchiveAutomationService {
 				}
 			},
 		);
-		const archives: ScanArchiveResult[] = [];
+		const items: Array<{ source: InputReference; value: T }> = [];
 		const failures: ScanFailure[] = [];
-		const unrecognized: UnrecognizedResource[] = [];
-		let unrecognizedCount = 0;
 		for (const [index, result] of inspected.entries()) {
 			const file = page[index];
 			if (!file) continue;
 			const source = { rootId, path: file.rootRelative };
 			if (result instanceof GarbroError)
 				failures.push({ source, error: result });
-			else if (!result) {
-				unrecognizedCount += 1;
-				if (options.includeUnrecognized)
-					unrecognized.push({
-						source,
-						diagnosis: this.#diagnoseUnrecognized(file.rootRelative),
-					});
-			} else
-				archives.push({
-					source,
-					size: result.size,
-					format: result.format,
-					validation: result.validation,
-					confidence: result.confidence,
-					warnings: result.warnings,
-				});
+			else items.push({ source, value: result });
 		}
 		const complete = normalizedStart + page.length >= files.length;
 		return {
 			scanned: page.length,
-			archives,
-			unrecognized,
-			unrecognizedCount,
+			items,
 			failures,
 			nextCursor:
 				complete || page.length === 0

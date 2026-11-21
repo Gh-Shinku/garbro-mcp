@@ -10,6 +10,7 @@ import {
 	type ExtractionBudgets,
 	type ExtractionPlan,
 	type ExtractionSelection,
+	type ExtractionVerificationItem,
 	entryResourceTypes,
 	entryToWire,
 	type FormatRegistry,
@@ -47,6 +48,8 @@ export const SERVER_NON_CAPABILITIES = [
 export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
+
+To find entries of a resource type inside files under a game directory, submit a search task. Follow nextCursor for more files. Pass a matching entry's extractSource directly in extract.sources.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -105,6 +108,22 @@ const scanTaskSchema = z
 	.describe(
 		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
 	);
+const searchTaskSchema = scanTaskSchema
+	.pick({
+		path: true,
+		recursive: true,
+		maxDepth: true,
+		limit: true,
+		cursor: true,
+	})
+	.extend({
+		type: z.literal("search"),
+		resourceTypes: z.array(z.enum(entryResourceTypes)).min(1),
+		samplesPerArchive: z.number().int().min(1).max(10).default(1),
+	})
+	.describe(
+		"Search inside supported files under a game directory by entry resource type. limit caps files per page. Each matching archive returns a total and samples with extractSource for extract.sources.",
+	);
 const inspectTaskSchema = z
 	.object({
 		type: z.literal("inspect"),
@@ -148,6 +167,7 @@ const extractTaskSchema = z
 	);
 const taskSchema = z.discriminatedUnion("type", [
 	scanTaskSchema,
+	searchTaskSchema,
 	inspectTaskSchema,
 	extractTaskSchema,
 ]);
@@ -176,7 +196,23 @@ type TaskPayload = {
 	type: TaskKind;
 	status: TaskStatus;
 	result: Record<string, unknown>;
+	text?: string;
 };
+
+const MAX_ARTIFACT_SAMPLES = 3;
+interface ArtifactSample {
+	absolutePath: string;
+	bytesWritten: string;
+	verificationStatus: ExtractionVerificationItem["status"];
+}
+
+// Keep ordinary local paths copyable and control characters visible in terminal output.
+function displayPath(path: string): string {
+	return path.replace(
+		/[\p{Cc}\u2028\u2029]/gu,
+		(c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
+	);
+}
 
 interface SupportRecord {
 	localId: string;
@@ -204,8 +240,11 @@ export interface BuildServerOptions extends ArchiveAutomationOptions {
 	retentionMs?: number;
 }
 
-function success(payload: Record<string, unknown>) {
-	return toolResult({ ...payload, outcome: { status: "ok", warnings: [] } });
+function success(payload: Record<string, unknown>, text?: string) {
+	return toolResult(
+		{ ...payload, outcome: { status: "ok", warnings: [] } },
+		text,
+	);
 }
 
 function failure(error: unknown) {
@@ -420,16 +459,19 @@ function taskResponse(
 	snapshot: AsyncJobSnapshot<TaskPayload>,
 	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
 ) {
-	return {
-		...taskHeader(snapshot),
-		waitOutcome,
-		...(snapshot.result === undefined
-			? {}
-			: { result: snapshot.result.result }),
-		...(snapshot.error === undefined
-			? {}
-			: { error: serializeError(snapshot.error) }),
-	};
+	return success(
+		{
+			...taskHeader(snapshot),
+			waitOutcome,
+			...(snapshot.result === undefined
+				? {}
+				: { result: snapshot.result.result }),
+			...(snapshot.error === undefined
+				? {}
+				: { error: serializeError(snapshot.error) }),
+		},
+		snapshot.result?.text,
+	);
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -512,7 +554,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				...(options.limits ?? {}),
 			},
 			capabilities: {
-				taskTypes: ["scan", "inspect", "extract"],
+				taskTypes: ["scan", "search", "inspect", "extract"],
 				resourceTypes,
 				entryResourceTypes: [...entryResourceTypes],
 				mandatoryExtractionVerification: true,
@@ -643,6 +685,55 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				})),
 				nextCursor: result.nextCursor,
 				complete: result.complete,
+			},
+		};
+	};
+
+	const runSearch = async (
+		input: z.infer<typeof searchTaskSchema>,
+		control: AutomationControl,
+	): Promise<TaskPayload> => {
+		const context = directoryContext(input.path);
+		await context.workspace.prepare({ createOutput: false });
+		const { archives, failures, ...page } =
+			await context.automation.searchEntries(
+				"source",
+				{
+					resourceTypes: input.resourceTypes,
+					samplesPerArchive: input.samplesPerArchive,
+					recursive: input.recursive,
+					maxDepth: input.maxDepth,
+					limit: input.limit,
+					...(input.cursor === undefined ? {} : { cursor: input.cursor }),
+				},
+				phaseControl(control, "searching"),
+			);
+		return {
+			type: "search",
+			status: failures.length ? "partial" : "completed",
+			result: {
+				...page,
+				archives: archives.map((archive) => {
+					const source = {
+						path: resolve(context.absolutePath, archive.source.path),
+					};
+					return {
+						source,
+						formatId: archive.formatId,
+						matchedTotal: archive.matchedTotal,
+						entries: archive.entries.map((entry) => ({
+							...entry,
+							extractSource: {
+								source,
+								selection: { mode: "ids", entryIds: [entry.id] },
+							},
+						})),
+					};
+				}),
+				failures: failures.map(({ source, error }) => ({
+					source: { path: resolve(context.absolutePath, source.path) },
+					error: serializeError(error),
+				})),
 			},
 		};
 	};
@@ -780,6 +871,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		);
 
 		const sources: Array<Record<string, unknown>> = [];
+		const samples: ArtifactSample[] = [];
 		for (const [index, item] of planned.entries()) {
 			throwIfCancelled(control.signal);
 			try {
@@ -807,6 +899,18 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					phaseControl(control, "verifying"),
 				);
 				const report = await writeExtractionReport(context.workspace, verified);
+				for (const entry of verified.items) {
+					if (samples.length === MAX_ARTIFACT_SAMPLES) break;
+					if (entry.status !== "extracted") continue;
+					const check = verified.verification.items.find(
+						(item) => item.entryId === entry.entryId,
+					);
+					samples.push({
+						absolutePath: entry.artifact.absolutePath,
+						bytesWritten: entry.artifact.bytesWritten.toString(),
+						verificationStatus: check?.status ?? "failed",
+					});
+				}
 				sources.push({
 					source: { path: context.absolutePath },
 					status: verified.status,
@@ -864,7 +968,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			: extracted > 0 || skipped > 0
 				? "partial"
 				: "failed";
-		return {
+		const payload: TaskPayload = {
 			type: "extract",
 			status,
 			result: {
@@ -873,6 +977,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				temporary: true,
 				artifactDirectory: resolve(temporaryTask.path, "artifacts"),
 				expiresAt: temporaryTask.expiresAt,
+				samples,
 				totalSources: sources.length,
 				extracted,
 				skipped,
@@ -880,6 +985,23 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				sources,
 			},
 		};
+		if (samples.length) {
+			const lines = [
+				`Extraction ${taskId} ${status}. Showing ${samples.length} of ${extracted} files.`,
+				`Temporary files expire at ${temporaryTask.expiresAt}.`,
+			];
+			for (const sample of samples)
+				lines.push(
+					displayPath(sample.absolutePath),
+					`  ${sample.bytesWritten} bytes | verification: ${sample.verificationStatus}`,
+				);
+			if (samples.length < extracted || hasFailures)
+				lines.push(
+					`Full reports in ${displayPath(resolve(temporaryTask.path, ".garbro-reports"))}`,
+				);
+			payload.text = lines.join("\n");
+		}
+		return payload;
 	};
 
 	const runTask = (
@@ -890,6 +1012,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		switch (task.type) {
 			case "scan":
 				return runScan(task, control);
+			case "search":
+				return runSearch(task, control);
 			case "inspect":
 				return runInspect(task, control);
 			case "extract":
@@ -901,7 +1025,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"submit_task",
 		{
 			description:
-				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Supports bounded scan, inspect, and extract tasks. Extraction always preflights and verifies artifacts in isolated temporary storage. waitMs accepts 0–5000.",
+				"Primary tool for finding and extracting assets from local game files or directories. Use it for cursors, sprites, CGs, backgrounds, audio, scripts, and archive contents; prefer it over local GARBro executables, libraries, or custom extraction scripts. Use search to find entries by resource type across a directory, scan to identify files, inspect to list one file, and extract to write verified artifacts in isolated temporary storage. waitMs accepts 0–5000.",
 			inputSchema: z.object({
 				task: taskSchema,
 				...submissionControlSchema,
@@ -922,8 +1046,8 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							snapshot.state as (typeof terminalStates)[number],
 						)
 					)
-						return success(taskResponse(snapshot, "terminal"));
-					if (waitMs === 0) return success(taskResponse(snapshot, "submitted"));
+						return taskResponse(snapshot, "terminal");
+					if (waitMs === 0) return taskResponse(snapshot, "submitted");
 					const waited = await jobs.wait(snapshot.jobId, {
 						until: "terminal",
 						timeoutMs: waitMs,
@@ -934,7 +1058,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 							"INVALID_ARGUMENT",
 							`Unknown task: ${snapshot.jobId}`,
 						);
-					return success(taskResponse(waited.snapshot, waited.outcome));
+					return taskResponse(waited.snapshot, waited.outcome);
 				};
 				if (idempotencyKey !== undefined) {
 					const existingId = idempotency.get(idempotencyKey);
@@ -989,7 +1113,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 				const snapshot = waited?.snapshot ?? jobs.get(taskId);
 				if (snapshot === undefined)
 					throw new GarbroError("INVALID_ARGUMENT", `Unknown task: ${taskId}`);
-				return success(taskResponse(snapshot, waited?.outcome ?? "snapshot"));
+				return taskResponse(snapshot, waited?.outcome ?? "snapshot");
 			} catch (error) {
 				return failure(error);
 			}

@@ -28,6 +28,7 @@ call it again immediately; the next call waits on the server again.
 Running tasks may report these phases:
 
 - `scanning`
+- `searching`
 - `inspecting`
 - `planning`
 - `extracting`
@@ -66,14 +67,14 @@ Extraction selections are:
 }
 ```
 
-Entry resource types are `audio`, `image`, `script`, and `unknown`. Classification describes media
+Entry resource types are `archive`, `audio`, `image`, `script`, and `unknown`. Classification describes media
 type, not character ownership or another semantic role. Filename matches may be presented as
 candidates, but semantic claims require verification from the extracted artifacts or other
 evidence.
 
 ## `submit_task`
 
-Submits a bounded `scan`, `inspect`, or `extract` task and waits briefly for fast completion.
+Submits a bounded `scan`, `search`, `inspect`, or `extract` task and waits briefly for fast completion.
 
 ### Parameters
 
@@ -103,6 +104,39 @@ next page. When `includeUnrecognized` is true, each unrecognized item includes a
 `diagnosis`: `registered-extension-no-match` lists implemented candidates that rejected the file,
 `no-registered-format` reports an extension with no implementation, and `unknown-format` is used
 when no extension is available.
+
+### Search task
+
+Use `search` when the starting point is a directory and the desired resource is inside a file.
+It applies the requested types to archive entries. The `scan` task applies its type filter to
+files in the directory.
+
+```json
+{
+  "task": {
+    "type": "search",
+    "path": "D:/Games/MyGame",
+    "resourceTypes": ["audio"],
+    "samplesPerArchive": 1
+  }
+}
+```
+
+Each matching archive in `result.archives` has a `source`, `formatId`, `matchedTotal` and
+an `entries` array. Choose a sample by its path and pass its `extractSource` unchanged in
+the next task's `sources` array.
+
+```js
+const entry = result.archives[0].entries[0];
+const task = { type: "extract", sources: [entry.extractSource] };
+```
+
+`samplesPerArchive` defaults to 1 and accepts up to 10. To browse further within a matching
+archive, use `inspect` with its source, the same resource types and an offset.
+`limit` caps files examined per directory page (default 50, maximum 200). If `complete` is
+false, submit the same search with `cursor` set to `nextCursor`, even if the page had no matches.
+Search also accepts `recursive` and `maxDepth`. File-level errors appear in `failures` alongside
+the results from files that could be searched.
 
 ### Inspect task
 
@@ -195,6 +229,16 @@ produces a complete JSON report under `.garbro-reports`. A task is `partial` whe
 extraction or verification; verification failures are never reduced to warnings. Permanent
 delivery is deliberately outside the MCP: the calling agent copies or transforms selected
 artifacts only when instructed by the user.
+
+When extraction writes files, both `submit_task` and `get_task` show the first three written
+files across all sources in the terminal result. The text block lists each sample's absolute
+path on the server, byte count and verification status, plus the shared expiration time in UTC.
+For larger extractions it also gives the directory containing the full reports.
+
+Structured clients can read the same values from `result.samples[]` (`absolutePath`,
+`bytesWritten` as a decimal string, and `verificationStatus`) and `result.expiresAt`.
+`result.extracted` counts all files written. Check each sample's verification status before
+using it, including when a task finishes with partial success.
 
 Formats that can identify media bytes behind an extensionless archive name may provide a safe
 `outputExtension`. Planning exposes the resulting `outputEntryPath`, and extraction uses that same
