@@ -3,6 +3,10 @@ name: Check
 on:
   pull_request:
   workflow_call:
+    outputs:
+      version-commit:
+        description: The main commit changed the release manifest
+        value: ${{ jobs.plan.outputs.version-commit }}
     inputs:
       defer-packages:
         description: The caller already verifies these artifacts
@@ -25,6 +29,7 @@ jobs:
     name: Plan ${{ github.sha }}
     runs-on: ubuntu-latest
     outputs:
+      version-commit: ${{ steps.release.outputs.changed }}
       tree: ${{ steps.base.outputs.tree }}
       matrix: ${{ steps.select.outputs.matrix }}
       work: ${{ steps.select.outputs.work }}
@@ -35,6 +40,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Identify a merged version change
+        id: release
+        if: github.ref == 'refs/heads/main'
+        run: |
+          changed=$(git diff --name-only HEAD^1 HEAD -- .release-please-manifest.json)
+          if [[ -n "$changed" ]]; then echo "changed=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
