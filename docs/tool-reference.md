@@ -360,5 +360,14 @@ and explicit non-capabilities.
 
 ### `garbro://formats`
 
-Returns the complete implemented-format catalog with extensions, capabilities, attribution,
-support status, verification level, and known limitations.
+Returns a page with `total`, `formats` and `nextUri`. Every summary includes `id`, `name`,
+`extensions` and a `detailUri`. Follow `nextUri` until null to enumerate the catalog.
+Clients that previously read the catalog as one array should collect `formats` from each page.
+
+- Read `garbro://formats/by-extension/xp3` to find registered readers for an extension, including
+  GARBro aliases. A leading dot and uppercase letters are accepted. No matches give an empty page.
+- Read `garbro://formats/by-id/xp3` (or a returned `detailUri`) for capabilities, attribution,
+  support status, verification level and known limitations. Format IDs are exact.
+
+Catalog listing pages use the 4096-byte response budget. A requested detail resource contains a
+single complete record with a 65536-byte ceiling.
