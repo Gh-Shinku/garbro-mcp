@@ -159,6 +159,35 @@ Optional entry filters are `includeGlobs`, `excludeGlobs`, `caseSensitive`, `com
 `encrypted`, and `resourceTypes`. Set `includeMetadata` to include archive-specific metadata or
 `includeEntries` to `false` when only a summary is needed.
 
+The first entry page also includes `result.entries.overview`. Its counts and samples cover
+the full set of matches, even with `limit: 1`. The overview groups entries by their parent
+directory when there are multiple directories. For flat archives it looks for repeated filename
+prefixes, such as `bg` in `bg001.png` or `voice` in `voice_001.ogg`. Flat archives with only
+numbers, hashes, or one shared prefix can be browsed using the samples.
+
+- To browse by a specific dimension, set `browse.by` to `directory` or `prefix`. Each group
+  includes its match count and a `browse` object. Copy that object into the next inspection
+  of the same source, keeping the same entry filters, to list that group's members. Keys
+  are literal and case-sensitive. The empty key denotes the archive root for directory groups,
+  or names without a detected prefix for prefix groups.
+- To see more groups, set `browse.offset` to `overview.nextGroupOffset` and keep the entry
+  `offset` at zero. Each group page lists up to 20 groups in order of first occurrence.
+  To continue listing entries within a group, keep its selector and use the usual entry
+  `nextOffset`.
+- To extract a sample, pass its `extractSource` directly in an extraction task's `sources`
+  array. The overview samples up to three distinct positions in archive order, at the
+  beginning, middle and end of the filtered list. Each sample includes its zero-based offset.
+
+```js
+const [first] = result.entries.overview.samples;
+if (first) {
+  await client.callTool({
+    name: "submit_task",
+    arguments: { task: { type: "extract", sources: [first.extractSource] } }
+  });
+}
+```
+
 An unrecognized source returns the same structured diagnosis used by scanning. For example, a CPZ
 variant not handled by the implemented CPZ1/CPZ2 readers reports
 `registered-extension-no-match` with both reader IDs; a PAZ file reports `no-registered-format`
