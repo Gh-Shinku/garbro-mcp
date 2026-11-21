@@ -116,6 +116,7 @@ async function extractSample(client: Client, sample: PrivateSample) {
 	};
 	const task = await submitTask(client, {
 		type: "extract",
+		maxResponseBytes: 16384,
 		sources: [
 			{
 				source: {

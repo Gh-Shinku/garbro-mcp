@@ -67,7 +67,7 @@ To find entries under a game directory, submit a search task with an entry path 
 
 For supported readers, read garbro://formats/by-extension/{extension} or garbro://formats/by-id/{id}.
 
-Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
+Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Use get_task with resultCursor to read further artifact samples and per-source reports. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
 The server extracts resource bytes, not game logic or semantic relationships. Filename matches are candidates, not proof of character, dialogue, voice, sprite, or other ownership; verify such claims from the artifacts or other evidence.`;
 
@@ -191,6 +191,7 @@ const extractTaskSchema = z
 	.object({
 		type: z.literal("extract"),
 		sources: z.array(extractSourceSchema).min(1).max(32),
+		maxResponseBytes: pageBytesSchema.default(DEFAULT_PAGE_BYTES),
 		budgets: extractionBudgetsSchema.optional(),
 	})
 	.describe(
@@ -224,15 +225,10 @@ type TaskInput = z.infer<typeof taskSchema>;
 type TaskKind = TaskInput["type"];
 type TaskStatus = "completed" | "partial" | "failed";
 type TaskPayload = {
+	type: TaskKind;
 	status: TaskStatus;
-	text?: string;
-} & (
-	| { type: "search" | "inspect" | "scan"; result: SavedResult }
-	| {
-			type: Exclude<TaskKind, "search" | "inspect" | "scan">;
-			result: Record<string, unknown>;
-	  }
-);
+	result: SavedResult;
+};
 
 const MAX_ARTIFACT_SAMPLES = 3;
 interface ArtifactSample {
@@ -496,68 +492,32 @@ function taskResponse(
 	requestId: number | string,
 	options: PageReadOptions = {},
 ) {
-	if (snapshot.kind !== "extract") {
-		const saved =
-			snapshot.result && snapshot.result.type !== "extract"
-				? snapshot.result.result
-				: undefined;
-		const budget = responseBodyBudget(
-			options.maxResponseBytes ?? saved?.maxResponseBytes ?? MIN_PAGE_BYTES,
-			requestId,
-		);
-		const { message: _progressPath, ...header } = taskHeader(snapshot);
-		const base = {
-			...header,
-			waitOutcome,
-			outcome: { status: "ok", warnings: [] },
-		};
-		if (saved)
-			return savedResultPage(snapshot.jobId, base, saved, options, budget);
-		if (options.resultCursor !== undefined)
-			throw new GarbroError(
-				"INVALID_ARGUMENT",
-				"No saved results for this task",
-			);
-		const error = snapshot.error && serializeError(snapshot.error);
-		const response = mirroredResult({ ...base, ...(error && { error }) });
-		if (Buffer.byteLength(JSON.stringify(response)) <= budget) return response;
-		return mirroredResult({
-			...base,
-			error: {
-				code: error?.code ?? "LIMIT_EXCEEDED",
-				message: "Task details exceed the response budget.",
-			},
-		});
-	}
-	if (
-		options.resultCursor !== undefined ||
-		options.limit !== undefined ||
-		options.maxResponseBytes !== undefined
-	)
-		throw new GarbroError(
-			"INVALID_ARGUMENT",
-			"Result paging options apply only to scan, search and inspect tasks",
-		);
-	const response = success(
-		{
-			...taskHeader(snapshot),
-			waitOutcome,
-			...(snapshot.result === undefined
-				? {}
-				: { result: snapshot.result.result }),
-			...(snapshot.error === undefined
-				? {}
-				: { error: serializeError(snapshot.error) }),
-		},
-		snapshot.result?.text,
+	const saved = snapshot.result?.result;
+	const budget = responseBodyBudget(
+		options.maxResponseBytes ?? saved?.maxResponseBytes ?? MIN_PAGE_BYTES,
+		requestId,
 	);
-	const error = snapshot.error;
-	const diagnostics =
-		typeof error?.details?.nextAction === "string"
-			? `${error.message} ${error.details.nextAction}`
-			: undefined;
-	if (diagnostics) response.content.push({ type: "text", text: diagnostics });
-	return response;
+	const { message: _progressPath, ...header } = taskHeader(snapshot);
+	const base = {
+		...header,
+		waitOutcome,
+		outcome: { status: "ok", warnings: [] },
+	};
+	if (saved)
+		return savedResultPage(snapshot.jobId, base, saved, options, budget);
+	if (options.resultCursor !== undefined)
+		throw new GarbroError("INVALID_ARGUMENT", "No saved results for this task");
+	const error = snapshot.error && serializeError(snapshot.error);
+	const response = mirroredResult({ ...base, ...(error && { error }) });
+	if (Buffer.byteLength(JSON.stringify(response)) <= budget) return response;
+	return mirroredResult({
+		...base,
+		error: {
+			code: error?.code ?? "LIMIT_EXCEEDED",
+			message:
+				"Task details exceed the response budget. Retry get_task with a larger maxResponseBytes.",
+		},
+	});
 }
 
 export function buildServer(options: BuildServerOptions = {}): McpServer {
@@ -1021,40 +981,41 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			: extracted > 0 || skipped > 0
 				? "partial"
 				: "failed";
-		const payload: TaskPayload = {
-			type: "extract",
-			status,
-			result: {
+		const result = sectionedResult(
+			input.maxResponseBytes,
+			{
 				status,
 				hasFailures,
 				temporary: true,
 				artifactDirectory: resolve(temporaryTask.path, "artifacts"),
 				expiresAt: temporaryTask.expiresAt,
-				samples,
 				totalSources: sources.length,
 				extracted,
 				skipped,
 				failed,
-				sources,
 			},
-		};
-		if (samples.length) {
+			{ samples, sources },
+			samples.length,
+		);
+		result.sampleText = (start, count) => {
+			const shown = samples.slice(start, start + count);
+			if (!shown.length) return undefined;
 			const lines = [
-				`Extraction ${taskId} ${status}. Showing ${samples.length} of ${extracted} files.`,
+				`Extraction ${taskId} ${status}. Showing ${shown.length} of ${extracted} files.`,
 				`Temporary files expire at ${temporaryTask.expiresAt}.`,
 			];
-			for (const sample of samples)
+			for (const sample of shown)
 				lines.push(
 					displayPath(sample.absolutePath),
 					`  ${sample.bytesWritten} bytes | verification: ${sample.verificationStatus}`,
 				);
-			if (samples.length < extracted || hasFailures)
+			if (shown.length < extracted || hasFailures)
 				lines.push(
 					`Full reports in ${displayPath(resolve(temporaryTask.path, ".garbro-reports"))}`,
 				);
-			payload.text = lines.join("\n");
-		}
-		return payload;
+			return lines.join("\n");
+		};
+		return { type: "extract", status, result };
 	};
 
 	const runTask = (
@@ -1144,7 +1105,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Wait server-side for a submitted task. For scan, search and inspect, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
+				"Wait server-side for a submitted task. Pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
 			inputSchema: z.object({
 				taskId: z.string().uuid(),
 				resultCursor: z.string().min(1).max(128).optional(),

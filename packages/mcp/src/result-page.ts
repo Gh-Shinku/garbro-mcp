@@ -7,6 +7,7 @@ export const MIN_PAGE_BYTES = 2048;
 export interface SavedResult {
 	maxResponseBytes: number;
 	recordCount: number;
+	sampleText?(start: number, count: number): string | undefined;
 	firstPagePriorityCount?: number;
 	compose(start: number, count: number): Record<string, unknown>;
 }
@@ -87,6 +88,8 @@ export function savedResultPage(
 			resultCursor: next < recordCount ? prefix + next : null,
 		};
 		const response = mirroredResult({ ...pageHeader, result });
+		const text = snapshot.sampleText?.(start, count);
+		if (text) response.content.unshift({ type: "text", text });
 		return Buffer.byteLength(JSON.stringify(response)) <= budget
 			? response
 			: undefined;
