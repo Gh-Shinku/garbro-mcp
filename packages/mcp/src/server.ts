@@ -16,6 +16,7 @@ import {
 	type FormatRegistry,
 	GarbroError,
 	TemporaryWorkspaceManager,
+	type UnrecognizedResource,
 	verifyExtractionResult,
 	WorkspacePolicy,
 	writeExtractionReport,
@@ -715,12 +716,14 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 	): Promise<TaskPayload> => {
 		const context = directoryContext(input.path);
 		await context.workspace.prepare({ createOutput: false });
-		const { archives, failures, unrecognized, ...page } =
+		const unrecognized: UnrecognizedResource[] = [];
+		const { archives, failures, ...page } =
 			await context.automation.searchEntries(
 				"source",
 				{
 					resourceTypes: input.resourceTypes,
 					samplesPerArchive: input.samplesPerArchive,
+					onUnrecognized: (file) => unrecognized.push(file),
 					recursive: input.recursive,
 					maxDepth: input.maxDepth,
 					limit: input.limit,

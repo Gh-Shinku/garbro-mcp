@@ -118,6 +118,7 @@ export interface ScanFailure {
 }
 
 interface DirectoryPageOptions {
+	onUnrecognized?: (file: UnrecognizedResource) => void;
 	path?: string;
 	recursive?: boolean;
 	includeGlobs?: readonly string[];
@@ -673,12 +674,7 @@ export class ArchiveAutomationService {
 		const archives = items.flatMap(({ source, value }) =>
 			value && value.matchedTotal > 0 ? [{ source, ...value }] : [],
 		);
-		const unrecognized = items.flatMap(({ source, value }) =>
-			value === undefined
-				? [{ source, diagnosis: this.#diagnoseUnrecognized(source.path) }]
-				: [],
-		);
-		return { ...page, archives, unrecognized };
+		return { ...page, archives };
 	}
 
 	async #visitDirectoryPage<T>(
@@ -794,7 +790,14 @@ export class ArchiveAutomationService {
 			const source = { rootId, path: file.rootRelative };
 			if (result instanceof GarbroError)
 				failures.push({ source, error: result });
-			else items.push({ source, value: result });
+			else {
+				items.push({ source, value: result });
+				if (result === undefined)
+					options.onUnrecognized?.({
+						source,
+						diagnosis: this.#diagnoseUnrecognized(source.path),
+					});
+			}
 		}
 		const complete = normalizedStart + page.length >= files.length;
 		return {
