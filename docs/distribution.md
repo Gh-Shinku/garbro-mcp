@@ -19,8 +19,8 @@ configuration can use `npx` with `--yes` and `garbro-mcp@<version>` as arguments
 `npx.cmd` if the client does not resolve command shims. Pinning avoids unreviewed automatic updates.
 
 Alternatively, download the portable ZIP and matching `SHA256SUMS` from a specific
-[GitHub release](https://github.com/Gh-Shinku/garbro-mcp/releases). These assets must be uploaded by a
-maintainer first; GitHub's automatically generated source archives are not portable builds.
+[GitHub release](https://github.com/Gh-Shinku/garbro-mcp/releases). Use the asset named
+`garbro-mcp-<version>-portable.zip`.
 
 Verify the ZIP's hash against its line in `SHA256SUMS`:
 
@@ -72,7 +72,7 @@ pnpm build:release --version 0.1.0-experimental.1
 pnpm test:release --version 0.1.0-experimental.1
 ```
 
-Without a version argument, both commands use `0.0.0-dev.0` from `distribution/package.json`.
+Without a version argument, both commands use the version in `distribution/package.json`.
 The build generates these ignored artifacts under `dist/release/`:
 
 - `garbro-mcp-<version>-portable.zip`: portable directory containing the bundle, manifest, README,
@@ -93,7 +93,38 @@ tools, planning, CP932 decoding, extraction and verification hashes, progress no
 conflict skipping, and path confinement, then removes the temporary test directories. It also
 verifies npm's generated executable and identical package contents.
 
-## Manual prerelease workflow
+## CI releases
+
+On pushes to `main`, **Prepare or publish releases** runs the Linux and Windows checks. Release
+Please uses Conventional Commits across the repository to open or update one version PR for
+`garbro-mcp`. Review the version, changelog, and checks before merging that PR. The CI release
+line starts from npm's `0.1.0-beta.1` and publishes subsequent betas under `next`.
+
+### Set up publication
+
+1. Allow GitHub Actions to create pull requests in the repository's Actions settings, or provide
+   a repository secret named `PAT_TOKEN` with repository contents, issues, and pull request
+   write access. The workflow falls back to `GITHUB_TOKEN`. If the bot PR has no checks,
+   dispatch **Check** on its head branch and verify the tested SHA.
+2. In npm's Trusted Publisher settings for `garbro-mcp`, select GitHub Actions and enter owner
+   `Gh-Shinku`, repository `garbro-mcp`, and workflow filename `publish.yml`. Leave the environment
+   blank. The publish job authenticates through OIDC.
+3. Set the Actions **variable** `NPM_PUBLISH_ENABLED` to `true` before merging the version PR
+   intended for publication. With the variable unset, CI still prepares the version PR.
+
+Merging the version PR with publication enabled creates a tag such as `v0.1.0-beta.2` and a
+draft GitHub release. CI builds once at the tagged commit, then tests the same ZIP and npm
+tarball on Linux, Windows, and macOS. It uploads the four assets to the draft, publishes the
+tested tarball to npm with provenance, and makes the GitHub release public.
+
+If publication fails, rerun the failed jobs of the original run to reuse its tested artifacts.
+CI skips existing npm versions and GitHub assets only when their digests match. Rebuilding can
+change the build timestamp and archive bytes. A later push to `main` cannot publish the old tag.
+
+See the [npm Trusted Publisher setup](https://docs.npmjs.com/trusted-publishers/) and
+[Release Please Action documentation](https://github.com/googleapis/release-please-action).
+
+## Manual experimental builds
 
 Run **Experimental release** in GitHub Actions with a new prerelease version such as
 `0.1.0-experimental.1`:
@@ -104,15 +135,5 @@ Run **Experimental release** in GitHub Actions with a new prerelease version suc
    macOS artifact smoke checks pass does the workflow create a GitHub prerelease at the tested
    commit. Existing tags are rejected rather than overwritten or reused.
 
-The workflow never invokes registry publication. Publish the already tested `.tgz` separately with
-an npm account protected by two-factor authentication:
-
-```shell
-npm login --registry=https://registry.npmjs.org/
-npm publish dist/release/garbro-mcp-<version>.tgz --access public --tag next
-```
-
-Use the `next` tag for prereleases and omit `--tag next` for a stable release. Internal workspace
-packages do not need to be published independently. After the first manual release, configure npm
-Trusted Publishing for a dedicated GitHub Actions workflow instead of storing a long-lived npm
-token.
+Use the `experimental.N` suffix for these GitHub-only builds so their tags stay distinct from the
+automated beta releases.
