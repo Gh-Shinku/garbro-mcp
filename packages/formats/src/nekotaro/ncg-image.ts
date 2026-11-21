@@ -1,13 +1,13 @@
 // Format reference: GARBro "Legacy/Nekotaro/ImageNCG.cs", class `NcgFormat` with the `NcgReader` beside it.
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
-import { GarbroError } from "@garbro-mcp/core";
+import { Readable } from "node:stream";
 import type {
 	ArchiveFormat,
 	ByteSource,
 	FormatDescriptor,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
+import { GarbroError } from "@garbro-mcp/core";
 import { writeBmp8Palette } from "../shared/bmp.js";
 import { changeExtension } from "../shared/companion.js";
 import {
@@ -59,14 +59,38 @@ function invalidImage(message: string): GarbroError {
 	return new GarbroError("INVALID_ARCHIVE", message);
 }
 
-/**
- * `NcgFormat.ReadMetaData`: every value of the head stands in its own unit - the place in eights and twos,
- * the size in eights and twos - and the picture has to fit the screen it was drawn for. The reference tells
- * this picture by a word of its own and by **nothing at all**, which is why its own list of words carries a
- * second, empty entry; this port asks for the shape of the head alone, as that empty entry does.
- */
+// The MPEG pack start code doubles as the NCG geometry for an 8 x 372 image.
+// Check the pack header markers and the start code at the next packet boundary.
+function startsWithMpegPack(data: Buffer): boolean {
+	if (data.readUInt32BE(0) !== 0x000001ba) return false;
+	const flags = data.readUInt8(4);
+	let nextPacket: number;
+	if ((flags & 0xf1) === 0x21) {
+		if (
+			(data.readUInt8(6) & data.readUInt8(8) & data.readUInt8(11) & 1) === 0 ||
+			(data.readUInt8(9) & 0x80) === 0
+		)
+			return false;
+		nextPacket = 12;
+	} else if ((flags & 0xc4) === 0x44) {
+		const stuffing = data.readUInt8(13);
+		if (
+			(data.readUInt8(6) & data.readUInt8(8) & 4) === 0 ||
+			(data.readUInt8(9) & 1) === 0 ||
+			(data.readUInt8(12) & 3) !== 3 ||
+			(stuffing & 0xf8) !== 0xf8
+		)
+			return false;
+		nextPacket = 14 + (stuffing & 7);
+	} else return false;
+	const startCode = data.readUInt32BE(nextPacket);
+	return startCode >= 0x000001b9 && startCode <= 0x000001ff;
+}
+
+/** GARBro NcgFormat.ReadMetaData geometry, with a probe for an overlapping MPEG pack header. */
 export function readNcgLayout(data: Buffer): NcgLayout | undefined {
 	if (data.length < HEAD_SIZE + PALETTE_BYTES) return undefined;
+	if (startsWithMpegPack(data)) return undefined;
 	const offsetX = (data[0] ?? 0) * LEFT_UNIT;
 	const offsetY = (data[1] ?? 0) * TOP_UNIT;
 	const width = (data[2] ?? 0) * WIDE_UNIT;
@@ -314,8 +338,12 @@ export function unpackNcg(data: Buffer, layout: NcgLayout): Buffer {
 	return pixels;
 }
 
-async function readStored(source: ByteSource): Promise<Buffer> {
-	return Buffer.from(await source.readAt(0n, Number(source.size)));
+async function probeNcgLayout(
+	source: ByteSource,
+): Promise<NcgLayout | undefined> {
+	const length = HEAD_SIZE + PALETTE_BYTES;
+	if (source.size < BigInt(length)) return undefined;
+	return readNcgLayout(await source.readAt(0n, length));
 }
 
 export const ncgImageDescriptor: FormatDescriptor = {
@@ -341,16 +369,13 @@ export const ncgImageDescriptor: FormatDescriptor = {
 
 export const ncgImageFormat: ArchiveFormat = defineFixedArchive({
 	descriptor: ncgImageDescriptor,
-	// A picture of this engine writes no word of its own at all: the reference lists a signature of
-	// **nothing** beside the word it sometimes carries, which makes every file a candidate that the shape of
-	// the head then settles. This port keeps that, as the project's other signatureless formats do.
+	// GARBro also accepts signatureless pictures. Probe them after signed formats.
 	detection: { signatures: [], priority: -1 },
 	async detect(source: ByteSource): Promise<boolean> {
-		if (source.size < BigInt(HEAD_SIZE + PALETTE_BYTES)) return false;
-		return readNcgLayout(await readStored(source)) !== undefined;
+		return (await probeNcgLayout(source)) !== undefined;
 	},
 	async read(source: ByteSource, sourcePath: string) {
-		const layout = readNcgLayout(await readStored(source));
+		const layout = await probeNcgLayout(source);
 		if (!layout) throw invalidImage("Not a Nekotaro Game System picture");
 		const entry: FixedEntry = {
 			...createFixedEntry({
@@ -385,7 +410,7 @@ export const ncgImageFormat: ArchiveFormat = defineFixedArchive({
 		};
 	},
 	async openEntry(source: ByteSource) {
-		const stored = await readStored(source);
+		const stored = await source.readAt(0n, Number(source.size));
 		const layout = readNcgLayout(stored);
 		if (!layout) throw invalidImage("Not a Nekotaro Game System picture");
 		return Readable.from([

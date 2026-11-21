@@ -1,14 +1,14 @@
 import { Buffer } from "node:buffer";
-import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
 import { buffer as consumeBuffer } from "node:stream/consumers";
-import { describe, expect, it } from "vitest";
-import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
+import { BufferByteSource, GarbroError } from "@garbro-mcp/core";
+import { describe, expect, it, vi } from "vitest";
 import {
 	ncgImageFormat,
 	readNcgLayout,
 	readNcgPalette,
 	unpackNcg,
 } from "../../packages/formats/src/nekotaro/ncg-image.js";
+import { readBmpImage } from "../../packages/formats/src/shared/bmp.js";
 
 const HEAD_SIZE = 4;
 const PALETTE_BYTES = 16 * 3;
@@ -171,7 +171,53 @@ describe("Nekotaro Game System image", () => {
 		await expect(extract(short)).rejects.toThrow(GarbroError);
 	});
 
-	it("tells a picture by the shape of its head alone", async () => {
+	it.each([
+		["MPEG-1", "000001ba 2100010001 800003 000001bb"],
+		["MPEG-2 with stuffing", "000001ba 440004000401 000007 fb ffffff 000001e0"],
+	])(
+		"rejects a %s pack whose start code also encodes valid NCG dimensions",
+		async (_, header) => {
+			const data = Buffer.alloc(2048, 0xff);
+			Buffer.from(header.replaceAll(" ", ""), "hex").copy(data);
+			const source = new BufferByteSource(data);
+			const read = vi.spyOn(source, "readAt");
+			expect(await ncgImageFormat.detect(source, "renamed.ncg")).toBe(false);
+			await expect(ncgImageFormat.open(source, "renamed.ncg")).rejects.toThrow(
+				GarbroError,
+			);
+			expect(read.mock.calls).toEqual([
+				[0n, HEAD_SIZE + PALETTE_BYTES],
+				[0n, HEAD_SIZE + PALETTE_BYTES],
+			]);
+		},
+	);
+
+	it("accepts a signatureless NCG with the same first four bytes as an MPEG pack", async () => {
+		const data = buildNcg({
+			width: 8,
+			height: 372,
+			tail: [
+				...NONE,
+				...NONE,
+				END,
+				...NONE,
+				END,
+				...Buffer.alloc((8 * 372) / 2),
+			],
+		});
+		expect(data.readUInt32BE(0)).toBe(0x000001ba);
+		// The palette mimics even the MPEG-1 marker bits, but no packet follows.
+		Buffer.from("2100010001800003", "hex").copy(data, HEAD_SIZE);
+		expect(
+			await ncgImageFormat.detect(new BufferByteSource(data), "renamed.mpg"),
+		).toBe(true);
+		expect(readBmpImage(await extract(data))).toMatchObject({
+			width: 8,
+			height: 372,
+		});
+	});
+
+	it("recognizes an ordinary NCG header and checks the screen bounds", async () => {
 		const data = buildNcg({
 			width: 8,
 			height: 2,
