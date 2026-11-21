@@ -314,9 +314,12 @@ stand it, as do the rows listed as gap 2 of `docs/status.md`.
   a writer ported from the encoder the same file carries as a comment stood of the same counts of the model
   as the reader over three thousand counts of a walk of the engine, and yet the two stood apart on coded
   blocks, the block sizes coming back as a count or two places of the file short, as if the two stood one
-  place of the file apart. That port stood of no count of its own, so it stands turned away; a later attempt
-  should start from the published qscoder of Michael Schindler, or from a real archive of that kind as the
-  count to stand against.
+  place of the file apart. That port stood of no count of its own, so it stood turned away. **It stands
+  ported now**, as `packages/formats/src/hypatia/cocotte.ts` (the `hypack` row): the walk of the block loop
+  and of the two transforms stands of the reference, and the walk of the range coder and of the frequency
+  model stands of the published qscoder of Michael Schindler, whose own encoder supplied the count the
+  earlier attempt lacked - three streams written by it anchor the tests, and a writer of the tests was held
+  against it. See `docs/formats/hypack.md`.
 
 * **something outside the file** - **4 rows**: `DAT/IGS` (an SQLite database beside the archive),
   `DAT/hibiki` (a scheme in a data file of the reference's own installation), and `BYTES/UNITY` with

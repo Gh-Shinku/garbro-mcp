@@ -12,6 +12,7 @@ import {
 	type FormatDescriptor,
 } from "@garbro-mcp/core";
 import { Readable } from "node:stream";
+import { decompressCocotte } from "./cocotte.js";
 import { decompressMariel } from "./mariel.js";
 
 const HYPACK_SIGNATURE = Buffer.from("HyPack", "ascii");
@@ -167,12 +168,6 @@ class HyPackArchiveHandle implements ArchiveHandle {
 		if (entry.compressionType === 0 || entry.compressionType > 3) {
 			return this.#source.createReadStream(entry.offset, entry.packedSize);
 		}
-		if (entry.compressionType === 2) {
-			throw new GarbroError(
-				"UNSUPPORTED_FEATURE",
-				`Cocotte-compressed HyPack entry is not supported: ${entry.path}`,
-			);
-		}
 		const data = await this.#source.readAt(
 			entry.offset,
 			bigintToBufferLength(entry.packedSize, "HyPack entry"),
@@ -182,6 +177,14 @@ class HyPackArchiveHandle implements ArchiveHandle {
 				data[index] = (data[index] ?? 0) ^ 0xff;
 			}
 			return Readable.from([data]);
+		}
+		if (entry.compressionType === 2) {
+			return Readable.from([
+				decompressCocotte(
+					data,
+					bigintToBufferLength(entry.size, "Cocotte output"),
+				),
+			]);
 		}
 		return Readable.from([
 			decompressMariel(data, bigintToBufferLength(entry.size, "Mariel output")),
