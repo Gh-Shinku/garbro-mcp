@@ -23,55 +23,19 @@ env:
   RELEASE_VERSION: ${{ inputs.version }}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.26.0
-          run_install: false
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm test
-      - name: Build fixed-version artifacts
-        run: node scripts/build-release.mjs --version "$RELEASE_VERSION" --prerelease
-      - uses: actions/upload-artifact@v4
-        with:
-          name: experimental-release
-          path: dist/release/garbro-mcp-*
-          if-no-files-found: error
+  checks:
+    uses: ./.github/workflows/check.yml
 
-  smoke:
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.26.0
-          run_install: false
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: experimental-release
-          path: dist/release
-      - name: Verify portable and offline npm installations
-        shell: bash
-        run: node scripts/test-release.mjs --version "$RELEASE_VERSION"
+  artifacts:
+    needs: checks
+    uses: ./.github/workflows/release-artifacts.yml
+    with:
+      version: ${{ inputs.version }}
+      prerelease: true
+      artifact-name: experimental-release
 
   publish:
-    needs: [build, smoke]
+    needs: artifacts
     if: inputs.publish && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

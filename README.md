@@ -10,7 +10,7 @@ codecs documented by [GARBro](https://github.com/morkt/GARBro).
 
 > [!WARNING]
 > This project is under active development. Format coverage, extraction behavior, and MCP contracts
-> may change between experimental releases.
+> may change between releases in the 0.1.x series.
 
 ## Key features
 
@@ -64,8 +64,7 @@ Configure your MCP client to start the same command over stdio:
 ```
 
 On Windows, use `npx.cmd` if the MCP client does not resolve command shims. For reproducible
-environments, pin an exact release such as `garbro-mcp@0.1.0-beta.1` instead of following the
-`latest` tag.
+environments, replace `latest` with the version printed by `--version`.
 
 Global npm installation and versioned portable bundles remain available for offline or
 centrally-managed environments. See [distribution](docs/distribution.md) for those alternatives.

@@ -1,0 +1,69 @@
+name: Build and test release artifacts
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      prerelease:
+        default: false
+        type: boolean
+      artifact-name:
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_VERSION: ${{ inputs.version }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Package release
+        env:
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          args=(--version "$RELEASE_VERSION")
+          if [[ "$PRERELEASE" == true ]]; then args+=(--prerelease); fi
+          node scripts/build-release.mjs "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name || format('garbro-mcp-{0}', inputs.version) }}
+          path: dist/release/garbro-mcp-*
+          if-no-files-found: error
+
+  smoke:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name || format('garbro-mcp-{0}', inputs.version) }}
+          path: dist/release
+      - name: Verify portable and offline npm installations
+        shell: bash
+        run: node scripts/test-release.mjs --version "$RELEASE_VERSION"

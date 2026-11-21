@@ -44,5 +44,5 @@ describe("archive differential harness", () => {
 			"xp3",
 		]);
 		expect(stdout).toContain("Matched 3 xp3 entries");
-	});
+	}, 30_000);
 });

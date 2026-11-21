@@ -16,7 +16,8 @@ The MCP layer must remain thin. Core parsing and extraction logic must not depen
 
 ## Contribution Guidelines
 
-Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit messages and commit discipline.
+Follow [CONTRIBUTING.md](CONTRIBUTING.md) for topic branches, PR scope, and commit messages.
+Keep related commits on the same branch for review in one ordinary PR to `main`.
 
 ## Test Scope
 
@@ -43,5 +44,5 @@ When implementing a format, follow this order:
 7. Compare against GARBro.
 8. Run scoped lint, typecheck, and relevant tests.
 9. Review the diff for unrelated changes.
-10. Commit according to `CONTRIBUTING.md`.
+10. Commit each completed step on the topic branch and group the format work in one PR.
 ```

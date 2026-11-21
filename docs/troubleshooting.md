@@ -2,10 +2,10 @@
 
 ## The server does not start
 
-Run the exact configured package manually:
+Run the configured package manually. If your client pins a version, substitute it for `latest`.
 
 ```powershell
-npx --yes garbro-mcp@0.1.0-beta.1 --version --json
+npx --yes garbro-mcp@latest --version --json
 ```
 
 garbro-mcp requires Node.js 24 or newer. On Windows, use `npx.cmd` if the MCP client does not resolve

@@ -5,7 +5,7 @@
 - GARbro reference: `ArcFormats/KiriKiri/ArcXP3.cs`
 - Pinned commit: `b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0`
 - GARbro author and copyright: Copyright (c) 2014-2020 morkt
-- License: MIT; the complete text is retained in the root `LICENSE` file
+- License: [GARBro's MIT license](../../THIRD_PARTY_NOTICES.md#garbro)
 - Official KiriKiri cross-reference: [`base/XP3Archive.cpp`](https://github.com/krkrz/krkrz/blob/master/base/XP3Archive.cpp)
 
 The implementation was written after analyzing the binary structure and observable behavior. It

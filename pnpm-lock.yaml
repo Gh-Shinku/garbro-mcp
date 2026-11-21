@@ -262,7 +262,11 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0
 
-  packages/codecs: {}
+  packages/codecs:
+    dependencies:
+      '@garbro-mcp/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/core:
     dependencies:
