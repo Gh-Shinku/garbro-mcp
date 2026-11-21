@@ -29,6 +29,7 @@ import * as z from "zod/v4";
 import { BUILD_IDENTITY } from "./build.js";
 import { MAX_RESPONSE_BYTES, toolResult } from "./context.js";
 import { directoryDiagnostics } from "./diagnostics.js";
+import { registerFormatCatalog } from "./format-catalog.js";
 import { inspectSnapshot, unrecognizedSnapshot } from "./inspect-page.js";
 import {
 	DEFAULT_PAGE_BYTES,
@@ -63,6 +64,8 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
 To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. For scan and search, submit another task with cursor set to nextCursor to examine more files. Use get_task with resultCursor to read more saved results from either task. For inspect, use get_task with resultCursor to read the saved inspection page before using nextOffset or nextGroupOffset to inspect more entries or groups.
+
+For supported readers, read garbro://formats/by-extension/{extension} or garbro://formats/by-id/{id}.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -668,36 +671,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		}),
 	);
 
-	server.registerResource(
-		"format-catalog",
-		"garbro://formats",
-		{
-			title: "garbro-mcp format catalog",
-			description:
-				"Implemented formats, support status, and known limitations.",
-			mimeType: "application/json",
-		},
-		async (uri) => ({
-			contents: [
-				{
-					uri: uri.href,
-					mimeType: "application/json",
-					text: JSON.stringify(
-						registry.listFormats().map((format) => ({
-							id: format.id,
-							name: format.name,
-							extensions: [...format.extensions],
-							capabilities: format.capabilities,
-							attribution: format.attribution,
-							support: supportById.get(format.id),
-						})),
-						null,
-						2,
-					),
-				},
-			],
-		}),
-	);
+	registerFormatCatalog(server, registry, supportById);
 
 	const runScan = async (
 		input: z.infer<typeof scanTaskSchema>,
