@@ -464,6 +464,132 @@ describe("MCP task server", () => {
 		});
 	});
 
+	it("reads the saved inspect window without reopening the archive or advancing its offsets", async () => {
+		const { client, root } = await connect();
+		const path = resolve(root, "basic.xp3");
+		const response = await client.callTool({
+			name: "submit_task",
+			arguments: {
+				task: {
+					type: "inspect",
+					source: { path },
+					limit: 2,
+					browse: { by: "directory" },
+					includeMetadata: true,
+					maxResponseBytes: 3072,
+				},
+				waitMs: 5000,
+			},
+		});
+		const taskId = structured(response).taskId;
+		function page(r: typeof response, budget: number) {
+			expect(r.content).toEqual([
+				{ type: "text", text: JSON.stringify(r.structuredContent) },
+			]);
+			expect(Buffer.byteLength(JSON.stringify(r))).toBeLessThanOrEqual(budget);
+			return structured(r).result as {
+				resultCursor: string | null;
+				metadata: Record<string, unknown>;
+				entries: {
+					nextOffset: number;
+					entries: unknown[];
+					overview: {
+						samples: { extractSource: unknown }[];
+						groups: unknown[];
+						nextGroupOffset: number | null;
+					};
+				};
+			};
+		}
+		const first = page(response, 3072);
+		const sample = first.entries.overview.samples[0];
+		if (!sample || !first.resultCursor)
+			throw new Error("Expected an extractable first page and a saved cursor");
+		const extracted = await waitForTask(
+			client,
+			await submit(client, {
+				type: "extract",
+				sources: [sample.extractSource],
+			}),
+		);
+		expect(extracted).toMatchObject({
+			state: "completed",
+			result: { samples: [{ verificationStatus: "verified" }] },
+		});
+		await writeFile(path, "source changed after inspection");
+		const read = (options: Record<string, unknown>) =>
+			client.callTool({ name: "get_task", arguments: { taskId, ...options } });
+		const full = page(await read({ maxResponseBytes: 65536 }), 65536);
+		expect(full.resultCursor).toBeNull();
+		expect(full.entries.nextOffset).toBe(2);
+		const pages = [first];
+		let cursor: string | null = first.resultCursor;
+		const visited = new Set<string>();
+		while (cursor) {
+			expect(visited.has(cursor)).toBe(false);
+			visited.add(cursor);
+			const next = page(await read({ resultCursor: cursor, limit: 1 }), 3072);
+			expect(next.entries.nextOffset).toBe(2);
+			expect(next.entries.overview.nextGroupOffset).toBe(
+				full.entries.overview.nextGroupOffset,
+			);
+			pages.push(next);
+			cursor = next.resultCursor;
+		}
+		expect(pages.flatMap((p) => p.entries.entries)).toEqual(
+			full.entries.entries,
+		);
+		expect(pages.flatMap((p) => p.entries.overview.groups)).toEqual(
+			full.entries.overview.groups,
+		);
+		expect(pages.flatMap((p) => p.entries.overview.samples)).toEqual(
+			full.entries.overview.samples,
+		);
+		expect(Object.assign({}, ...pages.map((p) => p.metadata))).toEqual(
+			full.metadata,
+		);
+	});
+
+	it("keeps unrecognized inspect diagnoses and paginates their candidate readers", async () => {
+		const { client, root } = await connect();
+		const path = resolve(root, "unknown.dat");
+		await writeFile(path, "unrecognized data");
+		const taskId = await submit(client, { type: "inspect", source: { path } });
+		const read = (options: Record<string, unknown>) =>
+			client.callTool({ name: "get_task", arguments: { taskId, ...options } });
+		const snapshot = structured(await read({ maxResponseBytes: 65536 }));
+		expect(snapshot).toMatchObject({
+			state: "failed",
+			result: { recognized: false, resultCursor: null },
+		});
+		const expected = (
+			snapshot.result as { diagnosis: { candidateFormatIds: string[] } }
+		).diagnosis.candidateFormatIds;
+		expect(expected.length).toBeGreaterThan(1);
+		const response = await read({ limit: 1 });
+		expect(response.content).toEqual([
+			{ type: "text", text: JSON.stringify(response.structuredContent) },
+		]);
+		const page = structured(response).result as {
+			resultCursor: string;
+			diagnosis: { candidateFormatIds: string[] };
+		};
+		expect(page.diagnosis.candidateFormatIds).toEqual(expected.slice(0, 1));
+		expect(
+			structured(
+				await read({
+					resultCursor: page.resultCursor,
+					maxResponseBytes: 65536,
+				}),
+			),
+		).toMatchObject({
+			result: {
+				resultCursor: null,
+				diagnosis: { candidateFormatIds: expected.slice(1) },
+			},
+		});
+	});
+
 	it("completes fast work during the submission window", async () => {
 		const { client, root } = await connect();
 		const response = await client.callTool({

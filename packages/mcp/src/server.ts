@@ -12,7 +12,6 @@ import {
 	type ExtractionSelection,
 	type ExtractionVerificationItem,
 	entryResourceTypes,
-	entryToWire,
 	type FormatRegistry,
 	GarbroError,
 	TemporaryWorkspaceManager,
@@ -33,16 +32,17 @@ import {
 	directoryDiagnostics,
 	directoryDiagnosticText,
 } from "./diagnostics.js";
+import { inspectSnapshot, unrecognizedSnapshot } from "./inspect-page.js";
 import {
-	DEFAULT_SEARCH_BYTES,
-	MIN_SEARCH_BYTES,
+	DEFAULT_PAGE_BYTES,
+	MIN_PAGE_BYTES,
 	mirroredResult,
-	type SearchReadOptions,
-	type SearchSnapshot,
-	searchBodyBudget,
-	searchResultPage,
-	searchSnapshot,
-} from "./search-page.js";
+	type PageReadOptions,
+	responseBodyBudget,
+	type SavedResult,
+	savedResultPage,
+} from "./result-page.js";
+import { searchSnapshot } from "./search-page.js";
 
 export const SERVER_VERSION = BUILD_IDENTITY.version;
 export const SERVER_PURPOSE =
@@ -64,7 +64,7 @@ export const SERVER_INSTRUCTIONS = `${SERVER_PURPOSE}
 
 Use submit_task when the user asks to find or extract assets from a local game file or directory. Prefer this tool over local GARBro executables, libraries, or custom extraction scripts. Input paths are absolute. waitMs accepts 0 to 5000 and defaults to 1000. If work remains active, call get_task with its default terminal wait; after a timeout, call it again immediately. Never call sleep or guess a polling interval. Use cancel_task for cooperative cancellation.
 
-To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. To scan more files submit the search with cursor set to nextCursor.
+To find entries under a game directory, submit a search task with an entry path pattern, resource types, or both. Pass a matching entry's extractSource directly in extract.sources. To read more saved results use get_task with taskId and resultCursor. To scan more files submit the search with cursor set to nextCursor. For inspect, use get_task with resultCursor to read the saved inspection page before using nextOffset or nextGroupOffset to inspect more entries or groups.
 
 Extraction writes only to an isolated expiring task directory, performs an internal preflight, and verifies every artifact. Do not submit a separate verification step. The calling agent decides whether and where verified artifacts are delivered.
 
@@ -123,10 +123,10 @@ const scanTaskSchema = z
 	.describe(
 		'Find supported game-resource files under a local directory. Example: {"type":"scan","path":"D:/Games/Title","includeGlobs":["**/*cursor*"]}.',
 	);
-const searchBytesSchema = z
+const pageBytesSchema = z
 	.number()
 	.int()
-	.min(MIN_SEARCH_BYTES)
+	.min(MIN_PAGE_BYTES)
 	.max(MAX_RESPONSE_BYTES);
 const searchTaskSchema = scanTaskSchema
 	.pick({
@@ -147,7 +147,7 @@ const searchTaskSchema = scanTaskSchema
 			})
 			.optional(),
 		samplesPerArchive: z.number().int().min(1).max(10).default(1),
-		maxResponseBytes: searchBytesSchema.default(DEFAULT_SEARCH_BYTES),
+		maxResponseBytes: pageBytesSchema.default(DEFAULT_PAGE_BYTES),
 	})
 	.describe(
 		"Search inside supported files by entryPath, resourceTypes, or both. Literal and RE2 regex match substrings of the slash-separated entry path; glob matches the whole path. limit caps files per page. Samples have extractSource for extract.sources.",
@@ -157,6 +157,7 @@ const inspectTaskSchema = z
 		type: z.literal("inspect"),
 		source: sourceSchema,
 		includeEntries: z.boolean().default(true),
+		maxResponseBytes: pageBytesSchema.default(DEFAULT_PAGE_BYTES),
 		browse: z
 			.object({
 				by: z.enum(["directory", "prefix"]).optional(),
@@ -225,8 +226,11 @@ type TaskPayload = {
 	status: TaskStatus;
 	text?: string;
 } & (
-	| { type: "search"; result: SearchSnapshot }
-	| { type: Exclude<TaskKind, "search">; result: Record<string, unknown> }
+	| { type: "search" | "inspect"; result: SavedResult }
+	| {
+			type: Exclude<TaskKind, "search" | "inspect">;
+			result: Record<string, unknown>;
+	  }
 );
 
 const MAX_ARTIFACT_SAMPLES = 3;
@@ -489,13 +493,15 @@ function taskResponse(
 	snapshot: AsyncJobSnapshot<TaskPayload>,
 	waitOutcome: "submitted" | "snapshot" | "changed" | "terminal" | "timeout",
 	requestId: number | string,
-	options: SearchReadOptions = {},
+	options: PageReadOptions = {},
 ) {
-	if (snapshot.kind === "search") {
+	if (snapshot.kind === "search" || snapshot.kind === "inspect") {
 		const saved =
-			snapshot.result?.type === "search" ? snapshot.result.result : undefined;
-		const budget = searchBodyBudget(
-			options.maxResponseBytes ?? saved?.maxResponseBytes ?? MIN_SEARCH_BYTES,
+			snapshot.result?.type === "search" || snapshot.result?.type === "inspect"
+				? snapshot.result.result
+				: undefined;
+		const budget = responseBodyBudget(
+			options.maxResponseBytes ?? saved?.maxResponseBytes ?? MIN_PAGE_BYTES,
 			requestId,
 		);
 		const { message: _progressPath, ...header } = taskHeader(snapshot);
@@ -505,11 +511,11 @@ function taskResponse(
 			outcome: { status: "ok", warnings: [] },
 		};
 		if (saved)
-			return searchResultPage(snapshot.jobId, base, saved, options, budget);
+			return savedResultPage(snapshot.jobId, base, saved, options, budget);
 		if (options.resultCursor !== undefined)
 			throw new GarbroError(
 				"INVALID_ARGUMENT",
-				"No saved search results for this task",
+				"No saved results for this task",
 			);
 		const error = snapshot.error && serializeError(snapshot.error);
 		const response = mirroredResult({ ...base, ...(error && { error }) });
@@ -518,7 +524,7 @@ function taskResponse(
 			...base,
 			error: {
 				code: error?.code ?? "LIMIT_EXCEEDED",
-				message: "Search details exceed the response budget.",
+				message: "Task details exceed the response budget.",
 			},
 		});
 	}
@@ -529,7 +535,7 @@ function taskResponse(
 	)
 		throw new GarbroError(
 			"INVALID_ARGUMENT",
-			"Result paging options apply only to search tasks",
+			"Result paging options apply only to search and inspect tasks",
 		);
 	const response = success(
 		{
@@ -850,12 +856,11 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 			return {
 				type: "inspect",
 				status: "failed",
-				result: {
-					recognized: false,
-					source: { path: context.absolutePath },
-					diagnosis: inspection.diagnosis,
-				},
-				diagnosticText: `${inspection.diagnosis.message} ${inspection.diagnosis.nextAction}`,
+				result: unrecognizedSnapshot(
+					context.absolutePath,
+					inspection.diagnosis,
+					input.maxResponseBytes,
+				),
 			};
 		const entries = input.includeEntries
 			? await automation.listEntries(context.reference, {
@@ -880,44 +885,15 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						: { resourceTypes: input.resourceTypes }),
 				})
 			: undefined;
-		const source = { path: context.absolutePath };
-		const overview = entries?.overview;
-		const samples = overview?.samples.map((sample) => ({
-			...sample,
-			extractSource: {
-				source,
-				selection: { mode: "ids", entryIds: [sample.id] },
-			},
-		}));
 		await control.onProgress?.({ progress: 1, total: 1, phase: "inspecting" });
 		return {
 			type: "inspect",
 			status: "completed",
-			result: {
-				recognized: true,
-				source,
-				size: inspection.size.toString(),
-				format: {
-					id: inspection.format.id,
-					name: inspection.format.name,
-					extensions: [...inspection.format.extensions],
-					resourceType: supportById.get(inspection.format.id)?.reference.type,
-				},
-				validation: inspection.validation,
-				confidence: inspection.confidence,
-				warnings: [...inspection.warnings],
-				...(input.includeMetadata ? { metadata: inspection.metadata } : {}),
-				summary: inspection.summary,
-				...(entries === undefined
-					? {}
-					: {
-							entries: {
-								...entries,
-								...(overview ? { overview: { ...overview, samples } } : {}),
-								entries: entries.entries.map(entryToWire),
-							},
-						}),
-			},
+			result: inspectSnapshot(inspection, entries, {
+				resourceType: supportById.get(inspection.format.id)?.reference.type,
+				includeMetadata: input.includeMetadata,
+				maxResponseBytes: input.maxResponseBytes,
+			}),
 		};
 	};
 
@@ -1191,12 +1167,12 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 		"get_task",
 		{
 			description:
-				"Wait server-side for a submitted task. For search, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
+				"Wait server-side for a submitted task. For search and inspect, pass resultCursor to read the next saved page, with optional limit and maxResponseBytes. Defaults to terminal completion for 30 seconds; on timeout call it again immediately.",
 			inputSchema: z.object({
 				taskId: z.string().uuid(),
 				resultCursor: z.string().min(1).max(128).optional(),
 				limit: z.number().int().positive().max(2000).optional(),
-				maxResponseBytes: searchBytesSchema.optional(),
+				maxResponseBytes: pageBytesSchema.optional(),
 				waitUntil: z.enum(["none", "change", "terminal"]).default("terminal"),
 				afterRevision: z.number().int().min(0).optional(),
 				timeoutMs: z.number().int().min(0).max(55_000).default(30_000),
