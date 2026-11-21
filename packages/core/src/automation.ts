@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
-import { extname, matchesGlob, posix, relative, resolve, sep } from "node:path";
+import { extname, matchesGlob, relative, resolve, sep } from "node:path";
+import { Minimatch } from "minimatch";
 import { RE2JS } from "re2js";
 import {
 	type EntryBrowseOptions,
@@ -97,7 +98,13 @@ function compileEntryPath(filter: EntryPathFilter): (path: string) => boolean {
 	const needle = fold(normalized);
 	if (mode === "literal") return (path) => fold(path).includes(needle);
 	validateGlobs([normalized]);
-	return (path) => posix.matchesGlob(fold(path), needle);
+	const glob = new Minimatch(normalized, {
+		platform: "linux",
+		nocase: !caseSensitive,
+		nonegate: true,
+		nocomment: true,
+	});
+	return (path) => glob.match(path);
 }
 
 export interface ArchiveSummary {
