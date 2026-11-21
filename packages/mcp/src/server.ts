@@ -110,6 +110,16 @@ const inspectTaskSchema = z
 		type: z.literal("inspect"),
 		source: sourceSchema,
 		includeEntries: z.boolean().default(true),
+		browse: z
+			.object({
+				by: z.enum(["directory", "prefix"]).optional(),
+				key: z.string().optional(),
+				offset: z.number().int().nonnegative().optional(),
+			})
+			.describe(
+				"First entry page includes groups and spread samples. Reuse a group's browse selector to list its entries, or use browse.offset for more groups.",
+			)
+			.optional(),
 		includeMetadata: z.boolean().default(false),
 		includeGlobs: z.array(z.string()).max(32).optional(),
 		excludeGlobs: z.array(z.string()).max(32).optional(),
@@ -661,6 +671,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					caseSensitive: input.caseSensitive,
 					offset: input.offset,
 					limit: input.limit,
+					browse: input.browse ?? {},
 					...(input.includeGlobs === undefined
 						? {}
 						: { includeGlobs: input.includeGlobs }),
@@ -678,13 +689,22 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 						: { resourceTypes: input.resourceTypes }),
 				})
 			: undefined;
+		const source = { path: context.absolutePath };
+		const overview = entries?.overview;
+		const samples = overview?.samples.map((sample) => ({
+			...sample,
+			extractSource: {
+				source,
+				selection: { mode: "ids", entryIds: [sample.id] },
+			},
+		}));
 		await control.onProgress?.({ progress: 1, total: 1, phase: "inspecting" });
 		return {
 			type: "inspect",
 			status: "completed",
 			result: {
 				recognized: true,
-				source: { path: context.absolutePath },
+				source,
 				size: inspection.size.toString(),
 				format: {
 					id: inspection.format.id,
@@ -702,6 +722,7 @@ export function buildServer(options: BuildServerOptions = {}): McpServer {
 					: {
 							entries: {
 								...entries,
+								...(overview ? { overview: { ...overview, samples } } : {}),
 								entries: entries.entries.map(entryToWire),
 							},
 						}),

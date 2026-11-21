@@ -178,6 +178,56 @@ describe("MCP task server", () => {
 		});
 	});
 
+	it("browses filtered groups beyond the flat entry page and extracts a returned sample", async () => {
+		const { client, root } = await connect();
+		const task = {
+			type: "inspect",
+			source: { path: resolve(root, "basic.xp3") },
+			resourceTypes: ["script"],
+			limit: 1,
+		};
+		const first = await waitForTask(client, await submit(client, task));
+		const { entries } = first.result as {
+			entries: { overview: { groups: Array<{ browse: unknown }> } };
+		};
+		expect(entries).toMatchObject({
+			matchedTotal: 2,
+			nextOffset: 1,
+			overview: {
+				groups: [
+					{ browse: { by: "directory", key: "" }, count: 1 },
+					{ browse: { by: "directory", key: "scripts" }, count: 1 },
+				],
+				samples: [{ id: "0" }, { id: "1" }],
+			},
+		});
+		const selected = await waitForTask(
+			client,
+			await submit(client, {
+				...task,
+				browse: entries.overview.groups[1]?.browse,
+			}),
+		);
+		const group = selected.result as {
+			entries: { overview: { samples: Array<{ extractSource: unknown }> } };
+		};
+		expect(group.entries).toMatchObject({
+			matchedTotal: 1,
+			entries: [{ path: "scripts/startup.tjs" }],
+		});
+		const extracted = await waitForTask(
+			client,
+			await submit(client, {
+				type: "extract",
+				sources: [group.entries.overview.samples[0]?.extractSource],
+			}),
+		);
+		expect(extracted).toMatchObject({
+			state: "completed",
+			result: { extracted: 1, sources: [{ verification: { verified: 1 } }] },
+		});
+	});
+
 	it("completes fast work during the submission window", async () => {
 		const { client, root } = await connect();
 		const response = await client.callTool({

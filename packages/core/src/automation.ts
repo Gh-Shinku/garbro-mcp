@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { lstat, readdir, rmdir } from "node:fs/promises";
 import { extname, matchesGlob, relative, resolve, sep } from "node:path";
+import {
+	type EntryBrowseOptions,
+	entryBrowseOverview,
+	selectEntryGroup,
+} from "./entry-browse.js";
 import { asGarbroError, GarbroError } from "./errors.js";
 import {
 	extractEntry,
@@ -517,7 +522,11 @@ export class ArchiveAutomationService {
 
 	async listEntries(
 		source: InputReference,
-		options: EntryFilter & { offset?: number; limit?: number } = {},
+		options: EntryFilter & {
+			offset?: number;
+			limit?: number;
+			browse?: EntryBrowseOptions;
+		} = {},
 	): Promise<{
 		archiveTotal: number;
 		matchedTotal: number;
@@ -525,6 +534,7 @@ export class ArchiveAutomationService {
 		limit: number;
 		nextOffset: number | null;
 		entries: ArchiveEntry[];
+		overview?: ReturnType<typeof entryBrowseOverview>;
 	}> {
 		const offset = options.offset ?? 0;
 		const limit = options.limit ?? 100;
@@ -541,7 +551,10 @@ export class ArchiveAutomationService {
 			);
 		const resolved = await this.workspace.resolveInput(source, "file");
 		return await this.#withArchive(resolved.absolutePath, async (archive) => {
-			const matched = filterArchiveEntries(archive.entries, options);
+			const filtered = filterArchiveEntries(archive.entries, options);
+			const matched = options.browse
+				? selectEntryGroup(filtered, options.browse)
+				: filtered;
 			const entries = matched.slice(offset, offset + limit);
 			return {
 				archiveTotal: archive.entries.length,
@@ -553,6 +566,9 @@ export class ArchiveAutomationService {
 						? offset + entries.length
 						: null,
 				entries,
+				...(options.browse && offset === 0
+					? { overview: entryBrowseOverview(matched, options.browse) }
+					: {}),
 			};
 		});
 	}
