@@ -1,18 +1,18 @@
 // Format reference: GARbro ArcFormats/KiriKiri/ArcXP3.cs
 // GARbro commit b09ee4570ccb1daf6ac56710ee8934dc0b8baeb0, MIT License.
 
+import { Readable } from "node:stream";
 import { createZlibInflateStream, inflateZlibBuffer } from "@garbro-mcp/codecs";
 import {
-	bigintToBufferLength,
-	BufferCursor,
-	GarbroError,
 	type ArchiveEntry,
 	type ArchiveFormat,
 	type ArchiveHandle,
+	BufferCursor,
 	type ByteSource,
+	bigintToBufferLength,
 	type FormatDescriptor,
+	GarbroError,
 } from "@garbro-mcp/core";
-import { Readable } from "node:stream";
 
 const XP3_SIGNATURE = Buffer.from([
 	0x58, 0x50, 0x33, 0x0d, 0x0a, 0x20, 0x0a, 0x1a, 0x8b, 0x67, 0x01,
@@ -329,6 +329,7 @@ async function readIndices(
 }
 
 class Xp3ArchiveHandle implements ArchiveHandle {
+	readonly identityFromSourceBytes = true;
 	readonly format = xp3Descriptor;
 	readonly size: bigint;
 	readonly metadata: Record<string, unknown>;

@@ -58,6 +58,8 @@ export interface ArchiveEntry {
 }
 
 export interface ArchiveHandle {
+	/** Identical source bytes determine the entire index and payloads, independent of the file path. */
+	readonly identityFromSourceBytes?: boolean;
 	readonly sourcePath: string;
 	readonly format: FormatDescriptor;
 	readonly size: bigint;

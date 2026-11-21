@@ -15,6 +15,7 @@ import {
 } from "./extract.js";
 import type { FormatRegistry } from "./registry.js";
 import { type EntryResourceType, entryResourceType } from "./resource-type.js";
+import { uniqueSearchHits } from "./search-copies.js";
 import type {
 	ArchiveEntry,
 	ArchiveHandle,
@@ -594,7 +595,7 @@ export class ArchiveAutomationService {
 		options: DirectoryPageOptions & { includeUnrecognized?: boolean } = {},
 		control: AutomationControl = {},
 	): Promise<ScanResult> {
-		const { items, ...page } = await this.#visitDirectoryPage(
+		const { items, page } = await this.#visitDirectoryPage(
 			rootId,
 			options,
 			control,
@@ -645,7 +646,7 @@ export class ArchiveAutomationService {
 				"INVALID_ARGUMENT",
 				"Select at least one entry resource type",
 			);
-		const { items, ...page } = await this.#visitDirectoryPage(
+		const { items, page, earlierFiles } = await this.#visitDirectoryPage(
 			rootId,
 			options,
 			control,
@@ -662,14 +663,34 @@ export class ArchiveAutomationService {
 						if (entries.length < sampleLimit)
 							entries.push({ id: entry.id, path: entry.path, resourceType });
 					}
-					return { formatId: archive.format.id, matchedTotal, entries };
+					return {
+						absolutePath: path,
+						size: archive.size,
+						formatId: archive.format.id,
+						matchedTotal,
+						entries,
+					};
 				} finally {
 					await archive.close();
 				}
 			},
 		);
-		const archives = items.flatMap(({ source, value }) =>
+		const hits = items.flatMap(({ source, value }) =>
 			value && value.matchedTotal > 0 ? [{ source, ...value }] : [],
+		);
+		const unique = await uniqueSearchHits(
+			hits,
+			hits.length ? earlierFiles() : [],
+			this.registry,
+			control.signal,
+		);
+		const archives = unique.map(
+			({ source, formatId, matchedTotal, entries }) => ({
+				source,
+				formatId,
+				matchedTotal,
+				entries,
+			}),
 		);
 		return { ...page, archives };
 	}
@@ -791,14 +812,18 @@ export class ArchiveAutomationService {
 		}
 		const complete = normalizedStart + page.length >= files.length;
 		return {
-			scanned: page.length,
 			items,
-			failures,
-			nextCursor:
-				complete || page.length === 0
-					? null
-					: encodeCursor(page.at(-1)?.rootRelative ?? ""),
-			complete,
+			earlierFiles: () =>
+				files.slice(0, normalizedStart).map((file) => file.absolutePath),
+			page: {
+				scanned: page.length,
+				failures,
+				nextCursor:
+					complete || page.length === 0
+						? null
+						: encodeCursor(page.at(-1)?.rootRelative ?? ""),
+				complete,
+			},
 		};
 	}
 
