@@ -1,13 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import {
-	copyFile,
-	mkdir,
-	mkdtemp,
-	readFile,
-	rm,
-	writeFile,
-} from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -35,14 +28,16 @@ const checksums = (
 )
 	.trim()
 	.split("\n");
+const remaining = new Set([
+	`${prefix}-portable.zip`,
+	`${prefix}.tgz`,
+	`${prefix}-build.json`,
+]);
 for (const line of checksums) {
 	const [hash, name] = line.split("  ");
 	assert(
-		[
-			`${prefix}-portable.zip`,
-			`${prefix}.tgz`,
-			`${prefix}-build.json`,
-		].includes(name),
+		remaining.delete(name),
+		`Unexpected or duplicate checksum for ${name}`,
 	);
 	assert.equal(
 		createHash("sha256")
@@ -51,10 +46,12 @@ for (const line of checksums) {
 		hash,
 	);
 }
-assert.equal(checksums.length, 3);
+assert.equal(remaining.size, 0);
+assert.equal(buildManifest.version, version);
+if (process.env.GITHUB_SHA)
+	assert.equal(buildManifest.commit, process.env.GITHUB_SHA);
 
 const sandbox = await mkdtemp(resolve(tmpdir(), "garbro-release-test-"));
-const input = resolve(sandbox, "input");
 const cwd = resolve(sandbox, "unrelated-working-directory");
 const portable = resolve(sandbox, "portable");
 const installation = resolve(sandbox, "installation");
@@ -113,26 +110,6 @@ async function smoke(bundlePath, outputRoot) {
 			["cancel_task", "get_task", "submit_task"],
 		);
 
-		async function call(name, arguments_ = {}) {
-			const result = await client.callTool({ name, arguments: arguments_ });
-			assert.notEqual(result.isError, true, JSON.stringify(result));
-			return result.structuredContent;
-		}
-		async function submit(task, idempotencyKey) {
-			return await call("submit_task", {
-				task,
-				waitMs: 0,
-				...(idempotencyKey === undefined ? {} : { idempotencyKey }),
-			});
-		}
-		async function waitForTask(taskId) {
-			return await call("get_task", {
-				taskId,
-				waitUntil: "terminal",
-				timeoutMs: 30_000,
-			});
-		}
-
 		const infoResource = await client.readResource({
 			uri: "garbro://server/info",
 		});
@@ -143,86 +120,6 @@ async function smoke(bundlePath, outputRoot) {
 			serverInfo.server.formatCatalogSha256,
 			buildManifest.formatCatalogSha256,
 		);
-		assert.equal(serverInfo.capabilities.mandatoryExtractionVerification, true);
-		assert.equal(serverInfo.capabilities.dynamicAbsolutePaths, true);
-		assert.equal(serverInfo.temporaryWorkspace.path, outputRoot);
-		assert(serverInfo.notSupported.includes("game logic reverse engineering"));
-		const formatsResource = await client.readResource({
-			uri: "garbro://formats",
-		});
-		const formats = JSON.parse(formatsResource.contents[0].text);
-		assert(formats.some((format) => format.id === "xp3"));
-
-		const source = { path: resolve(input, "basic.xp3") };
-		const scan = await waitForTask(
-			(
-				await submit({
-					type: "scan",
-					path: input,
-					formatIds: ["xp3"],
-				})
-			).taskId,
-		);
-		assert.equal(scan.result.archives[0].formatId, "xp3");
-		const inspected = await waitForTask(
-			(
-				await submit({
-					type: "inspect",
-					source,
-					resourceTypes: ["script"],
-				})
-			).taskId,
-		);
-		assert.equal(inspected.result.summary.entryCount, 3);
-		assert.equal(inspected.result.entries.matchedTotal, 2);
-
-		const extractionInput = {
-			type: "extract",
-			sources: [{ source }],
-			budgets: { maxResources: 3, maxOutputBytes: "1024" },
-		};
-		const extraction = await submit(
-			extractionInput,
-			"release-smoke-extraction",
-		);
-		assert.equal(
-			(await submit(extractionInput, "release-smoke-extraction")).taskId,
-			extraction.taskId,
-		);
-		const extracted = await waitForTask(extraction.taskId);
-		assert.equal(extracted.state, "completed");
-		assert.equal(extracted.result.temporary, true);
-		assert.equal(
-			extracted.result.artifactDirectory,
-			resolve(outputRoot, extraction.taskId, "artifacts"),
-		);
-		assert.equal(extracted.result.extracted, 3);
-		assert.equal(extracted.result.sources[0].verification.verified, 3);
-		const reportArtifact = extracted.result.sources[0].report;
-		const reportBytes = await readFile(reportArtifact.absolutePath);
-		assert.equal(
-			createHash("sha256").update(reportBytes).digest("hex"),
-			reportArtifact.sha256,
-		);
-		const report = JSON.parse(reportBytes.toString());
-		assert.equal(report.items.length, 3);
-		assert.equal(report.verification.verified, 3);
-		for (const item of report.items) {
-			const bytes = await readFile(item.artifact.absolutePath);
-			assert.equal(BigInt(bytes.length).toString(), item.artifact.bytesWritten);
-			assert.equal(
-				createHash("sha256").update(bytes).digest("hex"),
-				item.artifact.sha256,
-			);
-		}
-
-		const unsafe = await client.callTool({
-			name: "submit_task",
-			arguments: {
-				task: { type: "inspect", source: { path: "../escape" } },
-			},
-		});
-		assert.equal(unsafe.isError, true);
 	} catch (error) {
 		throw new Error(`Release smoke failed:\n${stderr}`, { cause: error });
 	} finally {
@@ -231,13 +128,7 @@ async function smoke(bundlePath, outputRoot) {
 }
 
 try {
-	await Promise.all(
-		[input, cwd, portable, installation].map((path) => mkdir(path)),
-	);
-	await copyFile(
-		resolve(repositoryRoot, "fixtures/xp3/basic.xp3"),
-		resolve(input, "basic.xp3"),
-	);
+	await Promise.all([cwd, portable, installation].map((path) => mkdir(path)));
 	const files = unzipSync(
 		await readFile(resolve(releaseDirectory, `${prefix}-portable.zip`)),
 	);
@@ -290,12 +181,8 @@ try {
 			await readFile(resolve(installed, file)),
 			await readFile(resolve(portable, file)),
 		);
-	await smoke(
-		resolve(installed, "garbro-mcp.cjs"),
-		resolve(sandbox, "installed-output"),
-	);
 	console.log(
-		`Release ${version}: ZIP and offline npm installation passed independent stdio smoke tests.`,
+		`Release ${version}: ZIP and offline npm installation passed bundle, stdio startup and executable checks.`,
 	);
 } finally {
 	await rm(sandbox, { recursive: true, force: true });

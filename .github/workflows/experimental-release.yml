@@ -24,7 +24,13 @@ env:
 
 jobs:
   checks:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
     uses: ./.github/workflows/check.yml
+    with:
+      defer-packages: true
 
   artifacts:
     needs: checks

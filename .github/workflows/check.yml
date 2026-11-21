@@ -3,16 +3,68 @@ name: Check
 on:
   pull_request:
   workflow_call:
+    inputs:
+      defer-packages:
+        description: The caller already verifies these artifacts
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      full:
+        description: Run all source tests and verify the release packages
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
 
 jobs:
-  check:
+  plan:
+    name: Plan ${{ github.sha }}
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      work: ${{ steps.select.outputs.work }}
+      packaging: ${{ steps.select.outputs.packaging }}
+      version: ${{ steps.select.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_FULL: ${{ inputs.full || false }}
+        run: node scripts/ci/baseline.mjs
+      - uses: pnpm/action-setup@v4
+        if: steps.base.outputs.graph == 'true'
+      - run: pnpm install --frozen-lockfile
+        if: steps.base.outputs.graph == 'true'
+      - id: select
+        env:
+          CI_DEFER_PACKAGES: ${{ inputs.defer-packages || false }}
+          BASE: ${{ steps.base.outputs.base }}
+        run: node scripts/ci/plan.mjs "$BASE"
+      - uses: actions/upload-artifact@v4
+        if: steps.select.outputs.work == 'true'
+        with:
+          name: selected-tests
+          path: ci-plan.json
+          retention-days: 1
+          overwrite: true
+
+  test:
+    needs: plan
+    if: needs.plan.outputs.work == 'true'
     strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -23,5 +75,38 @@ jobs:
           node-version-file: .node-version
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
-      - run: node --test scripts/publish-release.test.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: selected-tests
+          path: ${{ runner.temp }}/garbro-plan
+      - env:
+          CI_PLAN_FILE: ${{ runner.temp }}/garbro-plan/ci-plan.json
+          CI_SUITE: ${{ matrix.suite }}
+        run: node scripts/ci/run.mjs
+
+  packages:
+    needs: plan
+    if: needs.plan.outputs.packaging == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/release-artifacts.yml
+    with:
+      version: ${{ needs.plan.outputs.version }}
+      artifact-name: check-packages
+
+  verified:
+    name: Verified
+    needs: [plan, test, packages]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          PLAN: ${{ needs.plan.result }}
+          TEST: ${{ needs.test.result }}
+          PACKAGES: ${{ needs.packages.result }}
+          WORK: ${{ needs.plan.outputs.work }}
+          PACKAGING: ${{ needs.plan.outputs.packaging }}
+        run: |
+          [[ "$PLAN" == success ]]
+          [[ "$WORK:$TEST" == true:success || "$WORK:$TEST" == false:skipped ]]
+          [[ "$PACKAGING:$PACKAGES" == true:success || "$PACKAGING:$PACKAGES" == false:skipped ]]

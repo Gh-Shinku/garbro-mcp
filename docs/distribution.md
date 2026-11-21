@@ -86,15 +86,14 @@ remaining non-Node external imports and missing bundled dependency license files
 not read source files, support documents, or `node_modules` from the checkout.
 
 The verification command checks hashes, extracts the ZIP into a temporary directory, and installs
-the tarball using npm's offline mode with an empty cache. It starts each bundle through actual MCP
-stdio from an unrelated working directory, verifies the build identity and doctor command, all
-tools, planning, CP932 decoding, extraction and verification hashes, progress notifications,
-conflict skipping, and path confinement, then removes the temporary test directories. It also
-verifies npm's generated executable and identical package contents.
+the tarball using npm's offline mode with an empty cache. It starts the portable bundle over MCP stdio from an unrelated
+working directory and checks the embedded version, build identity, catalog hash and doctor
+command. It also invokes npm's generated executable and compares the installed files with the ZIP.
 
 ## CI releases
 
-On pushes to `main`, **Prepare or publish releases** runs the Linux and Windows checks. Release
+On pushes to `main`, **Prepare or publish releases** reuses a successful PR check when the
+merged tree matches. Otherwise it checks the changes introduced by the push. Release
 Please uses Conventional Commits across the repository to open or update one version PR for
 `garbro-mcp`. Review the version, changelog, and checks before merging that PR. The first
 release on the npm `latest` channel under this policy is `0.1.0`. Each subsequent release
