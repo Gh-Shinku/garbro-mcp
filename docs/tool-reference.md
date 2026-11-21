@@ -139,6 +139,24 @@ Each matching archive in `result.archives` has a `source`, `formatId`, `matchedT
 an `entries` array. Choose a sample by its path and pass its `extractSource` unchanged in
 the next task's `sources` array.
 
+Search returns the same JSON page in `structuredContent` and `content[0].text`. The default
+`maxResponseBytes` is 4096. Both copies, task status, diagnostics and protocol overhead count
+towards the UTF-8 response budget. You can choose a budget from 2048 to 65536 bytes.
+The first page puts extractable samples first. Small results fit in one response.
+
+Two cursors advance different operations:
+
+| Returned field | Next call | What it reads |
+| --- | --- | --- |
+| `result.resultCursor` | `get_task({ taskId, resultCursor })` | More saved samples, then diagnostic groups and failures from this task. |
+| `result.nextCursor` | `submit_task` with the same search and `task.cursor` | More files in the game directory. |
+
+Each cursor becomes `null` independently. A completed directory scan can still have saved
+results to read. Each page repeats the totals for the directory page: `archiveCount` counts
+matching archives, `matchedTotal` counts all matched entries, and `sampleCount` counts the
+samples saved under `samplesPerArchive`. An archive can continue on the next result page.
+`diagnosticGroupCount` and `failureCount` include details still available on later pages.
+
 ```js
 const entry = result.archives[0].entries[0];
 const task = { type: "extract", sources: [entry.extractSource] };
@@ -209,9 +227,9 @@ identifies the reader and failing stage. For example, a recognized CPZ6 whose in
 decrypted reports its version and the index decryption failure.
 
 Both `scan` and `search` return per-page `diagnostics` alongside matching files. Each group
-includes the reason, count, next action and one example source. The text response summarizes
-up to five groups, starting with reader errors. Use `inspect` on the example for the individual
-diagnosis.
+includes the reason, count, next action and one example source. Scan text summarizes up to five
+groups, starting with reader errors. Search pages include the group details after the samples.
+Use `inspect` on the example for the individual diagnosis.
 
 ### Extract task
 
@@ -280,6 +298,15 @@ state, so the calling agent does not need a timer.
 - **afterRevision** (non-negative integer) optional: Last observed `revision`, used with `change` to
   avoid missed-update races.
 - **timeoutMs** (integer, 0–55000) optional: Maximum server-side wait; defaults to `30000`.
+
+For search tasks, pass the returned `resultCursor` to read a saved page immediately. You can
+also set `limit` (1–2000 records) or override `maxResponseBytes` for that read. Omitting the
+cursor reads the first page. A record is one entry sample, diagnostic group, or failure.
+For example, `get_task({ taskId, resultCursor, limit: 1 })` reads one more record.
+The same cursor and options return the same records while the server retains the task.
+If a single record exceeds the budget, the tool returns `LIMIT_EXCEEDED` with the task ID and
+current cursor so the caller can retry that position with a larger budget. Paths and extraction
+selectors are kept intact.
 
 Every snapshot includes a monotonically increasing `revision` and a `waitOutcome`: `snapshot`,
 `changed`, `terminal`, `timeout`, or `submitted`. Active snapshots include progress, total, phase,
