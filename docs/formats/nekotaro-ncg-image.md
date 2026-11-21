@@ -14,7 +14,11 @@ colours of three bytes each.
 
 The reference tells this picture by a word of its own **and by nothing at all**, its own list of words carrying
 a second, empty entry beside `0xC8500000`; the shape of the head is what settles a file that carries no word.
-This port keeps that: no signature is declared, the format stands behind the others, and the head decides.
+This port probes signatureless files after signed formats. Detection and metadata reads use the
+first 52 bytes. The MPEG pack start code `00 00 01 BA` also describes an 8 × 372 NCG at the
+origin. For this geometry the probe checks the MPEG-1 or MPEG-2 pack header markers and the
+following packet start code at the expected offset, accounting for MPEG-2 stuffing. A confirmed
+pack is declined regardless of filename. Other files with this geometry can still open as NCG.
 
 ## The colour map
 
@@ -59,9 +63,10 @@ column, drawing its top row over the row the first block had drawn its own botto
 
 ## Verification
 
-Seven tests over synthetic fixtures (`tests/formats/nekotaro-ncg-image.test.ts`): the head and its refusals, a
+Tests over synthetic fixtures (`tests/formats/nekotaro-ncg-image.test.ts`) cover the head and its refusals, a
 single block of the first part with the pattern that four walks of a byte build, a run down with the step the
 reference takes, the third walk filling both blocks of a picture neither part drew, the colour map - whose
 first colour is worked out **by hand** and the rest against the same key written out again - the picture handed
 over as a bitmap with a file that ends inside itself, and the shape of the head telling a picture that carries
-no word at all.
+no word at all. Collision cases cover MPEG-1, MPEG-2 with stuffing, and a decodable NCG with
+the same first four bytes. The private Rewrite corpus checks the original `mov/op00.mpg` via MCP.
