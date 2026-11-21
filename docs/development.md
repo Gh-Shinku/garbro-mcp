@@ -33,7 +33,8 @@ Core parsing, decoding, and extraction logic must remain independent of MCP. The
 thin protocol adapter over the core APIs. Format implementations should remain modular and
 independently testable.
 
-Contributor workflow and commit conventions are defined in [AGENTS.md](../AGENTS.md).
+See [Contributing](../CONTRIBUTING.md) for the PR workflow and commit conventions, and
+[AGENTS.md](../AGENTS.md) for the format implementation steps and test scope.
 
 ## CLI
 

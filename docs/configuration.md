@@ -40,14 +40,14 @@ Extraction always goes to server-managed temporary storage first.
 
 ## MCP client configuration
 
-npx example using a fixed version:
+npx example using the current release:
 
 ```json
 {
   "mcpServers": {
     "garbro": {
       "command": "npx",
-      "args": ["--yes", "garbro-mcp@0.1.0-beta.1"]
+      "args": ["--yes", "garbro-mcp@latest"]
     }
   }
 }
@@ -117,14 +117,14 @@ prepared. Files should not be expected to remain available after `expiresAt`.
 Record the exact build and validate the temporary workspace:
 
 ```powershell
-npx --yes garbro-mcp@0.1.0-beta.1 --version --json
-npx --yes garbro-mcp@0.1.0-beta.1 --doctor --json
+npx --yes garbro-mcp@latest --version --json
+npx --yes garbro-mcp@latest --doctor --json
 ```
 
 When overriding temporary storage, pass the same option used by the MCP client:
 
 ```powershell
-npx --yes garbro-mcp@0.1.0-beta.1 `
+npx --yes garbro-mcp@latest `
   --temp-dir D:/garbro-temporary `
   --doctor --json
 ```
