@@ -3,9 +3,117 @@ import {
 	encodeCp932,
 	type GarbroError,
 } from "@garbro-mcp/core";
-import { HyPackFormat } from "@garbro-mcp/formats";
+import { decompressCocotte, HyPackFormat } from "@garbro-mcp/formats";
 import { buffer as consumeBuffer } from "node:stream/consumers";
 import { describe, expect, it } from "vitest";
+import { encodeCocotte } from "../helpers/cocotte.js";
+
+const COCOTTE_PATTERN = "The quick brown fox jumps over the lazy dog. ";
+
+/** A text of `size` bytes, of the pattern the Cocotte streams below were written from. */
+function cocotteText(size: number): Buffer {
+	const text = Buffer.alloc(size);
+	for (let index = 0; index < size; index += 1) {
+		text[index] = COCOTTE_PATTERN.charCodeAt(index % COCOTTE_PATTERN.length);
+	}
+	return text;
+}
+
+/** A run of bytes of little pattern, so that the writer stores a small block of it as it stands. */
+function cocotteStepping(size: number): Buffer {
+	const data = Buffer.alloc(size);
+	for (let index = 0; index < size; index += 1) {
+		data[index] = (index * 73 + 41) & 0xff;
+	}
+	return data;
+}
+
+// The three streams below were written by the published qscoder encoder of Michael Schindler
+// (`rangecod.c`/`qsmodel.c`) behind a forward Burrows-Wheeler transform and a move-to-front order, not by
+// the writer of this project's tests, so that the reader is held to the format rather than to its own
+// writer. The three of them cover a block the coder shortened, a stream of two blocks whose model and order
+// stand across the boundary, and a block the coder stored as it stands.
+const COCOTTE_CODED = Buffer.from(
+	"VAAsAQDh3nlEHttHnE0eLUHc+Qp15AeKHNpWampHRfwkwAdqYfIPqPB1g8nWnmFgWm2t3T06CwuvU4+b13f3mkWPeJANK1lMY5P0OoQMjNm8AABQ",
+	"base64",
+);
+const COCOTTE_CODED_BLOCKS = Buffer.from(
+	"ywAAIAD6N/KMAAAAAAAAAAAAAAAAAAAAMsJ8CgAAAA9C46IAAAhSR3gAGjOsGAKN0GwACA1O4AFwN0oInQUAC7RwogMiBfAA3r2kbygDqCIwGdsoQB3kGTGw3EgAAABwcsHggfd1JG3LgAVHx9g6YGIWwGW/yhgGq9rwKYc/XHba+DxnwxyXq8CfQa3YHjoxvLNMVt4h8hwS/WmAbPrgMogRvgkZ67gj3We+iIDGroInUDNKyyGIdOAAAAAAAFOm98lI4IAFOU0AAMdSACgDAPN/G/GFAS3JJ/d1tWzuaaS2xPECpG7dLe86aoqaJzQkUKNvUqfj6UvEFW98Jm8fOClG2isdFbjy+xu+1rJ9EIWjFdqyeJU10qtdAABO",
+	"base64",
+);
+const COCOTTE_STORED = Buffer.from(
+	"RgBAAA4Bt7i5urvX2Nna29zd3t8u/P3+/xMVFhcYMzQ1Njc4OTo7V1hZWltcXV5ffH1+f4CBgoOEoKGio6SlpqeoxcbHyA==",
+	"base64",
+);
+
+describe("Cocotte", () => {
+	it("reads a block the coder shortened", () => {
+		expect(decompressCocotte(COCOTTE_CODED, 300)).toEqual(cocotteText(300));
+	});
+
+	it("reads blocks whose model and order stand across their boundary", () => {
+		expect(decompressCocotte(COCOTTE_CODED_BLOCKS, 9000)).toEqual(
+			cocotteText(9000),
+		);
+	});
+
+	it("reads a block that stands as it was written", () => {
+		expect(decompressCocotte(COCOTTE_STORED, 64)).toEqual(cocotteStepping(64));
+	});
+
+	for (const mode of ["auto", "store"] as const) {
+		it(`round-trips the blocks its writer lays down (${mode})`, () => {
+			for (const size of [1, 2, 300, 8192, 8193, 20000]) {
+				for (const data of [
+					cocotteText(size),
+					Buffer.alloc(size, 0x41),
+					cocotteStepping(size),
+				]) {
+					expect(
+						decompressCocotte(encodeCocotte(data, { mode }), size),
+					).toEqual(data);
+				}
+			}
+		});
+	}
+
+	it("rejects a stream whose declared size does not match", () => {
+		expect(() => decompressCocotte(COCOTTE_CODED, 301)).toThrow(
+			/Cocotte stream is shorter/,
+		);
+		expect(() => decompressCocotte(COCOTTE_CODED, 299)).toThrow(
+			/Cocotte stream is longer/,
+		);
+	});
+
+	it("reads an empty stream as no bytes", () => {
+		expect(decompressCocotte(Buffer.alloc(0), 0)).toEqual(Buffer.alloc(0));
+	});
+
+	it("rejects a block whose transform index is outside it", () => {
+		const stream = Buffer.from([
+			0x08, 0x00, 0x02, 0x00, 0x05, 0x00, 0x00, 0x00,
+		]);
+		expect(() => decompressCocotte(stream, 2)).toThrow(
+			/Cocotte transform index is outside its block/,
+		);
+	});
+
+	it("rejects a truncated stream and an empty block", () => {
+		expect(() => decompressCocotte(Buffer.from([0x10, 0x00]), 1)).toThrow(
+			/Cocotte block header is truncated/,
+		);
+		expect(() =>
+			decompressCocotte(Buffer.from([0x04, 0x00, 0x00, 0x00, 0x00]), 1),
+		).toThrow(/Cocotte block size is invalid/);
+		expect(() =>
+			decompressCocotte(Buffer.from([0x05, 0x00, 0x00, 0x00, 0x00]), 1),
+		).toThrow(/Cocotte block size is invalid/);
+		expect(() => decompressCocotte(COCOTTE_CODED.subarray(0, 20), 300)).toThrow(
+			/Cocotte block is truncated/,
+		);
+	});
+});
 
 interface Definition {
 	name: string;
@@ -131,7 +239,32 @@ describe("Kogado HyPack", () => {
 		}
 	});
 
-	it("reports Cocotte compression explicitly", async () => {
+	it("expands Cocotte entries", async () => {
+		const output = cocotteText(300);
+		const fixture = buildHyPack(0x200, [
+			{
+				name: "cocotte",
+				extension: "bin",
+				stored: COCOTTE_CODED,
+				output,
+				compressionType: 2,
+			},
+		]);
+		const archive = await new HyPackFormat().open(
+			new BufferByteSource(fixture),
+			"sample.pak",
+		);
+		try {
+			expect(archive.entries).toMatchObject([
+				{ path: "cocotte.bin", compressed: true },
+			]);
+			expect(await consumeBuffer(await archive.openEntry("0"))).toEqual(output);
+		} finally {
+			await archive.close();
+		}
+	});
+
+	it("reports a Cocotte entry that does not decode", async () => {
 		const fixture = buildHyPack(0x200, [
 			{
 				name: "cocotte",
@@ -148,7 +281,7 @@ describe("Kogado HyPack", () => {
 		try {
 			await expect(archive.openEntry("0")).rejects.toMatchObject<
 				Partial<GarbroError>
-			>({ code: "UNSUPPORTED_FEATURE" });
+			>({ code: "INVALID_ARCHIVE" });
 		} finally {
 			await archive.close();
 		}
