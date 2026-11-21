@@ -98,12 +98,21 @@ Submits a bounded `scan`, `search`, `inspect`, or `extract` task and waits brief
 }
 ```
 
+Scan returns the same page as JSON text and structured content. The UTF-8 response budget
+defaults to 4096 bytes (`maxResponseBytes`, range 2048–65536). The first page prioritizes
+matching archives with a `source` ready for `inspect`. `recognizedCount` counts recognized files
+before filtering and `archiveCount` counts matching archives in the scanned window.
+Read more saved archives, diagnostic groups, requested unrecognized files and failures with
+`get_task({taskId, resultCursor})`. Submit another scan with `cursor: nextCursor` to examine
+more directory files. The two cursors advance independently.
+
 Optional fields are `includeGlobs`, `excludeGlobs`, `maxDepth`, `cursor`, `limit`,
 `includeUnrecognized`, `resourceTypes`, and `formatIds`. Use the returned `nextCursor` to submit the
 next page. When `includeUnrecognized` is true, each unrecognized item includes a structured
 `diagnosis`: `registered-extension-no-match` lists implemented candidates that rejected the file,
 `no-registered-format` reports an extension with no implementation, and `unknown-format` is used
-when no extension is available.
+when no extension is available. Scan previews up to eight candidate IDs and gives their total
+in `candidateFormatIdCount`. Inspect the returned source to read every candidate ID.
 
 ### Search task
 
@@ -243,8 +252,7 @@ identifies the reader and failing stage. For example, a recognized CPZ6 whose in
 decrypted reports its version and the index decryption failure.
 
 Both `scan` and `search` return per-page `diagnostics` alongside matching files. Each group
-includes the reason, count, next action and one example source. Scan text summarizes up to five
-groups, starting with reader errors. Search pages include the group details after the samples.
+includes the reason, count, next action and one example source. Scan and search pages include the diagnostic groups after matching archives or samples.
 Use `inspect` on the example for the individual diagnosis.
 
 ### Extract task
@@ -315,7 +323,7 @@ state, so the calling agent does not need a timer.
   avoid missed-update races.
 - **timeoutMs** (integer, 0–55000) optional: Maximum server-side wait; defaults to `30000`.
 
-For search and inspect tasks, pass the returned `resultCursor` to read a saved page immediately. You can
+For scan, search and inspect tasks, pass the returned `resultCursor` to read a saved page immediately. You can
 also set `limit` (1–2000 records) or override `maxResponseBytes` for that read. Omitting the
 cursor reads the first page. A search record is one entry sample, diagnostic group, or failure.
 An inspect record is one overview sample, archive detail record, group, listed entry, warning,
