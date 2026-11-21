@@ -201,6 +201,16 @@ extraction or verification; verification failures are never reduced to warnings.
 delivery is deliberately outside the MCP: the calling agent copies or transforms selected
 artifacts only when instructed by the user.
 
+When extraction writes files, both `submit_task` and `get_task` show the first three written
+files across all sources in the terminal result. The text block lists each sample's absolute
+path on the server, byte count and verification status, plus the shared expiration time in UTC.
+For larger extractions it also gives the directory containing the full reports.
+
+Structured clients can read the same values from `result.samples[]` (`absolutePath`,
+`bytesWritten` as a decimal string, and `verificationStatus`) and `result.expiresAt`.
+`result.extracted` counts all files written. Check each sample's verification status before
+using it, including when a task finishes with partial success.
+
 Formats that can identify media bytes behind an extensionless archive name may provide a safe
 `outputExtension`. Planning exposes the resulting `outputEntryPath`, and extraction uses that same
 path for conflict checks and writing. Reports retain the original `entryPath` while the artifact's

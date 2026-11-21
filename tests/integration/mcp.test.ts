@@ -321,6 +321,57 @@ describe("MCP task server", () => {
 		});
 	});
 
+	it("shows bounded artifact details in text on submission and subsequent task reads", async () => {
+		const { client, root, output } = await connect();
+		const source = { source: { path: resolve(root, "basic.xp3") } };
+		const response = await client.callTool({
+			name: "submit_task",
+			arguments: {
+				task: { type: "extract", sources: [source, source] },
+				waitMs: 5000,
+			},
+		});
+		const { taskId, result } = structured(response);
+		expect(structured(response)).toMatchObject({
+			state: "completed",
+			result: { extracted: 6 },
+		});
+		const { samples, expiresAt } = result as {
+			samples: Array<{
+				absolutePath: string;
+				bytesWritten: string;
+				verificationStatus: string;
+			}>;
+			expiresAt: string;
+		};
+		expect(samples).toHaveLength(3);
+		expect(samples[0]).toMatchObject({
+			absolutePath: resolve(output, String(taskId), "artifacts/0001/hello.txt"),
+			bytesWritten: "10",
+			verificationStatus: "verified",
+		});
+		expect(
+			Buffer.byteLength(JSON.stringify(response.structuredContent)),
+		).toBeGreaterThan(1024);
+		const text = response.content[0];
+		if (text?.type !== "text")
+			throw new Error("Expected a plain-text extraction summary");
+		expect(text.text).toContain("Showing 3 of 6 files");
+		expect(text.text).toContain(expiresAt);
+		for (const sample of samples) {
+			expect(text.text).toContain(sample.absolutePath);
+			expect(text.text).toContain(
+				`${sample.bytesWritten} bytes | verification: ${sample.verificationStatus}`,
+			);
+		}
+		const read = await client.callTool({
+			name: "get_task",
+			arguments: { taskId },
+		});
+		expect(read.content).toEqual(response.content);
+		expect(structured(read).result).toEqual(result);
+	});
+
 	it("extracts and verifies an XP3 under an aliased OS temp directory", async () => {
 		const parent = await mkdtemp(resolve(tmpdir(), "garbro-temp-alias-"));
 		const alias = resolve(parent, "alias");
