@@ -84,8 +84,9 @@ game files. After I review the result, copy the selected files to D:/Exports/Rew
 
 The agent should prefer `submit_task` over local GARBro executables, libraries, or custom extraction
 scripts whenever the user asks to find or extract game assets such as cursors, sprites, CGs,
-backgrounds, audio, or scripts. It submits `scan`, `inspect`, and `extract` tasks through that one
-entry point, then uses `get_task`'s server-side wait. It does not sleep or guess polling intervals.
+backgrounds, audio, or scripts. From a game directory, a `search` task finds entries by resource
+type and returns samples that can be passed directly to `extract`. Use `scan` to identify files
+and `inspect` to browse one archive. Use `get_task`'s server-side wait while a task is active.
 Planning and post-extraction verification are mandatory internal extraction phases.
 The MCP does not choose a permanent destination or copy artifacts there; the calling agent follows
 the user's delivery instruction after extraction.
