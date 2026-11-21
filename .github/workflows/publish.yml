@@ -1,0 +1,79 @@
+name: Prepare or publish releases
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: release-please-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/check.yml
+
+  release-please:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+          target-branch: main
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: ${{ vars.NPM_PUBLISH_ENABLED != 'true' }}
+      - uses: actions/checkout@v4
+        if: vars.NPM_PUBLISH_ENABLED == 'true'
+        with:
+          persist-credentials: false
+      - name: Select the release tagged at this commit
+        id: plan
+        if: vars.NPM_PUBLISH_ENABLED == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-release.mjs plan
+
+  artifacts:
+    needs: release-please
+    if: needs.release-please.outputs.version != ''
+    permissions:
+      contents: read
+    uses: ./.github/workflows/release-artifacts.yml
+    with:
+      version: ${{ needs.release-please.outputs.version }}
+
+  publish:
+    needs: [release-please, artifacts]
+    if: vars.NPM_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - uses: actions/download-artifact@v4
+        with:
+          name: garbro-mcp-${{ needs.release-please.outputs.version }}
+          path: dist/release
+      - name: Publish verified tarball and GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-release.mjs publish
