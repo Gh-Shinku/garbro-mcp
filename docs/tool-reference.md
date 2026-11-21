@@ -190,6 +190,22 @@ Optional entry filters are `includeGlobs`, `excludeGlobs`, `caseSensitive`, `com
 `encrypted`, and `resourceTypes`. Set `includeMetadata` to include archive-specific metadata or
 `includeEntries` to `false` when only a summary is needed.
 
+Inspect uses the same UTF-8 response budget as search (default 4096 bytes, configurable with
+`maxResponseBytes` from 2048 to 65536). Parse either `content[0].text` or `structuredContent`
+to read the same page. The first response prioritizes directly extractable overview samples.
+Archive details, group selectors, listed entries, warnings and requested metadata follow as space
+permits. For an unrecognized file the saved records are the candidate reader IDs.
+
+| Returned field | How to continue |
+| --- | --- |
+| `result.resultCursor` | Call `get_task({ taskId, resultCursor })` to read the rest of the saved inspection window. |
+| `result.entries.nextOffset` | Submit `inspect` again with this `offset` to list the next window of entries under the same filters and group. |
+| `result.entries.overview.nextGroupOffset` | Submit `inspect` with this `browse.offset` and entry `offset: 0` to browse the next window of groups. |
+
+Each result page repeats the entry-window offsets and group counts when applicable. Read until
+`resultCursor` is null to collect every saved sample, group and entry in that window. You can
+extract a sample or select a returned group immediately.
+
 The first entry page also includes `result.entries.overview`. Its counts and samples cover
 the full set of matches, even with `limit: 1`. The overview groups entries by their parent
 directory when there are multiple directories. For flat archives it looks for repeated filename
@@ -299,9 +315,11 @@ state, so the calling agent does not need a timer.
   avoid missed-update races.
 - **timeoutMs** (integer, 0–55000) optional: Maximum server-side wait; defaults to `30000`.
 
-For search tasks, pass the returned `resultCursor` to read a saved page immediately. You can
+For search and inspect tasks, pass the returned `resultCursor` to read a saved page immediately. You can
 also set `limit` (1–2000 records) or override `maxResponseBytes` for that read. Omitting the
-cursor reads the first page. A record is one entry sample, diagnostic group, or failure.
+cursor reads the first page. A search record is one entry sample, diagnostic group, or failure.
+An inspect record is one overview sample, archive detail record, group, listed entry, warning,
+metadata field, or candidate reader ID.
 For example, `get_task({ taskId, resultCursor, limit: 1 })` reads one more record.
 The same cursor and options return the same records while the server retains the task.
 If a single record exceeds the budget, the tool returns `LIMIT_EXCEEDED` with the task ID and
